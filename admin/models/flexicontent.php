@@ -1666,13 +1666,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($debug_initial_perms) { echo "Component DB Rule Count " . ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />"; }
 		if ($debug_initial_perms) { echo "Component File Rule Count " . count(JAccess::getActions('com_flexicontent', 'component')) . "<br />"; }
 		
-		// CHECK if some categories don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
+		// Get a list com_content TOP-LEVEL categories that have wrong asset names (do not point to 'com_content' asset)
+		// (NOTE: we do not longer force category asset creation if asset is not set, so we will not check them here)
+		// !!! WARNING this query must be same like the one USED in function initialPermission()
 		$com_content_asset	= JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
 		$query = $db->getQuery(true)
 			->select('c.id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
+			->where( '(c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.')' )
+			//->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
 			->where( 'c.extension = ' . $db->quote('com_content') );
 		
 		$db->setQuery($query);
@@ -1813,80 +1816,52 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		/*** CATEGORY assets ***/
 		
-		// Get a list com_content categories that do not have assets (or have wrong asset names)
+		// Get a list com_content TOP-LEVEL categories that have wrong asset names (do not point to 'com_content' asset)
+		// (NOTE: we do not longer force category asset creation if asset is not set)
 		$query = $db->getQuery(true)
 			->select('c.id, c.parent_id, c.title, c.asset_id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
+			->where( '(c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.')' )
+			//->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
 			->where( 'c.extension = ' . $db->quote('com_content') )
 			->order('c.level ASC');   // IMPORTANT create categories asset using increasing depth level, so that get parent assetid will not fail
 		$db->setQuery($query);
 		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
-		// Add an asset to every category that doesnot have one
-		if(count($results)>0) {
-			foreach($results as $category) {
-				$parentId = $this->_getAssetParentId(null, $category);
-				$name = "com_content.category.{$category->id}";
-				
-				// Try to load asset for the current CATEGORY ID
-				$asset_found = $asset->loadByName($name);
-				
-				if ( !$asset_found ) {
-					if ($category->asset_id) {
-						// asset name not found but category has an asset id set ?, we could delete it here
-						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
-					}
-					
-					// Set id to null since we will be creating a new asset on store
-					$asset->id 		= null;
-					
-					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new JAccessRules();
-					
-					/*if ($parentId == $component_asset->id) {				
-						$actions	= JAccess::getActions($component_name, 'category');
-						$rules 		= json_decode($component_asset->rules);		
-						foreach ($actions as $action) {
-							$catrules[$action->name] = $rules->{$action->name};
-						}
-						$rules = new JAccessRules(json_encode($catrules));
-						$asset->rules = $rules->__toString();
-					} else {
-						$parent = JTable::getInstance('asset');
-						$parent->load($parentId);
-						$asset->rules = $parent->rules;
-					}*/
-				} else {
-					// do not change (a) the id OR (b) the rules, of the asset
-				}
-				
-				// Initialize appropriate asset properties
-				$asset->name	= $name;
-				$asset->title	= $category->title;
-				$asset->setLocation($parentId, 'last-child');     // Permissions of categories are inherited by parent category, or from component if no parent category exists
-				
-				// Save the category asset (create or update it)
-				if (!$asset->check() || !$asset->store(false)) {
-					echo $asset->getError();
-					echo " Problem for asset with id: ".$asset ->id;
-					echo " Problem for category with id: ".$category->id. "(".$category->title.")";
-					$this->setError($asset->getError());
-					return false;
-				}
-				
-				// Assign the asset to the category, if it is not already assigned
-				$query = $db->getQuery(true)
-					->update('#__categories')
-					->set('asset_id = ' . (int)$asset->id)
-					->where('id = ' . (int)$category->id);
-				$db->setQuery($query);
-				
-				if (!$db->execute()) {
-					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-					return false;
-				}
+		// Check that any assets of top-level categories point to the correct component (we used to make these point to 'com_flexicontent' asset)
+		foreach($results as $category)
+		{
+			$parentId = $this->_getAssetParentId(null, $category);
+			$name = "com_content.category.{$category->id}";
+			
+			// Try to load asset for the current CATEGORY ID
+			$asset_found = $asset->loadByName($name);
+			if ( !$asset_found ) continue; // nothing to do
+			
+			// Since this is a top level category make sure, that the asset points to the correct component asset (com_content)
+			$asset->setLocation($parentId, 'last-child');
+			
+			// Save the category asset (create or update it)
+			if (!$asset->check() || !$asset->store(false))
+			{
+				echo $asset->getError();
+				echo " Problem for asset with id: ".$asset ->id;
+				echo " Problem for category with id: ".$category->id. "(".$category->title.")";
+				$this->setError($asset->getError());
+				return false;
+			}
+			
+			// Assign the asset to the category, if it is not already assigned
+			$query = $db->getQuery(true)
+				->update('#__categories')
+				->set('asset_id = ' . (int)$asset->id)
+				->where('id = ' . (int)$category->id);
+			$db->setQuery($query);
+			
+			if (!$db->execute()) {
+				echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+				$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+				return false;
 			}
 		}
 		
