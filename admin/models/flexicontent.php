@@ -2332,7 +2332,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			JFactory::getApplication()->enqueueMessage( 'Updated com_content asset with extra rules', 'notice' );
 		}
 		else {
-			JFactory::getApplication()->enqueueMessage( 'No update needed for com_content asset with extra rules', 'notice' );
+			//JFactory::getApplication()->enqueueMessage( 'No update needed for com_content asset with extra rules', 'notice' );
 		}
 	}
 }

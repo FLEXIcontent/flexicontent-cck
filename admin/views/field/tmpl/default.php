@@ -138,8 +138,8 @@ $this->document->addScriptDeclaration($js);
 								$this->document->addScriptDeclaration("
 									jQuery( document ).ready(function() {
 										setTimeout(function(){ 
-											jQuery('#jform_published input').attr('disabled', 'disabled').off('click');
-											jQuery('#jform_published label').attr('disabled', true).css('pointer-events', 'none').off('click');
+											jQuery('#jform_published').css('pointer-events', 'none').off('click');
+											jQuery('#jform_published').find('.btn').addClass('disabled');
 										}, 1);
 									});
 								");
