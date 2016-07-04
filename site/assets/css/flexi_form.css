@@ -467,6 +467,7 @@ div.control-group:first-of-type > div > .fcsep_level2 {
 	max-width: 60%;
 }
 body .alert.fcpadded {
+	padding: 4px;
 	margin: 4px 48px 2px;
 	box-sizing: border-box;
 	max-width: 92%;

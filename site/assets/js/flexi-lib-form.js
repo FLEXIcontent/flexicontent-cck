@@ -14,8 +14,10 @@
 	{
 		var element = jQuery(obj).parent();
 		var parent_element = jQuery(element.parent());
-		element.remove();
-		fcfield_store_ordering( parent_element );
+		element.slideUp(300, function(){
+			jQuery(this).remove();
+			fcfield_store_ordering( parent_element );
+		});
 	}
 	
 	
@@ -29,8 +31,9 @@
 		if (!val) return true;
 		var lbl = selobj.find('option:selected').text();
 		jQuery('#'+container).append(
-			'<li data-value="field_'+val+'" class="fields delfield">'+'<div style="float:left;">'+lbl+'</div>'+
-			'<a href="javascript:;" title="Remove" onclick="javascript:fcfield_del_sortable_element(this);" class="delfield_handle"></a>'+
+			'<li data-value="field_'+val+'" class="fcrecord">'+
+				'<span class="fcprop_box">'+lbl+'</span>'+
+				'<span class="delfield_handle" title="Remove" onclick="fcfield_del_sortable_element(this);"></span>'+
 			'</li>'
 		);
 		

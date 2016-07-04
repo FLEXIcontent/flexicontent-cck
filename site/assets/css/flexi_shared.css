@@ -122,61 +122,91 @@ h3.themes-title small {
 	opacity: 0.4;
 	font-style: oblique;
 }
-.postitle {
-	margin: 10px 0 2px;
-	font-weight: bold;
-}
-.positions_container {
-	overflow-y: hidden;
+div.records_container,
+div.positions_container {
+	overflow-y: hidden !important;
 	border: 1px dashed silver;
 	display: inline-block;
 	background-color: #f0f0f0;
 	padding: 0;
 	margin: 0;
 	width: 100%;
+	min-height: 12px;
+	box-sizing: border-box;
 }
-.positions_container.fcfields_sorter {
-	margin: 6px 0px;
-	min-height: 64px;
+div.records_container {
+	margin-top: 12px;
+	margin-bottom: 6px;
+	min-height: 48px;
 }
-.positions {
+.fcrecords_title,
+.positions_title {
+	margin: 10px 0 2px;
+	font-weight: bold;
+}
+ul.fcrecords,
+ul.positions {
+	display: block;
 	list-style: none;
 	padding: 10px 0px 0px 0px;
 	margin: 0;
-	display: block;
-	height: 0px;
-	background-color: lightgray;
-	border: 0px dashed silver;
-	overflow: visible;
+	height: 0;
 	width: 100%;
+	background: lightgray;
+	border: 0;
+	overflow: visible;
 }
-.positions_container .fields {
+ul.fcrecords {
+	padding: 0;
+}
+*:not(.ui-dialog-content) > .fcrecords_desc {
+	display: none !important;
+}
+.ui-dialog-content > .fcrecords_desc {
+	float: none !important;
+	display: table-cell !important;
+	margin: 0 !important;
+	box-sizing: border-box !important;
+}
+@media (max-width: 1040px) {
+	.ui-dialog-content > .fcrecords_desc {
+		font-size: 12px;
+		font-family: arial;
+		width: 36.9% !important;
+		display: inline-block !important;
+	}
+}
+.ui-dialog-content > .fcrecords_textarea {
+	float: left !important;
+	max-width: 1000px;
+	width: 62% !important;
+	height: 100% !important;
+	margin: 0 1% 0 0% !important;
+	box-sizing: border-box !important;
+	display: inline-block;
+}
+.fcrecord_header .fcrecord_label.fcrec_unused,
+.records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_unused {
+	width: 100px;
+	opacity: 0.65;
+}
+.records_container > ul > li.fcrecord,
+.positions_container > ul > li.fields {
 	background: white;
 	display: block;
 	border: 1px solid silver;
-	padding: 6px 6px 5px 24px;
-	margin: 2px;
+	margin: 2px 4px;
 	float: left;
-	cursor: move;
 	border-radius: 2px;
 	white-space: nowrap;
-}
-.positions_container .fields.delfield {
-	padding: 3px 3px 0px 6px;
-	margin: 2px;
-	float: left;
+	width: unset;
 	cursor: move;
 }
-.positions_container .fields.delfield .delfield_handle {
-	background: url("../images/cancel.png") no-repeat scroll 50% 30% transparent;
-	display: inline-block;
-	width: 18px;
-	height: 18px;
-	margin: 0 0 0 3px;
-	padding: 3px;
-	outline: none;
-	background-color: transparent;
-	vertical-align: middle;
+.positions_container > ul > li.fields {
+	padding: 4px 4px 4px 24px;
+}
+.records_container > ul > li.fcrecord {
+	padding: 2px 4px;
 }
 .positions_container .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat 3px 50%;
@@ -186,8 +216,93 @@ h3.themes-title small {
 	background: url(../images/textfield_key.png) #f9f9f9 no-repeat 3px 50%;
 	white-space: nowrap;
 }
-#lay-desc-table .key {
-	width: 80px;
+.records_container > ul > li.fcrecord .fcprop_box {
+	display: inline-block;
+}
+.records_container > ul > li.fcrecord .ordfield_handle,
+.records_container > ul > li.fcrecord .addfield_handle,
+.records_container > ul > li.fcrecord .delfield_handle {
+	display: inline-block;
+	width: 18px;
+	height: 16px;
+	line-height: 16px;
+	margin: 2px 2px 2px 5px;
+	padding: 3px;
+	outline: none;
+	cursor: pointer;
+	border: 1px solid #c0c0c0;
+	border-radius: 4px;
+	vertical-align: middle;
+}
+.records_container > ul > li.fcrecord .ordfield_handle {
+	margin: 2px 0px;
+	outline: none;
+	cursor: move;
+	border: 0;
+	opacity: 0.8;
+}
+.records_container .addfield_handle.fc_end {
+	min-width: 200px;
+	box-sizing: border-box;
+	float: left;
+	margin: 4px 4px;
+}
+.records_container > ul > li.fcrecord .addfield_handle.fc_after {
+	background: url("../images/insert_after_180.png") no-repeat scroll 50% 50% #f0f0f0;
+}
+.records_container > ul > li.fcrecord .addfield_handle.fc_before {
+	background: url("../images/insert_before_180.png") no-repeat scroll 50% 50% #f0f0f0;
+}
+.records_container > ul > li.fcrecord .delfield_handle {
+	background: url("../images/cancel.png") no-repeat scroll 50% 50% #f0f0f0;
+}
+.records_container > ul > li.fcrecord .ordfield_handle {
+	background: url("../images/move2.png") no-repeat scroll 50% 50% transparent;
+	cursor: move;
+}
+.records_container > ul > li.fcrecord .addfield_handle:hover,
+.records_container > ul > li.fcrecord .delfield_handle:hover {
+	background-color: #d7d7d7;
+}
+.records_container .fcrec_cascaded_msg,
+.records_container .fcrec_general_msg {
+	margin: 2px 0;
+}
+.records_container .fcrecord_header {
+	margin: 6px 0 0 0;
+	padding: 0px 2px;
+	display: block;
+}
+.records_container .fcrecord_header .fcrecord_label,
+.records_container > ul > li.fcrecord > .fcrecord_prop {
+	margin: 2px !important;
+	padding: 2px !important;
+	float: none !important;
+	box-sizing: border-box;
+	width: unset !important;
+	height: unset !important;
+	min-width: 32px !important;
+}
+.records_container .fcrecord_header .fcrecord_label.fcrec_hidden,
+.records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_hidden {
+	display: none;
+}
+div.sorter-full-width {
+	width: 100% !important;
+	max-width: unset !important;
+}
+div.sorter-full-width > ul.fcrecords > li.fcrecord {
+	box-sizing: border-box;
+	width: 100%;
+	margin: 0px 0 !important;
+}
+div.sorter-full-width > ul.fcrecords > li.fcrecord .fcprop_box {
+	float: none;
+}
+div.sorter-full-width > ul.fcrecords > li.fcrecord .ordfield_handle,
+div.sorter-full-width > ul.fcrecords > li.fcrecord .addfield_handle,
+div.sorter-full-width > ul.fcrecords > li.fcrecord .delfield_handle {
+	float: none;
 }
 table.adminlist {
 	background-color: #fff;

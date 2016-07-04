@@ -18,7 +18,7 @@
 		var w = typeof winwidth !== 'undefined' && winwidth  ? winwidth  : jQuery( window ).width() - 80;
 		var h = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 120;
 		
-		params.winwidth  = w  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)  :  w;
+		params.winwidth  = w  > (jQuery( window ).width() - 8)   ? (jQuery( window ).width() - 80)  :  w;
 		params.winheight = h  > (jQuery( window ).height() - 120) ? (jQuery( window ).height() - 120) : h;
 		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
 		
@@ -72,6 +72,7 @@
 		// Get close function
 		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
 		var keepPlace = !!params.keepPlace;
+		var visibleOnClose = !!params.visibleOnClose;
 		
 		// Because allowing moving modal to be moved out of form (under body), we need to set form ATTRIBUTE to form, for any form elements inside it
 		if (!keepPlace)
@@ -113,9 +114,11 @@
 				
 				// Destroy the dialog completely, this is needed because we have moved the content back into its proper position
 				jQuery(this).dialog('destroy');
-				
+
+				if (visibleOnClose) obj.css({'height': '', 'width': ''}).show();
+
 				// Finalize by doing the closing operation
-				if (typeof closeFunc === 'function') closeFunc();
+				if (typeof closeFunc === 'function') closeFunc(obj);
 				else if (closeFunc == 1) window.location.reload(false);
 				else if (closeFunc == 0) ;
 				else alert('Unknown action'+closeFunc);
@@ -507,6 +510,8 @@
 	// Add toggling of dependent form elements
 	function fc_bindFormDependencies(container, toggleParent, toggleParentSelector)
 	{
+		var vTimeStart = new Date().getTime();
+		
 		var toBeUpdated_ALL = Array();
 		var k = 0;
 		
@@ -527,6 +532,7 @@
 		});
 		
 		// *** Update the form
+		jQuery('form').data('skip_validation' ,1);
 		
 		// Enqueue dependencies by triggering change on select elements
 		jQuery('form select.fcform_toggler_element').trigger('change');
@@ -540,7 +546,10 @@
 		// Clear this flag to indicate that form initialization is done
 		fc_init_hide_dependent = 0;
 		
+		jQuery('form').data('skip_validation', null);
+		
 		/*setTimeout(function(){ }, 20);*/
+		if (!!Joomla.fc_debug) window.console.log( 'fc_bindFormDependencies() time: ' + ((new Date())  - vTimeStart) + ' ms');
 	}
 	
 	
@@ -548,6 +557,14 @@
 	{
 		// Turn radios into btn-group
 		jQuery(sel).find('.radio.btn-group label').addClass('btn');
+		
+		jQuery(sel).find('fieldset.btn-group').each(function() {
+			if (jQuery(this).prop('disabled')) {
+				jQuery(this).css('pointer-events', 'none').off('click');
+				jQuery(this).find('.btn').addClass('disabled');
+			}
+		});
+		
 		jQuery(sel).find('.btn-group label:not(.active)').click(function()
 		{
 			var label = jQuery(this);

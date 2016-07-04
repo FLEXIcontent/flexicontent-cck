@@ -60,10 +60,17 @@
 				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comment.png"  preview_img="database_green.png" 
 				inline_tip2="value1::label1::image1.png::valgrp%%&lt;br/&gt; value2::label2::image2.png::valgrp%% ..." tip_class2="elements_list" tip_img2="comment.png" preview_img2="text_area.png" 
 				class="btn-group group-fcinfo">
-				<option value="0" show_list="elements_list" hide_list="elements_sql">FLEXI_NO</option>
-				<option value="1" show_list="elements_sql" hide_list="elements_list">FLEXI_YES</option>
+				<option value="0" show_list="elements_list" hide_list="elements_sql" fcreadonly="{'field_elements':1}">FLEXI_NO</option>
+				<option value="1" show_list="elements_sql" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_YES</option>
 			</field>
-			<field name="field_elements" type="textarea" default="1::Information::information.png%% 0::Warning::warning.png%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
+			<field name="field_elements" type="fcsortablelist" subtype="elements"
+				default="1::Information::information.png%% 0::Warning::warning.png%% "
+				add_end="1" add_before="1" add_after="1" skip_initial_list="1"
+				edit_inline="1" edit_popup="1" raw_inline="0" raw_popup="1"
+				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP" props_used="1,1,1,1"
+				editbtns_class="elements_list" value_area_class="elements_field"
+				master_fieldname="cascade_after" cascaded_prop="3"
+				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
 			<field name="image_type" type="multilist" subtype="radio" toggle_related="1" default="0" label="Image / Icon" description="Select if 'image' will be an image filename (e.g. image1.png) or an font icon class (e.g. icon-mail, icon-lamp)" class="btn-group group-fcinfo" labelclass="label-success">
 				<option value="0" show_list="icontype_image" hide_list="icontype_font">Image name</option>
 				<option value="1" show_list="icontype_font" hide_list="icontype_image">Font class</option>
@@ -80,7 +87,7 @@
 			</field>
 			<field name="icon_color_form" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font"/>
 			
-			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Cascade after master" description="Load values when another field is changed" 
+			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="FLEXI_VALGRP_CASCADE_AFTER" description="FLEXI_VALGRP_CASCADE_AFTER_DESC" 
 				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
 				labelclass="" custom_prompt="FLEXI_NO" />
 			<field name="cascade_prompt" type="text" default="" label="Cascade prompt" description="A prompt to ask user to select a value in the cascade-after field, so that this field loads dependent values" />

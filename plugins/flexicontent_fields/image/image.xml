@@ -24,14 +24,15 @@
 		
 		<fieldset name="group-image-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+			
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
 				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
@@ -54,18 +55,17 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
 			<field name="" type="separator" default="Sizes must be smaller than medium thumbnail size (at Thumbnails TAB)" description="" level="level4" class="alert alert-info fcpadded"/>
 			<field name="preview_w" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="preview_h" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			
-		</fieldset>
-		<fieldset name="group-image-source" repeat="1" icon_class="icon-wrench" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
+
 			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC" class="btn-group group-fcinfo">
 				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla media manager</option>
 				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla article images: (intro + full)</option>
@@ -121,8 +121,7 @@
 				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER_IN_THUMBS_TAB</option>
 			</field>
 			
-		</fieldset>
-		<fieldset name="group-image-optional-props" repeat="1" icon_class="icon-question" label="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" icon_class="icon-checkmark-circle" level="tab_open" box_type="1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
 			<field name="linkto_url" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
@@ -196,10 +195,14 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" icon_class="" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-image-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" icon_class="icon-cog" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -211,9 +214,7 @@
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
-			
-			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level3" />
+			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level2" />
 			<field name="default_method_item" type="multilist" subtype="radio" default="display" label="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD_DESC"
 				inline_tip="Single Thumb, will only allow popup galleries" tip_class="" tip_img="comment.png" class="btn-group group-fcinfo">
 				<option value="display">All thumbnails</option>
@@ -221,7 +222,7 @@
 				<option value="display_single_total">Single + total</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAT_CONTENT_LISTS" level="level3" />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAT_CONTENT_LISTS" level="level2" />
 			<field name="default_method_cat" type="multilist" subtype="radio" default="display_single" label="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD_DESC"
 					inline_tip="Single Thumb, will optionally link to the item details view, and will not add gallery JS" tip_class="" tip_img="comment.png" toggle_related="1" class="btn-group group-fcinfo">
 				<option value="display" show_list="" hide_list="single_mode_cat">All thumbnails</option>
@@ -235,18 +236,20 @@
 				<option value="1" show_list="cat_view_link_to_item" hide_list="">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level2" />
+			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" icon_class="icon-list" level="tab_open" box_type="1" />
+			
 			<field name="usepopup_disabled_link_to_url" type="separator" label="" default="Gallery navigation JS has been disabled in ITEM &amp; CATEGORY view, because parameter 'Link to URL' was enabled" description="" class="alert fcpadded" depend_class="img-link-url-mode" />
 			<field name="usepopup_disabled_link_to_item" type="separator" label="" default="Gallery navigation JS has been disabled in CATEGORY view, because parameter 'Link to item' was enabled" description="" class="alert fcpadded" depend_class="cat_view_link_to_item single_mode_cat" />
-			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+
+			<field name="usepopup" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="">
+				<option value="0" show_list="" hide_list="use_js_lib">FLEXI_NO</option>
+				<option value="1" show_list="use_js_lib" hide_list="">FLEXI_YES</option>
 			</field>
 				
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC" labelclass="label-warning">
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="use_js_lib" />
+			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC" labelclass="label-warning" depend_class="use_js_lib" >
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
 				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
@@ -256,7 +259,7 @@
 				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
 				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
 			</field>
-			<field name="popuptype_mobile" type="list" default="" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE_DESC">
+			<field name="popuptype_mobile" type="list" default="" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE_DESC" depend_class="use_js_lib">
 				<option value="">FLEXI_FIELD_IMAGE_SAME_AS_DESKTOP</option>
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
 				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
@@ -267,20 +270,20 @@
 				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
 				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
 			</field>
-			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS_DESC">
+			<field name="grouptype" type="radio" default="1" label="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS_DESC" class="btn-group btn-group-yesno" depend_class="use_js_lib" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
 				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" />
-			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
+			<field name="thumbincatview" type="radio" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
-			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
+			<field name="thumbinitemview" type="radio" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
@@ -306,8 +309,7 @@
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 
-		</fieldset>
-		<fieldset name="group-image-thumbs" repeat="1" icon_class="icon-image" label="FLEXI_THUMBNAILS" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_THUMBNAILS" icon_class="icon-image" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
 			
@@ -381,6 +383,9 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_BACKEND_IMAGES" description="FLEXI_BACKEND_IMAGES_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_IMAGE_FIELD_USAGE_ITEMS_MAN" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_IMAGE_FIELD_USAGE_ITEM_FORM" level="level3" class="alert alert-info fcpadded" />
+			
 			<field name="w_b" type="text" default="40" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_b" type="text" default="30" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 			<field name="method_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
@@ -411,7 +416,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="" type="separator" default="Not applied in inline (non-popup) galleries like:  Elastislide / Galleriffic" level="level4" />
+			<field name="" type="separator" default="Not applied in inline (non-popup) galleries like:  Elastislide / Galleriffic" level="level4" class="alert alert-info fcpadded" />
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separatorf" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
@@ -425,6 +430,7 @@
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" icon_class="" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-image-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
 			

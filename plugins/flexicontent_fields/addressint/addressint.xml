@@ -135,12 +135,12 @@
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS_CONFIGURATION" description="" level="level2" />
 			<field name="show_address" type="multilist" subtype="radio" default="both" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
-				<option value="none" show_list="" hide_list="addr-settings">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
+				<option value="0" show_list="" hide_list="addr-settings">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
 				<option value="category" show_list="addr-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CATEGORY_VIEW</option>
 				<option value="item" show_list="addr-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
 				<option value="both" show_list="addr-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>
 			</field>
-			<field name="addr_display_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE_DESC" depend_class="addr-settings" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="addr_display_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE_DESC" depend_class="addr-settings" toggle_related="1" class="btn-group btn-fcmethod">
 				<option value="plaintext" show_list="" hide_list="addr-format">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLAINTEXT_MODE</option>
 				<option value="formatted" show_list="addr-format" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
 			</field>
@@ -156,7 +156,7 @@
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_CONFIGURATION" description="" level="level2" />
 			<field name="show_map" type="multilist" subtype="radio" default="none" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP_DESC" toggle_related="1" class="btn-group btn-group-yesno">
-				<option value="none" show_list="" hide_list="map-settings">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
+				<option value="0" show_list="" hide_list="map-settings">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
 				<option value="category" show_list="map-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CATEGORY_VIEW</option>
 				<option value="item" show_list="map-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
 				<option value="both" show_list="map-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>

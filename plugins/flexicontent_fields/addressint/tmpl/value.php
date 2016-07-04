@@ -10,7 +10,7 @@ $google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
 $google_maps_static_api_key = $field->parameters->get('google_maps_static_api_key', '');
 
 $show_address = $field->parameters->get('show_address','both');
-$show_address = false || $show_address == 'both' || ($view != 'item' && $show_address == 'category') || ($view == 'item' && $show_address == 'item');
+$show_address = $show_address == 'both' || ($view != 'item' && $show_address == 'category') || ($view == 'item' && $show_address == 'item');
 
 $addr_display_mode = $field->parameters->get('addr_display_mode','plaintext');
 $addr_format_tmpl = $field->parameters->get('addr_format_tmpl',	'
@@ -27,8 +27,8 @@ $addr_format_tmpl = $field->parameters->get('addr_format_tmpl',	'
 $directions_position = $field->parameters->get('directions_position','after');
 $directions_link_label = $field->parameters->get('directions_link_label', JText::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
 
-$show_map = $field->parameters->get('show_map','none');
-$show_map = false || $show_map == 'both' || ($view != 'item' && $show_map == 'category') || ($view == 'item' && $show_map == 'item');
+$show_map = $field->parameters->get('show_map','');
+$show_map = $show_map == 'both' || ($view != 'item' && $show_map == 'category') || ($view == 'item' && $show_map == 'item');
 
 $map_embed_type = $field->parameters->get('map_embed_type','img'); // defaults to img for backward compatibility
 $map_type = $field->parameters->get('map_type','roadmap');

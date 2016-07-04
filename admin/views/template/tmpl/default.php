@@ -459,13 +459,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						
 						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
 							<div style="float:left; margin-right:32px;">
-								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_available', $this->content_type_select), 'available_fields_container', 'hide', 'available'); ?>
 								</div>
 							</div>
 							<div style="float:left;">
-								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_available', $this->field_type_select), 'available_fields_container', 'hide', 'available'); ?>
 								</div>
@@ -473,7 +473,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						</div>
 						
 						
-						<div class="postitle label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
+						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
 					
 						<div class="positions_container">
 							<ul id="sortablecorefields" class="positions">
@@ -493,7 +493,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						</div>
 						
 						
-						<div class="postitle label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
+						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
 						
 						<div class="positions_container">
 							<ul id="sortableuserfields" class="positions">
@@ -524,13 +524,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						
 						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
 							<div style="float:left; margin-right:32px;">
-								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_used',$this->content_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
 								</div>
 							</div>
 							<div style="float:left;">
-								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_used',$this->field_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
 								</div>
@@ -557,7 +557,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 								
 							?>
 							
-							<div class="postitle label label-success" style="margin:10px 0 2px"><?php echo $pos; ?></div>
+							<div class="positions_title label label-success" style="margin:10px 0 2px"><?php echo $pos; ?></div>
 							
 							<?php
 							if ( isset($this->layout->attributes[$count]['readonly']) ) {

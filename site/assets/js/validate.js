@@ -455,6 +455,9 @@ var JFormValidator = function()
 	validate = function(el)
 	{
 		var $el = jQuery(el);
+		var $form = $el.form ? jQuery($el.form) : $el.closest('form');
+		if ($form.length && $form.data('skip_validation')) return true;
+
 		var el_id = $el.attr('id');
 
 		if (el_id && el_id.substring(0,11) == 'jform_rules') {
@@ -528,6 +531,9 @@ var JFormValidator = function()
 
 	isValid = function(form)
 	{
+		var $form = jQuery(form);
+		if ($form.length && $form.data('skip_validation')) return true;
+
 		var vTimeStart = new Date().getTime();
  		var fields, valid = true, message, error, label, invalid = [], i, l;
  		
