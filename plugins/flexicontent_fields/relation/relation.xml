@@ -22,23 +22,27 @@
 		
 		<fieldset name="group-relation-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
+			<!--field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" /-->
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-downarrow" level="tab_open" box_type="1" />
+
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
+			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
 			
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" />
-			
+
 			<field name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -61,10 +65,13 @@
 				<!--option value="rated">FLEXI_ORDER_BEST_RATED</option-->
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
-			
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_ITEMS_SCOPES" description="FLEXI_RIFLD_ITEMS_SCOPES_DESC" hr="false" level="level1" />
-			<field name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level2" />
+
+
+			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS" description="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" icon_class="icon-signup" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" description="" icon_class="icon-signup" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" level="level2" />
 			<field name="method_cat" type="multilist" subtype="radio" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_ALL</option>
 				<option value="2">FLEXI_EXCLUDE</option>
@@ -85,29 +92,33 @@
 			<field name="types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
-			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group btn-group-yesno">
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_RIFLD_ANY_USER</option>
 				<option value="1">FLEXI_RIFLD_EDITOR</option>
 				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
 			</field>
-			
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" icon_class="" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-relation-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" icon_class="icon-lock" level="tab_open" box_type="1" />
+
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -117,13 +128,14 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			
-		</fieldset>
-		<fieldset name="group-relation-viewing-ilist" repeat="1" icon_class="icon-list" label_prefix="FLEXI_FIELD_VIEWING" label="FLEXI_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">		
-			<!--field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level0" /-->
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEM_LIST" level="level0" />
+
+
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" icon_class="icon-list-2" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_RELATED_ITEM_LIST" level="level3" class="alert alert-info fcpadded" />
+
 			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
+
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
@@ -212,33 +224,12 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
-		</fieldset>
-		<fieldset name="group-relation-autorelate-submission" repeat="1" icon_class="icon-new" label_prefix="FLEXI_FIELD_VIEWING" label="Submit related" addfieldpath="/administrator/components/com_flexicontent/elements">		
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMISSION" description="FLEXI_RIFLD_AUTORELATE_SUBMISSION_DESC" hr="false" level="level0" />
-			<field name="auto_relate_curritem" type="multilist" subtype="radio"  default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" toggle_related="1" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="button-relation-mode">FLEXI_NO</option>
-				<option value="1" show_list="button-relation-mode" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" />
-			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_BEFORE</option>
-				<option value="1">FLEXI_AFTER</option>
-				<option value="2">FLEXI_BOTH</option>
-			</field>
-			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" />
-			<field name="auto_relate_show_to_unauth" type="list" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
-				<option value="2">FLEXI_YES</option>
-			</field>
-			
-		</fieldset>
-		<fieldset name="group-relation-viewing-alternative" repeat="1" icon_class="icon-info-2" label_prefix="FLEXI_FIELD_VIEWING" label="Alternative" addfieldpath="/administrator/components/com_flexicontent/elements">		
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_SPECIAL_DISPLAY_CASES" level="level0" />
-			
+
+
+			<field name="" type="separator" default="FLEXI_RIFLD_ALTERNATIVE_DISPLAY" icon_class="icon-info-2" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_SPECIAL_DISPLAY" level="level3" class="alert alert-info fcpadded" />
+
 			<field name="" type="separator" default="FLEXI_DISPLAY_SHOW_TOTAL_ONLY" level="level1" />
 			<field name="show_total_only" type="multilist" subtype="radio" default="0" label="FLEXI_RIFLD_SHOW_TOTAL_RELATED" description="FLEXI_RIFLD_SHOW_TOTAL_RELATED_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="viewing-total-mode">FLEXI_NO</option>
@@ -261,11 +252,45 @@
 			</field>
 			<field name="" type="separator" default="FLEXI_FIELD_OVERRIDE_DEFAULT" level="level3" depend_class="viewing-total-mode total_item_list" />
 			<field name="total_relitem_html" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
+
+
+			<field name="" type="separator" default="FLEXI_RIFLD_SUBMIT_RELATED_BUTTON" icon_class="icon-new" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMISSION" description="FLEXI_RIFLD_AUTORELATE_SUBMISSION_DESC" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMIT_REVERSE_RELATION_FIELD_NEEDED" description="" level="level3" depend_class="button-relation-mode" class="alert alert-warning fcpadded"/>
+
+			<field name="auto_relate_curritem" type="multilist" subtype="radio"  default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" toggle_related="1" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="button-relation-mode">FLEXI_NO</option>
+				<option value="1" show_list="button-relation-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC" class="btn-group group-fcinfo" depend_class="button-relation-mode" >
+				<option value="0">FLEXI_BEFORE</option>
+				<option value="1">FLEXI_AFTER</option>
+				<option value="2">FLEXI_BOTH</option>
+			</field>
+
+			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode" />
+			<field name="auto_relate_show_to_unauth" type="list" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC" depend_class="button-relation-mode" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
+				<option value="2">FLEXI_YES</option>
+			</field>
 			
+			
+			<field name="" type="separator" default="FLEXI_CUSTOMIZE" description="" level="level2" depend_class="button-relation-mode" />
+			<field name="auto_relate_submit_title" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE_DESC" depend_class="button-relation-mode" />
+			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" depend_class="button-relation-mode" />
+			<field name="auto_relate_submit_mssg" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT_DESC" depend_class="button-relation-mode" />
+
+
+			<field name="" type="separator" default="FLEXI_VIEWING" icon_class="" level="tabset_close" box_type="1" />
 		</fieldset>
+
 		<fieldset name="group-relation-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
@@ -279,9 +304,9 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
-			
-			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" icon_class="icon-list" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level2" />
 			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -335,7 +360,9 @@
 			</field>
 			
 			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" icon_class="icon-list" level="tab_open" box_type="1" />
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level2" />
 			<field name="display_label_filter_s" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -388,6 +415,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+
+			<field name="" type="separator" default="FLEXI_FILTERING" icon_class="" level="tabset_close" box_type="1" />
 		</fieldset>
 		
 	</fields>
@@ -396,4 +425,5 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation.ini</language>
 	</languages>
+
 </extension>

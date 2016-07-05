@@ -97,7 +97,7 @@ class JFormFieldFcSortableList extends JFormField
 				in_modal = typeof in_modal !== 'undefined' ? in_modal : 0;
 				if (in_modal)
 				{
-					fc_field_dialog_handle_fcrecord_list = fc_showAsDialog(value_area.parent(), null, null, fcrecord_toggle_textarea_edit, {'visibleOnClose': 1, 'title': '".JText::_('FLEXI_ADD')."'});
+					fc_field_dialog_handle_fcrecord_list = fc_showAsDialog(value_area.parent(), null, null, fcrecord_toggle_textarea_edit, {'visibleOnClose': 1, 'title': '".JText::_('FLEXI_EDIT')."'});
 					list.parent().hide();
 				}
 				else
@@ -614,8 +614,9 @@ class JFormFieldFcSortableList extends JFormField
 
 			<div class="'.($attributes->editbtns_class ? ' '.$attributes->editbtns_class : '').'">
 				<div class="'.$classes.'" style="'.($skip_initial_list ? 'display: none;' : '').'">
-					<div class="fcrec_cascaded_msg alert alert-notice" style="display: none;"></div>
 					<div class="fcrec_general_msg alert alert-info" style="display: none;"></div>
+					<div class="fcclear"></div>
+					<div class="fcrec_cascaded_msg alert alert-info" style="display: none;"></div>
 					'.($props_header ? '<span class="fcrecord_header"> '.implode('', $props_header).'</span>' : '').'
 					<ul id="'.$sortable_id.'" class="fcrecords" '.$list_attrs.'>';
 

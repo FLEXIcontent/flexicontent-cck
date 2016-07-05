@@ -1085,7 +1085,7 @@ h3.themes-title small {
 }
 div.records_container,
 div.positions_container {
-	overflow-y: hidden !important;
+	overflow: visible !important;
 	border: 1px dashed silver;
 	display: inline-block;
 	background-color: #f0f0f0;
@@ -1227,7 +1227,9 @@ ul.fcrecords {
 }
 .records_container .fcrec_cascaded_msg,
 .records_container .fcrec_general_msg {
-	margin: 2px 0;
+	margin: 3px;
+	display: inline-block;
+	padding: 1px 4px;
 }
 .records_container .fcrecord_header {
 	margin: 6px 0 0 0;

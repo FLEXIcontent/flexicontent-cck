@@ -1,5 +1,8 @@
-.tabberlive .tabbertabhide {
+.tabberlive .tabbertab.tabbertabhide {
 	display: none;
+}
+.tabberlive .tabbertab.tabbertablow {
+	opacity: 0.1;
 }
 .tabberlive {
 	margin-top: 1em;
@@ -49,6 +52,9 @@ ul.tabbernav > li.tabberactive a:hover {
 	padding: 5px;
 	border: 1px solid #aaa;
 	border-top: 0;
+	opacity: 1;
+	transition: opacity 0.29s;
+	transition-timing-function: ease-in;
 }
 .tabberlive .tabbertab h2.tabberheading,
 .tabberlive .tabbertab h3.tabberheading {

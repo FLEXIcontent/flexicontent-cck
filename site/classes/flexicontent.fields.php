@@ -3847,6 +3847,8 @@ class FlexicontentFields
 		// Execute query to get item list data 
 		$db = JFactory::getDBO();
 		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem, $states);
+		if (!$query) return '';
+
 		$db->setQuery($query);
 		try {
 			$item_list = $db->loadObjectList('id');
@@ -3861,8 +3863,12 @@ class FlexicontentFields
 		// No published related items or SQL query failed, return
 		if ( !$item_list ) return '';
 		
-		if ($_item_data) foreach($item_list as $_item)   // if it exists ... add prefered catid to items list data
+		// If catid exists ... add prefered catid to items list data
+		if ($_item_data) foreach($item_list as $_item)
+		{
 			$_item->rel_catid = @ $_item_data[$_item->id]->catid;
+		}
+
 		return FlexicontentFields::createItemsListHTML($params, $item_list, $isform, $parentfield, $parentitem, $_item_data);
 	}
 	
@@ -3901,28 +3907,38 @@ class FlexicontentFields
 		}
 		// item IDs via a given list (relation field and ... maybe other cases too)
 		else {
+			if (empty($_item_data)) return false;
 			$item_where = ' AND i.id IN ('. implode(",", array_keys($_item_data)) .')';
 		}
+
+
 		// reverse category scope
-		if($params->get('reverse_scope_category', 0)){
+		if($params->get('reverse_scope_category', 0))
+		{
 			$cat_where = ' AND i.catid IN ('. implode(",", array_values($params->get('reverse_scope_category', 0))) .')';
 		}
 		// reverse type scope
-		if($params->get('reverse_scope_types', 0)){
+		if($params->get('reverse_scope_types', 0))
+		{
 			$type_where = ' AND ext.type_id IN ('. implode(",", array_values($params->get('reverse_scope_types', 0))) .')';
 		}
 		// reverse owner scope
-		if($params->get('ownedbyuser', 0)){
+		if($params->get('ownedbyuser', 0))
+		{
 			//if item owned by editing user/logged in user currently editing the field
 			if ($params->get('ownedbyuser', 0) == 1) $itemowned_where = ' AND i.created_by=' . $user->id;
 			//if item owned by the reversing item's item owner
 			else if ($params->get('ownedbyuser', 0) == 2) $itemowned_where = ' AND i.created_by=' . $parentitem->created_by;
 		}
+
+
 		// item count limit
-		if($params->get('itemcount', 0) && is_numeric($params->get('itemcount', 0)) && $params->get('itemcount', 0) > 0){
+		if($params->get('itemcount', 0) && is_numeric($params->get('itemcount', 0)) && $params->get('itemcount', 0) > 0)
+		{
 			$limit = ' LIMIT ' . $params->get('itemcount', 0);
 		}
-		
+
+
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
 		$order = '';
 		$orderby = flexicontent_db::buildItemOrderBy(

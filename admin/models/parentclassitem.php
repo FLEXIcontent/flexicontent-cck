@@ -2702,9 +2702,9 @@ class ParentClassItem extends JModelAdmin
 				{
 					// Create field obj for DB insertion
 					$obj = new stdClass();
-					$obj->field_id 		= $field->id;
-					$obj->item_id 		= $item->id;
-					$obj->valueorder	= $i;
+					$obj->field_id 		= !empty($field->use_field_id) ? $field->use_field_id : $field->id;
+					$obj->item_id 		= !empty($field->use_item_id) ? $field->use_item_id : $item->id;
+					$obj->valueorder	= !empty($field->use_valueorder) ? $field->use_valueorder : $i;
 					$obj->suborder    = 1;
 					$obj->version			= (int)$last_version+1;
 					$use_ingroup = $field->parameters->get('use_ingroup', 0);

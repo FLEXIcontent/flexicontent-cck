@@ -2775,7 +2775,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $submit_text = '', $auto_relations = false, $ignore_unauthorized = false)
+	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $btn_text = '', $auto_relations = false, $ignore_unauthorized = false)
 	{
 		if ( !$params->get('show_addbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
@@ -2788,8 +2788,9 @@ class flexicontent_html
 		// IF not auto-relation given ... then check if current view / layout can use ADD button
 		$view = JRequest::getVar('view');
 		$layout = JRequest::getVar('layout', 'default');
-		if ( !$auto_relations ) {
-			if ( $view!='category' || $layout == 'author' ) return '';
+		if ( !$auto_relations )
+		{
+			if ( $view!='category' || $layout == 'author' || $layout == 'favs' || $layout == 'tags' ) return '';
 		}
 		
 		
@@ -2826,17 +2827,24 @@ class flexicontent_html
 		// Create submit button/icon text
 		// ******************************
 		
-		if ($submit_text) {
-			$submit_lbl = JText::_($submit_text);
-		} else {
-			$submit_lbl = JText::_( $submit_cat && $submit_cat->id  ?  'FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT'  :  'FLEXI_ADD_NEW_CONTENT_TO_LIST' );
-		}		
-		
-		
+		if (is_object($btn_text))
+		{
+			$btn_title = JText::_( $btn_text->title );
+			$btn_desc  = JText::_( $btn_text->tooltip );
+		}
+		else
+		{
+			$btn_title = JText::_( 'FLEXI_ADD' );
+			$btn_desc  = $btn_text ?
+				JText::_($btn_text) :
+				JText::_( $submit_cat && $submit_cat->id  ?  'FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT'  :  'FLEXI_ADD_NEW_CONTENT_TO_LIST' ) ;
+		}
+
+
 		// ***********
 		// Create link
 		// ***********
-		
+
 		// Add Itemid (if given) and do SEF URL routing it --before-- appending more variables, so that
 		// ... menu item URL variables from given menu item ID will be appended if SEF URLs are OFF
 		$menu_itemid = $menu_itemid ? $menu_itemid : (int)$params->get('addbutton_menu_itemid', 0);
@@ -2850,19 +2858,16 @@ class flexicontent_html
 		}
 		
 		// Append autorelate information to the URL (if given)
-		if ($auto_relations) foreach ( $auto_relations as $auto_relation ) {
+		if ($auto_relations) foreach ( $auto_relations as $auto_relation )
+		{
 			$link .= (strstr($link, '?') ? '&amp;' : '?') . 'autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
 		}
-		
-		
+
+
 		// ***************************************
 		// Finally create the submit icon / button
 		// ***************************************
-		
-		$overlib = $submit_lbl;
-		$text = JText::_( 'FLEXI_ADD' );
-		
-		
+
 		$show_icons = $params->get('show_icons', 2);
 		$use_font   = $params->get('use_font_icons', 1);
 		if ( $show_icons && $use_font && !$auto_relations ) {
@@ -2876,28 +2881,29 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons && !$auto_relations ) {
 			$attribs = '';
-			$image = JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $submit_lbl, $attribs);
+			$image = JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $btn_desc, $attribs);
 		} else {
 			$image = '';
 		}
-		
+
 		$button_classes = 'fc_addbutton';
 		if ( $show_icons==1 && !$auto_relations ) {
 			$caption = '';
 			$button_classes .= '';
 			$tooltip_place = 'bottom';
 		} else {
-			$caption = $text;
+			$caption = $btn_title;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .=
 				(self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
 				.($auto_relations ? ' btn-success' : '');
 			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
-		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
-		
+		$tooltip_title = flexicontent_html::getToolTip($btn_title, $btn_desc, 0);
+
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
-		if (!$auto_relations) {
+		if (!$auto_relations)
+		{
 			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		}
 		

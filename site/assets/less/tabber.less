@@ -4,8 +4,11 @@
   REQUIRED to hide the non-active tab content.
   But do not hide them in the print stylesheet!
   --------------------------------------------------*/
-.tabberlive .tabbertabhide {
+.tabberlive .tabbertab.tabbertabhide {
 	display: none;
+}
+.tabberlive .tabbertab.tabbertablow {
+	opacity: 0.1;
 }
 
 
@@ -81,8 +84,10 @@ ul.tabbernav > li.tabberactive a:hover {
 	padding: 5px;
 	border: 1px solid #aaa;
 	border-top: 0;
+	opacity: 1;
+	transition: opacity 0.29s;
+	transition-timing-function: ease-in;
 }
-
 
 
 /* Hide the heading since a heading is provided by the tab handle (navigation) */

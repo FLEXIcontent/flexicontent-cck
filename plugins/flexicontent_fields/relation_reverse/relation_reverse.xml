@@ -23,21 +23,26 @@
 		
 		<fieldset name="group-relation_reverse-data" repeat="1" icon_class="icon-database" label="Reversing" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
+			<field name="" type="separator" default="FLEXI_RIFLD_ITEMS_RELATED_VIA_CHOOSE_FIELD" level="level3" class="alert alert-success fcpadded"/>
 			<field name="reverse_field" type="fields" field_type="relation" label="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE" description="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" />
-			<field name="" type="separator" default="FLEXI_RIFLD_RELATION_REVERSE_SCOPE" description="FLEXI_RIFLD_RELATION_REVERSE_SCOPE_DESC" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATION_REVERSE_INCLUDE_ITEMS" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATION_REVERSE_INCLUDE_ITEMS_INFO" level="level3" class="alert alert-info fcpadded"/>
+			
 			<field name="reverse_scope_category" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD" description="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD_DESC" />
 			<field name="reverse_scope_types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
 
 			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
-			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group btn-group-yesno">
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_RIFLD_ANY_USER</option>
 				<option value="1">FLEXI_RIFLD_EDITOR</option>
 				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
@@ -45,8 +50,11 @@
 
 			
 		</fieldset>
-		<fieldset name="group-relation_reverse-editing-ilist" repeat="1" icon_class="icon-pencil" label_prefix="FLEXI_FIELD_EDITING" label="FLEXI_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<!--field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level0" /-->
+		<fieldset name="group-relation_reverse-editing-ilist" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" level="level0" />
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_ABOUT_ITEMS_LIST_IN_ITEM_FORM" description="" level="level3" class="alert alert-success fcpadded" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby_form" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
@@ -97,12 +105,14 @@
 			</field>
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
+
 		</fieldset>
 		<fieldset name="group-relation_reverse-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">		
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" icon_class="icon-lock" level="tab_open" box_type="1" />
+
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -112,18 +122,16 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			
-		</fieldset>
-		<fieldset name="group-relation_reverse-viewing-ilist" repeat="1" icon_class="icon-list" label_prefix="FLEXI_FIELD_VIEWING" label="FLEXI_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">		
-			<!--field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level0" /-->
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEM_LIST" level="level0" />
-			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
 
+
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" icon_class="icon-list-2" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_RELATED_ITEM_LIST" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
-				<option value="">FLEXI_ORDER_DEFAULT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
@@ -157,7 +165,7 @@
 				<option value="3">FLEXI_DATE</option>
 			</field>
 			
-			<field name="" type="separator" default="HTML" level="level1" />
+			<field name="" type="separator" default="FLEXI_HTML" level="level1" />
 			<field name="relitem_html" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" />
@@ -218,4 +226,5 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation_reverse.ini</language>
 	</languages>
+
 </extension>
