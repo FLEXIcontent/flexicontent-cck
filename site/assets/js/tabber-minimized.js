@@ -427,10 +427,15 @@ tabberObj.prototype.tabShow = function(tabberIndex)
   div = this.tabs[tabberIndex].div;
 
   /* Remove classTabHide from the div */
-  div.className = div.className.replace(this.REclassTabHide, '');
-  if (typeof jQuery != 'undefined') {
-  	jQuery(div).css({opacity: 0.5}).animate({ opacity: 1 }, 400);
-  }
+ 	div.className = div.className.replace(this.REclassTabHide, '');
+	
+	/* Use a CSS transition for making tab contents visible */
+ 	/*
+	div.className = div.className.replace(this.REclassTabHide, ' tabbertablow');
+	setTimeout(function(){
+		div.className = div.className.replace(' tabbertablow', '');
+	}, 10);
+	*/
 
   /* Mark this tab navigation link as "active" */
   this.navSetActive(tabberIndex);

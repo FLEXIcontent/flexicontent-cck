@@ -259,7 +259,7 @@ class plgFlexicontent_fieldsText extends FCField
 			}
 		
 			$sel_classes  = ' fcfield_textselval use_select2_lib ';
-		  $sel_onchange = " jQuery(this).parent().find('input.fcfield_textval').val(jQuery(this).val()); jQuery(this).val('').select2('destroy').show().select2(); ";
+		  $sel_onchange = " jQuery(this).parent().find('input.fcfield_textval').val(jQuery(this).val()).trigger('blur'); jQuery(this).select2('val', ''); ";
 			$sel_attribs  = ' class="'.$sel_classes.'" onchange="'.$sel_onchange.'"';
 			
 			$sel_fieldname = 'custom['.$field->name.'_sel][]';

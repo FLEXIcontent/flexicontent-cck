@@ -46,7 +46,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
-		// initialize framework objects and other variables
+		// Initialize framework objects and other variables
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$document = JFactory::getDocument();
@@ -63,27 +63,14 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		
 		// Case of autorelated item
 		$autorelation_itemid = JRequest::getInt('autorelation_'.$field->id);
-		if ( $autorelation_itemid)
+
+		if ( $autorelation_itemid )
 		{
-			// automatically related item
-			$query = 'SELECT title, id, catid, state, alias '
-				. ' FROM #__content '
-				. ' WHERE id ='. $autorelation_itemid
-				;
-			$db->setQuery($query);
-			$rel_item = $db->loadObject();
-			
-			if (!$rel_item) {
-				$field->html = 'auto relating item id: '.$autorelation_itemid .' : item not found ';
-				return;
-			}
-			
-			$field->html = '<input id="'.$elementid.'" name="'.$fieldname.'[]" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
-			$field->html .= $rel_item->title;
+			$field->html = 'You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field';
 			return;
 		}
-		
-		
+
+
 		// ************************************************************************
 		// Initialise values and split them into: (a) item ids and (b) category ids
 		// ************************************************************************
@@ -483,21 +470,22 @@ jQuery(document).ready(function()
 		$field->label = JText::_($field->label);
 		$field->{$prop} = '';
 		$values = $values ? $values : $field->value;
-		
+
 		$show_total_only     = $field->parameters->get('show_total_only', 0);
 		$total_show_auto_btn = $field->parameters->get('total_show_auto_btn', 0);
 		$total_show_list     = $field->parameters->get('total_show_list', 0);
-		
-		
+
+
 		// *******************************************
 		// Check for special display : total info only
 		// *******************************************
 		
-		if ($prop=='display_total') {
+		if ($prop=='display_total')
+		{
 			$display_total = true;
 		}
-		
-		else if ( $show_total_only==1 || ($show_total_only == 2 && count($values)) ) {
+		else if ( $show_total_only==1 || ($show_total_only == 2 && count($values)) )
+		{
 			$app = JFactory::getApplication();
 			$view = JRequest::getVar('view');
 			$option = JRequest::getVar('option');
@@ -507,12 +495,12 @@ jQuery(document).ready(function()
 			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);
 			$display_total = ($isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
 		}
-		
-		else {
+		else
+		{
 			$display_total = false;
 		}
-		
-		
+
+
 		// ***********************************************************
 		// Create total info and terminate if not adding the item list
 		// ***********************************************************
@@ -529,12 +517,12 @@ jQuery(document).ready(function()
 			$total_relitem_html = $field->parameters->get('total_relitem_html', '');
 			if ($total_relitem_html) $field->parameters->set('relitem_html', $total_relitem_html );
 		}
-		
-		
+
+
 		// ***********************************************************
 		// Prepare item list data for rendering the related items list
 		// ***********************************************************
-		
+
 		if ($field->field_type == 'relation_reverse')
 		{
 			$reverse_field = $field->parameters->get( 'reverse_field', 0) ;
@@ -547,11 +535,7 @@ jQuery(document).ready(function()
 		else  // $field->field_type == 'relation')
 		{
 			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-			$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
-			// No related items, just return empty display
-			if ( !$values || !count($values) ) return;
-			
-			$_itemids_catids = array();
+			$values = ( $field_data = @unserialize($values) ) ? $field_data : array();
 
 			// set upper limit as $values array length
 			$itemcount = count ($values);
@@ -560,10 +544,15 @@ jQuery(document).ready(function()
 			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&  
 				$field->parameters->get( 'itemcount', 0) > 0 && 
 				$field->parameters->get( 'itemcount', 0) < $itemcount
-			) $itemcount = $field->parameters->get( 'itemcount', 0);
+			) {
+				$itemcount = $field->parameters->get( 'itemcount', 0);
+			}
 
-			// use 'for' instead of 'foreach' to limit count
-			for($i = 0; $i < $itemcount; $i++){
+			// Limit list to desired max # items
+			$_itemids_catids = array();
+
+			for($i = 0; $i < $itemcount; $i++)
+			{
 				list ($itemid,$catid) = explode(":", $values[$i]);
 				$_itemids_catids[$itemid] = new stdClass();
 				$_itemids_catids[$itemid]->itemid = $itemid;
@@ -571,35 +560,41 @@ jQuery(document).ready(function()
 				$_itemids_catids[$itemid]->value  = $values[$i];
 			}
 		}
-		
-		
+
+
 		// **********************************************
 		// Create the submit button for auto related item
 		// **********************************************
-		
+
 		$auto_relate_curritem = $field->parameters->get( 'auto_relate_curritem', 0);
 		$auto_relate_menu_itemid = $field->parameters->get( 'auto_relate_menu_itemid', 0);
 		$auto_relate_position = $field->parameters->get( 'auto_relate_position', 0);
 		$auto_rel_btn = '';
 		if ( $auto_relate_curritem && $auto_relate_menu_itemid && (!$display_total || $total_show_auto_btn) )
 		{
-			$_submit_text = $field->parameters->get( 'auto_relate_submit_text', 'FLEXI_ADD_RELATED');
-			$_show_to_unauth = $field->parameters->get( 'auto_relate_show_to_unauth', 0);
+			$_btn_text = new stdClass();
+			$_btn_text->title = $field->parameters->get( 'auto_relate_submit_title', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED');
+			$_btn_text->tooltip = $field->parameters->get( 'auto_relate_submit_text', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED_TIP');
+
 			$auto_relations[0] = new stdClass();
 			$auto_relations[0]->itemid  = $item->id;
 			$auto_relations[0]->fieldid = $field->id;
+
 			$category = null;
+			$_show_to_unauth = $field->parameters->get( 'auto_relate_show_to_unauth', 0);
+
 			$auto_rel_btn = flexicontent_html::addbutton(
-				$field->parameters, $category, $auto_relate_menu_itemid, $_submit_text, $auto_relations, $_show_to_unauth
+				$field->parameters, $category, $auto_relate_menu_itemid, $_btn_text, $auto_relations, $_show_to_unauth
 			);
 		}
-		
-		
+
+
 		// *****************************
 		// Finally, create the item list
 		// *****************************
-		
-		if ( !$display_total || $total_show_list ) {
+
+		if ( !$display_total || $total_show_list )
+		{
 			$add_before = $auto_rel_btn && ($auto_relate_position == 0 || $auto_relate_position == 2);
 			$add_after  = $auto_rel_btn && ($auto_relate_position == 1 || $auto_relate_position == 2);
 			
@@ -607,13 +602,15 @@ jQuery(document).ready(function()
 				.($add_before ? $auto_rel_btn : '')
 				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, @ $reverse_field, $field, $item)
 				.($add_after ? $auto_rel_btn : '');
-		} else if ($auto_rel_btn) {
+		}
+		else if ($auto_rel_btn)
+		{
 			$field->{$prop} .= $auto_rel_btn;
 		}
 	}
-	
-	
-	
+
+
+
 	// **************************************************************
 	// METHODS HANDLING before & after saving / deleting field events
 	// **************************************************************

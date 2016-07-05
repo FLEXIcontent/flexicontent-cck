@@ -66,7 +66,7 @@
 			<field name="field_elements" type="fcsortablelist" subtype="elements"
 				default="1::Yes%% 0::No%% "
 				add_end="1" add_before="1" add_after="1" skip_initial_list="1"
-				edit_inline="1" edit_popup="1" raw_inline="0" raw_popup="1"
+				edit_inline="0" edit_popup="1" raw_inline="0" raw_popup="1"
 				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP" props_used="1,1,0,1"
 				editbtns_class="elements_list" value_area_class="elements_field"
 				master_fieldname="cascade_after" cascaded_prop="3"
