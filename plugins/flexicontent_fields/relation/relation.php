@@ -572,28 +572,44 @@ jQuery(document).ready(function()
 		$auto_rel_btn = '';
 		if ( $auto_relate_curritem && $auto_relate_menu_itemid && (!$display_total || $total_show_auto_btn) )
 		{
-			$_btn_text = new stdClass();
-			$_btn_text->title = $field->parameters->get( 'auto_relate_submit_title', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED');
-			$_btn_text->tooltip = $field->parameters->get( 'auto_relate_submit_text', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED_TIP');
-
-			$auto_relations[0] = new stdClass();
-			$auto_relations[0]->itemid  = $item->id;
-			$auto_relations[0]->fieldid = $field->id;
-
-			$category = null;
-			$_show_to_unauth = $field->parameters->get( 'auto_relate_show_to_unauth', 0);
-
-			$auto_rel_btn = flexicontent_html::addbutton(
-				$field->parameters, $category, $auto_relate_menu_itemid, $_btn_text, $auto_relations, $_show_to_unauth
-			);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$acclvl = (int) $field->parameters->get('auto_relate_acclvl', 1);
+			$has_acclvl = in_array($acclvl, $aid_arr);
+			
+			if ($has_acclvl)
+			{
+				$_btn_text = new stdClass();
+				$_btn_text->title = $field->parameters->get( 'auto_relate_submit_title', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED');
+				$_btn_text->tooltip = $field->parameters->get( 'auto_relate_submit_text', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED_TIP');
+	
+				$auto_relations[0] = new stdClass();
+				$auto_relations[0]->itemid  = $item->id;
+				$auto_relations[0]->fieldid = $field->id;
+	
+				$category = null;
+				$_show_to_unauth = $field->parameters->get( 'auto_relate_show_to_unauth', 0);
+	
+				$auto_rel_btn = flexicontent_html::addbutton(
+					$field->parameters, $category, $auto_relate_menu_itemid, $_btn_text, $auto_relations, $_show_to_unauth
+				);
+			}
 		}
 
 
-		// *****************************
-		// Finally, create the item list
-		// *****************************
+		// *************************************************************************
+		// Finally, create and add the item list if user has the needed access level
+		// *************************************************************************
 
-		if ( !$display_total || $total_show_list )
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$acclvl = (int) $field->parameters->get('itemslist_acclvl', 1);
+		$has_acclvl = in_array($acclvl, $aid_arr);
+		
+		if (!$has_acclvl)
+		{
+			$field->{$prop} = $auto_rel_btn;   // Only show the autorelate button
+		}
+
+		else if ( !$display_total || $total_show_list )
 		{
 			$add_before = $auto_rel_btn && ($auto_relate_position == 0 || $auto_relate_position == 2);
 			$add_after  = $auto_rel_btn && ($auto_relate_position == 1 || $auto_relate_position == 2);
@@ -603,6 +619,7 @@ jQuery(document).ready(function()
 				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, @ $reverse_field, $field, $item)
 				.($add_after ? $auto_rel_btn : '');
 		}
+
 		else if ($auto_rel_btn)
 		{
 			$field->{$prop} .= $auto_rel_btn;

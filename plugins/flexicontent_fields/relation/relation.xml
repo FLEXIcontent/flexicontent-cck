@@ -134,7 +134,8 @@
 
 			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_RELATED_ITEM_LIST" level="level3" class="alert alert-info fcpadded" />
 
-			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
+			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_MAX_LISTED_ITEMS" description="FLEXI_RIFLD_MAX_LISTED_ITEMS_DESC" />
+			<field name="itemslist_acclvl" type="accesslevel" default="1" label="FLEXI_RIFLD_ITEMS_LIST_ACCESS" description="FLEXI_RIFLD_ITEMS_LIST_ACCESS_DESC" depend_class="button-relation-mode" />
 
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
@@ -263,21 +264,22 @@
 				<option value="0" show_list="" hide_list="button-relation-mode">FLEXI_NO</option>
 				<option value="1" show_list="button-relation-mode" hide_list="">FLEXI_YES</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" description="" level="level2" depend_class="button-relation-mode" />
 			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC" class="btn-group group-fcinfo" depend_class="button-relation-mode" >
 				<option value="0">FLEXI_BEFORE</option>
 				<option value="1">FLEXI_AFTER</option>
 				<option value="2">FLEXI_BOTH</option>
 			</field>
-
-			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode" />
-			<field name="auto_relate_show_to_unauth" type="list" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC" depend_class="button-relation-mode" >
+			<field name="auto_relate_acclvl" type="accesslevel" default="1" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_ACCESS" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_ACCESS_DESC" depend_class="button-relation-mode" />
+			<field name="auto_relate_show_to_unauth" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC" depend_class="button-relation-mode" class="btn-group group-fcinfo" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
 				<option value="2">FLEXI_YES</option>
 			</field>
-			
-			
+
 			<field name="" type="separator" default="FLEXI_CUSTOMIZE" description="" level="level2" depend_class="button-relation-mode" />
+			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_title" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_mssg" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT_DESC" depend_class="button-relation-mode" />
