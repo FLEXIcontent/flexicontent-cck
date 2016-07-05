@@ -471,6 +471,7 @@ jQuery(document).ready(function()
 		$field->{$prop} = '';
 		$values = $values ? $values : $field->value;
 
+		$user = JFactory::getUser();
 		$show_total_only     = $field->parameters->get('show_total_only', 0);
 		$total_show_auto_btn = $field->parameters->get('total_show_auto_btn', 0);
 		$total_show_list     = $field->parameters->get('total_show_list', 0);
@@ -535,7 +536,7 @@ jQuery(document).ready(function()
 		else  // $field->field_type == 'relation')
 		{
 			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-			$values = ( $field_data = @unserialize($values) ) ? $field_data : array();
+			$values = ( $field_data = @unserialize($values) ) ? $field_data : $values;
 
 			// set upper limit as $values array length
 			$itemcount = count ($values);
