@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `type_id` int(11) NOT NULL DEFAULT '0',
  `lang_parent_id` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`id`),
+ KEY `alias` (`alias`),
  KEY `state` (`state`),
  KEY `catid` (`catid`),
  KEY `created_by` (`created_by`),
@@ -167,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `published` tinyint(1) NOT NULL,
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  KEY `name` (`name`),
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM;
 

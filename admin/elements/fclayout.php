@@ -306,9 +306,14 @@ function fc_getLayout(el)
 		 	panel_header.parent().css('display', '');
 			panel.html(str);
 			jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+
 			//tabberAutomatic(tabberOptions, panel_id);
 			fc_bindFormDependencies('#'+panel_id, 0, '');
 			fc_bootstrapAttach('#'+panel_id);
+			if (typeof(fcrecord_attach_sortable) == 'function')
+			{
+				fcrecord_attach_sortable('#'+panel_id);
+			}
 		}
 	});
 }

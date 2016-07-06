@@ -44,7 +44,7 @@ class FlexicontentViewField extends JViewLegacy
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
-		$document->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH );  // Frontend/backend script
+		flexicontent_html::loadFramework('flexi-lib-form');
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
@@ -148,23 +148,15 @@ class FlexicontentViewField extends JViewLegacy
 							url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
 							success: function(str) {
 								jQuery('#fieldspecificproperties').html(str);
-								".( FLEXI_J30GE ? "
-									jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
-								" : "
-								var tipped_elements = jQuery('#fieldspecificproperties .hasTip');
-								tipped_elements.each(function() {
-									var title = this.get('title');
-									if (title) {
-										var parts = title.split('::', 2);
-										this.store('tip:title', parts[0]);
-										this.store('tip:text', parts[1]);
-									}
-								});
-								var ajax_JTooltips = new Tips($('fieldspecificproperties').getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
-								")."
+								jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
+
 								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
 								fc_bindFormDependencies('#fieldspecificproperties', 0, '');
 								fc_bootstrapAttach('#fieldspecificproperties');
+								if (typeof(fcrecord_attach_sortable) == 'function')
+								{
+									fcrecord_attach_sortable('#fieldspecificproperties');
+								}
 								jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
 							}
 						});
