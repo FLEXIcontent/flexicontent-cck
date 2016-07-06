@@ -136,11 +136,12 @@ class JFormFieldFcMenuitem extends JFormFieldMenuitem
 						in_array($link->type, $this->disable)
 					);
 				}
+				if ( !count($groups[$menu->menutype]) )  unset($groups[$menu->menutype]);  // Skip menu with no items
 			}
 		}
 
 		// Merge any additional groups in the XML definition.
-		$groups = array_merge(parent::getGroups(), $groups);
+		//$groups = array_merge(parent::getGroups(), $groups);
 
 		return $groups;
 	}
@@ -149,18 +150,18 @@ class JFormFieldFcMenuitem extends JFormFieldMenuitem
 	{
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
-			->select('a.id AS value, 
-					  a.title AS text, 
-					  a.link AS url,
-					  a.alias, 
-					  a.level, 
-					  a.menutype, 
-					  a.type, 
-					  a.published, 
-					  a.template_style_id, 
-					  a.checked_out, 
-					  a.language, 
-					  a.lft')
+			->select('DISTINCT a.id AS value, 
+				  a.title AS text, 
+				  a.link AS url,
+				  a.alias, 
+				  a.level, 
+				  a.menutype, 
+				  a.type, 
+				  a.published, 
+				  a.template_style_id, 
+				  a.checked_out, 
+				  a.language, 
+				  a.lft')
 			->from('#__menu AS a')
 			->join('LEFT', $db->quoteName('#__menu') . ' AS b ON a.lft > b.lft AND a.rgt < b.rgt');
 
@@ -207,39 +208,6 @@ class JFormFieldFcMenuitem extends JFormFieldMenuitem
 		}
 
 		$query->where('a.published != -2');
-
-		if (JLanguageMultilang::isEnabled())
-		{
-			$query->group(
-				'a.id , 
-				 a.title , 
-				 a.alias, 
-				 a.level, 
-				 a.menutype, 
-				 a.type, 
-				 a.published, 
-				 a.template_style_id, 
-				 a.checked_out, 
-				 a.language,
-				 a.lft,
-				 l.title , 
-				 l.image');
-		}
-		else
-		{
-			$query->group(
-				'a.id , 
-				 a.title , 
-				 a.alias, 
-				 a.level, 
-				 a.menutype, 
-				 a.type, 
-				 a.published, 
-				 a.template_style_id, 
-				 a.checked_out, 
-				 a.language,
-				 a.lft');
-		}
 
 		$query->order('a.lft ASC');
 
