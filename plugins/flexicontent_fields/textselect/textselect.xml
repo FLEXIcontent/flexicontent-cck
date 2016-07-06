@@ -432,7 +432,7 @@
 			</field>
 
 
-			<field name="" type="separator" default="FLEXI_FILTERING" icon_class="" level="tabset_close" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_close" box_type="1" />
 		</fieldset>
 		
 	</fields>

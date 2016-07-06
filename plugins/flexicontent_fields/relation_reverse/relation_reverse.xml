@@ -26,29 +26,6 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_ITEMS_RELATED_VIA_CHOOSE_FIELD" level="level3" class="alert alert-success fcpadded"/>
 			<field name="reverse_field" type="fields" field_type="relation" label="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE" description="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_RIFLD_RELATION_REVERSE_INCLUDE_ITEMS" level="level1" />
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_RELATION_REVERSE_INCLUDE_ITEMS_INFO" level="level3" class="alert alert-info fcpadded"/>
-			
-			<field name="reverse_scope_category" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD" description="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD_DESC" />
-			<field name="reverse_scope_types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
-
-			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
-			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_RIFLD_ANY_USER</option>
-				<option value="1">FLEXI_RIFLD_EDITOR</option>
-				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
-			</field>
-
-			
 		</fieldset>
 		<fieldset name="group-relation_reverse-editing-ilist" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -75,7 +52,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_HTML" level="level1" />
+			<field name="" type="separator" default="FLEXI_ITEM_HTML" level="level1" />
 			<field name="relitem_html_form" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" />
@@ -92,7 +69,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separator" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_ITEM_FORM" description="FLEXI_VALUE_SEPARATOR_ITEM_FORM_DESC">
@@ -125,12 +102,37 @@
 
 
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" icon_class="icon-list-2" level="tab_open" box_type="1" />
-
 			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_RELATED_ITEM_LIST" level="level3" class="alert alert-info fcpadded" />
 
-			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
+			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_MAX_LISTED_ITEMS" description="FLEXI_RIFLD_MAX_LISTED_ITEMS_DESC" hint="FLEXI_INT" />
 
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" tab_class="s-cblue" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_FILTER_ITEMS" icon_class="icon-search" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_RIFLD_FILTER_ITEMS_INFO" level="level3" class="alert alert-info fcpadded"/>
+
+			<field name="reverse_scope_category" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD" description="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD_DESC" />
+			<field name="reverse_scope_types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
+			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_ANY_USER</option>
+				<option value="1">FLEXI_RIFLD_EDITOR</option>
+				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" icon_class="icon-refresh" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_DESC" level="level3" class="alert alert-info fcpadded" />			
+
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -164,8 +166,10 @@
 				<option value="2">FLEXI_FLOAT</option>
 				<option value="3">FLEXI_DATE</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_HTML" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_ITEM_HTML" icon_class="icon-cog" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_ITEM_HTML_DESC" level="level3" class="alert alert-info fcpadded" />			
+
 			<field name="relitem_html" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" />
@@ -193,7 +197,7 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
@@ -218,7 +222,9 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
+
+
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" level="tabset_close" box_type="1" />
 		</fieldset>
 	</fields>
 	</config>
