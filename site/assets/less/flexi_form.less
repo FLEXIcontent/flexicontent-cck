@@ -490,18 +490,18 @@ div .flexi_buttons button:not(.btn):hover {
 /**********************************************
  * Form field separator element CSS for forms *
  **********************************************/
-.fcsep_tblbreak {
-	padding: 4px 2% 4px 2%;
-	background-color: #ffffff;
-	color: darkred;
-	font-size: 16px !important;
-	font-weight: bold;
-	margin: 24px 0% 2px 0%;
-	width: auto;
+
+.fcsep_level0,
+.fcsep_level1,
+.fcsep_level2,
+.fcsep_level3 {
 	display: block;
+	position: relative;
+	border-radius: 5px;
+	clear: both;
 	float: left;
-	border: 1px solid lightgray;
 	font-size: 12px;
+	line-height: 1.5em;
 }
 
 .fcsep_level0 {
@@ -509,27 +509,15 @@ div .flexi_buttons button:not(.btn):hover {
 	color: white;
 	padding: 0.8em 1%;
 	margin: 48px 0% 2px 0%;
-	display: block;
-	position: relative;
-	border-radius: 5px;
-	font-weight: bold;
-	clear: both;
-	float: left;
 	width: 98%;
-	font-size: 12px;
+	font-weight: bold;
 }
 .fcsep_level1 {
 	background-color: #2096C9;
 	color: white;
 	padding: 0.8em 1%;
 	margin: 20px 0% 2px 0%;
-	display: block;
-	position: relative;
-	border-radius: 5px;
-	clear: both;
-	float: left;
 	width: 98%;
-	font-size: 12px;
 	font-weight: bold;
 }
 .fcsep_level2 {
@@ -537,13 +525,30 @@ div .flexi_buttons button:not(.btn):hover {
 	color: #3a57ad;
 	padding: 0.4em 1%;
 	margin: 4px 0% 2px 0%;
+	width: 98%;
+}
+.fcsep_level3 {
+	background-color: #9fe1ff;
+	border: 1px solid #96c7ef;
+	color: #3a579d;
+	padding: 0.3em 2em;
+	margin: 4px 5% 1px;
+	width: auto;
+}
+.fcsep_level4 {
+	background: #f7f7f7;
+	color: #333;
+	float: left;
+	font-weight: normal;
+	font-style: italic;
+	font-size: 12px;
+	border: 1px solid #777;
+	padding: 2px 16px 2px 16px !important;
+	margin: 5px 10% 1px !important;
 	display: block;
-	position: relative;
 	border-radius: 5px;
 	clear: both;
-	float: left;
-	width: 98%;
-	font-size: 12px;
+	max-width: 60%;
 }
 
 /* prevent margin when parameter list starts */
@@ -582,35 +587,6 @@ div.control-group:first-of-type > div > .fcsep_level2 {
 	margin-top: 0px;
 }
 
-.fcsep_level3 {
-	background-color: #9fe1ff;
-	border: 1px solid #96c7ef;
-	color: #3a579d;
-	padding: 0.3em 2em;
-	margin: 4px 5% 1px;
-	display: block;
-	position: relative;
-	border-radius: 5px;
-	clear: both;
-	float: left;
-	width: auto;
-	font-size: 12px;
-}
-.fcsep_level4 {
-	background: #f7f7f7;
-	color: #333;
-	float: left;
-	font-weight: normal;
-	font-style: italic;
-	font-size: 12px;
-	border: 1px solid #777;
-	padding: 2px 16px 2px 16px !important;
-	margin: 5px 10% 1px !important;
-	display: block;
-	border-radius: 5px;
-	clear: both;
-	max-width: 60%;
-}
 body .alert.fcpadded {
 	padding: 4px;
 	margin: 4px 48px 2px;

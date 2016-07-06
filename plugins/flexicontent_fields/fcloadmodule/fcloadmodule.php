@@ -85,7 +85,8 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$mainframe = JFactory::getApplication();
 		
 		$values = $values ? $values : $field->value;
-		if ( empty($values[0]) ) {
+		if ( empty($values[0]) )
+		{
 			$values[0] = '';
 		}
 		
@@ -97,7 +98,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$style 			= $field->parameters->get('style', -2);
 		
 		$document		= JFactory::getDocument();
-		$display 		= '';
+		$display 		= array();
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
 		
@@ -145,7 +146,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
 				$custom_mod_params[ $param_name ] = $value[$param_name];
 			}
-			$_mod_params = FLEXI_J16GE ? new JRegistry($mod->params) : new JParameter($mod->params);
+			$_mod_params = new JRegistry($mod->params);
 			foreach ($custom_mod_params as $i => $v) $_mod_params->set($i,$v);
 			$mod->params = $_mod_params ->toString();
 			
@@ -153,7 +154,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 			// ************************
 			// Render the module's HTML
 			// ************************
-			$display = $renderer->render($mod, $mparams);
+			$display[] = $renderer->render($mod, $mparams);
 		}
 		
 		
@@ -162,12 +163,14 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		// ************************************
 		else {
 			if (!$position) { $field->{$prop} = 'Error'; return; }
-			foreach (JModuleHelper::getModules($position) as $mod)  {
-				$display .= $renderer->render($mod, $mparams);
+			foreach (JModuleHelper::getModules($position) as $mod)
+			{
+				$display[] = $renderer->render($mod, $mparams);
 			}
 		}
-		
-		$field->{$prop} = $display;
+
+		$display = trim( implode('', $display) );
+		$field->{$prop} = strlen( $display ) ? $display : null;
 	}
 	
 	
