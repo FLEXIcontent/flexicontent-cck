@@ -3907,9 +3907,11 @@ class FlexicontentFields
 		$user = JFactory::getUser();
 		$sfx = $isform ? '_form' : '';
 		
-		// Get data like aliases and published state
 		$publish_where = '';
-		if ($params->get('use_publish_dates', 1 ))
+		
+		// Get data like aliases and published state
+		$use_publish_dates = $params->get('use_publish_dates_view', -1) != -1  ?  $params->get('use_publish_dates_view')  :  $params->get('use_publish_dates', 1);
+		if ($use_publish_dates)
 		{
 			// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 			//  thus the items are published globally at the time the author specified in his/her local clock
@@ -3923,10 +3925,13 @@ class FlexicontentFields
 			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
 			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
 		}
-		if (count($states)) {
+
+		$onlypublished_view = $params->get('onlypublished_view', -1) != -1  ?  $params->get('onlypublished_view')  :  $params->get('onlypublished', 1);
+		if ($onlypublished_view && count($states))
+		{
 			$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
 		}
-		
+
 		// item IDs via reversing a relation field
 		if ($reverse_field) {
 			$item_join  = ' JOIN #__flexicontent_fields_item_relations AS fi_rel'
@@ -3939,23 +3944,26 @@ class FlexicontentFields
 		}
 
 
-		// reverse category scope
+		// category scope (reverse relation field parameter)
 		if($params->get('reverse_scope_category', 0))
 		{
 			$cat_where = ' AND i.catid IN ('. implode(",", array_values($params->get('reverse_scope_category', 0))) .')';
 		}
-		// reverse type scope
+
+		// type scope (reverse relation field parameter)
 		if($params->get('reverse_scope_types', 0))
 		{
 			$type_where = ' AND ext.type_id IN ('. implode(",", array_values($params->get('reverse_scope_types', 0))) .')';
 		}
-		// reverse owner scope
-		if($params->get('ownedbyuser', 0))
+
+		// owner scope
+		$ownedbyuser = $params->get('ownedbyuser_view', -1) != -1  ?  $params->get('ownedbyuser_view')  :  $params->get('ownedbyuser', 0);
+		if($ownedbyuser)
 		{
-			//if item owned by editing user/logged in user currently editing the field
-			if ($params->get('ownedbyuser', 0) == 1) $itemowned_where = ' AND i.created_by=' . $user->id;
-			//if item owned by the reversing item's item owner
-			else if ($params->get('ownedbyuser', 0) == 2) $itemowned_where = ' AND i.created_by=' . $parentitem->created_by;
+			//if related item owned by editing user/logged in user currently editing the field
+			if ($ownedbyuser == 1) $itemowned_where = ' AND i.created_by=' . $user->id;
+			//if related item owned by the parent item's owner
+			else if ($ownedbyuser == 2) $itemowned_where = ' AND i.created_by=' . $parentitem->created_by;
 		}
 
 
