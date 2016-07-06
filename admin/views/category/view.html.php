@@ -134,7 +134,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
-		$document->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH );  // Frontend/backend script
+		flexicontent_html::loadFramework('flexi-lib-form');
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden

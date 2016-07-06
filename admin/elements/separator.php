@@ -179,6 +179,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$_class = @$attributes['class'];
 		$_style = @$attributes['style'];
 		
+		$tab_class = @$attributes['tab_class'] ? $attributes['tab_class'] : 's-gray';
+		
 		if (self::$tab_css_js_added===null && $level=='tabset_start')
 		{
 			$this->add_tab_css_js();
@@ -216,7 +218,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			if ($box_type==2)
 				return JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1));
 			else
-				return "\n". '<div class="fctabber s-gray" id="tabset_attrs_'.($tabset_id++).'">';
+				return "\n". '<div class="fctabber '.$tab_class.'" id="tabset_attrs_'.($tabset_id++).'">';
 			break;
 
 		case 'tabset_close':

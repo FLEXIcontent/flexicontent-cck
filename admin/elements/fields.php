@@ -53,7 +53,7 @@ class JFormFieldFields extends JFormField
 		if ( $js_css_added===null )
 		{
 			flexicontent_html::loadJQuery();
-			JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH );  // Frontend/backend script
+			flexicontent_html::loadFramework('flexi-lib-form');
 			$js_css_added = true;
 		}
 		
@@ -337,12 +337,7 @@ class JFormFieldFields extends JFormField
 			</div>
 			<div class="fcclear"></div>';
 			
-			$js = "
-				if (sorttable_fcfield_lists)
-					sorttable_fcfield_lists = sorttable_fcfield_lists + ',#".$sortable_id."';
-				else
-					sorttable_fcfield_lists = '#".$sortable_id."';
-			";
+			$js = "";
 			if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 			
 			$attribs .= ' class="use_select2_lib" ';

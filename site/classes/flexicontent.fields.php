@@ -518,10 +518,19 @@ class FlexicontentFields
 		} else {
 			$all_items = & $_item ;
 			$field_name = $_field;
-			$item = reset($_item);
-			$first_item_field = & $item->fields[$field_name];
+
+			$first_item_field = false;
+			foreach($all_items as $item)
+			{
+				if (isset($item->fields[$field_name]))
+				{
+					$first_item_field = & $item->fields[$field_name];
+				}
+			}
+			if (!$first_item_field) return null;
 		}
-		
+
+
 		// Skip items that have already created the given 'method' for this 'field' and for the given view
 		// we also use VIEW so that we can reder different displays of the field e.g. item VIEW and module view
 		$items = array();
@@ -3910,7 +3919,7 @@ class FlexicontentFields
 		$publish_where = '';
 		
 		// Get data like aliases and published state
-		$use_publish_dates = $params->get('use_publish_dates_view', -1) != -1  ?  $params->get('use_publish_dates_view')  :  $params->get('use_publish_dates', 1);
+		$use_publish_dates = $params->get('use_publish_dates_view', 1) != -1  ?  $params->get('use_publish_dates_view', 1)  :  $params->get('use_publish_dates', 1);
 		if ($use_publish_dates)
 		{
 			// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -3926,8 +3935,8 @@ class FlexicontentFields
 			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
 		}
 
-		$onlypublished_view = $params->get('onlypublished_view', -1) != -1  ?  $params->get('onlypublished_view')  :  $params->get('onlypublished', 1);
-		if ($onlypublished_view && count($states))
+		$onlypublished = $params->get('onlypublished_view', 1) != -1  ?  $params->get('onlypublished_view', 1)  :  $params->get('onlypublished', 1);
+		if ($onlypublished && count($states))
 		{
 			$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
 		}
@@ -4124,9 +4133,6 @@ class FlexicontentFields
 		
 		foreach($item_list as $result)
 		{
-			// Check if related item is published and skip if not published
-			if ($result->state != 1 && $result->state != -5) continue;
-			
 			$itemslug = $result->id.":".$result->alias;
 			$catslug = "";
 			
@@ -4178,9 +4184,6 @@ class FlexicontentFields
 		{
 			$url_read_more = JText::_( isset($_item_data->url_read_more) ? $_item_data->url_read_more : 'FLEXI_READ_MORE_ABOUT' , 1);
 			$url_class = (isset($_item_data->url_class) ? $_item_data->url_class : 'relateditem');
-			
-			// Check if related item is published and skip if not published
-			if ($result->state != 1 && $result->state != -5) continue;
 			
 			// a. Replace some custom made strings
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));

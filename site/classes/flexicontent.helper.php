@@ -1743,6 +1743,20 @@ class flexicontent_html
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				break;
 			
+			// Used only by content / configuration forms, that have form elements needing this
+			case 'flexi-lib-form':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH);
+				JText::script("FLEXI_EDIT", true);
+				JText::script("FLEXI_ADD", true);
+				JText::script("FLEXI_NA", true);
+				JText::script("FLEXI_REMOVE", true);
+				JText::script("FLEXI_ORDER", true);
+				JText::script("FLEXI_INDEXED_FIELD_UNUSED_COL_DISABLED", true);
+				JText::script("FLEXI_INDEXED_FIELD_VALGRP_COL_DISABLED", true);
+				break;
+			
 			default:
 				JFactory::getApplication()->enqueueMessage(__FUNCTION__.' Cannot load unknown Framework: '.$framework, 'error');
 				break;
