@@ -86,7 +86,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		
 		$_itemids_catids = array();
 		$_itemids = array();
-		foreach($field->value as $i => $val) {
+		foreach($field->value as $i => $val)
+		{
 			list ($itemid,$catid) = explode(":", $val);
 			$itemid = (int) $itemid;
 			$catid  = (int) $catid;
@@ -96,27 +97,9 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$_itemids_catids[$itemid]->value  = $val;
 			$_itemids[] = $itemid;
 		}
-		
-		$auto_relate_curritem = $field->parameters->get( 'auto_relate_curritem', 0);
-		if ($auto_relate_curritem && !empty($_itemids_catids) && !FlexicontentHelperPerm::getPerm()->SuperAdmin)
-		{
-			$query = 'SELECT title, id, catid, state, alias '
-				. ' FROM #__content '
-				. ' WHERE id IN ('. implode( array_keys($_itemids_catids), ',') .')'
-				;
-			$db->setQuery($query);
-			$rel_items = $db->loadObjectList();
-			$i = 0;
-			foreach ($rel_items as $rel_item) {
-				$field->html .= '<input id="'.$elementid.$i.'" name="'.$fieldname.'['.$i.']" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
-				$field->html .= $rel_item->title." <br/> \n";
-				$i++;
-			}
-			return;
-		}
-		
-		
-		
+
+
+
 		// ******************
 		// SCOPE PARAMETERS
 		// ******************

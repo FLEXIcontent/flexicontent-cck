@@ -128,7 +128,7 @@
 				<option value="1">FLEXI_SECURE</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_EDITING" icon_class="" level="tabset_close" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-file-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
