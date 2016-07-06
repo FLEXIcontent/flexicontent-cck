@@ -2790,7 +2790,7 @@ class flexicontent_html
 		$layout = JRequest::getVar('layout', 'default');
 		if ( !$auto_relations )
 		{
-			if ( $view!='category' || $layout == 'author' || $layout == 'favs' || $layout == 'tags' ) return '';
+			if ( $view!='category' || $layout == 'author' || $layout == 'favs' ) return '';
 		}
 		
 		

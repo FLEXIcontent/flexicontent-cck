@@ -346,13 +346,13 @@ class FlexicontentModelItems extends JModelLegacy
 			foreach($query_ids as $item_id) {
 				$item = $_data[$item_id];
 				
-				$item->cats = $item->relcats ? preg_split("/[\s]*,[\s]*/", $item->relcats) : array();
-				foreach ($item->cats as $item_cat) {
+				$item->catids = $item->relcats ? preg_split("/[\s]*,[\s]*/", $item->relcats) : array();
+				foreach ($item->catids as $item_cat) {
 					if ($item_cat) $this->_catids[$item_cat] = 1;
 				}
 				
-				$item->tags = $item->taglist ? array_reverse(preg_split("/[\s]*,[\s]*/", $item->taglist)) : array();
-				foreach ($item->tags as $item_tag) {
+				$item->tagids = $item->taglist ? array_reverse(preg_split("/[\s]*,[\s]*/", $item->taglist)) : array();
+				foreach ($item->tagids as $item_tag) {
 					if ($item_tag) $this->_tagids[$item_tag] = 1;
 				}
 				

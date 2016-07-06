@@ -20,6 +20,14 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
+
+// Create custom field columns
+foreach($this->extra_fields as $_field):
+	$values = null;
+	$field = $_field;
+	FlexicontentFields::renderField($this->rows, $field->name, $values, $field->methodname);
+endforeach;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $ico_class = 'btn btn-micro'; //'fc-man-icon-s';
@@ -883,21 +891,12 @@ jQuery(document).ready(function(){
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 
-    <?php foreach($this->extra_fields as $_field) :?>
+    <?php foreach($this->extra_fields as $field) :?>
 
 			<td>
 		    <?php
-		    // Clear display HTML just in case
-		    $field = clone($_field);  // quickly make a shallow copy of the fields object to avoid assignments of various member variables being persistent
-		    
-		    // Field value for current item
-		    $field_value = isset($row->fieldvalues[$field->id]) ? $row->fieldvalues[$field->id] : false;
-		    
-				// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
-				FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
-				
 				// Output the field's display HTML
-				echo @$field->{$field->methodname};
+				echo isset( $row->fields[$field->name]->{$field->methodname} ) ? $row->fields[$field->name]->{$field->methodname} : '';
 		    ?>
 			</td>
 		<?php endforeach; ?>
@@ -955,9 +954,9 @@ jQuery(document).ready(function(){
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
-				$_cats = array();
+				$catids = array();
 				$nn = 1;
-				foreach ($row->cats as $key => $_icat)
+				foreach ($row->catids as $key => $_icat)
 				{
 					if ( !isset($this->itemCats[$_icat]) ) continue;
 					$category = & $this->itemCats[$_icat];
@@ -965,28 +964,28 @@ jQuery(document).ready(function(){
 					// Place first category of category filter
 					if ($this->filter_order=='catsordering' && (int)$this->filter_cats) {
 						$isFilterCat = ((int)$category->id == (int)$this->filter_cats);
-						if ($isFilterCat) $_cats[0] = $_icat;
-						else $_cats[$nn++] = $_icat;
+						if ($isFilterCat) $catids[0] = $_icat;
+						else $catids[$nn++] = $_icat;
 					}
 					
 					// Place first the main category of the item, in ALL cases except if doing per category FLEXIcontent ordering
 					else if ($this->filter_order!='catsordering') {
 						$isMainCat = ((int)$category->id == (int)$row->catid);
-						if ($isMainCat) $_cats[0] = $_icat;
-						else $_cats[$nn++] = $_icat;
+						if ($isMainCat) $catids[0] = $_icat;
+						else $catids[$nn++] = $_icat;
 					}
 					else {  // $this->filter_order=='catsordering' AND filter_cats is empty, ordering by first found category, DONOT reoder the display
-						$_cats[$nn-1] = $_icat;
+						$catids[$nn-1] = $_icat;
 						$nn++;
 					}
 				}
-				$row->cats = $_cats;
+				$row->catids = $catids;
 				
-				$nr = count($row->cats);
+				$nr = count($row->catids);
 				$ix = 0;
 				$nn = 0;
 				for ($nn=0; $nn < $nr; $nn++) :
-					$_item_cat = $row->cats[$nn];
+					$_item_cat = $row->catids[$nn];
 					if ( !isset($this->itemCats[$_item_cat]) ) continue;
 					$category = & $this->itemCats[$_item_cat];
 					
@@ -1032,7 +1031,8 @@ jQuery(document).ready(function(){
 			
 			<td class="col_tag">
 				<?php
-					foreach ($row->tags as $key => $_itag) {
+					foreach ($row->tagids as $key => $_itag)
+					{
 						if ( !isset($this->itemTags[$_itag]) ) continue;
 						$tag = & $this->itemTags[$_itag];
 						echo '<span class="badge">'.$tag->name.'</span> ';

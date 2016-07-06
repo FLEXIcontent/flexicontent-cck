@@ -18,7 +18,7 @@
 		var w = typeof winwidth !== 'undefined' && winwidth  ? winwidth  : jQuery( window ).width() - 80;
 		var h = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 120;
 		
-		params.winwidth  = w  > (jQuery( window ).width() - 8)   ? (jQuery( window ).width() - 80)  :  w;
+		params.winwidth  = w  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)  :  w;
 		params.winheight = h  > (jQuery( window ).height() - 120) ? (jQuery( window ).height() - 120) : h;
 		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
 		
