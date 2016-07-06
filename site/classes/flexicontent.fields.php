@@ -525,22 +525,34 @@ class FlexicontentFields
 		// Skip items that have already created the given 'method' for this 'field' and for the given view
 		// we also use VIEW so that we can reder different displays of the field e.g. item VIEW and module view
 		$items = array();
-		foreach ($all_items as $_item_) {
+		foreach ($all_items as $_item_)
+		{
 			// Commented out, TODO: examine if we can return cached value here !!
 			//if (isset($_created[$view][$method][$field_name][$_item_->id])) continue;  // Skip this item
 			$items[] = $_item_;
 			$_created[$view][$method][$field_name][$_item_->id] = 1;
 		}
+
 		// Check if item array is empty (all items already rendered)
-		if (empty($items)) {
+		if (empty($items))
+		{
 			return !is_object($_field) ? null : $_field;
 		}
-		
+
+
 		// ***********************************************************************************************************
 		// Create field parameters (and values) in an optimized way, and also apply Type Customization for CORE fields
 		// ***********************************************************************************************************
-		foreach($items as $item) {
-			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+		foreach($items as $item)
+		{
+			// Only rendering 1 item the field object was given, skip current item if it does not have the desired field
+			if (is_object($_field))
+				$field = $_field;
+			else if ( isset($item->fields[$field_name]) )
+				$field = $item->fields[$field_name];
+			else
+				continue;
+
 			$field->item_id = (int)$item->id;  // Some code may make use of this
 			
 			// CHECK IF only rendering single field object for a single item  -->  thus we need to use custom values if these were given !
@@ -555,50 +567,45 @@ class FlexicontentFields
 			
 			FlexicontentFields::loadFieldConfig($field, $item);
 		}
-		
-		
-		// ***********************************************************************************************
-		// Return if field is in a group, since field display should be created only by the grouping field
-		// ***********************************************************************************************
-		/*if ( $first_item_field->parameters->get('use_ingroup', 0) )  {
-			if (is_object($_field)) $_field->{$method} = '
-				<span class="fc-mssg-inline fc-note">
-					This field ('.$field->label.') is configured for <b>grouping</b>. <br/>Please use a <b>grouping field</b> to edit and display this field
-				</span>
-			';
-			return !is_object($_field) ? null : $_field;
-		}*/
-		
-		
+
+
 		// **********************************************
 		// Return no access message if user has no ACCESS
 		// **********************************************
 		
 		// Calculate has_access flag if it is missing ... FLEXI_ACCESS ... no longer supported here ...
 		if ( !isset($first_item_field->has_access) ) {
-			$first_item_field->has_access = FLEXI_J16GE ? in_array($first_item_field->access, $aid) : $first_item_field->access <= $aid;
+			$first_item_field->has_access = in_array($first_item_field->access, $aid);
 		}
-		if ( !$first_item_field->has_access ) {
+		if ( !$first_item_field->has_access )
+		{
 			// Get configuration out of the field of the first item, any CONFIGURATION that is different
 			// per content TYPE, must not use this, instead it must be retrieved inside the item loops
 			$show_acc_msg = $first_item_field->parameters->get('show_acc_msg', 0);
 			$no_acc_msg = $first_item_field->parameters->get('no_acc_msg');
 			$no_acc_msg = JText::_( $no_acc_msg ? $no_acc_msg : 'FLEXI_FIELD_NO_ACCESS');
-			foreach($items as $item) {
-				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+			foreach($items as $item)
+			{
+				// Only rendering 1 item the field object was given, skip current item if it does not have the desired field
+				if (is_object($_field))
+					$field = $_field;
+				else if ( isset($item->fields[$field_name]) )
+					$field = $item->fields[$field_name];
+				else
+					continue;
+
 				// Only add no access message if field has a value
-				if (!empty($field->value)) {
+				if (!empty($field->value))
 					$field->$method = $show_acc_msg ? '<span class="fc-noauth fcfield_inaccessible_'.$field->id.'">'.$no_acc_msg.'</span>' : '';
-				} else {
+				else
 					$field->$method = '';
-				}
 			}
 			
 			// Return field only if single item was given (with a field object)
 			return !is_object($_field) ? null : $_field;
 		}
-		
-		
+
+
 		// ***************************************************************************************************
 		// Create field HTML by calling the appropriate DISPLAY-CREATING field plugin method.
 		// NOTE 1: We will not pass the 'values' method parameter to the display-creating field method,
@@ -623,8 +630,16 @@ class FlexicontentFields
 		else                      // NON CORE field
 		{
 			// DOES NOT support multiple items YET, do it 1 at a time
-			foreach($items as $item) {
-				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+			foreach($items as $item)
+			{
+				// Only rendering 1 item the field object was given, skip current item if it does not have the desired field
+				if (is_object($_field))
+					$field = $_field;
+				else if ( isset($item->fields[$field_name]) )
+					$field = $item->fields[$field_name];
+				else
+					continue;
+
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
 				if ($field->parameters->get('use_ingroup', 0) && empty($field->ingroup) && is_array($field->$method)) $field->$method = implode('', $field->$method);
@@ -639,32 +654,44 @@ class FlexicontentFields
 			}
 			@$fc_run_times['render_field'][$field->field_type] += $field_render_time;
 		}
-		
-		
+
+
 		// *****************************************
 		// Trigger content plugins on the field text
 		// *****************************************
 		
 		// Get configuration out of the field of the first item, if this CONFIGURATION was
 		// different per content TYPE, then we should move this inside the item loop (below)
-		if ( !is_array($_item) ) {
+		if ( !is_array($_item) )
+		{
 			$field = $_field;
-		} else {
+		}
+		else
+		{
 			$item = reset($items);
 			$field = $item->fields[$field_name];
 		}
-		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) ) {
+
+		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
+		{
 			$_t = $field->parameters->get('trigger_onprepare_content', 0);
 			if ($request_view=='category' && $view=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
 			$_trigger_plgs_ft[$field_name] = $_t;
 		}
-		
+
 		// DOES NOT support multiple items, do it 1 at a time
 		if ( !$skip_trigger_plgs && $_trigger_plgs_ft[$field_name] )
 		{
-			//echo "RENDER: ".$field_name."<br/>";
-			foreach($items as $item) {
-				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+			foreach($items as $item)
+			{
+				// Only rendering 1 item the field object was given, skip current item if it does not have the desired field
+				if (is_object($_field))
+					$field = $_field;
+				else if ( isset($item->fields[$field_name]) )
+					$field = $item->fields[$field_name];
+				else
+					continue;
+
 				if ($print_logging_info)  $start_microtime = microtime(true);	
 				FlexicontentFields::triggerContentPlugins($field, $item, $method, $view);
 				if ( $print_logging_info ) @$fc_run_times['content_plg'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

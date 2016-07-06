@@ -360,7 +360,13 @@ class FlexicontentViewItems extends JViewLegacy
 		foreach($customFilts as $filter) if (count($filter->value)) $count_filters++;
 		$itemCats   = $this->get( 'ItemCats' );
 		$itemTags   = $this->get( 'ItemTags' );
-		
+
+		// Get Field values to be used for rendering custom columns
+		if ($extraCols)
+		{
+			FlexicontentFields::getFields($rows, 'category');
+		}
+
 		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
 		$categories = $globalcats ? $globalcats : array();
