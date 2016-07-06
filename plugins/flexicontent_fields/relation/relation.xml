@@ -134,8 +134,24 @@
 
 			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_RELATED_ITEM_LIST" level="level3" class="alert alert-info fcpadded" />
 
-			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_MAX_LISTED_ITEMS" description="FLEXI_RIFLD_MAX_LISTED_ITEMS_DESC" />
+			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_MAX_LISTED_ITEMS" description="FLEXI_RIFLD_MAX_LISTED_ITEMS_DESC" hint="FLEXI_INT" />
 			<field name="itemslist_acclvl" type="accesslevel" default="1" label="FLEXI_RIFLD_ITEMS_LIST_ACCESS" description="FLEXI_RIFLD_ITEMS_LIST_ACCESS_DESC" depend_class="button-relation-mode" />
+
+			<field name="" type="separator" default="Filter items" level="level1" />
+			<field name="use_publish_dates_view" type="radio" default="-1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
+				<option value="-1">FLEXI_RIFLD_SAME_AS_EDIT</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="onlypublished_view" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group group-fcmethod">
+				<option value="-1">FLEXI_RIFLD_SAME_AS_EDIT</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="ownedbyuser_view" type="radio" default="-1" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group group-fcmethod">
+				<option value="-1">FLEXI_RIFLD_SAME_AS_EDIT</option>
+				<option value="1">FLEXI_RIFLD_EDITOR</option>
+				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
+			</field>
+
 
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
@@ -200,7 +216,7 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
@@ -279,7 +295,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_CUSTOMIZE" description="" level="level2" depend_class="button-relation-mode" />
-			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode" />
+			<field name="auto_relate_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" disable="separator,test" state="1" published="1" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_title" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_mssg" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT_DESC" depend_class="button-relation-mode" />
