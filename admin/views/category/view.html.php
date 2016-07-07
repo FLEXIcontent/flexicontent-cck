@@ -201,7 +201,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$autologin		= ''; //$cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			$previewlink 	= JRoute::_(JURI::root(). FlexicontentHelperRoute::getCategoryRoute($categories[$cid]->slug)) . $autologin;
 			// Add a preview button
-			$bar->appendButton( 'Custom', '<a class="preview btn btn-small btn-info spaced-btn" href="'.$previewlink.'" target="_blank" ><span title="'.JText::_('Preview').'" class="icon-screen"></span>'.JText::_('Preview').'</a>', 'preview' );
+			$bar->appendButton( 'Custom', '<a class="preview btn btn-small btn-info spaced-btn" href="'.$previewlink.'" target="_blank" ><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW').'</a>', 'preview' );
 		}
 
 

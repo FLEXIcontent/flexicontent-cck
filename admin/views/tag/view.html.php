@@ -65,7 +65,7 @@ class FlexicontentViewTag extends JViewLegacy
 			$autologin  = ''; // $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			// Add a preview button
 			$previewlink 	= $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($row->id)) . $autologin;
-			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW').'</a>', 'preview' );
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_TAG' ), 'tagadd' );
 		}
