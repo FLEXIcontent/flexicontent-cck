@@ -71,7 +71,7 @@ class FlexicontentViewReview extends JViewLegacy
 			$review_link    = JRoute::_(JURI::root().$review_link, $xhtml=false)."#review_id_".$row->id;  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 			$previewlink = $review_link . $autologin;
 			
-			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW').'</a>', 'preview' );
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_REVIEW' ), 'reviewadd' );
 		}
