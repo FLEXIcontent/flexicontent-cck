@@ -217,7 +217,8 @@ var move_within_ordering_groups_limits = <?php echo '"'.JText::_('FLEXI_MOVE_WIT
 <?php if ($this->unassociated && !$this->badcatitems) : ?>
 	var unassociated_items = <?php echo $this->unassociated; ?>;
 	function bindItems() {
-		jQuery('#log-bind').html('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" style="text-align:center;"></p>');
+		jQuery('#log-bind').html('<img src="components/com_flexicontent/assets/images/ajax-loader.gif">');
+		jQuery('#orphan_items_mssg').html("<?php echo JText::_( 'FLEXI_ITEMS_TO_BIND', true ); ?>");
 		
 		//$('bindForm').submb
 		//this.form.action += '&typeid='+this.form.elements['typeid'].options[this.form.elements['typeid'].selectedIndex].value;
@@ -264,10 +265,10 @@ jQuery(document).ready(function(){
 		$('fixcatForm').action += '&default_cat='+$('fixcatForm').elements['default_cat'].options[$('fixcatForm').elements['default_cat'].selectedIndex].value;
 		
 		if(MooTools.version>="1.2.4") {
-			$('log-fixcat').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" style="text-align:center;"></p>');
+			$('log-fixcat').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="text-align:center;"></p>');
 			e = e.stop();
 		}else{
-			$('log-fixcat').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" style="text-align:center;"></p>');
+			$('log-fixcat').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="text-align:center;"></p>');
 			e = new Event(e).stop();
 		}
 		if(MooTools.version>="1.2.4") {
@@ -307,30 +308,33 @@ jQuery(document).ready(function(){
 
 
 	<?php if ($this->unassociated && !$this->badcatitems) : ?>
-		<div class="fc-mssg fc-warning">
-		<table>
-			<tr>
-				<td>
-				<span style="font-size:115%;">
-				<?php echo JText::_( 'FLEXI_UNASSOCIATED_WARNING' ); ?>
-				</span>
-				</td>
-				<td width="35%">
-					<span style="font-size:150%;"><span id="orphan_items_count"><?php echo $this->unassociated; ?></span></span>
-					<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>
-					<div id="log-bind"></div>
-					<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw" method="post" name="bindForm" id="bindForm">
-						<?php echo $this->lists['bind_limits']; ?>
-						<?php
-							$types = $this->get( 'Typeslist' );
-							echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
-						?>
-						<input id="button-bind" type="button" class="<?php echo $btn_class; ?> btn-primary" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
-						onclick="jQuery(this.form).hide(); bindItems();" />
-					</form>
-				</td>
-			</tr>
-		</table>
+		<div class="fc-mssg fc-success" style="margin-bottom: 32px;">
+			
+			<?php echo JText::_( 'FLEXI_UNASSOCIATED_WARNING' ); ?>
+
+			<br/><br/>
+			<span id="log-bind"></span>
+			<span class="badge" style="border-radius: 3px;" id="orphan_items_count"><?php echo $this->unassociated; ?></span>
+			<span id="orphan_items_mssg"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></span>
+
+			<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw" method="post" name="bindForm" id="bindForm" style="display: inline-block;">
+
+				<input id="button-bind" type="button"
+					class="<?php echo $btn_class; ?> btn-primary" style='float:none !important; box-sizing: border-box; min-width: 200px;'
+					value="<?php echo JText::_( 'FLEXI_BIND' ); ?>" onclick="jQuery(this.form).hide(); bindItems();"
+				/>
+
+				<?php
+					echo '
+						<span class="badge" style="border-radius: 3px;">'.JText::_( 'FLEXI_TO' ) . '</span> ' .
+						flexicontent_html::buildtypesselect($_types = $this->get( 'Typeslist' ), 'typeid', $_typesselected='', false, ' class="use_select2_lib" ', 'typeid') . '
+						
+						<div style="display: '.($this->unassociated > 1000 ? 'inline-block;' : 'none;').'">
+							<span class="label">'.JText::_( 'with step ' ) . '</span>' . $this->lists['bind_limits'] .'
+						</div>';
+				?>
+
+			</form>
 		</div>
 	<?php endif; ?>
 
