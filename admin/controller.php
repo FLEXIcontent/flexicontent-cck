@@ -867,48 +867,60 @@ class FlexicontentController extends JControllerLegacy
 		
 		$model  = $this->getModel('flexicontent');
 		$missing_indexes = $model->getExistDBindexes($check_only=false);
-		if ( !empty($missing_indexes) ) {
+		if ( !empty($missing_indexes) )
+		{
 			$app = JFactory::getApplication();
 			
 			foreach($missing_indexes as $tblname => $indexnames)
 			{
 				$index_cmds = array();
 				if ( isset($indexnames['__indexing_started__']) ) continue;
-				foreach($indexnames as $indexname => $iconf) {
-					if (!is_array($iconf)) {
+				foreach($indexnames as $indexname => $iconf)
+				{
+					if (!is_array($iconf))
+					{
 						$indexlen = $iconf ? "(".$iconf.")" : "";
-						$index_cmds[] = " ADD INDEX " . $indexname . "(`".$indexname."`" .$indexlen. ")";
-					} else {
-						$indexdrop = !empty($iconf['custom_add']) ? $iconf['custom_drop'].", " : "";
+						$index_cmds['indexadd'][] = " ADD INDEX " . $indexname . "(`".$indexname."`" .$indexlen. ")";
+					}
+					else
+					{
+						$indexdrop = !empty($iconf['custom_drop']) ? $iconf['custom_drop'] : "";
 						$indexadd  = !empty($iconf['custom_add']) ? $iconf['custom_add'] : " ADD INDEX " . $indexname;
 						$_col_list = array();
-						foreach($iconf['cols'] as $indexcol => $len) {
+						foreach($iconf['cols'] as $indexcol => $len)
+						{
 							$indexlen  = $len ? "(".$len.")" : "";
 							$_col_list[] = "`".$indexcol."`" .$indexlen;
 						}
-						$index_cmds[]	= $indexdrop . $indexadd . "(". implode(", ", $_col_list) .")";
+						if ($indexdrop) $index_cmds['indexdrop'][] = $indexdrop;
+						if ($indexadd) $index_cmds['indexadd'][]   = $indexadd . "(". implode(", ", $_col_list) .")";
 					}
 				}
 				
 				// For MyISAM the table is copied for the purpose of adding indexes and then old table is dropped
 				// so it is better to add ALL table indexes via single command ?
 				// For InnoDB in MySQL 5.1+, table is not copied so these when adding indexes it is better to have InnoDB tables
-				if ( !empty($index_cmds) ) {
+				if ( !empty($index_cmds) )
+				{
 					$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
 					$file_contents = "".time();
 					JFile::write($file, $file_contents);
 					
-					$query  = "ALTER TABLE `#__".$tblname."` ";
-					$query .= implode(', ', $index_cmds);
-					$db->setQuery($query);
-					
-					try { $result = $db->execute(); }
-					catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-					
-					if (!$result) {
-						echo '<span class="install-notok"></span>';
-						if ($db->getErrorNum()) echo $db->getErrorMsg();
-						jexit();
+					foreach($index_cmds as $index_type => $index_clause)
+					{
+						$query  = "ALTER TABLE `#__".$tblname."` ";
+						$query .= implode(', ', $index_clause);
+						$db->setQuery($query);
+
+						try { $result = $db->execute(); }
+						catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+
+						if (!$result && $index_type!='indexdrop')
+						{
+							echo '<span class="install-notok"></span>';
+							if ($db->getErrorNum()) echo $db->getErrorMsg();
+							jexit();
+						}
 					}
 					JFile::delete($file);
 				}

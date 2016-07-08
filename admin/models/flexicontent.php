@@ -774,10 +774,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$missing = array();
 		$all_started = true;
-		foreach($tblname_indexnames as $tblname => $indexnames) {
+		foreach($tblname_indexnames as $tblname => $indexnames)
+		{
 			$indexing_started = false;
 			$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
-			if ( JFile::exists($file) ) {
+			if ( JFile::exists($file) )
+			{
 				$indexing_start_secs = (int)JFile::read($file);
 				$indexing_started = $indexing_start_secs + 3600 > time();
 				if (!$indexing_started) {
@@ -785,7 +787,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 			
-			foreach($indexnames as $indexname => $iconf) {
+			foreach($indexnames as $indexname => $iconf)
+			{
 				$query = "SELECT COUNT(1) AS IndexIsThere "
 					." FROM INFORMATION_SCHEMA.STATISTICS"
 					." WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."' AND index_name='".$indexname."'"

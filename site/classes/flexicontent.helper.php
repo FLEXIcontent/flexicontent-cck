@@ -272,7 +272,7 @@ class flexicontent_html
 			
 			if (!JFile::exists($path.$inFile)) {
 				//if ($debug) JFactory::getApplication()->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
-			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) ) {
+			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) || (filesize($path.$outFile)===0 && is_writable($path.$outFile)) ) {
 				$stale[$inFile] = $outFile;
 			}
 		}

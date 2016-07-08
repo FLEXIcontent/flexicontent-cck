@@ -67,8 +67,6 @@ class FlexicontentViewItems extends JViewLegacy
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 		
-		$bind_limit = $jinput->get('bind_limit', 1000, 'int');
-		
 		// Some flags
 		$useAssocs = flexicontent_db::useAssociations();
 		$print_logging_info = $cparams->get('print_logging_info');
@@ -350,6 +348,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$badcatitems  = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
 		$unassociated = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false);
 		
+		$bind_limit = $jinput->get('bind_limit', ($unassociated >= 1000 ? 1000 : 250), 'int');
+		
 		$rows     	= $this->get( 'Data');
 		$pagination	= $this->get( 'Pagination' );
 		$types			= $this->get( 'Typeslist' );
@@ -578,7 +578,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$bind_limits[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$bind_limits[] = JHTML::_('select.option', 1500,'1500 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$bind_limits[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$lists['bind_limits'] = JHTML::_('select.genericlist', $bind_limits, 'bind_limit', 'size="1" class="use_select2_lib"', 'value', 'text', $bind_limit, 'bind_limit' );
+		$lists['bind_limits'] = JHTML::_('select.genericlist', $bind_limits, 'bind_limit', ' class="use_select2_lib" ', 'value', 'text', $bind_limit, 'bind_limit' );
 
 		// search filter
 		$lists['search'] = $search;
