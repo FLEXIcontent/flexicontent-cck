@@ -546,7 +546,34 @@ class plgFlexicontent_fieldsRadio extends FCField
 				$_elements = array();
 				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);
-				$and_clause = ' AND valgroup IN ('.implode(',', $_valgrps).')';
+//REMOVE                        $and_clause = ' AND valgroup IN ('.implode(',', $_valgrps).')';
+                                
+                                // use value from the valgrp select expression to build where clause
+                                // to avoid "alias in where clause" issue
+                                // append or create the where clause
+                                if (preg_match("/where/i", $field_elements)) {
+                                    $and_clause = ' and ';
+                                } else {
+                                    $and_clause = ' where ';
+                                }
+                                // maybe put that scan in a function or use another if have in framework
+                                // the _valgrp_in_ substitute is not needed anymore
+                                // but sequence must be value,text,valgrp or value,text,image,valgrp
+                                if (preg_match("/as image/i", $field_elements)) {
+                                    $field_elements_pos = stripos($field_elements, 'as image,');
+                                    $field_elements_str = substr($field_elements, $field_elements_pos);
+                                    $field_elements_str_two = substr($field_elements_str, strlen('as image,'));
+                                } else {
+                                    $field_elements_pos = stripos($field_elements, 'as text,');
+                                    $field_elements_str = substr($field_elements, $field_elements_pos);
+                                    $field_elements_str_two = substr($field_elements_str, strlen('as text,'));
+                                }
+                                $field_elements_second_pos = stripos($field_elements_str_two, 'as valgrp');
+                                $field_elements_str_three = substr($field_elements_str_two, 0, $field_elements_second_pos);
+                                $valgrp_expression = trim($field_elements_str_three);
+                                $and_clause .= $valgrp_expression;
+                                $and_clause .= ' IN ('.implode(',', $_valgrps).')';
+
 			}
 			$item_pros = true;
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
