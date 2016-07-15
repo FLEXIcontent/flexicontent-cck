@@ -36,10 +36,11 @@ defined('_JEXEC') or die('Restricted access');
 						</tr>
 					</thead>
 					<tbody>
-						<?php
-						foreach ($this->rows as $row) :
+			<?php
+			
+							foreach ($this->rows as $row) :
 							if (in_array($row->id, $this->cid)) :
-								foreach ($row->cats as $catid) :
+								foreach ($row->catids as $catid) :
 									if ($catid == $row->catid) :
 										$maincat = $this->itemCats[$catid]->title;
 						?>
