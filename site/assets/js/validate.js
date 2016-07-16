@@ -1,23 +1,13 @@
-/**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- */
-
 // TODO: check which variables do not need to be global
-var fcform_isValid = false;
-var first_invalid_field_found;
+var fcform_1st_invalid_found = false;
+
 var max_cat_assign_fc = 0;
 var existing_cats_fc  = [];
 var fcpass_element = new Object();  // Validation functions needing element instead of value
 fcpass_element['jform_catid'] = 1;
 
-/*Object.size = function(obj) {
-	var size = 0, key;
-	for (key in obj) {
-		if (obj.hasOwnProperty(key)) size++;
-	}
-	return size;
-};*/
+
+// Joomla form validator should be loaded before this script, to allow proper overriding
 
 
 /**
@@ -33,18 +23,21 @@ var JFormValidator_fc = null;
 var JFormValidator = function()
 {
 	"use strict";
-	var handlers, inputEmail, custom,
+	var handlers, inputEmail, custom, IEversion, isIE8,
 
 	initialize = function()
 	{
-		// Joomla form validator should be loaded before this script, to avoid potential conflicts
-		// we prevent Joomla form validation JS script to create 2nd validation object
-		if (JFormValidator_fc) return JFormValidator_fc;  //
-		//alert('Initializing FLEXIcontent form validator');
+		// Prevent Joomla form validation JS script to create 2nd validation object
+		if (JFormValidator_fc) return JFormValidator_fc;
+
+		//Joomla.fc_debug = 1;
+		//window.console.log('Initializing FLEXIcontent JFormValidator');
 		
 		// Initialize variables
 		handlers = {};
 		custom = custom || {};
+		IEversion = isIE();
+		isIE8 = IEversion ? IEversion < 9 : false;
 
  	 	inputEmail = (function() {
  	 	 	var input = document.createElement("input");
@@ -80,69 +73,29 @@ var JFormValidator = function()
 		});
 
 		setHandler('radio', function (par) {
+			if (par.parentNode == null) return true;
+			//window.console.log( 'validate-radio: ' + jQuery(par.parentNode).attr('id') );
+
+			var options = par.parentNode.getElementsByTagName('input');
 			var nl, i;
-			if (par.parentNode == null) {
-				return true;
-			} else {
-				var options = par.parentNode.getElementsByTagName('input');
-				
-				for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked) return true;
-				}
-				
-				return false;
+			for (i=0, nl = options; i<nl.length; i++)
+			{
+				if (nl[i].checked) return true;
 			}
+			return false;
 		});
 
 		setHandler('checkbox', function (par) {
-			var nl, i;
-			if (par.parentNode == null) {
-				return true;
-			} else {
-				var options = par.parentNode.getElementsByTagName('input');
-				
-				for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked) return true;
-				}
-				
-				return false;
-			}
-		});
+			if (par.parentNode == null) return true;
+			//window.console.log( 'validate-checkbox: ' + jQuery(par.parentNode).attr('id') );
 
-		setHandler('checkbox2', function (par) {
+			var options = par.parentNode.getElementsByTagName('input');
 			var nl, i;
-			if (par.parentNode == null) {
-				return true;
-			} else {
-				var options = par.parentNode.getElementsByTagName('input');
-				
-				var count = 0;
-				for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked) count++;
-				}
-				
-				//exactly 2 options
-				if(count == 2) return true;
-				return false;
+			for (i=0, nl = options; i<nl.length; i++)
+			{
+				if (nl[i].checked) return true;
 			}
-		});
-
-		setHandler('checkbox3', function (par) {
-			var nl, i;
-			if (par.parentNode == null) {
-				return true;
-			} else {
-				var options = par.parentNode.getElementsByTagName('input');
-				
-				var count = 0;
-				for (i=0, nl = options; i<nl.length; i++) {
-					if (nl[i].checked) count++;
-				}
-				
-				//exactly 3 options
-				if(count == 3) return true;
-				return false;
-			}
+			return false;
 		});
 
 		setHandler('catid', function (el) {
@@ -157,10 +110,14 @@ var JFormValidator = function()
 			
 			// If exactly one secondary category was selected then set it as primary
 			var values = jQuery(document.getElementsByName(field_name)).val();
-			if (values && values.length == 1) {
+			if (values && values.length == 1)
+			{
 				$el.val(values[0]);
-				if ($el.val()) {  // main category tree maybe different than secondary, so check value exists
-					if ($el.hasClass('use_select2_lib')) {
+				// Main category tree maybe different than secondary, so check value exists
+				if ($el.val())
+				{
+					if ($el.hasClass('use_select2_lib'))
+					{
 						$el.trigger('change');
 					}
 					return true;
@@ -202,13 +159,15 @@ var JFormValidator = function()
 		setHandler('sellimitations', function (el)
 		{
 			if ( !el ) return true;
-			
+
 			var nl, i;
 			var options = el.getElementsByTagName('option');
 			var count = 0;
-			for (i=0, nl = options; i<nl.length; i++) {
+			for (i=0, nl = options; i<nl.length; i++)
+			{
 				if (nl[i].selected) count++;
 			}
+			//window.console.log('sellimitations: ' + el.name + ' -- ' + el.id + ' selected count: ' + count);
 			
 			var min_values = el.getAttribute("data-min_values");
 			min_values = min_values ? parseInt( min_values, 10 ) : 0;
@@ -230,10 +189,10 @@ var JFormValidator = function()
 			else if ( exact_values && count != exact_values) {
 				errorMessage = 'Number of values must be exactly : '+exact_values;
 			}
-			
+
 			var $el = jQuery(el);
 			var $next = $el.next();
-			
+
 			if ( errorMessage )
 			{
 				if ( $next.hasClass('invalid_jfield_message') )
@@ -242,25 +201,40 @@ var JFormValidator = function()
 					jQuery('<span class="alert alert-warning invalid_jfield_message" style="display:inline-block; margin: 2px 12px;">' + errorMessage + '</span>').insertAfter( $el );
 				return false;
 			}
-			
+
 			else if ( $next.hasClass('invalid_jfield_message') )
 			{
 				$next.remove();
 			}
-			
+
 			return true;
 		});
 
 		setHandler('cboxlimitations', function (el)
 		{
 			if ( !el.parentNode.parentNode ) return true;
-			
+
+			var el_name = el.name;
+			var $form = jQuery(el.form);
+
+			var fcform_input_sets = $form.data('fcform_input_sets');
+			if (fcform_input_sets && typeof fcform_input_sets[el_name] !== 'undefined') return null;
+
 			var nl, i;
 			var options = el.parentNode.parentNode.getElementsByTagName('input');
 			var count = 0;
-			for (i=0, nl = options; i<nl.length; i++) {
+			for (i=0, nl = options; i<nl.length; i++)
+			{
 				if (nl[i].checked) count++;
 			}
+
+			// Do not revalidate other checkboxes with same name
+			if (fcform_input_sets && typeof fcform_input_sets[el_name] === 'undefined')
+			{
+				fcform_input_sets[el_name] = count;
+				$form.data('fcform_input_sets', fcform_input_sets);
+			}
+			//window.console.log('cboxlimitations: ' + el.name + ' -- ' + el.id + ' selected count: ' + count);
 			
 			var min_values = el.getAttribute("data-min_values");
 			min_values = min_values ? parseInt( min_values, 10 ) : 0;
@@ -282,11 +256,11 @@ var JFormValidator = function()
 			else if ( exact_values && count != exact_values) {
 				errorMessage = 'Number of values must be exactly : '+exact_values;
 			}
-			
+
 			var $el = jQuery(el);
 			var $parent = $el.closest('.fc_input_set');
 			var $next = $parent.next();
-			
+
 			if ( errorMessage )
 			{
 				if ( $next.hasClass('invalid_jfield_message') )
@@ -314,36 +288,36 @@ var JFormValidator = function()
 		};
 	},
 
-	attachToForm = function(form)
+	attachToForm = function(form, container)
 	{
  	 	var inputFields = [], elements,
  	 		$form = jQuery(form);
 		
-		var isIE8 = isIE() ? isIE() < 9 : false;
-		
 		// Iterate through the form object and attach the validate method to all input fields.
-		//elements = $form.find('input, textarea, select, fieldset, button');
-		elements = $form.find('fieldset').toArray().concat(Array.from(form.elements));
+		//var elements = $form.find('input, textarea, select, fieldset, button');
+		var elements = typeof container !== 'undefined' && container ?
+			jQuery(container).find('input, textarea, select, fieldset, button').toArray() :
+			$form.find('fieldset').toArray().concat(Array.from(form.elements)) ;
 
  	 	for (var i = 0, l = elements.length; i < l; i++)
  	 	{
 			var $el = jQuery(elements[i]);
-			var tagName = $el.prop("tagName").toLowerCase();
-			var tagType = $el.attr('type');
+			var tagName = elements[i].tagName;
+			var inputType = tagName != 'INPUT' ? false : elements[i].type;
 			
-			if ( $el.hasClass('required') )
+			if ( hasClass(elements[i], 'required') )
 			{
 				$el.attr('aria-required', 'true').attr('required', 'required');
 			}
 			
 			// Styled via JS
-			if ( $el.hasClass('use_select2_lib') || $el.hasClass('use_prettycheckable') )
+			if ( hasClass(elements[i], 'use_select2_lib') || hasClass(elements[i], 'use_prettycheckable') )
 			{
 				$el.on('change', function(){ return document.formvalidator.validate(this); });
 			}
 			
 			// Radio / checkbox
-			else if ( tagType == 'radio' || tagType == 'checkbox' )
+			else if ( inputType == 'radio' || inputType == 'checkbox' )
 			{
 				isIE8 ?
 					$el.on('change', function(){ document.formvalidator.validate(this); return true; }) :  /*IE8 or less*/
@@ -351,26 +325,42 @@ var JFormValidator = function()
 			}
 			
 			// Submit button, needs to return true false to avoid form being submited 
-			else if ( (tagName == 'input' || tagName == 'button') && (tagType == 'submit' || tagType === 'image') )
+			else if ( (tagName == 'INPUT' || tagName == 'BUTTON') && (inputType == 'submit' || inputType === 'image') )
 			{
-				if ($el.hasClass('validate')) {
+				if (hasClass(elements[i], 'validate')) {
 					$el.on('click', function(){
 						return document.formvalidator.isValid(this.form);
 					});
 				}
 			}
 			
-			// text inputs, selects, ... other ?
-			else if (tagName !== 'button' && !(tagName === 'input' && $el.attr('type') === 'button'))
+			// Text inputs, selects, textareas ... other ?
+			else if (tagName !== 'BUTTON' && !(tagName === 'INPUT' && inputType === 'button'))
 			{
-				if (tagName !== 'fieldset') {
-					$el.on('blur', function(){ return document.formvalidator.validate(this); });
-	 	 	 	 	if (tagName == 'input' && $el.hasClass('validate-email') && inputEmail) {
-	 	 	 	 		try { $el.get(0).type = 'email'; } catch (e) { /*IE8 or less*/}
-	 	 	 	 	}
-	 	 	 	}
+				if (tagName == 'TEXTAREA')
+				{
+					var field_box = $el.closest('.fcfield_box.required_box');
+					if (field_box.length)
+					{
+						$el.addClass('required').addClass('required_boxed').data('label_text', field_box.data('label_text'));
+					}
+				}
+				if (tagName !== 'FIELDSET')
+				{
+					$el.on('blur', function(){ return document.formvalidator.validate(this); });   // Catch user leaving the form element
+
+					if (tagName == 'INPUT')
+					{
+						$el.on('change', function() { return document.formvalidator.validate(this); });  // Catch JS (e.g. inputmask JS) modifying the input and then triggering change event
+
+						if (hasClass(elements[i], 'validate-email') && inputEmail)
+						{
+							try { elements[i].type = 'email'; } catch (e) { /*IE8 or less or other non-supporting browsers*/}
+						}
+					}
+				}
 			}
-			
+
 		}
 	},
 
@@ -384,7 +374,7 @@ var JFormValidator = function()
 		jQuery('label').each(function()
 		{
 			$lbl = jQuery(this);
-			for_id = $lbl.attr('for');
+			for_id = this.getAttribute('for');
 			if (for_id)
 			{
 				$lbls_hash[for_id] = $lbl;
@@ -392,8 +382,9 @@ var JFormValidator = function()
 
 			// Also check ID-lbl as ID of label, needed for fieldset class="radio/checkbox"
 			// for other cases it is better not to rely on this, be compliant and specify ' for="..." '
-			var lbl_id = $lbl.attr('id');
-			if (lbl_id && lbl_id.indexOf('-lbl', lbl_id.length - 4) !== -1) {
+			var lbl_id = this.getAttribute('id');
+			if (lbl_id && lbl_id.indexOf('-lbl', lbl_id.length - 4) !== -1)
+			{
 				$lbls_hash[lbl_id.slice(0, -4)] = $lbl;
 			}
 		});
@@ -406,8 +397,8 @@ var JFormValidator = function()
 			$el = jQuery(f[i]);
 			if ( $el.data('label') === undefined )
 			{
-				el_id = $el.attr('data-element-grpid');
-				el_id = el_id ? el_id : $el.attr('id');
+				el_id = f[i].getAttribute('data-element-grpid');
+				el_id = el_id ? el_id : f[i].getAttribute('id');
 				
 				if ( !el_id )
 					$el.data('label', false) ;
@@ -459,23 +450,50 @@ var JFormValidator = function()
 		if ($form.length && $form.data('skip_validation')) return true;
 
 		var el_id = $el.attr('id');
+		//window.console.log('validate on :' + el_id + ' = ' + '-' + $el.val() + '-');
 
-		if (el_id && el_id.substring(0,11) == 'jform_rules') {
-			return true;
-		}
-		
 		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
-		if($el.attr('disabled')) {
+		if($el.attr('disabled'))
+		{
 			handleResponse(true, $el);
 			return true;
 		}
 
+		if (el_id && el_id.substring(0,11) == 'jform_rules') {
+			return true;
+		}
+
 		// BASIC 'required' VALIDATION: check that field has a non-empty value
-		if ( $el.hasClass('required') || $el.attr('aria-required')=='true' ) {
-			if($el.attr('type') == 'radio' || $el.attr('type') == 'checkbox') {
-				// radio/checkbox can be checked only via specific validation handler if this is set
+		if ( hasClass(el, 'required') || $el.attr('aria-required')=='true' )
+		{
+			var inputType = $el.attr('type');
+
+			// textareas that use JS editors, need special call to get current contents
+			if (el_id && $el.prop("tagName") == 'TEXTAREA')
+			{
+				// tinyMCE
+				if (hasClass(el, 'mce_editable') && typeof tinyMCE !== 'undefined' && tinyMCE && tinyMCE.get(el_id))
+				{
+					$el.val( tinyMCE.get(el_id).getContent().trim() );
+					if ($el.val() === null || $el.val().length==0)  tinyMCE.get(el_id).setContent('');
+					$el.data('use_fcfield_box', 1);
+				}
+				// CodeMirror
+				else if ($el.next('.CodeMirror').length)
+				{
+					$el.val( $el.next('.CodeMirror').get(0).CodeMirror.getValue().trim() );
+					if ($el.val() === null || $el.val().length==0)  $el.next('.CodeMirror').get(0).CodeMirror.setValue('');
+					$el.data('use_fcfield_box', 1);
+				}
+				else $el.data('use_fcfield_box', 0);
 			}
-			else if ($el.val() === null || $el.val().length==0) {
+
+			// Radio / Checkbox can not be checked with val() instead we will use special validation handlers
+			if (inputType == 'radio' || inputType == 'checkbox') ;
+
+			// Check remaining 'required' field using .val()
+			else if ($el.val() === null || $el.val().length==0)
+			{
 				handleResponse(false, $el);
 				return false;
 			}
@@ -491,13 +509,16 @@ var JFormValidator = function()
 		// ADVANCED method-specific validation for fields 'validation-*' CSS class
 		if (handler == "sellimitations" || handler == "cboxlimitations") {
 			// Execute the validation handler and return result
-			if (handlers[handler].exec(el) != true) {
+			var result = handlers[handler].exec(el);
+			if (result === null) return true;  // Already handled
+
+			if (result != true) {
 				handleResponse(false, $el);
 				return false;
 			}
-		} else if( !($el.attr('type') == "radio" || $el.attr('type') == "checkbox") ){
+		} else if ( !($el.attr('type') == "radio" || $el.attr('type') == "checkbox") ){
 			// Individual radio & checkbox can have blank value, providing one element in group is set
-			if ( typeof fcpass_element[el_id] != 'undefined' ) {
+			if ( typeof fcpass_element[el_id] !== 'undefined' ) {
 				// Execute the validation handler and return result
 				if (handlers[handler].exec(el) != true) {
 					handleResponse(false, $el);
@@ -513,7 +534,7 @@ var JFormValidator = function()
 		} else {
 			if ((handler) && (handler != 'none') && (handlers[handler])) {
 				if($el.attr('type') == "radio" || $el.attr('type') == "checkbox"){
-					if ($el.hasClass('required')) {
+					if (hasClass(el, 'required')) {
 						// Execute the validation handler and return result
 						if (handlers[handler].exec(el.parentNode) != true) {
 							handleResponse(false, $el);
@@ -523,25 +544,32 @@ var JFormValidator = function()
 				}
 			}
 		}
-	
+
 		// No errors found by method-specific validation handlers:  mark/update element's display as valid and return success
 		handleResponse(true, $el);
 		return true;
 	},
 
+
 	isValid = function(form)
 	{
 		var $form = jQuery(form);
-		if ($form.length && $form.data('skip_validation')) return true;
+
+		if ($form.length && $form.data('skip_validation'))
+		{
+			$form.data('fcform_isValid', true);
+			return true;
+		}
 
 		var vTimeStart = new Date().getTime();
- 		var fields, valid = true, message, error, label, invalid = [], i, l;
+ 		var fields, valid = true, message, error, label, label_text, usage_text, invalid_el, invalid = [], i, l;
  		
  		// Remove any inline error messages (added by any previous form, note we do not add this to individual fields)
 		jQuery('.invalid_jfield_message').remove();
 		
 		// Global variable defined above, we use this to focus the first tab that contains required field
-		first_invalid_field_found = false;
+		fcform_1st_invalid_found = false;
+		$form.data('fcform_input_sets', []);
  		
  		// Get fieldset containers of (checkbox/radio) and all form fields
  		//fields = jQuery(form).find('input, textarea, select, fieldset');
@@ -550,13 +578,13 @@ var JFormValidator = function()
 		// Validate form fields
 		for (i = 0, l = fields.length; i < l; i++)
 		{
-			var $el = jQuery(fields[i]), tagName = $el.prop("tagName").toLowerCase();
-			if ( $el.hasClass('novalidate') || tagName=='button' ) {
+			if ( hasClass(fields[i], 'novalidate') || fields[i].tagName=='BUTTON' )
+			{
 				continue;
 			}
 			if ( ! this.validate(fields[i]) )
 			{
-				first_invalid_field_found = true;
+				fcform_1st_invalid_found = true;
 				valid = false;
 				invalid.push(fields[i]);
 			}
@@ -585,24 +613,30 @@ var JFormValidator = function()
 				if (recaptcha_lbl.length) recaptcha_lbl.removeClass('invalid');
 			}
 		}
-		
- 	 	if (!valid && invalid.length > 0) {
- 	 	 	message = Joomla.JText._('JLIB_FORM_FIELD_INVALID');
- 	 	 	error = {"error": []};
- 	 	 	var added = [];
- 	 	 	for (i = invalid.length - 1; i >= 0; i--) {
- 	 	 		label = jQuery(invalid[i]).data("label");
- 	 			if (label && typeof added[label.text()] === 'undefined')
+
+ 	 	if (!valid && invalid.length > 0)
+		{
+			message = Joomla.JText._('JLIB_FORM_FIELD_INVALID');
+			error = {"error": []};
+			var added = [];
+			for (i = invalid.length - 1; i >= 0; i--)
+			{
+				invalid_el = jQuery(invalid[i]);
+				label = invalid_el.data('label');
+				label_text = label ? label.text() : invalid_el.data('label_text');
+				if (label_text && typeof added[label_text] === 'undefined')
 				{
- 	 	 			error.error.push(message + label.text().replace("*", ""));
-					//if (jQuery(invalid[i].attr('title')) message = message + ' ' + jQuery(invalid[i].attr('title');
-	 	 	 		added[label.text()] = 1;
+					//var usage_text = invalid_el.attr('title') ? ': ' + invalid_el.attr('title') : '';
+					error.error.push(message + label_text.replace("*", "") /*+ usage_text*/);
+					added[label_text] = 1;
 				}
- 	 	 	}
- 	 	 	Joomla.renderMessages(error);
- 	 	}
-		
-		fcform_isValid = valid;
+			}
+			Joomla.renderMessages(error);
+		}
+
+		$form.data('fcform_isValid', valid);    // Set flag for form validation state
+		$form.data('fcform_input_sets', null);  // Clear to allow atomic calls to validate()
+
 		if (!!Joomla.fc_debug) window.console.log( 'isValid() time: ' + ((new Date())  - vTimeStart) + ' ms');
 		return valid;
 	},
@@ -610,7 +644,7 @@ var JFormValidator = function()
 	handleResponse = function(state, $el)
 	{
 		// If given field has failed validation, and it is the FIRST field to fail the validation then check if it is inside a TAB, make sure the TAB get focused
-		if (state === false && !first_invalid_field_found)
+		if (state === false && !fcform_1st_invalid_found)
 		{
 			var tab = $el.parent().closest("div.tabbertab");
 			var tabset = $el.parent().closest("div.tabberlive");
@@ -626,57 +660,112 @@ var JFormValidator = function()
 				tab = jQuery(tab).parent().closest("div.tabbertab");
 				tabset = jQuery(tabset).parent().closest("div.tabberlive");
 			}
-		}
-		
-		// If given field has failed validation, then check if it is part of a field group and make sure the fied group is expanded
-		if (state === false)
-		{
+
+			// Performance concern ... only do for first invalid field  -- Check of fieldgroup value box is hidden and open it
 			var fieldval_box = $el.parent().closest("li.fcfieldval_container");
-			fieldval_box.find(".toggle_group_down").trigger('click');
-			
 			var fieldgroup_box = fieldval_box.parent().parent();
-			if (fieldgroup_box.is(":hidden")) fieldgroup_box.prev().find('.show_vals_btn').trigger('click');
+			if (fieldgroup_box.is(":hidden"))
+			{
+				fieldgroup_box.prev().find('.show_vals_btn').data('fc_noeffect', 1).trigger('click');
+			}
+
+			// Performance concern ... only do for first invalid field  --  Check if it is part of a field group and make sure the fied group is expanded
+			fieldval_box.find(".toggle_group_down").filter(":visible").data('fc_noeffect', 1).trigger('click');   // Only if is drop down button is visible = valuebox is hidden
 		}
 		
  		// Get the label
  	 	var $label = $el.data('label');
- 	 	if ($label === undefined) {
+ 	 	if ($label === undefined)
+		{
  	 		$label = findLabel($el);
  	 	}
+
+		var el = $el.get(0);
+		var tagName = el.tagName;
+		var inputType = tagName != 'INPUT' ? false : el.type;
+		var is_radio_check = inputType == 'checkbox' || inputType == 'radio';
 		
 		// Set the element and its label (if exists) invalid state
 		if (state === false)
 		{
-			// Add INVALID to ELEMENT (but not to checkboxes/radio if their group label was found)
-			if ($el.attr('type') == 'checkbox' || $el.attr('type') == 'radio') {
-				if (!$label) $el.addClass('invalid').attr('aria-invalid', 'true');
-			}
-			else {
+			// Add INVALID to ELEMENT (but not to checkboxes/radio, because we will try to add find an outer container for them)
+			if (!is_radio_check)
+			{
 				$el.addClass('invalid').attr('aria-invalid', 'true');
 			}
-			
-			// Add INVALID to LABEL, (Mark / the label to indicate validation error for current form field / fieldset)
-			if ($label) {
+
+			// Add INVALID to LABEL, (Thus adding CSS style that indicates a validation error for current form field / fieldset)
+			if ($label)
 				$label.addClass('invalid');
+
+			// No label found, add an inline message
+			else if ($el.data('use_fcfield_box')) {
+				if (!$el.closest('.fcfield_box.required_box').prev().hasClass('invalid_jfield_message'))
+					jQuery('<span class="alert alert-error invalid_jfield_message" style="display:inline-block; margin: 2px 4px 4px 0;">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
+			} else if (!is_radio_check) {
+				if (!$el.next().hasClass('invalid_jfield_message'))
+					jQuery('<span class="alert alert-error invalid_jfield_message" style="display:inline-block; margin: 2px 0 4px 4px;">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertAfter( $el );
+			} else {
+				var inputSet = $el.data('inputSet');
+				if (inputSet === undefined)
+				{
+					inputSet = $el.closest('.fc_input_set, .btn-group');
+					inputSet.length ? inputSet.find('input').data('inputSet', inputSet) : $el.data('inputSet', false);
+				}
+				if (inputSet && inputSet.length)
+				{
+					if (!inputSet.prev().hasClass('invalid_jfield_message'))
+					{
+						jQuery('<span class="alert alert-error invalid_jfield_message" style="display:inline-block; margin: 2px 4px 4px 0;">' + Joomla.JText._('FLEXI_INVALID') + '</span>').insertBefore( inputSet ) ;
+					}
+					inputSet.addClass('invalid');
+					alert('added');
+				}
+				else {
+					//if (!$label) $el.addClass('invalid').attr('aria-invalid', 'true');
+				}
 			}
+
+			// If field uses an outer visible container then mark it as invalid
+			if ($el.data('use_fcfield_box')) $el.closest('.fcfield_box.required_box').addClass('invalid');
 		}
 		else
 		{
 			// Remove INVALID from ELEMENT
 			$el.removeClass('invalid').attr('aria-invalid', 'false');
 			
-			// Remove INVALID from LABEL, (Unmarkup / clear CSS style to indicate no validation error for current form field / fieldset)
-			if ($label) {
+			// Remove INVALID from LABEL, (Thus clearing CSS style that indicates a validation error for current form field / fieldset)
+			if ($label)
 				$label.removeClass('invalid');
+
+			// No label found, remove any inline message
+			else if ($el.data('use_fcfield_box'))
+				$el.closest('.fcfield_box.required_box').prev('.invalid_jfield_message').remove();
+			else if (!is_radio_check)
+				$el.next('.invalid_jfield_message').remove() ;
+			else {
+				if ( $el.data('inputSet') )
+				{
+					$el.data('inputSet').prev('.invalid_jfield_message').remove();
+					$el.data('inputSet').removeClass('invalid');
+				}
 			}
+
+			// If field uses an outer visible container then remove invalid marking from it
+			if ($el.data('use_fcfield_box')) $el.closest('.fcfield_box.required_box').removeClass('invalid');
 		}
 	},
 	
 	isIE = function() {
 		var userAgent = navigator.userAgent.toLowerCase();
 		return (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
-	};
+	},
 	
+	hasClass = function(el, class_name)
+	{
+		return isIE8 ? jQuery(el).hasClass(class_name) : el.classList.contains(class_name);
+	}
+
 	
 	// Initialize handlers and attach validation to form
 	initialize();
@@ -708,9 +797,13 @@ jQuery(document).ready(function()
 });
 
 
-function flexi_submit(task, btn_box, msg_box) {
+function flexi_submit(task, btn_box, msg_box)
+{
 	Joomla.submitbutton(task);
-	if (fcform_isValid) {
+	$form = jQuery('#adminForm');
+	
+	if ($form.data('fcform_isValid'))
+	{
 		if (typeof btn_box !== 'undefined') {
 			//alert('hide submit btns');
 			jQuery('#'+btn_box).hide();

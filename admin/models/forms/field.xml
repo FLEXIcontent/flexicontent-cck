@@ -36,14 +36,14 @@
 		<option value="3">FLEXI_BOTH</option>
 		<option value="4">FLEXI_IF_EMPTY</option>
 	</field>
-	<field name="valueseditable" type="list" default="0" label="FLEXI_VALUES_EDITABLE_BY_ACL" description="FLEXI_VALUES_EDITABLE_BY_ACL_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="valueseditable" type="list" default="0" label="FLEXI_VALUES_EDITABLE_BY_ACL" description="FLEXI_VALUES_EDITABLE_BY_ACL_DESC" class="" labelclass="label">
 		<option value="0">FLEXI_ANY_EDITOR</option>
 		<option value="1">FLEXI_USE_ACL_AND_NO_EDIT_MSG</option>
 		<option value="2">FLEXI_USE_ACL_AND_NO_EDIT_MSG_DISPLAY</option>
 		<option value="3">FLEXI_USE_ACL_AND_DISPLAY_ONLY</option>
 		<option value="4">FLEXI_USE_ACL_AND_HIDE</option>
 	</field>
-	<field name="edithelp" type="radio" default="2" label="FLEXI_EDIT_HELP" description="FLEXI_EDIT_HELP_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="edithelp" type="list" default="2" label="FLEXI_EDIT_HELP" description="FLEXI_EDIT_HELP_DESC" class="" labelclass="label">
 		<option value="0">FLEXI_EDIT_HELP_NONE</option>
 		<option value="1">FLEXI_EDIT_HELP_LABEL_TOOLTIP</option>
 		<option value="2">FLEXI_EDIT_HELP_LABEL_TOOLTIP_WICON</option>

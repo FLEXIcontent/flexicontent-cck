@@ -3,10 +3,9 @@
 	margin: 1px 2px 1px 3px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select {
-	font-size: 12px;
 	display: inline-block;
-	margin: 1px 2px 1px 3px;
-	padding: 2px 2px;
+	margin: 1px 2px;
+	padding: 4px;
 	border-radius: 4px;
 	height: auto;
 }
@@ -1645,18 +1644,24 @@ body .group-fcmethod .btn.active:not(.btn-primary) {
 #flexicontent form div fieldset.panelform > select,
 #flexicontent form div fieldset.panelform > img,
 #flexicontent form div fieldset.panelform > span,
-form div fieldset > div.input-append,
-form div fieldset > div.input-prepend,
-form div fieldset > div.btn-group,
-form div fieldset > div.select2-container,
-form div fieldset > input,
-form div fieldset > button
-form div fieldset > textarea,
-form div fieldset > select,
-form div fieldset > img,
-form div fieldset > span {
-	margin: 0 0 2px 0;
+form div.container_fcfield > div.input-append,
+form div.container_fcfield > div.input-prepend,
+form div.container_fcfield > div.btn-group,
+form div.container_fcfield > div.select2-container,
+form div.container_fcfield > input,
+form div.container_fcfield > button,
+form div.container_fcfield > textarea,
+form div.container_fcfield > select,
+form div.container_fcfield > img,
+form div.container_fcfield > span {
+	margin: 1px 2px;
 	float: left;
+}
+form div.container_fcfield > input,
+form div.container_fcfield > button,
+form div.container_fcfield > textarea,
+form div.container_fcfield > select {
+	max-width: 96%;
 }
 #flexicontent div fieldset .input-append,
 #flexicontent div fieldset .input-prepend {
@@ -1909,13 +1914,15 @@ body .container_fcfield input,
 	border: 0 none !important;
 	background: none !important;
 }
-#flexicontent form textarea.invalid,
-#flexicontent form input.invalid,
-#flexicontent form select.invalid,
-select.invalid,
+textarea.invalid,
 input.invalid,
-textarea.invalid {
+select.invalid {
 	border: 1px solid #CC0000 !important;
+}
+.fc_input_set.invalid,
+.fcfield_box.invalid {
+	border: 1px dashed #CC0000 !important;
+	border-radius: 3px;
 }
 label.invalid > img {
 	border: 2px dashed #CC0000 !important;
