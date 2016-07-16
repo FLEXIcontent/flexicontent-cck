@@ -19,7 +19,9 @@
 		
 		<fieldset name="group-textarea-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
 			
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
@@ -44,21 +46,26 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
-			<field name="default_value" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="default_value" type="textarea" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="validation" type="list" default="2" label="FLEXI_FIELD_SERVER_SIDE_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
-				<option value="2">FLEXI_FIELD_UGRP_TEXT_FILTERS</option>
-				<option value="1">FLEXI_FIELD_SAFE_HTML</option>
-				<option value="RAW">FLEXI_FIELD_UNSAFE_HTML</option>
-				<option value="STRING">FLEXI_FIELD_PLAIN_TEXT_DECODE_ENTITIES</option>
-				<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
+			<field name="validation" type="groupedlist" default="2" label="FLEXI_FIELD_SERVER_SIDE_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
+				<group label="FLEXI_PER_USER">
+					<option value="2">FLEXI_FIELD_UGRP_TEXT_FILTERS</option>
+				</group>
+				<group label="FLEXI_HTML_TEXT">
+					<option value="1">FLEXI_FIELD_SAFE_HTML</option>
+					<option value="RAW">FLEXI_FIELD_UNSAFE_HTML</option>
+					<option value="STRING">FLEXI_FIELD_PLAIN_TEXT_DECODE_ENTITIES</option>
+					<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
+				</group>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -78,8 +85,8 @@
 			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
-			<field name="" type="separator" default="NOTE: about multi-value support" description="Only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; and &lt;b&gt;codemirror&lt;/b&gt; are supported, otherwise the editor on new values will appear only after saving" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
-			<field name="" type="separator" default="NOTE: prefer to use Joomla default" description="Adding 2 different editors on same page will break, XTD editor buttons like read-more" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
+			<field name="" type="separator" default="NOTE: about multi-value support" description="Only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; and &lt;b&gt;CodeMirror&lt;/b&gt; are supported, otherwise the editor on new values will appear only after saving" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
+			<field name="" type="separator" default="NOTE: prefer to use Joomla default editor" description="Adding 2 different editors on same page will break XTD editor buttons like read-more" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
 			<field name="editor" type="plugins" folder="editors" label="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" depend_class="using-html-editor">
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
 			</field>
@@ -92,8 +99,9 @@
 				<option value="1" show_list="using-editor-btns" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_LIST" description="FLEXI_SKIP_BUTTONS_LIST_DESC" depend_class="using-html-editor using-editor-btns" />
-			
 
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-textarea-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -132,7 +140,7 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
 				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>

@@ -20,7 +20,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 {
 	static $field_types = array('fieldgroup');
 	static $extra_props = array();
-	static $prior_to_version = "3.1";
+	//static $prior_to_version = "3.2";  // Display message for non free plugin
 	
 	
 	// ***********
@@ -109,8 +109,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			";
 			$js .= "
 			jQuery(document).ready(function(){"
-				.($compact_edit==2 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_down').trigger('click');" : "")
-				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_up').trigger('click');" : "")
+				.($compact_edit==2 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_down').data('fc_noeffect', 1).trigger('click');" : "")
+				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_up').data('fc_noeffect', 1).trigger('click');" : "")
 			."});
 			";
 			
@@ -127,6 +127,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
 				var newSubLabel = fieldval_box.prev('label.sub_label');
 				var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
+				newSubLabel.attr('id', newLabelFor + '-lbl');
 				newSubLabel.attr('for', newLabelFor);
 				newSubLabel.attr('data-for_bck', newLabelFor);
 				addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);";
@@ -184,13 +185,13 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				";
 			
-			// Add new element to sortable objects (if field not in group)
+			// Add new element to sortable objects (if field not in group) -- NOTE: remove_previous: 2 means remove element without do any cleanup actions
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				
 				// Add new values for each field
 				var groupval_box = newField;
-				var add_params = {remove_previous: 1, scroll_visible: 0, animate_visible: 0};
+				var add_params = {remove_previous: 2, scroll_visible: 0, animate_visible: 0};
 				".$addField_funcs."
 				";
 			
@@ -214,7 +215,12 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 
 			function deleteField".$field->id."(el)
 			{
-				var row = jQuery(el).closest('li');
+				// Disable clicks
+				var btn = jQuery(el);
+				if (btn) btn.css('pointer-events', 'none').off('click');
+
+				// Find field value container
+				var row = btn.closest('li');
 				
 				// Do cleanup by calling the deleteField of each individual field, these functions will re-add last element as empty if needed
 				var groupval_box = jQuery(el).closest('li');
@@ -225,7 +231,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				}
 				
 				// Also remove the group field values container if not last one
-				if(rowCount".$field->id." > 1) {
+				if (rowCount".$field->id." > 1)
+				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
@@ -234,6 +241,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					row.fadeOut(420, function(){ this.remove(); });
 					rowCount".$field->id."--;
 				}
+
+				// If not removing re-enable clicks
+				else if (btn) btn.css('pointer-events', '').on('click');
 			}
 			";
 			
@@ -303,7 +313,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				
 				$field->html[$n] .= '<div class="fcclear"></div>
 				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'">
-					<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" data-for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
+					<label id="custom_'.$grouped_field->name.'_'.$n.'-lbl" class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" data-for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
 					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >
 						'.($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '').'
 						'.@ $grouped_field->html[$n].'
@@ -336,7 +346,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		} else {
 			$field->html = '';
 		}
-		if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+		if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="jQuery(this).prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		
 		// Check max allowed version
 		//$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
