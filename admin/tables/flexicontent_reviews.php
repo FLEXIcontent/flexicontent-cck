@@ -29,23 +29,10 @@ class flexicontent_reviews extends JTable
 {
 	function __construct(& $db)
 	{
-		static $tbl_fields = null;
-		$tbl_name = '#__flexicontent_reviews_dev';
-		
-		if ($tbl_fields === null)
-		{
-			// Get columns
-			$tbls = array($tbl_name);
-			foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-			$tbl_fields = array_keys($tbl_fields[$tbl_name]);
-		}
-		
-		foreach ($tbl_fields as $tbl_field) $this->$tbl_field = null;
-		
-		parent::__construct($tbl_name, 'id', $db);
+		parent::__construct('#__flexicontent_reviews_dev', 'id', $db);
 	}
-	
-	
+
+
 	// overloaded check function
 	function check()
 	{
