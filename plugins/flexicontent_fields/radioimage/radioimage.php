@@ -26,6 +26,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 	static $valueIsArr = 0;
 	static $isDropDown = 0;
 	static $promptEnabled = 0;
+	static $usesImages = 1;
 	
 	
 	// ***********
@@ -75,7 +76,6 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
@@ -92,56 +92,85 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// *************************
 		// Input field configuration
 		// *************************
-		
-		// DISPLAY using prettyCheckable JS
-		$use_jslib = $field->parameters->get( 'use_jslib', 2 ) ;
-		$use_prettycheckable = $use_jslib==2;
-		static $prettycheckable_added = null;
-	  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-		
-		// Display text label, use checkbox/radio image field for more
-		$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
-		
-		// when field is displayed as drop-down select (item edit form only)
-		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
-		
-		// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
-		$pretext   = $field->parameters->get( 'pretext_form', '' ) ;
-		$posttext  = $field->parameters->get( 'posttext_form', '' ) ;
-		$separator = $field->parameters->get( 'separator', 0 ) ;
+
+		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
+		$display_as_select = self::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
+
+		if ($display_as_select)
+		{
+			// DISPLAY using select2 JS
+			$use_jslib = $field->parameters->get( 'use_jslib', 1 ) ;
+			$use_select2 = $use_jslib==1 || $use_jslib==2;
+			static $select2_added = null;
+		  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
+
+			// Fields: select / selectmultiple and fields: radioimage / checkboximage displayed as drop-down select in item edit form
+			$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
+			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
+
+			// Useful when displaying as multi-select without select2 JS
+			$size = $field->parameters->get( 'size', 6 ) ;
+		}
+		else
+		{
+			// DISPLAY using prettyCheckable JS
+			$use_jslib = $field->parameters->get( 'use_jslib', 2 ) ;
+			$use_prettycheckable = $use_jslib==2;
+			static $prettycheckable_added = null;
+		  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+			$placeInsideLabel = self::$usesImages && !($use_prettycheckable && $prettycheckable_added);
+		}
+
+
+		// Custom HTML placed before / after form field
 		$opentag   = $field->parameters->get( 'opentag_form', '' ) ;
 		$closetag  = $field->parameters->get( 'closetag_form', '' ) ;
-		
-		switch($separator)
+
+		// For radio /checkbox display
+		if (!$display_as_select)
 		{
-			case 0:
-			$separator = '&nbsp;';
-			break;
+			$fftype = self::$valueIsArr ? 'checkbox' : 'radio';
 
-			case 1:
-			$separator = '<br />';
-			break;
+			// Applicable only for radioimage/checkboximage fields, it allows a more compact display in item form
+			$form_vals_display = (int) $field->parameters->get( 'form_vals_display', 1 ) ;  // 0: label, 1: image, 2: both
 
-			case 2:
-			$separator = '&nbsp;|&nbsp;';
-			break;
+			// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
+			$pretext   = $field->parameters->get( 'pretext_form', '' ) ;
+			$posttext  = $field->parameters->get( 'posttext_form', '' ) ;
+			$separator = $field->parameters->get( 'separator', 0 ) ;
 
-			case 3:
-			$separator = ',&nbsp;';
-			break;
+			switch($separator)
+			{
+				case 0:
+				$separator = '&nbsp;';
+				break;
 
-			case 4:
-			$separator = $closetag . $opentag;
-			break;
+				case 1:
+				$separator = '<br />';
+				break;
 
-			default:
-			$separator = '&nbsp;';
-			break;
+				case 2:
+				$separator = '&nbsp;|&nbsp;';
+				break;
+
+				case 3:
+				$separator = ',&nbsp;';
+				break;
+
+				case 4:
+				$separator = $closetag . $opentag;
+				break;
+
+				default:
+				$separator = '&nbsp;';
+				break;
+			}
 		}
-		
+
+
 		// Initialise property with default value
-		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
+		{
 			$field->value = $default_values;
 		}
 		
@@ -153,15 +182,83 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		$valueholder_id = 'custom__fcfield_valueholder__'.$field->name;
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
-		$js = "";
-		$css = "";
-		
-		
+
+		// Create the attributes of the form field
+		$input_classes = array();
+		$attribs = '';
+
+		// Extra attributes for multi-value field
+		if (self::$valueIsArr)
+		{
+			if ($exact_values)
+				$attribs .= ' data-exact_values="'.$exact_values.'" ';
+			else
+			{
+				if ($max_values)    $attribs .= ' data-max_values="'.$max_values.'" ';
+				if ($min_values)    $attribs .= ' data-min_values="'.$min_values.'" ';
+			}
+		}
+
+		// Attributes if displaying as radio / checkbox set
+		if (!$display_as_select)
+		{
+			if ($use_prettycheckable && $prettycheckable_added)
+			{
+				$input_classes[] = 'use_prettycheckable';
+				$attribs .= self::$usesImages ? ' data-customClass="fcradiocheckimage"' : ' data-customClass="fcradiocheck"';
+			}
+			if (self::$valueIsArr)
+			{
+				if ($max_values || $min_values || $exact_values)
+					$input_classes[] = 'validate-cboxlimitations';
+				else if ($required)
+					$input_classes[] = 'required validate-checkbox';  // do basic checkbox-required validation
+			}
+			else if ($required)
+				$input_classes[] = 'required validate-radio';  // do basic radio-required validation
+
+			// Attributes for input-labels
+			$label_class = 'fccheckradio_lbl ' . ($form_vals_display==1 ? $tooltip_class : '');
+			$label_style = self::$usesImages ? 'vertical-align: unset!important;' : '';  // fix for image placement inside label
+		}
+
+		// Attributes if displaying as select
+		else
+		{
+			$input_classes[] = 'fcfield_textselval';
+			if ($use_jslib && $select2_added) $input_classes[] = 'use_select2_lib';
+			if ($required) $input_classes[] = 'required';
+
+			// Extra attributes multi-select field
+			if (self::$valueIsArr)
+			{
+				$add_placeholder = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', 1 );
+				$placeholder = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
+
+				$attribs .=
+					' multiple="multiple"' . ($size ? ' size="'.$size.'"' : '')
+					. ($add_placeholder ? ' data-placeholder="'.$placeholder.'" ' : '');
+			}
+
+			// Extra attributes
+			if (!empty($default_values))
+				$attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
+			if (self::$valueIsArr && ($max_values || $min_values || $exact_values))
+				$input_classes[] = 'validate-sellimitations';
+		}
+
+		// Form element classes
+		$input_classes = implode(' ', $input_classes);
+
+
+
 		// *********************************************************************************************
 		// Handle adding the needed JS code to CASCADE (listen to) changes of the dependent master field
 		// *********************************************************************************************
-		
+
+		$js = "";
+		$css = "";
+
 		if ($cascade_after && !$ajax)
 		{
 			$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
@@ -237,6 +334,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
+			".(!$display_as_select ? "
 				// Remove HTML added by prettyCheckable JS, from the dupicate new INPUT SET
 				var prettyContainers = newField.find('.prettyradio, .prettycheckbox');
 				prettyContainers.find('input, label').each(function() {
@@ -245,14 +343,8 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				});
 				prettyContainers.remove();
 				
-				// Update value holder
-				newField.find('.fcfield_value_holder')
-					.attr('id', '".$valueholder_id."_'+uniqueRowNum".$field->id.")
-					.attr('name', '".$valueholder_nm."['+uniqueRowNum".$field->id."+']');
-				
 				// Update INPUT SET container id
 				newField.find('.fc_input_set').attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-				var js_class = '".($use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable' : '')."';
 				
 				// Update the new INPUT SET
 				var theSet = newField.find('input:radio, input:checkbox');
@@ -262,16 +354,18 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
-					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + js_class);
+					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + ' " . $input_classes . "');
 					elem.attr('data-is-defval') ?
 						elem.attr('checked', 'checked') :
 						elem.removeAttr('checked') ;
+
 					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
-					".($use_prettycheckable && $prettycheckable_added ?
+
+					".(!$placeInsideLabel ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
-						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
+						"elem.closest('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."   // special case for field with image place input and image inside labels
 					nr++;
 				});
 				
@@ -283,6 +377,35 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					lbl.remove();
 					elem.prettyCheckable({ label: lbl_html });
 				});
+
+			" : "
+
+				// Update the new select field
+				var elem= newField.find('select.fcfield_textselval').first();
+				var defvals = elem.attr('data-defvals');
+				if ( defvals && defvals.length )
+				{
+					jQuery.each(defvals.split('|||'), function(i, val){
+						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
+					});
+				}
+				else elem.val('');
+				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
+				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
+				
+				// Re-init any select2 elements
+				var has_select2 = newField.find('div.select2-container').length != 0;
+				if (has_select2) {
+					newField.find('div.select2-container').remove();
+					newField.find('select.use_select2_lib').select2('destroy').show().select2();
+				}
+			")."
+
+				// Update value holder
+				newField.find('.fcfield_value_holder')
+					.attr('id', '".$valueholder_id."_'+uniqueRowNum".$field->id.")
+					.attr('name', '".$valueholder_nm."['+uniqueRowNum".$field->id."+']');
 				";
 			
 			// Add new field to DOM
@@ -293,7 +416,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				if (remove_previous) lastField.remove();
 				";
 			
-			// Listen to the changes of cascade-after field
+			// Listen to the changes of depends-on-master field
 			if ($cascade_after) $js .= "
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
 					return function () {
@@ -316,6 +439,9 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -323,6 +449,10 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
+				// Disable clicks
+				var btn = fieldval_box ? false : jQuery(el);
+				if (btn) btn.css('pointer-events', 'none').off('click');
+
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
@@ -331,7 +461,8 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if(rowCount".$field->id." > 1) {
+				if (rowCount".$field->id." > 1)
+				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
@@ -340,6 +471,9 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
+
+				// If not removing re-enable clicks
+				else if (btn) btn.css('pointer-events', '').on('click');
 			}
 			";
 			
@@ -370,7 +504,8 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		
 		// If cascading we will get it inside the value loop for every value, thus supporting field grouping properly
 		$elements = !$cascade_after ? $this->getLimitedProps($field, $item) : array();
-		if ( !is_array($elements) ) {
+		if ( !is_array($elements) )
+		{
 			$field->html = $elements;
 			return;
 		}
@@ -379,34 +514,17 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// *****************************************
 		// Create field's HTML display for item form
 		// *****************************************
-		
-		// Alternative form field display as drop-down select to save space
-		if ( $field->parameters->get( 'display_as_select', 0 ) ) {
+
+		if ($display_as_select)
+		{
+			// Create form field options
 			$options = array();
-			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
-			foreach ($elements as $element) {
+			foreach ($elements as $element)
+			{
 				$options[] = JHTML::_('select.option', $element->value, $element->text);
 			}
-			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="'.$required.'"', 'value', 'text', $field->value, $elementid);
-			return;
 		}
-		
-		// Create the attributes of the form field
-		$fftype = 'radio';
-		$display_as_radioset = 1;
-		if ($display_as_radioset)
-		{
-			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
-			$classes .= $required;
-			$onchange = '';
-			// Extra properties
-			$attribs  = '';
-			if ($required) $classes .= ' validate-radio ';  // if required then set appropriate validate-* CSS class (*=handler name)
-			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
-		}
-		$label_class = 'fccheckradio_lbl '.$tooltip_class;
-		$label_style = 'vertical-align: unset!important;';
-		
+
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
 		$is_array_already = is_array($field->value) ? is_array(reset($field->value)) : false;
@@ -437,17 +555,25 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			// Skip empty if not in field group, and at least one value was added
 			if ( !count($value) && !$use_ingroup && $n)
 				continue;
-			
+
+			// Only if needed ...
+			if (!$ajax || !$display_as_select)
+			{
+				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
+				$elementid_n = $elementid.'_'.$n;
+			}
+
 			// Get options according to cascading, this is here so that it works with field grouping too
 			if ($cascade_after) {
 				$elements = $this->getLimitedProps($field, $item, !$ajax ? $cascade_prompt : null, $ajax, $n);
 			}
-			
-			if (1)
+
+			if ($display_as_select)
 			{
-				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
-				$elementid_n = $elementid.'_'.$n;
-				
+				$options = & $elements;
+			}
+			else
+			{
 				// Create form field options
 				$i = 0;
 				$options = array();
@@ -460,14 +586,14 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					$checked  = (in_array($element->value, $value)  ?  ' checked="checked"'  :  '') . (in_array($element->value, $default_values)  ?  ' data-is-defval="1"'  :  '');
 					$elementid_no = $elementid_n.'_'.$i;
 					//echo " &nbsp; &nbsp; $elementid_n , $elementid_no , $fieldname_n  , &nbsp; value: {$element->value} <br/>\n";
-					$input_attribs  = $use_prettycheckable && $prettycheckable_added ? ' data-customClass="fcradiocheckimage"'/*.' data-labelPosition="right" data-labeltext="'.$element->text.'"'*/ : '';
-					$input_attribs .= ' class="'.@ $classes.' '.$elementid_n.'" ';
+					$input_attribs  = '';  //$use_prettycheckable && $prettycheckable_added ? ' data-labelPosition="right" data-labeltext="'.$element->text.'"' : '';
+					$input_attribs .= ' class="' . $input_classes .' '. $elementid_n . '" ';
 					$input_fld = ' <input type="'.$fftype.'" id="'.$elementid_no.'" data-element-grpid="'.$elementid_n.'" name="'.$fieldname_n.'" '.$attribs.$input_attribs.' value="'.$element->value.'" '.$checked.' />';
 					$options[] = ''
 						.$pretext
-						.($use_prettycheckable && $prettycheckable_added ? $input_fld : '')
-						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" title="'.@$element->label_tip.'">'
-							. (!$use_prettycheckable || !$prettycheckable_added ? $input_fld : '')
+						.(!$placeInsideLabel ? $input_fld : '')
+						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" '.($form_vals_display==1 ? 'title="'.@ $element->label_tip : '').'">'
+							. ($placeInsideLabel ? $input_fld : '')
 							.($form_vals_display!=1 ? $element->text : '')
 							.($form_vals_display==2 ? ' <br/>' : '')
 							.($form_vals_display >0 ? $element->image_html : '')
@@ -476,15 +602,18 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 						;
 					$i++;
 				}
-				
+
 				// Apply (item form) separator and open/close tags to create the radio field
 				$form_field = $opentag . implode($separator, $options) . $closetag;
 			}
-			
+
 			if (!$ajax)
 			{
 				$field->html[] = '
-					'.'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>
+					'.($display_as_select ?
+						$opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
+						'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>'
+					).'
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
 				'.($use_ingroup ? '' : '
@@ -495,7 +624,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				</div>
 				');
 				
-				// Listen to the changes of cascade-after field
+				// Listen to the changes of depends-on-master field
 				if ($cascade_after && !$ajax) $per_val_js .= "
 					fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
 						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".self::$promptEnabled.", ".$n.");
@@ -503,7 +632,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
 				";
 			} else {
-				$field->html = $form_field;
+				$field->html = !$display_as_select ? $form_field : JHTML::_('select.options', $options, 'value', 'text', $value, $translate = false);
 			}
 			
 			$n++;
@@ -515,8 +644,8 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					'.$per_val_js.'
 				});
 			');
-		
-		
+
+
 		if ($ajax) {
 			return; // Done
 		} else if ($use_ingroup) { // do not convert the array to string if field is in a group
@@ -530,6 +659,29 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
+
+
+		// For multi-value fields add configured limits
+		if (self::$valueIsArr)
+		{
+			// Add message box about allowed # values
+			if ($exact_values) {
+				$values_msg = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_EXACTLY', $exact_values) .'</div><div class="fcclear"></div>';
+			} else if ($max_values || $min_values > 1) {
+				$values_msg = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="fcclear"></div>';
+			}
+		
+			// Add message to every value if inside field group
+			if ( !empty($values_msg) )
+			{
+				if (!$use_ingroup) {
+					$field->html = $values_msg . $field->html;
+				} else {
+					foreach($field->html as & $html) $html = $values_msg . $html;
+					unset($html);
+				}
+			}
+		}
 	}
 	
 	
@@ -539,6 +691,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$cascade_after  = (int)$field->parameters->get('cascade_after', 0);
+		$display_as_select = self::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
 		
 		if ($cascade_after)
 		{
@@ -602,10 +755,11 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			$elements = array(0=>$prompt);
 			return $elements;
 		} else {
-			$display_label_form= 1;  // always-on, not applicable
+			$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
+			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', $display_as_select ? 1 : 0 );
 			$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
-			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 );
-			if ($usefirstoption) { // Add selection prompt
+			if ($usefirstoption)   // Add selection prompt
+			{
 				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				array_unshift($elements, $prompt);
@@ -729,7 +883,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// Value creation
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$text_or_value  = (int)$field->parameters->get( 'text_or_value', 2 ) ;
+		$text_or_value  = (int) $field->parameters->get( 'text_or_value', 2 ) ;
 		
 		// image specific or image related variables
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
