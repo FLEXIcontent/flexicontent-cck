@@ -65,14 +65,14 @@
 				<option value="__custom__" show_list="custommask-mode"  hide_list="regexmask-mode" fcreadonly="{'validation':0}">- CUSTOM MASK (property list)</option>
 				
 				<!-- Various aliases -->
-				<group label="Various (Saved unchanged)">
+				<group label="FLEXI_VALIDATION_VARIOUS_UNCHANGED">
 					<option value="url" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'URL', 'filter_compare_type':0}">URL</option>
 					<option value="email" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'EMAIL', 'filter_compare_type':0}">Email</option>
 					<option value="ip" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'STRING', 'filter_compare_type':0}">IP (i.i.i.i)</option>
 					<option value="mac" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'STRING', 'filter_compare_type':0}">MAC address (#:#:#:#:#:#)</option>
 				</group>
 				
-				<group label="DECIMAL (Saved as n.n)">
+				<group label="FLEXI_VALIDATION_DECIMAL_N_N">
 					<option value="currency" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'DOUBLE', 'filter_compare_type':2}">Currency ($)</option>
 					<option value="currency_euro" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'DOUBLE', 'filter_compare_type':2}">Currency (€)</option>
 					<option value="decimal" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'DOUBLE', 'filter_compare_type':2}">Decimal (radix: .)</option>
@@ -82,14 +82,14 @@
 					<option value="percentage_nolimit_nolimit" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'DOUBLE', 'filter_compare_type':2}">Percentage (no limits)</option>
 				</group>
 				
-				<group label="INTEGER (Saved as nnn)">
+				<group label="FLEXI_VALIDATION_INTEGER_NNN">
 					<option value="integer" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'INT', 'filter_compare_type':1}">Integer</option>
 					<option value="unsigned" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1}">Integer Unsigned (positive)</option>
 					<option value="mobile" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'UINT', 'filter_compare_type':1}">Mobile (9999 999 999)</option>
 				</group>
 				
 				<!-- Date aliases -->
-				<group label="DATE-TIME (Saved unchanged)">
+				<group label="FLEXI_VALIDATION_DATE_TIME_UNCHANGED">
 					<option value="dd/mm/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'STRING', 'filter_compare_type':0}">Date (dd/mm/yyyy)</option>
 					<option value="mm/dd/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'STRING', 'filter_compare_type':0}">Date (mm/dd/yyyy)</option>
 					<option value="yyyy/mm/dd" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':1, 'filter_compare_type':1}" fcconfigs="{'validation':'STRING', 'filter_compare_type':0}">Date (yyyy/mm/dd)</option>
@@ -109,26 +109,26 @@
 				</group>
 			</field>
 			<field name="validation" type="groupedlist" default="HTML" label="FLEXI_FIELD_SERVER_SIDE_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
-				<group label="Per user">
+				<group label="FLEXI_PER_USER">
 					<option value="2">FLEXI_FIELD_UGRP_TEXT_FILTERS</option>
 				</group>
-				<group label="HTML / Text">
+				<group label="FLEXI_HTML_TEXT">
 					<option value="1">FLEXI_FIELD_SAFE_HTML</option>
 					<option value="RAW">FLEXI_FIELD_UNSAFE_HTML</option>
 					<option value="STRING">FLEXI_FIELD_PLAIN_TEXT_DECODE_ENTITIES</option>
 					<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
 				</group>
-				<group label="Various">
+				<group label="FLEXI_VARIOUS">
 					<option value="URL">URL</option>
 					<option value="EMAIL">Email</option>
 					<option value="PATH">File Path</option>
 				</group>
-				<group label="Numbers">
+				<group label="FLEXI_NUMBERS">
 					<option value="INT">Integer</option>
 					<option value="UINT">Unsigned Integer</option>
 					<option value="DOUBLE">Decimal</option>
 				</group>
-				<group label="Strings">
+				<group label="FLEXI_STRINGS">
 					<option value="WORD">A-Za-z_</option>
 					<option value="ALNUM">A-Za-z0-9</option>
 					<option value="CMD">A-Za-z0-9_.-</option>
@@ -156,7 +156,8 @@
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			
+
+
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-text-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -217,7 +218,7 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
 				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>

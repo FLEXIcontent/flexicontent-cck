@@ -190,6 +190,9 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -197,6 +200,10 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
+				// Disable clicks
+				var btn = fieldval_box ? false : jQuery(el);
+				if (btn) btn.css('pointer-events', 'none').off('click');
+
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
@@ -205,7 +212,8 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if(rowCount".$field->id." > 1) {
+				if (rowCount".$field->id." > 1)
+				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
@@ -214,6 +222,9 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
+
+				// If not removing re-enable clicks
+				else if (btn) btn.css('pointer-events', '').on('click');
 			}
 			";
 			

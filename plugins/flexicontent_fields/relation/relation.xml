@@ -224,7 +224,7 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
 				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>
