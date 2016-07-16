@@ -70,7 +70,6 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
@@ -104,7 +103,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Editing method, text editor or HTML editor
-		$use_html  = $field->parameters->get( 'use_html', 1 );
+		$use_html = (int) $field->parameters->get( 'use_html', 0 );
 		
 		// *** Simple Textarea ***
 		$rows  = $field->parameters->get( 'rows', 3 ) ;
@@ -130,10 +129,11 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
 			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
 		}
-		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 		
 		// Initialise property with default value
-		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
+		{
 			$field->value = array();
 			$field->value[0]['title'] = $default_title;
 			$field->value[0]['text']  = $default_value;
@@ -183,7 +183,10 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
-				
+				";
+			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			$js .= "
 				// Update the new term title
 				var termtitle = newField.find('input.termtitle');
 				var termtitle_dv = termtitle.attr('data-defvals');
@@ -192,32 +195,54 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 					termtitle.val('') ;
 				termtitle.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				termtitle.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				
-				";
-			
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
+
 				// Update the new term description
 				var boxClass = 'termtext';
 				var container = newField.find('.fc_'+boxClass);
-				var hasTinyMCE = typeof tinyMCE === 'undefined' ? false : tinyMCE.get( container.find('textarea').first().attr('id') );
-				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : container.find('textarea').next().hasClass('CodeMirror');
-				
-				container.after('<div class=\"nowrap_box fc_'+boxClass+'\" style=\"min-width: 50%;\"></div>');  // Append a new container box
-				container.find('label.labeltext').show().appendTo(container.next()); // Copy the label
-				container.find('textarea').first().show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
-				container.remove(); // Remove old (cloned) container box along with all the contents
-				
+				var container_inner = newField.find('.fcfield_box');
+				var txtarea = container.find('textarea').first();
+
+				var hasTinyMCE = container.find('textarea').hasClass('mce_editable');  //typeof tinyMCE === 'undefined' ? false : !!tinyMCE.get( txtarea.attr('id') );
+				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : txtarea.next().hasClass('CodeMirror');
+
+				".( !$use_html ? "" : "
+				if (hasCodeMirror)  // CodeMirror case
+				{
+					// Get options not from copy but from the original DOM element
+					var CMoptions = jQuery('#'+txtarea.attr('id')).next().get(0).CodeMirror.options;
+
+					// Cleanup the cloned HTML elements of the editor
+					container.find('.CodeMirror').remove();
+				}
+				else   // tinyMCE / other editors
+				{
+					// Append a new container after the current textarea container
+					container.after('<div class=\"'+ container.get(0).className +'\"></div>');
+
+					// Copy label
+					container.find('label.labeltext').appendTo(container.next());
+
+					// Add inner container and copy only the textarea into the new container and make it visible
+					jQuery('<div class=\"'+ container_inner.get(0).className +'\">' + (hasTinyMCE ? '<div class=\"editor\"></div>' : '') + '</div>').appendTo(container.next());
+					var target = hasTinyMCE ? container.next().find('.editor') : container.next();
+					container.find('textarea').appendTo(target).css('display', '').css('visibility', '');
+
+					// Remove old (cloned) container box along with all the contents
+					container.remove();
+				}
+				")."
+
 				// Prepare the new textarea for attaching the HTML editor
 				theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
 				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-				theArea.removeClass(); // Remove all classes from the textarea
 				
 				// Update the labels
 				newField.find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				newField.find('label.labeltitle').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_title-lbl');
 				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				newField.find('label.labeltext').attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_text-lbl');
 				";
 			
 			// Add new field to DOM
@@ -225,41 +250,30 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
+
+				// 2: means no DATA clean-up
+				if (remove_previous && remove_previous!=2)
+				{
+					fc_removeAreaEditors(lastField.find('textarea'), 0);
+				}
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				";
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
-				if (hasCodeMirror) {
-					var CM = CodeMirror.fromTextArea(theArea.get(0),
-					{
-						mode: 'application/x-httpd-php',
-						indentUnit: 2,
-						lineNumbers: true,
-						matchBrackets: true,
-						lineWrapping: true,
-						onCursorActivity: function() 
-						{
-							CM.setLineClass(hlLine, null);
-							hlLine = CM.setLineClass(CM.getCursor().line, 'activeline');
-						}
-					});
-				}
-				if (hasTinyMCE)
+
+				if (hasCodeMirror)
 				{
-          if(tinyMCE.majorVersion >= 4) {
-          	//var ed = new tinymce.Editor('textareaid', { mode : 'exact' }, tinymce.EditorManager);
-						//tinyMCE.init({  mode : 'exact',  elements :'".$elementid."_'+uniqueRowNum".$field->id."+'_text'  });
-          	//tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."+'_text'].show();
-						tinyMCE.EditorManager.execCommand('mceAddEditor', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-          } else {
-          	tinyMCE.EditorManager.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-						//tinyMCE.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-          }
-          //tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-					theArea.addClass('mce_editable').addClass(boxClass);
-					newField.find('.mce-container').css('display', '');
+					var jsEditor = fc_attachCodeMirror(theArea, CMoptions);
 				}
+				else if (hasTinyMCE)
+				{
+					var jsEditor = fc_attachTinyMCE(theArea);
+				}
+				//window.console.log(jsEditor);
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -275,13 +289,17 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
-				
+
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
+				// Disable clicks
+				var btn = fieldval_box ? false : jQuery(el);
+				if (btn) btn.css('pointer-events', 'none').off('click');
+
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
@@ -290,32 +308,25 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if(rowCount".$field->id." > 1) {
+				if (rowCount".$field->id." > 1)
+				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
+
+					// Remove known JS editors
+					fc_removeAreaEditors( row.find('textarea'), 0 );
+
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){
-						var txtareas = jQuery(this).find('textarea');
-						txtareas.each(function( i, txtarea) {
-							var areaid = jQuery(txtarea).attr('id');
-							//window.console.log ('Termlist field, areaid: '+areaid);
-							
-							var hasTinyMCE = !areaid || typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
-							//window.console.log ('hasTinyMCE: '+hasTinyMCE);
-							//if (hasTinyMCE) window.console.log ('Removing TinyMCE in Termlist Field');
-							if (hasTinyMCE) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
-							
-							var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : jQuery(txtarea).first().next().hasClass('CodeMirror');
-							//window.console.log ('hasCodeMirror: '+hasCodeMirror);
-							//if (hasCodeMirror) window.console.log ('Removing CodeMirror in Termlist Field');
-							if (hasCodeMirror) jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
-						});
-						jQuery(this).remove();
-					});
+					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
+
+				// If not removing re-enable clicks
+				else if (btn) btn.css('pointer-events', '').on('click');
+
+				//if (typeof tinyMCE != 'undefined' && tinyMCE) window.console.log('Field \"".$field->label."\" # values: ' + rowCount".$field->id." + ' tinyMCE editor count: ' + tinyMCE.editors.length);
 			}
 			";
 			
@@ -360,16 +371,16 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			$elementid_n = $elementid.'_'.$n;
 			
 			$title = '
-				<div class="nowrap_box fc_termtitle">
-					<label class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label./*' '.($multiple?($n+1):'').*/'</label>
-					<input class="fcfield_textval termtitle '.$required.'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'"
+				<div class="fc_termtitle">
+					<label id="'.$elementid_n.'_title-lbl" class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label.'</label>
+					<input class="fcfield_textval termtitle '.($required ? ' required' : '').'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'"
 						value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" data-defvals="'.htmlspecialchars( $default_title, ENT_COMPAT, 'UTF-8' ).'"/>
 				</div>';
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$text = !$use_html ? '
-				<textarea class="fcfield_textval termtext" id="'.$elementid_n.'_text" name="'.$fieldname_n.'[text]" cols="'.$cols.'" rows="'.$rows.'">'
+				<textarea class="fcfield_textval termtext' .($required ? ' required' : ''). '" id="'.$elementid_n.'_text" name="'.$fieldname_n.'[text]" cols="'.$cols.'" rows="'.$rows.'">'
 					.htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
@@ -378,9 +389,11 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				);
 			
 			$text = '
-				<div class="nowrap_box fc_termtext" style="min-width: 50%;">
-					<label class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.' './*($multiple?($n+1):'').*/'</label>
-					'.$text.'
+				<div class="fc_termtext">
+					<label id="'.$elementid_n.'_text-lbl" class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.'</label>
+					<div class="fcfield_box' .($required ? ' required_box' : ''). '" data-label_text="'.$field->label.'">
+						'.$text.'
+					</div>
 				</div>';
 			
 			$field->html[] = '
@@ -430,6 +443,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
+		$use_html = (int) $field->parameters->get( 'use_html', 0 );
 		
 		// Term Title
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
@@ -490,6 +504,9 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				if ($encode_output) {
 					$value['title'] = htmlspecialchars( $value['title'], ENT_QUOTES, 'UTF-8' );
 					$value['text']  = htmlspecialchars( $value['text'], ENT_QUOTES, 'UTF-8' );
+				}
+				if (!$use_html) {
+					$value['text'] = nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $value['text']));
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
@@ -560,11 +577,15 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if (!$is_ingroup)  // do not convert the array to string if field is in a group
+		
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
 		{
-			// Apply separator and open/close tags
+			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+			if ( $field->{$prop}!=='' )
+			{
+				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			} else {
 				$field->{$prop} = '';
@@ -590,7 +611,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 2 ) ;
-		$use_html   = $field->parameters->get( 'use_html', 0 );
+		$use_html   = (int) $field->parameters->get( 'use_html', 0 );
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 		$maxlength  = $use_html ? 0 : $maxlength;
 		
