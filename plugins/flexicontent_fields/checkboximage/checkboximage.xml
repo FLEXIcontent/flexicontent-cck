@@ -48,10 +48,10 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_OPTIONS_PER_VALUE" description="" depend_class="fieldgroupoff" level="level3" />
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_OPTIONS" description="FLEXI_FIELD_MAX_OPTIONS_DESC" depend_class="fieldgroupoff" />
-			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_OPTIONS" description="FLEXI_FIELD_MIN_OPTIONS_DESC" depend_class="fieldgroupoff" />
-			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_OPTIONS" description="FLEXI_FIELD_EXACT_OPTIONS_DESC" depend_class="fieldgroupoff" />
+			<field name="" type="separator" default="FLEXI_FIELD_OPTIONS_PER_VALUE" description="" level="level3" />
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_OPTIONS" description="FLEXI_FIELD_MAX_OPTIONS_DESC" />
+			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_OPTIONS" description="FLEXI_FIELD_MIN_OPTIONS_DESC" />
+			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_OPTIONS" description="FLEXI_FIELD_EXACT_OPTIONS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
@@ -63,7 +63,7 @@
 			<field name="sql_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC"
 				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comment.png"  preview_img="database_green.png" 
 				inline_tip2="value1::label1::image1.png::valgrp%%&lt;br/&gt; value2::label2::image2.png::valgrp%% ..." tip_class2="elements_list" tip_img2="comment.png" preview_img2="text_area.png" 
-				class="btn-group group-fcinfo">
+				class="btn-group group-fcmethod">
 				<option value="0" show_list="elements_list" hide_list="elements_sql" fcreadonly="{'field_elements':1}">FLEXI_NO</option>
 				<option value="1" show_list="elements_sql" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_YES</option>
 			</field>
@@ -74,12 +74,20 @@
 				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP" props_used="1,1,1,1"
 				editbtns_class="elements_list" value_area_class="elements_field"
 				master_fieldname="cascade_after" cascaded_prop="3"
-				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
-			<field name="image_type" type="multilist" subtype="radio" toggle_related="1" default="0" label="Image / Icon" description="Select if 'image' will be an image filename (e.g. image1.png) or an font icon class (e.g. icon-mail, icon-lamp)" class="btn-group group-fcinfo" labelclass="label-success">
+				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" labelclass="label-info" />
+
+			<field name="" type="separator" default="FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD" description="FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD_DESC" level="level3" />
+			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="FLEXI_VALGRP_MASTER_FIELD" description="FLEXI_VALGRP_MASTER_FIELD_DESC" 
+				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
+				labelclass="" custom_prompt="FLEXI_NO" />
+			<field name="cascade_prompt" type="text" default="" label="FLEXI_VALGRP_SELECT_MASTER_PROMPT" description="FLEXI_VALGRP_SELECT_MASTER_PROMPT_DESC" />
+
+			<field name="" type="separator" default="FLEXI_IMAGE_ICON" description="" level="level3" />
+			<field name="image_type" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_IMAGE_ICON_TYPE" description="FLEXI_FIELD_IMAGE_ICON_TYPE_DESC" class="btn-group group-fcinfo">
 				<option value="0" show_list="icontype_image" hide_list="icontype_font">Image name</option>
 				<option value="1" show_list="icontype_font" hide_list="icontype_image">Font class</option>
 			</field>
-			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" depend_class="icontype_image" />
+			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGE_DIR" description="FLEXI_FIELD_IMAGE_DIR_DESC" depend_class="icontype_image" />
 			<field name="icon_size_form" type="list" default="" label="FLEXI_ICON_SIZE" description="" depend_class="icontype_font">
 				<option value="">FLEXI_SIZE_VIA_CSS</option>
 				<option value="16">16x16</option>
@@ -90,11 +98,6 @@
 				<option value="64">64x64</option>
 			</field>
 			<field name="icon_color_form" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font"/>
-			
-			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="FLEXI_VALGRP_CASCADE_AFTER" description="FLEXI_VALGRP_CASCADE_AFTER_DESC" 
-				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
-				labelclass="" custom_prompt="FLEXI_NO" />
-			<field name="cascade_prompt" type="text" default="" label="Cascade prompt" description="A prompt to ask user to select a value in the cascade-after field, so that this field loads dependent values" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 
@@ -116,17 +119,17 @@
 				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_PROMPT_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_PROMPT_TEXT_DESC" />
-			<field name="use_jslib" type="radio" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="2">prettyCheckable</option>
+			<field name="use_jslib" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="using_jslib" hide_list="">FLEXI_NO</option>
+				<option value="2" show_list="" hide_list="using_jslib">prettyCheckable / Select2</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" />
-			<field name="display_as_select" type="radio" default="0" label="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT" description="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_as_select" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_DISPLAY_AS_MULTIPLE_SELECT" description="FLEXI_FIELD_DISPLAY_AS_MULTIPLE_SELECT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_as_select">FLEXI_NO</option>
+				<option value="1" show_list="disp_as_select" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" depend_class="disp_as_select using_jslib" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
@@ -200,7 +203,7 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0,'ns_pretext':0,'ns_posttext':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1,'ns_pretext':1,'ns_posttext':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0','ns_pretext':'&lt;li style=\'text-decoration:line-through\'&gt;','ns_posttext':'&lt;/li&gt;'}">List: numbered</option>
 				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1,'ns_pretext':1,'ns_posttext':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0','ns_pretext':'&lt;li style=\'text-decoration:line-through\'&gt;','ns_posttext':'&lt;/li&gt;'}">List (bullets)</option>
