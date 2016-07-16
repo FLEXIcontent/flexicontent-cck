@@ -2283,6 +2283,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 	protected function verifyExtraRules()
 	{
+		$debug_initial_perms = JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
+		
 		$fc_asset = JTable::getInstance('asset');
 		$fc_asset->loadByName('com_flexicontent');
 		$fc_asset_rules = json_decode($fc_asset->rules, true);
@@ -2332,10 +2334,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			{
 				throw new RuntimeException($com_content_asset->getError());
 			}
-			JFactory::getApplication()->enqueueMessage( 'Updated com_content asset with extra rules', 'notice' );
+			if ($debug_initial_perms) JFactory::getApplication()->enqueueMessage( 'Updated component asset with extra rules', 'notice' );
 		}
 		else {
-			//JFactory::getApplication()->enqueueMessage( 'No update needed for com_content asset with extra rules', 'notice' );
+			if ($debug_initial_perms) JFactory::getApplication()->enqueueMessage( 'No update needed for component asset with extra rules', 'notice' );
 		}
 	}
 }

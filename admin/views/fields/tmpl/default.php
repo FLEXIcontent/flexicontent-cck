@@ -85,7 +85,7 @@ foreach ($this->allrows as $row)
 		$grouped_fields[$row->id] = array();  // Add this in case it is empty (= has no fields in it)
 		foreach($fid_arr as $_fid) $f2g_map[$_fid] = $row;
 	}
-	$allrows_byid[$row->id] = $row;  // used to display information for: CASCADE-after-master feature (and in future for more cases)
+	$allrows_byid[$row->id] = $row;  // used to display information for: depends-on-master field feature (and in future for more cases)
 }
 foreach ($this->allrows as $row)
 {
@@ -477,7 +477,7 @@ function delAllFilters() {
 					</a>
 					<?php echo $original_label_text;?>
 				<?php
-					// Handle displaying information: CASCADE-after-master field
+					// Handle displaying information: depends-on-master field
 					if (!empty($row->parameters) && $row->parameters->get('cascade_after'))
 					{
 						$_r = $allrows_byid[ $row->parameters->get('cascade_after') ];

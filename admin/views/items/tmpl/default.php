@@ -364,7 +364,7 @@ jQuery(document).ready(function(){
 	<?php endif; ?>
 
 
-	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm" style="<?php echo ($this->unassociated && !count($this->rows) ? 'display: none;' : ''); ?>">
 	
 	<div id="fc-filters-header">
 		<span class="fc-filter nowrap_box" style="margin:0;">

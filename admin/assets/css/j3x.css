@@ -280,7 +280,7 @@ div fieldset.panelform :not(.label-fcouter) label.hasTooltip,
 	display: inline-block;
 }
 div fieldset label:not(.btn) {
-	margin: 2px 8px 2px 2px;
+	margin: 1px 6px 1px 2px;
 	clear: none;
 }
 div fieldset label.btn {
@@ -301,7 +301,7 @@ fieldset.panelform :not(.input-prepend):not(.input-append) > button {
 	display: inline-block;
 	height: auto;
 	float: left !important;
-	margin: 2px 8px 0px 0px;
+	margin: 1px 6px 1px 2px;
 }
 div.width-20 fieldset,
 div.width-30 fieldset,
