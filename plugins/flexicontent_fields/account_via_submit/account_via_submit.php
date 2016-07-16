@@ -19,7 +19,7 @@ jimport('cms.plugin.plugin');
 class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 {
 	static $field_types = array('account_via_submit');
-	static $prior_to_version = "3.1";
+	//static $prior_to_version = "3.2";  // Display message for non free plugin
 	
 	// ***********
 	// CONSTRUCTOR

@@ -100,8 +100,13 @@ class plgFlexicontent_fieldsCore extends FCField
 		foreach($items as $item)
 		{
 			//if (!is_object($_field)) echo $item->id." - ".$_field ."<br/>";
-			if (is_object($_field)) $field = $_field;
-			else $field = $item->fields[$_field];
+			if (is_object($_field))
+				$field = $_field;
+
+			else if (!empty($item->fields))
+				$field = $item->fields[$_field];
+
+			else continue;   // Item with no type ?
 			
 			if($field->iscore != 1) continue;
 			$field->item_id = $item->id;
