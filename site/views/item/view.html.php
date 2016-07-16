@@ -184,7 +184,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		$_items = array(&$item);
 		FlexicontentFields::getFields($_items, FLEXI_ITEMVIEW, $params, $aid);
-		$fields = $item->fields;
+		if (isset($item->fields))
+			$fields = & $item->fields;
+		else
+			$fields = array();
 		
 		
 		// **********************************************************
@@ -560,7 +563,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *****************
 		
 		$has_J2S = false;
-		foreach ($fields as $field) {
+		foreach ($fields as $field)
+		{
 			$has_J2S = $has_J2S || $field->field_type == 'j2store';
 			if ($has_J2S) break;
 		}

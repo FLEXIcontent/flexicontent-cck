@@ -253,12 +253,13 @@ Joomla.submitform = function(task, form, validate)
 	if (!form) {
 		form = document.getElementById('adminForm');
 	}
-	var form_task = task ? task : (typeof form.task !== 'undefined' && typeof form.task.value !== 'undefined'  ?  form.task.value  :  '');
-	
+	var task_field_exists = typeof form.task !== 'undefined' && typeof form.task.value !== 'undefined';
+	var form_task = task ? task : (task_field_exists  ?  form.task.value  :  '');
+
 	// Do form validation if button task is not 'cancel'
 	var match_cancel = new RegExp(/(.*.|^)cancel$/);
 	var isCancel = match_cancel.test(form_task);
-	
+
 	// For flexicontent views we will do validation too (FLAG: fc_validateOnSubmitForm), NOTE: for non-FC views this is done before the method is called
 	var doValidation = typeof window.fc_validateOnSubmitForm !== undefined ? window.fc_validateOnSubmitForm : 0;
 	if ( doValidation && document.formvalidator && !isCancel )
@@ -268,44 +269,49 @@ Joomla.submitform = function(task, form, validate)
 		{
 			// Form is not invalid, focus the first invalid element, or focus the all errors container
 			var invalid = jQuery('.invalid').first();  // Get single element so that hidden check will work
-			if (invalid.is(':hidden')) {
-				invalid = jQuery('#system-message-container');
-			}
-			
-			if (invalid.length) {
-				var pos = invalid.offset().top - 80;
-				jQuery('html, body').animate({
-					scrollTop: pos
-				}, 1000);
-				invalid[0].focus();
-			}
+
+			setTimeout(function()   // This works without the timeout too ...
+			{
+				if (invalid.is(':hidden'))
+				{
+					invalid = jQuery('#system-message-container');
+				}
+				if (invalid.length)
+				{
+					var pos = invalid.offset().top - 80;
+					jQuery('html, body').animate({
+						scrollTop: pos
+					}, 400);
+					invalid[0].focus();
+				}
+			}, 20);
 			return false;
 		}
 	}
-	
+
 	// Modify form task after JS validation has run
-	if (task) {
+	if (task && task_field_exists) {
 		form.task.value = task;
 	}
-	
+
 	// Suppress validateForm() of htm5fallback.js
 	if ( form.H5Form ) {
 		form.H5Form.donotValidate = true;
 	}
-	
+
 	// HTML5 VALIDATION: Suppress if "*.cancel" or "cancel" tasks
 	// (*) we force it to OFF ... currently we will not use it all
 	if (1 || isCancel)
 		form.setAttribute('novalidate', 'novalidate');
-	
+
 	// HTML5 VALIDATION: do according to form original code
 	else if (typeof validate === 'undefined' || validate === null)
 		;
-	
+
 	// HTML5 VALIDATION: Force OFF / ON
 	else !validate ?
 		form.setAttribute('novalidate', 'novalidate') :
 		form.removeAttribute('novalidate') ;
-	
+
 	fc_submit_form(form, form_task); // Submit the form
 }

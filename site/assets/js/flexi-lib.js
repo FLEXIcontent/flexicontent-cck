@@ -551,8 +551,16 @@
 		/*setTimeout(function(){ }, 20);*/
 		if (!!Joomla.fc_debug) window.console.log( 'fc_bindFormDependencies() time: ' + ((new Date())  - vTimeStart) + ' ms');
 	}
-	
-	
+
+
+	/* Attach form validation to inner elements of the given selector */
+	function fc_validationAttach(sel)
+	{
+		document.formvalidator.attachToForm(null, sel);
+	}
+
+
+	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
 	function fc_bootstrapAttach(sel)
 	{
 		// Turn radios into btn-group
@@ -875,9 +883,11 @@
 			fclib_setCookie(cookieName, cookieValue, nDays);
 		}
 	}
-	
+
+
 	// *** Create column choosers row for a table. NOTE must have <th> cells at row 0
-	function create_column_choosers(container_div_id, data_tbl_id, firstload, start_text, end_text) {
+	function create_column_choosers(container_div_id, data_tbl_id, firstload, start_text, end_text)
+	{
 		// 1. Get column-status array for the table with id: data_tbl_id
 		var show_col = eval('show_col_'+data_tbl_id);
 	
@@ -924,14 +934,16 @@
 		str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true">' + str + end_text;
 		document.getElementById(container_div_id).innerHTML=str;
 	}
-	
-	
+
+
 	/* Set a cookie */
-	function fclib_setCookie(cookieName, cookieValue, nDays) {
+	function fclib_setCookie(cookieName, cookieValue, nDays)
+	{
 		var today = new Date();
 		var expire = new Date();
 		var path = "'.JURI::base(true).'";
 		if (nDays==null || nDays<0) nDays=0;
+
 		if (nDays) {
 			expire.setTime(today.getTime() + 3600000*24*nDays);
 			document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
@@ -940,32 +952,130 @@
 		}
 		//alert(cookieName+"="+escape(cookieValue) + ";path=" + path);
 	}
-	
-	
-	/* Toggle box via a button and set CSS class to indicate that it is open  */
-	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode) {
-		var box = typeof theBox=='string' ? jQuery('#'+theBox) : theBox;
+
+
+	/* Remove known textarea editors, optionally add a flag to restore editors laters */
+	function fc_removeAreaEditors(txtareas, addRestoreClass)
+	{
+		addRestoreClass = typeof addRestoreClass != 'undefined' ? addRestoreClass : 0; 
 		
-		if (btnNew) {
+		// Remove known JS editors
+		txtareas.each(function(i, txtarea)
+		{
+			var areaid = jQuery(txtarea).attr('id');
+
+			var hasTinyMCE = !!(!areaid || typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid));
+			if (hasTinyMCE) {
+				tinyMCE.majorVersion >= 4 ?
+					tinymce.remove('#'+areaid) :
+					tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid) ;
+				if (addRestoreClass) jQuery(txtarea).addClass('fc_hadTinyMCE');
+			}
+
+			var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : jQuery(txtarea).first().next().hasClass('CodeMirror');
+			if (hasCodeMirror) {
+				jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
+				if (addRestoreClass) jQuery(txtarea).addClass('fc_hadCodeMirror');
+			}
+		});
+	}
+
+
+	/* Restore known textarea editors to textareas with respective class */
+	function fc_restoreAreaEditors(txtareas)
+	{
+		fc_attachTinyMCE( txtareas.filter('.fc_hadTinyMCE') );
+		fc_attachCodeMirror( txtareas.filter('.fc_hadCodeMirror') );
+	}
+
+
+	/* Attach tinyMCE with default settings */
+	function fc_attachTinyMCE(txtareas)
+	{
+		var theArea, areaID;
+		txtareas.each(function(i, txtarea)
+		{
+			var theArea = jQuery(txtarea);
+			var areaID = theArea.attr('id');
+
+			// Remove tinymce classes from the textarea
+			theArea.removeClass('mce_editable');
+
+			// Add tinyMCE editor
+			tinyMCE.majorVersion >= 4 ?
+				tinyMCE.EditorManager.execCommand('mceAddEditor', true, areaID)  :  //{ tinyMCE.init({  mode : 'exact',  elements : areaID });  //tinyMCE.get(areaid).show();  //tinyMCE.editors[areaID].show(); }
+				tinyMCE.EditorManager.execCommand('mceAddControl', true, areaID) ;  //{ tinyMCE.execCommand('mceAddControl', false, theArea.attr('id')); }
+
+			// Some cleanups for proper display
+			theArea.addClass('mce_editable');
+			theArea.parent().children('.mce-container').css('display', '');   // allow editor container to stretch to the full width of its external container
+			//tinyMCE.EditorManager.execCommand('mceFocus', true, areaID);
+		});
+
+		return txtareas.length==1 ? tinyMCE.get(areaID) : true;
+	}
+
+
+	/* Attach CodeMirror with default settings */
+	function fc_attachCodeMirror(txtareas, CMoptions)
+	{
+		CMoptions = typeof CMoptions!=='undefined' ? CMoptions : {
+			mode: 'application/x-httpd-php',
+			indentUnit: 2,
+			lineNumbers: true,
+			matchBrackets: true,
+			lineWrapping: true,
+			onCursorActivity: function(CM) 
+			{
+				CM.setLineClass(hlLine, null);
+				hlLine = CM.setLineClass(CM.getCursor().line, 'activeline');
+			}
+		};
+
+		var editor, theArea;
+		txtareas.each(function(i, txtarea)
+		{
+			theArea = jQuery(txtarea);
+			theArea.removeClass(); // Remove all classes from the textarea
+			editor = CodeMirror.fromTextArea(theArea.get(0), CMoptions);
+			editor.refresh();
+		});
+
+		return txtareas.length==1 ? editor : true;
+	}
+
+
+	/* Toggle box via a button and set CSS class to indicate that it is open  */
+	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode)
+	{
+		var box = typeof theBox=='string' ? jQuery('#'+theBox) : theBox;
+
+		if (btnNew)
+		{
 			btnNew.show();
 			jQuery(btn).hide();
 		}
-		
+
 		if (
 			(typeof mode!=='undefined' && parseInt(mode)) ||  // use the mode provided
 			(typeof mode==='undefined' && box.is(':hidden'))  // if any of the elements collection 'box' is hidden then open them all
 		) {
-			jQuery(btn).addClass(btnClass);
-			box.slideDown(400);
+			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
+				box.show() :
+				box.slideDown(400) ;
+			jQuery(btn).addClass(btnClass).data('fc_noeffect', null).removeClass('fc_noeffect');
 		} else {
-			jQuery(btn).removeClass(btnClass);
-			box.slideUp(400);
+			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
+				box.hide() :
+				box.slideUp(400) ;
+			jQuery(btn).removeClass(btnClass).data('fc_noeffect', null).removeClass('fc_noeffect');
 		}
 	}
-	
-	
+
+
 	/* Disable/enable a check box group e.g. when 'Use Global' option is toggled */
-	function fc_toggle_checkbox_group(containerID, useGlobalElement) {
+	function fc_toggle_checkbox_group(containerID, useGlobalElement)
+	{
 		var container = jQuery('#'+containerID);
 		var inputs = container.find('input');
 		el = jQuery(useGlobalElement);
@@ -980,27 +1090,34 @@
 		}
 		el.attr('disabled', false);
 	}
-	
-	
-	function fc_dialog_resize_now()
+
+
+	/* Auto-resize the currently open dialog vertically or horizontally */
+	function fc_dialog_resize_now(boxWsel, boxHsel, contentSel)
 	{
 		params = {};
 		params = fc_getAutoSizePos(0, 0, params);
+
+		boxWsel = typeof boxWsel != 'undefined' ? boxWsel : '.ui-dialog.fc-autow-dialog';
+		boxHsel = typeof boxHsel != 'undefined' ? boxHsel : '.ui-dialog.fc-autoh-dialog';
+		contentSel = typeof contentSel != 'undefined' ? contentSel : '.ui-dialog-content';
 		
-		jQuery('.ui-dialog.fc-autow-dialog').css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' });
-		jQuery('.ui-dialog.fc-autoh-dialog').css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
+		jQuery(boxWsel).css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' });
+		jQuery(boxHsel).css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
 		
-		var dialogs = jQuery('.ui-dialog.fc-autoh-dialog');
-		dialogs.each(function( index ) {
+		var dialogs = jQuery(boxHsel);
+		dialogs.each(function( index )
+		{
 			var dialog_box = jQuery(this);
-			var content_box = dialog_box.find('.ui-dialog-content');
+			var content_box = dialog_box.find(contentSel);
 			var h = dialog_box.height() - content_box.prev().outerHeight(true) - content_box.next().outerHeight(true);
 			content_box.css({ 'height': h+'px', 'margin': '0', 'box-sizing': 'border-box' });
 			content_box.find('iframe').contents().find('body').css({ 'height': 'unset' });
 		});
 	}
-	
-	
+
+
+	/* Debounced function execution by the given 'wait' time, forcing single function execution within the given 'wait' time */
 	function fc_debounce_exec(func, wait, immediate) {
 		var timeout;
 		return function() {

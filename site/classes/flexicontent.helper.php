@@ -1755,6 +1755,8 @@ class flexicontent_html
 				JText::script("FLEXI_ORDER", true);
 				JText::script("FLEXI_INDEXED_FIELD_UNUSED_COL_DISABLED", true);
 				JText::script("FLEXI_INDEXED_FIELD_VALGRP_COL_DISABLED", true);
+				JText::script('FLEXI_REQUIRED',true);
+				JText::script('FLEXI_INVALID',true);
 				break;
 			
 			default:
@@ -1915,7 +1917,7 @@ class flexicontent_html
 		// Calculate length according to UTF-8 encoding
 		$uncut_length = StringHelper::strlen($cleantext);
 		
-		// Cut off the text if required but reencode html entities before doing so
+		// Cut off the text if required
 		if ($chars) {
 			if ($uncut_length > $chars) {
 				$cleantext = StringHelper::substr( $cleantext, 0, $chars ).'...';

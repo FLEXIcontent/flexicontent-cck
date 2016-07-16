@@ -329,8 +329,9 @@ class FlexicontentFields
 			
 			
 			// ONCE per Content Item Type
-			if ( empty($item->type_id) ) {
-				echo "<b>Item with id: ". $item->id . " has empty type<br/>";
+			if ( empty($item->type_id) )
+			{
+				//echo '<div class="alert alert-warning fc-small">Item with id: ' .$item->id. ' has empty type</div>';
 				continue;
 			}
 			else if ( !isset($type_fields[$item->type_id]) )
