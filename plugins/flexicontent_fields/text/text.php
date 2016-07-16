@@ -77,9 +77,9 @@ class plgFlexicontent_fieldsText extends FCField
 		$default_values= array($default_value);
 		
 		// Input field display size & max characters
-		$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
+		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
 		$placeholder= $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
 		
 		// create extra HTML TAG parameters for the form field
@@ -207,6 +207,9 @@ class plgFlexicontent_fieldsText extends FCField
 				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -214,6 +217,10 @@ class plgFlexicontent_fieldsText extends FCField
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
+				// Disable clicks
+				var btn = fieldval_box ? false : jQuery(el);
+				if (btn) btn.css('pointer-events', 'none').off('click');
+
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
@@ -222,7 +229,8 @@ class plgFlexicontent_fieldsText extends FCField
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if(rowCount".$field->id." > 1) {
+				if (rowCount".$field->id." > 1)
+				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
@@ -231,6 +239,9 @@ class plgFlexicontent_fieldsText extends FCField
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
+
+				// If not removing re-enable clicks
+				else if (btn) btn.css('pointer-events', '').on('click');
 			}
 			";
 			
