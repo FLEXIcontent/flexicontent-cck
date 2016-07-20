@@ -407,6 +407,14 @@ div .flexi_buttons button:not(.btn):hover {
 	clear: both;
 	max-width: 60%;
 }
+.fcsep_level_br {
+	line-height: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	display: block;
+}
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,

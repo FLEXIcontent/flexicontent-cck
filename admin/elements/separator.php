@@ -176,8 +176,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$description = @$attributes['description'];
 
 		$level = @$attributes['level'];
-		$_class = @$attributes['class'];
-		$_style = @$attributes['style'];
+		$classes = @$attributes['class'];
+		$style = @$attributes['style'];
 		
 		$tab_class = @$attributes['tab_class'] ? $attributes['tab_class'] : 's-gray';
 		
@@ -186,19 +186,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$this->add_tab_css_js();
 		}
 
-		if (substr($level, 0, 5)=='level')
-			$classes = 'fcsep_'.$level;
-		else
-			$classes = '';
-		
-		if ($_class) {
-			$classes .= ' '.$_class;
-		}
-
-		$style = '';
-		if ($_style) {
-			$style .= ' '.$_style;
-		}
+		$is_level = substr($level, 0, 5)=='level';
+		$classes .= $is_level ? ' fcsep_'.$level : '';
 
 		$tip = '';
 		$title = JText::_($value);
@@ -210,34 +199,38 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 		$icon_class = @$attributes['icon_class'];
 		
+		$box_count = (int) @ $attributes['remove_boxes'];
+		$_bof = $box_count ? ($box_count == 2 ? '</div></div>' : str_repeat("</div>", $box_count)) : '';
+		$_eof = $box_count ? ($box_count == 2 ? '<div><div>'   : str_repeat("<div>",  $box_count)) : '';
+
 		$box_type = @$attributes['box_type'];
-		switch ($level)
+		if (!$is_level) switch ($level)
 		{
 		case 'tabset_start':
 			$tab_id = 0;
 			if ($box_type==2)
-				return JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1));
+				return $_bof . JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1)) . $_eof;
 			else
-				return "\n". '<div class="fctabber '.$tab_class.'" id="tabset_attrs_'.($tabset_id++).'">';
+				return $_bof . "\n". '<div class="fctabber '.$tab_class.'" id="tabset_attrs_'.($tabset_id++).'">' . $_eof;
 			break;
 
 		case 'tabset_close':
 			if ($box_type==2)
-				return JHtml::_('tabs.end');
+				return $_bof . JHtml::_('tabs.end') . $_eof;
 			else
-			return '
+			return $_bof . '
 				</div>
-			</div>';
+			</div>' . $_eof;
 			break;
 
 		case 'tab_open':
 			if ($box_type==2)
-				return JHtml::_('tabs.panel', $title, 'tab_attrs_'.$tabset_id.'_'.($tab_id++));
-			return ($tab_id > 0 ? '
+				return $_bof . JHtml::_('tabs.panel', $title, 'tab_attrs_'.$tabset_id.'_'.($tab_id++)) . $_eof;
+			return $_bof . ($tab_id > 0 ? '
 				</div>' : '').'
 				<div class="tabbertab" id="tab_attrs_'.$tabset_id.'_'.($tab_id++).'" data-icon-class="'.$icon_class.'" >
 					<h3 class="tabberheading '.$classes.'" '.$tip.'>'.$title.'</h3>
-				';
+				' . $_eof;
 			break;
 
 		default:
@@ -245,6 +238,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			break;
 		}
 
-		return '<div style="'.$style.'" class="'.$classes.'" '.$tip.' >'.$title.'</div><div class="fcclear"></div>';
+		return $_bof . '<div style="'.$style.'" class="'.$classes.'" '.$tip.' >'.$title.'</div><div class="fcclear"></div>' . $_eof;
 	}
 }

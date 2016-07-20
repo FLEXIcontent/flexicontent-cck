@@ -783,7 +783,7 @@
 				<option value="0" show_list="" hide_list="cat_image">FLEXI_NO</option>
 				<option value="1" show_list="cat_image" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="cats_image_source" type="list" default="0" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" class="confpercat cat_image btn-group btn-group-yesno">
+			<field name="cats_image_source" type="radio" default="0" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" class="confpercat cat_image btn-group group-fcinfo">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
