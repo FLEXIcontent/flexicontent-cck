@@ -130,9 +130,10 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-file-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-file-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" description="" icon_class="icon-lock" level="tab_open" box_type="1" />
 			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -162,9 +163,87 @@
 			<field name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" />
 			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
 			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" description="" icon_class="icon-menu-3" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="Button configuration for actions such as: download, view, share, add-to-cart" level="level3" class="alert alert-info fcpadded" />
 			
+			<field name="usebutton" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_USE_BUTTONS" toggle_related="1" description="FLEXI_FIELD_USE_BUTTONS_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="multivalue-mode5">FLEXI_FIELD_LINKS</option>
+				<option value="1" show_list="multivalue-mode5" hide_list="">FLEXI_FIELD_BUTTONS</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			<field name="buttonsposition" type="radio" default="1" label="FLEXI_FIELD_BUTTONS_POSITION" depend_class="multivalue-mode5" description="FLEXI_FIELD_BUTTONS_POSITION_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_BEFORE</option>
+				<option value="1">FLEXI_FIELD_AFTER</option>
+			</field>
+
+			<field name="use_action_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_action_sep">FLEXI_NO</option>
+				<option value="1" show_list="use_action_sep" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="action_separator" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" depend_class="use_action_sep" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
+
+			<field name="" type="separator" default="" level="level_br" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" level="tabset_start" box_type="1" tab_class="s-cblue" />
+			<field name="" type="separator" default="FLEXI_DOWNLOADS" description="" icon_class="icon-download" level="tab_open" box_type="1" />
+
+			<field name="allowdownloads" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode7">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="multivalue-mode7">FLEXI_YES</option>
+				<option value="2" show_list="multivalue-mode7" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" depend_class="multivalue-mode7" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
+			
+			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level2" />
+			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode8">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="multivalue-mode8">FLEXI_YES</option>
+				<option value="2" show_list="multivalue-mode8" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="multivalue-mode8" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
+			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="multivalue-mode8" class="btn-group group-fcinfo">
+				<option value="0">Fancybox modal</option>
+				<option value="1">jQuery modal (responsive + fullscreen)</option>
+				<option value="2">New window</option>
+				<option value="3">Same window</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART_SHORT" description="" icon_class="icon-cart" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART" level="level2" />
+			<field name="use_downloads_manager" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode9">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="multivalue-mode9">FLEXI_YES</option>
+				<option value="2" show_list="multivalue-mode9" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="addtocarttext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_TEXT" depend_class="multivalue-mode9" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_TEXT_DESC"/>
+
+			<field name="" type="separator" default="FLEXI_SHARING" description="" icon_class="icon-users" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_SHARING" level="level2" />
+			<field name="allowshare" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode10">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="multivalue-mode10">FLEXI_YES</option>
+				<option value="2" show_list="multivalue-mode10" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="sharetext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" depend_class="multivalue-mode10" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>			
+			
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_DOWNLOAD_COUPONS" level="level3" class="alert alert-info fcpadded" />
+			<field name="enable_coupons" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ENABLE_COUPONS" toggle_related="1" description="FLEXI_FIELD_FILE_ENABLE_COUPONS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode11">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode11" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="coupon_hits_limit" type="text" size="5" default="3" label="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT_DESC"/>
+			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" level="tabset_close" box_type="1" />
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_TOTALS" level="level2" />
@@ -228,18 +307,10 @@
 				<option value="1" show_list="use_info_sep" hide_list="use_action_sep">FLEXI_YES</option>
 			</field>
 			<field name="info_separator" type="text" default="" label="FLEXI_FIELD_FILE_INFO_SEP_CHARS" depend_class="use_info_sep" description="FLEXI_FIELD_FILE_INFO_SEP_CHARS_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
-			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
-				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-			
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
@@ -267,80 +338,22 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
-		</fieldset>
-		<fieldset name="group-file-downloading" repeat="1" icon_class="icon-download" label="FLEXI_FIELD_FILE_DOWNLOAD" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="Button configuration for actions such as: download, view, share, add-to-cart" level="level2" />
-			
-			<field name="usebutton" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_USE_BUTTONS" toggle_related="1" description="FLEXI_FIELD_USE_BUTTONS_DESC" class="btn-group group-fcinfo">
-				<option value="0" show_list="" hide_list="multivalue-mode5">FLEXI_FIELD_LINKS</option>
-				<option value="1" show_list="multivalue-mode5" hide_list="">FLEXI_FIELD_BUTTONS</option>
-			</field>
-			
-			<field name="buttonsposition" type="radio" default="1" label="FLEXI_FIELD_BUTTONS_POSITION" depend_class="multivalue-mode5" description="FLEXI_FIELD_BUTTONS_POSITION_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_FIELD_BEFORE</option>
-				<option value="1">FLEXI_FIELD_AFTER</option>
-			</field>
 
-			<field name="use_action_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="use_action_sep">FLEXI_NO</option>
-				<option value="1" show_list="use_action_sep" hide_list="">FLEXI_YES</option>
+			<field name="" type="separator" default="FLEXI_CONTENT_PLUGINS" description="" icon_class="icon-power-cord" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
+				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="action_separator" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" depend_class="use_action_sep" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_DOWNLOADS" level="level1" />
-			<field name="allowdownloads" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode7">FLEXI_NO</option>
-				<option value="1" show_list="" hide_list="multivalue-mode7">FLEXI_YES</option>
-				<option value="2" show_list="multivalue-mode7" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" depend_class="multivalue-mode7" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
-			
-			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level1" />
-			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode8">FLEXI_NO</option>
-				<option value="1" show_list="" hide_list="multivalue-mode8">FLEXI_YES</option>
-				<option value="2" show_list="multivalue-mode8" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
-			</field>
-			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="multivalue-mode8" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
-			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="multivalue-mode8" class="btn-group group-fcinfo">
-				<option value="0">Fancybox modal</option>
-				<option value="1">jQuery modal (responsive + fullscreen)</option>
-				<option value="2">New window</option>
-				<option value="3">Same window</option>
-			</field>
-			
-		</fieldset>
-		<fieldset name="group-file-cart" repeat="1" icon_class="icon-cart" label="FLEXI_DOWNLOAD_CART_SHORT" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART" level="level1" />
-			<field name="use_downloads_manager" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode9">FLEXI_NO</option>
-				<option value="1" show_list="" hide_list="multivalue-mode9">FLEXI_YES</option>
-				<option value="2" show_list="multivalue-mode9" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
-			</field>
-			<field name="addtocarttext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_TEXT" depend_class="multivalue-mode9" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_TEXT_DESC"/>
-			
-		</fieldset>
-		<fieldset name="group-file-share" repeat="1" icon_class="icon-users" label="FLEXI_SHARING" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_SHARING" level="level1" />
-			<field name="allowshare" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode10">FLEXI_NO</option>
-				<option value="1" show_list="" hide_list="multivalue-mode10">FLEXI_YES</option>
-				<option value="2" show_list="multivalue-mode10" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
-			</field>
-			<field name="sharetext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" depend_class="multivalue-mode10" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>			
-			
-			<field name="" type="separator" default="FLEXI_FIELD_FILE_DOWNLOAD_COUPONS" level="level1" />
-			<field name="enable_coupons" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ENABLE_COUPONS" toggle_related="1" description="FLEXI_FIELD_FILE_ENABLE_COUPONS_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode11">FLEXI_NO</option>
-				<option value="1" show_list="multivalue-mode11" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="coupon_hits_limit" type="text" size="5" default="3" label="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT_DESC"/>
-			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
-			
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-envelope" label="Notifications" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			

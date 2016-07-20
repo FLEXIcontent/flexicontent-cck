@@ -21,7 +21,7 @@
 	<fields name="attribs">
 		
 		
-		<fieldset name="group-fcpagenav-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-fcpagenav-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
@@ -110,7 +110,7 @@
 				<option value="0" show_list="" hide_list="catimage-mode">FLEXI_HIDE</option>
 				<option value="1" show_list="catimage-mode" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="cat_image_source" type="list" default="2" size="1" label="FLEXI_CATIMAGE_SOURCE" depend_class="catimage-mode" description="FLEXI_CATIMAGE_SOURCE_DESC" class="btn-group btn-group-yesno">
+			<field name="cat_image_source" type="radio" default="2" size="1" label="FLEXI_CATIMAGE_SOURCE" depend_class="catimage-mode" description="FLEXI_CATIMAGE_SOURCE_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>

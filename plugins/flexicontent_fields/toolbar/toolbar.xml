@@ -22,7 +22,7 @@
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
 		
-		<fieldset name="group-toolbar-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
@@ -160,7 +160,7 @@
 				<option value="1" show_list="enable_addthis" hide_list="">FLEXI_YES</option>
 			</field>
 			
-			<field name="addthis_code_predefined" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS_DESC" class="btn-group group-fcmethod" labelclass="label-info" depend_class="enable_addthis">
+			<field name="addthis_code_predefined" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS_DESC" labelclass="label-info" depend_class="enable_addthis">
 				<option value=""   fcreadonly="{'addthis_custom_code':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_counter_facebook\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_google_plusone\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS</option>
 				<option value="2"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_tweet\' tw:count=\'vertical\'&gt;\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'tall\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_pinterest_pinit\' pi:pinit:url=\'_item_url_\' pi:pinit:media=\'_item_image_\' pi:pinit:layout=\'vertical\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_linkedin_counter\' li:counter=\'top\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS_BOX_STYLE</option>

@@ -289,8 +289,10 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 				}
 				unset($vg);
 			} else {
+				foreach($field->value as $value)
+					$field->html[] = '<div class="alert alert-error fc-small fc-iblock">Error, master field no: '.$cascade_after.' is not assigned to current item type or was unpublished</div><br/>';
 				$cascade_after = 0;
-				echo 'Error in field '.$field->label.' ['.$field->id.']'.' cannot cascaded after field no: '.$cascade_after.', field was not found <br/>';
+				return;
 			}
 		}
 		
@@ -404,7 +406,8 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
 					newField.find('div.select2-container').remove();
-					newField.find('select.use_select2_lib').select2('destroy').show().select2();
+					newField.find('select.use_select2_lib').select2('destroy').show();
+					fc_attachSelect2(newField);
 				}
 			")."
 
@@ -426,12 +429,22 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 			if ($cascade_after) $js .= "
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
 					return function () {
-						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+rowNo+', input.".$srcELid."_'+rowNo, '".$trgELid."_'+rowNo, '".$cascade_prompt."', ".self::$promptEnabled.", rowNo);
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+rowNo+', input.".$srcELid."_'+rowNo, '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".self::$promptEnabled.", rowNo);
 					}
 				}(uniqueRowNum".$field->id.");
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."]();
 				";
-			
+			else {
+				$js .= "
+				jQuery('#".$elementid."_'+uniqueRowNum".$field->id.").each(function() {
+					var el = jQuery(this);
+					setTimeout(function(){
+						el.trigger('change');
+					}, 20); // >0 is enough
+				});
+				";
+			}
+
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
@@ -964,7 +977,7 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 		}
 		
 		
-		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
 			if ($multiple && self::$valueIsArr) {

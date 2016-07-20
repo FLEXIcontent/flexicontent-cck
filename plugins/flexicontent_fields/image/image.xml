@@ -66,7 +66,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 
-			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC" class="btn-group group-fcinfo">
+			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC">
 				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla media manager</option>
 				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla article images: (intro + full)</option>
 				<option value="0"  show_list="img-db-mode"  hide_list="img-fld-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
@@ -197,7 +197,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-image-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-image-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
 

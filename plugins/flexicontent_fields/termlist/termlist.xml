@@ -89,7 +89,7 @@
 			<field name="title_maxlength" type="text" default="0" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="title_size" type="text" default="80" size="3" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			
-			<field name="" type="separator" default="Term decription" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_TERMTEXT" level="level1" />
 			<field name="value_label" type="text" default="FLEXI_FIELD_TERMTEXT" size="30" label="FLEXI_LABEL" description="Label, this is language filtered" />
 			<field name="use_html" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group group-fcinfo">
 				<option value="1" show_list="using-html-editor" hide_list="using-plain-area">FLEXI_HTML_EDITOR</option>
@@ -103,8 +103,8 @@
 			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
-			<field name="" type="separator" default="NOTE: about multi-value support" description="Only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; and &lt;b&gt;CodeMirror&lt;/b&gt; are supported, otherwise the editor on new values will appear only after saving" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
-			<field name="" type="separator" default="NOTE: prefer to use Joomla default editor" description="Adding 2 different editors on same page will break XTD editor buttons like read-more" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
+			<field name="" type="separator" default="FLEXI_FIELD_ABOUT_USING_MULVALUE_WITH_JEDITORS" description="FLEXI_FIELD_ABOUT_USING_MULVALUE_WITH_JEDITORS_DESC" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
+			<field name="" type="separator" default="FLEXI_FIELD_PREFER_DEFAULT_JEDITOR" description="FLEXI_FIELD_PREFER_DEFAULT_JEDITOR_DESC" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
 			<field name="editor" type="plugins" folder="editors" label="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" depend_class="using-html-editor">
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
 			</field>
@@ -116,12 +116,12 @@
 				<option value="0" show_list="" hide_list="using-editor-btns">FLEXI_NO</option>
 				<option value="1" show_list="using-editor-btns" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_LIST" description="FLEXI_SKIP_BUTTONS_LIST_DESC" depend_class="using-html-editor using-editor-btns" />
+			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_EDITOR_BUTTONS_LIST" description="FLEXI_SKIP_EDITOR_BUTTONS_LIST_DESC" depend_class="using-html-editor using-editor-btns" />
 
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-termlist-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-termlist-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
@@ -134,8 +134,12 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+
+			<field name="" type="separator" default="" level="level_br" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+
 			<field name="encode_output" type="radio" default="0" label="FLEXI_ENCODE_OUTPUT" description="FLEXI_ENCODE_OUTPUT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -146,17 +150,8 @@
 				<option value="2">FLEXI_ALL_HTML</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
-			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
-				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
@@ -184,7 +179,22 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
+
+			<field name="" type="separator" default="FLEXI_CONTENT_PLUGINS" description="" icon_class="icon-power-cord" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
+				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-termlist-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
