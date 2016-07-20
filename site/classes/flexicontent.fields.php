@@ -670,16 +670,19 @@ class FlexicontentFields
 		// Trigger content plugins on the field text
 		// *****************************************
 		
-		// Get configuration out of the field of the first item, if this CONFIGURATION was
-		// different per content TYPE, then we should move this inside the item loop (below)
+		// Get configuration out of the field of the first item that has the field, if this configuration 
+		// was different per content TYPE, then we should move this inside the item loop (below)
 		if ( !is_array($_item) )
 		{
 			$field = $_field;
 		}
 		else
 		{
-			$item = reset($items);
-			$field = $item->fields[$field_name];
+			foreach($items as $item)
+			{
+				if ( !isset($item->fields[$field_name]) ) continue;
+				$field = $item->fields[$field_name];
+			}
 		}
 
 		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
