@@ -12,6 +12,7 @@
 	<files>
 		<filename plugin="date">date.php</filename>
 		<filename>index.html</filename>
+		<folder>tmpl</folder>
 	</files>
 	
 	<config>
