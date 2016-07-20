@@ -464,11 +464,11 @@
 						jQuery(selector).each(function( index ) {
 							var c = jQuery(this);
 							if (c.is('select'))
-								c.trigger('change');
+								c.trigger('fcform_run_deps');  // instead of change
 							else if (c.is('input[type="radio"]'))
-								c.closest('.fcform_toggler_element').find('input[type="radio"]:checked').trigger('click');
+								c.closest('.fcform_toggler_element').find('input[type="radio"]:checked').trigger('fcform_run_deps');  // instead of click
 							else if (c.is('fieldset') && c.hasClass('radio'))
-								c.find('input[type="radio"]:checked').trigger('click');
+								c.find('input[type="radio"]:checked').trigger('fcform_run_deps');  // instead of click
 						});
 					}
 				});
@@ -515,29 +515,31 @@
 		var toBeUpdated_ALL = Array();
 		var k = 0;
 		
+		// Performance concern: use custom event
+
 		// Bind dependencies of select elements
-		jQuery(container+' select.fcform_toggler_element').change(function() {
+		jQuery(container+' select.fcform_toggler_element').on('change fcform_run_deps', function(e, data) {
 			var toBeUpdated = fc_findFormDependencies( jQuery('option:selected', this), toggleParent, toggleParentSelector, jQuery(this) );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
 		});
-		
+
 		// Bind dependencies of radio elements
-		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
+		jQuery(container+' .fcform_toggler_element input:radio').on('click fcform_run_deps', function(e, data) {
 			var toBeUpdated = fc_findFormDependencies( jQuery(this), toggleParent, toggleParentSelector, jQuery(this).parent('.fcform_toggler_element') );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
 		});
-		
+
 		// *** Update the form
 		jQuery('form').data('skip_validation' ,1);
 		
 		// Enqueue dependencies by triggering change on select elements
-		jQuery('form select.fcform_toggler_element').trigger('change');
+		jQuery('form select.fcform_toggler_element').trigger('fcform_run_deps');
 		// Enqueue dependencies by triggering change on radio elements
-		jQuery('form .fcform_toggler_element input[type="radio"]:checked').trigger('click');
+		jQuery('form .fcform_toggler_element input[type="radio"]:checked').trigger('fcform_run_deps');
 		
 		//alert(toBeUpdated_ALL.length);
 		// Apply form changes according to dependencies
@@ -592,15 +594,15 @@
 			}
 		});
 		
-		jQuery(sel).find('.btn-group input[checked=checked]').each(function()
+		jQuery(sel).find('.btn-group input[checked="checked"]').each(function()
 		{
 			var input = jQuery(this);
 			if (input.val() == '') {
-				input.parent().find('label[for=' + input.attr('id') + ']').addClass('active btn-primary');
+				input.parent().find('label[for="' + input.attr('id') + '"]').addClass('active btn-primary');
 			} else if (input.val() == 0) {
-				input.parent().find('label[for=' + input.attr('id') + ']').addClass('active btn-danger');
+				input.parent().find('label[for="' + input.attr('id') + '"]').addClass('active btn-danger');
 			} else {
-				input.parent().find('label[for=' + input.attr('id') + ']').addClass('active btn-success');
+				input.parent().find('label[for="' + input.attr('id') + '"]').addClass('active btn-success');
 			}
 		});
 	}
@@ -670,7 +672,7 @@
 				trgEL.empty().append(data).val('');
 				var trgTagName = trgEL.prop("tagName");
 				if (fc_cascade_field_funcs.hasOwnProperty(trgID) && trgTagName!='SELECT') {
-					//window.console.log ('Readding cascade function for source ID:' + trgID);
+					//window.console.log ('Reading cascade function for source ID:' + trgID);
 					fc_cascade_field_funcs[trgID]();
 				}
 				
@@ -1138,4 +1140,251 @@
 	jQuery(window).resize(function() {
 		fc_dialog_resize();
 	});
+
 	
+	/* Apply select2 JS to targeted elements */
+	function fc_attachSelect2(sel)
+	{
+		sel = typeof sel !== 'undefined' && sel ? sel : 'body';
+
+		if (window.skip_select2_js)
+		{
+			jQuery(sel).find('select.use_select2_lib')
+				//.filter(function(){return !jQuery(this).attr('multiple');})
+				.removeClass('use_select2_lib').addClass('fc_isselect fc_ismobile fc_no_js_attach');
+			jQuery(sel).find('.fc_mobile_label').show();
+			return;
+		}
+
+
+		// Attach select2 to specific to select elements having specific CSS class, for select-multiple show values as togglable checkboxes
+		jQuery(sel).find('select.use_select2_lib').each(function()
+		{
+			var sel_EL = jQuery(this);
+			if ( !sel_EL.attr('multiple') )
+			{
+				sel_EL.select2({
+					minimumResultsForSearch: 10
+				});
+			}
+			else
+			{
+				sel_EL.select2({
+					minimumResultsForSearch: 10,
+					closeOnSelect : false
+				}).addClass('select2_fc_checkboxes');
+			}
+		});
+
+
+		// Customization of SELECT2 JS selectors
+		jQuery(sel).find('div.use_select2_lib').each(function()
+		{
+			var el_container = jQuery(this);
+			var sel_EL = el_container.next('select');
+
+
+			// MULTI-SELECT2: Initialize internal labels, placing the label so that it overlaps the text filter box
+			var fc_label_text = sel_EL.attr('data-fc_label_text');
+			if (!fc_label_text) fc_label_text = sel_EL.attr('fc_label_text');
+			if (fc_label_text)
+			{
+				var _label = (fc_label_text.length >= 30) ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
+
+				jQuery('<span/>', {
+					'class': 'fc_has_inner_label fc_has_inner_label_select2',
+					'text': _label
+				}).prependTo(el_container.find('.select2-search-field'));
+			}
+
+
+			// MULTI-SELECT2: Initialize internal prompts, placing the prompt so that it overlaps the text filter box
+			var fc_prompt_text = sel_EL.attr('data-fc_prompt_text');
+			if (!fc_prompt_text) fc_prompt_text = sel_EL.attr('fc_prompt_text');
+			if (fc_prompt_text)
+			{
+				var _prompt = (fc_prompt_text.length >= 30) ? fc_prompt_text.substring(0, 28) + '...' : fc_prompt_text;
+
+				jQuery('<span/>', {
+					'class': 'fc_has_inner_prompt fc_has_inner_prompt_select2',
+					'text': _prompt
+				}).prependTo(el_container.find('.select2-search-field')).hide();
+			}
+
+
+			// SINGLE-SELECT2: Highlight selects with an active value
+			if ( ! sel_EL.attr('multiple') && !sel_EL.hasClass('fc_skip_highlight') )
+			{
+				var el = el_container.find('.select2-choice');
+				var val = sel_EL.val();
+				if (val === null) {
+					//el.addClass('fc_highlight_disabled');
+				} else if (!!val && val.length) {
+					el.addClass('fc_highlight');
+				} else {
+					el.removeClass('fc_highlight');
+				}
+			}
+		});
+
+
+		// MULTI-SELECT2:
+		jQuery(sel).find('select.use_select2_lib').on('select2-open', function()
+		{
+
+			// Add events to handle focusing the text filter box (hide inner label)
+			var sel_EL = jQuery(this);
+			var el = sel_EL.parent().find('.select2-input');
+			var el_label = el.prevAll('.fc_has_inner_label');
+			if (el_label) el_label.hide();
+			var el_prompt = el.prevAll('.fc_has_inner_prompt');
+			if (el_prompt) el_prompt.show();
+
+
+			// Allow listing already selected options WHEN having class 'select2_fc_checkboxes'
+			if (sel_EL.hasClass('select2_fc_checkboxes')) {
+				var els = jQuery('#select2-drop').find('.select2-selected');
+				els.addClass('select2-selected-visible').removeClass('select2-selected');
+				
+				// Suppress the onchange attribute while selector is open
+				sel_EL.data('onchange', sel_EL.attr('onchange'));
+				sel_EL.removeAttr('onchange');
+			}
+
+
+		}).on('select2-close', function()
+		{
+
+			// Add events to handle bluring the text filter box (show inner label)
+			var sel_EL = jQuery(this);
+			var el = sel_EL.parent().find('.select2-input');
+			var el_label = el.prevAll('.fc_has_inner_label');
+			if (el_label) el_label.show();
+			var el_prompt = el.prevAll('.fc_has_inner_prompt');
+			if (el_prompt) el_prompt.hide();
+			
+			// Restore already selected options state
+			if (sel_EL.hasClass('select2_fc_checkboxes')) {
+				var els = jQuery('#select2-drop').find('.select2-selected-visible');
+				els.removeClass('select2-selected-visible').addClass('select2-selected');
+			}
+
+
+			// Restore the onchange attribute when selector closes, running the JS if changes were made
+			if ( sel_EL.data('onchange') )
+			{
+				sel_EL.attr('onchange', sel_EL.data('onchange'));
+				sel_EL.data('onchange', null);
+			}
+
+			// Trigger change event on close if this was prevented
+			if ( sel_EL.data('field_being_edited') )
+			{
+				sel_EL.data('field_being_edited', null);
+				sel_EL.trigger('change');
+				if ( sel_EL.attr('onchange') )
+				{
+					eval(sel_EL.attr('onchange'));
+				}
+			}
+
+
+		}).on('select2-selecting', function(e)
+		{
+
+			// Handle toggling MULTI-SELECT2 as checkboxes
+			var sel_EL = jQuery(this);
+			if ( sel_EL.attr('multiple') && sel_EL.hasClass('select2_fc_checkboxes') )
+			{
+				var vals = sel_EL.val();
+				var nVals = new Array();
+				var i = 0;
+				var found = 0;
+				if (vals && vals.length) vals.each(function(v) {
+					if (v != e.val) nVals[i++] = v;
+					else found = 1;
+				});
+				if (!found) nVals[i++] = e.val;
+				sel_EL.data('set_selected_values', nVals);
+				sel_EL.data('field_being_edited', true);
+				sel_EL.data('field_being_selected', true);
+			}
+
+
+		}).on('change', function(e)
+		{
+
+			// SELECT2: Handle change event
+			var sel_EL = jQuery(this);
+			sel_EL.data('field_being_selected', null);
+			
+			if (sel_EL.data('field_being_edited'))
+			{
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation();
+			}
+
+			var nVals = sel_EL.data('set_selected_values');
+			if (nVals)
+			{
+				jQuery('#select2-drop').find('.select2-selected-visible, .select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
+				jQuery('#select2-drop').find('.select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
+				
+				sel_EL.data('set_selected_values', null).select2('val', nVals).trigger('change');
+			}
+
+
+			// SINGLE-SELECT2:
+			if ( ! sel_EL.attr('multiple') && !sel_EL.hasClass('fc_skip_highlight') )
+			{
+				// Handle highlighting selected value
+				var el = jQuery(this).prev('div').find('.select2-choice');
+				var val = sel_EL.val();
+				if (!!val && val.length) {
+					el.addClass('fc_highlight');
+				} else {
+					el.removeClass('fc_highlight');
+				}
+			}
+
+
+			// MULTI-SELECT2:
+			if ( sel_EL.attr('multiple') )
+			{
+				// Allow listing already selected options WHEN having class 'select2_fc_checkboxes'
+				if (jQuery(this).hasClass('select2_fc_checkboxes')) {
+					var els = jQuery('#select2-drop').find('.select2-selected');
+					els.addClass('select2-selected-visible').removeClass('select2-selected');//.removeClass('select2-result-selectable');
+				}
+			}
+
+		});
+
+		
+		// MULTI-SELECT2: Handle highlighting selected value
+		jQuery(sel).find('div.use_select2_lib.select2-container-multi input').on('keydown', function()
+		{
+			var el = jQuery(this);
+			setTimeout(function() {
+				var val = el.val();
+				if (!!val && val.length) {
+					var el_prompt = el.prevAll('.fc_has_inner_prompt');
+					if (el_prompt) el_prompt.hide();
+				} else {
+					var el_prompt = el.prevAll('.fc_has_inner_prompt');
+					if (el_prompt) el_prompt.show();
+				}
+			}, 0);
+		});
+
+
+		// SELECT2: scrollbar wrap problem
+		jQuery(sel).find('select.use_select2_lib').on('loaded open', function()
+		{
+			var ul = jQuery('#select2-drop ul.select2-results');
+			var needsScroll= ul.prop('scrollHeight') > ul.prop('clientHeight');
+			if (needsScroll) ul.css('overflow-y', 'scroll');
+			else  ul.css('overflow-y', 'auto');
+		});
+	}
