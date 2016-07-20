@@ -17,12 +17,11 @@
 	<config>
 	<fields name="attribs">
 		
-		<!--fieldset name="standard" repeat="1">
-		</fieldset-->
-		
 		<fieldset name="group-phonenumbers-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
 			
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
@@ -61,8 +60,9 @@
 				<option value="2">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_2_PART_NUM</option>
 				<option value="3">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_3_PART_NUM</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="" level="level2" />
 			<field name="label_maxlength" type="text" default="48" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
@@ -95,9 +95,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
+
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-phonenumbers-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-phonenumbers-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
@@ -110,28 +112,57 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_OPTIONAL_PROPERTIES_EVERY_VALUE" level="level2" />
+
+			<field name="" type="separator" default="" level="level_br" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
+
+			<!--field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_OPTIONAL_PROPERTIES_EVERY_VALUE" description="" level="level2" /-->
 			
 			<field name="display_phone_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_country_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_COUNTRY_CODE" description="">
+			<field name="display_country_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_COUNTRY_CODE" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_area_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_AREA_CODE" description="">
+			<field name="display_area_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_AREA_CODE" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_tel_link" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ADD_TEL_LINK" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ADD_TEL_LINK_DESC">
+			<field name="add_tel_link" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ADD_TEL_LINK" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ADD_TEL_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PROPERTY_SEPARATORS" description="" level="level2" />
+			
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="" level="level3" />
+			<field name="label_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX_DESC" />
+			<field name="label_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX_DESC" />
+			
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="" level="level3" />
+			<field name="country_code_prefix" type="text" default="+" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX_DESC" />
+			<field name="separator_cc_phone1" type="text" default=" " size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP_DESC" />
+			
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="" level="level3" />
+			<field name="separator_phone1_phone2" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP_DESC" />
+			<field name="separator_phone2_phone3" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
+			
+			<field name="opentag" type="text" default="" size="10" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="closetag" type="text" default="" size="10" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+
+			<field name="field_prefix" type="text" default="" size="10" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="field_suffix" type="text" default="" size="10" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+
+			<field name="" type="separator" default="FLEXI_CONTENT_PLUGINS" description="" icon_class="icon-power-cord" level="tab_open" box_type="1" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
@@ -142,29 +173,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PROPERTY_SEPARATORS" description="" level="level2" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="" level="level4" />
-			<field name="label_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX_DESC" />
-			<field name="label_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX_DESC" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="" level="level4" />
-			<field name="country_code_prefix" type="text" default="+" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX_DESC" />
-			<field name="separator_cc_phone1" type="text" default=" " size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP_DESC" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="" level="level4" />
-			<field name="separator_phone1_phone2" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_PART2_SEP_DESC" />
-			<field name="separator_phone2_phone3" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PART2_PART3_SEP_DESC" />
-			
-			<field name="" type="separator" default="Value List" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			
-			<field name="opentag" type="text" default="" size="10" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="closetag" type="text" default="" size="10" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 
-			<field name="field_prefix" type="text" default="" size="10" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="field_suffix" type="text" default="" size="10" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 		
 	</fields>

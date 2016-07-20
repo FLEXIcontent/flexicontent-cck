@@ -118,6 +118,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 			$use_prettycheckable = $use_jslib==2;
 			static $prettycheckable_added = null;
 		  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+			$placeInsideLabel = self::$usesImages && !($use_prettycheckable && $prettycheckable_added);
 		}
 
 
@@ -130,7 +131,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 		{
 			$fftype = self::$valueIsArr ? 'checkbox' : 'radio';
 
-			// For radioimage/checkboximage fields allow a more compact display in item form
+			// Applicable only for radioimage/checkboximage fields, it allows a more compact display in item form
 			$form_vals_display = 0;  // 0: label, 1: image, 2: both
 
 			// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
@@ -204,7 +205,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 			if ($use_prettycheckable && $prettycheckable_added)
 			{
 				$input_classes[] = 'use_prettycheckable';
-				$attribs .= ' data-customClass="fcradiocheck"';
+				$attribs .= self::$usesImages ? ' data-customClass="fcradiocheckimage"' : ' data-customClass="fcradiocheck"';
 			}
 			if (self::$valueIsArr)
 			{
@@ -218,7 +219,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 
 			// Attributes for input-labels
 			$label_class = 'fccheckradio_lbl ' . ($form_vals_display==1 ? $tooltip_class : '');
-			$label_style = '';
+			$label_style = self::$usesImages ? 'vertical-align: unset!important;' : '';  // fix for image placement inside label
 		}
 
 		// Attributes if displaying as select
@@ -282,8 +283,10 @@ class plgFlexicontent_fieldsSelect extends FCField
 				}
 				unset($vg);
 			} else {
+				foreach($field->value as $value)
+					$field->html[] = '<div class="alert alert-error fc-small fc-iblock">Error, master field no: '.$cascade_after.' is not assigned to current item type or was unpublished</div><br/>';
 				$cascade_after = 0;
-				echo 'Error in field '.$field->label.' ['.$field->id.']'.' cannot cascaded after field no: '.$cascade_after.', field was not found <br/>';
+				return;
 			}
 		}
 		
@@ -357,12 +360,14 @@ class plgFlexicontent_fieldsSelect extends FCField
 					elem.attr('data-is-defval') ?
 						elem.attr('checked', 'checked') :
 						elem.removeAttr('checked') ;
+
 					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
-					".($use_prettycheckable && $prettycheckable_added ?
+
+					".(!$placeInsideLabel ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
-						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
+						"elem.closest('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."   // special case for field with image place input and image inside labels
 					nr++;
 				});
 				
@@ -395,7 +400,8 @@ class plgFlexicontent_fieldsSelect extends FCField
 				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
 					newField.find('div.select2-container').remove();
-					newField.find('select.use_select2_lib').select2('destroy').show().select2();
+					newField.find('select.use_select2_lib').select2('destroy').show();
+					fc_attachSelect2(newField);
 				}
 			")."
 
@@ -417,12 +423,22 @@ class plgFlexicontent_fieldsSelect extends FCField
 			if ($cascade_after) $js .= "
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
 					return function () {
-						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+rowNo+', input.".$srcELid."_'+rowNo, '".$trgELid."_'+rowNo, '".$cascade_prompt."', ".self::$promptEnabled.", rowNo);
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+rowNo+', input.".$srcELid."_'+rowNo, '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".self::$promptEnabled.", rowNo);
 					}
 				}(uniqueRowNum".$field->id.");
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."]();
 				";
-			
+			else {
+				$js .= "
+				jQuery('#".$elementid."_'+uniqueRowNum".$field->id.").each(function() {
+					var el = jQuery(this);
+					setTimeout(function(){
+						el.trigger('change');
+					}, 20); // >0 is enough
+				});
+				";
+			}
+
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
@@ -588,9 +604,12 @@ class plgFlexicontent_fieldsSelect extends FCField
 					$input_fld = ' <input type="'.$fftype.'" id="'.$elementid_no.'" data-element-grpid="'.$elementid_n.'" name="'.$fieldname_n.'" '.$attribs.$input_attribs.' value="'.$element->value.'" '.$checked.' />';
 					$options[] = ''
 						.$pretext
-						.$input_fld
-						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" title="'.@$element->label_tip.'">'
+						.(!$placeInsideLabel ? $input_fld : '')
+						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" '.($form_vals_display==1 ? 'title="'.@ $element->label_tip : '').'">'
+							. ($placeInsideLabel ? $input_fld : '')
 							.($form_vals_display!=1 ? $element->text : '')
+							.($form_vals_display==2 ? ' <br/>' : '')
+							.($form_vals_display >0 ? $element->image_html : '')
 						.'</label>'
 						.$posttext
 						;
@@ -952,7 +971,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 		}
 		
 		
-		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
 			if ($multiple && self::$valueIsArr) {

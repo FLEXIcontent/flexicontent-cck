@@ -578,7 +578,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		}
 		
 		
-		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
 			// Apply values separator

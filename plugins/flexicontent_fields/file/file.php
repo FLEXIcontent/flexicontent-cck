@@ -731,7 +731,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');
 		
-		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
 			// Apply values separator
