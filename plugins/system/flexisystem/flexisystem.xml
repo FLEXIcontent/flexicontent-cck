@@ -21,7 +21,7 @@
 	<fields name="params"  addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<!--field name="redirect_method_fe" type="list" default="1" label="&lt;span style='color:darkgreen'&gt; Frontend Redirect Method&lt;/span&gt;" description="Select method of redirecting com_content menu &amp; links to com_flexicontent. &lt;br&gt;&lt;br&gt;&lt;b&gt;NOTE&lt;/b&gt;: The Redirect URL method, will make existing module assignment not to work and also may cause redirect loops when using third party SEF extensions" class="btn-group btn-group-yesno">
+			<!--field name="redirect_method_fe" type="list" default="1" label="&lt;span style='color:darkgreen'&gt; Frontend Redirect Method&lt;/span&gt;" description="Select method of redirecting com_content menu &amp; links to com_flexicontent. &lt;br&gt;&lt;br&gt;&lt;b&gt;NOTE&lt;/b&gt;: The Redirect URL method, will make existing module assignment not to work and also may cause redirect loops when using third party SEF extensions">
 				<option value="0">Redirect to FLEXIcontent URL</option>
 				<option value="1">Set Request Variables (Recommeneded)</option>
 			</field-->
