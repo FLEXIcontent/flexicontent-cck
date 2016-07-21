@@ -122,6 +122,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		// NOTE: this is imported by main Frontend/Backend CSS file
 		// so import these only if it is not a flexicontent view
 		if ($option!='com_flexicontent') {
+			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', FLEXI_VHASH);
 			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH);  // NOTE: this is imported by main Frontend/Backend CSS file
 			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH);  // NOTE: this is imported by main Frontend/Backend CSS file
 			

@@ -526,9 +526,10 @@ class FlexicontentFields
 				if (isset($item->fields[$field_name]))
 				{
 					$first_item_field = & $item->fields[$field_name];
+					break;   // found break out, field found
 				}
 			}
-			if (!$first_item_field) return null;
+			if (!$first_item_field) return null;  // none of the items has the field, return
 		}
 
 
@@ -669,26 +670,11 @@ class FlexicontentFields
 		// *****************************************
 		// Trigger content plugins on the field text
 		// *****************************************
-		
-		// Get configuration out of the field of the first item that has the field, if this configuration 
-		// was different per content TYPE, then we should move this inside the item loop (below)
-		if ( !is_array($_item) )
-		{
-			$field = $_field;
-		}
-		else
-		{
-			foreach($items as $item)
-			{
-				if ( !isset($item->fields[$field_name]) ) continue;
-				$field = $item->fields[$field_name];
-			}
-		}
 
 		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
 		{
-			$_t = $field->parameters->get('trigger_onprepare_content', 0);
-			if ($request_view=='category' && $view=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
+			$_t = $first_item_field->parameters->get('trigger_onprepare_content', 0);
+			if ($request_view=='category' && $view=='category') $_t = $_t && $first_item_field->parameters->get('trigger_plgs_incatview', 1);
 			$_trigger_plgs_ft[$field_name] = $_t;
 		}
 
