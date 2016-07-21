@@ -50,18 +50,13 @@ ul.tabbernav > li > a {
 	text-decoration: none;
 	font-size: 11px;
 }
-ul.tabbernav > li > a:link {
-	color: #448;
-}
-ul.tabbernav > li > a:visited {
-	color: #667;
-}
-ul.tabbernav > li > a:hover {
-	color: #000;
-	background: #AAE;
-	border-color: #227;
-}
 
+ul.tabbernav > li > a [class^="icon-"],
+ul.tabbernav > li > a [class*=" icon-"] {
+	font-size: 16px;
+	padding-top: 4px;
+	vertical-align: top;
+}
 
 
 /* Tab handle active */
@@ -243,6 +238,7 @@ body .tabber-inline ul.tabbernav > li > a,
 /* Gray tabber */
 body .s-gray ul.tabbernav > li > a,
 #flexicontent .s-gray ul.tabbernav > li > a {
+	color: #FFFFFF;
 	border: 1px solid #838383;
 	background-color: #909090;
 	background-image: -webkit-gradient(linear,left top,left bottom,from(#909090),to(#707070));
@@ -298,6 +294,7 @@ body .s-gray ul.tabbernav > li.tabberactive a:before,
 
 body .s-cblue ul.tabbernav > li > a,
 #flexicontent .s-cblue ul.tabbernav > li > a {
+	color: #FFFFFF;
 	border: 1px solid #66aaee;
 	background-color: #b0b0b0;
 	background-image: -webkit-gradient(linear,left top,left bottom,from(#77bbff),to(#5599dd));
@@ -356,4 +353,10 @@ body div.tabberlive.s-gray:not(.tabber-inline),
 body div.tabberlive.s-cblue:not(.tabber-inline),
 #flexicontent div.tabberlive.s-cblue:not(.tabber-inline) {
 	margin-top: 12px;
+}
+
+/* Customize tabber containers */
+body .tab-pane.active > div > div.tabberlive.s-gray:not(.tabber-inline),
+body .tab-pane.active > div > div.tabberlive.s-cblue:not(.tabber-inline) {
+	margin-top: 0px;
 }
