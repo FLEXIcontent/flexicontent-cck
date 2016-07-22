@@ -400,6 +400,15 @@ foreach($ac_type_allowed_list as $ac_type)
 $document = JFactory::getDocument();
 $cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
+// JS data of current field
+$js = '
+	fcfield_addrint.allowed_countries["'.$field->name.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
+	fcfield_addrint.single_country["'.$field->name.'"] = "'.$single_country.'";
+
+	fcfield_addrint.map_zoom["'.$field->name.'"] = '.$map_zoom.';
+	fcfield_addrint.map_type["'.$field->name.'"] = "'.strtoupper($map_type).'";
+';
+
 $tooltip_class = 'hasTooltip';
 $add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 $input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';		
@@ -436,7 +445,7 @@ foreach ($values as $value)
 				<div class="'.$input_grp_class.' fc-xpended">
 					<label class="'.$add_on_class.' fc-lbl addrint-ac-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH' ).'</label>
 					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="input-xxlarge" name="'.$fieldname_n.'[autocomplete]" type="text" />
-					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(\''.$elementid_n.'\');">
+					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(\''.$elementid_n.'\', \''.$field->name.'\');">
 						'.$ac_type_options.'
 					</select>
 				</div>
@@ -601,24 +610,27 @@ foreach ($values as $value)
 		';
 	}
 
-	$js = '
-	fcfield_addrint.allowed_countries["'.$elementid_n.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
-	fcfield_addrint.single_country["'.$elementid_n.'"] = "'.$single_country.'";
-
-	fcfield_addrint.map_zoom["'.$elementid_n.'"] = '.$map_zoom.';
-	fcfield_addrint.map_type["'.$elementid_n.'"] = "'.strtoupper($map_type).'";
-
+	$js .= '
 	fcfield_addrint.LatLon["'.$elementid_n.'"] =  {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
-
-	// load autocomplete on page ready
-	jQuery(document).ready(function() {
-		fcfield_addrint.initAutoComplete("'.$elementid_n.'");
-		'.($is_empty ? '' : 'fcfield_addrint.initMap("'.$elementid_n.'");').'
-	});
+	';
+	
+	$dom_ready_js = '
+		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field->name.'");' . /* autocomplete search */'
+		'.($is_empty ? '' : 'fcfield_addrint.initMap("'.$elementid_n.'", "'.$field->name.'");') . /* initialize map */'
 	';
 
-	JFactory::getDocument()->addScriptDeclaration($js);
-	
 	$field->html[$n] = $field_html;
 	$n++;
 }
+
+if ($dom_ready_js)
+{
+	$js .= '
+	// load autocomplete on page ready
+	jQuery(document).ready(function() {'
+		.$dom_ready_js.
+	'});
+	';
+}
+
+$document->addScriptDeclaration($js);

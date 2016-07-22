@@ -12,11 +12,11 @@
 
 
 	// initialize autocomplete
-	fcfield_addrint.initAutoComplete = function(elementid_n)
+	fcfield_addrint.initAutoComplete = function(elementid_n, config_name)
 	{
 		var ac_input = document.getElementById(elementid_n + '_autocomplete');
 		var ac_type    = jQuery('#' + elementid_n + '_ac_type').val();
-		var ac_country = fcfield_addrint.single_country[elementid_n];
+		var ac_country = fcfield_addrint.single_country[config_name];
 
 		var ac_options = {};
 		if (ac_type)    ac_options.types = [ ac_type ];
@@ -26,36 +26,36 @@
 
 		fcfield_addrint.gmapslistener[elementid_n] = google.maps.event.addListener(fcfield_addrint.autoComplete[elementid_n], 'place_changed', function() {
 			jQuery('#' + elementid_n + '_messages').html('').hide();
-			fcfield_addrint.fillInAddress(elementid_n);
+			fcfield_addrint.fillInAddress(elementid_n, false, config_name);
 		});
 		return true;
 	}
 
 
 	// re-initialize autocomplete
-	fcfield_addrint.changeAutoCompleteType = function(elementid_n)
+	fcfield_addrint.changeAutoCompleteType = function(elementid_n, config_name)
 	{
 		// Remove listener that update the google map on autocomplete selection
-		google.maps.event.removeListener(fcfield_addrint.gmapslistener[elementid_n] );
+		google.maps.event.removeListener( fcfield_addrint.gmapslistener[elementid_n] );
 		
 		// Clone replace input to remove the currently configured autocomplete search
 		var el = document.getElementById(elementid_n + '_autocomplete');
 		el.parentNode.replaceChild(el.cloneNode(true), el);
 		
 		// Attach new autocomplete search
-		return fcfield_addrint.initAutoComplete(elementid_n);
+		return fcfield_addrint.initAutoComplete(elementid_n, config_name);
 	}
 
 
-	fcfield_addrint.initMap = function(elementid_n)
+	fcfield_addrint.initMap = function(elementid_n, config_name)
 	{
 		jQuery('#' + elementid_n + '_addressint_map').show();  // Show map container
 		
 		fcfield_addrint.google_maps[elementid_n] = new google.maps.Map(document.getElementById('map_canvas_' + elementid_n), {
 			center: fcfield_addrint.LatLon[elementid_n],
 			scrollwheel: false,
-			zoom: fcfield_addrint.map_zoom[elementid_n],
-			mapTypeId: google.maps.MapTypeId[ fcfield_addrint.map_type[elementid_n] ],
+			zoom: fcfield_addrint.map_zoom[config_name],
+			mapTypeId: google.maps.MapTypeId[ fcfield_addrint.map_type[config_name] ],
 			zoomControl: true,
 			mapTypeControl: false,
 			scaleControl: false,
@@ -76,12 +76,12 @@
 		});
 		
 		google.maps.event.addListener(myMarker, "dragend", function (event) {
-			fcfield_addrint.geocodePosition(elementid_n, this.getPosition(), myMarker);
+			fcfield_addrint.geocodePosition(elementid_n, this.getPosition(), myMarker, config_name);
 		});
 	}
 
 
-	fcfield_addrint.geocodePosition = function(elementid_n, pos, marker)
+	fcfield_addrint.geocodePosition = function(elementid_n, pos, marker, config_name)
 	{
 		jQuery('#' + elementid_n + '_messages')
 			.removeClass('alert-success').removeClass('alert-warning').addClass('alert-info')
@@ -108,7 +108,7 @@
 							.html( Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE').replace("%s", tolerance) + "<br/> -" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT') ).show();
 					} else {
 						jQuery('#' + elementid_n + '_messages').html('');
-						fcfield_addrint.fillInAddress(elementid_n,  results[0]);
+						fcfield_addrint.fillInAddress(elementid_n,  results[0], config_name);
 						marker.setPosition( results[0].geometry.location );
 						var html = ! jQuery('#' + elementid_n + '_messages').html().length ? "" : jQuery('#' + elementid_n + '_messages').html() + "<br/> ";
 						jQuery('#' + elementid_n + '_messages')
@@ -130,7 +130,7 @@
 
 
 	// fill address fields when autocomplete address is selected
-	fcfield_addrint.fillInAddress = function(elementid_n, place)
+	fcfield_addrint.fillInAddress = function(elementid_n, place, config_name)
 	{
 		var redrawMap = false;
 		if (typeof place === "undefined" || !place)
@@ -143,8 +143,9 @@
 		if (typeof place.address_components == 'undefined') return;
 		
 		// Check allowed country, (zero length means all allowed)
-		var country_valid = fcfield_addrint.allowed_countries[elementid_n].length == 0;
-		var selected_country = "";
+		var country_valid = fcfield_addrint.allowed_countries[config_name].length == 0;
+		var selected_country = '';
+
 		if (!country_valid)
 		{
 			//place.address_components.forEach(function(o)
@@ -153,19 +154,19 @@
 				var o = place.address_components[j];
 				if (o.types[0] != 'country') continue;
 				selected_country = o.long_name;
-				for(var i=0; i<fcfield_addrint.allowed_countries[elementid_n].length; i++)
+				for(var i=0; i<fcfield_addrint.allowed_countries[config_name].length; i++)
 				{
-					if (o.short_name == fcfield_addrint.allowed_countries[elementid_n][i]) { country_valid = true; break; }
+					if (o.short_name == fcfield_addrint.allowed_countries[config_name][i]) { country_valid = true; break; }
 				}
 				if (country_valid) break;
 			}
 		}
 		if (!country_valid) {
 			jQuery('#' + elementid_n + '_messages').removeClass('alert-success').removeClass('alert-info').addClass('alert-warning').html(
-				"'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING').': <b>"
-				+selected_country+"</b><br/>"
-				+"<b>'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES').'</b>: "
-				+ fcfield_addrint.allowed_countries.join(', ')
+				Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING') + ': <b>'
+				+ selected_country + '</b><br/>'
+				+ '<b>' + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES') + '</b>: '
+				+ fcfield_addrint.allowed_countries[config_name].join(', ')
 			).show();
 			return false;
 		}
@@ -274,8 +275,8 @@
 		jQuery('#' + elementid_n + '_url').val(place.url);
 		
 		// default zoom level
-		jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.map_zoom[elementid_n]);
-		jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.map_zoom[elementid_n]);
+		jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.map_zoom[config_name]);
+		jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.map_zoom[config_name]);
 		
 		// latitude
 		jQuery('#' + elementid_n + '_lat').val(place.geometry.location.lat);
@@ -289,6 +290,6 @@
 		// redraw map
 		if (redrawMap)
 		{
-			fcfield_addrint.initMap(elementid_n);
+			fcfield_addrint.initMap(elementid_n, config_name);
 		}
 	}
