@@ -42,16 +42,24 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Render form field
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field';
-		
+
+		// Add needed JS/CSS
 		static $js_added = null;
 		if ( $js_added === null )
 		{
+			$js_added = true;
+			$document = JFactory::getDocument();
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_AT_MARKER', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT', false);
+			$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');	
+
+			// Load google maps library
+			$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
+			$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&key=' . $google_maps_js_api_key : ''));
 		}
-		
+
 		$this->displayField( $formlayout );
 	}
 	

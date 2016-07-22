@@ -6,29 +6,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $required = $field->parameters->get('required', 0);
 $required_class = $required ? 'required' : '';
 
-$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
 $addr_edit_mode = $field->parameters->get('addr_edit_mode', 'plaintext');
-$edit_latlon  = $field->parameters->get('edit_latlon',  1);
-$use_name     = $field->parameters->get('use_name',     1);
-$use_addr2    = $field->parameters->get('use_addr2',    1);
-$use_addr3    = $field->parameters->get('use_addr3',    1);
-$use_usstate  = $field->parameters->get('use_usstate',  1);
-$use_province = $field->parameters->get('use_province', 1);
-$use_zip_suffix = $field->parameters->get('use_zip_suffix', 1);
-$use_country  = $field->parameters->get('use_country',  1);
+$edit_latlon  = (int) $field->parameters->get('edit_latlon',  1);
+$use_name     = (int) $field->parameters->get('use_name',     1);
+$use_addr2    = (int) $field->parameters->get('use_addr2',    1);
+$use_addr3    = (int) $field->parameters->get('use_addr3',    1);
+$use_usstate  = (int) $field->parameters->get('use_usstate',  1);
+$use_province = (int) $field->parameters->get('use_province', 1);
+$use_zip_suffix = (int) $field->parameters->get('use_zip_suffix', 1);
+$use_country  = (int) $field->parameters->get('use_country',  1);
 $map_type = $field->parameters->get('map_type', 'roadmap');
-$map_zoom = $field->parameters->get('map_zoom', 16);
-
-// Add needed JS/CSS
-static $js_added = null;
-if ($js_added === null)
-{
-	$js_added = true;
-	$document = JFactory::getDocument();
-	// Load google maps library
-	$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&key=' . $google_maps_js_api_key : ''));
-}
-
+$map_zoom = (int) $field->parameters->get('map_zoom', 16);
 
 
 // Google autocomplete search types drop down list (for geolocation)
@@ -448,7 +436,7 @@ foreach ($values as $value)
 				<div class="'.$input_grp_class.' fc-xpended">
 					<label class="'.$add_on_class.' fc-lbl addrint-ac-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH' ).'</label>
 					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="input-xxlarge" name="'.$fieldname_n.'[autocomplete]" type="text" />
-					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="changeAutoCompleteType_'.$field->name.$n.'();">
+					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(\''.$elementid_n.'\');">
 						'.$ac_type_options.'
 					</select>
 				</div>
@@ -575,7 +563,7 @@ foreach ($values as $value)
 		</tbody></table>
 		
 		<div class="fcfield_addressint_canvas_outer">
-			<div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div>
+			<div id="map_canvas_'.$elementid_n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div>
 		</div>
 	</div>
 	
@@ -612,310 +600,23 @@ foreach ($values as $value)
 		<input type="hidden" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
-	$js = '
-	
-	if ('.count($ac_country_allowed_list).')
-		var allowed_countries_'.$field->name.$n.' = new Array("'.implode('", "', $ac_country_allowed_list).'");
-	else
-		var allowed_countries_'.$field->name.$n.' = new Array();
-	
-	// autocomplete object
-	var autoComplete_'.$field->name.$n.';
-	var gmapslistener_'.$field->name.$n.';
 
-	// initialize autocomplete
-	function initAutoComplete_'.$field->name.$n.'()
-	{
-		var ac_input = document.getElementById("'.$elementid_n.'_autocomplete");
-		var ac_type    = jQuery("#'.$elementid_n.'_ac_type").val();
-		var ac_country = "'.$single_country.'";
-		//window.console.log(ac_type);
-		
-		var ac_options = {};
-		if (ac_type)    ac_options.types = [ ac_type ];
-		if (ac_country) ac_options.componentRestrictions = {country: ac_country};
-		
-		autoComplete_'.$field->name.$n.' = new google.maps.places.Autocomplete( ac_input, ac_options );
-		
-		gmapslistener_'.$field->name.$n.' = google.maps.event.addListener(autoComplete_'.$field->name.$n.', "place_changed", function() {
-			jQuery("#'.$elementid_n.'_messages").html("").hide();
-			fillInAddress_'.$field->name.$n.'();
-		});
-		return true;
-	}
-	
-	
-	// re-initialize autocomplete
-	function changeAutoCompleteType_'.$field->name.$n.'()
-	{
-		// Remove listener that update the google map on autocomplete selection
-		google.maps.event.removeListener(gmapslistener_'.$field->name.$n.' );
-		
-		// Clone replace input to remove the currently configured autocomplete search
-		var el = document.getElementById("'.$elementid_n.'_autocomplete");
-		el.parentNode.replaceChild(el.cloneNode(true), el);
-		
-		// Attach new autocomplete search
-		return initAutoComplete_'.$field->name.$n.'();
-	}
-	
-	
-	// fill address fields when autocomplete address is selected
-	function fillInAddress_'.$field->name.$n.'(place)
-	{
-		var redrawMap = false;
-		if (typeof place === "undefined" || !place)
-		{
-			place = autoComplete_'.$field->name.$n.'.getPlace();
-			redrawMap = true;
-		}
-		//window.console.log(place);
-		
-		if (typeof place.address_components == "undefined") return;
-		
-		// Check allowed country, (zero length means all allowed)
-		var country_valid = allowed_countries_'.$field->name.$n.'.length == 0;
-		var selected_country = "";
-		if (!country_valid)
-		{
-			//place.address_components.forEach(function(o)
-			for(var j=0; j<place.address_components.length; j++)
-			{
-				var o = place.address_components[j];
-				if (o.types[0] != "country") continue;
-				selected_country = o.long_name;
-				for(var i=0; i<allowed_countries_'.$field->name.$n.'.length; i++)
-				{
-					if (o.short_name == allowed_countries_'.$field->name.$n.'[i]) { country_valid = true; break; }
-				}
-				if (country_valid) break;
-			}
-		}
-		if (!country_valid) {
-			jQuery("#'.$elementid_n.'_messages").removeClass("alert-success").removeClass("alert-info").addClass("alert-warning").html(
-				"'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING').': <b>"
-				+selected_country+"</b><br/>"
-				+"<b>'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES').'</b>: "
-				+"'.htmlspecialchars(implode(', ', $allowed_country_names), ENT_COMPAT, 'UTF-8').'"
-			).show();
-			return false;
-		}
-		else
-			jQuery("#'.$elementid_n.'_messages").html("").hide();
-		
-		
-		// Empty all fields in case they are not set to a new value
-		jQuery(""+
-			"#'.$elementid_n.'_autocomplete, #'.$elementid_n.'_name, #'.$elementid_n.'_url,"+
-			"#'.$elementid_n.'_addr_display, #'.$elementid_n.'_addr_formatted,"+
-			"#'.$elementid_n.'_addr1, #'.$elementid_n.'_addr2, #'.$elementid_n.'_addr3,"+
-			"#'.$elementid_n.'_city, #'.$elementid_n.'_state, #'.$elementid_n.'_province, #'.$elementid_n.'_country,"+
-			"#'.$elementid_n.'_zip, #'.$elementid_n.'_zip_suffix, #'.$elementid_n.'_lat, #'.$elementid_n.'_lon"
-		).val("").trigger("change");
-		
-		// load city, country code, postal code
-		var country_long_name = "";
-		place.address_components.forEach(function(o)
-		{
-			switch(o.types[0])
-			{
-				// load city
-				case "locality":
-				jQuery("#'.$elementid_n.'_city").val(o.long_name);
-				break;
-				
-				// load country code
-				case "country":
-				jQuery("#'.$elementid_n.'_country").val(o.short_name).trigger("change");
-				country_long_name = o.long_name;
-				break;
-				
-				// load postal code
-				case "postal_code":
-				jQuery("#'.$elementid_n.'_zip").val(o.long_name);
-				break;
-				
-				// load postal code suffix
-				case "postal_code_suffix":
-				jQuery("#'.$elementid_n.'_zip_suffix").val(o.long_name);
-				break;
-				
-				// province
-				case "administrative_area_level_1":
-				jQuery("#'.$elementid_n.'_province").val(o.long_name);
-				break;
-			}
-		});
-		
-		var street_address = "", index = -1, div = document.createElement("div");
-		
-		// Get FULL address
-		if (typeof place.formatted_address != "undefined")
-			street_address = place.formatted_address;
-		else if (typeof place.adr_address != "undefined")
-			street_address = place.adr_address;
-		
-		window.console.log(street_address);
-		
-		// Strip tags
-		div.innerHTML = street_address;
-		street_address = div.textContent || div.innerText; // innerText: FF >= 45  --  textContent: IE >= 9
-		street_address = !!street_address ? street_address : "";  // Case div.textContent was empty string and div.innerText was undefined
-		
-		// Convert full-address to just street-address, by splitting at the (zip) postal code
-		street_address = street_address.split( jQuery("#'.$elementid_n.'_zip").val() )[0];
-		
-		// Also split at the city / province or country in case that postal code (zip) was missing or in case it was placed after city or  province
-		index = jQuery("#'.$elementid_n.'_city").val() ? street_address.lastIndexOf( jQuery("#'.$elementid_n.'_city").val() ) : -1;
-		if (index != -1)  street_address = street_address.substring(0, index);
-		
-		index = jQuery("#'.$elementid_n.'_province").val() ? street_address.lastIndexOf( jQuery("#'.$elementid_n.'_province").val() ) : -1;
-		if (index != -1)  street_address = street_address.substring(0, index);		
-		
-		if (country_long_name)  street_address = street_address.split(country_long_name)[0];
-		
-		// Get the street address trimming any spaces, commas
-		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, "")
-		jQuery("#'.$elementid_n.'_addr1").val(street_address);
-		
-		if(jQuery("#'.$elementid_n.'_country").val() == "US")
-		{	
-			// load state
-			place.address_components.forEach(function(o){
-				if(o.types[0] == "administrative_area_level_1")
-				{
-					jQuery("#'.$elementid_n.'_state").val(o.short_name).trigger("change");
-				}
-			});
-		}
-		
-		// load suggested display address
-		jQuery("#'.$elementid_n.'_addr_display, #'.$elementid_n.'_addr_formatted").val(place.formatted_address);
-		
-		// name to google maps
-		if ( place.formatted_address.indexOf(place.name) == -1 )
-		{
-			jQuery("#'.$elementid_n.'_name").val(place.name);
-		}
-		
-		// url to google maps
-		jQuery("#'.$elementid_n.'_url").val(place.url);
-		
-		// default zoom level
-		jQuery("#'.$elementid_n.'_zoom").val('.$map_zoom.');
-		jQuery("#'.$elementid_n.'_zoom_label").text("'.$map_zoom.'");
-		
-		// latitude
-		jQuery("#'.$elementid_n.'_lat").val(place.geometry.location.lat);
-		
-		// longitude
-		jQuery("#'.$elementid_n.'_lon").val(place.geometry.location.lng);
-		
-		// reset map lat/lon
-		myLatLon_'.$field->name.$n.' = place.geometry.location;
-		
-		// redraw map
-		if (redrawMap)
-		{
-			initMap_'.$field->name.$n.'();
-		}
-	}
-	
-	
+	$js = '
+	fcfield_addrint.allowed_countries["'.$elementid_n.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
+	fcfield_addrint.single_country["'.$elementid_n.'"] = "'.$single_country.'";
+
+	fcfield_addrint.map_zoom["'.$elementid_n.'"] = '.$map_zoom.';
+	fcfield_addrint.map_type["'.$elementid_n.'"] = "'.strtoupper($map_type).'";
+
+	fcfield_addrint.LatLon["'.$elementid_n.'"] =  {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
+
 	// load autocomplete on page ready
-	jQuery(document).ready(function(){initAutoComplete_'.$field->name.$n.'();});
-	
-	// map object
-	var myMap_'.$field->name.$n.';
-	var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
-	
-	
-	function initMap_'.$field->name.$n.'()
-	{
-		jQuery("#'.$elementid_n.'_addressint_map").show();  // Show map container
-		
-		myMap_'.$field->name.$n.' = new google.maps.Map(document.getElementById("map_canvas_'.$field->name.$n.'"), {
-			center: myLatLon_'.$field->name.$n.',
-			scrollwheel: false,
-			zoom: '.$map_zoom.',
-			mapTypeId: google.maps.MapTypeId.'.strtoupper($map_type).',
-			zoomControl: true,
-			mapTypeControl: false,
-			scaleControl: false,
-			streetViewControl: false,
-			rotateControl: false,
-		});
-		
-		myMarker = new google.maps.Marker({
-			map: myMap_'.$field->name.$n.',
-			draggable:true,
-			animation: google.maps.Animation.DROP,
-			position: myLatLon_'.$field->name.$n.'
-		});
-		
-		google.maps.event.addListener(myMap_'.$field->name.$n.', "zoom_changed", function() {
-			jQuery("#'.$elementid_n.'_zoom").val(myMap_'.$field->name.$n.'.getZoom());
-			jQuery("#'.$elementid_n.'_zoom_label").text(myMap_'.$field->name.$n.'.getZoom());
-		});
-		
-		google.maps.event.addListener(myMarker, "dragend", function (event) {
-			geocodePosition_'.$field->name.$n.'( this.getPosition(), myMarker );
-		});
-	}
-	
-	
-	function geocodePosition_'.$field->name.$n.'(pos, marker)
-	{
-		jQuery("#'.$elementid_n.'_messages")
-			.removeClass("alert-success").removeClass("alert-warning").addClass("alert-info")
-			.html("Searching address of new marker position ...").show();
-		geocoder = new google.maps.Geocoder();
-		geocoder.geocode(
-			{ latLng: pos },
-			function(results, status)
-			{
-				if (status == google.maps.GeocoderStatus.OK)
-				{
-					var tolerance = parseInt( jQuery("#'.$elementid_n.'_marker_tolerance").val() );
-					if ( !tolerance || tolerance < 1 ) {
-						tolerance = 50;
-						jQuery("#'.$elementid_n.'_marker_tolerance").val(tolerance);
-					}
-					
-					var distance = Math.round( parseInt( google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location, pos) ) );
-					if (distance > tolerance) {
-						jQuery("#'.$elementid_n.'_lat").val(pos.lat);
-						jQuery("#'.$elementid_n.'_lon").val(pos.lng);
-						jQuery("#'.$elementid_n.'_messages")
-							.removeClass("alert-success").removeClass("alert-warning").addClass("alert-info")
-							.html( Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE").replace("%s", tolerance) + "<br/> -" + Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT") ).show();
-					} else {
-						jQuery("#'.$elementid_n.'_messages").html("");
-						fillInAddress_'.$field->name.$n.'( results[0] );
-						marker.setPosition( results[0].geometry.location );
-						var html = ! jQuery("#'.$elementid_n.'_messages").html().length ? "" : jQuery("#'.$elementid_n.'_messages").html() + "<br/> ";
-						jQuery("#'.$elementid_n.'_messages")
-							.removeClass("alert-info").removeClass("alert-warning").addClass("alert-success")
-							.html(html + Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE").replace("%s", distance)).show();
-					}
-				}
-				else
-				{
-					jQuery("#'.$elementid_n.'_lat").val(pos.lat);
-					jQuery("#'.$elementid_n.'_lon").val(pos.lng);
-					jQuery("#'.$elementid_n.'_messages")
-						.removeClass("alert-info").removeClass("alert-success").removeClass("alert-info").addClass("alert-warning")
-						.html( Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE") + "<br/> -" + Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT") ).show();
-				}
-			}
-		);
-	}
-	
-	'.($is_empty ? '' : '
-	jQuery(document).ready(function(){
-		initMap_'.$field->name.$n.'();
+	jQuery(document).ready(function() {
+		fcfield_addrint.initAutoComplete("'.$elementid_n.'");
+		'.($is_empty ? '' : 'fcfield_addrint.initMap("'.$elementid_n.'");').'
 	});
-	');
+	';
+
 	JFactory::getDocument()->addScriptDeclaration($js);
 	
 	$field->html[$n] = $field_html;
