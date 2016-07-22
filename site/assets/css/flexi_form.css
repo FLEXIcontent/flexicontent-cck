@@ -443,6 +443,11 @@ li:first-child .fcsep_level2,
 .fcsep_level2.fc-ngmargin {
 	margin-top: -12px !important;
 }
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2 {
+	margin-top: 12px;
+}
 div.control-group:first-of-type > div > .fcsep_level0,
 div.control-group:first-of-type > div > .fcsep_level1,
 div.control-group:first-of-type > div > .fcsep_level2 {

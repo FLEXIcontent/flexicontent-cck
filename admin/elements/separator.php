@@ -202,7 +202,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		$box_count = (int) @ $attributes['remove_boxes'];
 		$_bof = $box_count ? ($box_count == 2 ? '</div></div>' : str_repeat("</div>", $box_count)) : '';
-		$_eof = $box_count ? ($box_count == 2 ? '<div><div>'   : str_repeat("<div>",  $box_count)) : '';
+		$_eof = $box_count ? ($box_count == 2 ? '<div class="fc_empty_box"><div>'   : str_repeat("<div>",  $box_count)) : '';
 
 		$box_type = @$attributes['box_type'];
 		if (!$is_level) switch ($level)
