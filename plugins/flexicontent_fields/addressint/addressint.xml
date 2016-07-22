@@ -13,6 +13,7 @@
 		<filename plugin="addressint">addressint.php</filename>
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
+		<folder>js</folder>
 	</files>
 	
 	<config>

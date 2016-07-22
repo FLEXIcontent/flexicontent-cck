@@ -287,7 +287,7 @@ body div.tabberlive.s-gray:not(.tabber-inline),
 #flexicontent div.tabberlive.s-gray:not(.tabber-inline),
 body div.tabberlive.s-cblue:not(.tabber-inline),
 #flexicontent div.tabberlive.s-cblue:not(.tabber-inline) {
-	margin-top: 12px;
+	margin-top: 10px;
 }
 body .tab-pane.active > div > div.tabberlive.s-gray:not(.tabber-inline),
 body .tab-pane.active > div > div.tabberlive.s-cblue:not(.tabber-inline) {

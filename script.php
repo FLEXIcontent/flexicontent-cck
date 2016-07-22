@@ -433,13 +433,13 @@ class com_flexicontentInstallerScript
 		}
 		
 		$this->setParams( $params );*/
-		JFactory::getApplication()->enqueueMessage('
+		J/*Factory::getApplication()->enqueueMessage('
 			Please clear your frontend / backend Joomla cache once, <br/>
 			- to make sure that any changes (e.g in filtering) take immediate effect<br/>
 			In case of display issue, press CTRL+F5 / F5 / command+R, (Windows / Linux / Apple\'s Safari)<br/>
 			- to make sure that latest FLEXIcontent JS/CSS is retrieved',
 			'warning'
-		);
+		);*/
 		
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
 		echo '
