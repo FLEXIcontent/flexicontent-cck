@@ -30,7 +30,7 @@ var JFormValidator = function()
 		// Prevent Joomla form validation JS script to create 2nd validation object
 		if (JFormValidator_fc) return JFormValidator_fc;
 
-		Joomla.fc_debug = 1;
+		//Joomla.fc_debug = 1;
 		//window.console.log('Initializing FLEXIcontent JFormValidator');
 		
 		// Initialize variables

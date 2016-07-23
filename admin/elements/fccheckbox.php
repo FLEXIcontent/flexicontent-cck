@@ -46,17 +46,13 @@ class JFormFieldFccheckbox extends JFormField
 	
 	function getInput()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
+		$values = $this->value;
 		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		else if ( ! is_array($values) )		$values = explode("|", $values);
 		$split_char = ",";
 		
 		// Get options and values
@@ -78,13 +74,13 @@ class JFormFieldFccheckbox extends JFormField
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		// 'multiple' attribute in XML adds '[]' automatically in J2.5 and manually in J1.5
 		// This field is always multiple, we will add '[]' WHILE checking for the attribute ...
 		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
-		if (!FLEXI_J16GE || !$is_multiple)
+		if (!$is_multiple)
 			$fieldname .= '[]';
 		
 		$classes = "radio";
@@ -92,7 +88,7 @@ class JFormFieldFccheckbox extends JFormField
 			$classes .= ' '.$class;
 		}
 		$attribs = ' class="'.$classes.'"';
-		$html = '<fieldset id="'.$element_id.'" '.$attribs.' style="border-width:0px;'.(FLEXI_J16GE ? "width:60%; " : "").'">';
+		$html = '<fieldset id="'.$element_id.'" '.$attribs.' style="border-width:0px; width:60%;">';
 		
 		$inline_style  = "float:left; white-space:nowrap;";
 		$disable_all = '';
@@ -104,7 +100,7 @@ class JFormFieldFccheckbox extends JFormField
 			}
 			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
 			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_($useglobal_lbl).'</label></div>';
+			$html .= '<label for="'.$element_id.'_useglobal" ><b>'.JText::_($useglobal_lbl).'</b></label></div>';
 		}
 
 		// Create checkboxes

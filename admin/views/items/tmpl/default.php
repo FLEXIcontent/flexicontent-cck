@@ -62,7 +62,7 @@ if ( $useAssocs ) $list_total_cols++;
 $list_total_cols += count($this->extra_fields);
 
 $image_flag_path = "../media/mod_languages/images/";
-$attribs_preview = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_preview = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), $attribs_preview);
 
 $attribs_editlayout = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
@@ -70,10 +70,12 @@ $image_editlayout = JHTML::image( 'components/com_flexicontent/assets/images/'.'
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/warning.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
@@ -481,9 +483,9 @@ jQuery(document).ready(function(){
 	<?php echo @$this->minihelp; ?>
 
 	<div class="fcclear"></div>
-	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
-		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '') ; ?>
-	</span>
+	<div id="fcorder_save_warn_box" class="fc-mssg fc-note" style="padding: 4px 8px 4px 36px; line-height: 32px; display: none;">
+		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
+	</div>
 	
 	<?php
 	$order_msg = '';
@@ -500,9 +502,9 @@ jQuery(document).ready(function(){
 	?>
 	
 	<?php if ($order_msg): ?>
-	<span class="fc-mssg-inline fc-success" id="fcorder_notes_box" style="margin-top:20px !important;">
+	<div id="fcorder_notes_box" class="fc-mssg fc-success" style="padding: 4px 8px 4px 36px; line-height: 32px;">
 		<?php echo $order_msg;?>
-	</span>
+	</div>
 	<?php endif; ?>
 	
 	<div class="fcclear"></div>
@@ -518,7 +520,23 @@ jQuery(document).ready(function(){
 			<th class="left">
 				<input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" />
 			</th>
-			
+
+			<th class="left nowrap hideOnDemandClass" style="padding-right: 0px;">
+				<?php
+				if (!$this->filter_order_type) {
+					echo $this->CanOrder ? $image_ordering_tip : '';
+					echo str_replace('_FLEXI_REORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_REORDER_', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] ));
+				} else {
+					echo $this->CanOrder ? $image_ordering_tip : '';
+					echo str_replace('_FLEXI_REORDER_', JText::_('FLEXI_REORDER', true), str_replace('_FLEXI_REORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_REORDER_', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] )));
+				}
+
+				/*if ($this->CanOrder && $this->ordering) :
+					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
+				endif;*/
+				?>
+			</th>
+
 			<th class="left"></th>
 			
 			<th class="left hideOnDemandClass">
@@ -582,22 +600,6 @@ jQuery(document).ready(function(){
 			</th>
 		<?php endforeach; ?>
 
-			<th class="left nowrap hideOnDemandClass">
-				<?php
-				echo $this->CanOrder ? $image_ordering_tip : '';
-
-				if (!$this->filter_order_type) :
-					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
-				else :
-					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] );
-				endif;
-
-				if ($this->CanOrder && $this->ordering) :
-					echo str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder'));
-				endif;
-				?>
-			</th>
-			
 			<th class="left hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_access) : ?>
@@ -766,6 +768,53 @@ jQuery(document).ready(function(){
 		<tr class="<?php echo "row$k"; ?>">
 			<td class="sort_handle"><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td><?php echo $cid_checkbox; ?></td>
+
+		<?php if ($this->CanOrder) : ?>
+			<td class="order">
+				<?php
+					$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
+					$row_stategrp = @ $stategrps[$this->rows[$i]->state];
+					$row_stategrp_next = @ $stategrps[@$this->rows[$i+1]->state];
+
+					$show_orderUp   = @$this->rows[$i-1]->$ord_catid == $this->rows[$i]->$ord_catid && $row_stategrp_prev == $row_stategrp;
+					$show_orderDown = $this->rows[$i]->$ord_catid == @$this->rows[$i+1]->$ord_catid && $row_stategrp == $row_stategrp_next;
+					if (
+						($this->filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
+						(!$this->filter_order_type && FLEXI_J16GE)   // Joomla order does not support language in J1.5
+					) {
+						$show_orderUp   = $show_orderUp   && @$this->rows[$i-1]->lang == $this->rows[$i]->lang;
+						$show_orderDown = $show_orderDown && $this->rows[$i]->lang == @$this->rows[$i+1]->lang;
+					}
+				?>
+				<?php if ($ordering_draggable) : ?>
+					<?php
+						if (!$this->ordering) echo sprintf($drag_handle_box,' fc_drag_handle_disabled');
+						else if ($show_orderUp && $show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_both');
+						else if ($show_orderUp) echo sprintf($drag_handle_box,' fc_drag_handle_uponly');
+						else if ($show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_downonly');
+						else echo sprintf($drag_handle_box,'_none');
+					?>
+				<?php else: ?>
+					<span><?php echo $this->pagination->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
+					<span><?php echo $this->pagination->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
+				<?php endif; ?>
+
+				<?php /*$disabled = $this->ordering ?  '' : 'disabled="disabled"';*/ ?>
+				<?php if ($this->ordering): $disabled = ''; ?>
+				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
+
+				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
+				<input type="hidden" name="ord_catid[]" style="display:none;" value="<?php echo $row->$ord_catid; ?>" />
+				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
+				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
+				<?php endif; ?>
+			</td>
+		<?php else : ?>
+			<td>
+				<?php echo !$this->filter_order_type  ?  $row->ordering  :  $row->catsordering; ?>
+			</td>
+		<?php endif; ?>
+
 			<td>
 				<?php
 				$item_url = str_replace('&', '&amp;',
@@ -777,6 +826,7 @@ jQuery(document).ready(function(){
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
 			</td>
+
 			<td class="col_title">
 				<?php
 
@@ -904,51 +954,6 @@ jQuery(document).ready(function(){
 		    ?>
 			</td>
 		<?php endforeach; ?>
-
-		<?php if ($this->CanOrder) : ?>
-			<td class="order">
-				<?php
-					$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
-					$row_stategrp = @ $stategrps[$this->rows[$i]->state];
-					$row_stategrp_next = @ $stategrps[@$this->rows[$i+1]->state];
-
-					$show_orderUp   = @$this->rows[$i-1]->$ord_catid == $this->rows[$i]->$ord_catid && $row_stategrp_prev == $row_stategrp;
-					$show_orderDown = $this->rows[$i]->$ord_catid == @$this->rows[$i+1]->$ord_catid && $row_stategrp == $row_stategrp_next;
-					if (
-						($this->filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
-						(!$this->filter_order_type && FLEXI_J16GE)   // Joomla order does not support language in J1.5
-					) {
-						$show_orderUp   = $show_orderUp   && @$this->rows[$i-1]->lang == $this->rows[$i]->lang;
-						$show_orderDown = $show_orderDown && $this->rows[$i]->lang == @$this->rows[$i+1]->lang;
-					}
-				?>
-				<?php if ($ordering_draggable) : ?>
-					<?php
-						if (!$this->ordering) echo sprintf($drag_handle_box,' fc_drag_handle_disabled');
-						else if ($show_orderUp && $show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_both');
-						else if ($show_orderUp) echo sprintf($drag_handle_box,' fc_drag_handle_uponly');
-						else if ($show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_downonly');
-						else echo sprintf($drag_handle_box,'_none');
-					?>
-				<?php else: ?>
-					<span><?php echo $this->pagination->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-					<span><?php echo $this->pagination->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
-				<?php endif; ?>
-
-				<?php $disabled = $this->ordering ?  '' : 'disabled="disabled"'; ?>
-				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
-
-				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
-				<input type="hidden" name="ord_catid[]" style="display:none;" value="<?php echo $row->$ord_catid; ?>" />
-				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
-				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
-
-			</td>
-		<?php else : ?>
-			<td>
-				<?php echo !$this->filter_order_type  ?  $row->ordering  :  $row->catsordering; ?>
-			</td>
-		<?php endif; ?>
 
 			<td class="col_access">
 				<?php echo $access; ?>
