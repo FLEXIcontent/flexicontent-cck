@@ -125,6 +125,14 @@ class flexicontent_html
 	}
 	
 	
+	static function gridOrderBtn($rows, $image = 'filesave.png', $task = 'saveorder')
+	{
+		//return str_replace('rel="tooltip"', '', JHTML::_('grid.order', $rows, $image, $task));
+		return '<a href="javascript:saveorder('
+			. (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn pull-right"><span class="icon-menu-2"></span> '.JText::_('JLIB_HTML_SAVE_ORDER') .'</a>';
+	}
+	
+	
 	static function & checkPHPLimits($required=null, $recommended=null)
 	{
 		if (!$required)    $required=array('max_input_vars'=>1000, 'suhosin.post.max_vars'=>1000, 'suhosin.request.max_vars'=>1000);
