@@ -319,29 +319,29 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				";
 				
 			if ($usealt) $js .= "
-				newField.find('input.imgalt').val('".$default_alt."');
+				newField.find('input.imgalt').val('".json_encode($default_alt)."');
 				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
 				newField.find('input.imgalt').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_alt');
 				";
 				
 			if ($usetitle) $js .= "
-				newField.find('input.imgtitle').val('".$default_title."');
+				newField.find('input.imgtitle').val('".json_encode($default_title)."');
 				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				newField.find('input.imgtitle').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
 				
 			if ($usedesc) $js .= "
-				newField.find('textarea.imgdesc').val('".$default_desc."');
+				newField.find('textarea.imgdesc').val('".json_encode($default_desc)."');
 				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
 				";
 				
 			if ($usecust1) $js .= "
-				newField.find('input.imgcust1').val('".$default_cust1."');
+				newField.find('input.imgcust1').val('".json_encode($default_cust1)."');
 				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
 				";
 				
 			if ($usecust2) $js .= "
-				newField.find('input.imgcust2').val('".$default_cust2."');
+				newField.find('input.imgcust2').val('".json_encode($default_cust2)."');
 				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
 				";
 			
