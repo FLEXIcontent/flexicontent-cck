@@ -484,7 +484,7 @@ function delAllFilters() {
 						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;id='. $_r->id;
 						echo '
 						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
-							<img style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
+							<img style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="'.JText::_('FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD').': '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
 						</a>';
 					}
 				}
