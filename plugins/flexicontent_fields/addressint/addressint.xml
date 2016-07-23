@@ -13,6 +13,7 @@
 		<filename plugin="addressint">addressint.php</filename>
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
+		<folder>tmpl_common</folder>
 		<folder>js</folder>
 	</files>
 	
@@ -24,7 +25,54 @@
 		
 		<fieldset name="group-addressint-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
+			
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
+				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
+				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
+				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
+				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_SEARCH_LIMITATIONS" level="level3" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_LIMITATIONS_TYPE" level="level4" />
+			<field name="ac_types_default" type="radio" default="" toggle_related="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_TYPE_DESC" class="btn-group group-fcmethod">
+				<option value="">FLEXI_ALL</option>
+				<option value="geocode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_GEOCODE</option>
+				<option value="address">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS</option>
+				<option value="establishment">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUSINESS</option>
+				<option value="(regions)">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_REGION</option>
+				<option value="(cities)">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY</option>
+			</field>
+			<field name="ac_type_allowed_list" type="fccheckbox" default="" display_useglobal="1" useglobal_lbl="FLEXI_SHOW_ALL"
+				checkoptions="FLEXI_ALL,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_GEOCODE,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUSINESS,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_REGION,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY"
+				checkvals=",geocode,address,establishment,(regions),(cities)"
+				defaultvals=""
+				label="User selection" description="Select which types of autocomplete search will be allowed to the user" />
+			
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_LIMITATIONS_COUNTRY" level="level4" />
+			<field name="ac_country_default" type="fccountries" subtype="singular" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY_DESC" />
+			<field name="ac_country_allowed_list" type="fccountries" subtype="sortable" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES_DESC" />
+
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -33,11 +81,6 @@
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" hide_none="1" hide_default="" defaultlabel="Table" labelclass="" />
@@ -82,28 +125,9 @@
 				<option value="1" show_list="" hide_list="country-selection-off">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_SEARCH_LIMITATIONS" level="level3" />
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_LIMITATIONS_TYPE" level="level4" />
-			<field name="ac_types_default" type="radio" default="" toggle_related="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_TYPE_DESC" class="btn-group group-fcmethod">
-				<option value="">FLEXI_ALL</option>
-				<option value="geocode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_GEOCODE</option>
-				<option value="address">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS</option>
-				<option value="establishment">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUSINESS</option>
-				<option value="(regions)">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_REGION</option>
-				<option value="(cities)">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY</option>
-			</field>
-			<field name="ac_type_allowed_list" type="fccheckbox" default="" display_useglobal="1" useglobal_lbl="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DISABLE_FORCE_DEFAULT"
-				checkoptions="FLEXI_ALL,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_GEOCODE,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUSINESS,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_REGION,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY"
-				checkvals=",geocode,address,establishment,(regions),(cities)"
-				defaultvals=""
-				label="User selection" description="Select which types of autocomplete search will be allowed to the user" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_LIMITATIONS_COUNTRY" level="level4" />
-			<field name="ac_country_default" type="fccountries" subtype="singular" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY_DESC" />
-			<field name="ac_country_allowed_list" type="fccountries" subtype="sortable" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES_DESC" />
-			
-		</fieldset>
 
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
+		</fieldset>
 		<fieldset name="group-addressint-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
