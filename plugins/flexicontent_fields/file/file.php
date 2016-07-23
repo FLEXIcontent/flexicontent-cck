@@ -162,7 +162,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $field->parameters->get('fields_box_placing', '1')==1 ? ' floated' : '';
+		$value_classes .= $field->parameters->get('fields_box_placing', '0')==1 ? ' floated' : '';
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -458,15 +458,16 @@ class plgFlexicontent_fieldsFile extends FCField
 		// *****************************************
 		
 		$field->html = array();
-		
-		//$this->setField($field);
-		//$this->setItem($item);
-		
+
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
-		
+
+		//$this->setField($field);
+		//$this->setItem($item);
 		//$this->displayField( $formlayout );
+
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
+
 		foreach($field->html as &$_html_) {
 			$_html_ = '
 				'.($use_ingroup ? '' : '
