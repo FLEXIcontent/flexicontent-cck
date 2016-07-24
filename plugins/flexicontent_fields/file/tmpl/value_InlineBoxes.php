@@ -96,7 +96,7 @@ foreach($values as $file_id)
 		$lang = '
 		<span class="fcfile_lang">
 			<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span>
-			<span class="fcfile_lang_value">';
+			<span class="fcfile_lang_value value">';
 		if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc ) {
 			if (!$add_lang_txt) {
 				$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
@@ -123,13 +123,13 @@ foreach($values as $file_id)
 		$sizeinfo = '<span class="fcfile_size">';
 		$sizeinfo .= '<span class="fcfile_size_label label">' .JTEXT::_('FLEXI_SIZE'). '</span> ';
 		if ( !is_numeric($_size) )
-			$sizeinfo .= '<span class="fcfile_size_value">'.$_size.'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.$_size.'</span>';
 		else if ($display_size==1)
-			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($_size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
 		else if ($display_size==2)
-			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($_size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
 		else
-			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
 		$sizeinfo .= '</span>';
 	}
 	
@@ -143,7 +143,10 @@ foreach($values as $file_id)
 			$hits .= sprintf($hits_icon, $file_data->hits);
 		}
 		if ( $add_hits_txt ) {
-			$hits .= '<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_HITS'). '</span> <span class="fcfile_hits_value">'.$file_data->hits.'</span>';
+			$hits .= '
+				<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_HITS'). '</span>
+				<span class="fcfile_hits_value value">'.$file_data->hits.'</span>
+			';
 		}
 		$hits .= '</span>';
 	}
@@ -181,7 +184,14 @@ foreach($values as $file_id)
 		} else if ($display_descr==2) {  // As inline text
 			$descr_inline = ' <div class="fcfile_descr_inline alert alert-info">'. nl2br($file_data->description) . '</div>';
 		}
-		if ($descr_icon) $descr_icon = ' <span class="fcfile_descr_tip"><span class="fcfile_descr_tip_label label">' .JTEXT::_('FLEXI_DESCRIPTION'). '</span> '. $descr_icon . '</span>';
+		if ($descr_icon) $descr_icon = '
+			<span class="fcfile_descr_tip">
+				<span class="fcfile_descr_tip_label label">
+					' .JTEXT::_('FLEXI_DESCRIPTION'). '
+				</span>
+				'. $descr_icon . '
+			</span>
+		';
 	}
 	
 	
