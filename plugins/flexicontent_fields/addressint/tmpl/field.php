@@ -42,7 +42,7 @@ foreach ($values as $value)
 	
 	<div class="fcfield_field_data_box fcfield_addressint_data">
 	
-	<div><div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock" style="display:none;"></div></div>
+	<div><div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock addrint_messages" style="display:none;"></div></div>
 	
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 	';
