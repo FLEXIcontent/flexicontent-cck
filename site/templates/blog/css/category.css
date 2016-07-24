@@ -127,8 +127,8 @@ div.comments {
 	padding: 0;
 }
 #flexicontent ul.leadingblock > li {
-	margin: 0px 0px 12px 0px;
-	padding: 12px 0px 0px 0px;
+	margin: 32px 0 32px 0;
+	padding: 16px 0 16px 0;
 	border-top: 1px dashed darkgray;
 	background: none;
 	width: 100%;
@@ -140,8 +140,8 @@ div.comments {
 	line-height: inherit;
 }
 #flexicontent ul.introblock > li {
-	margin: 0px 0px 12px 0px;
-	padding: 12px 0px 0px 0px;
+	margin: 32px 0 32px 0;
+	padding: 16px 0 16px 0;
 	border-top: 1px dashed darkgray;
 	background: none;
 	width: 100%;
@@ -223,19 +223,18 @@ div.comments {
 	vertical-align: middle;
 }
 #flexicontent .lineinfo .element {
-	display: block;
+	display: inline-block;
 	float: left;
 	margin-right: 10px;
 }
 #flexicontent .lineinfo .element .label {
+	display: inline-block;
 	font-size: 90%;
+	margin-left: 8px;
 	margin-right: 8px;
 }
-#flexicontent .lineinfo .element,
-#flexicontent .lineinfo .element .label,
 #flexicontent .lineinfo .element .value {
 	display: inline-block;
-	float: left;
 }
 #flexicontent .readmore {
 	display: inline-block;
