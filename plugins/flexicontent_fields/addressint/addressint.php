@@ -205,7 +205,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			
 			// Address format: 'plaintext'
 			if ($addr_edit_mode == 'plaintext') $js .= "
-				theInput = newField.find('.addr_display').first();
+				theInput = newField.find('.addrint_addr_display').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr_display]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addr_display');
@@ -309,6 +309,13 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_zoom_label');
 				";
 
+			// Update messages box
+			$js .= "
+				theDiv = newField.find('div.addrint_messages');
+				theDiv.html('');
+				theDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_messages');
+				";
+			
 			// Clear canvas container and attach search auto-complete
 			$js .= "
 				theDiv = newField.find('div.addrint_map_canvas');
