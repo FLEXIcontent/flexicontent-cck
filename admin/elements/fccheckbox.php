@@ -73,24 +73,27 @@ class JFormFieldFccheckbox extends JFormField
 		// Sanity check
 		if (count($checkoptions)!=count($checkvals))
 			return "Number of check options not equal to number of check values";
-		
+
 		$fieldname	= $this->name;
 		$element_id = $this->id;
-		
-		// 'multiple' attribute in XML adds '[]' automatically in J2.5 and manually in J1.5
-		// This field is always multiple, we will add '[]' WHILE checking for the attribute ...
+
+		// This field is always multiple, we will add '[]' WHILE checking for the attribute ... so that we do not add twice
 		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
 		if (!$is_multiple)
+		{
 			$fieldname .= '[]';
-		
-		$classes = "radio";
-		if ($class = @$attributes['class']) {
-			$classes .= ' '.$class;
 		}
-		$attribs = ' class="'.$classes.'"';
-		$html = '<fieldset id="'.$element_id.'" '.$attribs.' style="border-width:0px; width:60%;">';
+
+		$class = @ $attributes['class'];
+		$classes = ($class ? $class : '') . ' group-fcset fc_input_set';
+
+		$cols = (float) @ $attributes['cols'];
+		if ($cols) $t = ceil(count($checkoptions ) / $cols);
+		if ($cols) $classes .= ' fc-columned';
 		
-		$inline_style  = "float:left; white-space:nowrap;";
+		$attribs = ' class="'.$classes.'"';
+		$html = '<fieldset id="'.$element_id.'" '.$attribs.' style="border-width:0px; width:74%;">';
+
 		$disable_all = '';
 		if ( @$attributes['display_useglobal'] ) {
 			$check_global='';
@@ -99,20 +102,26 @@ class JFormFieldFccheckbox extends JFormField
 				$disable_all  = ' disabled="disabled" ';
 			}
 			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
-			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
+			$html .= '<div><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
 			$html .= '<label for="'.$element_id.'_useglobal" ><b>'.JText::_($useglobal_lbl).'</b></label></div>';
 		}
 
 		// Create checkboxes
-		foreach($checkoptions as $i => $o) {
+		
+		if ($cols) $html .= '<div>';
+		foreach($checkoptions as $i => $o)
+		{
 			$curr_element_id = $element_id.$i;
-			$html .= '
-			<div style="'.$inline_style.'">
+			$html .= 
+			($cols && $i && ((($i) % $t) == 0) ? '</div><div>' : '').
+			'
+			<div>
 				<input id="'.$curr_element_id.'" type="checkbox" '.$disable_all .(in_array($checkvals[$i], $values) ? ' checked="checked"' : '').' name="'.$fieldname.'" value="'.$checkvals[$i].'" />
 				<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>
 			</div>
 		';
 		}
+		if ($cols) $html .= '</div>';
 
 		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
 		$html .= '</fieldset>';
