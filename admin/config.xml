@@ -399,6 +399,7 @@
 			</field>
 
 		<field name="" type="separator" default="" level="level_br" />
+		<field name="" type="separator" default="" level="level_br"/>
 		<field name="" type="separator" default="FLEXI_LISTS" level="tabset_start" box_type="1" remove_boxes="2" tab_class="s-fake" />
 		<field name="" type="separator" default="FLEXI_LISTS_HEADER_CONF" icon_class="icon-info-circle" level="tab_open" box_type="1" remove_boxes="2" />
 
@@ -626,9 +627,9 @@
 
 		<field name="" type="separator" default="FLEXI_LISTS_HEADER_CONF" level="tabset_close" box_type="1" remove_boxes="2" />
 		<field name="" type="separator" default="FLEXI_PARAMS_CAT_SEARCH_FILTER_FORM" icon_class="icon-search" level="tab_open" box_type="1" remove_boxes="2" />
-
-			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level1" />
-			<field name="" type="separator" default="FLEXI_ENABLE_SEARCH_FILTERS_AI_INDIVIDUALLY_INFO" label="" level="level4" class="alert alert-warning" />
+		
+			<field name="" type="separator" default="FLEXI_PARAMS_CAT_SEARCH_FILTER_FORM" level="tabset_start" box_type="1" remove_boxes="2" />
+			<field name="" type="separator" default="FLEXI_BASIC" description="FLEXI_SEARCH_FILTER_FORM" icon_class="icon-home" level="tab_open" box_type="1" remove_boxes="2" />
 			
 			<field name="ff_placement" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" toggle_related="0" class="btn-group group-fcsuccess">
 				<option value="0">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
@@ -700,7 +701,8 @@
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" icon_class="icon-search" level="tab_open" box_type="1" remove_boxes="2" />
+			
 			<field name="use_search" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="txtsearch_display">FLEXI_NO</option>
 				<option value="1" show_list="txtsearch_display" hide_list="">FLEXI_YES</option>
@@ -727,7 +729,8 @@
 				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" icon_class="icon-filter" level="tab_open" box_type="1" remove_boxes="2" />
+			
 			<field name="use_filters" type="multilist" subtype="radio" default="0" toggle_related="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="filter_display">FLEXI_NO</option>
 				<option value="1" show_list="filter_display" hide_list="">FLEXI_YES</option>
@@ -752,7 +755,7 @@
 			</field>
 			<field name="persistent_filters" default="" type="textarea" rows="5" cols="60" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="input-xxlarge" />
 			
-			<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" icon_class="icon-link" level="tab_open" box_type="1" remove_boxes="2" />
 			
 			<field name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
 			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="2" cols="60" class="input-xxlarge" />
@@ -765,6 +768,7 @@
 			</field>
 
 
+		<field name="" type="separator" default="FLEXI_PARAMS_CAT_SEARCH_FILTER_FORM" level="tabset_close" box_type="1" remove_boxes="2" />
 		<field name="" type="separator" default="FLEXI_PARAMS_CAT_LAYOUT" icon_class="icon-palette" level="tab_open" box_type="1" remove_boxes="2" />
 
 		<field name="" type="separator" default="FLEXI_LAYOUTS" label="" level="level1" />

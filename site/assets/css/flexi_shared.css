@@ -675,8 +675,8 @@ body .btn-group.group-fcprimary .btn.active:not(.btn-primary) {
 	border-color: #15497c #15497c #0a223b;
 }
 body .btn-group.group-fcsuccess .btn.active:not(.btn-primary) {
-	background-color: #51a351;
-	border-color: #51a351 #51a351 #387038;
+	background-color: #378137;
+	border-color: #378137 #378137 #204b20;
 }
 body .btn-group.group-fcwarning .btn.active:not(.btn-primary) {
 	background-color: #faa732;
