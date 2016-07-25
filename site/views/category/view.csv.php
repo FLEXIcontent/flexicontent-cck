@@ -52,46 +52,47 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Initialize framework variables
 		$user     = JFactory::getUser();
 		$aid      = JAccess::getAuthorisedViewLevels($user->id);
-		
+
 		// Get model
 		$model  = $this->getModel();
-		
-		
+
+
 		// Get the category, loading category data and doing parameters merging
 		$category = $this->get('Category');
-		
+
 		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		$params   = $category->parameters;
-		
+
 		// Check if CSV export button is enabled for current view
 		if ( !$params->get('show_csvbutton', 0) ) die('CSV export not enabled for this view');
-		
-		
-		
+
+
+
 		// ***********************
 		// Get data from the model
 		// ***********************
-		
+
 		$items   = $this->get('Data');
-		
+
 		// Get field values
 		$_vars = null;
 		FlexicontentFields::getItemFields($items, $_vars, $_view='category', $aid);
-		
+
 		// Zero unneeded search index text
 		foreach ($items as $item) $item->search_index = '';
-		
+
 		// Use &test=1 to test / preview item data of first item
 		if (JRequest::getCmd('test', 0))
 		{
 			$item = reset($items); echo "<pre>"; print_r($item); exit;
 		}
-		
-		
+
+
+
 		// **********************
 		// 1. Output HTTP HEADERS
 		// *********************
-		
+
 		@ob_end_clean();
 		header("Pragma: no-cache");
 		header("Cache-Control: no-cache");
@@ -101,33 +102,58 @@ class FlexicontentViewCategory extends JViewLegacy
 		header('Content-Disposition: attachment; filename=EXPORT.csv');
 		//header("Content-Transfer-Encoding: binary");
 		echo "\xEF\xBB\xBF"; // UTF-8 BOM
-		
-		
-		
+
+
+
 		// *********************
 		// 2. Output HEADERS row
 		// *********************
 		
 		// 2a. Output CORE properties titles
-		$props = array('title', 'author', 'created');
+		$props = array('title'=>'title', 'created_by'=>'author', 'created'=>'created');
 		$delim = "";
-		foreach($props as $prop)
+		$item0 = reset($items);
+		
+		$total_fields = 0;
+		foreach($props as $field_name => $prop)
 		{
+			$field = $item0->fields[$field_name];
+			FlexicontentFields::loadFieldConfig($field, $item0);
+
+			if ( !$field->parameters->get('include_in_csv_export', 0) )
+			{
+				continue;
+			}
+
 			echo $delim . $this->encodeCSVField($prop);
 			$delim = ",";
+			$total_fields++;
 		}
-		
-		
+
+
 		// 2b. Output CUSTOM field titles
-		$item0 = reset($items);
 		foreach( $item0->fields as $field )
 		{
+			FlexicontentFields::loadFieldConfig($field, $item0);
+
+			if ( !$field->parameters->get('include_in_csv_export', 0) )
+			{
+				continue;
+			}
+
 			echo $delim . $this->encodeCSVField($field->label);
+			$total_fields++;
 		}
 		echo "\n";
-		
-		
-		
+	
+		if ($total_fields==0)
+		{
+			echo "Fist record in list does not have any fields that supports CSV export and that are also marked as CSV exportable in their configuration";
+			jexit();
+		}
+
+
+
 		// *******************
 		// 3. Output data rows
 		// *******************
@@ -141,10 +167,15 @@ class FlexicontentViewCategory extends JViewLegacy
 				echo $delim . $this->encodeCSVField($item->$prop);
 				$delim = ",";
 			}
-			
+
 			// 3b. CUSTOM fields
 			foreach($item0->fields as $field)
 			{
+				if ( !$field->parameters->get('include_in_csv_export', 0) )
+				{
+					continue;
+				}
+
 				if (!isset($item->fieldvalues[$field->id]))
 				{
 					echo $delim;
@@ -152,7 +183,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				}
 				echo $delim . $this->encodeCSVField(implode("\t", $item->fieldvalues[$field->id]));
 			}
-			
+
 			echo "\n";
 		}
 	}
