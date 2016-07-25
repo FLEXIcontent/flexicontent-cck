@@ -91,26 +91,32 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
-input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
+	background-position: 0 0 !important;
+	font-style: italic !important;
+	cursor: default !important;
+	opacity: 0.6 !important;
+}
+input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -72px !important;
 	font-style: italic !important;
 	color: gray !important;
 	cursor: default !important;
+	opacity: 0.6 !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn) {
-	background: url(../images/checks.png) no-repeat 0 0 !important;
+	background: url(../images/checks2.png) no-repeat 0 0 !important;
 }
 input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
-	background: url(../images/checks.png) no-repeat 0 0 !important;
+	background: url(../images/checks2.png) no-repeat 0 -72px !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),

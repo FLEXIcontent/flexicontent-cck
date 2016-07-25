@@ -262,8 +262,8 @@ div fieldset.panelform ul.adminformlist > li .input-prepend {
 }
 #jform_tid-lbl,
 #jform_attribs_ilayout-lbl,
-div fieldset.panelform :not(.label-fcouter) label.hasTip,
-div fieldset.panelform :not(.label-fcouter) label.hasTooltip,
+div fieldset.panelform :not(.label-fcouter) label:not(.btn).hasTip,
+div fieldset.panelform :not(.label-fcouter) label:not(.btn).hasTooltip,
 .fc_fieldset label.hasTip,
 .fc_fieldset label.hasTooltip {
 	clear: both;
@@ -318,7 +318,7 @@ div.width-100 fieldset {
 	background-color: #FFFFFF !important;
 	padding: 5px 8px 8px 5px !important;
 }
-div fieldset.panelform :not(.label-fcouter) label {
+div fieldset.panelform :not(.label-fcouter) label:not(.btn) {
 	min-width: 132px;
 	text-align: right;
 }
