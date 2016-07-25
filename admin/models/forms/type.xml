@@ -38,7 +38,7 @@
 			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
-			<field name="auto_title" type="radio" default="0" label="FLEXI_AUTO_TITLE" description="FLEXI_AUTO_TITLE_DESC" class="btn-group btn-group-yesno">
+			<field name="auto_title" type="radio" default="0" label="FLEXI_AUTO_TITLE" description="FLEXI_AUTO_TITLE_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_SET_TO_ID</option>
 			</field>
@@ -58,9 +58,9 @@
 			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
-			<field name="hide_maintext" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC" class="btn-group group-fcmethod">
-				<option value="0" show_list="display_maintext" hide_list="">FLEXI_SHOW</option>
+			<field name="hide_maintext" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC" class="btn-group group-fcmethod fcnoyes">
 				<option value="1" show_list="" hide_list="display_maintext">FLEXI_HIDE</option>
+				<option value="0" show_list="display_maintext" hide_list="">FLEXI_SHOW</option>
 			</field>
 			<field name="maintext_hide_html" type="radio" default="" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" depend_class="display_maintext" class="btn-group group-fcsuccess">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -580,7 +580,7 @@
 			
 			<field name="" type="separator" default="FLEXI_EXISTING_ITEMS" label="" level="level2" />
 			<field name="allowlangmods_fe" type="fccheckbox" default="" display_useglobal="1"
-				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
+				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_ASSOCIATIONS"
 				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals=""
 				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" />
 			<field name="allow_subscribers_notify_fe" type="radio" default="" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" class="btn-group btn-group-yesno">

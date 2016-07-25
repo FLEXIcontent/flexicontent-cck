@@ -588,7 +588,7 @@
 				<option value="0" show_list="" hide_list="display_hitsstd">FLEXI_NO</option>
 				<option value="1" show_list="display_hitsstd" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_hitsstd btn-group group-fcmethod fcyesno">
+			<field name="hits_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_hitsstd btn-group group-fcmethod fcnoyes">
 				<option value="2">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
@@ -599,7 +599,7 @@
 				<option value="0" show_list="" hide_list="display_hitsfeat">FLEXI_NO</option>
 				<option value="1" show_list="display_hitsfeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_hitsfeat btn-group group-fcmethod fcyesno">
+			<field name="hits_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_hitsfeat btn-group group-fcmethod fcnoyes">
 				<option value="2">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
@@ -613,7 +613,7 @@
 				<option value="0" show_list="" hide_list="display_votestd">FLEXI_NO</option>
 				<option value="1" show_list="display_votestd" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_votestd btn-group group-fcmethod fcyesno">
+			<field name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_votestd btn-group group-fcmethod fcnoyes">
 				<option value="2">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
@@ -636,7 +636,7 @@
 				<option value="0" show_list="" hide_list="display_votefeat">FLEXI_NO</option>
 				<option value="1" show_list="display_votefeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_votefeat btn-group group-fcmethod fcyesno">
+			<field name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_votefeat btn-group group-fcmethod fcnoyes">
 				<option value="2">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
@@ -662,7 +662,7 @@
 				<option value="0" show_list="" hide_list="display_commentstd">FLEXI_NO</option>
 				<option value="1" show_list="display_commentstd" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="comments_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_commentstd btn-group group-fcmethod fcyesno" >
+			<field name="comments_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_commentstd btn-group group-fcmethod fcnoyes" >
 				<option value="2">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
@@ -678,7 +678,7 @@
 				<option value="0" show_list="" hide_list="display_commentfeat">FLEXI_NO</option>
 				<option value="1" show_list="display_commentfeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="comments_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_commentfeat btn-group group-fcmethod fcyesno">
+			<field name="comments_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="display_commentfeat btn-group group-fcmethod fcnoyes">
 				<option value="2">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
