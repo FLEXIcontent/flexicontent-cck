@@ -22,6 +22,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
+
 //jimport('joomla.form.helper'); // JFormHelper
 //JFormHelper::loadFieldClass('...');   // JFormField...
 
@@ -70,7 +71,7 @@ class JFormFieldItem extends JFormField
 		if ($value) {
 			$item->load($value);
 		} else {
-			$item->title = JText::_( 'FLEXI_FORM_SELECT' );
+			$item->title = '';
 		}
 		
 		// J1.6+ does have required field capability, add a HTML tag parameter
@@ -79,7 +80,7 @@ class JFormFieldItem extends JFormField
 		static $js_added = false;
 		if (!$js_added) {
 			$js = "
-			function qfClearSelectedItem(element_id)
+			function fcClearSelectedItem(element_id)
 			{
 				jQuery('#'+element_id+'_name').val('');
 				jQuery('#'+element_id+'_name').attr('placeholder', '".JText::_( 'FLEXI_FORM_SELECT',true )."');
@@ -90,7 +91,7 @@ class JFormFieldItem extends JFormField
 			};
 			
 			var fc_select_element_id;
-			function qfSelectItem(id, cid, title)
+			function fcSelectItem(id, cid, title)
 			{
 				document.getElementById(fc_select_element_id).value = id;
 				document.getElementById(fc_select_element_id+'_name').value = title;"
@@ -100,11 +101,13 @@ class JFormFieldItem extends JFormField
 				jQuery('#'+fc_select_element_id+'_clear').removeClass('hidden');" :'')
 			."
 				if (cid_field =	document.getElementById('jform_request_cid')) cid_field.value = cid;
-				$('sbox-btn-close').fireEvent('click');
+				//$('sbox-btn-close').fireEvent('click');
+				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
 			JFactory::getDocument()->addScriptDeclaration($js);
-			JHTML::_('behavior.modal', 'a.modal');
+			//JHTML::_('behavior.modal', 'a.modal');
+			flexicontent_html::loadFramework('flexi-lib');
 		}
 		
 		$option = JRequest::getVar('option');
@@ -132,11 +135,13 @@ class JFormFieldItem extends JFormField
 		$link .= $language ? '&amp;language='.$language : '';
 		$link .= ($language && $assocs_id) ? '&amp;assocs_id='.$assocs_id : '';
 		
-		$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
+		//$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
+		$_select = JText::_( 'FLEXI_SELECT_ITEM', true);
 		return '
 		<span class="input-append">
-			<input type="text" id="'.$element_id.'_name" value="'.$item->title.'" '.$required_param.' readonly="readonly" />
-			<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.JText::_( 'FLEXI_SELECT_ITEM' ).'">
+			<input type="text" id="'.$element_id.'_name" placeholder="'.JText::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$item->title.'" '.$required_param.' readonly="readonly" />
+			'. //<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
+			'<a class="btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
@@ -144,12 +149,12 @@ class JFormFieldItem extends JFormField
 				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
 			</a>' : '').'
 			'.($allowClear ? '
-			<button id="' .$element_id. '_clear" class="btn'.($value ? '' : ' hidden').'" onclick="return qfClearSelectedItem(\''.$element_id . '\')">
-				<span class="icon-remove"></span>'
-				.JText::_('FLEXI_CLEAR').'
+			<button id="' .$element_id. '_clear" class="btn'.($value ? '' : ' hidden').'" onclick="return fcClearSelectedItem(\''.$element_id . '\')">
+				<span class="icon-remove"></span>
+				'.JText::_('FLEXI_CLEAR').'
 			</button>' : '').'
 		</span>
-		<input type="hidden" id="'.$element_id.'" name="'.$fieldname.'" value="'.$value.'" />
+		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$value.'" class="fc_hidden_value" />
 		';
 	}
 }

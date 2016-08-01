@@ -21,6 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
+
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('menuitem');   // JFormFieldMenuitem
 

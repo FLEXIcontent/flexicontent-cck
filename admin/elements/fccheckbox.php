@@ -27,11 +27,12 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
+
 //jimport('joomla.form.helper'); // JFormHelper
 //JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
- * Renders a multi element checkbox (array of checkboxes)
+ * Renders a checkbox-set element
  */
 class JFormFieldFccheckbox extends JFormField
 {
@@ -92,7 +93,7 @@ class JFormFieldFccheckbox extends JFormField
 		if ($cols) $classes .= ' fc-columned';
 		
 		$attribs = ' class="'.$classes.'"';
-		$html = '<fieldset id="'.$element_id.'" '.$attribs.' style="border-width:0px; width:74%;">';
+		$html = '<fieldset id="'.$element_id.'" '.$attribs.'>';
 
 		$disable_all = '';
 		if ( @$attributes['display_useglobal'] ) {
@@ -108,7 +109,7 @@ class JFormFieldFccheckbox extends JFormField
 
 		// Create checkboxes
 		
-		if ($cols) $html .= '<div>';
+		if ($cols) $html .= '<div style="margin-bottom: 12px;">';
 		foreach($checkoptions as $i => $o)
 		{
 			$curr_element_id = $element_id.$i;
@@ -136,6 +137,13 @@ class JFormFieldFccheckbox extends JFormField
 		}
 		
 		return $html;
+	}
+
+
+	function getLabel()
+	{
+		// Valid HTML ... you can not have for LABEL attribute for fieldset
+		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
 }
 

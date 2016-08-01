@@ -28,6 +28,7 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
+
 //jimport('joomla.form.helper'); // JFormHelper
 //JFormHelper::loadFieldClass('...');   // JFormField...
 
@@ -39,7 +40,9 @@ class JFormFieldMultiList extends JFormField
 {
 	protected $_options;
 	protected $_inherited;
-	
+
+	static $css_js_added = null;
+
 	/**
 	* Element name
 	*
@@ -151,12 +154,13 @@ class JFormFieldMultiList extends JFormField
 		}
 		
 		/* support for parameter multi-value, multi-parameter dependencies in non-FLEXIcontent views */
-		static $js_added = false;
-		if (!$js_added) {
-			$js_added = true;
-			$doc = JFactory::getDocument();
+		if (self::$css_js_added === null)
+		{
+			self::$css_js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
-			if ( JRequest::getCmd('option')!='com_flexicontent' ) {
+
+			if ( JFactory::getApplication()->input->get('option') != 'com_flexicontent' )
+			{
 				$js = "
 				jQuery(document).ready(function(){
 					".(FLEXI_J30GE ?
@@ -165,11 +169,12 @@ class JFormFieldMultiList extends JFormField
 					)."
 				});
 				";
-				$doc->addScriptDeclaration($js);
+				JFactory::getDocument()->addScriptDeclaration($js);
 			}
 		}
 		
-		if ($subtype=='radio') {
+		if ($subtype=='radio')
+		{
 			$_class = ' class ="'.$attribs['list.attr']['class'].'"';
 			$_id = ' id="'.$element_id.'"';
 			$html = '';
@@ -241,16 +246,23 @@ class JFormFieldMultiList extends JFormField
 		
 		return $html .@ $inherited_info .@ $tip_text .@ $tip_text2;
 	}
-	
-	
+
+
 	function getListOptions()
 	{
 		return $this->_options;
 	}
-	
-	
+
+
 	function setInherited($values)
 	{
 		$this->_inherited = $values;
+	}
+
+
+	function getLabel()
+	{
+		// Valid HTML ... you can not have for LABEL attribute for fieldset
+		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
 }
