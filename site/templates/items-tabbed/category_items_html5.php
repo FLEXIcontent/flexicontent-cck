@@ -118,16 +118,16 @@ foreach ($items as $i => $item) :
 	<?php endif; ?>
 	
 	<?php
-	$show_editbutton = $this->params->get('show_editbutton', 1);
 	$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
 	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
-	$editbutton = $show_editbutton ? flexicontent_html::editbutton( $item, $this->params ) : '';
-	$statebutton = $show_editbutton ? flexicontent_html::statebutton( $item, $this->params ) : '';
+	$editbutton = flexicontent_html::editbutton( $item, $this->params );
+	$statebutton = flexicontent_html::statebutton( $item, $this->params );
+	$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 	$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 	?>
 	
-	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
+	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $deletebutton || $approvalbutton) : ?>
 		<!-- BOF buttons -->
 		<div class="buttons">
 			<?php echo $pdfbutton; ?>
@@ -135,6 +135,7 @@ foreach ($items as $i => $item) :
 			<?php echo $printbutton; ?>
 			<?php echo $editbutton; ?>
 			<?php echo $statebutton; ?>
+			<?php echo $deletebutton; ?>
 			<?php echo $approvalbutton; ?>
 		</div>
 		<!-- EOF buttons -->
