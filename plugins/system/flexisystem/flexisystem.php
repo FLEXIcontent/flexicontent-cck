@@ -171,6 +171,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ($redirect_pdf_format && $jinput->get('format', 'html', 'cmd') == 'pdf' )
 		{
 			JRequest::setVar('format', 'html');
+			JFactory::getApplication()->input->set('format', 'html');
 			if ($redirect_pdf_format==2) {
 				JFactory::getApplication()->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
 			}
