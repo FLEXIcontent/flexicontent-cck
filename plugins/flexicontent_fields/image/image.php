@@ -1013,7 +1013,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// This is field HTML that is created regardless of values
-		$non_value_html = '<input id="'.$elementid.'" class="'.($use_ingroup ? '' : $required_class).'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		$non_value_html = '<input id="'.$elementid.'" class="'.($use_ingroup ? '' : $required_class).' fc_hidden_input" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		if ($use_ingroup) {
 			$field->html[-1] = $non_value_html;
 		} else {

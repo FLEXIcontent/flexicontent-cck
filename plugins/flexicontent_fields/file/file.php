@@ -495,7 +495,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// Button for popup file selection
 		/*if (!$use_ingroup) $field->html .= '
-			<input id="'.$elementid.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
+			<input id="'.$elementid.'" class="'.$required_class.' fc_hidden_input" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
 	
@@ -566,10 +566,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		$tooltip_class = 'hasTooltip';
 		
 		
-		$display_total_count = $field->parameters->get( 'display_total_count', 1 ) ;
+		$display_total_count = $field->parameters->get( 'display_total_count', 0 ) ;
 		$total_count_label = JText::_($field->parameters->get( 'total_count_label', 'FLEXI_FIELD_FILE_TOTAL_FILES' ));
 		
-		$display_total_hits  = $field->parameters->get( 'display_total_hits', 1 ) ;
+		$display_total_hits  = $field->parameters->get( 'display_total_hits', 0 ) ;
 		$total_hits_label = JText::_($field->parameters->get( 'total_hits_label', 'FLEXI_FIELD_FILE_TOTAL_DOWNLOADS' ));
 		
 		$useicon = $field->parameters->get( 'useicon', 0 ) ;

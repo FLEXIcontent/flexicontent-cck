@@ -251,13 +251,13 @@
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_TOTALS" level="level2" />
-			<field name="display_total_count" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT_DESC" class="btn-group btn-group-yesno">
+			<field name="display_total_count" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="use_total_count">FLEXI_HIDE</option>
 				<option value="1" show_list="use_total_count" hide_list="">FLEXI_SHOW</option>
 			</field>
 			<field name="total_count_label" type="text" default="FLEXI_FIELD_FILE_TOTAL_FILES" label="FLEXI_FIELD_FILE_TOTAL_COUNT_LABEL" depend_class="use_total_count" description="FLEXI_FIELD_FILE_CUSTOM_LABEL_DESC" />
 			
-			<field name="display_total_hits" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_TOTAL_HITS" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_HITS_DESC" class="btn-group btn-group-yesno">
+			<field name="display_total_hits" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_TOTAL_HITS" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_HITS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="use_total_hits">FLEXI_HIDE</option>
 				<option value="1" show_list="use_total_hits" hide_list="">FLEXI_SHOW</option>
 			</field>
