@@ -25,6 +25,7 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
+
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('list');   // JFormFieldList
 
@@ -258,7 +259,7 @@ class JFormFieldFcSortableList extends JFormField
 					<p class="fcrecords_desc alert alert-info">'.JText::_($attributes->description).'</p>
 				</div>'
 			: '
-				<input type="hidden" value="'.implode(',', $values).'" id="'.$element_id.'" name="'.$fieldname.'" />'
+				<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.implode(',', $values).'" class="fc_hidden_value" />'
 			).'
 			<div class="fcclear"></div>
 

@@ -25,6 +25,7 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
+
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('list');   // JFormFieldList
 

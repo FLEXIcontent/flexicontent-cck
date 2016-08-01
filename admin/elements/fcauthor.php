@@ -11,6 +11,7 @@ defined('JPATH_PLATFORM') or die;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
+
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('list');   // JFormFieldList
 
