@@ -176,12 +176,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Add css and js to document
 		// **************************
 		
-		if ($app->isSite()) {
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-		} else {
+		$app->isSite() ?
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-		}
-		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		// This is not included automatically in frontend

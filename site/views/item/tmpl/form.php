@@ -1198,8 +1198,9 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							$input_only = !$field->label || $field->hidden;
 							echo
 								($input_only ? '' :
-								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-									$form_layout->getLabel($fieldname, $groupname)).'
+								str_replace(' for="', ' data-for="',
+									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+										$form_layout->getLabel($fieldname, $groupname))).'
 								<div class="container_fcfield">
 								').
 								

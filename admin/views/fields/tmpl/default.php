@@ -326,7 +326,7 @@ function delAllFilters() {
 			
 			if ($row->issearch==0 || $row->issearch==1 || !$supportsearch) {
 				$search_dirty = 0;
-				$issearch = ($row->issearch && $supportsearch) ? "search.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
+				$issearch = ($row->issearch && $supportsearch) ? "magnifier2.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
 				$issearch_tip = ($row->issearch && $supportsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			} else {
 				$search_dirty = 1;
@@ -339,7 +339,7 @@ function delAllFilters() {
 			
 			if ($row->isadvsearch==0 || $row->isadvsearch==1 || !$supportadvsearch) {
 				$advsearch_dirty = 0;
-				$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "search.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
+				$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "magnifier2.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
 				$isadvsearch_tip = ($row->isadvsearch && $supportadvsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportadvsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			} else {
 				$advsearch_dirty = 1;

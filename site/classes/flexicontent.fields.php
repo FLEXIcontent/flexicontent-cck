@@ -117,26 +117,6 @@ class FlexicontentFields
 		// Calculate access for current user if it was not given or if given access is invalid
 		$aid = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
 		
-		// Apply cache to public (unlogged) users only 
-		/*$apply_cache = !$user->id && FLEXI_CACHE;
-		if ($apply_cache) {
-			$itemcache = JFactory::getCache('com_flexicontent_items');  // Get Joomla Cache of '...items' Caching Group
-			$itemcache->setCaching(1); 		              // Force cache ON
-			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
-			
-			$filtercache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...filters' Caching Group
-			$filtercache->setCaching(1); 		              // Force cache ON
-			$filtercache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
-			
-			// Auto-clean expired item & filters cache, only done here once
-			if (FLEXI_GC && !$expired_cleaned) {
-				$itemcache->gc();
-				$filtercache->gc();
-				$expired_cleaned = true;
-			}
-			// ... now retrieved CACHED ... code removed ...
-		}*/
-		
 		$vars = null;
 		FlexicontentFields::getItemFields($items, $vars, $view, $aid);
 		

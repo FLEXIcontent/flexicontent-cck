@@ -122,8 +122,8 @@
 					<option value="0">MOD_FLEXICATEGORIES_SCALE</option>
 					<option value="1">MOD_FLEXICATEGORIES_CROP</option>
 				</field>		
-				<field name="cat_image_width" type="text" size="4" default="24" label="MOD_FLEXICATEGORIES_IMAGE_WIDTH" description="MOD_FLEXICATEGORIES_IMAGE_WIDTH" class="disp_cat_img" />
-				<field name="cat_image_height" type="text" size="4" default="24" label="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" description="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" class="disp_cat_img" />
+				<field name="cat_image_width" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_WIDTH" description="MOD_FLEXICATEGORIES_IMAGE_WIDTH" class="disp_cat_img" />
+				<field name="cat_image_height" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" description="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" class="disp_cat_img" />
 				<field name="cat_image_float" type="radio" default="left" label="MOD_FLEXICATEGORIES_IMAGE_POSITION" description="MOD_FLEXICATEGORIES_IMAGE_POSITION_DESC" class="btn-group btn-group-yesno disp_cat_img">
 					<option value="left">MOD_FLEXICATEGORIES_IMAGE_LEFT</option>
 					<option value="right">MOD_FLEXICATEGORIES_IMAGE_RIGHT</option>

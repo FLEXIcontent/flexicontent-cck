@@ -261,7 +261,7 @@ foreach ($this->values as $n => $value)
 					scaleControl: false,
 					streetViewControl: false,
 					rotateControl: false,
-                    styles: '.$style.', 
+					styles: '.$style.', 
 				});
 				
 				var myInfoWindow = new google.maps.InfoWindow({

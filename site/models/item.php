@@ -447,10 +447,10 @@ class FlexicontentModelItem extends ParentClassItem
 		// a1. Start with empty registry, then merge COMPONENT parameters
 		$params->merge($compParams);
 		
-		// b. Merge parameters from current category
-		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
-		$catParams->set('title_linkable', '');   // Prevent title_linkable from propagating ... to the item, it is meant for category view only
-		$catParams->set('show_editbutton', '');  // Prevent title_linkable from propagating ... to the item, it is meant for category view only
+		// b. Merge parameters from current category, but prevent some settings from propagating ... to the item, that are meant for
+		//    category view only, these are legacy settings that were removed from category.xml, but may exist in saved configurations
+		$catParams->set('show_title', '');
+		$catParams->set('show_editbutton', '');
 		$params->merge($catParams);
 		
 		// c. Merge TYPE parameters into the page configuration

@@ -445,10 +445,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
 			<div class="fcclear"></div>
-			<span class="fc-mssg fc-info fc-nobgimage" style="font-size:100%; margin: 4px 0;">
+			<div class="fc-mssg fc-info fc-nobgimage" style="font-size:100%; margin: 4px 0;">
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
 				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
-			</span>
+			</div>
 			
 			<div class="container-fluid" style="padding:0px!important;">
 				<div class="span6 full_width_980">
