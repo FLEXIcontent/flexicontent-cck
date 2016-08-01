@@ -70,6 +70,11 @@ if ( $user->id ) :
 			endif;
 		endif;
 		
+		if ($item->deletebutton = flexicontent_html::deletebutton( $item, $this->params )) :
+			$buttons_exists = true;
+			$item->deletebutton = '<div class="fc_delete_link">'.$item->deletebutton.'</div>';
+		endif;
+		
 		if ($item->approvalbutton = flexicontent_html::approvalbutton( $item, $this->params )) :
 			$item->approvalbutton = '<div class="fc_approval_request_link_nopad">'.$item->approvalbutton.'</div>';
 		endif;
