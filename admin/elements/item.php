@@ -26,6 +26,13 @@ jimport('joomla.form.field');  // JFormField
 //jimport('joomla.form.helper'); // JFormHelper
 //JFormHelper::loadFieldClass('...');   // JFormField...
 
+// Load the helper classes
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+
+
 /**
  * Renders an Item element
  *
@@ -64,9 +71,7 @@ class JFormFieldItem extends JFormField
 			$fieldname  = $this->name;
 			$element_id = $this->id;
 		}
-		
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		
+
 		$item = JTable::getInstance('flexicontent_items', '');
 		if ($value) {
 			$item->load($value);
