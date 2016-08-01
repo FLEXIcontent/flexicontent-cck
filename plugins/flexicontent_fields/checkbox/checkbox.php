@@ -611,7 +611,7 @@ class plgFlexicontent_fieldsCheckbox extends FCField
 					$options[] = ''
 						.$pretext
 						.(!$placeInsideLabel ? $input_fld : '')
-						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" '.($form_vals_display==1 ? 'title="'.@ $element->label_tip : '').'">'
+						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" '.($form_vals_display==1 ? 'title="'.@ $element->label_tip.'"' : '').'>'
 							. ($placeInsideLabel ? $input_fld : '')
 							.($form_vals_display!=1 ? $element->text : '')
 							.($form_vals_display==2 ? ' <br/>' : '')

@@ -494,7 +494,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		
 		// Button for popup file selection
 		/*if (!$use_ingroup) $field->html .= '
-			<input id="'.$elementid.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
+			<input id="'.$elementid.'" class="'.$required_class.' fc_hidden_input" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
 	
@@ -584,9 +584,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		if (!$js_and_css_added)
 		{
 			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
-		  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		  JHtml::_('behavior.framework', true);
 		  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
-		  if($slideshowtype!='slideshow') {
+		  if($slideshowtype!='slideshow')
+			{
 		  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
 		  	$slideshowClass .= '.'.$slideshowtype;
 		  }

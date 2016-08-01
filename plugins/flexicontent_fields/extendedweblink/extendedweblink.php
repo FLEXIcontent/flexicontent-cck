@@ -438,7 +438,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 						<label class="'.$add_on_class.' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_EXTWL_POPULARITY' ).'</label>
 						<span class="'.$add_on_class.' hitcount" style="font-style: italic; min-width:64px;">'.$hits.' '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					</div>
-					<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />';
+					<input class="urlhits fc_hidden_input" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.$hits.'" />';
 			}
 			
 			$field->html[] = '

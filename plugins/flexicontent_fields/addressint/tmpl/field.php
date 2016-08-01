@@ -52,7 +52,7 @@ foreach ($values as $value)
 		$field_html .= '
 		<tr>
 			<td class="key"><label class="label addrint_addr_display-lbl" for="'.$elementid_n.'_addr_display">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_ADDRESS').'</label></td>
-			<td><textarea class="fcfield_textval addrint_addr_display" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24" class="'.$required_class.'" />'
+			<td><textarea class="fcfield_textval addrint_addr_display '.$required_class.'" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24">'
 			.($value['name'] ? $value['name']."\n" : '')
 			.($value['addr_display'] ? $value['addr_display'] :
 				(
