@@ -282,6 +282,11 @@ if ($leadnum) :
 				
 			<?php endif; ?>
 			
+			<?php $deletebutton = flexicontent_html::deletebutton( $item, $this->params ); ?>
+			<?php if ($deletebutton) : ?>
+				<div class="fc_delete_link"><?php echo $deletebutton;?></div>
+			<?php endif; ?>
+			
 			<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 			<?php if ($approvalbutton) : ?>
 				<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
