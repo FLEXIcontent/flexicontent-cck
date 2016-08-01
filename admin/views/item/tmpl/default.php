@@ -414,7 +414,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			
 			<div class="fcclear"></div>
 			<span class="label-fcouter" id="jform_catid-lbl-outer">
-			<label id="jform_catid-lbl" for="jform_catid" data-for_bck="jform_catid" class="label pull-left label-fcinner label-toplevel <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1);?>">
+			<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" class="label pull-left label-fcinner label-toplevel <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1);?>">
 				<?php echo JText::_( 'FLEXI_CATEGORY' ); ?>
 				<i class="icon-tree-2"></i>
 			</label>
@@ -439,7 +439,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			?>
 			<div class="fcclear"></div>
 			<span class="label-fcouter" id="jform_tag-lbl-outer">
-			<label id="jform_tag-lbl" for="jform_tag" <?php echo $label_tooltip; ?> >
+			<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_TAGS' ); ?>
 				<i class="icon-tags-2"></i>
 			</label>
@@ -497,8 +497,8 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 						{
 							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
 							echo '
-							<input type="checkbox" name=jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
-							<label for="quick-tag-'.$tag->id.'" name="quick-tags[]" class="tagitem">'.$tag->name.'</label>
+							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
+							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.$tag->name.'</label>
 							';
 						}
 					}
@@ -524,7 +524,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			?>
 			<div class="fcclear"></div>
 			<span class="label-fcouter" id="jform_type_id-lbl-outer">
-			<label id="jform_type_id-lbl" for="jform_type_id" data-for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
+			<label id="jform_type_id-lbl" for="jform_type_id" data-for="jform_type_id" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
 				<i class="icon-briefcase"></i>
 			</label>
@@ -570,7 +570,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			?>
 			<div class="fcclear"></div>
 			<span class="label-fcouter" id="jform_state-lbl-outer">
-			<label id="jform_state-lbl" for="jform_state" <?php echo $label_tooltip; ?> >
+			<label id="jform_state-lbl" data-for="jform_state" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
 				<i class="icon-file-check"></i>
 			</label>
@@ -600,7 +600,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 						$label_tooltip = 'class="'.$tip_class.' label label-success pull-left label-fcinner" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 					?>
 					<span class="label-fcouter" id="jform_vstate-lbl-outer">
-					<label id="jform_vstate-lbl" for="jform_vstate" <?php echo $label_tooltip; ?> >
+					<label id="jform_vstate-lbl" data-for="jform_vstate" <?php echo $label_tooltip; ?> >
 						<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
 					</label>
 					</span>
@@ -741,7 +741,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<?php /* description field label will be USED as TAB handle title, with field's description as Tooltip */
 			/*if ($display_label_form > 0): ?>
 				<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
-				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
+				<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
 				</label>
 				</span>
@@ -893,7 +893,7 @@ if ($this->row->type_id) {
 				
 				<div class="fcclear"></div>
 				<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
-				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
+				<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
 				</label>
 				</span>
@@ -988,7 +988,7 @@ if ($this->row->type_id) {
 				
 				<div class="fcclear"></div>
 				<span class="label-fcouter" id="jform_cid-lbl-outer">
-				<label id="jform_cid-lbl" for="jform_cid" data-for_bck="jform_cid" class="label pull-left label-fcinner label-toplevel">
+				<label id="jform_cid-lbl" for="jform_cid" data-for="jform_cid" class="label pull-left label-fcinner label-toplevel">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?>
 				</label>
 				</span>
@@ -1001,7 +1001,7 @@ if ($this->row->type_id) {
 			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
 				<div class="fcclear"></div>
 				<span class="label-fcouter" id="jform_featured_cid-lbl-outer">
-				<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for_bck="jform_featured_cid" class="label pull-left label-fcinner label-toplevel">
+				<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for="jform_featured_cid" class="label pull-left label-fcinner label-toplevel">
 					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
 				</label>
 				</span>
@@ -1207,7 +1207,7 @@ if ($this->row->type_id) {
 			<?php else: ?>
 				<fieldset class="panelform">
 					<?php echo ($field->label ? '
-						<span class="label-fcouter" id="jform_metadata_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+						<span class="label-fcouter" id="jform_metadata_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
 						<div class="container_fcfield">'.$field->input.'</div>
 					' : $field->input); ?>
 				</fieldset>
@@ -1226,7 +1226,7 @@ if ($this->row->type_id) {
 			<?php else: ?>
 				<fieldset class="panelform">
 					<?php echo ($field->label ? '
-						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
 						<div class="container_fcfield">'.$field->input.'</div>
 					' : $field->input); ?>
 				</fieldset>
@@ -1262,7 +1262,7 @@ if ($this->row->type_id) {
 				<?php else: ?>
 					<fieldset class="panelform">
 						<?php echo ($field->label ? '
-							<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+							<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
 							<div class="container_fcfield">'.$field->input.'</div>
 						' : $field->input); ?>
 					</fieldset>
@@ -1301,7 +1301,7 @@ if ($this->row->type_id) {
 					<?php else: ?>
 						<fieldset class="panelform">
 							<?php echo ($field->label ? '
-								<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+								<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
 								<div class="container_fcfield">'.$field->input.'</div>
 							' : $field->input); ?>
 						</fieldset>
@@ -1418,8 +1418,9 @@ if ( count($FC_jfields_html) ) : ?>
 							$input_only = !$field->label || $field->hidden;
 							echo
 								($input_only ? '' :
-								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-									$form_layout->getLabel($fieldname, $groupname)).'
+								str_replace(' for="', ' data-for="',
+									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+										$form_layout->getLabel($fieldname, $groupname))).'
 								<div class="container_fcfield">
 								').
 								
