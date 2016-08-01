@@ -375,6 +375,7 @@ var JFormValidator = function()
 		{
 			$lbl = jQuery(this);
 			for_id = this.getAttribute('for');
+			for_id = for_id ? for_id : this.getAttribute('data-for');
 			if (for_id)
 			{
 				$lbls_hash[for_id] = $lbl;
@@ -406,7 +407,7 @@ var JFormValidator = function()
 					$el.data('label', $lbls_hash[el_id]);
 				else
 				{
-					el_id = el_id.replace(/_[0-9]+$/, '')
+					el_id = el_id.replace(/_[0-9]+$/, '');
 					$lbls_hash.hasOwnProperty(el_id) ?
 						$el.data('label', $lbls_hash[el_id]) :
 						$el.data('label', false) ;
@@ -627,7 +628,7 @@ var JFormValidator = function()
 				if (label_text && typeof added[label_text] === 'undefined')
 				{
 					//var usage_text = invalid_el.attr('title') ? ': ' + invalid_el.attr('title') : '';
-					error.error.push(message + label_text.replace("*", "") /*+ usage_text*/);
+					error.error.push(message + label_text.replace('*', '') /*+ usage_text*/);
 					added[label_text] = 1;
 				}
 			}
