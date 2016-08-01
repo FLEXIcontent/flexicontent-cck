@@ -74,14 +74,13 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		// Prepare the document: set title, add css files, etc
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
 		
-		if ($app->isSite()) {
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-		} else {
+		$app->isSite() ?
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-		}
-		flexicontent_html::loadFramework('select2');
-		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
+		
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
 		
 		// Include backend CSS template CSS file , access to backend folder may not be allowed but ...
 		//$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();

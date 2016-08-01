@@ -247,15 +247,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		// **********************************************************************************************************
 		// Get Layouts, load language of current selected template and apply Layout parameters values into the fields
 		// **********************************************************************************************************
-		
-		// Get Layouts
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->category;
 
 		// Load language file of currently selected template
 		$_clayout = $catparams->get('clayout');
 		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
-		
+
+		// Get the category layouts, checking template of current layout for modifications
+		$themes		= flexicontent_tmpl::getTemplates($_clayout);
+		$tmpls		= $themes->category;
+
 		// Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{
@@ -271,10 +271,10 @@ class FlexicontentViewCategory extends JViewLegacy
 				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
 		}
-		
+
 		//build selectlists
 		$Lists = array();
-		
+
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
 		$fieldname = 'jform[parent_id]';
 		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
@@ -348,12 +348,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			return str_replace(
 				'<input ',
-				'<input placeholder="'.$_v.'" ',
+				'<input placeholder="'.preg_replace('/[\n\r]/', ' ', $_v).'" ',
 				$field->input);
 		}
 		else if ($field->getAttribute('type')=='textarea')
 		{
-			return str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
+			return str_replace('<textarea ', '<textarea placeholder="'.preg_replace('/[\n\r]/', ' ', $_v).'" ', $field->input);
 		}
 		else if ( method_exists($field, 'setInherited') )
 		{

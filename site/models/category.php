@@ -2028,10 +2028,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		
 		// Parameters meant for lists
-		$params->set('show_editbutton', $params->get('show_editbutton_lists', 1));    // Parameter meant for lists
-		$params->set('show_deletebutton', $params->get('show_deletebutton_lists', 0));    // Parameter meant for lists
-		$params->set('show_title', $params->get('show_title_lists', 1));    // Parameter meant for lists
-		$params->set('link_titles', $params->get('link_titles_lists', 1));  // Parameter meant for lists
+		$params->set('show_editbutton', $params->get('show_editbutton_lists', 1));
+		$params->set('show_deletebutton', $params->get('show_deletebutton_lists', 0));
+		$params->set('show_state_icon', $params->get('show_state_icon_lists', 0));
+		$params->set('show_title', $params->get('show_title_lists', 1));
+		$params->set('link_titles', $params->get('link_titles_lists', 1));
 		
 		// Set filter values (initial or locked) via configuration parameters
 		if ($params->get('use_persistent_filters')) FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);

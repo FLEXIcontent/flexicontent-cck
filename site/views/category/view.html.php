@@ -46,6 +46,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
 		$app      = JFactory::getApplication();
+		$jinput   = JFactory::getApplication()->input;
 		$session  = JFactory::getSession();
 		$option   = JRequest::getVar('option');
 		$format   = JRequest::getCmd('format', 'html');
@@ -476,7 +477,9 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			// Set the view and option to 'category' and 'com_content'  (actually view is already called category)
 			JRequest::setVar('option', 'com_content');
-			JRequest::setVar("isflexicontent", "yes");
+			JRequest::setVar('isflexicontent', 'yes');
+			$jinput->set('option', 'com_content');
+			$jinput->set('isflexicontent', 'yes');
 			
 			// These events return text that could be displayed at appropriate positions by our templates
 			$item->event = new stdClass();
@@ -492,6 +495,7 @@ class FlexicontentViewCategory extends JViewLegacy
 							
 			// Set the option back to 'com_flexicontent'
 			JRequest::setVar('option', 'com_flexicontent');
+			$jinput->set('option', 'com_flexicontent');
 			
 			// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
 			$item->fields['text']->display = & $item->text;

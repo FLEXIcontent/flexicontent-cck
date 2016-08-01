@@ -4791,21 +4791,26 @@ class flexicontent_upload
 		$imginfo = null;
 		$images = explode( ',', $params->get( 'image_extensions' ));
 		
-		if($params->get('restrict_uploads', 1) ) {
-
-			if(in_array($format, $images)) { // if its an image run it through getimagesize
-				if(($imginfo = getimagesize($file['tmp_name'])) === FALSE) {
+		if ($params->get('restrict_uploads', 1) )
+		{
+			if (in_array($format, $images))  // if its an image run it through getimagesize
+			{
+				if (($imginfo = getimagesize($file['tmp_name'])) === FALSE)
+				{
 					$err = 'FLEXI_WARNINVALIDIMG';
 					return false;
 				}
 
-			} else if(!in_array($format, $ignored)) {
-
+			}
+			
+			else if (!in_array($format, $ignored))
+			{
 				// if its not an image...and we're not ignoring it
 				$allowed_mime = explode(',', $params->get('upload_mime'));
 				$illegal_mime = explode(',', $params->get('upload_mime_illegal'));
 
-				if(function_exists('finfo_open') && $params->get('check_mime',1)) {
+				if (function_exists('finfo_open') /*&& $params->get('check_mime',1)*/)
+				{
 					// We have fileinfo
 					$finfo = finfo_open(FILEINFO_MIME);
 					$type = finfo_file($finfo, $file['tmp_name']);
@@ -4815,8 +4820,9 @@ class flexicontent_upload
 					}
 					finfo_close($finfo);
 
-				} else if(function_exists('mime_content_type') && $params->get('check_mime',1)) {
-
+				}
+				else if(function_exists('mime_content_type') /*&& $params->get('check_mime',1)*/)
+				{
 					// we have mime magic
 					$type = mime_content_type($file['tmp_name']);
 

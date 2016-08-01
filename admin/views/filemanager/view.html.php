@@ -136,12 +136,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Add css and js to document
 		// **************************
 		
-		if ($app->isSite()) {
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-		} else {
+		$app->isSite() ?
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-		}
-		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		
@@ -272,9 +269,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$lists['order']			= $filter_order;
 		
 		// uploadstuff
-		if ($cparams->get('enable_flash', 1) && !FLEXI_J30GE) {
-			JHTML::_('behavior.uploader', 'file-upload', array('onAllComplete' => 'function(){ window.location.reload(); }') );
-		}
 		jimport('joomla.client.helper');
 		$ftp = !JClientHelper::hasCredentials('ftp');
 		

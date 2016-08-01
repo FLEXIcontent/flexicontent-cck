@@ -525,16 +525,17 @@ jQuery(document).ready(function(){
 				<?php
 				if (!$this->filter_order_type) {
 					echo $this->CanOrder ? $image_ordering_tip : '';
-					echo str_replace('_FLEXI_REORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_REORDER_', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] ));
+					echo str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] ));
 				} else {
 					echo $this->CanOrder ? $image_ordering_tip : '';
-					echo str_replace('_FLEXI_REORDER_', JText::_('FLEXI_REORDER', true), str_replace('_FLEXI_REORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_REORDER_', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] )));
+					echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] )));
 				}
 
 				/*if ($this->CanOrder && $this->ordering) :
 					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
 				endif;*/
 				?>
+				<span class="column_toggle_lbl" style="display:none;"><?php echo JText::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
 			<th class="left"></th>

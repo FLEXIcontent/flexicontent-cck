@@ -188,7 +188,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		if ( $ext_view=='module' && $ext_option!='com_modules' && $ext_option!='com_advancedmodules' )
 		{
-			echo '<div class="alert fcpadded fcinlineblock" style="">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
+			echo '<div class="alert fcpadded fc-iblock" style="">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
 		}
 		
 		if ( !$app->isAdmin() )

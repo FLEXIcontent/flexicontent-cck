@@ -53,7 +53,7 @@ class _flexicontent_categories_common extends JTableNested {
 			$query	= $db->getQuery(true);
 			$query->select('id');
 			$query->from('#__assets');
-			$query->where('name= "com_flexicontent"');
+			$query->where('name= "com_content"');
 
 			// Get the asset id from the database.
 			$db->setQuery($query);

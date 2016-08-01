@@ -18,8 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
-<script language="javascript" type="text/javascript">
-function submitbutton(pressbutton) {
+<script type="text/javascript">
+function submitbutton(pressbutton)
+{
 	var form = document.adminForm;
 	if (pressbutton == 'cancel') {
 		submitform( pressbutton );
@@ -60,12 +61,12 @@ if (!$this->row->url)
 	<table class="fc-form-tbl">
 		<tr>
 			<td class="key">
-				<label class="label" for="altname">
+				<label class="label" for="filename_original">
 					<?php echo JText::_( !$this->row->url ? 'FLEXI_FILENAME' : 'FLEXI_FILE_URL' ); ?>
 				</label>
 			</td>
 			<td>
-				<input type="text" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge" maxlength="100" />
+				<input type="text" id="filename_original" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge" maxlength="100" />
 			</td>
 		</tr>
 
@@ -76,7 +77,7 @@ if (!$this->row->url)
 				</label>
 			</td>
 			<td>
-				<input type="text" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100" class="input-xxlarge" />
+				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100" class="input-xxlarge" />
 			</td>
 		</tr>
 		<tr>
@@ -91,7 +92,7 @@ if (!$this->row->url)
 		</tr>
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-				<label class="label" for="access">
+				<label class="label" for="language">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</label>
 			</td>
@@ -103,7 +104,7 @@ if (!$this->row->url)
 		</tr>
 		<tr>
 			<td class="key">
-				<label class="label" for="access">
+				<label class="label" for="assetgroups_1">
 					<?php echo JText::_( 'FLEXI_ACCESS_LEVEL' ); ?>
 				</label>
 			</td>
@@ -114,7 +115,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
-				<label class="label" for="ext">
+				<label class="label" for="mime_ext">
 					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
 			</td>
@@ -793,8 +794,8 @@ if (!$this->row->url)
 			</td>
 			<td>
 				<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->row->size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
-				<select id="size_unit" name="size_unit" class="use_select2_lib" value="KBs">
-					<option value="KBs">KBs</option>
+				<select id="size_unit" name="size_unit" class="use_select2_lib">
+					<option value="KBs" selected="selected">KBs</option>
 					<option value="MBs">MBs</option>
 					<option value="GBs">GBs</option>
 				</select>
