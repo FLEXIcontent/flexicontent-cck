@@ -390,8 +390,15 @@
 		
 		if (fcreadonly) for (var fieldname in fcreadonly) {
 			if (fcreadonly.hasOwnProperty(fieldname)) {
-				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
-				if (!jf_field.length) continue;
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname); // first try 'jform_attribs'
+				if (!jf_field.length) {
+					jf_field = jQuery('#'+'jform_params_'+fieldname);  // then try 'jform_params'
+					if (!jf_field.length) {
+						jf_field = jQuery('#'+'jform_'+fieldname);  // then try just 'jform_'
+						if (!jf_field.length) continue;
+					}
+				}
+				jf_field = jf_field.first();
 				
 				if (fcreadonly[fieldname] && !field.hasClass('fccustom_revert')) {
 					if (jf_field.is('fieldset')) {
@@ -1388,3 +1395,11 @@
 			else  ul.css('overflow-y', 'auto');
 		});
 	}
+
+
+	/* Valid HTML for legacy modals using rel, TODO: add more */
+	jQuery(document).ready(function() {
+		jQuery(".modal").each(function(i, el) {
+			if (jQuery(el).get(0).hasAttribute("data-rel")) jQuery(el).attr("rel", jQuery(el).attr("data-rel"));
+		});
+	});

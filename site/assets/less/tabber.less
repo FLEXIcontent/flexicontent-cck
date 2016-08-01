@@ -348,15 +348,16 @@ body .s-cblue ul.tabbernav > li.tabberactive a:before,
 
 
 /* Customize tabber containers */
-body div.tabberlive.s-gray:not(.tabber-inline),
-#flexicontent div.tabberlive.s-gray:not(.tabber-inline),
-body div.tabberlive.s-cblue:not(.tabber-inline),
-#flexicontent div.tabberlive.s-cblue:not(.tabber-inline) {
+body div.tabberlive:not(.tabber-inline):not(.fcparams_tabset) {
 	margin-top: 10px;
 }
 
-/* Customize tabber containers */
-body .tab-pane.active > div > div.tabberlive.s-gray:not(.tabber-inline),
-body .tab-pane.active > div > div.tabberlive.s-cblue:not(.tabber-inline) {
+body div.tabberlive.fcparams_tabset,
+body .tab-pane.active > div > div.tabberlive:not(.tabber-inline) {
 	margin-top: 0px;
+}
+
+body .tabberlive.fcparams_tabset .tabbertab:not(.fcperms_tab),
+body #flexicontent .tabberlive.fcparams_tabset .tabbertab:not(.fcperms_tab) {
+	padding: 16px;
 }

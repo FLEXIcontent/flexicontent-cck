@@ -371,7 +371,7 @@ div .flexi_buttons button:not(.btn):hover {
 	background-color: #0066AA;
 	color: white;
 	padding: 0.8em 1%;
-	margin: 48px 0% 2px 0%;
+	margin: 48px 0% 4px 0%;
 	width: 98%;
 	font-weight: bold;
 }
@@ -379,7 +379,7 @@ div .flexi_buttons button:not(.btn):hover {
 	background-color: #2096C9;
 	color: white;
 	padding: 0.8em 1%;
-	margin: 20px 0% 2px 0%;
+	margin: 20px 0% 4px 0%;
 	width: 98%;
 	font-weight: bold;
 }
@@ -387,7 +387,7 @@ div .flexi_buttons button:not(.btn):hover {
 	background-color: #7fc1ff;
 	color: #3a57ad;
 	padding: 0.4em 1%;
-	margin: 4px 0% 2px 0%;
+	margin: 4px 0% 3px 0%;
 	width: 98%;
 }
 .fcsep_level3 {
@@ -395,7 +395,7 @@ div .flexi_buttons button:not(.btn):hover {
 	border: 1px solid #96c7ef;
 	color: #3a579d;
 	padding: 0.3em 2em;
-	margin: 4px 5% 1px;
+	margin: 4px 5% 3px;
 	width: auto;
 }
 .fcsep_level4 {
@@ -406,12 +406,19 @@ div .flexi_buttons button:not(.btn):hover {
 	font-style: italic;
 	font-size: 12px;
 	border: 1px solid #777;
-	padding: 2px 16px 2px 16px !important;
-	margin: 5px 10% 1px !important;
+	padding: 2px 16px 2px 16px;
+	margin: 5px 10% 2px;
 	display: block;
 	border-radius: 5px;
 	clear: both;
 	max-width: 60%;
+}
+body .fcsep_level4.fc-mssg,
+body .fcsep_level4.fc-mssg-inline,
+body .fcsep_level4.alert,
+body .fcsep_level4.alert.fcpadded {
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 .fcsep_level_br {
 	line-height: 16px;
@@ -421,6 +428,23 @@ div .flexi_buttons button:not(.btn):hover {
 	width: 100%;
 	display: block;
 }
+body .alert.fcpadded {
+	padding: 4px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	box-sizing: border-box;
+	float: left;
+	clear: both;
+}
+body .control-group .alert.fcpadded,
+.control-group .fcsep_level0,
+.control-group .fcsep_level1,
+.control-group .fcsep_level2,
+.control-group .fcsep_level3,
+.control-group .fcsep_level4 {
+	float: left;
+	margin-bottom: -3px;
+}
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
@@ -429,44 +453,38 @@ table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
 fieldset:nth-child(1) > .fcsep_level0,
 fieldset:nth-child(1) > .fcsep_level1,
+fieldset:nth-child(1) > .fcsep_level2,
 .container_fcfield:nth-child(1) > .fcsep_level0,
 .container_fcfield:nth-child(1) > .fcsep_level1,
+.container_fcfield:nth-child(1) > .fcsep_level2,
 li:first-child .fcsep_level0,
 li:first-child .fcsep_level1,
 li:first-child .fcsep_level2,
-.fc-nomargin > .fcsep_level0,
-.fc-nomargin > .fcsep_level1,
-.fc-nomargin > .fcsep_level2 {
-	margin-top: 8px !important;
+h3:first-child + .fcsep_level0,
+h3:first-child + .fcsep_level1,
+h3:first-child + .fcsep_level2,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2 {
+	margin-top: 4px !important;
 }
+.fcsep_level0.fc-nomargin,
+.fcsep_level1.fc-nomargin,
+.fcsep_level2.fc-nomargin,
 .fc-nomargin > .fcsep_level0,
 .fc-nomargin > .fcsep_level1,
 .fc-nomargin > .fcsep_level2 {
-	margin-top: 0.8em !important;
+	margin-top: 4px !important;
 }
 .fcsep_level0.fc-ngmargin,
 .fcsep_level1.fc-ngmargin,
 .fcsep_level2.fc-ngmargin {
 	margin-top: -12px !important;
 }
-div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
-div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
-div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2 {
-	margin-top: 12px;
-}
 div.control-group:first-of-type > div > .fcsep_level0,
 div.control-group:first-of-type > div > .fcsep_level1,
 div.control-group:first-of-type > div > .fcsep_level2 {
 	margin-top: 0px;
-}
-body .alert.fcpadded {
-	padding: 4px;
-	margin: 4px 48px 2px;
-	box-sizing: border-box;
-	max-width: 92%;
-}
-body .alert.fcinlineblock {
-	display: inline-block;
 }
 body .nowrap_hidden {
 	display: block;
@@ -496,17 +514,6 @@ body .nowrap_hidden {
 	width: unset;
 	min-width: 80%;
 	max-width: unset;
-}
-.control-label {
-	clear: left;
-	float: left;
-	min-width: 120px;
-	text-align: right;
-	padding: 4px 16px 4px 2px;
-}
-.control-label .label {
-	width: auto;
-	display: inline-block;
 }
 .flexicontent iframe.seamless {
 	background-color: transparent;
