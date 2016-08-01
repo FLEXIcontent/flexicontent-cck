@@ -371,7 +371,7 @@ div .flexi_buttons button:not(.btn):hover {
 	background-color: #0066AA;
 	color: white;
 	padding: 0.8em 1%;
-	margin: 48px 0% 2px 0%;
+	margin: 48px 0% 4px 0%;
 	width: 98%;
 	font-weight: bold;
 }
@@ -379,7 +379,7 @@ div .flexi_buttons button:not(.btn):hover {
 	background-color: #2096C9;
 	color: white;
 	padding: 0.8em 1%;
-	margin: 20px 0% 2px 0%;
+	margin: 20px 0% 4px 0%;
 	width: 98%;
 	font-weight: bold;
 }
@@ -387,7 +387,7 @@ div .flexi_buttons button:not(.btn):hover {
 	background-color: #7fc1ff;
 	color: #3a57ad;
 	padding: 0.4em 1%;
-	margin: 4px 0% 2px 0%;
+	margin: 4px 0% 3px 0%;
 	width: 98%;
 }
 .fcsep_level3 {
@@ -395,7 +395,7 @@ div .flexi_buttons button:not(.btn):hover {
 	border: 1px solid #96c7ef;
 	color: #3a579d;
 	padding: 0.3em 2em;
-	margin: 4px 5% 1px;
+	margin: 4px 5% 3px;
 	width: auto;
 }
 .fcsep_level4 {
@@ -406,12 +406,19 @@ div .flexi_buttons button:not(.btn):hover {
 	font-style: italic;
 	font-size: 12px;
 	border: 1px solid #777;
-	padding: 2px 16px 2px 16px !important;
-	margin: 5px 10% 1px !important;
+	padding: 2px 16px 2px 16px;
+	margin: 5px 10% 2px;
 	display: block;
 	border-radius: 5px;
 	clear: both;
 	max-width: 60%;
+}
+body .fcsep_level4.fc-mssg,
+body .fcsep_level4.fc-mssg-inline,
+body .fcsep_level4.alert,
+body .fcsep_level4.alert.fcpadded {
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 .fcsep_level_br {
 	line-height: 16px;
@@ -421,6 +428,23 @@ div .flexi_buttons button:not(.btn):hover {
 	width: 100%;
 	display: block;
 }
+body .alert.fcpadded {
+	padding: 4px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	box-sizing: border-box;
+	float: left;
+	clear: both;
+}
+body .control-group .alert.fcpadded,
+.control-group .fcsep_level0,
+.control-group .fcsep_level1,
+.control-group .fcsep_level2,
+.control-group .fcsep_level3,
+.control-group .fcsep_level4 {
+	float: left;
+	margin-bottom: -3px;
+}
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
@@ -429,44 +453,38 @@ table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
 fieldset:nth-child(1) > .fcsep_level0,
 fieldset:nth-child(1) > .fcsep_level1,
+fieldset:nth-child(1) > .fcsep_level2,
 .container_fcfield:nth-child(1) > .fcsep_level0,
 .container_fcfield:nth-child(1) > .fcsep_level1,
+.container_fcfield:nth-child(1) > .fcsep_level2,
 li:first-child .fcsep_level0,
 li:first-child .fcsep_level1,
 li:first-child .fcsep_level2,
-.fc-nomargin > .fcsep_level0,
-.fc-nomargin > .fcsep_level1,
-.fc-nomargin > .fcsep_level2 {
-	margin-top: 8px !important;
+h3:first-child + .fcsep_level0,
+h3:first-child + .fcsep_level1,
+h3:first-child + .fcsep_level2,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2 {
+	margin-top: 4px !important;
 }
+.fcsep_level0.fc-nomargin,
+.fcsep_level1.fc-nomargin,
+.fcsep_level2.fc-nomargin,
 .fc-nomargin > .fcsep_level0,
 .fc-nomargin > .fcsep_level1,
 .fc-nomargin > .fcsep_level2 {
-	margin-top: 0.8em !important;
+	margin-top: 4px !important;
 }
 .fcsep_level0.fc-ngmargin,
 .fcsep_level1.fc-ngmargin,
 .fcsep_level2.fc-ngmargin {
 	margin-top: -12px !important;
 }
-div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
-div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
-div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2 {
-	margin-top: 12px;
-}
 div.control-group:first-of-type > div > .fcsep_level0,
 div.control-group:first-of-type > div > .fcsep_level1,
 div.control-group:first-of-type > div > .fcsep_level2 {
 	margin-top: 0px;
-}
-body .alert.fcpadded {
-	padding: 4px;
-	margin: 4px 48px 2px;
-	box-sizing: border-box;
-	max-width: 92%;
-}
-body .alert.fcinlineblock {
-	display: inline-block;
 }
 body .nowrap_hidden {
 	display: block;
@@ -496,17 +514,6 @@ body .nowrap_hidden {
 	width: unset;
 	min-width: 80%;
 	max-width: unset;
-}
-.control-label {
-	clear: left;
-	float: left;
-	min-width: 120px;
-	text-align: right;
-	padding: 4px 16px 4px 2px;
-}
-.control-label .label {
-	width: auto;
-	display: inline-block;
 }
 .flexicontent iframe.seamless {
 	background-color: transparent;
@@ -1441,6 +1448,7 @@ div#tags #input_new_tag {
 	border-radius: 4px;
 	background: #fff;
 	margin: 0px 4px 4px 0px;
+	padding: 0 0 0 8px;
 	float: left;
 	min-width: 16px;
 	min-height: 24px;
@@ -1585,16 +1593,19 @@ div label.lang_box img {
 		margin-left: 32px;
 	}
 }
+body .controls .btn-group.btn-group-yesno .btn,
+body .btn-group.btn-group-yesno .btn,
 body .btn-group.group-fcinfo .btn,
 body .btn-group.group-fcprimary .btn,
-body .btn-group.group-fcinfo .btn,
+body .btn-group.group-fcsuccess .btn,
 body .btn-group.group-fcwarning .btn,
-body .btn-group.group-fcmethod .btn {
-	min-width: 84px;
+body .btn-group.group-fcmethod .btn,
+body .btn-group input[value=""]:first-of-type + label.btn {
+	min-width: 64px;
 }
 body .btn-group.group-fcinfo .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn:not(.btn-primary),
-body .btn-group.group-fcinfo .btn:not(.btn-primary),
+body .btn-group.group-fcsuccess .btn:not(.btn-primary),
 body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #333;
@@ -1637,6 +1648,7 @@ body .btn-group.group-fcwarning .btn.active:not(.btn-primary) {
 	background-color: #faa732;
 	border-color: #f89406 #f89406 #ad6704;
 }
+body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary):first-of-type {
 	background-color: #942a25;
 	border-color: #942a25 #942a25 #802420;
@@ -1645,6 +1657,7 @@ body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary) {
 	background-color: #378137;
 	border-color: #378137 #378137 #204b20;
 }
+body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444;
 	border-color: #444 #444 #333;
@@ -1653,6 +1666,7 @@ body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary) {
 	background-color: #378137;
 	border-color: #378137 #378137 #204b20;
 }
+body .btn-group.group-fcmethod input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444;
 	border-color: #444 #444 #333;
@@ -1660,6 +1674,9 @@ body .btn-group.group-fcmethod .btn.active:not(.btn-primary):first-of-type {
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 	background-color: #faa732;
 	border-color: #f89406 #f89406 #ad6704;
+}
+body .group-fcset {
+	border-width: 0px;
 }
 body .group-fcset.fc-cleared.radio,
 body .group-fcset.fc-cleared.fc_input_set {
@@ -1696,6 +1713,14 @@ body .group-fcset.fc_input_set.fc-aligned-150 > div {
 body .group-fcset.fc_input_set.fc-aligned-100 > div {
 	min-width: 150px !important;
 }
+body input.fc_hidden_value {
+	width: 0 !important;
+	height: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	display: inline-block;
+}
+#flexicontent form div fieldset.panelform > fieldset,
 #flexicontent form div fieldset.panelform > div.input-append,
 #flexicontent form div fieldset.panelform > div.input-prepend,
 #flexicontent form div fieldset.panelform > div.btn-group,
@@ -1706,6 +1731,7 @@ body .group-fcset.fc_input_set.fc-aligned-100 > div {
 #flexicontent form div fieldset.panelform > select,
 #flexicontent form div fieldset.panelform > img,
 #flexicontent form div fieldset.panelform > span,
+form div.container_fcfield > fieldset,
 form div.container_fcfield > div.input-append,
 form div.container_fcfield > div.input-prepend,
 form div.container_fcfield > div.btn-group,
@@ -1738,10 +1764,17 @@ form div.container_fcfield > select {
 	margin-left: 0px;
 }
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
+#flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
 #flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input,
-#flexicontent div fieldset.panelform textarea {
+#flexicontent div fieldset.panelform :not(.container_fcfield) textarea {
 	min-width: 60%;
-	width: 72%;
+	max-width: 81%;
+	box-sizing: border-box;
+	display: inline-block;
+	margin-left: 0;
+	margin-right: 0;
+	line-height: unset;
+	height: unset;
 }
 div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"],
 div fieldset td textarea {
@@ -1820,9 +1853,6 @@ table.adminform td #search {
 	margin: auto;
 	padding: auto;
 }
-#flexicontent .pane-sliders .group-rules label.hasTip {
-	width: auto;
-}
 #flexicontent .flexi_params > label,
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
@@ -1842,7 +1872,7 @@ table.adminform td #search {
 	float: left;
 	clear: left;
 	margin: 2px 1% 3px 0% !important;
-	padding: 8px 8px 8px 8px !important;
+	padding: 8px !important;
 	box-sizing: border-box;
 }
 body .label-fcouter,
@@ -1864,10 +1894,10 @@ body .label-fcinner,
 	min-width: 90px;
 	width: 100%;
 	float: right;
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
 	border: 0px solid !important;
 	margin: 0 !important;
-	padding: 8px 8px 8px 8px !important;
+	padding: 8px !important;
 	box-sizing: border-box;
 	white-space: normal !important;
 }
@@ -2427,6 +2457,90 @@ table.fc-form-tbl td.data {
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
+}
+body .popover-title {
+	font-weight: bold;
+}
+body .popover.right .arrow::after {
+	border-right-color: #333;
+}
+body .popover .arrow::after {
+	border-width: 0;
+}
+div.pane-sliders ul.adminformlist li select {
+	margin-bottom: 0px;
+}
+div.pane-sliders ul.adminformlist li fieldset {
+	margin: 0;
+	padding: 0;
+}
+div.current ul.config-option-list li .fcsep_level3 {
+	left: 232px !important;
+}
+div.current ul.config-option-list li select {
+	margin-bottom: 0px;
+	font-size: 12px;
+}
+div.current ul.config-option-list li fieldset {
+	margin: 0;
+	padding: 0;
+}
+*:not(.form-vertical) > div.control-group {
+	margin-bottom: 2px;
+}
+fieldset.form-vertical div.control-group {
+	margin-bottom: 8px;
+}
+*:not(.form-vertical) > div.control-group div.control-label,
+div.current ul.config-option-list li {
+	margin: 0 8px 0 0 !important;
+	padding: 0 !important;
+	max-width: 160px;
+	min-width: 120px;
+	width: 15%;
+	border: 0;
+}
+*:not(.form-vertical) > div.control-group div.control-label label.hasPopover,
+*:not(.form-vertical) > div.control-group div.control-label label.hasTooltip,
+div.current ul.config-option-list li label.hasPopover,
+div.current ul.config-option-list li label.hasTooltip {
+	color: white;
+	background-color: #999;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: right;
+	min-width: 90px;
+	margin: 0px 4% 3px 0 !important;
+	width: 96%;
+	float: right;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+	border: 0px solid;
+	padding: 8px !important;
+	box-sizing: border-box;
+	white-space: normal;
+	display: inline-block;
+	border-radius: 3px;
+}
+*:not(.form-vertical) > div.control-group div.controls {
+	min-width: 60%;
+	max-width: 81%;
+	box-sizing: border-box;
+	display: inline-block;
+	line-height: unset;
+	height: unset;
+	padding: 0px !important;
+	margin: 0px !important;
+}
+*:not(.form-vertical) > .control-label {
+	clear: left;
+	float: left;
+	min-width: 120px;
+	text-align: right;
+	padding: 4px 16px 4px 2px;
+}
+*:not(.form-vertical) > .control-label .label {
+	width: auto;
+	display: inline-block;
 }
 hr.fcclearline {
 	border: 0;
