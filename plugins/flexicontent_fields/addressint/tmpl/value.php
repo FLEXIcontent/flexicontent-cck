@@ -45,6 +45,8 @@ $map_height = (int) $field->parameters->get('map_height',150);
 $field_prefix = $field->parameters->get('field_prefix','');
 $field_suffix = $field->parameters->get('field_suffix','');
 
+$style = $field->parameters->get('style','');
+
 $list_states = array(
 	'AL'=>'Alabama',
 	'AK'=>'Alaska',
@@ -259,6 +261,7 @@ foreach ($this->values as $n => $value)
 					scaleControl: false,
 					streetViewControl: false,
 					rotateControl: false,
+                    styles: '.$style.', 
 				});
 				
 				var myInfoWindow = new google.maps.InfoWindow({
