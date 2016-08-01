@@ -787,17 +787,17 @@ class FlexicontentViewItem extends JViewLegacy
 		// Handle Template related work
 		// ****************************
 
-		// (a) Get the item layouts
-		$themes			= flexicontent_tmpl::getTemplates();
-		$tmpls_all	= $themes->items;
-
-		// (b) Get Content Type allowed templates
+		// (a) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
 
-		// (c) Load language file of currently selected template
+		// (b) Load language file of currently selected template
 		$_ilayout = $item->itemparams->get('ilayout', $type_default_layout);
 		if ($_ilayout) FLEXIUtilities::loadTemplateLanguageFile( $_ilayout );
+
+		// (c) Get the item layouts, checking template of current layout for modifications
+		$themes			= flexicontent_tmpl::getTemplates($_ilayout);
+		$tmpls_all	= $themes->items;
 
 		// (d) Get allowed layouts adding default layout (unless all templates are already allowed ... array is empty)
 		if ( empty($allowed_tmpls) ) {

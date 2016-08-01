@@ -130,7 +130,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="default_searchphrase" type="radio" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="usesearch btn-group btn-fcinfo">
+			<field name="default_searchphrase" type="radio" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="usesearch btn-group group-fcinfo">
 				<option value="all">FLEXI_ALL_WORDS</option>
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>

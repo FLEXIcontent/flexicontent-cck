@@ -155,7 +155,7 @@ function delAllFilters() {
 			<td align="left" class="col_title">
 				<?php if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>
 				
-				<a style="cursor:pointer" onclick="window.parent.qfSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+				<a style="cursor:pointer" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 			</td>

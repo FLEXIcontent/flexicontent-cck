@@ -796,8 +796,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="cats_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="confpercat cat_image"/>
-			<field name="cats_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="confpercat cat_image" />
+			<field name="cats_image_width" type="text" size="5" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="confpercat cat_image"/>
+			<field name="cats_image_height" type="text" size="5" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="confpercat cat_image" />
 			
 		 <field name="" type="separator" default="FLEXI_CURRCAT" level="level1" class="confpercat" />
 		 
@@ -861,8 +861,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="currcat_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="confpercat currcat currcat_image btn-group btn-group-yesno"/>
-			<field name="currcat_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="confpercat currcat currcat_image btn-group btn-group-yesno"/>
+			<field name="currcat_image_width" type="text" size="5" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="confpercat currcat currcat_image btn-group btn-group-yesno"/>
+			<field name="currcat_image_height" type="text" size="5" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="confpercat currcat currcat_image btn-group btn-group-yesno"/>
 		</fieldset>
 			
 		<fieldset name="FLEXI_SPECIAL_LISTS_AND_INFO" label="FLEXI_SPECIAL_LISTS_AND_INFO" description="FLEXI_SPECIAL_LISTS_AND_INFO_DESC">

@@ -98,8 +98,8 @@
 				<option value="m" show_list="" hide_list="image_params">FLEXI_MEDIUM</option>
 				<option value="l" show_list="" hide_list="image_params">FLEXI_LARGE</option>
 			</field>
-			<field name="image_width" type="text" size="4" default="90" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="display_images image_params" />
-			<field name="image_height" type="text" size="4" default="90" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="display_images image_params" />
+			<field name="image_width" type="text" size="5" default="90" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="display_images image_params" />
+			<field name="image_height" type="text" size="5" default="90" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="display_images image_params" />
 			<field name="image_method" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="display_images image_params btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
@@ -139,7 +139,7 @@
 			</field>
 			
 			<field name="" type="separator" hr="false" default="SEO" level="level1" />
-			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

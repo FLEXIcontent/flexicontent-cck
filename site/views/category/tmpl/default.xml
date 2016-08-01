@@ -53,7 +53,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_feed_link" type="radio" default="" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC" class="btn-group btn-group-yesno">
+			<field name="show_feed_link" type="radio" default="" label="FLEXI_FEED_HEAD_LINK" description="FLEXI_FEED_HEAD_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -122,8 +122,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="cat_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="cat_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="cat_image_width" type="text" size="5" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="cat_image_height" type="text" size="5" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
 			<field name="sep_cat_descr" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description" type="radio" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
@@ -207,8 +207,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="subcat_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="subcat_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="subcat_image_width" type="text" size="5" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="subcat_image_height" type="text" size="5" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
 			<field name="sep_subcats_descr" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description_subcat" type="radio" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
@@ -218,7 +218,7 @@
 			</field>
 			<field name="description_cut_text_subcat" type="text" class="input-xxlarge" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			
-			<field name="sep_subcats_enclosers" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level1" />
+			<field name="sep_subcats_enclosers" type="separator" default="FLEXI_CATEGORY_LIST_ENCLOSING" level="level1" />
 			<field name="subcat_pretext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
 			<field name="subcat_posttext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
 			<field name="subcat_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
@@ -303,8 +303,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="peercat_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="peercat_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="peercat_image_width" type="text" size="5" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="peercat_image_height" type="text" size="5" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
 			<field name="sep_peercats_descr" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description_peercat" type="radio" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
@@ -314,7 +314,7 @@
 			</field>
 			<field name="description_cut_text_peercat" type="text" class="input-xxlarge" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			
-			<field name="sep_peercats_enclosers" type="separator" default="FLEXI_PEERCATEGORY_ENCLOSING" level="level1" />
+			<field name="sep_peercats_enclosers" type="separator" default="FLEXI_CATEGORY_LIST_ENCLOSING" level="level1" />
 			<field name="peercat_pretext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
 			<field name="peercat_posttext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
 			<field name="peercat_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
@@ -432,7 +432,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="default_searchphrase" type="radio" default="" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="btn-group btn-fcinfo">
+			<field name="default_searchphrase" type="radio" default="" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="all">FLEXI_ALL_WORDS</option>
 				<option value="any">FLEXI_ANY_WORDS</option>
@@ -501,13 +501,13 @@
 			<field name="addbutton_menu_itemid" type="menuitem" default="" label="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM" description="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 			</field>
-			<field name="show_editbutton_lists" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+			<field name="show_editbutton_lists" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_LINK_TO_FE</option>
 				<option value="2">FLEXI_LINK_TO_BE</option>
 			</field>
-			<field name="show_deletebutton_lists" type="radio" default="" label="FLEXI_SHOW_DELETE_BUTTON_IN_LISTS" description="FLEXI_SHOW_DELETE_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+			<field name="show_deletebutton_lists" type="radio" default="" label="FLEXI_SHOW_DELETE_BUTTON" description="FLEXI_SHOW_DELETE_BUTTON" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -517,12 +517,12 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_title_lists" type="radio" default="" label="FLEXI_SHOWTITLE_IN_LISTS" description="FLEXI_SHOWTITLE_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+			<field name="show_title_lists" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="link_titles_lists" type="radio" default="" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+			<field name="link_titles_lists" type="radio" default="" label="FLEXI_LINKED_TITLES" description="FLEXI_LINKED_TITLES" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -798,16 +798,16 @@
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
-			<field name="feed_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="feed_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="feed_image_width" type="text" size="5" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="feed_image_height" type="text" size="5" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="feed_image_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			
-			<field name="sep_rss_custom_fields" type="separator" default="FLEXI_DISPLAY_CUSTOM_FIELDS" description="FLEXI_DISPLAY_CUSTOM_FIELDS_DESC" level="level1" menu="hide" />
-			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="FLEXI_DISPLAY_CUSTOM_FIELDS_LIST" description="FLEXI_DISPLAY_CUSTOM_FIELDS_LIST_DESC" />
+			<field name="sep_rss_custom_fields" type="separator" default="FLEXI_RSS_CUSTOM_FIELDS" description="FLEXI_RSS_CUSTOM_FIELDS_DESC" level="level1" menu="hide" />
+			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="FLEXI_RSS_CUSTOM_FIELDS_LIST" description="FLEXI_RSS_CUSTOM_FIELDS_LIST_DESC" />
 			
 			<field name="sep_rss_order_1st" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="feed_orderby" type="fcordering" default="" add_global="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"
@@ -867,8 +867,8 @@
 		
 		<fieldset name="cat_seo" label="FLEXI_PARAMS_CAT_SEO" addfieldpath="/administrator/components/com_flexicontent/elements" >
 			
-			<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST_FALLBACK" description="FLEXI_MICRODATA_ITEMTYPE_LIST_FALLBACK_DESC" class="use_select2_lib" />
-			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
+			<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST" description="FLEXI_MICRODATA_ITEMTYPE_LIST_DESC" class="use_select2_lib" />
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

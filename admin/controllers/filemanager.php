@@ -401,14 +401,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
 		
-		$return		= $jinput->get( 'return-url', null, 'base64' );
-		$filename	= $jinput->get( 'file-url-data', null, 'string');
-		$filename = flexicontent_html::dataFilter($filename, 4000, 'URL', 0);  // Clean bad text/html
-		$altname	= $jinput->get( 'file-url-title', null, 'string' );
-		$ext			= $jinput->get( 'file-url-ext', null, 'alnum' );
-		$filedesc	= $jinput->get( 'file-url-desc', '');  // Default filtering
-		$filelang	= $jinput->get( 'file-url-lang', '*', 'string');
-		$filesize	= $jinput->get( 'file-url-size', 0, 'int');
+		$return   = $jinput->get( 'return-url', null, 'base64' );
+		$filename = $jinput->get( 'file-url-data', null, 'string');
+		$filename = flexicontent_html::dataFilter($filename, 4000, 'URL', 0);  // Validate file URL
+		$altname  = $jinput->get( 'file-url-title', null, 'string' );
+		$ext      = $jinput->get( 'file-url-ext', null, 'alnum' );
+		$filedesc = $jinput->get( 'file-url-desc', '');  // Default filtering
+		$filelang = $jinput->get( 'file-url-lang', '*', 'string');
+		$filesize = $jinput->get( 'file-url-size', 0, 'int');
 		$size_unit= $jinput->get( 'size_unit', 'KBs', 'cmd');
 
 		jimport('joomla.utilities.date');
@@ -801,7 +801,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 		else
 		{
-			
 			// Get file size from submitted field (file URL)
 			$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
 			$size_unit = (int) @ $arr_sizes[$data['size_unit']];
@@ -810,7 +809,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			else
 				$data['size'] = 0;
 
-			// Validate file link
+		  // Validate file URL
 			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
 		}
 

@@ -92,8 +92,8 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 		$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 		$editbutton = flexicontent_html::editbutton( $item, $this->params );
-		$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 		$statebutton = flexicontent_html::statebutton( $item, $this->params );
+		$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 		$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 		?>
 		

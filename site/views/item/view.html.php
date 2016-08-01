@@ -59,6 +59,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
 		$app      = JFactory::getApplication();
+		$jinput   = JFactory::getApplication()->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
@@ -311,7 +312,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Do some compatibility steps, Set the view and option to 'article' and 'com_content'
 		JRequest::setVar('view', 'article');
 		JRequest::setVar('option', 'com_content');
-		JRequest::setVar("isflexicontent", "yes");
+		JRequest::setVar('isflexicontent', 'yes');
+		$jinput->set('view', 'article');
+		$jinput->set('option', 'com_content');
+		$jinput->set('isflexicontent', 'yes');
+
 		$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
 
 		// These events return text that could be displayed at appropriate positions by our templates
@@ -329,6 +334,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
 		JRequest::setVar('view', FLEXI_ITEMVIEW);
 		JRequest::setVar('option', 'com_flexicontent');
+		$jinput->set('view', FLEXI_ITEMVIEW);
+		$jinput->set('option', 'com_flexicontent');
 
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );
@@ -471,13 +478,17 @@ class FlexicontentViewItem  extends JViewLegacy
 		$jdata = $app->getUserState('com_flexicontent.edit.item.data');   //print_r($jdata);
 		if (!empty($jdata['type_id']) )
 		{
-			JRequest::setVar('typeid', (int)$jdata['type_id']);  // This also forces zero if value not set
+			// This also forces zero if value not set
+			JRequest::setVar('typeid', (int)$jdata['type_id']);
+			JFactory::getApplication()->input->set('typeid', (int)$jdata['type_id']);
 		}
 		
 		// Try type from active menu
 		else if ( $menu && isset($menu->query['typeid']) )
 		{
-			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
+			// This also forces zero if value not set
+			JRequest::setVar('typeid', (int)$menu->query['typeid']);
+			JFactory::getApplication()->input->set('typeid', (int)$menu->query['typeid']);
 		}
 		
 		// NOTE about -new_typeid-, this is it used only for CREATING new item (ignored for EDIT existing item)
@@ -500,6 +511,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				$new_typeid = $single_type->id;
 			}
 			JRequest::setVar('typeid', $new_typeid);
+			JFactory::getApplication()->input->set('typeid', $new_typeid);
 			$canCreateType = true;
 		}
 		
@@ -597,9 +609,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 		
 		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
-		FLEXI_J30GE ?
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH) :
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j25.css', FLEXI_VHASH) ;
+		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		// Add js function to overload the joomla submitform
 		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
@@ -630,8 +640,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			$unique_tmp_itemid = $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
-		//print_r($unique_tmp_itemid);
-		JRequest::setVar( 'unique_tmp_itemid', $unique_tmp_itemid );
+		JRequest::setVar('unique_tmp_itemid', $unique_tmp_itemid);
+		JFactory::getApplication()->input->set('unique_tmp_itemid', $unique_tmp_itemid);
 		
 		// Component / Menu Item parameters
 		$allowunauthorize   = $params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content
@@ -662,7 +672,7 @@ class FlexicontentViewItem  extends JViewLegacy
 					$label_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 					$label_tooltip = flexicontent_html::getToolTip(null, 'FLEXI_CAPTCHA_ENTER_CODE_DESC', 1, 1);
 					$captcha_field = '
-						<label id="'.$c_name.'-lbl" for="'.$c_name.'" class="'.$label_class.'" title="'.$label_tooltip.'" >
+						<label id="'.$c_name.'-lbl" data-for="'.$c_name.'" class="'.$label_class.'" title="'.$label_tooltip.'" >
 						'. JText::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
 						</label>
 						<div id="container_fcfield_'.$c_plugin.'" class="container_fcfield container_fcfield_name_'.$c_plugin.'">

@@ -20,9 +20,15 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 $this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
 $this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+$js = "
+	jQuery(document).ready(function(){
+		fc_bindFormDependencies('#flexicontent', 0, '');
+	});
+";
+$this->document->addScriptDeclaration($js);
 ?>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	/*jQuery(document).ready(function() {
 		jQuery('input[type=password]').each(function() {
 			jQuery(this).val('');
