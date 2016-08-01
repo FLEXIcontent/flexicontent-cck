@@ -25,6 +25,7 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
+
 jimport('joomla.form.field');  // JFormField
 jimport('joomla.form.helper'); // JFormHelper
 
@@ -333,7 +334,7 @@ class JFormFieldFields extends JFormField
 			}
 			$sorter_html .= '
 				</ul>
-				<input type="hidden" value="'.implode(',', $values).'" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" />
+				<input type="text" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" value="'.implode(',', $values).'" class="fc_hidden_value" />
 			</div>
 			<div class="fcclear"></div>';
 			
