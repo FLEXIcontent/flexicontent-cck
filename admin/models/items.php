@@ -153,7 +153,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		// Category filtering
 		$filter_cats        = $fcform ? $jinput->get('filter_cats',        '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_cats',        'filter_cats',       '',  'int' );
-		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
+		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
 		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
 		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering'))
 		{
@@ -582,7 +582,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$filter->parameters->set( 'faceted_filter', 0 );
 			$filter->parameters->set( 'display_filter_as', 0 );
 			$filter->parameters->set( 'display_label_filter', -1 );
-			$filter->parameters->set( 'label_filter_css', 'label label-info' );
+			$filter->parameters->set( 'label_filter_css', 'add-on' );
 			$filter->parameters->set( 'filter_extra_attribs', ' onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ' );
 			
 			// Check for error during getting indexed field elements
