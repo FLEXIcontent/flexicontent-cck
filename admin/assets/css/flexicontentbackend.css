@@ -2835,14 +2835,59 @@ table.adminlist.fcmanlist {
 	padding: 0px;
 	margin: 0px;
 }
+.flexicontent #fc-filters-slide-btn {
+	width: 100%;
+	display: inline-block;
+	box-sizing: border-box;
+	margin: 12px 0 0 0;
+	height: 24px;
+	padding: 4px;
+	float: none;
+	clear: both;
+}
+.flexicontent #fc-filters-box .fc-filter .select2-container .select2-choice {
+	min-width: 39px !important;
+	max-width: 170px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
+	min-width: 40px !important;
+	max-width: 178px !important;
+}
 .flexicontent #fc-filters-box .fc-filter {
-	border: 0px !important;
-	margin: 0px 12px 0px 0;
+	border: 0px solid !important;
+	margin: 4px 2px 4px 2px;
 	padding: 0px !important;
-	vertical-align: baseline !important;
+	vertical-align: top !important;
+	min-width: 326px;
+	min-height: 30px;
+	float: none;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double {
+	min-width: 660px;
+}
+.flexicontent #fc-filters-box .fc-filter #startdate_img,
+.flexicontent #fc-filters-box .fc-filter #enddate_img {
+	padding-left: 2px !important;
+	padding-right: 2px !important;
+}
+#s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
+	width: 106px !important;
+}
+.flexicontent #fc-filters-box .fc-filter #startdate,
+.flexicontent #fc-filters-box .fc-filter #enddate {
+	font-size: 11px !important;
+}
+.flexicontent #fc-filters-box .fc-xpended-row .add-on:first-child {
+	min-width: 130px;
+	max-width: 130px;
 }
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
+	float: left;
+	margin: 0 !important;
+}
+.flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
+	margin: 0 6px 0 2px !important;
 }
 .flexicontent #fc-filters-header .fc-filter .label,
 .flexicontent #fc-filters-box .fc-filter .label {
@@ -2854,7 +2899,7 @@ table.adminlist.fcmanlist {
 	display: inline-block;
 	margin: 3px 0 7px;
 }
-.flexicontent #fc-filters-box input[type="text"] {
+.flexicontent #fc-filters-box *:not(.input-append):not(.input-prepend) > input[type="text"] {
 	padding: 2px 2px 3px !important;
 	margin: 0px !important;
 }
@@ -2865,7 +2910,6 @@ table.adminlist.fcmanlist {
 .flexicontent #fc-filters-box .input-prepend input,
 .flexicontent #fc-filters-box .input-append input {
 	margin: 0 !important;
-	padding: 4px !important;
 }
 .flexicontent #stateGroupsBox input:checked + label {
 	color: #8B0000;
