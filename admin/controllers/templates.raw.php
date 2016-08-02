@@ -54,6 +54,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+		}
+
 		$source 		= JRequest::getCmd('source');
 		$dest 			= JRequest::getCmd('dest');
 		
@@ -80,8 +86,14 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-		$dir = JRequest::getCmd('dir');
 
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+		}
+
+		$dir = JRequest::getCmd('dir');
 		$model = $this->getModel('templates');
 		
 		if (!$model->delete($dir)) {
@@ -106,6 +118,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	 */
 	function getlayoutparams()
 	{
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+		}
+
 		jimport('joomla.filesystem.file');
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -306,6 +324,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 
 	function loadlayoutfile()
 	{
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+		}
+
 		jimport('joomla.filesystem.file');
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -396,6 +420,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	
 	function savelayoutfile()
 	{
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+		}
+
 		jimport('joomla.filesystem.file');
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();

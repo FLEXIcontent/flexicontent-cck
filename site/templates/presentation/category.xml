@@ -66,7 +66,7 @@
 			<field name="bottom_tab11_label" type="text" default="" label="Label for Tab 11" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="bottom_tab12_label" type="text" default="" label="Label for Tab 12" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			
-			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
+			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" />
 			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_XHTML</option>

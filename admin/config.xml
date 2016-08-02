@@ -273,11 +273,21 @@
 		<field name="" type="separator" default="FLEXI_LISTS_HEADER_CONF" level="tabset_start" box_type="1" remove_boxes="2" class="fcparams_tabset" />
 		<field name="" type="separator" default="FLEXI_BUTTONS" icon_class="icon-menu-3" level="tab_open" box_type="1" remove_boxes="2" />
 			
-			<field name="" type="separator" default="FLEXI_CONFIGURE_AT_TOP_LEVEL_TAB" level="level3" value_printf="FLEXI_BUTTONS" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_CONFIGURE_MORE_BUTTONS_AT_TOP_LEVEL_TAB" level="level3" value_printf="FLEXI_BUTTONS" class="alert alert-info fcpadded" />
 			
+			<field name="" type="separator" default="FLEXI_ADD_NEW_ITEM_BUTTON" level="level3" />
+			<field name="show_addbutton" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_ADD_NEW_ITEM_BUTTON" description="FLEXI_SHOW_ADD_NEW_ITEM_BUTTON_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_addbtn">FLEXI_HIDE</option>
+				<option value="1" show_list="disp_addbtn" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="addbutton_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" label="FLEXI_ADD_NEW_ITEM_SUBMIT_MENU_ITEM" description="FLEXI_ADD_NEW_ITEM_SUBMIT_MENU_ITEM_DESC" class="disp_addbtn">
+				<option value="">FLEXI_NONE</option>
+			</field>
+
 		<field name="" type="separator" default="FLEXI_PARAMS_CAT_INFORMATION" icon_class="icon-info-circle" level="tab_open" box_type="1" remove_boxes="2" />
 
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" class="fc-nomargin" />
+			<field name="" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_category.php" level="level3" class="alert alert-success fcpadded" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level1" class="fc-nomargin" />
 			<field name="show_cat_title" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" toggle_related="0" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_cat_title">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_cat_title" hide_list="">FLEXI_SHOW</option>
@@ -318,8 +328,9 @@
 
 		<field name="" type="separator" default="FLEXI_PARAMS_SUBCATS_LIST" icon_class="icon-tree-2" level="tab_open" box_type="1" remove_boxes="2" />
 
-			<field name="subcats_list_title" type="separator" default="FLEXI_PARAMS_SUBCATS_INFO_OPTIONS" level="level1" />
-			<field name="about_subcats_layout_file" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_subcategories.php" class="alert alert-info fcpadded" />
+			<field name="about_subcats_layout_file" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_subcategories.php" level="level3" class="alert alert-success fcpadded" />
+			<field name="subcats_list_title" type="separator" default="FLEXI_PARAMS_SUBCATS_INFO_OPTIONS" level="level1" class="fc-nomargin" />
+
 			<field name="show_subcategories" type="multilist" subtype="radio" default="0" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_subcats">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_subcats" hide_list="">FLEXI_SHOW</option>
@@ -382,7 +393,7 @@
 			</field>
 			<field name="description_cut_text_subcat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" class="disp_subcats disp_subcats_desc" />
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_LIST_ENCLOSING" level="level3" class="disp_subcats" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_LIST_ENCLOSING" level="level2" class="disp_subcats" />
 			<field name="show_label_subcats" type="fcradio" default="1" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" class="disp_subcats btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -415,9 +426,10 @@
 			
 
 		<field name="" type="separator" default="FLEXI_PARAMS_PEERCATS_LIST" icon_class="icon-tree-2" level="tab_open" box_type="1" remove_boxes="2" />
-			
-			<field name="peercats_list_title" type="separator" default="FLEXI_PARAMS_PEERCATS_INFO_OPTIONS" level="level1" />
-			<field name="about_peercats_layout_file" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_peercategories.php" class="alert alert-info fcpadded" />
+
+			<field name="about_peercats_layout_file" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_peercategories.php" level="level3" class="alert alert-success fcpadded" />
+			<field name="peercats_list_title" type="separator" default="FLEXI_PARAMS_PEERCATS_INFO_OPTIONS" level="level1" class="fc-nomargin" />
+
 			<field name="show_peercategories" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_PEERCATS" description="FLEXI_SHOW_PEERCATS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_peercats">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_peercats" hide_list="">FLEXI_SHOW</option>
@@ -480,7 +492,7 @@
 			</field>
 			<field name="description_cut_text_peercat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" class="disp_peercats disp_peercats_desc" />
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_LIST_ENCLOSING" level="level3" class="disp_peercats" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_LIST_ENCLOSING" level="level2" class="disp_peercats" />
 			<field name="show_label_peercats" type="fcradio" default="1" label="FLEXI_SHOW_PEERCATS_LABEL" description="FLEXI_SHOW_PEERCATS_LABEL_DESC" class="disp_peercats btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -686,20 +698,16 @@
 
 
 	<field name="" type="separator" default="FLEXI_ITEMS_LIST" icon_class="icon-list" level="tab_open" box_type="1" remove_boxes="2" />
+
+		<field name="" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_items.php" level="level3" class="alert alert-success fcpadded" />
+		<field name="" type="separator" default="" level="level_br" />
+
 	<field name="" type="separator" default="FLEXI_ITEMS_LIST" level="tabset_start" box_type="1" remove_boxes="2" class="fcparams_tabset" />
 
 		<field name="" type="separator" default="FLEXI_ITEMS_BASIC_N_ORDERING" icon_class="icon-file-2" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="" type="separator" default="FLEXI_BASIC_DISPLAY" description="" level="level1" />
 			
-			<field name="show_addbutton" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="disp_addbtn">FLEXI_HIDE</option>
-				<option value="1" show_list="disp_addbtn" hide_list="">FLEXI_SHOW</option>
-			</field>
-			<field name="addbutton_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" label="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM" description="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM_DESC" class="disp_addbtn">
-				<option value="">FLEXI_NONE</option>
-			</field>
-
 			<field name="" type="separator" default="FLEXI_ABOUT_PER_ITEM_LISTS_SETTINGS_INFO" description="" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="show_editbutton_lists" type="fcradio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" class="btn-group btn-group-yesno">

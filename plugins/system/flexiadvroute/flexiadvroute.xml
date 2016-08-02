@@ -21,7 +21,7 @@
 	<config>
 	<fields name="params"  addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="basic">
-			<field name="" type="separator" default="Hide categories" hr="false" level="level2" menu="hide" />
+			<field name="" type="separator" default="Hide categories" hr="false" level="level2" />
 			<field name="" type="separator" default="Hide Categories from Pathway/URLs for Types &lt;small&gt; &lt;br&gt; - These are types that contain content not being a part of structure but rather general information content like site usage instructions or license agreement, etc &lt;/small&gt;" level="level3" class="alert alert-info" />
 			<field name="route_to_type" type="radio" default="0" label="Enable" description="..." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
