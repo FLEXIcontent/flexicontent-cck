@@ -2839,7 +2839,7 @@ table.adminlist.fcmanlist {
 	width: 100%;
 	display: inline-block;
 	box-sizing: border-box;
-	margin: 12px 0 0 0;
+	margin: 8px 0 0 0;
 	height: 24px;
 	padding: 4px;
 	float: none;
@@ -2847,23 +2847,23 @@ table.adminlist.fcmanlist {
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container .select2-choice {
 	min-width: 39px !important;
-	max-width: 170px !important;
+	max-width: 164px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
 	min-width: 40px !important;
-	max-width: 178px !important;
+	max-width: 172px !important;
 }
 .flexicontent #fc-filters-box .fc-filter {
 	border: 0px solid !important;
 	margin: 4px 2px 4px 2px;
 	padding: 0px !important;
 	vertical-align: top !important;
-	min-width: 326px;
+	min-width: 310px;
 	min-height: 30px;
 	float: none;
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
-	min-width: 660px;
+	min-width: 628px;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_img,
 .flexicontent #fc-filters-box .fc-filter #enddate_img {
@@ -2871,15 +2871,17 @@ table.adminlist.fcmanlist {
 	padding-right: 2px !important;
 }
 #s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
-	width: 106px !important;
+	width: 90px !important;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate,
 .flexicontent #fc-filters-box .fc-filter #enddate {
 	font-size: 11px !important;
 }
 .flexicontent #fc-filters-box .fc-xpended-row .add-on:first-child {
-	min-width: 130px;
-	max-width: 130px;
+	min-width: 120px;
+	max-width: 120px;
+	white-space: normal;
+	word-wrap: break-word;
 }
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
