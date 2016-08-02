@@ -114,12 +114,12 @@
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
 		
 		<field name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
-		<field name="comments" type="fcradio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" menu="hide" class="btn-group btn-group-yesno">
+		<field name="comments" type="fcradio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
 			<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>
 		</field>
-		<field name="automatic_pathways" type="fcradio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide" class="btn-group btn-group-yesno">
+		<field name="automatic_pathways" type="fcradio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

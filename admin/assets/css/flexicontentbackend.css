@@ -2554,6 +2554,9 @@ div.current ul.config-option-list li label.hasTooltip {
 .flexicontent [class*=" icon-"] {
 	width: 16px;
 }
+.fc-layout-params-icon:before {
+	color: white !important;
+}
 .fc-rss-params-icon:before {
 	color: yellowgreen !important;
 }

@@ -102,10 +102,14 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	{
 		static $tabset_id = 0;
 		static $tab_id;
+		static $is_fc = null;
 
 		if (self::$css_js_added===null)
 		{
 			$this->add_css_js();
+			
+			$jinput = JFactory::getApplication()->input;
+			$is_fc = $jinput->get('option', '', 'cmd') == 'com_flexicontent';
 		}
 		
 		$node = & $this->element;
@@ -154,7 +158,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 		$icon_class = @$attributes['icon_class'];
 		
-		$box_count = (int) @ $attributes['remove_boxes'];
+		$box_count = @ $attributes['remove_boxes'];
+		$box_count = strlen($box_count) ? (int) $box_count : ($is_fc ? 0 : 2);
 		$_bof = $box_count ? ($box_count == 2 ? '</div></div>' : str_repeat("</div>", $box_count)) : '';
 		$_eof = $box_count ? ($box_count == 2 ? '<div class="fc_empty_box"><div>'   : str_repeat("<div>",  $box_count)) : '';
 

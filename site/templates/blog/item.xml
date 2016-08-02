@@ -67,7 +67,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="Customblocks" type="separator" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" menu="hide" />
+			<field name="Customblocks" type="separator" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" />
 			
 			<field name="columnmode" type="radio" default="" label="FLEXI_COLUMN_MODE" description="FLEXI_COLUMN_MODE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -76,7 +76,7 @@
 				<option value="2">FLEXI_COLUMN_MODE_FORCE_AUTO_COLS</option>
 			</field>
 			
-			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
+			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" />
 			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_XHTML</option>

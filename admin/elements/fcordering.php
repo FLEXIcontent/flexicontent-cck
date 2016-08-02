@@ -68,7 +68,7 @@ class JFormFieldFcordering extends JFormFieldList
 		$is_legacy = !empty($attributes['is_legacy']);
 		$o = $is_legacy ? self::$legacy_names : self::$order_names;
 		
-		$s = !empty($attributes['skip_orders']) ? preg_split("/\s*,\s*/u", $skip_orders) : array();
+		$s = !empty($attributes['skip_orders']) ? preg_split("/\s*,\s*/u", $attributes['skip_orders']) : array();
 		$s = array_flip($s);
 		
 		if ( !empty($attributes['add_global']) )
