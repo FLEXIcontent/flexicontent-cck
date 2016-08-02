@@ -29,7 +29,7 @@
 			<field name="table_row1_bg_color" type="color" cssprep="less" default="#f7f7f7" label="FLEXI_TMPL_TABLE_ROW1_BG" description="FLEXI_TMPL_TABLE_ROW0_BG_DESC" />
 			<field name="table_value_color" type="color" cssprep="less" default="#555555" label="FLEXI_TMPL_TABLE_TEXT_COLOR" description="FLEXI_TMPL_TABLE_TEXT_COLOR_DESC" />
 			
-			<field name="disp_params" type="separator" default="FLEXI_DISPLAY" level="level1" menu="hide" />
+			<field name="disp_params" type="separator" default="FLEXI_DISPLAY" level="level1" />
 			<field name="show_field_labels_row" type="radio" default="" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -47,7 +47,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
+			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" />
 			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_XHTML</option>

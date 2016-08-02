@@ -57,7 +57,15 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-		
+
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent', '');
+			return;
+		}
+
 		$post   = JRequest::get( 'post' );
 		$task   = JRequest::getVar('task');
 		$type   = JRequest::getVar('type',  'items', '', 'word');
@@ -110,6 +118,14 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+
+		// check access
+		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent', '');
+			return;
+		}
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=templates' );
 	}
