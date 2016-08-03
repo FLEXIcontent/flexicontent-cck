@@ -17,11 +17,16 @@ foreach ($values as $value)
 	$value['url']  = @ $value['url'];
 	$value['zoom'] = @ $value['zoom'];
 	$value['name'] = @ $value['name'];
+	$value['addr1'] = @ $value['addr1'];
 	$value['addr2'] = @ $value['addr2'];
 	$value['addr3'] = @ $value['addr3'];
 	$value['state']    = @ $value['state'];
 	$value['province'] = @ $value['province'];
+	$value['city']  = @ $value['city'];
 	$value['country']  = @ $value['country'];
+	$value['zip']  = @ $value['zip'];
+	$value['lat'] = @ $value['lat'];
+	$value['lon'] = @ $value['lon'];
 	
 	$is_empty = !$value['lat'] && !$value['lon'];
 	

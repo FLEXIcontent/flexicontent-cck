@@ -412,9 +412,9 @@ class FlexicontentViewItems extends JViewLegacy
 				'.JText::sprintf('FLEXI_ABOUT_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', $conf_link).'<br/><br/>
 				<sup>[1]</sup> ' . JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT') . '<br />
 				<sup>[2]</sup> ' . JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max) . '<br />
-				<?php if ( $useAssocs )	:?>
+				'.( $useAssocs ? '
 				<sup>[3]</sup> ' . JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION') . '<br />
-				<?php endif;?>
+				' : '').'
 				<sup>[4]</sup> ' . JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS') . '<br />
 			</div>
 		';
@@ -446,7 +446,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$states[] = JHTML::_('select.optgroup', '' );
 
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHTML::_('select.genericlist', $states, 'filter_state[]', 'class="use_select2_lib fcfilter_be" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+			JHTML::_('select.genericlist', $states, 'filter_state[]', 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
 			//JHTML::_('grid.state', $filter_state );
 		
 		// build filter state group
@@ -506,11 +506,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
 		}
 
-		$_img_title = JText::_('FLEXI_LIST_ITEMS_IN_CATS', true);
-		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true);
-		$_tooltip = ' class="add-on icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title_desc, 0, 1).'" ';
-		$catsinstate_attrs = ' alt="'.$_img_title_desc.'" '.$_tooltip.' ';
-
+		$catsinstate_attrs = ' class="add-on icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_LIST_ITEMS_IN_CATS', true), JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true), 0, 1).'" ';
 		$lists['filter_catsinstate'] = ($filter_catsinstate || 1 ? '<div '.$catsinstate_attrs.'>&nbsp;'.JText::_('FLEXI_IN_CAT_STATE').'</div>' : '').
 			JHTML::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib'.($filter_catsinstate!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
 		//$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
@@ -534,11 +530,11 @@ class FlexicontentViewItems extends JViewLegacy
 
 		//build type select list
 		$lists['filter_type'] = ($filter_type || 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
-			flexicontent_html::buildtypesselect($types, 'filter_type[]', $filter_type, 0/*'-'*//*true*/, 'class="use_select2_lib fcfilter_be" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
+			flexicontent_html::buildtypesselect($types, 'filter_type[]', $filter_type, 0/*'-'*//*true*/, 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
 
 		//build authors select list
 		$lists['filter_author'] = ($filter_author || 1 ? '<div class="add-on">'.JText::_('FLEXI_AUTHOR').'</div>' : '').
-			flexicontent_html::buildauthorsselect($authors, 'filter_author[]', $filter_author, 0/*'-'*//*true*/, 'class="use_select2_lib fcfilter_be" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"');
+			flexicontent_html::buildauthorsselect($authors, 'filter_author[]', $filter_author, 0/*'-'*//*true*/, 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"');
 
 		if ($badcatitems) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="use_select2_lib"', false, false);
 		
@@ -612,11 +608,11 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		//build tags filter
 		$lists['filter_tag'] = ($filter_tag || 1 ? '<div class="add-on">'.JText::_('FLEXI_TAG').'</div>' : '').
-			flexicontent_html::buildtagsselect('filter_tag[]', 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple" size="3" ', $filter_tag, 0);
+			flexicontent_html::buildtagsselect('filter_tag[]', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple" size="3" ', $filter_tag, 0);
 
 		//build languages filter
 		$lists['filter_lang'] = ($filter_lang || 1 ? '<div class="add-on">'.JText::_('FLEXI_LANGUAGE').'</div>' : '').
-			flexicontent_html::buildlanguageslist('filter_lang[]', 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple" size="3" ', $filter_lang, 1/*'-'*//*2*/);
+			flexicontent_html::buildlanguageslist('filter_lang[]', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple" size="3" ', $filter_lang, 1/*'-'*//*2*/);
 		
 		// build access level filter
 		$access_levels = JHtml::_('access.assetgroups');
@@ -635,7 +631,7 @@ class FlexicontentViewItems extends JViewLegacy
 		//array_unshift($access_levels, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/) );
 		$fieldname = 'filter_access[]';  // make multivalue
 		$elementid = 'filter_access';
-		$attribs = 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple"';
+		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple"';
 		$lists['filter_access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
 			JHTML::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		

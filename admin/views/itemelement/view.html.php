@@ -113,21 +113,21 @@ class FlexicontentViewItemelement extends JViewLegacy
 		// build the categories select list
 		$categories = $globalcats;
 		$lists['filter_cats'] =  '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>'.
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib fcfilter_be" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
 		
 		
 		// build type select list
 		$lists['filter_type'] = '<label class="label">'.JText::_('FLEXI_TYPE').'</label>'.
 			($assocs_id && !empty($type_data) ?
 				'<span class="badge badge-info">'.$type_data->name.'</span>' :
-				flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib fcfilter_be" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type')
+				flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type')
 			);
 		
 		// build author select list
 		$lists['filter_author'] = '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>'.
 			($assocs_id && $created_by ?
 				'<span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' :
-				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib fcfilter_be" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
+				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
 			);
 
 		// build publication state filter
@@ -140,7 +140,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$states[] = JHtml::_('select.option',  'A', 'FLEXI_ARCHIVED' );
 		
 		$fieldname =  $elementid = 'filter_state';
-		$attribs = ' class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
+		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_state'] = '<label class="label">'.JText::_('FLEXI_STATE').'</label>'.
 			JHTML::_('select.genericlist', $states, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid
 		, $translate=true );
@@ -149,7 +149,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$levels = JHtml::_('access.assetgroups');
 		array_unshift($levels, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_ACCESS'*/));
 		$fieldname =  $elementid = 'filter_access';
-		$attribs = ' class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
+		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_access']	= '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>'.
 			JHTML::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid
 		, $translate=true );
@@ -158,7 +158,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$lists['filter_lang'] = '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>'.
 			($assocs_id && $language ?
 				'<span class="badge badge-info">'.$language.'</span>' :
-				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
+				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
 			);
 		
 		// assign data to template
