@@ -59,7 +59,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent', '');
@@ -120,7 +120,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent', '');
