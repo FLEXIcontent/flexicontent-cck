@@ -280,12 +280,12 @@ div.current dd .pane-sliders .panel {
 }
 
 
+
 /************************************
  * FLEXIcontent backend manager views
  ************************************/
 
 /* rows table */
-
 table.adminlist.fcmanlist {
 	margin-top: 12px;
 }
@@ -294,11 +294,9 @@ table.adminlist.fcmanlist {
 }
 
 
-/* various containers of backend managers */
-
+/* containers */
 .flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
-.flexicontent #stateGroupsBox,
 .flexicontent #itemusage-filters {
 	padding: 4px 8px 4px 4px;
 	margin: 4px 0px;
@@ -308,10 +306,12 @@ table.adminlist.fcmanlist {
 .flexicontent #fc-filters-box {
 	padding-left: 0px;
 }
-.tooltip {
-}
 
-/* text search / pagination line */
+
+
+/********************************************************
+ * Filters header  (Text search / Buttons / Pagination) *
+ ********************************************************/
 
 .flexicontent #fc-filters-header #search {
 	margin: 0px !important;
@@ -328,18 +328,22 @@ table.adminlist.fcmanlist {
 	margin: 2px 32px 6px 0px;
 }
 .flexicontent #fc-filters-header .use_select2_lib {
-	margin-top: 1px !important;
+	margin-top: 2px !important;
+}
+.flexicontent #fc-filters-header .fc-filter .label{
+	font-size: 11px;
+	padding: 4px 4px;
+	margin: 0px 4px;
 }
 
 
-/* filters line */
 
-#fc-filter-buttons { /* TO BE REMOVED, TODO: replace this in itemselement view */
-	display: inline-block;
-	padding: 0px;
-	margin: 0px;
-}
-.flexicontent #fc-filters-slide-btn {
+/***************
+ * Filters box *
+ ***************/
+
+/* Filters close button */
+.flexicontent #fc-filters-box #fc-filters-slide-btn {
 	width: 100%;
 	display: inline-block;
 	box-sizing: border-box;
@@ -349,19 +353,16 @@ table.adminlist.fcmanlist {
 	float: none;
 	clear: both;
 }
-.flexicontent #fc-filters-box .fc-filter .select2-container .select2-choice {
-	min-width: 39px !important;
-	max-width: 164px !important;
-}
-.flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
-	min-width: 40px !important;
-	max-width: 172px !important;
-}
+
+
+
+
+/* Filter container */
 .flexicontent #fc-filters-box .fc-filter {
-	border: 0px solid !important;
+	border: 0px solid;
 	margin: 4px 2px 4px 2px;
-	padding: 0px !important;
-	vertical-align: top !important;
+	padding: 0px;
+	vertical-align: top;
 	min-width: 310px;
 	min-height: 30px;
 	float: none;
@@ -369,29 +370,46 @@ table.adminlist.fcmanlist {
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
 	min-width: 628px;
 }
-.flexicontent #fc-filters-box .fc-filter #startdate_img,
-.flexicontent #fc-filters-box .fc-filter #enddate_img {
-	padding-left: 2px !important;
-	padding-right: 2px !important;
-}
-#s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
-	width: 90px !important;
-}
-.flexicontent #fc-filters-box .fc-filter #startdate,
-.flexicontent #fc-filters-box .fc-filter #enddate {
-	font-size: 11px !important;
-}
-.flexicontent #fc-filters-box .fc-xpended-row .add-on:first-child {
-	min-width: 120px;
-	max-width: 120px;
-	white-space: normal;
-	word-wrap: break-word;
-}
-.flexicontent #fc-filters-box .fc-filter .fc-xpended {
-}
-.flexicontent #fc-filters-box .fc-filter .label {
+
+
+/*************************
+ * Specific Filter cases *
+ *************************/
+
+.flexicontent #fc-filters-box .fc-filter {
+	#s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
+		width: 90px !important;
+		min-width: 90px !important;
+	}
+	#startdate_img,
+	#enddate_img {
+		padding-left: 2px !important;
+		padding-right: 2px !important;
+	}
+	#startdate,
+	#enddate {
+		font-size: 11px !important;
+		min-width: 57px;
+		max-width: 57px;
+	}
+	.fc-xpended-row .add-on:first-child {
+		min-width: 120px;
+		max-width: 120px;
+		white-space: normal;    /* allow wrap */
+		word-wrap: break-word;  /* allow wrap */
+		text-align: right;
+	}
+	.fc-xpended .add-on:first-child {
+	}
 }
 
+
+
+/***********
+ * Filters *
+ ***********/
+ 
+/* First level childs */
 .flexicontent #fc-filters-box .fc-filter > * {
 	vertical-align: middle !important;
 	float: left;
@@ -400,8 +418,6 @@ table.adminlist.fcmanlist {
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
 }
-
-.flexicontent #fc-filters-header .fc-filter .label,
 .flexicontent #fc-filters-box .fc-filter .label {
 	font-size: 11px;
 	padding: 4px 4px;
@@ -409,28 +425,76 @@ table.adminlist.fcmanlist {
 }
 
 
-/* form controls */
 
-.flexicontent #fc-filters-box .controls {
-	display: inline-block;
-	margin: 3px 0 7px;
+/* Increase max height of select2 drop downs */
+.admin.com_flexicontent .select2-drop .select2-results {
+	max-height: 400px !important;
 }
-.flexicontent #fc-filters-box *:not(.input-append):not(.input-prepend) > input[type="text"] {
-	padding: 2px 2px 3px !important;
-	margin: 0px !important;
-}
-.flexicontent #fc-filters-box .input-append,
-#fc-filters-box .input-prepend {
-	margin: 0px;
-}
-.flexicontent #fc-filters-box .input-prepend input,
-.flexicontent #fc-filters-box .input-append input {
-	margin: 0 !important;
-	/*padding: 4px !important;*/
-}
-.flexicontent #stateGroupsBox input:checked + label {
-	color: #8B0000;
-	font-weight: bold;
+
+
+.flexicontent #fc-filters-box .fc-filter {
+	*:not(.input-append):not(.input-prepend) > input[type="text"] {
+		padding: 2px 2px 3px !important;
+		margin: 0px !important;
+	}
+	.input-append,
+	input-prepend {
+		margin: 0px;
+		font-size: 13px;
+	}
+	.input-prepend > .add-on + input,
+	.input-append > .add-on + input {
+		width: 160px !important;
+	}
+	.input-prepend > input,
+	.input-append > input {
+		margin: 0 !important;
+	}
+
+	
+	/* SELECT2 */
+	/* Single-choice */
+	.select2-container .select2-choice {
+		width: 164px !important;
+	}
+	
+	/* Multi-choises */
+	.select2-container-multi {
+		width: 172px !important;
+		
+	 .select2-choices {
+			margin: 0 !important;
+			.select2-search-field {
+				float: right !important;
+				margin: 0 !important;
+				border-left-width: 0;
+			}
+			.select2-search-field input.select2-input {
+		    min-height: 26px !important;
+		    box-sizing: border-box;
+		    margin: 0 !important;
+		    width: 22px !important;
+				cursor: pointer !important;
+				border-width: 0px !important;
+				background: transparent url(../images/select2.png) no-repeat scroll 100% -22px !important;
+				font-size: 13px;
+			}
+			.select2-search-choice {
+				color: darkorange !important;
+			}
+		}
+	}
+	.select2-container-multi.select2-dropdown-open .select2-choices {
+		.select2-search-field {
+			width: 100% !important;
+			
+			input.select2-input {
+		    padding: 2px 6px 2px 26px !important;
+				background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
+				width: 100% !important;
+			}
+		}
+	}
 }
 
 
@@ -464,7 +528,9 @@ table.adminlist.fcmanlist {
 }
 
 
-/* sortable rows handles */
+/*************************
+ * Sortable rows handles *
+ *************************/
 
 .flexicontent .fc_drag_handle_none,
 .flexicontent .fc_drag_handle {
@@ -847,28 +913,6 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text {
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
 	color: gray;
 	font-style: italic;
-}
-
-
-/* Increase max height of select2 drop downs */
-.admin.com_flexicontent .select2-drop .select2-results {
-	max-height: 400px !important;
-}
-
-
-/* Shrink the search box but enlarge when focused, and highlight selected values */
-.fcfilter_be.select2-container-multi .select2-choices .select2-search-field input.select2-input {
-	width: 22px !important;
-	min-width: 22px !important;
-	cursor: pointer;
-}
-.fcfilter_be.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	width: 128px !important;
-	min-width: 128px !important;
-	cursor: pointer;
-}
-.fcfilter_be.select2-container-multi .select2-choices .select2-search-choice {
-	color: darkorange !important;
 }
 
 

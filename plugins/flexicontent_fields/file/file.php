@@ -495,7 +495,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// Button for popup file selection
 		/*if (!$use_ingroup) $field->html .= '
-			<input id="'.$elementid.'" class="'.$required_class.' fc_hidden_input" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
+			<input id="'.$elementid.'" class="'.$required_class.' fc_hidden_value" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
 	

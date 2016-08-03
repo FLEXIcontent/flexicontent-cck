@@ -867,11 +867,13 @@ body .fc-nowrap-box,
 	width: 100%;
 }
 #flexicontent .fc-xpended .add-on:first-child {
+	float: left;
 	margin: 0 0 9px 0;
 	padding-left: 4px;
 	padding-right: 4px;
 }
 #flexicontent .fc-xpended-row .add-on:first-child {
+	float: left;
 	min-width: 150px;
 	margin: 0 0 3px 0;
 	padding-left: 4px;
@@ -889,8 +891,10 @@ body .fc-nowrap-box,
 	font-weight: normal !important;
 }
 #flexicontent [class^="fc-xpended"] > select,
-#flexicontent [class^="fc-xpended"] > div.select2-container > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > select,
+#flexicontent [class^="fc-xpended"] > div.select2-container > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container > ul.select2-choices,
+#flexicontent [class^="fc-xpended"] > div.select2-container > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > div.select2-container > a.select2-choice {
 	border-top-left-radius: 6px;
 	border-bottom-left-radius: 6px;
@@ -898,22 +902,30 @@ body .fc-nowrap-box,
 	border-bottom-right-radius: 6px;
 	margin-top: 0;
 	vertical-align: top;
+	font-size: 13px;
 }
 #flexicontent [class^="fc-xpended"] > select:not(:first-child),
-#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > select:not(:first-child),
+#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
+#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 	margin-left: 0px;
 }
 #flexicontent [class^="fc-xpended"] > select:not(:last-child),
-#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > select:not(:last-child),
+#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	margin-right: 0px;
+}
+#flexicontent [class*="fc-xpended"] > div.select2-container .select2-input {
+	border-radius: 4px;
 }
 .fc-icon-16:before {
 	font-size: 16px !important;
@@ -1717,8 +1729,10 @@ body input.fc_hidden_value {
 	width: 0 !important;
 	height: 0 !important;
 	padding: 0 !important;
+	margin: 0 !important;
 	border: 0 !important;
 	display: inline-block;
+	box-sizing: border-box !important;
 }
 #flexicontent form div fieldset.panelform > fieldset,
 #flexicontent form div fieldset.panelform > div.input-append,
