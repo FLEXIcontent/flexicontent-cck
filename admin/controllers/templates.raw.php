@@ -55,7 +55,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 		}
@@ -88,7 +88,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 		}
@@ -119,7 +119,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	function getlayoutparams()
 	{
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 		}
@@ -325,7 +325,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	function loadlayoutfile()
 	{
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 		}
@@ -421,7 +421,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	function savelayoutfile()
 	{
 		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->canTemplates )
+		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
 		{
 			jexit ( JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 		}
