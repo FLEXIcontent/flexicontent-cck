@@ -237,6 +237,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				newField.find('.urlhits-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				
+				// Re-init any select2 elements
+				var has_select2 = newField.find('div.select2-container').length != 0;
+				if (has_select2) {
+					newField.find('div.select2-container').remove();
+					newField.find('select.use_select2_lib').select2('destroy').show();
+					fc_attachSelect2(newField);
+				}
+
 				// Set hits to zero for new row value
 				newField.find('span span').html('0');
 				";
@@ -265,6 +273,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 
 				// Attach form validation on new element
 				fc_validationAttach(newField);
+				
+				// Attach bootstrap eventon new element
+				fc_bootstrapAttach(newField);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -368,12 +379,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_EXTWL_IS_RELATIVE_DESC', 1, 1);
 				$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
 				$autoprefix = '
-				<div class="'.$input_grp_class.' fc-xpended-row btn-group group-fcinfo">
+				<div class="'.$input_grp_class.' fc-xpended-row">
 					<label class="'.$add_on_class.' fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ).'</label>
-					<input class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
-					<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
-					<input class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
-					<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
+					<div class="btn-group group-fcinfo">
+						<input class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
+						<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
+						<input class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
+						<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
+					</div>
 				</div>';
 			}
 			
@@ -411,7 +424,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 						<input class="urlclass fcfield_textval" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.$value['class'].'" />
 					</div>';
 			} else if ($useclass==2) {
-				$class_attribs = ' class="urlclass" ';
+				$class_attribs = ' class="urlclass use_select2_lib" ';
 				$class = '
 					<div class="'.$input_grp_class.' fc-xpended-row">
 						<label class="'.$add_on_class.' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
@@ -438,7 +451,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 						<label class="'.$add_on_class.' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_EXTWL_POPULARITY' ).'</label>
 						<span class="'.$add_on_class.' hitcount" style="font-style: italic; min-width:64px;">'.$hits.' '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 					</div>
-					<input class="urlhits fc_hidden_input" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.$hits.'" />';
+					<input class="urlhits fc_hidden_value" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.$hits.'" />';
 			}
 			
 			$field->html[] = '

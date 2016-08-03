@@ -112,7 +112,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		// build the categories select list
 		$categories = $globalcats;
 		$lists['filter_cats'] =  '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>'.
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib fcfilter_be" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
 		
 		// filter depth level
 		$depths	= array();
@@ -120,7 +120,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		for($i=1; $i<=10; $i++) $depths[]	= JHtml::_('select.option', $i, $i);
 		
 		$fieldname =  $elementid = 'filter_level';
-		$attribs = ' class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
+		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_level'] = '<label class="label">'.JText::_('FLEXI_MAX_DEPTH').'</label>'.
 			JHTML::_('select.genericlist', $depths, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid
 		, $translate=true );
@@ -129,7 +129,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		$lists['filter_author'] = '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>'.
 			($assocs_id && $created_by ?
 				'<span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' :
-				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib fcfilter_be" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
+				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"')
 			);
 
 		// build publication state filter
@@ -137,7 +137,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		array_unshift($states, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
 		
 		$fieldname =  $elementid = 'filter_state';
-		$attribs = ' class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
+		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_state'] = '<label class="label">'.JText::_('FLEXI_STATE').'</label>'.
 			JHTML::_('select.genericlist', $states, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid
 		, $translate=true );
@@ -146,7 +146,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		$levels = JHtml::_('access.assetgroups');
 		array_unshift($levels, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_ACCESS'*/));
 		$fieldname =  $elementid = 'filter_access';
-		$attribs = ' class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
+		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_access']	= '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>'.
 			JHTML::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid
 		, $translate=true );
@@ -155,7 +155,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		$lists['filter_lang'] = '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>'.
 			($assocs_id && $language ?
 				'<span class="badge badge-info">'.$language.'</span>' :
-				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
+				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_lang, '-'/*2*/)
 			);
 		
 		// assign data to template
