@@ -1832,6 +1832,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// Check that any assets of top-level categories point to the correct component (we used to make these point to 'com_flexicontent' asset)
+		$bad_cat_assets = array();
 		foreach($results as $category)
 		{
 			$parentId = $this->_getAssetParentId(null, $category);
@@ -1847,13 +1848,26 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// Save the category asset (create or update it)
 			if (!$asset->check() || !$asset->store(false))
 			{
-				echo $asset->getError();
-				echo " Problem for asset with id: ".$asset ->id;
-				echo " Problem for category with id: ".$category->id. "(".$category->title.")";
-				$this->setError($asset->getError());
-				return false;
+				//echo $asset->getError();
+				//echo " Problem for asset with id: ".$asset ->id;
+				//echo " Deleting but category asset for category #: ".$category->id. "(".$category->title.")";
+				//$this->setError($asset->getError());
+				//return false;
+				$bad_cat_assets[] = $category->id;
+				
+				// DELETE bad category asset
+				$query = $db->getQuery(true)
+					->delete('#__assets')
+					->where( ($asset->id ? ' id = ' . (int)$asset->id .' AND ' : '') . ' name = ' . $db->quote($name) );
+				$db->setQuery($query);
+				
+				try { $db->execute(); } catch (Exception $e) { }
+				if ($db->getErrorNum()) echo $db->getErrorMsg();
+
+				// Nothing more to do
+				continue;
 			}
-			
+
 			// Assign the asset to the category, if it is not already assigned
 			$query = $db->getQuery(true)
 				->update('#__categories')
@@ -1861,11 +1875,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				->where('id = ' . (int)$category->id);
 			$db->setQuery($query);
 			
-			if (!$db->execute()) {
-				echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-				$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-				return false;
-			}
+			try { $db->execute(); } catch (Exception $e) { }
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+		}
+		if (!empty($bad_cat_assets))
+		{
+			echo '
+			<div class="alert alert-warning">Please refresh this page, deleted bad assets for category IDs:
+				'. print_r($bad_cat_assets, true) .'
+			</div>';
 		}
 		
 		
