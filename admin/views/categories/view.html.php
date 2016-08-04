@@ -268,7 +268,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// filter by a category (it's subtree will be displayed)
 		$categories = $globalcats;
-		$lists['cats'] = ($filter_cats || 1 ? '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>' : '').
+		$lists['cats'] = ($filter_cats || 1 ? '<div class="add-on">'.JText::_('FLEXI_CATEGORY').'</div>' : '').
 			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=true, $check_perms=false);
 		
 		// filter depth level
@@ -277,7 +277,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
 		$fieldname =  $elementid = 'filter_level';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['level']	= ($filter_level || 1 ? '<label class="label">'.JText::_('FLEXI_MAX_DEPTH').'</label>' : '').
+		$lists['level']	= ($filter_level || 1 ? '<div class="add-on">'.JText::_('FLEXI_MAX_DEPTH').'</div>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
 		// filter publication state
@@ -285,7 +285,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
 		$fieldname =  $elementid = 'filter_state';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['state']	= ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+		$lists['state']	= ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
 		
 		// filter access level
@@ -293,11 +293,11 @@ class FlexicontentViewCategories extends JViewLegacy
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 		$fieldname =  $elementid = 'filter_access';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
+		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		
 		// filter language
-		$lists['language'] = ($filter_language || 1 ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
+		$lists['language'] = ($filter_language || 1 ? '<div class="add-on">'.JText::_('FLEXI_LANGUAGE').'</div>' : '').
 			flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_language, '-'/*2*/);
 		
 		// filter search word

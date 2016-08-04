@@ -927,6 +927,23 @@ body .fc-nowrap-box,
 #flexicontent [class*="fc-xpended"] > div.select2-container .select2-input {
 	border-radius: 4px;
 }
+#flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted,
+#flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
+	background: #555 none repeat scroll 0 0;
+	color: white;
+	font-family: monospace;
+	text-shadow: unset;
+	border: 1px solid gray;
+	font-size: 12px;
+}
+#flexicontent [class^="fc-xpended"] > .btn-group,
+#flexicontent [class*="fc-xpended"] > .btn-group {
+	margin-left: 1px;
+}
+#flexicontent [class^="fc-xpended"] > *:not(.btn-group):not(:first-child),
+#flexicontent [class*="fc-xpended"] > *:not(.btn-group):not(:first-child) {
+	margin-left: 0px;
+}
 .fc-icon-16:before {
 	font-size: 16px !important;
 }
