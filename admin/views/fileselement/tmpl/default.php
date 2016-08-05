@@ -34,7 +34,7 @@ $session = JFactory::getSession();
 $document = JFactory::getDocument();
 $cparams = JComponentHelper::getComponent('com_flexicontent')->params;
 
-$secure_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
+$secure_folder_tip  = '<i data-placement="bottom" class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
 
 // Common language strings
 $edit_entry = JText::_('FLEXI_EDIT_FILE', true);
@@ -42,6 +42,8 @@ $view_entry = JText::_('FLEXI_VIEW', true);
 $select_entry = JText::_('FLEXI_SELECT', true);
 $usage_in_str = JText::_('FLEXI_USAGE_IN', true);
 $fields_str = JText::_('FLEXI_FIELDS', true);
+
+$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
@@ -107,6 +109,7 @@ function delAllFilters() {
 var _file_data = new Array();
 <?php
 // Output file data JSON encoded so that they are available to JS code
+// but exclude parameters and other array data from encoding since we will not need them
 foreach ($this->rows as $i => $row) :
 	$data = new stdClass();
 	foreach($row as $j => $d) {
@@ -359,9 +362,11 @@ flexicontent_html::loadFramework('flexi-lib');
 				</span>
 				
 				<?php if ($this->CanViewAllFiles && !empty($this->cols['uploader'])) : /* FOR files element place filter outside the filter box */ ?>
-				<span class="fc-filter nowrap_box">
-					<?php echo $this->lists['uploader']; ?>
-				</span>
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['uploader']; ?>
+					</div>
+				</div>
 				<?php endif; ?>
 			
 			</div>
@@ -369,33 +374,45 @@ flexicontent_html::loadFramework('flexi-lib');
 			
 			<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 				<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-				
+
 				<?php if (!empty($this->cols['lang'])) :  /* if layout==image then this was force to unset */ ?>
-				<span class="fc-filter nowrap_box">
-					<?php echo $this->lists['language']; ?>
-				</span>
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['language']; ?>
+					</div>
+				</div>
 				<?php endif; ?>
-				
+
 				<?php if ($this->layout!='image') : /* if layout==image then this URL filter is not applicable */ ?>
-				<span class="fc-filter nowrap_box">
-					<?php echo $this->lists['url']; ?>
-				</span>
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['url']; ?>
+					</div>
+				</div>
 				<?php endif; ?>
-				
+
 				<?php if (!empty($this->cols['target']) && $_forced_secure_val=='') :  /* if layout==image then this was force to unset */ ?>
-				<span class="fc-filter nowrap_box">
-					<?php echo $this->lists['secure']; ?>
-				</span>
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['secure']; ?>
+					</div>
+				</div>
 				<?php endif; ?>
-				
-				<span class="fc-filter nowrap_box">
-					<?php echo $this->lists['ext']; ?>
-				</span>
-				
-				<span class="fc-filter nowrap_box">
-					<label class="label">Item ID</label> <?php echo $this->lists['item_id']; ?>
-				</span>
-				
+
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['ext']; ?>
+					</div>
+				</div>
+
+
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<div class="add-on">Item ID</div>
+						<?php echo $this->lists['item_id']; ?>
+					</div>
+				</div>
+
 				<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 			</div>
 			
@@ -716,7 +733,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 			<input type="hidden" name="fcform" value="1" />
 			<?php echo JHTML::_( 'form.token' ); ?>
-			
+
 			<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 			<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 			<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
@@ -945,7 +962,7 @@ flexicontent_html::loadFramework('flexi-lib');
 								<input type="text" id="file-url-ext" size="5" class="required input-xxlarge" name="file-url-ext" />
 							</td>
 						</tr>
-						
+
 					</table>
 					
 					<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>

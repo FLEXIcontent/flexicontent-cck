@@ -30,7 +30,7 @@ endforeach;
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$ico_class = 'btn btn-micro'; //'fc-man-icon-s';
+$ico_class = 'btn btn-small'; //'fc-man-icon-s';
 
 $featimg = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="fc-man-icon-s" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
@@ -65,8 +65,11 @@ $image_flag_path = "../media/mod_languages/images/";
 $attribs_preview = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), $attribs_preview);
 
-$attribs_editlayout = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
-$image_editlayout = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'),  $attribs_editlayout);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+
+//$editlayout_attribs = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ';
+//$editLayout_icon = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'),  $editlayout_attribs);
+$editLayout_icon = '<span class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'"><span class="icon-edit"></span></span>';
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
@@ -952,7 +955,7 @@ jQuery(document).ready(function(){
 				<?php echo $row->type_name; ?>
 			</td>
 			<td class="col_state">
-				<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
+				<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max), 'left' ); ?>
 				<?php if ($extra_img) : ?>
 					<img src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" style="border: 0;" class="<?php echo $tip_class; ?>" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" />
 				<?php endif; ?>
@@ -962,7 +965,7 @@ jQuery(document).ready(function(){
 			<td class="col_edit_layout">
 				<?php if ($this->CanTemplates && $row_ilayout) : ?>
 				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
-					<?php echo $image_editlayout;?>
+					<?php echo $editLayout_icon;?>
 				</a>
 				<?php endif; ?>
 			</td>

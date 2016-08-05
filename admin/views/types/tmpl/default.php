@@ -22,7 +22,7 @@ use Joomla\String\StringHelper;
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$ico_class = 'btn btn-micro'; //'fc-man-icon-s';
+$ico_class = 'btn btn-small'; //'fc-man-icon-s';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -38,9 +38,13 @@ $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 $list_total_cols = 12;
 
-$article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_JOOMLA_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_JOOMLA_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
-$default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_TYPE_DEFAULT_TEMPLATE', true ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
-$editLayout_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="'.$ico_class.' '.$tip_class.'" alt="'.$edit_layout.'" title="'.$edit_layout.'" /> ';
+$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
+$article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_JOOMLA_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
+$default_template_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_TYPE_DEFAULT_TEMPLATE', true ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
+
+//$editlayout_attribs = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ';
+//$editLayout_icon = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'),  $editlayout_attribs);
+$editLayout_icon = '<span class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'"><span class="icon-edit"></span></span>';
 ?>
 <script type="text/javascript">
 
@@ -63,7 +67,7 @@ function delAllFilters() {
 
 </script>
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
@@ -112,15 +116,19 @@ function delAllFilters() {
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['state']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['access']; ?>
-		</span>
-		
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['state']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['access']; ?>
+			</div>
+		</div>
+
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
@@ -249,12 +257,12 @@ function delAllFilters() {
 				?>
 			</td>
 			<td class="right">
-				<a class="btn btn-small" style="width:100%; box-sizing:border-box;" href="<?php echo $fields_url; ?>">
+				<a class="btn btn-small fc-assignments-btn" href="<?php echo $fields_url; ?>">
 					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
 			<td class="right">
-				<a class="btn btn-small btn-info" style="width:100%; box-sizing:border-box;" href="<?php echo $items_url; ?>">
+				<a class="btn btn-small btn-info fc-assignments-btn" href="<?php echo $items_url; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
 			</td>

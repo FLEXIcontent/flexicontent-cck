@@ -159,12 +159,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 			}
 			
-			$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
+			$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
 				JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fieldtype );
 		}
 		
 		//build type select list
-		$lists['filter_itemtype'] = ($filter_itemtype|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
+		$lists['filter_itemtype'] = ($filter_itemtype|| 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
 			flexicontent_html::buildtypesselect($types, 'filter_itemtype', $filter_itemtype, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_itemtype');
 		
 		//publish unpublished filter
@@ -173,7 +173,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$ffstates[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$ffstates[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 		
-		$lists['filter_itemstate'] = ($filter_itemstate || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+		$lists['filter_itemstate'] = ($filter_itemstate || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHTML::_('select.genericlist', $ffstates, 'filter_itemstate', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemstate );
 		
 		// build filter index type record listing
