@@ -28,6 +28,9 @@ $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" sty
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCsearch'.($this->isADV ? '_advanced' : '_basic'), $start_text, $end_text);
 
 $edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
+
+$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
+
 $list_total_cols = $this->isADV ? 10 : 5;
 ?>
 
@@ -71,7 +74,7 @@ function delAllFilters() {
 
 </script>
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
@@ -121,30 +124,40 @@ function delAllFilters() {
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 		
-		<span class="fc-filter nowrap_box">
-			<?php echo '<label class="label'.($this->f_active['search_itemtitle'] ? " highlight":"").'">'.JText::_('FLEXI_TITLE').'</label> '; ?>
-			<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onchange="document.adminForm.submit();" size="30"/>
-		</span>
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo '<div class="add-on'.($this->f_active['search_itemtitle'] ? " highlight":"").'">'.JText::_('FLEXI_TITLE').'</div> '; ?>
+				<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onchange="document.adminForm.submit();" size="30"/>
+			</div>
+		</div>
 
-		<span class="fc-filter nowrap_box">
-			<?php echo '<label class="label'.($this->f_active['search_itemid'] ? " highlight":"").'">'.JText::_('FLEXI_ID').'</label> '; ?>
-			<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onchange="document.adminForm.submit();" size="6" />
-		</span>
-			
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_itemtype']; ?>
-		</span>
-			
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_itemstate']; ?>
-		</span>
-		
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo '<div class="add-on'.($this->f_active['search_itemid'] ? " highlight":"").'">'.JText::_('FLEXI_ID').'</div> '; ?>
+				<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onchange="document.adminForm.submit();" size="6" />
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_itemtype']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_itemstate']; ?>
+			</div>
+		</div>
+
 		<?php if ($this->isADV) : ?>
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_fieldtype']; ?>
-		</span>
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_fieldtype']; ?>
+			</div>
+		</div>
 		<?php endif; ?>
-		
+
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	

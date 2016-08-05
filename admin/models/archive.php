@@ -230,7 +230,7 @@ class FlexicontentModelArchive extends JModelList
 
 		$where = array();
 		
-		$where[] = ' i.state = -1';
+		$where[] = ' i.state = 2';
 		$where[] = FLEXI_J16GE ? ' c.extension="'.FLEXI_CAT_EXTENSION.'"' : ' i.sectionid = '.FLEXI_SECTION;
 		
 		if ($search) {
@@ -242,92 +242,7 @@ class FlexicontentModelArchive extends JModelList
 
 		return $where;
 	}
-
-	/**
-	 * Method to remove an item
-	 *
-	 * @access	public
-	 * @return	string $msg
-	 * @since	1.0
-	 */
-	function delete($cid)
-	{
-		if (count( $cid ))
-		{
-			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__content'
-					. ' WHERE id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-			
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// remove items extended
-			$query = 'DELETE FROM #__flexicontent_items_ext'
-					. ' WHERE item_id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-			
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
-			//remove assigned tag references
-			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
-					.' WHERE itemid IN ('. $cids .')'
-					;
-			$this->_db->setQuery($query);
-
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			//remove assigned category references
-			$query = 'DELETE FROM #__flexicontent_cats_item_relations'
-					.' WHERE itemid IN ('. $cids .')'
-					;
-			$this->_db->setQuery($query);
-
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			//remove assigned file references
-			$query = 'DELETE FROM #__flexicontent_files_item_relations'
-					.' WHERE itemid IN ('. $cids .')'
-					;
-			$this->_db->setQuery($query);
-
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
-			// delete also field in fields_item relation
-			$query = 'DELETE FROM #__flexicontent_fields_item_relations'
-					. ' WHERE item_id IN ('. $cids .')'
-					;
-
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
-			return true;
-		}
-		
-		return false;
-	}
+	
 	
 	/**
 	 * Method to fetch the assigned categories
@@ -350,39 +265,6 @@ class FlexicontentModelArchive extends JModelList
 		$this->_cats = $this->_db->loadObjectList();
 
 		return $this->_cats;
-	}
-	
-	/**
-	 * Method to unarchive an item
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function unarchive($cid = array())
-	{
-		$user 	= JFactory::getUser();
-		$userid	= (int) $user->get('id');
-
-		if (count( $cid ))
-		{
-			$cids = implode( ',', $cid );
-
-			$query = 'UPDATE #__content'
-					. ' SET state = 0'
-					. ' WHERE id IN ('. $cids .')'
-					. ' AND ( checked_out = 0 OR ( checked_out = ' .$userid. ' ) )'
-			;
-			$this->_db->setQuery( $query );
-			if (!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-		
-			return true;
-		}
-		
-		return false;
 	}
 }
 ?>
