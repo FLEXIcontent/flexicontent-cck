@@ -29,6 +29,8 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $edit_entry = JText::_('FLEXI_EDIT_TAG', true);
 
+$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
+
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
@@ -59,7 +61,7 @@ function delAllFilters() {
 
 </script>
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
@@ -108,15 +110,19 @@ function delAllFilters() {
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['assigned']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['state']; ?>
-		</span>
-		
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['assigned']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['state']; ?>
+			</div>
+		</div>
+
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
@@ -227,7 +233,7 @@ function delAllFilters() {
 				?>
 			</td>
 			<td class="center">
-				<a class="btn btn-small" href="<?php echo $items_link.$row->id; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="width:100; box-sizing:border-box;">
+				<a class="btn btn-small fc-assignments-btn" href="<?php echo $items_link.$row->id; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>">
 					<?php echo $row->nrassigned ? $row->nrassigned : 0; ?>
 				</a>
 			</td>

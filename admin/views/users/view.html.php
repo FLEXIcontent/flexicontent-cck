@@ -216,17 +216,17 @@ class FlexicontentViewUsers extends JViewLegacy
 		$itemscount_options[] = JHTML::_('select.option',  '', '-');
 		$itemscount_options[] = JHTML::_('select.option',  1, JText::_( 'None' ) );
 		$itemscount_options[] = JHTML::_('select.option',  2, JText::_( 'One or more' ) );
-		$lists['filter_itemscount'] = ($filter_itemscount || 1 ? '<label class="label"># '.JText::_('FLEXI_ITEMS').'</label>' : '').
+		$lists['filter_itemscount'] = ($filter_itemscount || 1 ? '<div class="add-on"># '.JText::_('FLEXI_ITEMS').'</div>' : '').
 			JHTML::_('select.genericlist', $itemscount_options, 'filter_itemscount', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemscount );
 		
-		$lists['filter_usergrp'] = ($filter_usergrp || 1 ? '<label class="label">'.JText::_('Select Group').'</label>' : '').
+		$lists['filter_usergrp'] = ($filter_usergrp || 1 ? '<div class="add-on">'.JText::_('Select Group').'</div>' : '').
 			JHTML::_('select.genericlist', $types, 'filter_usergrp', 'class="use_select2_lib" style="width:auto;" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_usergrp );
 
 		// get list of Log Status for dropdown filter
 		$logged[] = JHTML::_('select.option',  '', '-' /*JText::_( 'Select Log Status' )*/);
 		$logged[] = JHTML::_('select.option',  1, JText::_( 'Logged In' ) );
 		$logged[] = JHTML::_('select.option',  2, JText::_( 'Logged Out' ) );
-		$lists['filter_logged'] = ($filter_logged || 1 ? '<label class="label">'.JText::_('Log Status').'</label>' : '').
+		$lists['filter_logged'] = ($filter_logged || 1 ? '<div class="add-on">'.JText::_('Log Status').'</div>' : '').
 			JHTML::_('select.genericlist', $logged, 'filter_logged', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_logged );
 
 		// table ordering
@@ -238,7 +238,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		$dates[] = JHTML::_('select.option',  '1', JText::_( 'Registered' ) );
 		$dates[] = JHTML::_('select.option',  '2', JText::_( 'Last Visit' ) );
 		
-		$lists['date'] = '<label class="label">'.JText::_('FLEXI_DATE').'</label>'.
+		$lists['date'] = //'<div class="add-on">'.JText::_('FLEXI_DATE').'</div>'.
 			JHTML::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
 		
 		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));

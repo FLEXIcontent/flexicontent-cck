@@ -29,6 +29,8 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $edit_entry = JText::_('FLEXI_EDIT_FIELD', true);
 
+$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
+
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $ctrl = FLEXI_J16GE ? 'fields.' : '';
@@ -40,7 +42,6 @@ $flexi_no  = JText::_( 'FLEXI_NO' );
 $flexi_nosupport = JText::_( 'FLEXI_PROPERTY_NOT_SUPPORTED', true );
 $flexi_rebuild   = JText::_( 'FLEXI_REBUILD_SEARCH_INDEX', true );
 $flexi_toggle    = JText::_( 'FLEXI_CLICK_TO_TOGGLE', true );
-
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
@@ -124,7 +125,7 @@ function delAllFilters() {
 
 
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
@@ -174,27 +175,37 @@ function delAllFilters() {
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_type']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['assigned']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['fftype']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['state']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['access']; ?>
-		</span>
-		
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_type']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['assigned']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['fftype']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['state']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['access']; ?>
+			</div>
+		</div>
+
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	

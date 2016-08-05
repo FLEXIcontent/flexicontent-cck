@@ -44,6 +44,8 @@ $edit_entry = JText::_('FLEXI_EDIT_TAG', true);
 $view_entry = JText::_('FLEXI_VIEW', true);
 $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER');
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+
+$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 ?>
 <script type="text/javascript">
 
@@ -107,7 +109,7 @@ function delAllFilters() {
 
 </script>
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
@@ -157,29 +159,40 @@ function delAllFilters() {
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_itemscount']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_logged']; ?>
-		</span>
-		
-		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_usergrp']; ?>
-		</span>
-		
+
 		<div class="fc-filter nowrap_box">
-			<span class="radio"><?php echo $this->lists['date']; ?></span>
-			<?php echo $this->lists['startdate']; ?>&nbsp;&nbsp;<?php echo $this->lists['enddate']; ?>
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_itemscount']; ?>
+			</div>
 		</div>
-		
+
 		<div class="fc-filter nowrap_box">
-			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
-			<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_logged']; ?>
+			</div>
 		</div>
-		
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_usergrp']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $date_note_attrs; ?> >
+				<?php echo $this->lists['date']; ?>
+			</div>
+			<?php echo $this->lists['startdate']; ?>
+			<?php echo $this->lists['enddate']; ?>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<div class="add-on"><?php echo JText::_('FLEXI_ID'); ?></div>
+				<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
+			</div>
+		</div>
+
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	

@@ -2234,7 +2234,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, &$params=null, $addToggler=true )
+	static function statebutton( $item, &$params=null, $addToggler=true, $tooltip_place = null )
 	{
 		// Check for empty params too
 		if ( $params && !$params->get('show_state_icon', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
@@ -2288,7 +2288,7 @@ class flexicontent_html
 		{
 			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
 			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 			
 			$tooltip_class = ' hasTooltip';
 			$state_tips = array();
@@ -2357,7 +2357,8 @@ class flexicontent_html
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br/><br/>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			
-			if ( !$params || !$params->get('show_icons', 2) )
+			if ( $tooltip_place ) ;
+			else if ( !$params || !$params->get('show_icons', 2) )
 				$tooltip_place = 'bottom';
 			else
 				$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
@@ -2718,7 +2719,7 @@ class flexicontent_html
 		static $state_fulltips = null;
 		if ( !$state_names ) {
 			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 		
 		if ( !$state_fulltips ) {
@@ -3830,7 +3831,7 @@ class flexicontent_html
 		if ( !$state_names ) {
 			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
 			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 		
 		$state[] = JHTML::_('select.option',  '', JText::_( !is_numeric($displaytype) && is_string($displaytype) ? $displaytype : 'FLEXI_DO_NOT_CHANGE' ) );

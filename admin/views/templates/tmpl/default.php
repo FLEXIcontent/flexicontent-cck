@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$ico_class = 'btn btn-micro'; //'fc-man-icon-s';
+$ico_class = 'btn btn-small'; //'fc-man-icon-s';
 $commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
 
 $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
@@ -71,18 +71,21 @@ $list_total_cols = 8;
 <?php endif;?>
 
 
-	<div id="howto_box" style="margin:10px 10px 24px 0px;">
-	<table class="fc-table-list" style="margin:0px; min-width: unset;">
-		<tr>
-			<th>Configure display of your fields <span class="badge">item</span> view and <span class="badge">multi-item</span> views</th>
-		</tr>
-		<tr>
-			<td><span class="badge badge-warning">ITEM Layout</span> Select this in configuration of <span class="badge">types</span> and (optionally) in  <span class="badge">items</span></td>
-		</tr>
-		<tr>
-			<td><span class="badge badge-warning">CATEGORY Layout</span> Select this in configuration of <span class="badge">categories / content lists</span> except for <b>search view</b></td>
-		</tr>
-	</table>
+
+<div id="outer_templates" style="float: left; min-width: 50%;">
+
+	<div id="howto_box" style="margin:10px 0% 24px 0%; width: 100%;">
+		<table class="fc-table-list" style="margin: 0; min-width: unset; width: 100%;">
+			<tr>
+				<th>Configure display of your fields <span class="badge">item</span> view and <span class="badge">multi-item</span> views</th>
+			</tr>
+			<tr>
+				<td><span class="label label-info">ITEM Layout</span> Select this in configuration of <span class="badge">types</span> and (optionally) in  <span class="badge">items</span></td>
+			</tr>
+			<tr>
+				<td><span class="label label-info">CATEGORY Layout</span> Select this in configuration of <span class="badge">categories / content lists</span> except for <b>search view</b></td>
+			</tr>
+		</table>
 	</div>
 	
 	<!--
@@ -92,7 +95,7 @@ $list_total_cols = 8;
 	</div>
 	-->
 	
-	<table class="adminlist">
+	<table class="adminlist" style="width: 100% !important;">
 	
 	<thead>
 		<tr class="header">
@@ -102,11 +105,11 @@ $list_total_cols = 8;
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
-				<span class="badge badge-warning">ITEM Layout</span>
+				<span class="label label-info">ITEM Layout</span>
 			</th>
 			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
-				<span class="badge badge-warning">CATEGORY Layout</span>
+				<span class="label label-info">CATEGORY Layout</span>
 			</th>
 		</tr>
 	</thead>
@@ -220,7 +223,9 @@ $list_total_cols = 8;
 	</tbody>
 
 	</table>
-	
+</div>
+
+
 	<div class="fcclear"></div>
 	
 	<input type="hidden" name="option" value="com_flexicontent" />

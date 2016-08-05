@@ -327,10 +327,7 @@ table.adminlist.fcmanlist {
 	padding: 0px !important;
 	margin: 2px 32px 6px 0px;
 }
-.flexicontent #fc-filters-header .use_select2_lib {
-	margin-top: 2px !important;
-}
-.flexicontent #fc-filters-header .fc-filter .label{
+.flexicontent #fc-filters-header .fc-filter .label {
 	font-size: 11px;
 	padding: 4px 4px;
 	margin: 0px 4px;
@@ -1109,7 +1106,12 @@ ul.fcimport_field_value_list li {
 	padding: 1px 0 1px 20px;
 }
 
-/* Import screen */
+
+
+/*****************
+ * Import screen *
+ ****************/
+ 
 #import-log {
 	margin: 10px 10px 15px 10px;
 	font-size: 12px;
@@ -1180,6 +1182,12 @@ ul.import-failed li {
 	padding: 1px 0 1px 20px;
 }
 
+
+
+/********************
+ * Backend listings *
+ ********************/
+
 .fc-man-icon-s {
 	float: none;
 	min-width: 16px;
@@ -1187,4 +1195,17 @@ ul.import-failed li {
 .btn.btn-micro.fc-man-icon-s {
 	border-radius: 3px;
 	padding: 3px;
+}
+
+.adminlist.fcmanlist .btn.btn-small {
+    padding: 2px 3px 3px 4px;
+}
+.adminlist.fcmanlist .btn.btn-small > [class^="icon-"],
+.adminlist.fcmanlist .btn.btn-small > [class*="icon-"] {
+	margin: 0;
+}
+
+.adminlist.fcmanlist .btn.btn-small.fc-assignments-btn {
+	min-width: 50px;
+	box-sizing: border-box;
 }
