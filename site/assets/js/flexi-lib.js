@@ -15,16 +15,19 @@
 		if (autoWidth)  params.dialogClass += ' fc-autow-dialog';
 		if (autoHeight) params.dialogClass += ' fc-autoh-dialog';
 		
-		var w = typeof winwidth !== 'undefined' && winwidth  ? winwidth  : jQuery( window ).width() - 80;
+		var w = typeof winwidth !== 'undefined' && winwidth  ? winwidth  : jQuery( window ).width() - 70;
 		var h = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 120;
 		
-		params.winwidth  = w  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)  :  w;
+		params.winwidth  = w  > (jQuery( window ).width() - 70)   ? (jQuery( window ).width() - 70)  :  w;
 		params.winheight = h  > (jQuery( window ).height() - 120) ? (jQuery( window ).height() - 120) : h;
 		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
 		
 		params.winleft = (jQuery( window ).width()  - params.winwidth)  / 2 + 5;
 		params.wintop  = (jQuery( window ).height() - params.winheight) / 2 - 5;
 		//window.console.log ('winleft : ' + params.winleft + ', wintop : ' + params.wintop);
+
+		var max_filelist_h = 568;
+		params.plupload_filelist_h = max_filelist_h > (jQuery( window ).height() - 480) ? (jQuery( window ).height() - 480) : max_filelist_h;
 		
 		return params;
 	}
@@ -1121,7 +1124,9 @@
 			var content_box = dialog_box.find(contentSel);
 			var h = dialog_box.height() - content_box.prev().outerHeight(true) - content_box.next().outerHeight(true);
 			content_box.css({ 'height': h+'px', 'margin': '0', 'box-sizing': 'border-box' });
-			content_box.find('iframe').contents().find('body').css({ 'height': 'unset' });
+			var body = content_box.find('iframe').contents().find('body');
+			body.css({ 'height': 'unset' });
+			body.find('.plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)').css({ 'height': params.plupload_filelist_h+'px' });
 		});
 	}
 

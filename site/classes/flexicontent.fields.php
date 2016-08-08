@@ -188,7 +188,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 3
 	 */
-	static function & getFieldsByIds($field_ids) 
+	static function & getFieldsByIds($field_ids, $check_access=true) 
 	{
 		if (!count($field_ids))
 		{
@@ -201,10 +201,15 @@ class FlexicontentFields
 		JArrayHelper::toInteger($field_ids);
 		
 		// Field's has_access flag
-		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		$aid_list = implode(",", $aid_arr);
-		$select_access = ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
-		
+		if ($check_access)
+		{
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access = ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
+		}
+		else
+			$select_access = '';
+
 		$query 	= 'SELECT fi.*'
 			. $select_access
 			. ' FROM #__flexicontent_fields AS fi'

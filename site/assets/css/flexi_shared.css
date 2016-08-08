@@ -428,6 +428,14 @@ table.adminlist .pagination {
 	background: url(../images/bullet_add.png) no-repeat 0% 50%;
 	padding-left: 12px;
 }
+body div .badge-info-2 {
+	background-color: #2b89a4;
+}
+body div a.striketext {
+	text-decoration: line-through;
+	color: red;
+	font-style: italic;
+}
 ul#ultagbox {
 	margin: 0;
 	padding: 0;
@@ -1384,20 +1392,71 @@ table.fc-form-tbl td.data {
 	border: none;
 	margin: 0;
 }
-#flash_uploader_container {
+#multiple_uploader {
 	padding: 0px;
 	margin: 6px 0 0 0;
+	width: auto;
 }
-#flash_uploader_container .plupload_filelist_content {
-	overflow: hidden;
+#multiple_uploader.fc_file_uploading {
+	min-width: 540px;
+	height: 500px;
+	width: auto;
 }
-#flash_uploader_container .plupload_view_switch .ui-button {
-	min-width: 1px;
-	display: inline-block;
-	margin: 0px;
-}
-#flash_uploader_container .plupload_filelist_content .plupload_file {
+#multiple_uploader.fc_file_uploading overflow: visible
+	
+	.plupload_container {
 	padding: 0;
+}
+#multiple_uploader.fc_file_uploading ul.plupload_filelist_content li.plupload_file {
+	padding: 0;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist {
+	min-height: 100px;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_droptext {
+	line-height: 60px;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name {
+	display: inline-block;
+	height: 60px;
+	width: 400px;
+	overflow: visible;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name > span:first-of-type {
+	display: inline-block;
+	width: 200px;
+	white-space: normal;
+	word-wrap: break-word;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name .btn.fc_img_preview_btn:before {
+	font-size: 24px;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name .btn.fc_img_preview_btn {
+	width: unset;
+	margin: 2px 16px 2px 12px;
+	padding: 8px 6px;
+	vertical-align: top;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name span.plupload_img_preview {
+	display: inline-block;
+	min-width: 120px;
+	vertical-align: top;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name span.plupload_img_preview img {
+	position: relative;
+	max-height: 64px;
+	max-width: 140px;
+	transition: all 0.5s ease-in-out;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name span.plupload_img_preview img.fc_uploader_zooming {
+	top: 25% !important;
+	position: fixed !important;
+	max-width: unset !important;
+	box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75) !important;
+	z-index: 2050 !important;
+}
+#multiple_uploader.fc_file_uploading .fc_uploader_zoomed.fc_uploader_zooming {
+	max-height: 50% !important;
 }
 .filemanager img {
 	vertical-align: middle;

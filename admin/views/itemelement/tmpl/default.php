@@ -116,7 +116,7 @@ function delAllFilters() {
 	<table class="adminlist">
 	<thead>
 		<tr>
-			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
