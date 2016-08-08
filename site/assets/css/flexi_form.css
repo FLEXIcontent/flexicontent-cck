@@ -230,11 +230,8 @@ div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group {
 	margin-right: 0;
 }
 div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group > button {
-	width: 33%;
-	box-sizing: border-box;
 	margin-left: 0;
 	margin-right: 0;
-	float: left;
 }
 div .listall-lbl {
 	max-width: 1200px;

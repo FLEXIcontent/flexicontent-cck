@@ -93,6 +93,13 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$target_dir = $layout=='image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
 		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage');
 		$cols = array();
+
+		if ($fieldid)
+		{
+			$field = FlexicontentFields::getFieldsByIds($fieldid);
+			$field->parameters = new JRegistry($field->attribs);
+		}
+
 		// No column disabling for filemanager YET, column disabling only in fileselement view
 		foreach($optional_cols as $col) $cols[$col] = 1;
 		
@@ -141,6 +148,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
+		// This is not included automatically in frontend
+		flexicontent_html::loadFramework('flexi-lib');
 		
 		
 		
@@ -289,6 +298,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
+		$this->field = !empty($field) ? $field : null;
 		$this->assignRef('langs', $langs);
 		
 		$this->assignRef('option', $option);
@@ -341,8 +351,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 	}
-	
-	
+
+
 	function indexer($tpl)
 	{		
 		parent::display($tpl);

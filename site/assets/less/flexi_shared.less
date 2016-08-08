@@ -542,6 +542,14 @@ table.adminlist .pagination {
 	background: url(../images/bullet_add.png) no-repeat 0% 50%;
 	padding-left: 12px;
 }
+body div .badge-info-2 {
+	background-color: #2b89a4;
+}
+body div a.striketext {
+	text-decoration: line-through;
+	color: red;
+	font-style: italic;
+}
 
 
 
@@ -1641,20 +1649,77 @@ table.fc-form-tbl td.data {
 }
 
 /* Filemanager's plupload (multi-upload script) CSS compatibility fixes */
-#flash_uploader_container {
+#multiple_uploader {
 	padding: 0px;
 	margin: 6px 0 0 0;
+	width: auto;	
 }
-#flash_uploader_container .plupload_filelist_content {
-	overflow: hidden;
-}
-#flash_uploader_container .plupload_view_switch .ui-button {
-	min-width: 1px;
-	display: inline-block;
-	margin: 0px;
-}
-#flash_uploader_container .plupload_filelist_content .plupload_file {
-	padding: 0;
+#multiple_uploader.fc_file_uploading {
+	min-width: 540px;
+	height: 500px;
+	width: auto;
+	overflow: visible
+	
+	.plupload_container {
+		padding: 0;
+	}
+	
+	ul.plupload_filelist_content li.plupload_file {
+		padding: 0;
+	}
+	.plupload_scroll
+	{
+		ul.plupload_filelist {
+			min-height: 100px;
+
+			.plupload_droptext {
+				line-height: 60px;
+			}
+			.plupload_file_name {
+				display:inline-block;
+				height: 60px;
+				width: 400px;
+				overflow: visible;
+
+				> span:first-of-type {
+					display:inline-block;
+					width: 200px;
+					white-space: normal;
+					word-wrap: break-word;
+				}
+				.btn.fc_img_preview_btn:before {
+					font-size: 24px;
+				}
+				.btn.fc_img_preview_btn {
+					width: unset;
+					margin: 2px 16px 2px 12px;
+					padding: 8px 6px;
+					vertical-align: top;
+				}
+				span.plupload_img_preview  {
+					display:inline-block;
+					min-width: 120px;
+					vertical-align: top;
+				}
+				span.plupload_img_preview img {
+					position: relative;
+					max-height: 64px;
+					max-width: 140px;
+					transition: all 0.5s ease-in-out;
+				}
+				span.plupload_img_preview img.fc_uploader_zooming {
+					top: 25% !important;
+					position: fixed !important;
+					max-width: unset !important;
+					box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75) !important;
+					z-index: 2050 !important;
+				}
+			}
+		}
+	}
+	.fc_uploader_zoomed.fc_uploader_zooming {
+		max-height: 50% !important;
+	}
 }
 
 /* Filemanager various */

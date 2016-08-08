@@ -350,6 +350,12 @@ table.adminlist.fcmanlist {
 .admin.com_flexicontent .select2-drop .select2-results {
 	max-height: 400px !important;
 }
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container .select2-choice {
+	width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container-multi {
+	width: 490px !important;
+}
 .flexicontent #fc-filters-box .fc-filter *:not(.input-append):not(.input-prepend) > input[type="text"] {
 	padding: 2px 2px 3px !important;
 	margin: 0px !important;

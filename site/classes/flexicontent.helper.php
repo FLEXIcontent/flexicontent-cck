@@ -932,7 +932,7 @@ class flexicontent_html
 		// Set jQuery to load in views that use it
 		$JQUERY_VER    = !$params ? '1.8.3' : $params->get('jquery_ver', '1.8.3');
 		$JQUERY_UI_VER = !$params ? '1.9.2' : $params->get('jquery_ui_ver', '1.9.2');
-		$JQUERY_UI_THEME = !$params ? 'ui-lightness' : $params->get('jquery_ui_theme', 'ui-lightness');
+		$JQUERY_UI_THEME = !$params ? 'ui-lightness' : $params->get('jquery_ui_theme', 'ui-lightness');   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
 		$add_remote = (FLEXI_J30GE && $add_remote==2) || (!FLEXI_J30GE && $add_remote);
 		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
 		
@@ -944,6 +944,7 @@ class flexicontent_html
 		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
 			if ( $add_remote ) {
+				JHtml::_('jquery.framework');   // add and "override" it
 				$document->addScript('//ajax.googleapis.com/ajax/libs/jquery/'.$JQUERY_VER.'/jquery.min.js');
 			} else {
 				FLEXI_J30GE ?
@@ -964,6 +965,7 @@ class flexicontent_html
 		if ( $add_jquery_ui && !$jquery_ui_added ) {
 			// Load all components of jQuery-UI
 			if ($add_remote) {
+				JHtml::_('jquery.ui', array());   // add and "override" it
 				$document->addScript('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
 			} else {
 				if (FLEXI_J30GE) {
@@ -971,6 +973,7 @@ class flexicontent_html
 					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
 					if ( !$params || $params->get('load-ui-menu', 1) )          $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
 					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+					if ( !$params || $params->get('load-ui-progressbar', 1) )   $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.progressbar.min.js');
 				} else {
 					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
 				}
@@ -985,8 +988,8 @@ class flexicontent_html
 				$document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
 			} else {
 				$document->addStyleSheet(JURI::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
-				$jquery_ui_css_added = 1;
 			}
+			$jquery_ui_css_added = 1;
 		}
 	}
 	
@@ -1454,7 +1457,7 @@ class flexicontent_html
 				if ($mode=='ui') {
 					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
 					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
-					$document->addScript($framework_path.'/js/themeswitcher.js');
+					//$document->addScript($framework_path.'/js/themeswitcher.js');
 				} else {
 					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
 					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
