@@ -56,13 +56,28 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
-			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
+			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png" size="60" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
-			<field name="" type="separator" default="Sizes must be smaller than medium thumbnail size (at Thumbnails TAB)" description="" level="level4" class="alert alert-info fcpadded"/>
+			<field name="" type="separator" default="FLEXI_ABOUT_PREVIEW_THUMBNAILS_SIZES" description="" level="level3" class="alert alert-info fcpadded"/>
 			<field name="preview_w" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="preview_h" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+
+
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGE" description="" level="level2" />
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGE_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
+			<field name="resize_on_upload" type="radio" default="1" label="FLEXI_FIELD_IMAGE_RESIZE_ORIGINAL" description="FLEXI_FIELD_IMAGE_RESIZE_ORIGINAL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="upload_max_w" type="text" default="4000" size="5" label="FLEXI_IMAGE_WIDTH" description="" />
+			<field name="upload_max_h" type="text" default="3000" size="5" label="FLEXI_IMAGE_HEIGHT" description="" />
+			<field name="method_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
+
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 

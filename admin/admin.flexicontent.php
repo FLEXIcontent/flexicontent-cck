@@ -305,7 +305,7 @@ if ( $format == 'html' )
 	JHtml::_('behavior.framework', true);
 	
 	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
-	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
+	if ($view != 'item' || $view != 'fileselement') flexicontent_html::loadFramework('jQuery');
 	
 	if ( 1 ) // always load tooltips JS in backend
 	{

@@ -81,6 +81,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 <?php endif;?>
 
 		<?php
+		$config_saved = $this->params->get('flexi_cat_extension');
+
 		if (version_compare(PHP_VERSION, FLEXI_PHP_RECOMMENDED, '<'))
 		{
 			echo '<div class="fc-mssg fc-note">';
@@ -88,39 +90,37 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			echo '</div>';
 		}
 		$_title = "PHP/DB Requirements";
-		
+
 		// Set a system message with warning of failed PHP limits
 		$phplimits_printed = $app->getUserStateFromRequest( $option.'.flexicontent.phplimits_printed',	'phplimits_printed',	0, 'int' );
-		if ($this->dopostinstall && isset($php_lims['notice']))
+		if ($this->dopostinstall && isset($php_lims['warning']) && $config_saved)
 		{
 			$app->setUserState( $option.'.flexicontent.phplimits_printed', $phplimits_printed+1 );
-			if ($phplimits_printed < 1) {
-				echo '<div class="fc-mssg fc-note">';
-				echo '<b>PHP/DB requirements</b><br/>';
+			if ($phplimits_printed < 1)
+			{
+				$mssg = '<b>PHP/DB requirements</b><br/>';
 				foreach($php_lims as $type => $html) {
-					echo implode('<br/>', $html);
+					$mssg .= implode('<br/>', $html);
 				}
-				echo JText::sprintf(
+				$mssg .= JText::sprintf(
 					'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
 					For more information on changing these limitations, please see this article: %s',
 					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
 				);
-				echo '</div>';
+				JFactory::getApplication()->enqueueMessage($mssg, 'warning', '');
 			}
 		}
 		
-		if ( isset($php_lims['warning']) ) {
+		if ( isset($php_lims['warning']) )
 			$_title .= ' - <span class="badge badge-important">Warning</span>';
-		} else if ( isset($php_lims['notice']) ) {
+		else if ( isset($php_lims['notice']) )
 			$_title .= ' - <span class="badge badge-warning">Notice</span>';
-		} else {
+		else
 			$_title .= ' - <span class="badge badge-success">OK</span>';
-		}
 		?>
 		
 		<div id="fc-dash-boardbtns">
 		<?php
-		$config_saved = $this->params->get('flexi_cat_extension');
 		if (!$this->dopostinstall)
 		{
 			echo '<div class="fc-mssg fc-warning">';
@@ -132,19 +132,15 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			echo '<div class="fc-mssg fc-warning">';
 			if ( !$config_saved )
 			{
-				if ( FLEXI_J16GE ) {
-					$session = JFactory::getSession();
-					$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-					$_width = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-					$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-					$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-					$conf_link = 'index.php?option=com_config&view=component&component=com_flexicontent&path=';
-					$conf_link = '<a href="'.$conf_link.'" class="btn btn-warning">';
-					$msg = JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.JText::_("FLEXI_CONFIG").'</a>' );
-				} else {
-					$msg = str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SECTION_CHOOSEN' ));
-				}
-				echo $msg . '<br/>';
+				$session = JFactory::getSession();
+				$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+				$_width = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+				$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+				$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+				$conf_link = 'index.php?option=com_config&view=component&component=com_flexicontent&path=';
+				$conf_link = '<a href="'.$conf_link.'" class="btn btn-warning">';
+
+				echo JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.JText::_("FLEXI_CONFIG").'</a>' ) . '<br/>';
 			}
 			else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 			else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
@@ -387,11 +383,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			<?php ob_start(); ?>
 			<?php
 				echo JHtml::_('sliders.panel', $_title, 'requirements' );
-				echo '<table class="fc-table-list">';
+				echo '<div class="fc-mssg fc-note" style="margin: 24px; display: inline-block;">';
+				echo '<b>PHP/DB requirements</b><br/>';
 				foreach($php_lims as $type => $html) {
-					echo '<tr><td>'.implode('<br/>', $html).'</td></tr>';
+					echo implode('<br/>', $html);
 				}
-				echo '</table>';
+				echo JText::sprintf(
+					'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
+					For more information on changing these limitations, please see this article: %s',
+					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
+				);
+				echo '</div>';
 			?>
 			<?php $fc_requirements = ob_get_clean(); ?>
 			
@@ -529,7 +531,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['inprogress'])): ?>
 			<?php
-			$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge badge-info">'.$this->totalrows['inprogress'].'</span>';
+			$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge badge-info-2">'.$this->totalrows['inprogress'].'</span>';
 			echo JHtml::_('sliders.panel', $title, 'inprogress' );
 			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
@@ -592,7 +594,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['draft'])): ?>
 			<?php
-			$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge badge-info">'.$this->totalrows['draft'].'</span>';
+			$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge badge-info-2">'.$this->totalrows['draft'].'</span>';
 			echo JHtml::_('sliders.panel', $title, 'draft' );
 			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
