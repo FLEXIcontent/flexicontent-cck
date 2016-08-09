@@ -149,10 +149,10 @@ if ($enable_multi_uploader)
 	// Initialize a plupload Queue
 	if ($resize_on_upload)
 	{
-		$upload_max_w   = $this->field->parameters->get('upload_max_w', 4000);
-		$upload_max_h   = $this->field->parameters->get('upload_max_h', 3000);
-		$upload_quality = $this->field->parameters->get('upload_quality', 95);
-		$upload_crop    = $this->field->parameters->get('upload_crop', 1);
+		$upload_max_w   = (int) $this->field->parameters->get('upload_max_w', 4000);
+		$upload_max_h   = (int) $this->field->parameters->get('upload_max_h', 3000);
+		$upload_quality = (int) $this->field->parameters->get('upload_quality', 95);
+		$upload_method  = (int) $this->field->parameters->get('upload_method', 1);
 	}
 	
 	$js = '
@@ -287,7 +287,7 @@ if ($enable_multi_uploader)
 					width : '.$upload_max_w.',
 					height : '.$upload_max_h.',
 					quality : '.$upload_quality.',
-					crop: '.($upload_crop ? 'true' : 'false').'},
+					crop: '.($upload_method ? 'true' : 'false').'},
 				' : '').'
 				
 				// Specify what files to browse for
@@ -359,7 +359,7 @@ if ($enable_multi_uploader)
 					width : '.$upload_max_w.',
 					height : '.$upload_max_h.',
 					quality : '.$upload_quality.',
-					crop: '.($upload_crop ? 'true' : 'false').'},
+					crop: '.($upload_method ? 'true' : 'false').'},
 				' : '').'
 
 				// Specify what files to browse for
@@ -664,7 +664,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						if (file_exists($file_path)){
 							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=60&amp;h=60&amp;zc=1&amp;ar=x" alt="'.$filename_original.'" />';
 						} else {
-							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
+							$thumb_or_icon = '<span class="badge badge-box badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
 					}
 					
@@ -813,7 +813,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			
 				<?php if (!empty($this->cols['upload_time'])) : ?>
 					<td class="center hidden-tablet hidden-phone">
-						<?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?>
+						<?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
 					</td>
 				<?php endif; ?>
 			
@@ -862,7 +862,7 @@ flexicontent_html::loadFramework('flexi-lib');
 	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
 		
-		<?php if (!$this->CanUpload && !$this->layout!=='image') : /* image layout is not subject to upload check */ ?>
+		<?php if (!$this->CanUpload && !$this->layout!=='image') : /* image layout of fileselement view is not subject to upload check */ ?>
 			<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
 		<?php else : ?>
 		
@@ -873,10 +873,10 @@ flexicontent_html::loadFramework('flexi-lib');
 			$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
 			$server_limit_exceeded = $phpUploadLimit['value'] < $upload_maxsize;
 			
-			$conf_limit_class = $server_limit_exceeded ? '' : 'badge-success';
+			$conf_limit_class = $server_limit_exceeded ? 'badge badge-box' : '';
 			$conf_limit_style = $server_limit_exceeded ? 'text-decoration: line-through;' : '';
 			$conf_lim_image   = $server_limit_exceeded ? $warn_image.$hint_image : $hint_image;
-			$sys_limit_class  = $server_limit_exceeded ? 'badge-important' : '';
+			$sys_limit_class  = $server_limit_exceeded ? 'badge badge-box badge-important' : '';
 			
 			$limit_typename = $has_field_upload_maxsize ? 'FLEXI_FIELD_CONF_UPLOAD_MAX_LIMIT' : 'FLEXI_CONF_UPLOAD_MAX_LIMIT';
 			$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
@@ -885,28 +885,28 @@ flexicontent_html::loadFramework('flexi-lib');
 			<!--span class="alert alert-info fcpadded" style="font-size: 11px; margin-right:12px;" >'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span-->
 			<span class="fc-fileman-upload-limits-box" style="font-size: 14px !important;">
 			<table style="border-collapse: collapse;">
-				<tr>
+				<tr class="fc-about-size-limits">
 					<td style="padding-right: 24px;">
-						<div class="alert alert-info" style="padding: 2px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
+						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
 					</td>
 					<td>
-						<span class="fc-sys-upload-limit-box">
+						<span class="fc-sys-upload-limit-box fc-about-conf-size-limit">
 							<span class="icon-database"></span>
-							<span class="badge '.$conf_limit_class.' '.$tip_class.'" style="margin-right: 4px; '.$conf_limit_style.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'">'.round($upload_maxsize / (1024*1024), 2).'</span> MBytes
+							<span class="'.$conf_limit_class.' '.$tip_class.'" style="margin-right: 4px; '.$conf_limit_style.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'">'.round($upload_maxsize / (1024*1024), 2).'</span> MBytes
 						</span>
 						'.($perms->SuperAdmin ?
 							'<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'"></span>
 						' : '').'
 						'.($server_limit_exceeded && ! $enable_multi_uploader ? /* plupload JS overcomes server limitations so we will not display it, if using plupload*/
 						'
-							<span class="fc-php-upload-limit-box">
+							<span class="fc-php-upload-limit-box fc-about-server-size-limit">
 								<span class="icon-database"></span>
-								<span class="badge '.$sys_limit_class.' '.$tip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.round($phpUploadLimit['value'] / (1024*1024), 2).'</span> MBytes
+								<span class="'.$sys_limit_class.' '.$tip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.round($phpUploadLimit['value'] / (1024*1024), 2).'</span> MBytes
 							</span>
 						' : '').'
 					</td>
 					'.($enable_multi_uploader ? '
-					<td rowspan="2" style="padding-left: 48px;">
+					<td rowspan="3" style="padding-left: 48px;">
 						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); jQuery(\'#multiple_uploader\').height(210); setTimeout(function(){showUploader()}, 100);"
 							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'"
 						>
@@ -915,17 +915,32 @@ flexicontent_html::loadFramework('flexi-lib');
 					<td>' : '').'
 				</tr>
 
-				<tr>
+				'.($resize_on_upload ? '
+				<tr class="fc-about-dim-limits">
 					<td style="padding-right: 24px;">
-						<div class="alert alert-info" style="padding: 2px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'</div>
+						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-contract-2"></span>
-							<span class="badge badge-success'.$sys_limit_class.' '.$tip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC', '', 1, 1).'">'.$upload_max_w.'x'.$upload_max_h.'</span> Pixels
+							<span class="'.$sys_limit_class.' '.$tip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC', '', 1, 1).'">'.$upload_max_w.'x'.$upload_max_h.'</span> Pixels
 						</span>
 					</td>
 				</tr>
+
+				<tr class="fc-about-crop-quality-limits">
+					<td style="padding-right: 24px;">
+						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'</div>
+					</td>
+					<td>
+						<span class="fc-php-upload-limit-box">
+							<span class="icon-scissors" style="margin-right: 4px;'.($upload_method ? '' : 'opacity: 0.3;').'"></span>
+							<span class="" style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% '.JText::_('FLEXI_QUALITY', true).'</span>
+						</span>
+					</td>
+				</tr>
+				' : '').'
+
 			</table>
 			</span>
 			';

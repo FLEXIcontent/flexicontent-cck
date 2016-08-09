@@ -71,6 +71,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 		
 		// Get folder mode
+		$fieldid = 0;  //$jinput->get('field', 0, 'int');
 		$_view = $view;
 		$folder_mode = 0;
 		
