@@ -1503,7 +1503,7 @@
 	</fieldset>
 	<fieldset name="files_conf_fset" label="Files" description="" >
 
-		<field name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level0" class="fc-nomargin" />
 
 			<field name="display_file_lang_as" type="list" default="0" label="FLEXI_DISPLAY_FILE_LANG_AS" description="FLEXI_DISPLAY_FILE_LANG_AS_DESC">
 				<option value="1">FLEXI_DISPLAY_LANG_AS_DROP_DOWN_WITHOUT</option>
@@ -1514,15 +1514,15 @@
 				<option value="6">FLEXI_DISPLAY_LANG_AS_CHECKBOXES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_LIMITS" label="" level="level1" />
+			<field name="" type="separator" default="FLEXI_LIMITS" label="" level="level2" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="upload_extensions" type="textarea" rows="2" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />
 
-			<field name="" type="separator" default="FLEXI_FOLDERS" label="" level="level1" />
+			<field name="" type="separator" default="FLEXI_FOLDERS" label="" level="level2" />
 			<field name="file_path" type="text" size="50" default="components/com_flexicontent/uploads" label="FLEXI_PATH_TO_FILE_FOLDER" description="FLEXI_TIPFILEFOLDER" class="input-xxlarge" />
 			<field name="media_path" type="text" size="50" default="components/com_flexicontent/medias" label="FLEXI_PATH_TO_MEDIA_FOLDER" description="FLEXI_TIPMEDIAFOLDER" class="input-xxlarge" />
 
-			<field name="" type="separator" default="FLEXI_RESTRICT_UPLOADS_VERIFY_FILE_CONTENTS" label="" level="level1" />
+			<field name="" type="separator" default="FLEXI_RESTRICT_UPLOADS_VERIFY_FILE_CONTENTS" label="" level="level2" />
 			<field name="restrict_uploads" type="fcradio" default="1" label="FLEXI_RESTRICT_UPLOADS" description="FLEXI_RESTRICT_UPLOADS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_RESTRICT_UPLOADS_CHECK_CONTENTS</option>

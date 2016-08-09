@@ -240,25 +240,33 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$filepath 	  = JPath::clean($path.strtolower($filename));
 		
 		// Check if uploaded file is valid
-		if (!$upload_check) {
-			if ($format == 'json') {
+		if (!$upload_check)
+		{
+			if ($format == 'json')
+			{
 				jimport('joomla.error.log');
 				$log = JLog::getInstance('com_flexicontent.error.php');
-				$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err));
+				$log->addEntry( array('comment' => 'Invalid: ' . $filepath . ': ' . JText::_($err)) );
 				header('HTTP/1.0 415 Unsupported Media Type');
 				if ($task=='uploads') {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Error. Unsupported Media Type!"}, "id" : "id"}');
+					die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "'.JText::_($err, true).'"}, "id" : "id"}');
 				} else {
-					die('Error. Unsupported Media Type!');
+					die(JText::_($err));
 				}
-			} else {
-				if ($task=='uploads') {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "'.$err.'"}, "id" : "id"}');
-				} else {
-					JError::raiseNotice(100, JText::_($err));
-					// REDIRECT
-					if ($return) {
-						$app->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
+			}
+
+			else
+			{
+				if ($task=='uploads')
+				{
+					die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "'.JText::_($err, true).'"}, "id" : "id"}');
+				}
+				else
+				{
+					JError::raiseNotice(415, JText::_($err));
+					if ($return)  // REDIRECT
+					{
+						$app->redirect(base64_decode($return) ."&". JSession::getFormToken() ."=1");
 					}
 				}
 				return;
@@ -537,21 +545,27 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$app->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 		}
 		
-		$c = 0;
+		$added = array();
+		$excluded = array();
 		$file_ids = array();
-		if($filenames)
+		if ($filenames)
 		{
 			for ($n=0; $n<count($filenames); $n++)
 			{
 				$ext = strtolower(JFile::getExt($filesdir . $filenames[$n]));
-				if ( !in_array($ext, $allowed) ) continue;
+				if ( !in_array($ext, $allowed) )
+				{
+					$excluded[] = $filenames[$n];
+					continue;
+				}
 				
 				$source 		= $filesdir . $filenames[$n];
 				$filename		= flexicontent_upload::sanitize($destpath, $filenames[$n]);
 				$destination 	= $destpath . $filename;
 				
 				// Check for file already added by import task and do not re-add the file
-				if ( $is_importcsv && isset($imported_files[$source]) ) {
+				if ( $is_importcsv && isset($imported_files[$source]) )
+				{
 					$file_ids[$filename] = $imported_files[$source];
 					continue;
 				}
@@ -582,11 +596,22 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					// Add file ID to files imported by import task
 					if ( $is_importcsv )  $imported_files[$source] = $file_ids[$filename];
 					
-					$c++;
+					$added[] = $filenames[$n];
 				}
 			}
-			$app->enqueueMessage(JText::sprintf( 'FLEXI_FILES_COPIED_SUCCESS', $c ));
-		} else {
+
+			if (count($added))
+			{
+				$app->enqueueMessage(JText::sprintf( 'FLEXI_FILES_COPIED_SUCCESS', count($added)), 'message');
+			}
+			if (count($excluded))
+			{
+				$app->enqueueMessage(JText::sprintf( 'FLEXI_FILES_EXCLUDED_WARNING', count($excluded) ) .' : '.implode(', ', $excluded), 'warning');
+			}
+		}
+
+		else
+		{
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILES_IN_DIR' ));
 			if (!$return) return;  // REDIRECT only if this was requested
 			$app->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");

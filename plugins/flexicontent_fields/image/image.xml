@@ -73,7 +73,7 @@
 			</field>
 			<field name="upload_max_w" type="text" default="4000" size="5" label="FLEXI_IMAGE_WIDTH" description="" />
 			<field name="upload_max_h" type="text" default="3000" size="5" label="FLEXI_IMAGE_HEIGHT" description="" />
-			<field name="method_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
+			<field name="upload_method" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>

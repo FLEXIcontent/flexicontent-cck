@@ -1419,6 +1419,9 @@ table.adminlist .pagination {
 body div .badge-info-2 {
 	background-color: #2b89a4;
 }
+body div .badge-box {
+	border-radius: 3px;
+}
 body div a.striketext {
 	text-decoration: line-through;
 	color: red;
@@ -2080,8 +2083,9 @@ input.invalid + .fccheckradio_lbl {
 #flexicontent {
 	margin: 0px;
 }
+body.contentpane.component #flexicontent,
 body.contentpane.modal #flexicontent {
-	margin: 8px;
+	margin: 8px 4px 4px 4px;
 }
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess,
@@ -2389,10 +2393,9 @@ table.fc-form-tbl td.data {
 	min-width: 540px;
 	height: 500px;
 	width: auto;
+	overflow: visible;
 }
-#multiple_uploader.fc_file_uploading overflow: visible
-	
-	.plupload_container {
+#multiple_uploader.fc_file_uploading .plupload_container {
 	padding: 0;
 }
 #multiple_uploader.fc_file_uploading ul.plupload_filelist_content li.plupload_file {
