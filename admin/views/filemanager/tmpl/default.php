@@ -35,7 +35,7 @@ $session = JFactory::getSession();
 $document = JFactory::getDocument();
 $cparams = JComponentHelper::getComponent('com_flexicontent')->params;
 
-$secure_folder_tip  = '<i data-placement="bottom" class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
+$secure_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
 
 // Common language strings
 $edit_entry = JText::_('FLEXI_EDIT_FILE', true);
