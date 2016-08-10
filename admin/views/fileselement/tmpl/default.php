@@ -159,18 +159,17 @@ if ($enable_multi_uploader)
 	}
 	
 	$js = '
-	// I handle the PostInit event. At this point, we will know which runtime
+	// Handle the PostInit event. At this point, we will know which runtime
 	// has loaded, and whether or not drag-drop functionality is supported.
 	// --
 	// NOTE: we use the "PostInit" instead of the "Init" event in order for the "dragdrop" feature to be correct defined
 	function handlePluploadInit( uploader, params )
 	{
-		//window.console.log( "Initialization complete." );
-		//window.console.log( "Drag-drop supported:", !! uploader.features.dragdrop );
+		window.console.log( uploader.features );
 	}
 	
 	
-	// I handle the files-added event. This is different that the queue-changed event.
+	// Handle the files-added event. This is different that the queue-changed event.
 	// Since at this point, we have an opportunity to reject files from the queue.
 	function handlePluploadFilesAdded( uploader, files )
 	{
@@ -278,7 +277,7 @@ if ($enable_multi_uploader)
 				// General settings
 				runtimes : "html5,html4,flash,silverlight",
 				url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
-				unique_names : true,
+				prevent_duplicates : true,
 				
 				// Set maximum file size and chunking to 1 MB
 				max_file_size : "'.$upload_maxsize.'",
@@ -350,7 +349,7 @@ if ($enable_multi_uploader)
 				// General settings
 				runtimes : "html5,html4,flash,silverlight",
 				url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
-				unique_names : true,
+				prevent_duplicates : true,
 				
 				// Set maximum file size and chunking to 1 MB
 				max_file_size : "'.$upload_maxsize.'",

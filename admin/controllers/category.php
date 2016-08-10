@@ -124,37 +124,33 @@ class FlexicontentControllerCategory extends JControllerForm
 		$user		= JFactory::getUser();
 		$userId		= $user->get('id');
 
-		// Check general edit permission first.
-		if ($user->authorise('core.edit', $this->extension)) {
+		// Zero record id return false to promote correct usage
+		if (!$recordId)
+		{
+			return false;
+		}
+
+		// Check "edit" permission on record asset (explicit or inherited)
+		if ($user->authorise('core.edit', 'com_content.category.'.$recordId))
+		{
 			return true;
 		}
 
-		// Check specific edit permission.
-		if ($user->authorise('core.edit', 'com_content.category.'.$recordId)) {
-			return true;
-		}
+		// Check "edit own" permission on record asset (explicit or inherited)
+		if ($user->authorise('core.edit.own', 'com_content.category.'.$recordId))
+		{
+			// Load record
+			$record = $this->getModel()->getItem($recordId);
 
-		// Fallback on edit.own.
-		// First test if the permission is available.
-		if ($user->authorise('core.edit.own', 'com_content.category.'.$recordId) || $user->authorise('core.edit.own', $this->extension)) {
-			// Now test the owner is the user.
-			$ownerId	= (int) isset($data['created_user_id']) ? $data['created_user_id'] : 0;
-			if (empty($ownerId) && $recordId) {
-				// Need to do a lookup from the model.
-				$record		= $this->getModel()->getItem($recordId);
-
-				if (empty($record)) {
-					return false;
-				}
-
-				$ownerId = $record->created_user_id;
+			// Record not found
+			if (empty($record))
+			{
+				return false;
 			}
 
-			// If the owner matches 'me' then do the test.
-			if ($ownerId == $userId) {
-				return true;
-			}
+			return $record->created_user_id == $userId;
 		}
+
 		return false;
 	 }
 
