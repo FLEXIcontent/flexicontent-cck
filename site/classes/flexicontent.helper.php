@@ -7203,7 +7203,11 @@ function FLEXISubmenu($cando)
 			'</a>', '', false);
 		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, '<span class="fcsb-icon-comments disabled"></span><span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
 		
-		if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'reviews';
+		if (file_exists($appsman_path))
+		{
+			if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
+		}
 		
 		call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
 		if ($perms->CanTypes)			call_user_func($addEntry, '<span class="fcsb-icon-types"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
@@ -7223,7 +7227,8 @@ function FLEXISubmenu($cando)
 	
 		call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
 		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
-		if (file_exists($appsman_path)) {
+		if (file_exists($appsman_path))
+		{
 			if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench"></span>'.JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
 		}
 		if ($perms->CanImport)		call_user_func($addEntry, '<span class="fcsb-icon-import"></span>'.JText::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
