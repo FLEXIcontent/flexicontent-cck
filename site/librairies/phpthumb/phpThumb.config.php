@@ -16,6 +16,7 @@ if ( ini_get('date.timezone')=='' && version_compare(phpversion(), '5.1.0', '>')
 	date_default_timezone_set('UTC');
 }
 
+// ALLOW INCLUDING CONFIG multiple times
 if (!defined('phpThumbConfigFileVersion'))
 {
 	define('phpThumbConfigFileVersion', '1.7.14');
@@ -27,6 +28,7 @@ if (!file_exists(dirname(__FILE__).'/phpthumb.functions.php') || !include_once(d
 	die('failed to include_once(phpthumb.functions.php) - realpath="'.realpath(dirname(__FILE__).'/phpthumb.functions.php').'"');
 }
 ob_end_clean();
+
 
 
 /****************************************************************************************/
@@ -218,8 +220,8 @@ $PHPTHUMB_CONFIG['http_user_agent'] = @$_SERVER['HTTP_USER_AGENT'];             
 
 // * Compatability settings
 $PHPTHUMB_CONFIG['disable_pathinfo_parsing']        = false;  // if true, $_SERVER[PATH_INFO] is not parsed. May be needed on some server configurations to allow normal behavior.
-$PHPTHUMB_CONFIG['disable_imagecopyresampled']      = false;  // if true, ImageCopyResampled is replaced with ImageCopyResampleBicubic. May be needed for buggy versions of PHP-GD.
-$PHPTHUMB_CONFIG['disable_onlycreateable_passthru'] = true;   // if true, any image that can be parsed by GetImageSize() can be passed through; if false, only images that can be converted to GD by ImageCreateFrom(JPEG|GIF|PNG) functions are allowed
+$PHPTHUMB_CONFIG['disable_imagecopyresampled']      = false;  // if true, imagecopyresampled is replaced with ImageCopyResampleBicubic. May be needed for buggy versions of PHP-GD.
+$PHPTHUMB_CONFIG['disable_onlycreateable_passthru'] = true;   // if true, any image that can be parsed by getimagesize() can be passed through; if false, only images that can be converted to GD by ImageCreateFrom(JPEG|GIF|PNG) functions are allowed
 $PHPTHUMB_CONFIG['disable_realpath']                = false;  // PHP realpath() function requires that "the running script must have executable permissions on all directories in the hierarchy, otherwise realpath() will return FALSE". Set config_disable_realpath=false to enable alternate filename-parsing that does not use realpath() function (but also does not resolve symbolic links)
 
 
@@ -253,7 +255,6 @@ $PHPTHUMB_DEFAULTS_DISABLEGETPARAMS  = false; // if true, GETstring parameters w
 
 // CURRENT WEBSITE CONFIGURATION
 include_once('phpThumb.config_OVERRIDE.php');
-//include_once('phpThumb.config_FC_DB_CONFIG.php');
 
 
 //////////////////////////////////////////////////////////////////////////////

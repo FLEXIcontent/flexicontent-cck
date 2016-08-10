@@ -10,22 +10,20 @@
 //                                                         ///
 //////////////////////////////////////////////////////////////
 
-//error_reporting(E_ALL & ~E_STRICT);
-//ini_set('display_errors', '1');
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 ini_set('magic_quotes_runtime', '0');
 if (ini_get('magic_quotes_runtime')) {
 	die('"magic_quotes_runtime" is set in php.ini, cannot run phpThumb with this enabled');
 }
-
 // Set a default timezone if web server has not done already in php.ini
-if ( ini_get('date.timezone')=='' && version_compare(phpversion(), '5.1.0', '>')) {
-	date_default_timezone_set('UTC');
+if (!ini_get('date.timezone') && function_exists('date_default_timezone_set')) { // PHP >= 5.1.0
+    date_default_timezone_set('UTC');
 }
-
 $starttime = array_sum(explode(' ', microtime())); // could be called as microtime(true) for PHP 5.0.0+
 
 // this script relies on the superglobal arrays, fake it here for old PHP versions
-if (phpversion() < '4.1.0') {
+if (PHP_VERSION < '4.1.0') {
 	$_SERVER = $HTTP_SERVER_VARS;
 	$_GET    = $HTTP_GET_VARS;
 }
@@ -62,7 +60,7 @@ function RedirectToCachedFile() {
 		$phpThumb->DebugTimingMessage('skipped using cached image', __FILE__, __LINE__);
 		$phpThumb->DebugMessage('Would have used cached file, but skipping due to phpThumbDebug', __FILE__, __LINE__);
 		$phpThumb->DebugMessage('* Would have sent headers (1): Last-Modified: '.gmdate('D, d M Y H:i:s', $nModified).' GMT', __FILE__, __LINE__);
-		if ($getimagesize = @GetImageSize($phpThumb->cache_filename)) {
+		if ($getimagesize = @getimagesize($phpThumb->cache_filename)) {
 			$phpThumb->DebugMessage('* Would have sent headers (2): Content-Type: '.phpthumb_functions::ImageTypeToMIMEtype($getimagesize[2]), __FILE__, __LINE__);
 		}
 		if (preg_match('#^'.preg_quote($nice_docroot).'(.*)$#', $nice_cachefile, $matches)) {
@@ -89,7 +87,7 @@ function RedirectToCachedFile() {
 		}
 		header('Last-Modified: '.gmdate('D, d M Y H:i:s', $nModified).' GMT');
 		header('ETag: "'.md5_file($phpThumb->cache_filename).'"');
-		if ($getimagesize = @GetImageSize($phpThumb->cache_filename)) {
+		if ($getimagesize = @getimagesize($phpThumb->cache_filename)) {
 			header('Content-Type: '.phpthumb_functions::ImageTypeToMIMEtype($getimagesize[2]));
 		} elseif (preg_match('#\\.ico$#i', $phpThumb->cache_filename)) {
 			header('Content-Type: image/x-icon');
@@ -117,7 +115,7 @@ if (!include_once(dirname(__FILE__).'/phpthumb.class.php')) {
 ob_end_clean();
 $phpThumb = new phpThumb();
 $phpThumb->DebugTimingMessage('phpThumb.php start', __FILE__, __LINE__, $starttime);
-$phpThumb->SetParameter('config_error_die_on_error', true);
+$phpThumb->setParameter('config_error_die_on_error', true);
 
 if (!phpthumb_functions::FunctionIsDisabled('set_time_limit')) {
 	set_time_limit(60);  // shouldn't take nearly this long in most cases, but with many filters and/or a slow server...
@@ -235,6 +233,7 @@ if (empty($_SERVER['PATH_INFO']) && empty($_SERVER['QUERY_STRING'])) {
 }
 
 if (!empty($_GET['src']) && isset($_GET['md5s']) && empty($_GET['md5s'])) {
+	$md5s = '';
 	if (preg_match('#^([a-z0-9]+)://#i', $_GET['src'], $protocol_matches)) {
 		if (preg_match('#^(f|ht)tps?://#i', $_GET['src'])) {
 			if ($rawImageData = phpthumb_functions::SafeURLread($_GET['src'], $error, $phpThumb->config_http_fopen_timeout, $phpThumb->config_http_follow_redirect)) {
@@ -488,8 +487,8 @@ while ($CanPassThroughDirectly && $phpThumb->src) {
 	$SourceFilename = $phpThumb->ResolveFilenameToAbsolute($phpThumb->src);
 
 	// security and size checks
-	if ($phpThumb->getimagesizeinfo = @GetImageSize($SourceFilename)) {
-		$phpThumb->DebugMessage('Direct passthru GetImageSize() returned [w='.$phpThumb->getimagesizeinfo[0].';h='.$phpThumb->getimagesizeinfo[1].';t='.$phpThumb->getimagesizeinfo[2].']', __FILE__, __LINE__);
+	if ($phpThumb->getimagesizeinfo = @getimagesize($SourceFilename)) {
+		$phpThumb->DebugMessage('Direct passthru getimagesize() returned [w='.$phpThumb->getimagesizeinfo[0].';h='.$phpThumb->getimagesizeinfo[1].';t='.$phpThumb->getimagesizeinfo[2].']', __FILE__, __LINE__);
 
 		if (!@$_GET['w'] && !@$_GET['wp'] && !@$_GET['wl'] && !@$_GET['ws'] && !@$_GET['h'] && !@$_GET['hp'] && !@$_GET['hl'] && !@$_GET['hs']) {
 			// no resizing needed
@@ -513,8 +512,9 @@ while ($CanPassThroughDirectly && $phpThumb->src) {
 				break 2;
 		}
 
-		$ImageCreateFunctions = array(1=>'ImageCreateFromGIF', 2=>'ImageCreateFromJPEG', 3=>'ImageCreateFromPNG');
+		$ImageCreateFunctions = array(1=>'imagecreatefromgif', 2=>'imagecreatefromjpeg', 3=>'imagecreatefrompng');
 		$theImageCreateFunction = @$ImageCreateFunctions[$phpThumb->getimagesizeinfo[2]];
+		$dummyImage = false;
 		if ($phpThumb->config_disable_onlycreateable_passthru || (function_exists($theImageCreateFunction) && ($dummyImage = @$theImageCreateFunction($SourceFilename)))) {
 
 			// great
@@ -546,7 +546,7 @@ while ($CanPassThroughDirectly && $phpThumb->src) {
 		}
 
 	} else {
-		$phpThumb->DebugMessage('Not passing "'.$SourceFilename.'" through directly because GetImageSize() failed', __FILE__, __LINE__);
+		$phpThumb->DebugMessage('Not passing "'.$SourceFilename.'" through directly because getimagesize() failed', __FILE__, __LINE__);
 		break;
 	}
 	break;
@@ -595,11 +595,11 @@ if ($phpThumb->rawImageData) {
 		$alpha = (100 - min(100, max(0, $opacity))) * 1.27;
 		if ($alpha) {
 			$phpThumb->setParameter('is_alpha', true);
-			ImageAlphaBlending($phpThumb->gdimg_source, false);
-			ImageSaveAlpha($phpThumb->gdimg_source, true);
+			imagealphablending($phpThumb->gdimg_source, false);
+			imagesavealpha($phpThumb->gdimg_source, true);
 		}
 		$new_background_color = phpthumb_functions::ImageHexColorAllocate($phpThumb->gdimg_source, $bghexcolor, false, $alpha);
-		ImageFilledRectangle($phpThumb->gdimg_source, 0, 0, $phpThumb->w, $phpThumb->h, $new_background_color);
+		imagefilledrectangle($phpThumb->gdimg_source, 0, 0, $phpThumb->w, $phpThumb->h, $new_background_color);
 	} else {
 		$phpThumb->ErrorImage('failed to create "new" image ('.$phpThumb->w.'x'.$phpThumb->h.')');
 	}
@@ -695,5 +695,3 @@ if (isset($_GET['phpThumbDebug']) && ($_GET['phpThumbDebug'] == '10')) {
 	$phpThumb->phpThumbDebug();
 }
 ////////////////////////////////////////////////////////////////
-
-?>
