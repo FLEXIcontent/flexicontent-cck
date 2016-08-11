@@ -1288,7 +1288,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			
 			// Skip main category from the selected cats to allow easy change of it
 			$featured_sel_nomain = array();
-			foreach($featured_sel_nomain as $cat_id) if ($cat_id!=$item->catid) $featured_sel_nomain[] = $cat_id;
+			foreach($featured_sel as $cat_id) if ($cat_id!=$item->catid) $featured_sel_nomain[] = $cat_id;
 			
 			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, true,	$actions_allowed,
