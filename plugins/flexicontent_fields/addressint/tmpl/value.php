@@ -45,7 +45,24 @@ $map_height = (int) $field->parameters->get('map_height',150);
 $field_prefix = $field->parameters->get('field_prefix','');
 $field_suffix = $field->parameters->get('field_suffix','');
 
-$style = $field->parameters->get('style','');
+static $addressint_map_styles = array();
+
+if ( !isset($addressint_map_styles[$field->id]) )
+{
+	$map_style = $field->parameters->get('map_style','');
+	json_decode($map_style);
+	if (json_last_error() == JSON_ERROR_NONE)
+	{
+		$addressint_map_styles[$field->id] = $map_style;
+	}
+	else
+	{
+		$addressint_map_styles[$field->id] = null;
+		echo '<div class="alert alert-warning"> Bad map styling was set for Address International field #: '. $field->id.'</div>';
+	}		 
+}
+$map_style = $addressint_map_styles[$field->id];
+
 
 $list_states = array(
 	'AL'=>'Alabama',
@@ -260,8 +277,8 @@ foreach ($this->values as $n => $value)
 					mapTypeControl: false,
 					scaleControl: false,
 					streetViewControl: false,
-					rotateControl: false,
-					styles: '.$style.', 
+					rotateControl: false
+					'.($map_style ? ',styles: '.$map_style : '').'
 				});
 				
 				var myInfoWindow = new google.maps.InfoWindow({
