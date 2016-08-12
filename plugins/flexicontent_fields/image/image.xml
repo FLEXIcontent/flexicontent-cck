@@ -65,27 +65,13 @@
 			<field name="preview_h" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
 
 
-			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGE" description="" level="level2" />
-			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGE_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
-			<field name="resize_on_upload" type="radio" default="1" label="FLEXI_FIELD_IMAGE_RESIZE_ORIGINAL" description="FLEXI_FIELD_IMAGE_RESIZE_ORIGINAL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="upload_max_w" type="text" default="4000" size="5" label="FLEXI_IMAGE_WIDTH" description="" />
-			<field name="upload_max_h" type="text" default="3000" size="5" label="FLEXI_IMAGE_HEIGHT" description="" />
-			<field name="upload_method" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_SCALE</option>
-				<option value="1">FLEXI_CROP</option>
-			</field>
-
-
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 
 			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC">
-				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla media manager</option>
-				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla article images: (intro + full)</option>
-				<option value="0"  show_list="img-db-mode"  hide_list="img-fld-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
-				<option value="1"  show_list="img-fld-mode" hide_list="img-db-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
+				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode,client-resize">Joomla media manager</option>
+				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode,client-resize">Joomla article images: (intro + full)</option>
+				<option value="0"  show_list="img-db-mode"  hide_list="img-fld-mode,client-resize">FLEXI_FIELD_REUSABLE_DB_MODE</option>
+				<option value="1"  show_list="img-fld-mode,client-resize" hide_list="img-db-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level1" depend_class="img-fld-mode" />
@@ -135,6 +121,22 @@
 				<option value="0">FLEXI_FIELD_UNIQUE_THUMB_FIELD_ID</option>
 				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER_IN_THUMBS_TAB</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level2" depend_class="client-resize"  />
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" depend_class="client-resize"  class="alert alert-info fcpadded"/>
+			<field name="resize_on_upload" type="multilist" subtype="radio" default="1" label="FLEXI_RESIZE_ON_UPLOADED_IMAGE" description="FLEXI_RESIZE_ON_UPLOADED_IMAGE_DESC" depend_class="client-resize"  class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="upload_max_w" type="text" default="4000" size="5" label="FLEXI_IMAGE_WIDTH" description="..." depend_class="client-resize"  />
+			<field name="upload_max_h" type="text" default="3000" size="5" label="FLEXI_IMAGE_HEIGHT" description=".." depend_class="client-resize"  />
+			<field name="upload_method" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" depend_class="client-resize" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
+
 			
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" icon_class="icon-checkmark-circle" level="tab_open" box_type="1" />
 			

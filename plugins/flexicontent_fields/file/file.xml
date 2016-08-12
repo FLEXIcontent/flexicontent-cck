@@ -97,8 +97,8 @@
 			
 			<field name="" type="separator" default="File properties editing" description="" level="level2"/>
 			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Select to allow editing file properties elements" class="btn-group group-fcmethod">
-				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on">FLEXI_NO</option>
-				<option value="0" show_list="inline-edit-on" hide_list="inline-edit-off">FLEXI_YES</option>
+				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on,client-resize">FLEXI_NO</option>
+				<option value="0" show_list="inline-edit-on,client-resize" hide_list="inline-edit-off">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="" level="level3" depend_class="inline-edit-on" />
@@ -127,6 +127,22 @@
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level2" depend_class="client-resize use-myfiles-on"  />
+			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" depend_class="client-resize use-myfiles-on"  class="alert alert-info fcpadded"/>
+			<field name="resize_on_upload" type="multilist" subtype="radio" default="1" label="FLEXI_RESIZE_ON_UPLOADED_IMAGE" description="FLEXI_RESIZE_ON_UPLOADED_IMAGE_DESC" depend_class="client-resize use-myfiles-on"  class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="upload_max_w" type="text" default="4000" size="5" label="FLEXI_IMAGE_WIDTH" description="..." depend_class="client-resize use-myfiles-on"  />
+			<field name="upload_max_h" type="text" default="3000" size="5" label="FLEXI_IMAGE_HEIGHT" description=".." depend_class="client-resize use-myfiles-on"  />
+			<field name="upload_method" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" depend_class="client-resize use-myfiles-on" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
+
 			
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
