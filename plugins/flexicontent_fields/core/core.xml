@@ -118,7 +118,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 			
-			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
+			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
 				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC2</option>
 				<option value="DATE_FORMAT_LC3" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC3</option>
@@ -426,7 +426,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 			
-			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
+			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
 				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC2</option>
 				<option value="DATE_FORMAT_LC3" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC3</option>
