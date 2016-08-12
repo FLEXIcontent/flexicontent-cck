@@ -63,7 +63,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$tip_class     = $tooltip_class;  // Compatibility with older custom templates
 		
 		// Get a unique id to use as item id if current item is new
-		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
+		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 		
 		
 		// ****************
@@ -156,7 +156,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect
 			.'&amp;filter_uploader='.$user->id
 			.'&amp;targetid=%s'
-			.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+			.'&amp;' . JSession::getFormToken() . '=1';
 		
 		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
 		
@@ -765,16 +765,19 @@ class plgFlexicontent_fieldsFile extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
-		
+
 		// Get configuration
+		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
+		$import_docs_folder = $jinput->get('import_docs_folder', '', 'string');
+
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
-		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
-		$import_docs_folder  = JRequest::getVar('import_docs_folder');
-		
 		$iform_allowdel = $field->parameters->get('iform_allowdel', 1);
-		
+
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
@@ -931,17 +934,17 @@ class plgFlexicontent_fieldsFile extends FCField
 					}
 					
 					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
-					JRequest::setVar( 'return-url', null, 'post' );  // needed !
-					JRequest::setVar( 'secure', $v['secure'], 'post' );
-					JRequest::setVar( 'file-title', $v['file-title'], 'post' );
-					JRequest::setVar( 'file-desc', $v['file-desc'], 'post' );
-					JRequest::setVar( 'file-lang', $v['file-lang'], 'post' );
+					$jinput->set('return-url', null);  // needed !
+					$jinput->set('secure', $v['secure']);
+					$jinput->set('file-title', $v['file-title']);
+					$jinput->set('file-desc', $v['file-desc']);
+					$jinput->set('file-lang', $v['file-lang']);
 					
 					// The dform field name of the <input type="file" ...
-					JRequest::setVar( 'file-ffname', 'custom', 'post' );
-					JRequest::setVar( 'fname_level1', $field->name, 'post' );
-					JRequest::setVar( 'fname_level2', $n, 'post' );
-					JRequest::setVar( 'fname_level3', 'file-data', 'post' );
+					$jinput->set('file-ffname', 'custom');
+					$jinput->set('fname_level1', $field->name);
+					$jinput->set('fname_level2', $n);
+					$jinput->set('fname_level3', 'file-data');
 					$file_id = $fman->upload();
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
 				}
@@ -1195,14 +1198,16 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
+		$app  = JFactory::getApplication();
+
+		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		
-		//$tree_var = JRequest::getVar( 'tree_var', "" );
-		$file_id    = (int) JRequest::getInt( 'file_id', 0 );
-		$content_id = (int) JRequest::getInt( 'content_id', 0 );
-		$field_id   = (int) JRequest::getInt( 'field_id', 0 );
-		$tpl = JRequest::getCmd( '$tpl', 'default' );
+		$file_id    = $jinput->get('file_id', 0, 'int');
+		$content_id = $jinput->get('content_id', 0, 'int');
+		$field_id   = $jinput->get('field_id', 0, 'int');
+		$tpl = $jinput->get('tpl', 'default', 'cmd');
 		
 		// Check for missing file id
 		if (!$file_id) {
@@ -1227,11 +1232,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->field_id   = $field_id;
 
 		// Load with previous data, if it exists
-		$mailto		= JRequest::getString('mailto', '', 'post');
-		$sender		= JRequest::getString('sender', '', 'post');
-		$from			= JRequest::getString('from', '', 'post');
-		$subject	= JRequest::getString('subject', '', 'post');
-		$desc     = JRequest::getString('desc', '', 'post');
+		$mailto		= $jinput->get('mailto', '', 'string');
+		$sender		= $jinput->get('sender', '', 'string');
+		$from			= $jinput->get('from', '', 'string');
+		$subject	= $jinput->get('subject', '', 'string');
+		$desc     = $jinput->get('desc', '', 'string');
 
 		if ($user->get('id') > 0) {
 			$data->sender	= $user->get('name');
@@ -1262,11 +1267,13 @@ class plgFlexicontent_fieldsFile extends FCField
 	function share_file_email()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDbo();
 		$app  = JFactory::getApplication();
+
+		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		
@@ -1281,10 +1288,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		$FromName	= $app->getCfg('fromname');
 		
 		
-		$file_id    = (int) JRequest::getInt( 'file_id', 0 );
-		$content_id = (int) JRequest::getInt( 'content_id', 0 );
-		$field_id   = (int) JRequest::getInt( 'field_id', 0 );
-		$tpl = JRequest::getCmd( '$tpl', 'default' );
+		$file_id    = $jinput->get('file_id', 0, 'int');
+		$content_id = $jinput->get('content_id', 0, 'int');
+		$field_id   = $jinput->get('field_id', 0, 'int');
+		$tpl = $jinput->get('tpl', 'default', 'cmd');
 		
 		// Check for missing file id
 		if (!$file_id) {
@@ -1419,12 +1426,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		 */
 		unset ($headers, $fields);
 
-		$email		= JRequest::getString('mailto', '', 'post'); echo "<br>";
-		$sender		= JRequest::getString('sender', '', 'post'); echo "<br>";
-		$from			= JRequest::getString('from', '', 'post'); echo "<br>";
+		$email		= $jinput->get('mailto', '', 'string'); echo "<br>";
+		$sender		= $jinput->get('sender', '', 'string'); echo "<br>";
+		$from			= $jinput->get('from', '', 'string'); echo "<br>";
 		$_subject = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender); echo "<br>";
-		$subject  = JRequest::getString('subject', $_subject, 'post'); echo "<br>";
-		$desc     = JRequest::getString('desc', '', 'post'); echo "<br>";
+		$subject  = $jinput->get('subject', $_subject, 'string'); echo "<br>";
+		$desc     = $jinput->get('desc', '', 'string'); echo "<br>";
 		
 		// Check for a valid to address
 		$error	= false;

@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		// Get a unique id to use as item id if current item is new
-		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
+		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 		
 		// Check if using folder of original content being translated
 		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
@@ -2120,13 +2120,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
-		
+
 		// Get configuration
-		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
-		$import_media_folder  = JRequest::getVar('import_media_folder');
-		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
+		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
+		$import_media_folder = $jinput->get('import_media_folder', '', 'string');
+		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
+		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 		
 		$image_source = $field->parameters->get('image_source', 0);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
@@ -2158,7 +2162,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( $image_source >= 1 )
 		{
 			$dir = $field->parameters->get('dir');
-			$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
+			$unique_tmp_itemid = substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 			
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id . '_field_'.$field->id .DS );
 			//if ( $image_source > 1 ) ; // TODO
@@ -2277,11 +2281,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				else {
 					$fman = new FlexicontentControllerFilemanager();
-					JRequest::setVar( 'return-url', null, 'post' );
-					JRequest::setVar( 'file-dir-path', DS.$import_media_folder . $sub_folder, 'post' );
-					JRequest::setVar( 'file-filter-re', preg_quote($filename), 'post' );
-					JRequest::setVar( 'secure', 1, 'post' );
-					JRequest::setVar( 'keep', 1, 'post' );
+					$jinput->set('return-url', null);
+					$jinput->set('file-dir-path', DS.$import_media_folder . $sub_folder);
+					$jinput->set('file-filter-re', preg_quote($filename));
+					$jinput->set('secure', 1);
+					$jinput->set('keep', 1);
 					$file_ids = $fman->addlocal();
 					reset($file_ids);  // Reset array to point to first element
 					$v['originalname'] = key($file_ids);  // The (first) key of file_ids array is the cleaned up filename

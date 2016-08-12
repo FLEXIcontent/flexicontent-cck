@@ -63,7 +63,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$tip_class     = $tooltip_class;  // Compatibility with older custom templates
 		
 		// Get a unique id to use as item id if current item is new
-		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
+		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 		
 		
 		// ****************
@@ -467,6 +467,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		//$this->displayField( $formlayout );
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
+
 		foreach($field->html as &$_html_) {
 			$_html_ = '
 				'.($use_ingroup ? '' : '
@@ -476,7 +477,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					'.(!$add_position ? '' : $add_here).'
 				</div>
 				').'
-			'.$_html_;
+				'.$_html_;
 		}
 		unset($_html_);
 		
@@ -731,16 +732,19 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
-		
+
 		// Get configuration
+		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
+		$import_docs_folder = $jinput->get('import_docs_folder', '', 'string');
+
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
-		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
-		$import_docs_folder  = JRequest::getVar('import_docs_folder');
-		
 		$iform_allowdel = $field->parameters->get('iform_allowdel', 1);
-		
+
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
@@ -790,8 +794,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			else {
 	    	$file_id = isset($v['file-id']) ? (int) $v['file-id'] : $v;
 	    	$file_id = is_numeric($file_id) ? (int) $file_id : 0;  // if $v is not an array
-	    	
-	    	$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data']) ? $_FILES['custom']['error'][$field->name][$n]['file-data'] : UPLOAD_ERR_NO_FILE;
+				
+				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data']) ? $_FILES['custom']['error'][$field->name][$n]['file-data'] : UPLOAD_ERR_NO_FILE;
 				$new_file = $err_code === 0;
 				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
 				{
@@ -897,17 +901,17 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					}
 					
 					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
-					JRequest::setVar( 'return-url', null, 'post' );  // needed !
-					JRequest::setVar( 'secure', $v['secure'], 'post' );
-					JRequest::setVar( 'file-title', $v['file-title'], 'post' );
-					JRequest::setVar( 'file-desc', $v['file-desc'], 'post' );
-					JRequest::setVar( 'file-lang', $v['file-lang'], 'post' );
+					$jinput->set('return-url', null);  // needed !
+					$jinput->set('secure', $v['secure']);
+					$jinput->set('file-title', $v['file-title']);
+					$jinput->set('file-desc', $v['file-desc']);
+					$jinput->set('file-lang', $v['file-lang']);
 					
 					// The dform field name of the <input type="file" ...
-					JRequest::setVar( 'file-ffname', 'custom', 'post' );
-					JRequest::setVar( 'fname_level1', $field->name, 'post' );
-					JRequest::setVar( 'fname_level2', $n, 'post' );
-					JRequest::setVar( 'fname_level3', 'file-data', 'post' );
+					$jinput->set('file-ffname', 'custom');
+					$jinput->set('fname_level1', $field->name);
+					$jinput->set('fname_level2', $n);
+					$jinput->set('fname_level3', 'file-data');
 					$file_id = $fman->upload();
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
 				}
