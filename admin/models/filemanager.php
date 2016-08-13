@@ -92,7 +92,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
 		
-		$default_order     = 'f.id';
+		$default_order     = 'f.uploaded'; //'f.id';
 		$default_order_dir = 'DESC';
 		
 		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
@@ -222,23 +222,28 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 			
 			// Single property fields, get file usage (# assignments), if not already done by main query
-			if ( !$s_assigned_via_main && $s_assigned_fields) {
-				foreach ($s_assigned_fields as $field_type) {
+			if ( !$s_assigned_via_main && $s_assigned_fields)
+			{
+				foreach ($s_assigned_fields as $field_type)
+				{
 					$this->countFieldRelationsSingleProp( $this->_data, $field_type );
 				}
 			}
 			// Multi property fields, get file usage (# assignments)
-			if ($m_assigned_fields) {
-				foreach ($m_assigned_fields as $field_type) {
+			if ($m_assigned_fields)
+			{
+				foreach ($m_assigned_fields as $field_type)
+				{
 					$field_prop = $m_assigned_props[$field_type];
 					$value_prop = $m_assigned_vals[$field_type];
 					$this->countFieldRelationsMultiProp($this->_data, $value_prop, $field_prop, $field_type='image');
 				}
 			}
-			
+
 			$session = JFactory::getSession();
 			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
-			foreach ($this->_data as $row) {
+			foreach ($this->_data as $row)
+			{
 				// we have multiple item list indexed by field type, concatanate these
 				$itemids_list = !empty($row->item_list)  ?  implode(',', $row->item_list)  :  '';
 				// now create a item ids array that contains duplicates
@@ -304,7 +309,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function _buildQuery( $assigned_fields=array(), $item_id=0, $ids_only=false )
 	{
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$where = $this->_buildContentWhere();
@@ -410,7 +416,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
@@ -491,7 +498,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function _buildContentHaving()
 	{
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$filter_assigned	= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_assigned', 'filter_assigned', '', 'word' );
 		
@@ -516,7 +524,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQueryUsers() {
+	function _buildQueryUsers()
+	{
 		// Get the WHERE and ORDER BY clauses for the query
 		$where = $this->_buildContentWhere();
 		
@@ -587,7 +596,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,   'int' );
 		
@@ -657,7 +667,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,   'int' );
 		
