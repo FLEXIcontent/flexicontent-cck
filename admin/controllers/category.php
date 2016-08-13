@@ -122,22 +122,22 @@ class FlexicontentControllerCategory extends JControllerForm
 		// Initialise variables.
 		$recordId	= (int) isset($data[$key]) ? $data[$key] : 0;
 		$user		= JFactory::getUser();
-		$userId		= $user->get('id');
+		$_extension = 'com_content';
 
-		// Zero record id return false to promote correct usage
+		// Zero record (id:0), return component edit permission by calling parent controller method
 		if (!$recordId)
 		{
-			return false;
+			return parent::allowEdit($data, $key);
 		}
 
 		// Check "edit" permission on record asset (explicit or inherited)
-		if ($user->authorise('core.edit', 'com_content.category.'.$recordId))
+		if ($user->authorise('core.edit',  $_extension . '.category.'.$recordId))
 		{
 			return true;
 		}
 
 		// Check "edit own" permission on record asset (explicit or inherited)
-		if ($user->authorise('core.edit.own', 'com_content.category.'.$recordId))
+		if ($user->authorise('core.edit.own', $_extension . '.category.'.$recordId))
 		{
 			// Load record
 			$record = $this->getModel()->getItem($recordId);
@@ -148,11 +148,11 @@ class FlexicontentControllerCategory extends JControllerForm
 				return false;
 			}
 
-			return $record->created_user_id == $userId;
+			return $record->created_user_id == $user->get('id');
 		}
 
 		return false;
-	 }
+	}
 
 	/**
 	 * Method to run batch opterations.
@@ -161,7 +161,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	 */
 	public function batch($model)
 	{
-		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Set the model
 		$model	= $this->getModel('Category');

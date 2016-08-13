@@ -289,9 +289,6 @@ class FlexicontentModelType extends JModelAdmin
 	 */
 	function store($data)
 	{
-		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
-
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
 		$type = $this->getTable('flexicontent_types', '');
 		

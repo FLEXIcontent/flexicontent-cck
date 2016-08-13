@@ -156,7 +156,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect
 			//.'&amp;filter_uploader='.$user->id
 			.'&amp;targetid=%s'
-			.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+			.'&amp;' . JSession::getFormToken() . '=1';
 		
 		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
 		

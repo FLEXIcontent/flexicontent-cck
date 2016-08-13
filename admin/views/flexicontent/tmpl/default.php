@@ -339,7 +339,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				if(jQuery.trim(jQuery('#displayfversion').html())=='') {
 					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 					jQuery.ajax({
-						url: 'index.php?option=com_flexicontent&task=fversioncompare&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1',
+						url: 'index.php?option=com_flexicontent&task=fversioncompare&". JSession::getFormToken() ."=1',
 						success: function(str) {
 							jQuery('#displayfversion').html(str);
 							jQuery('#displayfversion').parent().css('height', 'auto');
@@ -665,7 +665,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
 							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							jQuery.ajax({
-								url: 'index.php?option=com_flexicontent&task=fversioncompare&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1',
+								url: 'index.php?option=com_flexicontent&task=fversioncompare&". JSession::getFormToken() ."=1',
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
 									jQuery('#displayfversion').parent().css('height', 'auto');

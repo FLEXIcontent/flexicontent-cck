@@ -60,15 +60,18 @@ class FlexicontentControllerImport extends FlexicontentController
 	 */
 	function importcsv()
 	{
+		$app = JFactory::getApplication();
+		$jinput = $app->input;
+
 		// Check for request forgeries
 		if (JRequest::getCmd( 'task' )!='importcsv') {
-			JRequest::checkToken() or jexit( 'Invalid Token' );	
+			JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));	
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />';
 			$fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			echo '<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VHASH.'" />';
 		} else {
 			// output this before every other output
-			echo 'success||||'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'||||';
+			echo 'success||||'. JSession::getFormToken() .'||||';
 		}
 		
 		// Get item model
@@ -78,7 +81,6 @@ class FlexicontentControllerImport extends FlexicontentController
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
 		$task  = JRequest::getCmd( 'task' );
-		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
@@ -534,6 +536,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		$items_per_call = JRequest::getInt( 'items_per_call', 0 );
 		JRequest::setVar('import_media_folder', $conf['media_folder']);
 		JRequest::setVar('import_docs_folder', $conf['docs_folder']);
+		$jinput->set('import_media_folder', $conf['media_folder']);
+		$jinput->set('import_docs_folder', $conf['docs_folder']);
 		
 		$lineno  = $task=='testcsv'  ?  1  :  $lineno + 1;
 		$linelim = $items_per_call ?  $lineno + $items_per_call - 1 : $itemcount;

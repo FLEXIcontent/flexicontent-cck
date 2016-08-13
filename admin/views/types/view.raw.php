@@ -51,7 +51,7 @@ class FlexicontentViewTypes extends JViewLegacy{
 		<tr>
 			<td>
 		';
-		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
 		$_name = '- '.JText::_("FLEXI_ANY") .' -';//.' ... '. JText::_("FLEXI_TYPE");
 		?>
 			<a class="<?php echo $btn_class; ?> btn-info" href="<?php echo $link; ?>" style="min-width:60px;" target="_parent">
@@ -65,7 +65,7 @@ class FlexicontentViewTypes extends JViewLegacy{
 			$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 			
-			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1";
 			
 			if ( !$allowed && $type->itemscreatable == 2 ) {
 				?>

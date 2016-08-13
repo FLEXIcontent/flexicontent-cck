@@ -58,7 +58,7 @@ $usetags_fe = $this->params->get('usetags_fe', 1);
 $tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe==2) ) ;
 
 // Create reusable html code
-$infoimage = $this->params->get('use_font_icons', 1) ? '<i class="icon-comment" style="color:darkgray"></i>' : JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
+$infoimage = $this->params->get('use_font_icons', 1) ? '<i class="icon-comment" style="color:darkgray"></i>' : JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ) );
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
@@ -1747,7 +1747,7 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<?php endif; ?>
 		<?php if ( $isnew ) echo $this->submitConf; ?>
 		
-		<input type="hidden" name="unique_tmp_itemid" value="<?php echo JRequest::getVar( 'unique_tmp_itemid' );?>" />
+		<input type="hidden" name="unique_tmp_itemid" value="<?php echo substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);?>" />
 
 	</form>
 	<div class="fcclear"></div>

@@ -168,20 +168,23 @@ foreach($values as $file_id)
 	
 	// f. DESCRIPTION: either as tooltip or as inline text
 	$descr_tip = $descr_inline = $descr_icon = '';
-	if (!empty($file_data->description)) {
+	if (!empty($file_data->description))
+	{
 		if ( !$authorized ) {
 			if ($noaccess_display != 2 ) {
 				$name_escaped = flexicontent_html::escapeJsText($name_str, 's');
 				$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
-				$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
+				$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 				$descr_inline  = '';
 			}
-		} else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
+		}
+		else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
 				$name_escaped = flexicontent_html::escapeJsText($name_str, 's');
 			$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
-			$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
+			$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
-		} else if ($display_descr==2) {  // As inline text
+		}
+		else if ($display_descr==2) {  // As inline text
 			$descr_inline = ' <div class="fcfile_descr_inline alert alert-info">'. nl2br($file_data->description) . '</div>';
 		}
 		if ($descr_icon) $descr_icon = '

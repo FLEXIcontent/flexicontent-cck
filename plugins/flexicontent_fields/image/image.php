@@ -3187,9 +3187,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		return $itemid_list;
 	}
 	
-	function getUploadLimitsTxt(&$field) {
+	function getUploadLimitsTxt(&$field)
+	{
 		$tooltip_class = 'hasTooltip';
-		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), '' );
+		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
 		
 		$upload_maxsize = $field->parameters->get('upload_maxsize');
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();

@@ -44,14 +44,14 @@ class FlexicontentControllerItems extends FlexicontentController
 	function getversionlist()
 	{
 		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		@ob_end_clean();
 		$id 		= JRequest::getInt('id', 0);
 		$active 	= JRequest::getInt('active', 0);
 		if(!$id) return;
 		$revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
 		$view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
-		$comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
+		$comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
 
 		$model 	= $this->getModel('item');
 		$model->setId($id);
@@ -87,7 +87,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				((int)$v->nr==(int)$currentversion) ? // is current version ?
 					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$item->id.'&version='.$v->nr.'\');" href="javascript:;">'.JText::_( 'FLEXI_CURRENT' ).'</a>' :
 					'<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]='.$item->id.'&version='.$v->nr.'&tmpl=component" title="'.JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ).'" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">'.$view.'</a>
-					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$item->id.'&version='.$v->nr.'&'.JSession::getFormToken().'=1\');" href="javascript:;" title="'.JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr ).'">'.$revert.'</a>
+					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&'.$ctrl_task.'&cid='.$item->id.'&version='.$v->nr.'&'. JSession::getFormToken() .'=1\');" href="javascript:;" title="'.JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr ).'">'.$revert.'</a>
 				').'
 				</td>
 			</tr>';
@@ -153,7 +153,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function viewtags()
 	{
 		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		@ob_end_clean();
 		//header("Content-type:text/json");
@@ -234,7 +234,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		<?php
 			foreach($state as $shortname => $statedata) {
 				$css = "width:216px; margin:0px 24px 12px 0px;";
-				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&". JSession::getFormToken() ."=1";
 				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
 		?>
 			<span class="fc-filter nowrap_box">

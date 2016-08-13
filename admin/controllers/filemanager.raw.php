@@ -50,26 +50,41 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function countrows()
 	{
-		$start_microtime = microtime(true);
-		// Check for request forgeries
-		//JRequest::checkToken() or jexit( 'Invalid Token' );
-		//$params = JComponentHelper::getParams( 'com_flexicontent' );
-		
 		@ob_end_clean();
-		$indexer = JRequest::getVar('indexer','fileman_default');
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
+
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
+		{
+			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
+
+		// Test counting with limited memory
+		//ini_set("memory_limit", "20M");
+
+		$start_microtime = microtime(true);
+
+		$has_zlib    = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		$indexer     = JRequest::getVar('indexer','fileman_default');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
+
 		$session = JFactory::getSession();
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
-		
+
 		// Actions according to rebuildmode
-		if ($indexer!='fileman_default') {
+		if ($indexer!='fileman_default')
+		{
 			die("'rebuildmode': '".$rebuildmode."'. not supported");
 		}
-		
+
 		// Get ids of files to index
-		$fmanmodel = $this->getModel('filemanager');
-		$file_ids = $fmanmodel->getFileIds($skip_urls=true);
+		$model = $this->getModel('filemanager');
+		$file_ids = $model->getFileIds($skip_urls=true);
 		
 		// Set file ids into session to avoid recalculation ...
 		$session->set($indexer.'_items_to_index', $file_ids, 'flexicontent');
@@ -94,11 +109,28 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	
 	function index()
 	{
+		@ob_end_clean();
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
+
+		// Check for request forgeries
+		//JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		// Not need because this task need the user session data that are set by countrows that checked for forgeries
+
+		if (!FlexicontentHelperPerm::getPerm()->SuperAdmin)
+		{
+			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
+
+		// Test indexing with limited memory
+		//ini_set("memory_limit", "20M");
+
 		$start_microtime = microtime(true);
+
 		$session = JFactory::getSession();
 		$db = JFactory::getDBO();
 		
-		@ob_end_clean();
 		$indexer = JRequest::getVar('indexer','fileman_default');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 		

@@ -51,7 +51,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		if ( !empty($conf) )
-			echo 'success|'.count($conf['contents_parsed']).'|'.$lineno.'|'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());
+			echo 'success|'.count($conf['contents_parsed']).'|'.$lineno.'|'. JSession::getFormToken();
 		else
 			echo 'fail|0|0';
 		jexit();
