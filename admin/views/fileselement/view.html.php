@@ -78,10 +78,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Get user's global permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 		
-		// Get folder mode
-		$fieldid = $jinput->get('field', 0, 'int');
+		// Get field id and folder mode
+		$fieldid = $view=='fileselement' ? $jinput->get('field', 0, 'int') : null;   // Force no field id for filemanager
 		$_view = $view.$fieldid;
-		$folder_mode = $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode',      'folder_mode',      0,           'int' );
+		$folder_mode = !$fieldid ? 0 :
+			$app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode', 'folder_mode', 0, 'int' );
 		
 		
 		
@@ -112,12 +113,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 				$field->parameters = new JRegistry($field->attribs);
 			}
 			else
-				$fieldid = 0;
+				$fieldid = null;
 		}
 
-		// *** BOF FILESELEMENT view specific ***
-		// Column disabling only applicable for FILESELEMENT view
-		if (!$folder_mode)
+		// Column disabling only applicable for FILESELEMENT view, with field in DB mode (folder_mode==0)
+		if (!$folder_mode && $fieldid)
 		{
 			// Clear secure/media filter if field is not configured to use specific
 			$target_dir = $field->parameters->get('target_dir', '');
@@ -125,17 +125,34 @@ class FlexicontentViewFileselement extends JViewLegacy
 			
 			$filelist_cols = FLEXIUtilities::paramToArray( $field->parameters->get('filelist_cols', array('upload_time', 'hits')) );
 			
-			$cols = array();
+		}
+
+		// Column selection of optional columns given
+		if ( !empty($filelist_cols) )
+		{
 			foreach($filelist_cols as $col) $cols[$col] = 1;
 			unset($cols['_SAVED_']);
 		}
-		// *** EOF FILESELEMENT view specific ***
-		
+
+		// Column selection of optional columns not given
+		else
+		{
+			// Filemanager view, add all columns
+			if ($view=='filemanager')
+			{
+				foreach($optional_cols as $col) $cols[$col] = 1;
+			}
+			
+			// Fileselement view, show none of optional columns
+			else ;
+		}
+
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
 		$filter_item      = $app->getUserStateFromRequest( $option.'.'.$_view.'.item_id',          'item_id',          '',           'int' );
 		
-		if ($layout!='image') {
+		if ($layout!='image')
+		{
 			if ($filter_lang) $count_filters++;
 			if ($filter_url) $count_filters++;
 			if ($filter_secure) $count_filters++;
@@ -155,9 +172,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		if ($filter_uploader && !empty($this->cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
-		// *** BOF FILESELEMENT view specific ***
-		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id',        'u_item_id',        0,           'string' );
+		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
 		//if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // DO NOT SET it prevents listing and selecting files !!
+
+		// *** BOF FILESELEMENT view specific ***
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
 		$autoselect       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       0, 				  'int' );
@@ -205,12 +223,18 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		//FLEXISubmenu('CanFiles');  // not applicable for fileselement view
+		if ($view!='fileselement')
+		{
+			FLEXISubmenu('CanFiles');
+		}
 		
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_FILE' );
+		$doc_title = JText::_( 'FLEXI_FILEMANAGER' );
 		$site_title = $document->getTitle();
-		//JToolBarHelper::title( $doc_title, 'files' );  // not applicable for fileselement view
+		if ($view!='fileselement')
+		{
+			JToolBarHelper::title( $doc_title, 'files' );
+		}
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
@@ -222,10 +246,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Get data from the model
 		// ***********************
 		
-		if ( !$folder_mode ) {
+		// DB mode
+		if ( !$folder_mode )
+		{
 			$rows  = $this->get('Data');
 			$img_folder = '';
-		} else {
+		}
+
+		// FOLDER mode
+		else
+		{
 			$exts = $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
 			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
 			
@@ -234,7 +264,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 			
 			$ext = strtolower(pathinfo($newfilename, PATHINFO_EXTENSION));
 			$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1&amp;ar=x';
+			$thumb_url = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1&amp;ar=x';
 		}
 		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
@@ -256,15 +286,15 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
 
 
-		// *** BOF FILESELEMENT view specific ***
+		// *** BOF FOLDER MODE specific ***
 
 		$fname = $model->getFieldName($fieldid);
 		$files_selected = $model->getItemFiles($u_item_id);
-		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
 		
 		// Add JS to document to initialize the file list
 		// eg Find and mark file usage by fileid / filename search (respectively: DB mode / Folder mode)
-		if ($folder_mode) {
+		if ($folder_mode)
+		{
 			$js = "
 			jQuery(document).ready(function()
 			{
@@ -306,7 +336,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					jQuery(rows).addClass('striketext');
 				}
 				"
-				.($autoassign && $newfilename ? "window.parent.qmAssignFile".$fieldid."('".$targetid."', '".$newfilename."', '".$thumb."');" : "")
+				.($autoassign && $newfilename ? "window.parent.qmAssignFile".$fieldid."('".$targetid."', '".$newfilename."', '".$thumb_url."');" : "")
 				."
 			});
 			";
@@ -373,11 +403,12 @@ class FlexicontentViewFileselement extends JViewLegacy
 		}
 		
 		$document->addScriptDeclaration($js);
-		if ($autoselect && $newfileid) {
+		if ($autoselect && $newfileid)
+		{
 			$app->enqueueMessage(JText::_( 'FLEXI_UPLOADED_FILE_WAS_SELECTED' ), 'message');
 		}
 
-		// *** BOF FILESELEMENT view specific ***
+		// *** BOF FOLDER MODE specific ***
 		
 		
 		/*****************
@@ -462,28 +493,37 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
 		$lists['order']			= $filter_order;
-		
-		// removed files
-		$filelist = JRequest::getString('files');
-		$file = JRequest::getInt('file');
 
-		$filelist = explode(',', $filelist);
-		$files = array();
-		foreach ($filelist as $fileid)
+
+		// BOF *** REMOVED files *** fileselement VIEW
+		if ($view=='fileselement')
 		{
-			if ($fileid && $fileid != $file) {
-				$files[] = (int)$fileid;
-			}
-		}
+			$filelist = JRequest::getString('files');
+			$file = JRequest::getInt('file');
 
-		$files = implode(',', $files);
-		if (strlen($files) > 0) {
-			$files .= ',';
+			$filelist = explode(',', $filelist);
+			$files = array();
+			foreach ($filelist as $fileid)
+			{
+				if ($fileid && $fileid != $file) {
+					$files[] = (int)$fileid;
+				}
+			}
+
+			$files = implode(',', $files);
+			if (strlen($files) > 0) {
+				$files .= ',';
+			}
+			$files .= $file;
 		}
-		$files .= $file;
+		// EOF *** REMOVED files *** fileselement VIEW
+
+
+		// uploadstuff
+		jimport('joomla.client.helper');
+		$require_ftp = !JClientHelper::hasCredentials('ftp');
 		
 		//assign data to template
-		$this->assignRef('layout', $layout);
 		$this->assignRef('target_dir', $target_dir);
 		$this->assignRef('optional_cols', $optional_cols);
 		$this->assignRef('cols', $cols);
@@ -492,26 +532,36 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->assignRef('lists'      , $lists);
 		$this->assignRef('rows'       , $rows);
 		$this->assignRef('folder_mode', $folder_mode);
-		$this->assignRef('img_folder' , $img_folder);
-		$this->assignRef('thumb_w'    , $thumb_w);
-		$this->assignRef('thumb_h'    , $thumb_h);
 		$this->assignRef('pagination' , $pagination);
-		$this->assignRef('files' 			, $files);
-		$this->assignRef('fieldid' 		, $fieldid);
-		$this->assignRef('u_item_id' 	, $u_item_id);
-		$this->assignRef('targetid' 	, $targetid);
 		$this->assignRef('CanFiles'        , $perms->CanFiles);
 		$this->assignRef('CanUpload'       , $perms->CanUpload);
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
-		$this->assignRef('files_selected'  , $files_selected);
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
-		$this->field = !empty($field) ? $field : null;
 		$this->assignRef('langs', $langs);
+
+		$this->require_ftp = $require_ftp;
+		$this->layout  = $layout;
+		$this->field   = !empty($field) ? $field : null;
+		$this->fieldid = $fieldid;
+		$this->u_item_id  = $u_item_id;
 		
 		$this->assignRef('option', $option);
 		$this->assignRef('view', $view);
 
+		if ($view=='fileselement')
+		{
+			$this->img_folder = $img_folder;
+			$this->thumb_w    = $thumb_w;
+			$this->thumb_h    = $thumb_h;
+			$this->files      = $files;
+			$this->targetid   = $targetid;
+			$this->files_selected = $files_selected;
+		}
+		else
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 		parent::display($tpl);
 	}
 	

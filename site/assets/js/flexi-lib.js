@@ -26,9 +26,6 @@
 		params.wintop  = (jQuery( window ).height() - params.winheight) / 2 - 5;
 		//window.console.log ('winleft : ' + params.winleft + ', wintop : ' + params.wintop);
 
-		var max_filelist_h = 568;
-		params.plupload_filelist_h = max_filelist_h > (jQuery( window ).height() - 480) ? (jQuery( window ).height() - 480) : max_filelist_h;
-		
 		return params;
 	}
 	
@@ -1126,7 +1123,6 @@
 			content_box.css({ 'height': h+'px', 'margin': '0', 'box-sizing': 'border-box' });
 			var body = content_box.find('iframe').contents().find('body');
 			body.css({ 'height': 'unset' });
-			body.find('.plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)').css({ 'height': params.plupload_filelist_h+'px' });
 		});
 	}
 
