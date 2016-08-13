@@ -50,7 +50,7 @@ class flexicontent_reviews extends JTable
 			$this->update_date = $datenow->toSql();
 		}
 		
-		return;
+		return true;
 	}
 }
 ?>

@@ -31,6 +31,8 @@ use Joomla\String\StringHelper;
  */
 class FlexicontentModelReviews extends JModelLegacy
 {
+	var $reviews_tbl = 'flexicontent_reviews_dev';
+
 	/**
 	 * Review data
 	 *
@@ -139,8 +141,8 @@ class FlexicontentModelReviews extends JModelLegacy
 		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
 	}
-	
-	
+
+
 	/**
 	 * Method to set the Review identifier
 	 *
@@ -153,8 +155,8 @@ class FlexicontentModelReviews extends JModelLegacy
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
-	
-	
+
+
 	/**
 	 * Method to get reviews data
 	 *
@@ -175,8 +177,8 @@ class FlexicontentModelReviews extends JModelLegacy
 		
 		return $this->_data;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the total nr of the reviews
 	 *
@@ -194,8 +196,8 @@ class FlexicontentModelReviews extends JModelLegacy
 
 		return $this->_total;
 	}
-	
-	
+
+
 	/**
 	 * Method to get a pagination object for the reviews
 	 *
@@ -213,8 +215,8 @@ class FlexicontentModelReviews extends JModelLegacy
 
 		return $this->_pagination;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for the reviews
 	 *
@@ -232,7 +234,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		$filter_order     = $this->getState( 'filter_order' );
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS r.*, u.name AS editor'
-			. ' FROM #__flexicontent_reviews_dev AS r'
+			. ' FROM #__'.$this->reviews_tbl.' AS r'
 			. ' LEFT JOIN #__users AS u ON u.id = r.checked_out'
 			. $where
 			. ' GROUP BY r.id'
@@ -242,6 +244,7 @@ class FlexicontentModelReviews extends JModelLegacy
 
 		return $query;
 	}
+
 
 	/**
 	 * Method to build the orderby clause of the query for the reviews
@@ -259,6 +262,7 @@ class FlexicontentModelReviews extends JModelLegacy
 
 		return $orderby;
 	}
+
 
 	/**
 	 * Method to build the where clause of the query for the reviews
@@ -297,8 +301,8 @@ class FlexicontentModelReviews extends JModelLegacy
 
 		return $where;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
@@ -312,8 +316,8 @@ class FlexicontentModelReviews extends JModelLegacy
 		
 		return $having;
 	}
-	
-	
+
+
 	/**
 	 * Method to (un)publish a review
 	 *
@@ -329,7 +333,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		{
 			$cids = implode( ',', $cid );
 
-			$query 	= 'UPDATE #__flexicontent_reviews_dev'
+			$query 	= 'UPDATE #__'.$this->reviews_tbl
 					. ' SET state = ' . (int) $publish
 					. ' WHERE id IN ('. $cids .')'
 					. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
@@ -359,7 +363,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		{
 			$cids = implode( ',', $cid );
 
-			$query 	= 'UPDATE #__flexicontent_reviews_dev'
+			$query 	= 'UPDATE #__'.$this->reviews_tbl
 					. ' SET approved = ' . (int) $publish
 					. ' WHERE id IN ('. $cids .')'
 					. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
@@ -372,8 +376,8 @@ class FlexicontentModelReviews extends JModelLegacy
 		}
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to remove a review
 	 *
@@ -388,7 +392,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__flexicontent_reviews_dev'
+			$query = 'DELETE FROM #__'.$this->reviews_tbl
 					. ' WHERE id IN ('. $cids .')'
 					;
 

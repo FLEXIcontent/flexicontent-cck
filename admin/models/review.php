@@ -30,6 +30,8 @@ jimport('legacy.model.legacy');
  */
 class FlexicontentModelReview extends JModelLegacy
 {
+	var $reviews_tbl = 'flexicontent_reviews_dev';
+
 	/**
 	 * Review data
 	 *
@@ -119,7 +121,7 @@ class FlexicontentModelReview extends JModelLegacy
 			} else {
 				
 				$query = 'SELECT *'
-						. ' FROM #__flexicontent_reviews_dev'
+						. ' FROM #__'.$this->reviews_tbl
 						. ' WHERE '
 						.(!$name_quoted ? ' id='.$this->_id : '')
 						.($name_quoted  ? ' name='.$name_quoted : '')
@@ -206,8 +208,8 @@ class FlexicontentModelReview extends JModelLegacy
 		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Tests if the review is checked out
 	 *
@@ -232,6 +234,7 @@ class FlexicontentModelReview extends JModelLegacy
 			return false;
 		}
 	}
+
 
 	/**
 	 * Method to store the review
@@ -262,11 +265,19 @@ class FlexicontentModelReview extends JModelLegacy
 			return false;
 		}
 		
-		$this->_review	=& $review;
+		$this->_review =& $review;
 
 		return true;
 	}
-	
+
+
+	/**
+	 * Method to add a new review
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
 	function addreview($title)
 	{	
 		$obj = new stdClass();

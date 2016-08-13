@@ -30,6 +30,8 @@ JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.
  */
 class FlexicontentControllerReviews extends FlexicontentController
 {
+	var $reviews_tbl = 'flexicontent_reviews_dev';
+
 	/**
 	 * Constructor
 	 *
@@ -56,7 +58,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$task  = JRequest::getVar('task');
 		$model = $this->getModel('review');
@@ -80,18 +82,16 @@ class FlexicontentControllerReviews extends FlexicontentController
 					$link = 'index.php?option=com_flexicontent&view=reviews';
 					break;
 			}
-			$msg = JText::_( 'FLEXI_TAG_SAVED' );
+			$msg = JText::_( 'FLEXI_REVIEW_SAVED' );
 
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
+			$reviewcache = JFactory::getCache('com_flexicontent_reviews');
+			$reviewcache->clean();
 
 		} else {
 
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_TAG' );
+			$msg = JText::_( 'FLEXI_ERROR_SAVING_REVIEW' );
 			JError::raiseWarning( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=review';
 		}
@@ -108,9 +108,8 @@ class FlexicontentControllerReviews extends FlexicontentController
 	 */
 	function checkin()
 	{
-		$tbl = 'flexicontent_reviews';
 		$redirect_url = 'index.php?option=com_flexicontent&view=reviews';
-		flexicontent_db::checkin($tbl, $redirect_url, $this);
+		flexicontent_db::checkin('flexicontent_reviews', $redirect_url, $this);
 		return;// true;
 	}
 	
@@ -128,7 +127,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$model = $this->getModel('reviews');
 		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_REVIEW_PUBLISH' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=reviews', '');
 			return;
 		}
@@ -139,7 +138,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		}
 		
 		$total = count( $cid );
-		$msg 	= $total.' '.JText::_( 'FLEXI_TAG_PUBLISHED' );
+		$msg 	= $total.' '.JText::_( 'FLEXI_REVIEW_PUBLISHED' );
 		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
 		
@@ -160,7 +159,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$model = $this->getModel('reviews');
 		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_REVIEW_UNPUBLISH' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=reviews', '');
 			return;
 		}
@@ -172,7 +171,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		$total = count( $cid );
-		$msg 	= $total.' '.JText::_( 'FLEXI_TAG_UNPUBLISHED' );
+		$msg 	= $total.' '.JText::_( 'FLEXI_REVIEW_UNPUBLISHED' );
 		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
 		
@@ -194,7 +193,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_REVIEW_DELETE' ) );
 		} else {
 
 			if (!$model->delete($cid)) {
@@ -202,7 +201,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 			
-			$msg = count($cid).' '.JText::_( 'FLEXI_TAGS_DELETED' );
+			$msg = count($cid).' '.JText::_( 'FLEXI_REVIEWS_DELETED' );
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
@@ -221,7 +220,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 	function cancel()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$post = JRequest::get('post');
 		//$post = FLEXI_J16GE ? $post['jform'] : $post;  //JForm currently not used for reviews
