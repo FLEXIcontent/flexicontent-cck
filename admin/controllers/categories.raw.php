@@ -57,7 +57,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 	function params( )
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$copyid		= JRequest::getInt( 'copycid', '', 'post' );
 		$destid		= JRequest::getVar( 'destcid', null, 'post', 'array' );

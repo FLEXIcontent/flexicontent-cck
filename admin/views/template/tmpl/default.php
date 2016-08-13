@@ -265,7 +265,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		jQuery.ajax({
 			type: form.attr('method'),
 			url: form.attr('action'),
-			data: { layout_name: layout_name, file_subpath: file_subpath, load_mode: load_mode, '<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>': 1 },
+			data: { layout_name: layout_name, file_subpath: file_subpath, load_mode: load_mode, '<?php echo JSession::getFormToken();?>': 1 },
 			success: function (data) {
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);

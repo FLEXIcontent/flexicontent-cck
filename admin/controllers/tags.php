@@ -56,7 +56,7 @@ class FlexicontentControllerTags extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$task  = JRequest::getVar('task');
 		$model = $this->getModel('tag');
@@ -221,7 +221,7 @@ class FlexicontentControllerTags extends FlexicontentController
 	function cancel()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$post = JRequest::get('post');
 		//$post = FLEXI_J16GE ? $post['jform'] : $post;  //JForm currently not used for tags

@@ -61,7 +61,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel('field');
 		$user  = JFactory::getUser();
@@ -380,7 +380,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	function cancel()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$post = JRequest::get('post');
 		$post = FLEXI_J16GE ? $post['jform'] : $post;
@@ -462,7 +462,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	function reorder($dir=null)
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
@@ -520,7 +520,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	function saveorder()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
@@ -554,7 +554,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	function access()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$user  = JFactory::getUser();
 		$model = $this->getModel('fields');
@@ -599,7 +599,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	function copy()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Get model, user, ids of copied fields
 		$model = $this->getModel('fields');
@@ -702,7 +702,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		foreach($state as $shortname => $statedata) {
 			$css = "width:216px; margin:0px 24px 12px 0px; text-align: left;";
-			$link = JURI::base(true)."/index.php?option=com_flexicontent&task=fields.toggleprop&propname=".$shortname."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+			$link = JURI::base(true)."/index.php?option=com_flexicontent&task=fields.toggleprop&propname=".$shortname."&". JSession::getFormToken() ."=1";
 			$icon = $statedata['icon'];
 			
 			if ($shortname=='issearch') echo '<br/><span class="label">'. JText::_( 'FLEXI_TOGGLE' ).'</span> '.JText::_( 'Content Lists' ).'<br/>';

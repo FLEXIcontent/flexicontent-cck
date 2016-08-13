@@ -54,7 +54,7 @@ class FlexicontentControllerTags extends FlexicontentController
 	function import( )
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$list  = JRequest::getVar( 'taglist', null, 'post', 'string' );
 		$list  = preg_replace("/[\"'\\\]/u", "", $list);
@@ -82,7 +82,7 @@ class FlexicontentControllerTags extends FlexicontentController
 	function addtag()
 	{
 		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$name 	= JRequest::getString('name', '');
 		$array = JRequest::getVar('cid',  0, '', 'array');

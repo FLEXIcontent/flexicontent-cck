@@ -80,7 +80,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$option = JRequest::getCmd( 'option');
 
@@ -213,7 +213,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 	function remove()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
@@ -290,7 +290,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 	function cancel( )
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=users' );
 	}
@@ -303,7 +303,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 	function block($check_uids=null, $check_task='block')
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDBO();
@@ -387,7 +387,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 	function logout( )
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDBO();

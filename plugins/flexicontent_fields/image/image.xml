@@ -33,7 +33,7 @@
 				<option value="2">FLEXI_CLEARED</option>
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
-			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
 				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
@@ -237,7 +237,7 @@
 			
 			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level2" />
 			<field name="default_method_item" type="multilist" subtype="radio" default="display" label="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD_DESC"
-				inline_tip="Single Thumb, will only allow popup galleries" tip_class="" tip_img="comment.png" class="btn-group group-fcinfo">
+				inline_tip="Single Thumb, will only allow popup galleries" tip_class="" tip_img="comments.png" class="btn-group group-fcinfo">
 				<option value="display">All thumbnails</option>
 				<option value="display_single">Single</option>
 				<option value="display_single_total">Single + total</option>
@@ -245,14 +245,14 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAT_CONTENT_LISTS" level="level2" />
 			<field name="default_method_cat" type="multilist" subtype="radio" default="display_single" label="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD_DESC"
-					inline_tip="Single Thumb, will optionally link to the item details view, and will not add gallery JS" tip_class="" tip_img="comment.png" toggle_related="1" class="btn-group group-fcinfo">
+					inline_tip="Single Thumb, will optionally link to the item details view, and will not add gallery JS" tip_class="" tip_img="comments.png" toggle_related="1" class="btn-group group-fcinfo">
 				<option value="display" show_list="" hide_list="single_mode_cat">All thumbnails</option>
 				<option value="display_single" show_list="single_mode_cat" hide_list="">Single</option>
 				<option value="display_single_total" show_list="single_mode_cat" hide_list="">Single + total</option>
 				<option value="display_link" show_list="" hide_list="single_mode_cat" force_list="cat_view_link_to_item">All thumbnails, link to item</option>
 			</field>
 			<field name="cat_link_single_to" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM" description="FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM_DESC"
-					inline_tip="Single Thumb, will link to the item details view, instead of linking to a gallery" tip_class="" tip_img="comment.png" toggle_related="1" depend_class="single_mode_cat" class="btn-group group-fcinfo">
+					inline_tip="Single Thumb, will link to the item details view, instead of linking to a gallery" tip_class="" tip_img="comments.png" toggle_related="1" depend_class="single_mode_cat" class="btn-group group-fcinfo">
 				<option value="0" show_list="" hide_list="cat_view_link_to_item">FLEXI_NO</option>
 				<option value="1" show_list="cat_view_link_to_item" hide_list="">FLEXI_YES</option>
 			</field>

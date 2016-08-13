@@ -93,11 +93,19 @@ class plgFlexicontent_fieldsDate extends FCField
 		// both according to given configuration
 		// *******************************************
 		
+		$date_format_form = ''; //$field->parameters->get( 'date_format_form', '' ) ;
 		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
+
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
+		$date_allowtime = !in_array($date_format_form, array(1,2)) ? $date_allowtime : 0;  // Allow time usage IS disabled, for 1: Year-only, 2:Month-only
+
+		$time_formats_map = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
+		$_time_format = $time_formats_map[$date_allowtime];
+
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 		$customdate     = $field->parameters->get( 'custom_date', $date_source!=3 ? 'Y-m-d' : 'Y M d, H:i:s' ) ;
+
 		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
 		$dateformat = $dateformat ? JText::_($dateformat) :
 			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
@@ -221,12 +229,12 @@ class plgFlexicontent_fieldsDate extends FCField
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
 				";
-				
+			
 			if ($date_source!=3) $js .= "
 				// This needs to be after field is added to DOM (unlike e.g. select2 / inputmask JS scripts)
 				Calendar.setup({
 					inputField:	theInput.attr('id'),
-					ifFormat:		'%Y-%m-%d',
+					ifFormat:		'%Y-%m-%d".$_time_format."',
 					button:			thePicker.attr('id'),
 					align:			'Tl',
 					singleClick:	true
@@ -339,7 +347,8 @@ class plgFlexicontent_fieldsDate extends FCField
 			}
 			else {
 				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date input-medium'.$required), $skip_on_invalid=true, $timezone);
-				if (!$html) {
+				if (!$html)
+				{
 					$skipped_vals[] = $value;
 					if (!$use_ingroup) continue;
 					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date input-medium'.$required), $skip_on_invalid=true, $timezone);

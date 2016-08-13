@@ -48,7 +48,7 @@ if ($this->ordering) {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/warning.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
@@ -435,7 +435,7 @@ function delAllFilters() {
 				} else if ($field_desc_len) {
 					$field_desc = htmlspecialchars($row->description, ENT_QUOTES, 'UTF-8');
 				}
-				if ($field_desc) echo ' <img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" alt="Note" title="'.flexicontent_html::getToolTip($_desc_label, $field_desc, 0, 0).'" />';
+				if ($field_desc) echo ' <img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Note" title="'.flexicontent_html::getToolTip($_desc_label, $field_desc, 0, 0).'" />';
 				?>
 			</td>
 

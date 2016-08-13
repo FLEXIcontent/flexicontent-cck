@@ -56,7 +56,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel('type');
 		$user  = JFactory::getUser();
@@ -303,7 +303,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	function cancel()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$post = JRequest::get('post');
 		$post = FLEXI_J16GE ? $post['jform'] : $post;
@@ -381,7 +381,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	function access()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel('types');
 		$task  = JRequest::getVar( 'task' );
@@ -428,7 +428,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	function copy()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$model = $this->getModel('types');
 		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
