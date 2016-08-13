@@ -7203,8 +7203,8 @@ function FLEXISubmenu($cando)
 			'</a>', '', false);
 		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, '<span class="fcsb-icon-comments disabled"></span><span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
 		
-		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'reviews';
-		if (file_exists($appsman_path))
+		$reviews_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'reviews';
+		if (file_exists($reviews_path))
 		{
 			if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 		}

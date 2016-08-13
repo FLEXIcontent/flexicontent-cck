@@ -512,7 +512,7 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		//$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
+		//$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';   // TODO WHEN FEATURE IS COMPLETE SWITCH WITH THE ABOVE !!
 		//$db->setQuery($query);
 		//$reviews_tbl_exists = (boolean) count($db->loadObjectList());
 		

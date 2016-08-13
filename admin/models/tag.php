@@ -208,8 +208,8 @@ class FlexicontentModelTag extends JModelLegacy
 		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Tests if the tag is checked out
 	 *
@@ -265,7 +265,7 @@ class FlexicontentModelTag extends JModelLegacy
 			return false;
 		}
 		
-		$this->_tag	=& $tag;
+		$this->_tag = & $tag;
 
 		return true;
 	}
@@ -281,7 +281,7 @@ class FlexicontentModelTag extends JModelLegacy
 	function addtag($name)
 	{	
 		$obj = new stdClass();
-		$obj->name	 	= $name;
+		$obj->name = $name;
 		$obj->published	= 1;
 		
 		if ($this->store($obj))

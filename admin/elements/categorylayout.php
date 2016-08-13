@@ -221,7 +221,7 @@ jQuery(document).ready(function() {
 		if ($inline_tip = @$attributes['inline_tip'])
 		{
 			$tip_img = @$attributes['tip_img'];
-			$tip_img = $tip_img ? $tip_img : 'comment.png';
+			$tip_img = $tip_img ? $tip_img : 'comments.png';
 			$preview_img = @$attributes['preview_img'];
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class'];
@@ -233,7 +233,7 @@ jQuery(document).ready(function() {
 		if ($inline_tip = @$attributes['inline_tip2'])
 		{
 			$tip_img = @$attributes['tip_img2'];
-			$tip_img = $tip_img ? $tip_img : 'comment.png';
+			$tip_img = $tip_img ? $tip_img : 'comments.png';
 			$preview_img = @$attributes['preview_img2'];
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class2'];

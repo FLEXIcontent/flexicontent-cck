@@ -56,23 +56,29 @@ class FlexicontentControllerSearch extends FlexicontentController
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
-		
+
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
+		{
+			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
+
 		// Test counting with limited memory
 		//ini_set("memory_limit", "20M");
-		
+
 		$start_microtime = microtime(true);
-		// Check for request forgeries
-		//JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$has_zlib    = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		$indexer     = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
-		
+
 		$session = JFactory::getSession();
 		$db      = JFactory::getDBO();
 		$app     = JFactory::getApplication();
 		$model = $this->getModel('search');
-		
+
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
 		if ($rebuildmode=='quick' && $indexer=='advanced') {
 			$nse_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='non-search');
@@ -181,14 +187,21 @@ class FlexicontentControllerSearch extends FlexicontentController
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
-		
+
+		// Check for request forgeries
+		//JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		// Not need because this task need the user session data that are set by countrows that checked for forgeries
+
+		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
+		{
+			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
+
 		// Test indexing with limited memory
 		//ini_set("memory_limit", "20M");
-		
+
 		$start_microtime = microtime(true);
-		// Check for request forgeries
-		//JRequest::checkToken() or jexit( 'Invalid Token' );
-		
+
 		$session = JFactory::getSession();
 		$db      = JFactory::getDBO();
 		

@@ -27,7 +27,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
 			
-			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
 				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
@@ -61,8 +61,8 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			<field name="sql_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC"
-				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comment.png"  preview_img="database_green.png" 
-				inline_tip2="value1::label1::image1.png::valgrp%%&lt;br/&gt; value2::label2::image2.png::valgrp%% ..." tip_class2="elements_list" tip_img2="comment.png" preview_img2="text_area.png" 
+				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comments.png"  preview_img="database_green.png" 
+				inline_tip2="value1::label1::image1.png::valgrp%%&lt;br/&gt; value2::label2::image2.png::valgrp%% ..." tip_class2="elements_list" tip_img2="comments.png" preview_img2="text_area.png" 
 				class="btn-group group-fcmethod">
 				<option value="0" show_list="elements_list" hide_list="elements_sql" fcreadonly="{'field_elements':1}">FLEXI_NO</option>
 				<option value="1" show_list="elements_sql" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_YES</option>
@@ -78,7 +78,7 @@
 
 			<field name="" type="separator" default="FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD" description="FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD_DESC" level="level3" />
 			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="FLEXI_VALGRP_MASTER_FIELD" description="FLEXI_VALGRP_MASTER_FIELD_DESC" 
-				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
+				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comments.png"  preview_img="relationships.png" 
 				labelclass="" custom_prompt="FLEXI_NO" />
 			<field name="cascade_prompt" type="text" default="" label="FLEXI_VALGRP_SELECT_MASTER_PROMPT" description="FLEXI_VALGRP_SELECT_MASTER_PROMPT_DESC" />
 

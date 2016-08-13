@@ -58,11 +58,12 @@ class FlexicontentControllerItems extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
 		$config  = JFactory::getConfig();
@@ -106,8 +107,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		
 		// Unique id for new items, needed by some fields for temporary data
-		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
-		
+		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
+		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
+
 		// Auto title for some content types
 		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
 		
@@ -634,7 +636,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function reorder($dir=null)
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Get variables: model, user, item id
 		$model = $this->getModel('items');
@@ -700,7 +702,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function saveorder()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Get variables: model, user, item id, new ordering
 		$model = $this->getModel('items');
@@ -815,7 +817,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function copymove()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db    = JFactory::getDBO();
 		$task  = JRequest::getVar('task');
@@ -989,7 +991,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function import()
 	{		
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$user  = JFactory::getUser();
 		$model = $this->getModel('items');
@@ -1161,7 +1163,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function remove()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
@@ -1239,7 +1241,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function access( )
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$user	= JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
@@ -1293,7 +1295,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function cancel()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$post = JRequest::get('post');
 		$post = FLEXI_J16GE ? $post['jform'] : $post;
@@ -1311,7 +1313,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	function restore()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$id			= JRequest::getInt( 'id', 0 );
 		$version	= JRequest::getVar( 'version', '', 'request', 'int' );

@@ -143,7 +143,7 @@ class FlexicontentController extends JControllerLegacy
 	function processLanguageFiles() 
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$code 	= JRequest::getVar('code', 'en-GB');
 		$method = JRequest::getVar('method', '');
@@ -331,7 +331,7 @@ class FlexicontentController extends JControllerLegacy
 	function saveacl()
 	{
 
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Initialize some variables
 		$app     = JFactory::getApplication();
@@ -392,7 +392,7 @@ class FlexicontentController extends JControllerLegacy
 	function createDefaultType()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 
@@ -446,7 +446,7 @@ class FlexicontentController extends JControllerLegacy
 	function createMenuItems()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 		if (FLEXI_J16GE) {
@@ -524,7 +524,7 @@ class FlexicontentController extends JControllerLegacy
 	function createDefaultFields()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 		
@@ -571,7 +571,7 @@ class FlexicontentController extends JControllerLegacy
 	function publishplugins()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$format = JRequest::getVar('format', '');
 		$db = JFactory::getDBO();
@@ -620,7 +620,7 @@ class FlexicontentController extends JControllerLegacy
 	function cachethumbchmod()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$format		= JRequest::getVar('format', '');
 		// PhpThumb cache directory
@@ -776,7 +776,7 @@ class FlexicontentController extends JControllerLegacy
 	function createLangColumn()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
@@ -860,7 +860,7 @@ class FlexicontentController extends JControllerLegacy
 	function createDBindexes()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
@@ -942,7 +942,7 @@ class FlexicontentController extends JControllerLegacy
 	function updateItemCountingData()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$db = JFactory::getDBO();
 		$cache_tbl = "#__flexicontent_items_tmp";
@@ -972,7 +972,7 @@ class FlexicontentController extends JControllerLegacy
 	function createVersionsTable()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
@@ -1013,7 +1013,7 @@ class FlexicontentController extends JControllerLegacy
 	function createAuthorsTable()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
@@ -1048,7 +1048,7 @@ class FlexicontentController extends JControllerLegacy
 	function populateVersionsTable()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
@@ -1101,7 +1101,7 @@ class FlexicontentController extends JControllerLegacy
 	function deleteDeprecatedFiles()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel('flexicontent');
 		$deprecated = null;
@@ -1134,7 +1134,7 @@ class FlexicontentController extends JControllerLegacy
 	function cleanupOldTables()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
@@ -1296,7 +1296,7 @@ class FlexicontentController extends JControllerLegacy
 	function addCurrentVersionData()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel('flexicontent');
 		if ($model->addCurrentVersionData()) {
@@ -1309,7 +1309,7 @@ class FlexicontentController extends JControllerLegacy
 	
 	function initialPermission() {
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$model = $this->getModel('flexicontent');
 		if ($model->initialPermission()) {
@@ -1351,7 +1351,7 @@ class FlexicontentController extends JControllerLegacy
 	
 	function fversioncompare() {
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		@ob_end_clean();
 		JRequest::setVar('layout', 'fversion');
 		parent::display();

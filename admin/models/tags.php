@@ -142,8 +142,8 @@ class FlexicontentModelTags extends JModelLegacy
 		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
 	}
-	
-	
+
+
 	/**
 	 * Method to set the Tag identifier
 	 *
@@ -156,8 +156,8 @@ class FlexicontentModelTags extends JModelLegacy
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
-	
-	
+
+
 	/**
 	 * Method to count assigned items for the given categories
 	 *
@@ -203,8 +203,8 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		return $this->_data;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the total nr of the tags
 	 *
@@ -222,8 +222,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return $this->_total;
 	}
-	
-	
+
+
 	/**
 	 * Method to get a pagination object for the tags
 	 *
@@ -241,8 +241,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return $this->_pagination;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for the tags
 	 *
@@ -277,6 +277,7 @@ class FlexicontentModelTags extends JModelLegacy
 		return $query;
 	}
 
+
 	/**
 	 * Method to build the orderby clause of the query for the tags
 	 *
@@ -293,6 +294,7 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return $orderby;
 	}
+
 
 	/**
 	 * Method to build the where clause of the query for the tags
@@ -331,8 +333,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return $where;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
@@ -356,6 +358,7 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		return $having;
 	}
+
 
 	/**
 	 * Method to (un)publish a tag
@@ -385,6 +388,7 @@ class FlexicontentModelTags extends JModelLegacy
 		}
 		return true;
 	}
+
 
 	/**
 	 * Method to remove a tag
@@ -425,6 +429,7 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return true;
 	}
+
 
 	/**
 	 * Method to import a list of tags

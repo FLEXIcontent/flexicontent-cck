@@ -45,13 +45,14 @@ class FlexicontentViewItem extends JViewLegacy
 		$categories = & $globalcats;		
 		
 		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
 		$dispatcher = JDispatcher::getInstance();
 		$document   = JFactory::getDocument();
 		$config     = JFactory::getConfig();
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDBO();
-		$option     = JRequest::getVar('option');
+		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
 		
 		// We do not have item parameters yet, but we need to do some work before creating the item
@@ -114,8 +115,9 @@ class FlexicontentViewItem extends JViewLegacy
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
 		//print_r($unique_tmp_itemid);
-		JRequest::setVar( 'unique_tmp_itemid', $unique_tmp_itemid );
-		
+		JRequest::setVar('unique_tmp_itemid', $unique_tmp_itemid);
+		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
+
 		// Get number of subscribers
 		$subscribers = $model->getSubscribersCount();
 		

@@ -368,11 +368,12 @@ class FlexicontentController extends JControllerLegacy
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
 		$config  = JFactory::getConfig();
@@ -442,7 +443,8 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		// Unique id for new items, needed by some fields for temporary data
-		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
+		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
+		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 		
 		// Auto title for some content types
 		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
@@ -1271,7 +1273,7 @@ class FlexicontentController extends JControllerLegacy
 	function cancel()
 	{
 		// Check for request forgeries
-		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );		
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Initialize some variables
 		$user    = JFactory::getUser();
@@ -2097,7 +2099,7 @@ class FlexicontentController extends JControllerLegacy
 	function addtag()
 	{
 		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$name 	= JRequest::getString('name', '');
 		$array = JRequest::getVar('cid',  0, '', 'array');
@@ -3053,7 +3055,7 @@ class FlexicontentController extends JControllerLegacy
 	function viewtags()
 	{
 		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		@ob_end_clean();
 		//header("Content-type:text/json");

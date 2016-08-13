@@ -56,7 +56,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		// check access
 		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
@@ -117,7 +117,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	function cancel()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		// check access
 		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )

@@ -59,7 +59,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
 		$app      = JFactory::getApplication();
-		$jinput   = JFactory::getApplication()->input;
+		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
@@ -431,6 +431,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Initialize variables, flags, etc
 		// ********************************
 		$app        = JFactory::getApplication();
+		$jinput     = $app->input;
 		$dispatcher = JDispatcher::getInstance();
 		$document   = JFactory::getDocument();
 		$session    = JFactory::getSession();
@@ -480,7 +481,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		{
 			// This also forces zero if value not set
 			JRequest::setVar('typeid', (int)$jdata['type_id']);
-			JFactory::getApplication()->input->set('typeid', (int)$jdata['type_id']);
+			$jinput->set('typeid', (int)$jdata['type_id']);
 		}
 		
 		// Try type from active menu
@@ -488,7 +489,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		{
 			// This also forces zero if value not set
 			JRequest::setVar('typeid', (int)$menu->query['typeid']);
-			JFactory::getApplication()->input->set('typeid', (int)$menu->query['typeid']);
+			$jinput->set('typeid', (int)$menu->query['typeid']);
 		}
 		
 		// NOTE about -new_typeid-, this is it used only for CREATING new item (ignored for EDIT existing item)
@@ -511,7 +512,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				$new_typeid = $single_type->id;
 			}
 			JRequest::setVar('typeid', $new_typeid);
-			JFactory::getApplication()->input->set('typeid', $new_typeid);
+			$jinput->set('typeid', $new_typeid);
 			$canCreateType = true;
 		}
 		
@@ -641,7 +642,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
 		JRequest::setVar('unique_tmp_itemid', $unique_tmp_itemid);
-		JFactory::getApplication()->input->set('unique_tmp_itemid', $unique_tmp_itemid);
+		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 		
 		// Component / Menu Item parameters
 		$allowunauthorize   = $params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content

@@ -64,7 +64,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function save()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		parent::save();
 		$cache = JFactory::getCache('com_flexicontent');
@@ -111,7 +111,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function changestate($state=1)
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		$user = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 		$CanCats = $perms->CanCats;
@@ -165,7 +165,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function orderup()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$model = $this->getModel('categories');
 		$model->move(-1);
@@ -188,7 +188,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function orderdown()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$model = $this->getModel('categories');
 		$model->move(1);
@@ -211,7 +211,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function saveorder()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		// Get the arrays from the Request
 		$order	= JRequest::getVar('order',	null, 'post', 'array');
@@ -242,7 +242,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function remove()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$user = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -294,7 +294,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function cancel()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$post = JRequest::get('post');
 		$post = $post['jform'];
@@ -313,7 +313,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	function access( )
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$user  = JFactory::getUser();
 		$task  = JRequest::getVar( 'task' );

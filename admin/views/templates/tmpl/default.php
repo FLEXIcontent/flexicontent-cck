@@ -20,11 +20,11 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $ico_class = 'btn btn-small'; //'fc-man-icon-s';
-$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
+$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
 
 $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
-$form_token = FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken();
+$form_token = JSession::getFormToken();
 $js = "
 jQuery(document).ready(function() {
 	jQuery('a.deletable-template').click(function( event ) {
