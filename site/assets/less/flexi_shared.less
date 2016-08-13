@@ -994,7 +994,7 @@ form div.container_fcfield > select {
 	min-width: 60%;
 	max-width: 81%;
 	box-sizing: border-box;
-	display:inline-block;
+	display: inline-block;
 	margin-left: 0;
 	margin-right: 0;
 	line-height: unset;
@@ -1347,7 +1347,7 @@ fieldset.adminform legend {
 	padding-right: 6px;
 }
 
-.fieldgrprow_cell:last {
+.fieldgrprow_cell:last-child {
 	padding-right: 0px;
 }
 
@@ -1651,6 +1651,9 @@ table.fc-form-tbl td.data {
 	border: none;
 	margin: 0;
 }
+.fc-fileman-upload-icon:before {
+	color: darkorange !important;
+}
 
 /* Filemanager's plupload (multi-upload script) CSS compatibility fixes */
 #multiple_uploader {
@@ -1659,13 +1662,33 @@ table.fc-form-tbl td.data {
 	width: auto;	
 }
 #multiple_uploader.fc_file_uploading {
-	min-width: 540px;
-	height: 500px;
 	width: auto;
 	overflow: visible;
 	
+	.plupload_container.fc_uploader_hide_preview {
+		span.plupload_img_preview {
+			display: none !important;
+		}
+	}
+	.plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist > li.fc_uploader_is_image {
+		height: 64px;
+	}
+
 	.plupload_container {
 		padding: 0;
+		min-width: 500px;
+
+		input {
+			height: 2.4em;
+			padding: 0.5em;
+			box-sizing: border-box;
+			width: 98%;
+			margin: 1px 1%;
+		}
+	}
+
+	.plupload_button {
+		padding: 3px 4px 3px 24px;
 	}
 	
 	ul.plupload_filelist_content li.plupload_file {
@@ -1676,55 +1699,155 @@ table.fc-form-tbl td.data {
 		ul.plupload_filelist {
 			min-height: 100px;
 
+			> li {
+				padding: 6px 8px;
+			}
 			.plupload_droptext {
 				line-height: 60px;
 			}
 			.plupload_file_name {
-				display:inline-block;
-				height: 60px;
-				width: 400px;
+				display: inline-block;
+				width: 200px;
 				overflow: visible;
 
 				> span:first-of-type {
-					display:inline-block;
+					display: inline-block;
 					width: 200px;
 					white-space: normal;
 					word-wrap: break-word;
 				}
-				.btn.fc_img_preview_btn:before {
-					font-size: 24px;
-				}
-				.btn.fc_img_preview_btn {
-					width: unset;
-					margin: 2px 16px 2px 12px;
-					padding: 8px 6px;
-					vertical-align: top;
-				}
-				span.plupload_img_preview  {
-					display:inline-block;
-					min-width: 120px;
-					vertical-align: top;
-				}
-				span.plupload_img_preview img {
-					position: relative;
-					max-height: 64px;
-					max-width: 140px;
-					transition: all 0.5s ease-in-out;
-				}
-				span.plupload_img_preview img.fc_uploader_zooming {
-					top: 25% !important;
-					position: fixed !important;
-					max-width: unset !important;
-					box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75) !important;
-					z-index: 2050 !important;
+			}
+			.btn.fc_img_preview_btn:before {
+				font-size: 24px;
+			}
+			.btn.fc_img_preview_btn {
+				width: unset;
+				margin: 0px 16px 0px 12px;
+				padding: 8px 6px;
+				vertical-align: top;
+			}
+			span.plupload_img_preview {
+				display: inline-block;
+				vertical-align: top;
+				margin: 0;
+				padding: 0;
+			}
+			span.plupload_img_preview > img {
+				position: relative;
+				max-height: 64px;
+				max-width: 140px;
+				transition: all 0.5s ease-in-out;
+			}
+			
+			> li.fc_uploader_zooming span.plupload_img_preview {
+				display: inline-block !important;
+			}
+			> li.fc_uploader_zooming span.plupload_img_preview > img {
+				top: 25% !important;
+				position: fixed !important;
+				max-width: unset !important;
+				box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75) !important;
+				z-index: 2050 !important;
+			}
+			> li.fc_uploader_zooming.fc_uploader_zoomed span.plupload_img_preview > img {
+				max-height: 50% !important;
+			}
+		}
+	}
+}
+
+table.fc_uploader_header_tbl {
+	border-collapse: collapse;
+	td {
+		padding: 1px 24px 1px 0px;
+	}
+	td:last-child {
+		padding: 1px 0px 1px 0px;
+	}
+}
+.fc_set_file_assignment {
+	max-width: 240px;
+	word-wrap: break-word;
+}
+
+@media (max-width: 960px) {
+	.fc_hidden_960 {
+		display: none;
+	}
+	.fc_set_file_assignment {
+		max-width: 200px;
+	}
+}
+@media (max-width: 720px) {
+	#multiple_uploader.fc_file_uploading {
+		.plupload_file_size, .plupload_file_status, .plupload_progress {
+			width: 60px;
+		}
+	}
+}
+@media (max-width: 640px) {
+	.fc_hidden_640 {
+		display: none;
+	}
+	.fc_set_file_assignment {
+		max-width: 180px;
+	}
+
+	#multiple_uploader.fc_file_uploading {
+		.plupload_container {
+			min-width: 400px;
+		}
+		.fc_img_preview_btn {
+			display: none !important;
+		}
+	}
+}
+@media (max-width: 580px) {
+	.fc_hidden_580 {
+		display: none;
+	}
+	.fc_set_file_assignment {
+		max-width: 140px;
+		word-wrap: break-word;
+	}
+	
+	#multiple_uploader.fc_file_uploading {
+		.fc_plupload_toggleThumbs_btn,
+		span.plupload_img_preview {
+			display: none !important;
+		}
+	}
+}
+@media (max-width: 440px) {
+	.fc_set_file_assignment {
+		max-width: 100px;
+		word-wrap: break-word;
+	}
+	
+	#multiple_uploader.fc_file_uploading {
+		.plupload_container {
+			margin-left: -32px;
+		}
+	}
+}
+@media (max-width: 900px) {
+	#multiple_uploader.fc_file_uploading {
+		.plupload_container ul.plupload_filelist > li.fc_uploader_is_image,
+		.plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist > li.fc_uploader_is_image {
+			height: 32px;
+		}
+		.plupload_scroll
+		{
+			ul.plupload_filelist {
+				span.plupload_img_preview > img {
+					max-height: 32px;
+					max-width: 64px;
 				}
 			}
 		}
 	}
-	.fc_uploader_zoomed.fc_uploader_zooming {
-		max-height: 50% !important;
-	}
 }
+
 
 /* Filemanager various */
 .filemanager img {
@@ -1931,7 +2054,7 @@ div.current ul.config-option-list li label.hasTooltip {
 	padding: 8px !important;
 	box-sizing: border-box;
 	white-space: normal;
-	display:inline-block;
+	display: inline-block;
 	border-radius: 3px;
 }
 
@@ -1940,7 +2063,7 @@ div.current ul.config-option-list li label.hasTooltip {
 	min-width: 60%;
 	max-width: 81%;
 	box-sizing: border-box;
-	display:inline-block;
+	display: inline-block;
 
 	line-height: unset;
 	height: unset;

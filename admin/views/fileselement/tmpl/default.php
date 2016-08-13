@@ -20,15 +20,19 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$tip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $hint_image = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
 $warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCfileselement_'.$this->layout.$this->fieldid, $start_text, $end_text);
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCfiles'.$this->layout.$this->fieldid, $start_text, $end_text);
+
 $ctrl_task  = 'task=filemanager.';
+$ctrl_task_authors = 'task=users.';
+$action_url = JURI::base() . 'index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
+$action_url_js = str_replace('&amp;', '&', $action_url);
 
 $session = JFactory::getSession();
 $document = JFactory::getDocument();
@@ -64,10 +68,21 @@ if ($this->folder_mode) $list_total_cols -= 7;
 if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0) $list_total_cols -= (count($this->optional_cols) - count($this->cols));
 
 // Currently multi-uploading is supported / finished only for LAYOUT 'image'
-$enable_multi_uploader = $this->layout=='image';
 $_forced_secure_val = $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
 $_forced_secure_int = $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? '0' : '1');
+$_tmpl = $this->view=='fileselement' ? 'component' : '';
+
+$uconf = new JRegistry();
+$uconf->merge( $this->params );
+if (!empty($this->field))
+{
+	$uconf->merge( $this->field->parameters );
+}
+
+$is_inline_input = strlen($uconf->get('inputmode')) && $uconf->get('inputmode', 0) == 0;
+$enable_multi_uploader = $this->view=='filemanager' || $is_inline_input;
 ?>
+
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
@@ -80,8 +95,7 @@ jQuery(document).ready(function() {
 		jQuery('#multiple_uploader').height(210);
 
 		// Also set filelist height
-		var plupload_filelist_h = 568 > jQuery( window ).height()  ?  jQuery( window ).height() - 320  :  568;
-		jQuery('.plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)').css({ 'height': plupload_filelist_h+'px' });
+		fc_plupload_resize_now();
 	}
 	fctabber['fileman_tabset'].tabShow(0);
 	if (use_mul_upload) jQuery('#filemanager-1').hide();
@@ -133,10 +147,20 @@ endforeach;
 // BOF multi-uploader JS
 // *********************
 
-$upload_maxsize = $this->field ? (int) $this->field->parameters->get('upload_maxsize', 0) : 0;  // Try field with upload_maxsize parameter
-$has_field_upload_maxsize = (boolean) $upload_maxsize;
-$upload_maxsize = $upload_maxsize ? $upload_maxsize : (int) $this->params->get('upload_maxsize', '10000000');   // Fallback to component parameter
-$resize_on_upload = $this->field ? (int) $this->field->parameters->get('resize_on_upload', 1) : 0;
+$has_field_upload_maxsize   = !empty($this->field) && strlen($this->field->parameters->get('upload_maxsize'));
+$has_field_resize_on_upload = !empty($this->field) && strlen($this->field->parameters->get('resize_on_upload'));
+
+// Try field with upload_maxsize and resize_on_upload parameters
+$upload_maxsize   = (int) $uconf->get('upload_maxsize', 10000000);
+$resize_on_upload = (int) $uconf->get('resize_on_upload', 1);
+
+if ($resize_on_upload)
+{
+	$upload_max_w   = (int) $uconf->get('upload_max_w', 4000);
+	$upload_max_h   = (int) $uconf->get('upload_max_h', 3000);
+	$upload_quality = (int) $uconf->get('upload_quality', 95);
+	$upload_method  = (int) $uconf->get('upload_method', 1);
+}
 
 $user = JFactory::getUser();	// get current user
 $perms = FlexicontentHelperPerm::getPerm();  // get global perms
@@ -148,32 +172,48 @@ if ($enable_multi_uploader)
 	$pluploadlib = JURI::root(true).'/components/com_flexicontent/librairies/plupload/';
 	$plupload_mode = 'runtime';  // 'runtime,ui'
 	flexicontent_html::loadFramework('plupload', $plupload_mode);
+	flexicontent_html::loadFramework('flexi-lib');
 	
-	// Initialize a plupload Queue
-	if ($resize_on_upload)
-	{
-		$upload_max_w   = (int) $this->field->parameters->get('upload_max_w', 4000);
-		$upload_max_h   = (int) $this->field->parameters->get('upload_max_h', 3000);
-		$upload_quality = (int) $this->field->parameters->get('upload_quality', 95);
-		$upload_method  = (int) $this->field->parameters->get('upload_method', 1);
-	}
-	
+	// Add plupload Queue handling functions and initialize a plupload Queue
 	$js = '
 	// Handle the PostInit event. At this point, we will know which runtime
 	// has loaded, and whether or not drag-drop functionality is supported.
 	// --
 	// NOTE: we use the "PostInit" instead of the "Init" event in order for the "dragdrop" feature to be correct defined
-	function handlePluploadInit( uploader, params )
+	function fc_plupload_handle_init( uploader, params )
 	{
-		window.console.log( uploader.features );
+		jQuery(uploader.settings.container).find(".plupload_header_content").prepend(\'<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="fc_plupload_toggleThumbs(this);"><span class="icon-image"></span> Thumbnails</span>\');
+		if(window.console) window.console.log( uploader.features );
 	}
 	
-	
+	function fc_plupload_toggleThumbs(obj)
+	{
+		jQuery(obj).closest(".plupload_container").toggleClass("fc_uploader_hide_preview");
+	}
+
+	/* Auto-resize the currently open dialog vertically or horizontally */
+	function fc_plupload_resize_now()
+	{
+		var window_h = jQuery( window ).height();
+		var window_w = jQuery( window ).width();
+		
+		// Also set filelist height
+		var max_filelist_h = 568;
+		var plupload_filelist_h = max_filelist_h > (window_h - 320) ? (window_h - 320) : max_filelist_h;
+		jQuery(".plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)").css({ "height": plupload_filelist_h+"px" });
+	}
+
+	var fc_plupload_resize = fc_debounce_exec(fc_plupload_resize_now, 200, false);
+
+	jQuery(window).resize(function() {
+		fc_plupload_resize();
+	});
+
 	// Handle the files-added event. This is different that the queue-changed event.
 	// Since at this point, we have an opportunity to reject files from the queue.
-	function handlePluploadFilesAdded( uploader, files )
+	function fc_plupload_handle_filesAdded( uploader, files )
 	{
-		//window.console.log( "Files added." );
+		//if(window.console) window.console.log( "Files added." );
 
 		// Since the full list is recreated, on new file(s) added. We need to loop through all
 		// files and update their client-side preview, and not only through the newly addede files
@@ -201,9 +241,10 @@ if ($enable_multi_uploader)
 	function showImagePreview( file )
 	{
 		var tagid = file.id;
-		var item = jQuery("#"+tagid).find(".plupload_file_name");
+		var row = jQuery("#"+tagid);
+		var item = row.find(".plupload_file_name");
 
-		var box = jQuery("<span class=\"plupload_img_preview\"></span>").appendTo( item );
+		var box = jQuery("<span class=\"plupload_img_preview\"></span>").insertAfter( item );
 		var prev_handle = jQuery("<span class=\"btn fc_img_preview_btn icon-eye\"></span></span>").insertBefore( box );
 
 		// Try to use already loaded image
@@ -212,6 +253,7 @@ if ($enable_multi_uploader)
 		{
 			fc_loaded_imgs[tagid] = jQuery( "<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" />" );
 		}
+		row.addClass("fc_uploader_is_image");
 		fc_loaded_imgs[tagid].appendTo( box );
 
 
@@ -219,20 +261,21 @@ if ($enable_multi_uploader)
 		prev_handle.add(fc_loaded_imgs[tagid]).on( "click", function()
 		{
 			// Close any open previews
-			var btn, img;
-			btn = jQuery(this).closest(".plupload_file_name").find(".fc_img_preview_btn");
-			img = jQuery(this).closest(".plupload_file_name").find(".plupload_img_preview img");
+			var row, btn, img_box;
+			row = jQuery(this).closest("li");
+			btn = row.find(".fc_img_preview_btn");
+			img_box = row.find(".plupload_img_preview");
 
-			btn.closest("ul").find("li:not(\'#" + btn.closest("li").attr("id") + "\') .btn.fc_img_preview_btn.active").trigger("click");
-			if (img.hasClass("fc_uploader_zoomed"))
+			row.closest("ul").find("li:not(\'#" + btn.closest("li").attr("id") + "\') .btn.fc_img_preview_btn.active").trigger("click");
+			if (row.hasClass("fc_uploader_zoomed"))
 			{
 				btn.removeClass("active btn-info");
-				img.removeClass("fc_uploader_zoomed");
-				setTimeout(function(){ img.removeClass("fc_uploader_zooming"); }, 400);
+				row.removeClass("fc_uploader_zoomed");
+				setTimeout(function(){ row.removeClass("fc_uploader_zooming"); }, 400);
 			}
 			else {
-				if (img.hasClass("fc_uploader_zooming")) return;
-				img.addClass("fc_uploader_zooming fc_uploader_zoomed");
+				if (row.hasClass("fc_uploader_zooming")) return;
+				row.addClass("fc_uploader_zooming fc_uploader_zoomed");
 				btn.addClass("active btn-info");
 			}
 		});
@@ -264,11 +307,10 @@ if ($enable_multi_uploader)
 	var uploader = 0;
 	function showUploader()
 	{
+		// Already initialized
 		if (uploader)
 		{
-			// Already initialized, re-initialize and empty it
-			uploader.init();
-			uploader.splice();
+			//uploader.splice();  // empty it
 		}
 		
 		else if ("'.$plupload_mode.'"=="ui")
@@ -276,7 +318,7 @@ if ($enable_multi_uploader)
 	    uploader = jQuery("#multiple_uploader").plupload({
 				// General settings
 				runtimes : "html5,html4,flash,silverlight",
-				url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
+				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
 				prevent_duplicates : true,
 				
 				// Set maximum file size and chunking to 1 MB
@@ -325,30 +367,30 @@ if ($enable_multi_uploader)
 						up.settings.multipart_params = {
 							filename: file.name
 						};
-					}
-					/*,
+					},
+
+					PostInit: fc_plupload_handle_init,
+					FilesAdded: fc_plupload_handle_filesAdded,
+
 					UploadComplete: function (up, files) {
 						if(window.console) window.console.log("All Files Uploaded");
-						//window.location.reload();
-						window.location.replace(window.location.href);
-					}*/
+						window.document.body.innerHTML = "<span class=\"fc_loading_msg\">Reloading ... please wait</span>";
+						window.location.reload(true);  //window.location.replace(window.location.href);
+					}
 				}
-	    })
+	    });
 
-			// Set up the event handlers for the uploader
-			.bind(\'PostInit\', handlePluploadInit)
-			.bind(\'FilesAdded\', handlePluploadFilesAdded)
-			.bind(\'complete\',function()
-			{
-				if(window.console) window.console.log("All Files Uploaded");
-				window.location.replace(window.location.href);  //window.location.reload();
-			});
-			
-		} else {
+			// Binding event handlers is also possible after initialization
+			//uploader.bind(\'PostInit\', fc_plupload_handle_init);
+			//uploader.bind(\'FilesAdded\', fc_plupload_handle_filesAdded);
+		}
+
+		else
+		{
 			jQuery("#multiple_uploader").pluploadQueue({
 				// General settings
 				runtimes : "html5,html4,flash,silverlight",
-				url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
+				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
 				prevent_duplicates : true,
 				
 				// Set maximum file size and chunking to 1 MB
@@ -390,34 +432,34 @@ if ($enable_multi_uploader)
 
 				// Silverlight settings
 				silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
-				
+
 				init: {
-					BeforeUpload: function (up, file) {
+					BeforeUpload: function (up, file)
+					{
 						// Called right before the upload for a given file starts, can be used to cancel it if required
 						up.settings.multipart_params = {
 							filename: file.name
 						};
-					}
-					/*,
-					UploadComplete: function (up, files) {
+					},
+
+					PostInit: fc_plupload_handle_init,
+					FilesAdded: fc_plupload_handle_filesAdded,
+
+					UploadComplete: function (up, files)
+					{
 						if(window.console) window.console.log("All Files Uploaded");
-						//window.location.reload();
-						window.location.replace(window.location.href);
-					}*/
+						window.document.body.innerHTML = "<span class=\"fc_loading_msg\">Reloading ... please wait</span>";
+						window.location.reload(true);  //window.location.replace(window.location.href);
+					}
 				}
 			});
 			
 			// Need to make 2nd call to get the created uploader instance
 			uploader = jQuery("#multiple_uploader").pluploadQueue();
-
-			uploader.bind(\'PostInit\', handlePluploadInit);
-			uploader.bind(\'FilesAdded\', handlePluploadFilesAdded);
-			uploader.bind(\'UploadComplete\',function()
-			{
-				if(window.console) window.console.log("All Files Uploaded");
-				//window.location.reload();
-				window.location.replace(window.location.href);
-			});
+			
+			// It is also possible to bind events also after initialization
+			//uploader.bind(\'PostInit\', fc_plupload_handle_init);
+			//uploader.bind(\'FilesAdded\', fc_plupload_handle_filesAdded);
 		}
 	};
 	';
@@ -452,7 +494,7 @@ flexicontent_html::loadFramework('flexi-lib');
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_LIST' ); ?> </h3>
 		
-		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?><?php echo $_forced_secure_val ? '&amp;filter_secure='.$_forced_secure_val : ''; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
+		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?><?php echo $_forced_secure_val ? '&amp;filter_secure='.$_forced_secure_val : ''; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
 		
 		<?php if (!$this->folder_mode) : ?>
 		
@@ -490,8 +532,8 @@ flexicontent_html::loadFramework('flexi-lib');
 					</span>
 					<?php endif; ?>
 				</span>
-				
-				<?php if ($this->CanViewAllFiles && !empty($this->cols['uploader'])) : /* FOR files element place filter outside the filter box */ ?>
+
+				<?php if ($this->fieldid && $this->CanViewAllFiles && !empty($this->cols['uploader'])) : /* WHEN using field id (fileselement view) place filter outside the filter box */ ?>
 				<div class="fc-filter nowrap_box">
 					<div <?php echo $fcfilter_attrs_row; ?> >
 						<?php echo $this->lists['uploader']; ?>
@@ -535,6 +577,13 @@ flexicontent_html::loadFramework('flexi-lib');
 					</div>
 				</div>
 
+				<?php if (!$this->fieldid && $this->CanViewAllFiles && !empty($this->cols['uploader'])) : ?>
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['uploader'].' &nbsp; &nbsp; &nbsp;'; ?>
+					</div>
+				</div>
+				<?php endif; ?>
 
 				<div class="fc-filter nowrap_box">
 					<div <?php echo $fcfilter_attrs_row; ?> >
@@ -560,7 +609,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 			<div class="fcclear"></div>
 			
-			<table id="adminListTableFCfileselement_<?php echo $this->layout.$this->fieldid; ?>" class="adminlist fcmanlist">
+			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist fcmanlist">
 			<thead>
     		<tr class="header">
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -707,13 +756,13 @@ flexicontent_html::loadFramework('flexi-lib');
 							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 						}
 					}
-					
+
 					if ( in_array($ext, $imageexts)) {
 						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 					} else {
 						$file_preview  = '';
 					}
-					
+
 					if ($this->folder_mode) {
 						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."', 0, '".$filename_original."');document.getElementById('file{$i}').className='striketext';";
 					} else {
@@ -748,7 +797,7 @@ flexicontent_html::loadFramework('flexi-lib');
 							}
 						?>
 						<?php echo '
-						<a style="cursor:pointer; font-family:Georgia;" id="file'.$row->id.'" class="'.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$img_assign_link.'" title="'.$select_entry.'">
+						<a style="cursor:pointer; font-family:Georgia;" id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$img_assign_link.'" title="'.$select_entry.'">
 							'.$filename_cut.'
 						</a>
 						'; ?>
@@ -853,10 +902,10 @@ flexicontent_html::loadFramework('flexi-lib');
 			</table>
 			
 			<input type="hidden" name="boxchecked" value="0" />
+			<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 			<input type="hidden" name="controller" value="filemanager" />
 			<input type="hidden" name="task" value="" />
-			<input type="hidden" name="file" value="" />
-			<input type="hidden" name="files" value="<?php echo $this->files; ?>" />
+			<input type="hidden" name="tmpl" value="<?php echo $_tmpl; ?>" />
 			<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 			<input type="hidden" name="fcform" value="1" />
@@ -867,6 +916,8 @@ flexicontent_html::loadFramework('flexi-lib');
 			<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 			<?php echo strlen($_forced_secure_int) ? '<input type="hidden" name="secure" value="'.$_forced_secure_int.'" />' : ''; ?>
 			<input type="hidden" name="filename" value="" />
+			<input type="hidden" name="file" value="" />
+			<input type="hidden" name="files" value="<?php echo $this->files; ?>" />
 		</form>
 		
 	</div>
@@ -874,14 +925,32 @@ flexicontent_html::loadFramework('flexi-lib');
 	
 	<!-- File(s) by uploading -->
 	
-	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'fileupload' );*/ ?>
-	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
+	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
+	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload fc-fileman-upload-icon">
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 		
-		<?php if (!$this->CanUpload && !$this->layout!=='image') : /* image layout of fileselement view is not subject to upload check */ ?>
+		<?php if (!$this->CanUpload && ($this->layout!='image' || $this->view!='fileselement')) : /* image layout of fileselement view is not subject to upload check */ ?>
 			<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
 		<?php else : ?>
-		
+
+		<?php if ($this->require_ftp) : ?>
+		<form action="<?php echo $action_url . 'ftpValidate'; ?>" name="ftpForm" id="ftpForm" method="post">
+			<fieldset title="<?php echo JText::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?>">
+				<legend><?php echo JText::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?></legend>
+				<table class="fc-form-tbl">
+					<tbody>
+						<tr>
+							<td class="key"><label class="label" for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?></label></td>
+							<td><input type="text" id="username" name="username" class="input-xlarge" size="70" value="" /></td>
+							<td class="key"><label class="label" for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?></label></td>
+							<td><input type="password" id="password" name="password" class="input-xlarge" size="70" value="" /></td>
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>
+		</form>
+		<?php endif; ?>
+
 		<!-- File Upload Form -->
 		<fieldset class="filemanager-tab" >
 			<?php
@@ -898,17 +967,17 @@ flexicontent_html::loadFramework('flexi-lib');
 			$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
 			
 			echo '
-			<!--span class="alert alert-info fcpadded" style="font-size: 11px; margin-right:12px;" >'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span-->
-			<span class="fc-fileman-upload-limits-box" style="font-size: 14px !important;">
-			<table style="border-collapse: collapse;">
+			<!--span class="label" style="font-size: 11px; margin-right:12px;" >'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span-->
+			<div class="fc-fileman-upload-limits-box" style="font-size: 14px !important;">
+			<table class="fc_uploader_header_tbl">
 				<tr class="fc-about-size-limits">
-					<td style="padding-right: 24px;">
+					<td>
 						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
 					</td>
 					<td>
 						<span class="fc-sys-upload-limit-box fc-about-conf-size-limit">
 							<span class="icon-database"></span>
-							<span class="'.$conf_limit_class.' '.$tip_class.'" style="margin-right: 4px; '.$conf_limit_style.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'">'.round($upload_maxsize / (1024*1024), 2).'</span> MBytes
+							<span class="'.$conf_limit_class.' '.$tip_class.'" style="margin-right: 4px; '.$conf_limit_style.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'">'.round($upload_maxsize / (1024*1024), 2).'</span> <span class="fc_hidden_580">MBytes</span>
 						</span>
 						'.($perms->SuperAdmin ?
 							'<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'"></span>
@@ -921,51 +990,66 @@ flexicontent_html::loadFramework('flexi-lib');
 							</span>
 						' : '').'
 					</td>
+					<td rowspan="3" style="text-align: center;" class="fc_hidden_960">
 					'.($enable_multi_uploader ? '
-					<td rowspan="3" style="padding-left: 48px;">
+						<div class="fc-mssg fc-info" style="margin: 0px 0 8px 0; padding-top: 4px; padding-bottom: 4px; width: 100%; box-sizing: border-box;">'.JText::_('Please edit file properties<br/>after you upload the files').'</div>
 						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); jQuery(\'#multiple_uploader\').height(210); setTimeout(function(){showUploader()}, 100);"
-							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'"
+							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'" style=""
 						>
 							'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
 						</button>
-					<td>' : '').'
+					' : '').'
+					<td>
 				</tr>
 
 				'.($resize_on_upload ? '
 				<tr class="fc-about-dim-limits">
-					<td style="padding-right: 24px;">
-						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'</div>
+					<td>
+						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">
+							'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'
+							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
+						</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-contract-2"></span>
-							<span class="'.$sys_limit_class.' '.$tip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC', '', 1, 1).'">'.$upload_max_w.'x'.$upload_max_h.'</span> Pixels
+							<span class="'.$sys_limit_class.'" style="margin-right: 4px;">'.$upload_max_w.'x'.$upload_max_h.'</span> <span class="fc_hidden_580">Pixels</span>
+							<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC', '', 1, 1).'"></span>
 						</span>
+					</td>
+					<td>
 					</td>
 				</tr>
 
 				<tr class="fc-about-crop-quality-limits">
-					<td style="padding-right: 24px;">
-						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'</div>
+					<td>
+						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">
+							'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'
+							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
+						</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-scissors" style="margin-right: 4px;'.($upload_method ? '' : 'opacity: 0.3;').'"></span>
-							<span class="" style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% '.JText::_('FLEXI_QUALITY', true).'</span>
+							<span class="'.$tip_class.'" style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
+							<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FIT_METHOD_DESC', '', 1, 1).'"></span>
 						</span>
+					</td>
+					<td>
 					</td>
 				</tr>
 				' : '').'
 
 			</table>
-			</span>
+			</div>
 			';
 			?>
 
 		
 			<fieldset class="actions" id="filemanager-1">
-				<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
+				<form action="<?php echo $action_url . 'upload'; ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 					
+					<span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_BASIC_UPLOADER'); ?></span>
 					<table class="fc-form-tbl" id="file-upload-form-container">
 						
 						<tr>
@@ -1048,7 +1132,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 					<?php echo strlen($_forced_secure_int) ? '<input type="hidden" name="secure" value="'.$_forced_secure_int.'" />' : ''; ?>
 					<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
-					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout='.$this->layout.($_forced_secure_val ? '&filter_secure='.$_forced_secure_val : '')); ?>" />
+					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=<?php echo $this->view; ?>&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout='.$this->layout.($_forced_secure_val ? '&filter_secure='.$_forced_secure_val : '').'&tmpl='.$_tmpl); ?>" />
 				</form>
 				
 			</fieldset>
@@ -1071,11 +1155,11 @@ flexicontent_html::loadFramework('flexi-lib');
 	<!-- File URL by Form -->
 	<?php if ($this->layout !='image' ) : /* not applicable for LAYOUT 'image' */ ?>
 
-	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'filebyurl' );*/ ?>
-	<div class="tabbertab" id="fileurl_tab" data-icon-class="icon-out">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?> </h3>
+	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_URL' ), 'filebyurl' );*/ ?>
+	<div class="tabbertab" id="fileurl_tab" data-icon-class="icon-link">
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_URL' ); ?> </h3>
 
-		<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
+		<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
 			<fieldset class="filemanager-tab" >
 				<fieldset class="actions" id="filemanager-3">
 					

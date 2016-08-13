@@ -90,7 +90,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option.'.'.$view.'.';
 		
-		$this->fieldid = JRequest::getVar( 'field', null, 'request', 'int' );
+		$this->fieldid = $jinput->get('field', null, 'int');
 		$this->viewid  = $view.$this->fieldid;
 		
 		
@@ -99,8 +99,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
 		
-		$default_order     = 'f.filename_displayed';
-		$default_order_dir = 'ASC';
+		$default_order     = 'f.uploaded'; //'f.id';
+		$default_order_dir = 'DESC';
 		
 		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
 		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
@@ -205,14 +205,18 @@ class FlexicontentModelFileselement extends JModelLegacy
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 			
 			// Single property fields, get file usage (# assignments), if not already done by main query
-			if ( !$s_assigned_via_main && $s_assigned_fields) {
-				foreach ($s_assigned_fields as $field_type) {
+			if ( !$s_assigned_via_main && $s_assigned_fields)
+			{
+				foreach ($s_assigned_fields as $field_type)
+				{
 					$this->countFieldRelationsSingleProp( $this->_data, $field_type );
 				}
 			}
 			// Multi property fields, get file usage (# assignments)
-			if ($m_assigned_fields) {
-				foreach ($m_assigned_fields as $field_type) {
+			if ($m_assigned_fields)
+			{
+				foreach ($m_assigned_fields as $field_type)
+				{
 					$field_prop = $m_assigned_props[$field_type];
 					$value_prop = $m_assigned_vals[$field_type];
 					$this->countFieldRelationsMultiProp($this->_data, $value_prop, $field_prop, $field_type='image');
@@ -271,10 +275,11 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 */
 	function getFilesFromPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir', $exts='bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')
 	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+
 		$imageexts = array('jpg','gif','png','bmp','jpeg');  // Common image extensions
-		
 		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $append_item, $append_field, $folder_param_name);
 		//echo $gallery_folder ."<br />";
 		
@@ -398,7 +403,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 	function _buildQuery( $assigned_fields=array(), $item_id=0, $ids_only=false )
 	{
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$where = $this->_buildContentWhere();
@@ -504,7 +510,9 @@ class FlexicontentModelFileselement extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+
 		$params = $this->getFieldParams();
 		$target_dir = $params->get('target_dir', '');
 		
@@ -522,9 +530,10 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanViewAllFiles = $permission->CanViewAllFiles;
-		
-		// List any file, or limit to secure / media
-		if ( strlen($target_dir) && $target_dir!=2 ) {  // Limit to secure:1 or media:0, if 2 then both allowed
+
+		// List any file, or limit to secure / media -- limit to secure:1, limit to media:0, both allowed: 2
+		if ( strlen($target_dir) && $target_dir!=2 )
+		{
 			$filter_secure = $target_dir ? 'S' : 'M';   // force secure / media
 		}
 		
@@ -583,13 +592,43 @@ class FlexicontentModelFileselement extends JModelLegacy
 	
 	
 	/**
+	 * Method to build the having clause of the query for the files
+	 *
+	 * @access private
+	 * @return string
+	 * @since 1.0
+	 */
+	function _buildContentHaving()
+	{
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		
+		$filter_assigned	= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_assigned', 'filter_assigned', '', 'word' );
+		
+		$having = '';
+		
+		if ( $filter_assigned ) {
+			if ( $filter_assigned == 'O' ) {
+				$having = ' HAVING COUNT(rel.fileid) = 0';
+			} else if ($filter_assigned == 'A' ) {
+				$having = ' HAVING COUNT(rel.fileid) > 0';
+			}
+		}
+		
+		return $having;
+	}
+	
+	
+	/**
 	 * Method to build the query for file uploaders according to current filtering
 	 *
 	 * @access private
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQueryUsers() {
+	function _buildQueryUsers()
+	{
 		// Get the WHERE and ORDER BY clauses for the query
 		$where = $this->_buildContentWhere();
 		
@@ -660,7 +699,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,   'int' );
 		
@@ -730,7 +770,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,   'int' );
 		

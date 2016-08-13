@@ -59,6 +59,11 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
 		$langs = FLEXIUtilities::getLanguages('code');
 		
+		//$jq_params = new JRegistry();
+		//$jq_params->set('jquery_ver', '1');
+		//$jq_params->set('jquery_ui_ver', '1.10.2');
+		//$jq_params->set('jquery_ui_theme', 'ui-lightness');
+		//flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 2, $jq_params );
 		
 		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
@@ -70,10 +75,11 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Get user's global permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 		
-		// Get folder mode
-		$fieldid = 0;  //$jinput->get('field', 0, 'int');
-		$_view = $view;
-		$folder_mode = 0;
+		// Get field id and folder mode
+		$fieldid = $view=='fileselement' ? $jinput->get('field', 0, 'int') : null;   // Force no field id for filemanager
+		$_view = $view.$fieldid;
+		$folder_mode = !$fieldid ? 0 :
+			$app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode', 'folder_mode', 0, 'int' );
 		
 		
 		
@@ -97,19 +103,53 @@ class FlexicontentViewFilemanager extends JViewLegacy
 
 		if ($fieldid)
 		{
-			$field = FlexicontentFields::getFieldsByIds($fieldid);
-			$field->parameters = new JRegistry($field->attribs);
+			$_fields = FlexicontentFields::getFieldsByIds(array($fieldid), false);
+			if ( !empty($_fields[$fieldid]) )
+			{
+				$field = $_fields[$fieldid];
+				$field->parameters = new JRegistry($field->attribs);
+			}
+			else
+				$fieldid = null;
 		}
 
-		// No column disabling for filemanager YET, column disabling only in fileselement view
-		foreach($optional_cols as $col) $cols[$col] = 1;
-		
-		
+		// Column disabling only applicable for FILESELEMENT view, with field in DB mode (folder_mode==0)
+		if (!$folder_mode && $fieldid)
+		{
+			// Clear secure/media filter if field is not configured to use specific
+			$target_dir = $field->parameters->get('target_dir', '');
+			$filter_secure = !strlen($target_dir) || $target_dir!=2  ?  ''  :  $filter_secure;
+			
+			$filelist_cols = FLEXIUtilities::paramToArray( $field->parameters->get('filelist_cols', array('upload_time', 'hits')) );
+			
+		}
+
+		// Column selection of optional columns given
+		if ( !empty($filelist_cols) )
+		{
+			foreach($filelist_cols as $col) $cols[$col] = 1;
+			unset($cols['_SAVED_']);
+		}
+
+		// Column selection of optional columns not given
+		else
+		{
+			// Filemanager view, add all columns
+			if ($view=='filemanager')
+			{
+				foreach($optional_cols as $col) $cols[$col] = 1;
+			}
+			
+			// Fileselement view, show none of optional columns
+			else ;
+		}
+
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
 		$filter_item      = $app->getUserStateFromRequest( $option.'.'.$_view.'.item_id',          'item_id',          '',           'int' );
 		
-		if ($layout!='image') {
+		if ($layout!='image')
+		{
 			if ($filter_lang) $count_filters++;
 			if ($filter_url) $count_filters++;
 			if ($filter_secure) $count_filters++;
@@ -129,6 +169,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($filter_uploader && !empty($this->cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
+		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
+		//if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // DO NOT SET it prevents listing and selecting files !!
+
 		// Text search
 		$scope  = $model->getState( 'scope' );
 		$search = $model->getState( 'search' );
@@ -159,12 +202,18 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanFiles');
+		if ($view!='fileselement')
+		{
+			FLEXISubmenu('CanFiles');
+		}
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FILEMANAGER' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'files' );
+		if ($view!='fileselement')
+		{
+			JToolBarHelper::title( $doc_title, 'files' );
+		}
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
@@ -176,9 +225,25 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Get data from the model
 		// ***********************
 		
-		if ( !$folder_mode ) {
+		// DB mode
+		if ( !$folder_mode )
+		{
 			$rows  = $this->get('Data');
-		} else {
+			$img_folder = '';
+		}
+
+		// FOLDER mode
+		else
+		{
+			$exts = $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
+			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
+			
+			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
+			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
+			
+			$ext = strtolower(pathinfo($newfilename, PATHINFO_EXTENSION));
+			$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$thumb_url = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1&amp;ar=x';
 		}
 		$pagination = $this->get('Pagination');
 		//$users = $this->get('Users');
@@ -193,6 +258,10 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', 'minigallery'=>'minigallery');
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
+
+
+		// *** BOF FOLDER MODE specific ***
+
 		
 		
 		/*****************
@@ -277,19 +346,42 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
 		$lists['order']			= $filter_order;
-		
+
+
+		// BOF *** REMOVED files *** fileselement VIEW
+		if ($view=='fileselement')
+		{
+			$filelist = JRequest::getString('files');
+			$file = JRequest::getInt('file');
+
+			$filelist = explode(',', $filelist);
+			$files = array();
+			foreach ($filelist as $fileid)
+			{
+				if ($fileid && $fileid != $file) {
+					$files[] = (int)$fileid;
+				}
+			}
+
+			$files = implode(',', $files);
+			if (strlen($files) > 0) {
+				$files .= ',';
+			}
+			$files .= $file;
+		}
+		// EOF *** REMOVED files *** fileselement VIEW
+
+
 		// uploadstuff
 		jimport('joomla.client.helper');
-		$ftp = !JClientHelper::hasCredentials('ftp');
+		$require_ftp = !JClientHelper::hasCredentials('ftp');
 		
 		//assign data to template
-		$this->assignRef('layout', $layout);
 		$this->assignRef('target_dir', $target_dir);
 		$this->assignRef('optional_cols', $optional_cols);
 		$this->assignRef('cols', $cols);
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('params'     , $cparams);
-		$this->assign('require_ftp'		, $ftp);
 		$this->assignRef('lists'      , $lists);
 		$this->assignRef('rows'       , $rows);
 		$this->assignRef('folder_mode', $folder_mode);
@@ -299,13 +391,30 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
-		$this->field = !empty($field) ? $field : null;
 		$this->assignRef('langs', $langs);
+
+		$this->require_ftp = $require_ftp;
+		$this->layout  = $layout;
+		$this->field   = !empty($field) ? $field : null;
+		$this->fieldid = $fieldid;
+		$this->u_item_id  = $u_item_id;
 		
 		$this->assignRef('option', $option);
 		$this->assignRef('view', $view);
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		if ($view=='fileselement')
+		{
+			$this->img_folder = $img_folder;
+			$this->thumb_w    = $thumb_w;
+			$this->thumb_h    = $thumb_h;
+			$this->files      = $files;
+			$this->targetid   = $targetid;
+			$this->files_selected = $files_selected;
+		}
+		else
+		{
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		}
 		parent::display($tpl);
 	}
 	
@@ -319,27 +428,32 @@ class FlexicontentViewFilemanager extends JViewLegacy
 	function setToolbar()
 	{
 		$document = JFactory::getDocument();
-		$js = "jQuery(document).ready(function(){";
 		$toolbar = JToolBar::getInstance('toolbar');
 
-		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
-		
-		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
-					.attr('href', '".$popup_load_url."');
-			";
-			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
-		} else {
-			$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-		}
-		
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
-		if ($perms->CanConfig) {
+
+		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
+
+		$js = "jQuery(document).ready(function(){";
+		if ($perms->CanConfig)
+		{
+			$btn_task = '';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
+			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
+				$js .= "
+					jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
+						.attr('href', '".$popup_load_url."');
+				";
+				JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
+			} else {
+				$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
+			}
+		}
+
+		if ($perms->CanConfig)
+		{
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
