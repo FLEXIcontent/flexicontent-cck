@@ -58,26 +58,31 @@ class FlexicontentControllerCategory extends JControllerForm
 		$this->registerTask( 'save2copy', 'save' );
 	}
 
-	function add() {
+	function add()
+	{
 		parent::add();
 	}
 	
-	function edit($key = NULL, $urlVar = NULL) {
+	function edit($key = NULL, $urlVar = NULL)
+	{
 		$cid = JRequest::getVar('cid', array(), 'get', 'array');
 		if (count($cid)) JRequest::setVar('cid', $cid, 'post', 'array');
 		parent::edit();
 	}
 
-	function save($key = NULL, $urlVar = NULL) {
+	function save($key = NULL, $urlVar = NULL)
+	{
 		parent::save();
-		if ( JRequest::getVar('fc_doajax_submit') ) {
+		if ( JRequest::getVar('fc_doajax_submit') )
+		{
 			JFactory::getApplication()->enqueueMessage(JText::_( 'FLEXI_ITEM_SAVED' ), 'message');
 			echo flexicontent_html::get_system_messages_html();
 			exit();  // Ajax submit, do not rerender the view
 		}
 	}
 	
-	function cancel($key = NULL) {
+	function cancel($key = NULL)
+	{
 		parent::cancel();
 	}
 	
@@ -94,16 +99,16 @@ class FlexicontentControllerCategory extends JControllerForm
 	protected function allowAdd($data = array())
 	{
 		$user = JFactory::getUser();
-		if ( !FLEXI_J16GE || $user->authorise('core.create', $this->extension) ) {
-			$cancreate_cat = true;
-		} else {
-			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
-				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
-			);
-			$cancreate_cat = count($usercats) > 0;
+		if ( $user->authorise('core.create', $this->extension) )
+		{
+			return true;
 		}
-		
-		return $cancreate_cat;
+
+		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
+			, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+		);
+
+		return count($usercats) > 0;
 	}
 
 	/**

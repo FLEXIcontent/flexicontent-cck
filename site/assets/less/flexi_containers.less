@@ -394,31 +394,31 @@ body .fc-nowrap-box,
  ***********************/
  
 #flexicontent .fc-xpended {
+	margin-top: 12px;
 	margin-right: 12px;
 }
 #flexicontent .fc-xpended-btns {
-	margin: 0 0 2px 0 !important;
+	margin: 0 0 8px 0 !important;
 	float: none !important;
 }
 #flexicontent .fc-xpended-row {
 	box-sizing: border-box;
 	clear: both;
 	float: left;
-	margin-right: 0;
-	margin-top: 1px;
+	margin: 0 4px 4px 0 !important;
 	width: 100%;
 }
 
 #flexicontent .fc-xpended .add-on:first-child {
 	float: left;
-	margin: 0 0 9px 0;
+	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
 }
 #flexicontent .fc-xpended-row .add-on:first-child {
 	float: left;
 	min-width: 150px;
-	margin: 0 0 3px 0;
+	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
 }
@@ -452,6 +452,8 @@ body .fc-nowrap-box,
 	font-size: 13px;
 }
 
+#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
+#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
 #flexicontent [class^="fc-xpended"] > select:not(:first-child),
 #flexicontent [class*="fc-xpended"] > select:not(:first-child),
 #flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
@@ -485,12 +487,10 @@ body .fc-nowrap-box,
 	font-size: 12px;
 }
 #flexicontent [class^="fc-xpended"] > .btn-group,
-#flexicontent [class*="fc-xpended"] > .btn-group {
-	margin-left: 1px;
-}
+#flexicontent [class*="fc-xpended"] > .btn-group,
 #flexicontent [class^="fc-xpended"] > *:not(.btn-group):not(:first-child),
 #flexicontent [class*="fc-xpended"] > *:not(.btn-group):not(:first-child) {
-	margin-left: 0px;
+	margin: 0px;
 }
 
 /* ICONs */

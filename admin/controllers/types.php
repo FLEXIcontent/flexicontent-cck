@@ -64,7 +64,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$jinput = $app->input;
 
 		$task  = $jinput->get('task', '', 'cmd');
-		$data  = $jinput->get('jform', array(), 'array');
+		$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data, validation will follow
 
 		// calculate access
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -87,22 +87,21 @@ class FlexicontentControllerTypes extends FlexicontentController
 		{
 			// Get the validation messages and push up to three validation messages out to the user
 			$errors	= $form->getErrors();
-			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
+			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++)
+			{
 				$app->enqueueMessage($errors[$i] instanceof Exception ? $errors[$i]->getMessage() : $errors[$i], 'error');
 			}
-			
+
 			// Set POST form date into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
-			
-			// Redirect back to the item form
+
+			// Redirect back to the edit form
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			
-			if ( JRequest::getVar('fc_doajax_submit') )
-			{
-				echo flexicontent_html::get_system_messages_html();
-				exit();  // Ajax submit, do not rerender the view
-			}
-			return false; //die('error');
+
+			if ($jinput->get('fc_doajax_submit'))
+				jexit(flexicontent_html::get_system_messages_html());
+			else
+				return false;
 		}
 
 		// Some fields need to be assigned after JForm validation (main XML file), because they do not exist in main XML file
@@ -291,8 +290,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
 	}
-	
-	
+
+
 	/**
 	 * logic for cancel an action
 	 *
@@ -304,14 +303,17 @@ class FlexicontentControllerTypes extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$post = JRequest::get('post');
-		$post = FLEXI_J16GE ? $post['jform'] : $post;
-		JRequest::setVar('cid', $post['id']);
+
+		$app   = JFactory::getApplication();
+		$jinput = $app->input;
+
+		$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$jinput->set('cid', (int) $data['id']);
+
 		$this->checkin();
 	}
-	
-	
+
+
 	/**
 	 * Logic to create the view for the edit field screen
 	 *

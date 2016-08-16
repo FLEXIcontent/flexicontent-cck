@@ -228,7 +228,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		// Create / load layout parameters if not already done above
 		if (!is_object($layout->params))
 		{
-			$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => true));
+			$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
 			$jform->load($layout->params);
 			$layout->params = $jform;
 		}

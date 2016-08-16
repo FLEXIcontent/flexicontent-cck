@@ -816,7 +816,6 @@ form div.container_fcfield > select {
 }
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
-#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input,
 #flexicontent div fieldset.panelform :not(.container_fcfield) textarea {
 	min-width: 60%;
 	max-width: 81%;
@@ -827,7 +826,9 @@ form div.container_fcfield > select {
 	line-height: unset;
 	height: unset;
 }
-div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"],
+#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
+#flexicontent div fieldset.panelform textarea,
+div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
 div fieldset td textarea {
 	min-width: 80%;
 }
@@ -1587,7 +1588,6 @@ table.fc_uploader_header_tbl td:last-child {
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
 	color: darkorange;
-	font-weight: bold;
 }
 .select2-container .select2-choice.fc_highlight_disabled span,
 .fc_highlight_disabled {

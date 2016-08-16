@@ -58,13 +58,16 @@ class FlexicontentControllerTags extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$task  = JRequest::getVar('task');
 		$model = $this->getModel('tag');
+		$user  = JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$jinput = $app->input;
 
-		// Get posted data
-		$post = JRequest::get( 'post' );
-		
-		if ( $model->store($post) )
+		$task  = $jinput->get('task', '', 'cmd');
+		$data  = $jinput->post->getArray();  // Default filtering will remove HTML
+		$data['id'] = (int) $data['id'];
+
+		if ( $model->store($data) )
 		{
 			switch ($task)
 			{
@@ -222,10 +225,15 @@ class FlexicontentControllerTags extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$post = JRequest::get('post');
-		//$post = FLEXI_J16GE ? $post['jform'] : $post;  //JForm currently not used for tags
-		JRequest::setVar('cid', $post['id']);
+
+		$app   = JFactory::getApplication();
+		$jinput = $app->input;
+
+		// TODO: Use JForm for tags ... 
+		//$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$data  = $jinput->get->post->get('id', 0, 'int');
+		$jinput->set('cid', (int) $data['id']);
+
 		$this->checkin();
 	}
 	

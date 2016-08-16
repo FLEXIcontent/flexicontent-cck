@@ -2,6 +2,9 @@
 	display: inline-block;
 	margin: 1px 2px 1px 3px;
 }
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
+	margin: 1px 2px;
+}
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select {
 	display: inline-block;
 	margin: 1px 2px;
@@ -19,6 +22,17 @@
 }
 body .fc_isselect.fc_ismobile {
 	min-width: 140px;
+}
+body label.fc-prop-lbl,
+body span.fc-prop-lbl,
+body #flexicontent label.fc-prop-lbl,
+body #flexicontent span.fc-prop-lbl {
+	font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+	font-size: 13px;
+	color: #040507;
+}
+body table.fc-form-tbl td.key > .fc-prop-lbl {
+	margin: 0 8px 0;
 }
 #flexicontent .fcradiocheckimage label.fccheckradio_lbl {
 	vertical-align: unset !important;
@@ -852,30 +866,30 @@ body .fc-nowrap-box,
 	float: left;
 }
 #flexicontent .fc-xpended {
+	margin-top: 12px;
 	margin-right: 12px;
 }
 #flexicontent .fc-xpended-btns {
-	margin: 0 0 2px 0 !important;
+	margin: 0 0 8px 0 !important;
 	float: none !important;
 }
 #flexicontent .fc-xpended-row {
 	box-sizing: border-box;
 	clear: both;
 	float: left;
-	margin-right: 0;
-	margin-top: 1px;
+	margin: 0 4px 4px 0 !important;
 	width: 100%;
 }
 #flexicontent .fc-xpended .add-on:first-child {
 	float: left;
-	margin: 0 0 9px 0;
+	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
 }
 #flexicontent .fc-xpended-row .add-on:first-child {
 	float: left;
 	min-width: 150px;
-	margin: 0 0 3px 0;
+	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
 }
@@ -904,6 +918,8 @@ body .fc-nowrap-box,
 	vertical-align: top;
 	font-size: 13px;
 }
+#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
+#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
 #flexicontent [class^="fc-xpended"] > select:not(:first-child),
 #flexicontent [class*="fc-xpended"] > select:not(:first-child),
 #flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
@@ -937,12 +953,10 @@ body .fc-nowrap-box,
 	font-size: 12px;
 }
 #flexicontent [class^="fc-xpended"] > .btn-group,
-#flexicontent [class*="fc-xpended"] > .btn-group {
-	margin-left: 1px;
-}
+#flexicontent [class*="fc-xpended"] > .btn-group,
 #flexicontent [class^="fc-xpended"] > *:not(.btn-group):not(:first-child),
 #flexicontent [class*="fc-xpended"] > *:not(.btn-group):not(:first-child) {
-	margin-left: 0px;
+	margin: 0px;
 }
 .fc-icon-16:before {
 	font-size: 16px !important;
@@ -1807,7 +1821,6 @@ form div.container_fcfield > select {
 }
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
-#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input,
 #flexicontent div fieldset.panelform :not(.container_fcfield) textarea {
 	min-width: 60%;
 	max-width: 81%;
@@ -1818,7 +1831,9 @@ form div.container_fcfield > select {
 	line-height: unset;
 	height: unset;
 }
-div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"],
+#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
+#flexicontent div fieldset.panelform textarea,
+div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
 div fieldset td textarea {
 	min-width: 80%;
 }
@@ -2578,7 +2593,6 @@ table.fc_uploader_header_tbl td:last-child {
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
 	color: darkorange;
-	font-weight: bold;
 }
 .select2-container .select2-choice.fc_highlight_disabled span,
 .fc_highlight_disabled {

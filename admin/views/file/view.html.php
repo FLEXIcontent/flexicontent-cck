@@ -62,9 +62,25 @@ class FlexicontentViewFile extends JViewLegacy {
 			}
 		}
 		
-		//build access level list
-		$lists['access'] 	= JHTML::_('access.assetgrouplist', 'access', $row->access, $config=array('class'=>'use_select2_lib'));
+		// Build access level list
+		//$lists['access'] = JHTML::_('access.assetgrouplist', 'access', $row->access, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
 		
+		$options = JHtml::_('access.assetgroups');
+		// Add number if it has been deleted
+		$found = false;
+		foreach ($options as $o)
+		{
+			if ($o->value == $row->access)
+			{
+				$found = true;
+				break;
+			}
+		}
+		if (!$found) array_unshift($options, JHtml::_('select.option', $row->access, /*JText::_('FLEXI_ACCESS').': '.*/$row->access) );
+		$elementid = $fieldname = 'access';
+		$attribs = 'class="use_select2_lib"';
+		$lists['access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $row->access, $elementid, $translate=true );
+
 		// Build languages list
 		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
