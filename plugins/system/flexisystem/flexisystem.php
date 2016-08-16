@@ -54,11 +54,11 @@ class plgSystemFlexisystem extends JPlugin
 	function onAfterInitialise()
 	{
 		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
-		
-		$jinput = JFactory::getApplication()->input;
 
-		// Get Post DATA
-		if ( $jinput->get('task')=='config.store' )
+		$jinput = JFactory::getApplication()->input;
+		$task   = $jinput->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
+
+		if ( $task=='config.store' )
 		{
 			$comp = $jinput->get('comp');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
@@ -210,7 +210,7 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$layout = $jinput->get('layout', '', 'string');
 		$tmpl   = $jinput->get('tmpl', '', 'string');
-		$task   = $jinput->get('task', '', 'string');
+		$task   = $jinput->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 		
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
 		$isAdmin = JFactory::getApplication()->isAdmin();
@@ -228,7 +228,7 @@ class plgSystemFlexisystem extends JPlugin
 		}
 
 		if (
-			$isAdmin && ($isFC_Config || $isBE_Module_Edit) || ($option=='com_flexicontent' && ($isAdmin || $task == 'edit'))
+			$isAdmin && ($isFC_Config || $isBE_Module_Edit) || ($option=='com_flexicontent' && ($isAdmin || $task == 'edit'))  // frontend task does not include 'controller.'
 		) {
 			// WORKAROUNDs for slow chosen JS in component configuration form
 			if ($isFC_Config)
@@ -304,8 +304,9 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
-		$task   = $jinput->get('task', '', 'string');
+		$task   = $jinput->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 		
+		// Split the task into 'controller' and task
 		$_ct = explode('.', $task);
 		$task = $_ct[ count($_ct) - 1];
 		if (count($_ct) > 1) $controller = $_ct[0];
@@ -1632,29 +1633,40 @@ class plgSystemFlexisystem extends JPlugin
 			
 			// Load XML file
 			$xml = simplexml_load_file($layoutpath);
+			if (!$xml)
+			{
+				JFactory::getApplication()->enqueueMessage('Error parsing layout file of "'.$new_ilayout.'". Layout parameters were not saved', 'warning');
+				return;
+			}
 			
 			// Create form object loading the , (form name seems not to cause any problem)
-			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+			$jform = new JForm('com_flexicontent.layout', array('control' => 'jform', 'load_data' => false));
 			$tmpl_params = $xml->asXML();
 			$jform->load($tmpl_params);
 			
 			// Set cleared layout parameters
-			$_post = & $_POST['jform']['params'];
-			$params = new JRegistry($table->params);
-			$grpname = 'params';
-			
-			$isValid = $jform->validate($_post, $grpname);
+			$fset = 'params';
+			$layout_post = array();
+			$layout_post[$fset] = & $_POST['jform'][$fset];
+
+			//foreach ($jform->getGroup($fset) as $field) { if ( !empty($field->getAttribute('filter')) ) echo $field->fieldname . $field->getAttribute('filter') . "<br/>"; } exit;
+
+			// Filter and validate the resulting data
+			$layout_post = $jform->filter($layout_post);   //echo "<pre>"; print_r($layout_post); echo "</pre>"; exit();
+			$isValid = $jform->validate($layout_post, $fset);
+
 			if (!$isValid)
 			{
 				JFactory::getApplication()->enqueueMessage('Error validating layout posted parameters. Layout parameters were not saved', 'error');
 				return;
 			}
 			
-			foreach ($jform->getGroup($grpname) as $field)
+			$params = new JRegistry($table->params);
+			foreach ($jform->getGroup($fset) as $field)
 			{
 				$fieldname = $field->fieldname;
 				if (substr($fieldname, 0, 2)=="__") continue;   // Skip field that start with __
-				$value = $_post[$fieldname];
+				$value = isset($layout_post[$fset][$fieldname]) ? $layout_post[$fset][$fieldname] : null;
 				$params->set($fieldname, $value);
 			}
 			

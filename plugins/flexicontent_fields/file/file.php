@@ -80,11 +80,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		$top_notice = '';//$use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
 		
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
+		$fields_box_placing = $field->parameters->get('fields_box_placing', '0');
 		$form_file_preview = $field->parameters->get('form_file_preview', '2');
 		
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
+		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
@@ -139,11 +141,12 @@ class plgFlexicontent_fieldsFile extends FCField
 			$files_data[0] = (object)array(
 				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
 				'url'=>'',
-				'secure'=>$field->parameters->get('iform_dir_default', '1'),
+				'secure' => (int) $field->parameters->get('iform_dir_default', 1),
 				'ext'=>'', 'published'=>1,
-				'language'=>$field->parameters->get('iform_lang_default', '*'),
+				'language' => $field->parameters->get('iform_lang_default', '*'),
+				'access' => (int) $field->parameters->get('iform_access_default', 1),
 				'hits'=>0,
-				'uploaded'=>'', 'uploaded_by'=>0, 'checked_out'=>false, 'checked_out_time'=>'', 'access'=>0,
+				'uploaded'=>'', 'uploaded_by'=>0, 'checked_out'=>false, 'checked_out_time'=>''
 			);
 		}
 		
@@ -328,6 +331,15 @@ class plgFlexicontent_fieldsFile extends FCField
 				newField.find('.inlinefile-lang-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang-lbl');
 				" : "")."
 				
+				".($iform_access ? "
+				var theInput = newField.find('select.fc_fileaccess').first();
+				//theInput.get(0).selectedIndex = 0;
+				theInput.val('1');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-access]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-access');
+				newField.find('.inlinefile-access-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-access').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-access-lbl');
+				" : "")."
+
 				".($iform_dir ? "
 				var nr = 0;
 				newField.find('.inlinefile-secure-info').remove();
@@ -390,10 +402,25 @@ class plgFlexicontent_fieldsFile extends FCField
 				// Attach form validation on new element
 				fc_validationAttach(newField);
 				
+				// Attach bootstrap eventon new element
+				fc_bootstrapAttach(newField);
+				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
-
+			
+			function expandFields".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				var fields_s = row.find('.fc-xpended');
+				var fields_m = row.find('.fc-xpended-row');
+				
+				fields_s.each(function() {  jQuery(this).removeClass('fc-xpended').addClass('fc-xpended-row');  });
+				fields_m.each(function() {  jQuery(this).removeClass('fc-xpended-row').addClass('fc-xpended');  });
+			}
+			
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
 				// Disable clicks
@@ -435,12 +462,14 @@ class plgFlexicontent_fieldsFile extends FCField
 			
 			$css .= '';
 			
+			$expand_view = '<span class="'.$add_on_class.' fcfield-expand-view'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_EXPAND_VALUES' ).'" onclick="expandFields'.$field->id.'(this);"></span>';
 			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
+			$expand_view = '';
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
@@ -468,18 +497,23 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
-		foreach($field->html as &$_html_) {
-			$_html_ = '
+		foreach($field->html as &$_html) {
+			$_html = '
 				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
+					'.$expand_view.'
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here).'
 				</div>
+				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
-				'.$_html_;
+				<div class="fc-field-props-box">
+				'.$_html.'
+				</div>
+				';
 		}
-		unset($_html_);
+		unset($_html);
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
@@ -781,6 +815,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
+		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		
 		// Execute once
@@ -848,10 +883,11 @@ class plgFlexicontent_fieldsFile extends FCField
 				
 				// validate data or empty/set default values
 				$v['file-del']   = !$iform_allowdel ? 0 : (int) @ $v['file-del'];
-				$v['file-title'] = !$iform_title ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
-				$v['file-desc']  = !$iform_desc  ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
-				$v['file-lang']  = !$iform_lang  ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
-				$v['secure']     = !$iform_dir   ? 1 : ((int) $v['secure'] ? 1 : 0);
+				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
+				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
+				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
+				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
+				$v['secure']     = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
 				
 				// UPDATE existing file
 				if( !$new_file && $file_id ) {
@@ -861,6 +897,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					if ($iform_title)  $dbdata['altname'] = $v['file-title'];
 					if ($iform_desc)   $dbdata['description'] = $v['file-desc'];
 					if ($iform_lang)   $dbdata['language'] = $v['file-lang'];
+					if ($iform_access) $dbdata['access'] = $v['file-access'];
 					// !! Do not change folder for existing files
 					//if ($iform_dir) {  $dbdata['secure'] = $v['secure'];
 					
@@ -939,6 +976,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					$jinput->set('file-title', $v['file-title']);
 					$jinput->set('file-desc', $v['file-desc']);
 					$jinput->set('file-lang', $v['file-lang']);
+					$jinput->set('file-access', $v['file-access']);
 					
 					// The dform field name of the <input type="file" ...
 					$jinput->set('file-ffname', 'custom');

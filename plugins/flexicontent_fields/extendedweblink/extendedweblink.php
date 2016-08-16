@@ -381,13 +381,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				$autoprefix = '
 				<div class="'.$input_grp_class.' fc-xpended-row">
 					<label class="'.$add_on_class.' fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ).'</label>
-					<div class="btn-group group-fcinfo">
+					<fieldset class="radio btn-group group-fcinfo">
 						<input class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
 						<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
 						<input class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
 						<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
-					</div>
-				</div>';
+					</fieldset>
+				</div>
+				';
 			}
 			
 			$title = '';
