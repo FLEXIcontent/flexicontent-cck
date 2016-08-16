@@ -14,9 +14,9 @@
 	<fields name="params">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="NOTE: Only standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel" class="alert fcpadded" />
+			<field name="" type="separator" level="level3" default="NOTE: Only standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel" class="alert alert-warning fcpadded" />
 			
-			<field name="" type="separator" default="Featured items (non-carousel items)" description="Placed before the carousel" level="level0" />
+			<field name="" type="separator" default="Featured items (non-carousel items)" description="Placed before the carousel" level="level0" class="fc-nomargin" />
 			<field name="item_columns_feat" type="list" default="1" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -61,11 +61,11 @@
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_padding_top_bottom_feat" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="carousel_padding_left_right_feat" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="carousel_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="carousel_margin_top_bottom_feat" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="carousel_margin_left_right_feat" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="carousel_padding_top_bottom_feat" type="text" filter="int" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right_feat" type="text" filter="int" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="carousel_border_width_feat" type="text" filter="int" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_margin_top_bottom_feat" type="text" filter="int" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="carousel_margin_left_right_feat" type="text" filter="int" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
 			
 			<field name="" type="separator" default="Standard items (inside carousel)" description="Placed inside the carousel" level="level0" />

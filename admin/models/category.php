@@ -266,6 +266,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	public function save($data)
 	{
 		// Initialise variables;
+		$app = JFactory::getApplication();
 		$dispatcher = JDispatcher::getInstance();
 		$table = $this->getTable();
 		$pk = (!empty($data['id'])) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
@@ -281,23 +282,83 @@ class FlexicontentModelCategory extends JModelAdmin
 			$isNew = false;
 		}
 		
-		// Retrieve form data these are subject to basic filtering
-		$jform = JRequest::getVar('jform', array(), 'post', 'array');
+		// ***************************
+		// Merge already filtered data
+		// ***************************
 		
 		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
-		if( !empty($jform['templates']) )
-			$data['params'] = array_merge($data['params'], $jform['templates']);
-		
-		// Merge the parameters of the select clayout
-		$clayout = $jform['templates']['clayout'];
-		if( !empty($jform['layouts'][$clayout]) ) {
-			$data['params'] = array_merge($data['params'], $jform['layouts'][$clayout]);
+		if( !empty($data['templates']) )
+		{
+			$data['params'] = array_merge($data['params'], $data['templates']);
 		}
-		
+
 		// Merge other special parameters, e.g. 'inheritcid'
-		if( !empty($jform['special']) )
-			$data['params'] = array_merge($data['params'], $jform['special']);
-		
+		if( !empty($data['special']) )
+		{
+			$data['params'] = array_merge($data['params'], $data['special']);
+		}
+
+
+		// ****************************************
+		// Get layout and verify layout file exists
+		// ****************************************
+
+		$clayout = $data['templates']['clayout'];
+		$layoutpath = !$clayout ? '' : JPath::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$clayout.DS.'category.xml');
+		if ($layoutpath && !file_exists($layoutpath))
+		{
+			$layoutpath = '';
+		}
+
+
+		// *****************************************************************************************************
+		// Retrieve Unfiltered data and apply nohtml filtering or the layout filtering specified in the XML file
+		// *****************************************************************************************************
+
+		$raw_data = $app->input->post->get('jform', array(), 'array');
+		$layout_data = array();
+
+		// Filter / validate the selected clayout parameters
+		if( $layoutpath && isset($raw_data['layouts'][$clayout]) )
+		{
+			// Attempt to parse the XML file
+			$xml = simplexml_load_file($layoutpath);
+			if (!$xml)
+			{
+				$this->setError('Error parsing layout file of "'.$new_ilayout.'"');
+				return false;
+			}
+
+			else
+			{
+				// Create form object and setting the relevant xml file
+				$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
+				$tmpl_params = $xml->asXML();
+				$jform->load($tmpl_params);
+
+				$fset = 'attribs';
+				$layout_data[$fset] = $raw_data['layouts'][$clayout];
+
+				//foreach ($jform->getGroup($fset) as $field) { if ( !empty($field->getAttribute('filter')) ) echo $field->fieldname  .' filt: '. $field->getAttribute('filter') . "<br/>"; } exit;
+
+				// Filter and validate the resulting data
+				$layout_data = $jform->filter($layout_data);   //echo "<pre>"; print_r($layout_data); echo "</pre>"; exit();
+				$isValid = $jform->validate($layout_data, $fset);
+				if (!$isValid)
+				{
+					$this->setError('Error validating layout posted parameters');
+					return false;
+				}
+			}
+		}
+
+
+		// Merge the parameters of the selected layout
+		if ( !empty($layout_data[$fset]) )
+		{
+			$data['params'] = array_merge($data['params'], $layout_data[$fset]);
+		}
+
 		// Set the new parent id if parent id not matched OR while New/Save as Copy .
 		if ($table->parent_id != $data['parent_id'] || $data['id'] == 0)
 		{
@@ -314,7 +375,7 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 		//$params			= $data["params"];
-		$copyparams = $jform['copycid'];
+		$copyparams = (int) $data['copycid'];
 		if ($copyparams) unset($data['params']);
 		
 		// Bind the data.
@@ -446,7 +507,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		if ( $this->_inherited_params !== NULL && !$force ) return $this->_inherited_params;
 		$id = (int)$this->_id;
 		
-		$app  = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		
 		// a. Clone component parameters ... we will use these as parameters base for merging
 		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
