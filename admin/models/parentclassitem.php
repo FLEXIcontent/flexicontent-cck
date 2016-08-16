@@ -3880,27 +3880,38 @@ class ParentClassItem extends JModelAdmin
 		// Build item parameters INI string
 		if (is_array($params))
 		{
+			// Get current item attributes
 			$item->attribs = new JRegistry($item->attribs);
 			
-			
+			// Get new and old layout names
 			$new_ilayout = isset($params['ilayout']) ? $params['ilayout'] : null;  // a non-set will return null, but let's make this cleaner
 			$old_ilayout = $item->attribs->get('ilayout');
 			
 			//echo "new_ilayout: $new_ilayout,  old_ilayout: $old_ilayout <br/>";
 			//echo "<pre>"; print_r($params); exit;
-			
-			
+
+
+			// *************************
+			// Verify layout file exists
+			// *************************
+			$layoutpath = !$new_ilayout ? '' : JPath::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$new_ilayout.DS.'item.xml');
+			if ($layoutpath && !file_exists($layoutpath))
+			{
+				$layoutpath = '';
+			}
+
+
 			// **************************************************************************************
 			// THIS is costly if site has many templates but it will only happen if layout is changed
 			// **************************************************************************************
-			
+
 			// WARNING: NULL layout means layout was not present in the FORM, aka do not clear parameters
 			if (
 				// (a) non-null but empty new ilayout, and (b) old layout was non empty: clear parameters of old layout, to allow proper heritage from content type (= aka use type's defaults for ilayout and its parameters)
-				($new_ilayout!==null && $new_ilayout=='' && !empty($old_ilayout))  ||
+				($layoutpath && $new_ilayout!==null && $new_ilayout=='' && !empty($old_ilayout))  ||
 				
 				// (a) new ilayout was given and (b) is different than old ilayout, clear ilayout parameters, in case old parameters are have same name with of new ilayout parameters
-				($new_ilayout!='' && $new_ilayout!=$old_ilayout)
+				($layoutpath && $new_ilayout!='' && $new_ilayout!=$old_ilayout)
 			) {
 				//JFactory::getApplication()->enqueueMessage('Layout changed, cleared old layout parameters', 'message');
 				
@@ -3910,7 +3921,7 @@ class ParentClassItem extends JModelAdmin
 					//if ( $tmpl_name == @$params['ilayout'] ) continue;
 					
 					$tmpl_params = $tmpl->params;
-					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
 					$jform->load($tmpl_params);
 					foreach ($jform->getGroup('attribs') as $field)
 					{
@@ -3919,17 +3930,54 @@ class ParentClassItem extends JModelAdmin
 					}
 				}
 			}
-			
-			if ( isset($params['layouts']) ) {
-				if (isset($params['layouts'][$new_ilayout])) {
-					foreach ($params['layouts'][$new_ilayout] as $k => $v) {
-						//echo "$k: $v <br/>";
-						$item->attribs->set($k, $v);
+
+
+			// Load XML file of the ilayout and filter / validate selected ilayout parameters
+			$layout_data = array();
+			if ( $layoutpath && isset($params['layouts'][$new_ilayout]) )
+			{
+				// Attempt to parse the XML file
+				$xml = simplexml_load_file($layoutpath);
+				if (!$xml)
+				{
+					JFactory::getApplication()->enqueueMessage('Error parsing layout file of "'.$new_ilayout.'". Layout parameters were not saved', 'warning');
+				}
+
+				else
+				{
+					// Create form object and load the relevant xml file
+					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
+					$tmpl_params = $xml->asXML();
+					$jform->load($tmpl_params);
+
+					$fset = 'attribs';
+					$layout_data[$fset] = $params['layouts'][$new_ilayout];
+
+					//foreach ($jform->getGroup($fset) as $field) { if ( !empty($field->getAttribute('filter')) ) echo $field->fieldname .' filt: '. $field->getAttribute('filter') . "<br/>"; } exit;
+
+					// Filter and validate the resulting data
+					$layout_data = $jform->filter($layout_data);   //echo "<pre>"; print_r($layout_data); echo "</pre>"; exit();
+					$isValid = $jform->validate($layout_data, $fset);
+					if (!$isValid)
+					{
+						JFactory::getApplication()->enqueueMessage('Error validating layout posted parameters. Layout parameters were not saved', 'warning');
 					}
 				}
-				unset($params['layouts']);
 			}
-			foreach ($params as $k => $v) {
+
+			// Merge the parameters of the selected layout (if not empty)
+			if ( !empty($layout_data[$fset]) )
+			{
+				foreach ($layout_data[$fset] as $k => $v)
+				{
+					$item->attribs->set($k, $v);  //echo "$k: $v <br/>";
+				}
+			}
+			unset($params['layouts']);
+
+
+			foreach ($params as $k => $v)
+			{
 				//$v = is_array($v) ? implode('|', $v) : $v;
 				$item->attribs->set($k, $v);
 			}
@@ -3942,7 +3990,8 @@ class ParentClassItem extends JModelAdmin
 		{
 			$item->metadata = new JRegistry($item->metadata);
 			// NOTE: metadesc, metakey are directly under jform 'attribs' so they do not need special handling
-			foreach ($metadata as $k => $v) {
+			foreach ($metadata as $k => $v)
+			{
 				$item->metadata->set($k, $v);
 			}
 			$item->metadata = $item->metadata->toString();
