@@ -420,7 +420,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function storeLessConf($folder, $cfgname, $layout, $attribs)
 	{
 		// Load the XML file into a JForm object
-		$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => true));
+		$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
 		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
 		
 		$layout_type = $layout=='items' ? 'item' : 'category';

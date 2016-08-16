@@ -408,21 +408,34 @@ class flexicontent_html
 	
 	
 	// *** Output the javascript to dynamically hide/show columns of a table
-	static function jscode_to_showhide_table($container_div_id, $data_tbl_id, $start_html='', $end_html='') {
+	static function jscode_to_showhide_table($container_div_id, $data_tbl_id, $start_html='', $end_html='')
+	{
 		$document = JFactory::getDocument();
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+
 		$js = "
 		var show_col_${data_tbl_id} = Array();
 		jQuery(document).ready(function() {
 		";
-		
-		if (isset($_POST["columnchoose_${data_tbl_id}"])) {
-			foreach ($_POST["columnchoose_${data_tbl_id}"] as $colnum => $ignore) {
+
+		$columnchoose_post   = $jinput->post->get('columnchoose_'.$data_tbl_id, null, 'array');
+		$columnchoose_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, null, 'string');		
+
+		if ( $columnchoose_post !== null )
+		{
+			foreach ($columnchoose_post as $colnum => $ignore)
+			{
+				$colnum = (int) $colnum;
 				$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
 			}
 		}
-		else if (isset($_COOKIE["columnchoose_${data_tbl_id}"])) {
-			$colnums = preg_split("/[\s]*,[\s]*/", $_COOKIE["columnchoose_${data_tbl_id}"]);
-			foreach ($colnums as $colnum) {
+
+		else if ( $columnchoose_cookie !== null )
+		{
+			$colnums = preg_split("/[\s]*,[\s]*/", $columnchoose_cookie);
+			foreach ($colnums as $colnum)
+			{
 				$colnum = (int) $colnum;
 				$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
 			}
@@ -1625,7 +1638,29 @@ class flexicontent_html
 				// Filter according to user group Text Filters
 				$v = JComponentHelper::filterText($v);
 				break;
+
+			case 'ACCESSLEVEL':
+				// Filter using known access levels
+				if (!is_integer($v))
+				{
+					$v = 1;  // Public
+					break;
+				}
+				$v = (int) $v;
 				
+				$options = JHtml::_('access.assetgroups');
+				$found = false;
+				foreach ($options as $o)
+				{
+					if ($o->value== $v)
+					{
+						$found = true;
+						break;
+					}
+				}
+				if (!$found) $v = 1;
+				break;
+
 			case 'URL': case 'url':
 				// This cleans some of the more dangerous characters but leaves special characters that are valid.
 				$v = trim($noHtmlFilter->clean($v, 'HTML'));
@@ -3422,23 +3457,28 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid=null, $label_class='')
+	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid=null, $label_class='', $label_on_class='', $fset_attribs='')
 	{
+		$add_fset = $buildtype==1 || $buildtype==3; 
 		$selected = is_array($selected) ? $selected : array($selected);
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 		
+		// Set input-set attributes and input's label class if not given
+		$fset_attribs = !$fset_attribs && $add_fset ? ' class="radio btn-group btn-group-yesno"' : $fset_attribs;
+		$label_class  = !$label_class && $add_fset ? ' btn': $label_class;
+		$label_on_class = !$label_on_class && $add_fset ? ' active': $label_on_class;
+
+		$html = $add_fset ? '<fieldset ' . $fset_attribs . '>' : '';
 		$n = 0;
-		$html = $buildtype==1 || $buildtype==3 ? '<fieldset class="radio btn-group btn-group-yesno">' : '';
-		$label_class .= (!$label_class && ($buildtype==1 || $buildtype==3)) ? ' btn': '';
 		foreach ($options as $value => $text) {
 			$tagid_n = $tagid.$n;
 			$html .='
 			<input type="'.($buildtype > 1 ? 'checkbox' : 'radio').'" '.(in_array($value, $selected) ? ' checked="checked" ' : '').' value="'.$value.'" id="'.$tagid_n.'" name="'.$name.'" '.$attribs.'/>
-			<label id="'.$tagid_n.'-lbl" for="'.$tagid_n.'" class="'.$label_class.'">'.$text.'</label>
+			<label id="'.$tagid_n.'-lbl" for="'.$tagid_n.'" class="' . (in_array($value, $selected) ? $label_on_class : '') . $label_class.'">'.$text.'</label>
 			';
 			$n++;
 		}
-		$html .= $buildtype==1 ? '</fieldset>' : '';
+		$html .= $add_fset ? '</fieldset>' : '';
 		return $html;
 	}
 	
