@@ -279,7 +279,15 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$allowed_langs = null;
 		$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
 		
-		
+		// Build access list
+		//$lists['file-access'] = JHTML::_('access.assetgrouplist', 'access', null, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
+
+		$options = JHtml::_('access.assetgroups');
+		$elementid = $fieldname = 'file-access';
+		$attribs = 'class="use_select2_lib"';
+		$lists['file-access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', null, $elementid, $translate=true );
+
+
 		/*************
 		 ** FILTERS **
 		 *************/

@@ -62,14 +62,20 @@ class FlexicontentViewField extends JViewLegacy
 		$typesselected= $this->get( 'Typesselected' );
 		
 		//create the toolbar
-		if ( $row->id ) {
+		$isnew  = !$row->id;
+		if ( !$isnew ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
 		}
 		
-		$ctrl = FLEXI_J16GE ? 'fields.' : '';
-		JToolBarHelper::apply( $ctrl.'apply' );
+		$ctrl = 'fields.';
+
+		JToolBarHelper::apply( $ctrl.'apply', 'FLEXI_APPLY' );
+		if ( !$isnew ) flexicontent_html::addToolBarButton(
+			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('".$ctrl."apply_ajax')", $msg_alert='', $msg_confirm='',
+			$btn_task=$ctrl.'apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop"
+		);
 		JToolBarHelper::save( $ctrl.'save' );
 		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
@@ -180,7 +186,7 @@ class FlexicontentViewField extends JViewLegacy
 		//build type select list
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';
 		$attribs .= $row->iscore ? ' disabled="disabled"' : '';
-		$types_fieldname = FLEXI_J16GE ? 'jform[tid][]' : 'tid[]';
+		$types_fieldname = 'jform[tid][]';
 		$lists['tid'] = flexicontent_html::buildtypesselect($types, $types_fieldname, $typesselected, false, $attribs);
 		
 		

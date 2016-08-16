@@ -252,8 +252,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		}
 		
 		// Create form object, (form name seems not to cause any problem)
-		$form_layout = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-		$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
+		$form_layout = new JForm('com_flexicontent.layout.'.$layout_name, array('control' => 'jform', 'load_data' => true));
+		$tmpl_params = $xmldoc->asXML();
 		$form_layout->load($tmpl_params);
 		
 		// Load existing layout values into the object (that we got from DB)

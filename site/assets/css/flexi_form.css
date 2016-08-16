@@ -2,6 +2,9 @@
 	display: inline-block;
 	margin: 1px 2px 1px 3px;
 }
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
+	margin: 1px 2px;
+}
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select {
 	display: inline-block;
 	margin: 1px 2px;
@@ -19,6 +22,17 @@
 }
 body .fc_isselect.fc_ismobile {
 	min-width: 140px;
+}
+body label.fc-prop-lbl,
+body span.fc-prop-lbl,
+body #flexicontent label.fc-prop-lbl,
+body #flexicontent span.fc-prop-lbl {
+	font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+	font-size: 13px;
+	color: #040507;
+}
+body table.fc-form-tbl td.key > .fc-prop-lbl {
+	margin: 0 8px 0;
 }
 #flexicontent .fcradiocheckimage label.fccheckradio_lbl {
 	vertical-align: unset !important;

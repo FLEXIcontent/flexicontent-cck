@@ -432,21 +432,33 @@ div.empty_image {
 	font-weight: normal;
 }
 #flexicontent .fc_filedata_txt_nowrap {
-	padding: 0 11px;
+	display: block !important;
+	height: 1px !important;
+	margin-bottom: -3px !important;
+	overflow: hidden !important;
+	visibility: hidden !important;
+	white-space: normal !important;
 }
 #flexicontent .fc_filedata_txt {
 	display: inline-block;
-	border: 1px solid lightgray;
+	color: black;
 	box-sizing: border-box;
 	border-radius: 0;
 	min-height: 1.2em;
-	padding: 4px 8px;
-	margin: 2px 0 4px;
+	padding: 4px;
 	min-width: 220px;
-	width: 100%;
-	background: #f0f0f0 none repeat scroll 0 0;
+	background: #c0c0c0 none repeat scroll 0 0;
 	color: #444;
 	border-radius: 4px;
+}
+#flexicontent .fc_filedata_txt_nowrap,
+#flexicontent .fc_filedata_txt {
+	width: 98%;
+	margin: 0 2% 6px 0;
+	border: 1px solid gray;
+	font-size: 12px;
+	padding-left: 8px;
+	padding-right: 8px;
 }
 #flexicontent .fc_filedata_txt.file_unpublished {
 	color: #888;
