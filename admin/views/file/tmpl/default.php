@@ -59,8 +59,9 @@ if (!$this->row->url)
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
 
 	<table class="fc-form-tbl">
+
 		<tr>
-			<td class="key">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
 				<label class="label" for="filename_original">
 					<?php echo JText::_( !$this->row->url ? 'FLEXI_FILENAME' : 'FLEXI_FILE_URL' ); ?>
 				</label>
@@ -80,6 +81,7 @@ if (!$this->row->url)
 				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100" class="input-xxlarge" />
 			</td>
 		</tr>
+
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 				<label class="label" for="file-desc">
@@ -90,6 +92,7 @@ if (!$this->row->url)
 				<textarea name="description" rows="5" class="input-xxlarge" id="file-desc"><?php echo $this->row->description; ?></textarea>
 			</td>
 		</tr>
+
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 				<label class="label" for="language">
@@ -102,10 +105,11 @@ if (!$this->row->url)
 				</span>
 			</td>
 		</tr>
+
 		<tr>
-			<td class="key">
-				<label class="label" for="assetgroups_1">
-					<?php echo JText::_( 'FLEXI_ACCESS_LEVEL' ); ?>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
+				<label class="label" for="access">
+					<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 				</label>
 			</td>
 			<td>

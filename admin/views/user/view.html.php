@@ -221,7 +221,7 @@ class FlexicontentViewUser extends JViewLegacy
 		{
 			if ($tmpl->name != $_clayout) continue;
 			
-			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
 			foreach ($tmpl->params->getGroup('attribs') as $field)

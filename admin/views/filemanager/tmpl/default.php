@@ -510,7 +510,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		<?php if (!$this->folder_mode) : ?>
 		
 			<div id="fc-filters-header">
-				<span class="fc-filter nowrap_box" style="margin:0;">
+				<span class="fc-filter nowrap_box" style="margin: 1px;">
 					<?php echo $this->lists['scope']; ?>
 				</span>
 				<span class="btn-group input-append fc-filter filter-search">
@@ -1104,17 +1104,6 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					<?php if (!$this->folder_mode) : ?>
 						<tr>
-							<td id="file-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-								<label class="label" id="file-lang-lbl" for="file-lang">
-								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-								</label>
-							</td>
-							<td id="file-lang-container">
-								<?php echo $this->lists['file-lang']; ?>
-							</td>
-						</tr>
-							
-						<tr>
 							<td id="file-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 								<label class="label" id="file-desc-lbl" for="file-desc_uploadFileForm">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
@@ -1124,7 +1113,29 @@ flexicontent_html::loadFramework('flexi-lib');
 								<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
-						
+
+						<tr>
+							<td id="file-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
+								<label class="label" id="file-lang-lbl" for="file-lang">
+								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+								</label>
+							</td>
+							<td id="file-lang-container">
+								<?php echo $this->lists['file-lang']; ?>
+							</td>
+						</tr>
+
+						<tr>
+							<td id="file-access-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
+								<label class="label" id="file-access-lbl" for="file-access">
+								<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
+								</label>
+							</td>
+							<td id="file-access-container">
+								<?php echo $this->lists['file-access']; ?>
+							</td>
+						</tr>
+
 						<?php if ($this->target_dir==2) : ?>
 						<tr>
 							<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
@@ -1190,67 +1201,78 @@ flexicontent_html::loadFramework('flexi-lib');
 					<table class="fc-form-tbl" id="file-url-form-container">
 						
 						<tr>
-							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_URL', 'FLEXI_FILE_URL_DESC', 1, 1); ?>">
+							<td id="file-url-data-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_URL', 'FLEXI_FILE_URL_DESC', 1, 1); ?>">
 								<label class="label" for="file-url-data">
 								<?php echo JText::_( 'FLEXI_FILE_URL' ); ?>
 								</label>
 							</td>
-							<td>
+							<td id="file-url-data-container">
 								<input type="text" id="file-url-data" size="44" class="required input-xxlarge" name="file-url-data" />
 							</td>
 						</tr>
 
 						<tr>
-							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
+							<td id="file-url-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 								<label class="label" for="file-url-title">
 								<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 								</label>
 							</td>
-							<td>
+							<td id="file-url-title-container">
 								<input type="text" id="file-url-title" size="44" class="required input-xxlarge" name="file-url-title" />
 							</td>
 						</tr>
 
 						<tr>
-							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-								<label class="label" id="file-url-lang-lbl" for="file-url-lang">
-								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-								</label>
-							</td>
-							<td>
-								<?php echo str_replace('file-lang', 'file-url-lang', $this->lists['file-lang']); ?>
-							</td>
-						</tr>
-
-						<tr>
-							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
+							<td id="file-url-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 								<label class="label" for="file-url-desc">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 								</label>
 							</td>
-							<td>
+							<td id="file-url-desc-container">
 								<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
 
 						<tr>
-							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC', 1, 1); ?>">
+							<td id="file-url-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
+								<label class="label" id="file-url-lang-lbl" for="file-url-lang">
+								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+								</label>
+							</td>
+							<td id="file-url-lang-container">
+								<?php echo str_replace('file-lang', 'file-url-lang', $this->lists['file-lang']); ?>
+							</td>
+						</tr>
+
+						<tr>
+							<td id="file-url-access-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
+								<label class="label" id="file-url-access-lbl" for="file-url-access">
+								<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
+								</label>
+							</td>
+							<td id="file-url-access-container">
+								<?php echo str_replace('file-access', 'file-url-access', $this->lists['file-access']); ?>
+							</td>
+						</tr>
+
+						<tr>
+							<td id="file-url-ext-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC', 1, 1); ?>">
 								<label class="label" for="file-url-ext">
 								<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 								</label>
 							</td>
-							<td>
+							<td id="file-url-ext-container">
 								<input type="text" id="file-url-ext" size="5" class="required input-xxlarge" name="file-url-ext" />
 							</td>
 						</tr>
 
 						<tr>
-							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', '', 1, 1); ?>">
+							<td id="file-url-size-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', '', 1, 1); ?>">
 								<label class="label" for="file-url-size">
 								<?php echo JText::_( 'FLEXI_SIZE' ); ?>
 								</label>
 							</td>
-							<td>
+							<td id="file-url-size-container">
 								<input type="text" id="file-url-size" size="44" class="required input-xxlarge" name="file-url-size" />
 								<select id="size_unit" name="size_unit" class="use_select2_lib">
 									<option value="KBs" selected="selected">KBs</option>
@@ -1262,8 +1284,9 @@ flexicontent_html::loadFramework('flexi-lib');
 						</tr>
 
 					</table>
-					
-					<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
+
+					<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
+
 				</fieldset>
 			</fieldset>
 			<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>

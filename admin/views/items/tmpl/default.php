@@ -370,7 +370,7 @@ jQuery(document).ready(function(){
 	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm" style="<?php echo ($this->unassociated && !count($this->rows) ? 'display: none;' : ''); ?>">
 	
 	<div id="fc-filters-header">
-		<span class="fc-filter nowrap_box" style="margin:0;">
+		<span class="fc-filter nowrap_box" style="margin: 1px;">
 			<?php echo $this->lists['scope']; ?>
 		</span>
 		<span class="btn-group input-append fc-filter filter-search">

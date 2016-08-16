@@ -60,12 +60,15 @@ class FlexicontentControllerReviews extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$task  = JRequest::getVar('task');
 		$model = $this->getModel('review');
+		$user  = JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$jinput = $app->input;
 
-		// Get posted data
-		$post = JRequest::get( 'post' );
-		
+		$task  = $jinput->get('task', '', 'cmd');
+		$data  = $jinput->post->getArray();  // Default filtering will remove HTML
+		$data['id'] = (int) $data['id'];
+
 		if ( $model->store($post) )
 		{
 			switch ($task)
@@ -208,8 +211,8 @@ class FlexicontentControllerReviews extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=reviews', $msg );
 	}
-	
-	
+
+
 	/**
 	 * logic for cancel an action
 	 *
@@ -221,14 +224,19 @@ class FlexicontentControllerReviews extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$post = JRequest::get('post');
-		//$post = FLEXI_J16GE ? $post['jform'] : $post;  //JForm currently not used for reviews
-		JRequest::setVar('cid', $post['id']);
+
+		$app   = JFactory::getApplication();
+		$jinput = $app->input;
+
+		// TODO: Use JForm for reviews ... 
+		//$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$data  = $jinput->get->post->get('id', 0, 'int');
+		$jinput->set('cid', (int) $data['id']);
+
 		$this->checkin();
 	}
-	
-	
+
+
 	/**
 	 * Logic to create the view for the record editing
 	 *

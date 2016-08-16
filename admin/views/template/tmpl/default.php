@@ -657,6 +657,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 										$this->layout->params->getInput($fieldname, $groupname, $value)
 									)
 								);
+							echo '<div class="fcclear"></div>';
 						endforeach; ?>
 					</fieldset>
 				<?php endforeach; ?>

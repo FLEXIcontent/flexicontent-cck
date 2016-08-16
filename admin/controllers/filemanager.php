@@ -42,13 +42,15 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		parent::__construct();
 		$this->registerTask( 'uploads', 	'upload' );
-		
-		$view = JRequest::getVar('view', 'filemanager');
-		$this->return_url = $view == 'filemanager' ?
-			'index.php?option=com_flexicontent&view=filemanager' :
-			$_SERVER['HTTP_REFERER'] ;
+
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+		$view = $jinput->get('view', '', 'cmd');
+
+		$this->return_url = $view == 'filemanager' ? 'index.php?option=com_flexicontent&view=filemanager' : $_SERVER['HTTP_REFERER'] ;
 	}
-	
+
+
 	/**
 	 * Upload files
 	 *
@@ -62,15 +64,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
 		$jinput = $app->input;
-		
-		$task = JRequest::getVar('task');
-		
+
+		$option = $jinput->get('option', '', 'cmd');
+		$task   = $jinput->get('task', '', 'cmd');
+		$format = $jinput->get('format', 'html', 'cmd');
+
 		// calculate access
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$is_authorised = $canupload;
 		
 		// check access
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			if ($task=='uploads') {
 				die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "'.JText::_( 'FLEXI_ALERTNOTAUTH' ).'"}, "id" : "id"}');
 			} else {
@@ -80,10 +85,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 
-		$option		= JRequest::getVar( 'option');
-		if ($task=='uploads') {
+		if ($task=='uploads')
+		{
 			$file = JRequest::getVar( 'file', '', 'files', 'array' );
-		} else {
+		}
+		else
+		{
 			// Default field <input type="file" is name="Filedata" ... get the file
 			$ffname = JRequest::getCmd( 'file-ffname', 'Filedata', 'post' );
 			$file   = JRequest::getVar( $ffname, '', 'files', 'array' );
@@ -100,13 +107,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			if (strlen($fname_level2))  $file = $file[$fname_level2];
 			if (strlen($fname_level3))  $file = $file[$fname_level3];
 		}
-		$format  = JRequest::getVar('format', 'html', '', 'cmd');
-		$secure  = JRequest::getInt('secure', 1 );
+		$secure  = $jinput->get('secure', 1, 'int');
 		$secure  = $secure ? 1 : 0;
-		$return  = JRequest::getVar('return-url', null, '', 'base64');
+		$return  = $jinput->get('return-url', null, 'base64');
 
-		$filetitle  = $jinput->get('file-title', null, 'string');
-		$filedesc   = $jinput->get('file-desc', '');  // Default filtering
+		$filetitle  = $jinput->get('file-title', '', 'string');
+		$filedesc   = $jinput->get('file-desc', '');  // Joomla default text-filters for the usergroup
 		$filelang   = $jinput->get('file-lang', '*', 'string');
 		$fileaccess = $jinput->get('file-access', 1, 'int');
 
@@ -808,9 +814,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		$jinput = JFactory::getApplication()->input;
 		
 		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+		$jinput = JFactory::getApplication()->input;
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
 		$file		= $model->getFile();
