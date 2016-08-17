@@ -2256,12 +2256,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// Handle copying original files from a server folder during CSV import
-			else if ($is_importcsv && $import_media_folder ) {
+			else if ($is_importcsv && $import_media_folder )
+			{
 				$filename = basename($v['originalname']);
 				$sub_folder = dirname($v['originalname']);
 				$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 				
-				if ( $image_source >= 1 ) {
+				if ( $image_source >= 1 )
+				{
 					$srcfilepath  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$destfilepath = JPath::clean( $destpath_original . $filename );
 					if ( JFile::exists($srcfilepath) ) {
@@ -2270,7 +2272,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 					$v['originalname'] = $filename; // make sure filename is WITHOUT subfolder
 				}
-				else if ( $image_source == -2 ) {
+
+				else if ( $image_source == -2 )
+				{
 					$srcfilepath  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$destfilepath = JPath::clean( $destpath_media_full . $filename );
 					if ( JFile::exists($srcfilepath) ) {
@@ -2279,14 +2283,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 					$v['originalname'] = $destpath_media . $filename; // make sure filename is WITH subfolder
 				}
-				else {
+
+				else
+				{
 					$fman = new FlexicontentControllerFilemanager();
+					$fman->runMode = 'interactive';
+
 					$jinput->set('return-url', null);
 					$jinput->set('file-dir-path', DS.$import_media_folder . $sub_folder);
 					$jinput->set('file-filter-re', preg_quote($filename));
 					$jinput->set('secure', 1);
 					$jinput->set('keep', 1);
-					$file_ids = $fman->addlocal();
+
+					$upload_err = null;
+					$file_ids = $fman->addlocal(null, $upload_err);
 					reset($file_ids);  // Reset array to point to first element
 					$v['originalname'] = key($file_ids);  // The (first) key of file_ids array is the cleaned up filename
 				}
