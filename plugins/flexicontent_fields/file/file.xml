@@ -73,7 +73,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field-->
 
-			<field name="" type="separator" default="File properties editing" description="" level="level2"/>
+			<field name="" type="separator" default="FLEXI_EDIT_PROPERTIES" description="" level="level2"/>
 			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Select to allow editing file properties elements" class="btn-group group-fcmethod">
 				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on,client-resize">FLEXI_NO</option>
 				<option value="0" show_list="inline-edit-on,client-resize" hide_list="inline-edit-off">FLEXI_YES</option>
@@ -110,9 +110,9 @@
 				<option value="1">FLEXI_SECURE</option>
 			</field>
 
-			<field name="" type="separator" default="My Files" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_MY_FILES" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
 
-			<field name="" type="separator" default="My Files allows selecting existing files in a modal popup" description="" level="level3" class="alert alert-info fcpadded"/>
+			<field name="" type="separator" default="FLEXI_MY_FILES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
 
 			<field name="use_myfiles" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Enable to allow selecting an existing file that was previously uploaded" class="btn-group group-fcmethod">
 				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-on">FLEXI_NO</option>

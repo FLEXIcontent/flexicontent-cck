@@ -490,6 +490,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
+		if ($formlayout != 'field_InlineBoxes') $expand_view = '';
 
 		//$this->setField($field);
 		//$this->setItem($item);
@@ -806,20 +807,27 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			}
 			
 			// support for basic CSV import / export
-			if ( $is_importcsv ) {
-				if ( !is_numeric($v) ) {
+			if ( $is_importcsv )
+			{
+				if ( !is_numeric($v) )
+				{
 					$filename = basename($v);
 					$sub_folder = dirname($v);
 					$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
-					
+
+					// Add by calling the filemanager upload() task in interactive mode
 					$fman = new FlexicontentControllerFilemanager();
+					$fman->runMode = 'interactive';
+
 					$Fobj = new stdClass();
 					$Fobj->return_url     = null;
 					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
 					$Fobj->file_filter_re = preg_quote($filename);
 					$Fobj->secure = 0;
 					$Fobj->keep   = 1;
-					$file_ids = $fman->addlocal($Fobj);
+					
+					$upload_err = null;
+					$file_ids = $fman->addlocal($Fobj, $upload_err);
 					$v = !empty($file_ids) ? reset($file_ids) : false; // Get fist element
 					//$_filetitle = key($file_ids);  this is the cleaned up filename, currently not needed
 				}
@@ -937,8 +945,11 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 						continue;
 					}
 					
-					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
-					$jinput->set('return-url', null);  // needed !
+					// Add file by calling filemanager controller upload() task, which will do the data filtering too
+					$fman = new FlexicontentControllerFilemanager();
+					$fman->runMode = 'interactive';
+
+					$jinput->set('return-url', null);
 					$jinput->set('secure', $v['secure']);
 					$jinput->set('file-title', $v['file-title']);
 					$jinput->set('file-desc', $v['file-desc']);
@@ -950,8 +961,15 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$jinput->set('fname_level1', $field->name);
 					$jinput->set('fname_level2', $n);
 					$jinput->set('fname_level3', 'file-data');
-					$file_id = $fman->upload();
+
+					$upload_err = null;
+					$file_id = $fman->upload(null, $upload_err);
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
+
+					if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
+					{
+						JFactory::getApplication()->enqueueMessage($upload_err, $err_type);
+					}
 				}
 				
 				else {
