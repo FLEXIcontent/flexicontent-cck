@@ -905,7 +905,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 			<input type="hidden" name="controller" value="filemanager" />
 			<input type="hidden" name="task" value="" />
-			<input type="hidden" name="tmpl" value="<?php echo $_tmpl; ?>" />
+			<?php echo $_tmpl ? '<input type="hidden" name="tmpl" value="'.$_tmpl.'" />' : ''; ?>
 			<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 			<input type="hidden" name="fcform" value="1" />
