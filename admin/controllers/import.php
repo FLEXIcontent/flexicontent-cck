@@ -90,10 +90,16 @@ class FlexicontentControllerImport extends FlexicontentController
 		$log_filename = 'importcsv_'.($user->id).'.php';
 		
 		jimport('joomla.log.log');
-		JLog::addLogger(array('text_file' => $log_filename));
-		
-		
-		
+		JLog::addLogger(
+			array(
+				'text_file' => $log_filename,  // Sets the format of each line
+        'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+			),
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			array('com_flexicontent.importcsv')  // category of logged messages
+		);
+
+
 		// *************************
 		// Execute according to task
 		// *************************
@@ -649,7 +655,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			else if ( !$itemmodel->store($data) ) {
 				$conf['failure_count']++;
 				$msg = 'Failed item no: '. $lineno . ". titled as: '" . $data['title'] . "' : ". $itemmodel->getError();
-				JLog::add($msg);
+				JLog::add($msg, JLog::WARNING, 'com_flexicontent.importcsv');
 				echo $msg."<br/>";
 			}
 			
@@ -657,7 +663,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			else {
 				$conf['success_count']++;
 				$msg = 'Imported item no: '. $lineno . ". titled as: '" . $data['title'] . "'" ;
-				JLog::add($msg);
+				JLog::add($msg, JLog::INFO, 'com_flexicontent.importcsv');
 				echo $msg."<br/>";
 				
 				// Try to rename entry if id column is being used
@@ -714,7 +720,8 @@ class FlexicontentControllerImport extends FlexicontentController
 			jexit();
 		}
 		
-		if ($lineno == $itemcount) {
+		if ($lineno == $itemcount)
+		{
 			// Clean item's cache
 			$cache = FLEXIUtilities::getCache($group='', 0);
 			$cache->clean('com_flexicontent_items');
@@ -858,9 +865,10 @@ class FlexicontentControllerImport extends FlexicontentController
 		$conf['contents_parsed'] = array();
 		foreach( $conf['contents'] as $lineno => $fields )
 		{
-			if (count($fields) > $colcount) {
+			if (count($fields) > $colcount)
+			{
 				$msg = "Redundadant columns at record row ".$lineno.", Found # columns: ". count($fields) . " > expected: ". $colcount;
-				JLog::add($msg);
+				JLog::add($msg, JLog::NOTICE, 'com_flexicontent.importcsv');
 				if ($task == 'testcsv') $parse_log .= $msg;
 			}
 			
