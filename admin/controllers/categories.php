@@ -84,7 +84,6 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$tbl = 'flexicontent_categories';
 		$redirect_url = 'index.php?option=com_flexicontent&view=categories';
 		flexicontent_db::checkin($tbl, $redirect_url, $this);
-		return;// true;
 	}
 	
 	
@@ -295,10 +294,10 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$post = JRequest::get('post');
-		$post = $post['jform'];
-		JRequest::setVar('cid', $post['id']);
+
+		$data = $this->input->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$this->input->set('cid', (int) $data['id']);
+
 		$this->checkin();
 	}
 	

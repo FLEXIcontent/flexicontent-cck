@@ -155,7 +155,6 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$tbl = 'flexicontent_types';
 		$redirect_url = 'index.php?option=com_flexicontent&view=types';
 		flexicontent_db::checkin($tbl, $redirect_url, $this);
-		return;// true;
 	}
 	
 	
@@ -304,11 +303,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
-		$jinput = $app->input;
-
-		$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
-		$jinput->set('cid', (int) $data['id']);
+		$data = $this->input->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$this->input->set('cid', (int) $data['id']);
 
 		$this->checkin();
 	}

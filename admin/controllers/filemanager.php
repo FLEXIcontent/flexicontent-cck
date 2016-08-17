@@ -33,6 +33,14 @@ JLoader::register('FlexicontentController', JPATH_BASE.DS.'components'.DS.'com_f
  */
 class FlexicontentControllerFilemanager extends FlexicontentController
 {
+	var $runMode = 'standalone';
+
+	var $exitHttpHead = null;
+	var $exitMessages = array();
+	var $exitLogTexts = array();
+	var $exitSuccess  = true;
+
+
 	/**
 	 * Constructor
 	 *
@@ -43,11 +51,37 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		parent::__construct();
 		$this->registerTask( 'uploads', 	'upload' );
 
-		$app  = JFactory::getApplication();
-		$jinput = $app->input;
-		$view = $jinput->get('view', '', 'cmd');
+		$this->option = $this->input->get('option', '', 'cmd');
+		$this->task   = $this->input->get('task', '', 'cmd');
+		$this->view   = $this->input->get('view', '', 'cmd');
+		$this->format = $this->input->get('format', '', 'cmd');
 
-		$this->return_url = $view == 'filemanager' ? 'index.php?option=com_flexicontent&view=filemanager' : $_SERVER['HTTP_REFERER'] ;
+		// Get return URL
+		$this->returnURL = $this->input->get('return-url', null, 'base64');
+		$this->returnURL = $this->returnURL ? base64_decode($this->returnURL) : $this->returnURL;
+
+		// Compatibility for upload and addlocal tasks:  null return URL means return IDs
+		if ( ($this->task=='upload' || $this->task=='addurl' || $this->task=='addlocal') && $this->returnURL === null )
+		{
+			$this->runMode = 'interactive';
+		}
+
+		// Check return URL if empty or not safe and set a default one
+		if ( ! $this->returnURL || ! flexicontent_html::is_safe_url($this->returnURL) )
+		{
+			if ($this->view == 'filemanager')
+			{
+				$this->returnURL = 'index.php?option=com_flexicontent&view=filemanager';
+			}
+			else if ( !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) )
+			{
+				$this->returnURL = $_SERVER['HTTP_REFERER'];
+			}
+			else
+			{
+				$this->returnURL = null;
+			}
+		}
 	}
 
 
@@ -56,70 +90,71 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function upload()
+	function upload($Fobj = null, & $exitMessages = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		$user = JFactory::getUser();
-		$app  = JFactory::getApplication();
-		$jinput = $app->input;
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 
-		$option = $jinput->get('option', '', 'cmd');
-		$task   = $jinput->get('task', '', 'cmd');
-		$format = $jinput->get('format', 'html', 'cmd');
+		// Force interactive run mode, if given parameters
+		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
+		$file_id = 0;
+
+		// Force JSON format for 'uploads' task
+		$this->format = $this->format != '' ? $this->format : ($this->task=='uploads' ? 'json' : 'html');
 
 		// calculate access
-		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
-		$is_authorised = $canupload;
-		
+		$canuploadfile = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
+		$is_authorised = $canuploadfile;
+
 		// check access
 		if ( !$is_authorised )
 		{
-			if ($task=='uploads') {
-				die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "'.JText::_( 'FLEXI_ALERTNOTAUTH' ).'"}, "id" : "id"}');
-			} else {
-				JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-				$this->setRedirect( $this->return_url, '');
-			}
-			return;
+			$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
 		}
 
-		if ($task=='uploads')
+		if ($this->task=='uploads')
 		{
-			$file = JRequest::getVar( 'file', '', 'files', 'array' );
+			$file = $this->input->files->get('file', '', 'array');
 		}
 		else
 		{
 			// Default field <input type="file" is name="Filedata" ... get the file
-			$ffname = JRequest::getCmd( 'file-ffname', 'Filedata', 'post' );
-			$file   = JRequest::getVar( $ffname, '', 'files', 'array' );
+			$ffname = $this->input->get('file-ffname', 'Filedata', 'cmd');
+			$file   = $this->input->files->get($ffname, '', 'array');
 			
 			// Refactor the array swapping positions
 			$file = $this->refactorFilesArray($file);
 			
 			// Get nested position, and reach the final file data array
-			$fname_level1 = JRequest::getCmd( 'fname_level1', null, 'post' );
-			$fname_level2 = JRequest::getCmd( 'fname_level2', null, 'post' );
-			$fname_level3 = JRequest::getCmd( 'fname_level3', null, 'post' );
+			$fname_level1 = $this->input->get('fname_level1', null, 'string');
+			$fname_level2 = $this->input->get('fname_level2', null, 'string');
+			$fname_level3 = $this->input->get('fname_level3', null, 'string');
 			
 			if (strlen($fname_level1))  $file = $file[$fname_level1];
 			if (strlen($fname_level2))  $file = $file[$fname_level2];
 			if (strlen($fname_level3))  $file = $file[$fname_level3];
 		}
-		$secure  = $jinput->get('secure', 1, 'int');
+
+		$secure  = $this->input->get('secure', 1, 'int');
 		$secure  = $secure ? 1 : 0;
-		$return  = $jinput->get('return-url', null, 'base64');
 
-		$filetitle  = $jinput->get('file-title', '', 'string');
-		$filedesc   = $jinput->get('file-desc', '');  // Joomla default text-filters for the usergroup
-		$filelang   = $jinput->get('file-lang', '*', 'string');
-		$fileaccess = $jinput->get('file-access', 1, 'int');
+		$filetitle  = $this->input->get('file-title', '', 'string');
+		$filedesc   = $this->input->get('file-desc', '');  // Joomla default text-filters for the usergroup
+		$filelang   = $this->input->get('file-lang', '*', 'string');
+		$fileaccess = $this->input->get('file-access', 1, 'int');
+		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
-		$fieldid	  = $jinput->get('fieldid', 0, 'int');
-		$u_item_id  = $jinput->get('u_item_id', 0, 'int');
-		$file_mode  = $jinput->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
-		$err		= null;
+		$fieldid    = $this->input->get('fieldid', 0, 'int');
+		$u_item_id  = $this->input->get('u_item_id', 0, 'int');
+		$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 		
 		$model = $this->getModel('filemanager');
 		if ($file_mode != 'folder_mode' && $fieldid)
@@ -134,46 +169,45 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				// allow filter secure via form/URL variable
 			}
 		}
-		
+
+
 		// *****************************************
 		// Check that a file was provided / uploaded
 		// *****************************************
 		if ( !isset($file['name']) )
 		{
-			if ($task=='uploads') {
-				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "'.JText::_( 'Filename has invalid characters (or other error occured)' ).'"}, "id" : "id"}');
-			} else {
-				JError::raiseWarning(100, JText::_( 'Filename has invalid characters (or other error occured)' ));
-				$this->setRedirect( $_SERVER['HTTP_REFERER'], '' );
-			}
-			return;
+			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+			$this->exitMessages = array( 0 => array('error' => 'Filename has invalid characters (or other error occured)') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
 		}
-		
+
 		// Chunking might be enabled
-		$chunks = JRequest::getInt('chunks');
+		$chunks = $this->input->get('chunks', 0, 'int');
 		if ($chunks)
 		{
-			$chunk = JRequest::getInt('chunk');
+			$chunk = $this->input->get('chunk', 0, 'int');
 			
 			// Get / Create target directory
 			$targetDir = (ini_get("upload_tmp_dir") ? ini_get("upload_tmp_dir") : sys_get_temp_dir()) . DIRECTORY_SEPARATOR . "fc_fileselement";
 			if (!file_exists($targetDir))  @mkdir($targetDir);
 			
 			// Create name of the unique temporary filename to use for concatenation of the chunks, or get the filename from session
-			$fileName = JRequest::getVar( 'filename' );
+			$fileName = $this->input->get('filename', '', 'string');
+
 			$fileName_tmp = $app->getUserState( $fileName, date('Y_m_d_').uniqid() );
 			$app->setUserState( $fileName, $fileName_tmp );
-			
 			$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
-			
+
 			// CREATE tmp file inside SERVER tmp directory, but if this FAILS, then CREATE tmp file inside the Joomla temporary folder
 			if (!$out = @fopen("{$filePath_tmp}", "ab"))
 			{
-				
 				$targetDir = $app->getCfg('tmp_path') . DIRECTORY_SEPARATOR . "fc_fileselement";
 				if (!file_exists($targetDir))  @mkdir($targetDir);
 				$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
-				
+
 				ini_set('track_errors', 1);
 				if (!$out = @fopen("{$filePath_tmp}", "ab")) {
 					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$filePath_tmp. ' fopen failed. reason: ' .@$php_errormsg. '"}, "id" : "id"}');
@@ -228,7 +262,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if ($file_mode == 'folder_mode') {
 			$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 			$path = $app->getUserState( $upload_path_var, '' ).DS;
-			if ($task!='uploads') $app->setUserState( $upload_path_var, '');  // Do not clear in multi-upload
+			if ($this->task!='uploads') $app->setUserState( $upload_path_var, '');  // Do not clear in multi-upload
 		} else {
 			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
 		}
@@ -244,43 +278,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Sanitize filename further and make unique
 		$params = null;
+		$err_text = null;
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename
-		$upload_check = flexicontent_upload::check( $file, $err, $params );
+		$upload_check = flexicontent_upload::check( $file, $err_text, $params );
 		$filename 	  = flexicontent_upload::sanitize($path, $file['name']);
 		$filepath 	  = JPath::clean($path.strtolower($filename));
 		
 		// Check if uploaded file is valid
 		if (!$upload_check)
 		{
-			if ($format == 'json')
-			{
-				jimport('joomla.error.log');
-				$log = JLog::getInstance('com_flexicontent.error.php');
-				$log->addEntry( array('comment' => 'Invalid: ' . $filepath . ': ' . JText::_($err)) );
-				header('HTTP/1.0 415 Unsupported Media Type');
-				if ($task=='uploads') {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "'.JText::_($err, true).'"}, "id" : "id"}');
-				} else {
-					die(JText::_($err));
-				}
-			}
+			$this->exitHttpHead = array( 0 => array('status' => '415 Unsupported Media Type') );
+			$this->exitMessages = array( 0 => array('error' => $err_text) );
+			$this->exitLogTexts = array( 0 => array(JLog::ERROR => 'Invalid: ' . $filepath . ': ' . JText::_($err_text)) );
+			$this->exitSuccess  = false;
 
-			else
-			{
-				if ($task=='uploads')
-				{
-					die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "'.JText::_($err, true).'"}, "id" : "id"}');
-				}
-				else
-				{
-					JError::raiseNotice(415, JText::_($err));
-					if ($return)  // REDIRECT
-					{
-						$app->redirect(base64_decode($return) ."&". JSession::getFormToken() ."=1");
-					}
-				}
-				return;
-			}
+			return $this->terminate($file_id, $exitMessages);
 		}
 		
 		// Get the extension to record it in the DB
@@ -295,114 +307,88 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				// - also we allow all extensions and php inside content, FLEXIcontent will never execute "include" files evening when doing "in-browser viewing"
 				array('null_byte'=>true, 'forbidden_extensions'=>array('_fake_ext_'), 'php_tag_in_content'=>true, 'shorttag_in_content'=>true, 'shorttag_extensions'=>array(), 'fobidden_ext_in_content'=>false, 'php_ext_content_extensions'=>array() )
 			);
-		if (!$move_success) {
-			if ($format == 'json') {
-				jimport('joomla.error.log');
-				$log = JLog::getInstance('com_flexicontent.error.php');
-				$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
-				header('HTTP/1.0 409 Conflict');
-				if ($task=='uploads') {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 105, "message": "File already exists"}, "id" : "id"}');
-				} else {
-					jexit('Error. File already exists');
-				}
-			} else {
-				if ($task=='uploads') {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 106, "message": "'.JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ).'"}, "id" : "id"}');
-				} else {
-					JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ));
-					// REDIRECT
-					if ($return) {
-						$app->redirect(base64_decode($return)."&". JSession::getFormToken() ."=1");
-					}
-				}
-				return;
-			}
-				
+
+		if (!$move_success)
+		{
+			$this->exitHttpHead = array( 0 => array('status' => '409 Conflict') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_UNABLE_TO_UPLOAD_FILE') );
+			$this->exitLogTexts = array( 0 => array(JLog::ERROR => JText::_('FLEXI_UNABLE_TO_UPLOAD_FILE') . ': ' . $filepath) );
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
+		}
+
+
+		// *****************
 		// Upload Successful
-		} else {
-			
-			// a. Database mode
-			if ($file_mode == 'db_mode')
+		// *****************
+
+		// a. Database mode
+		if ($file_mode == 'db_mode')
+		{
+			$db 	= JFactory::getDBO();
+			$user	= JFactory::getUser();
+
+			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+			$filepath = $path . $filename;
+			$filesize = file_exists($filepath) ? filesize($filepath) : 0;
+
+			$obj = new stdClass();
+			$obj->filename    = $filename;
+			$obj->filename_original = $filename_original;
+			$obj->altname     = $filetitle ? $filetitle : $filename_original;
+
+			$obj->url         = 0;
+			$obj->secure      = $secure;
+			$obj->ext         = $ext;
+
+			$obj->description = $filedesc;
+			$obj->language    = strlen($filelang) ? $filelang : '*';
+			$obj->access      = strlen($fileaccess) ? $fileaccess : 1;
+
+			$obj->hits        = 0;
+			$obj->size        = $filesize;
+			$obj->uploaded    = JFactory::getDate('now')->toSql();
+			$obj->uploaded_by = $user->get('id');
+
+			// Insert file record in DB
+			$db->insertObject('#__flexicontent_files', $obj);
+
+			// Get id of new file record
+			$file_id = (int) $db->insertid();
+
+			$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
+			if ($filter_item)
 			{
-				if ($format == 'json')
+				$session = JFactory::getSession();
+				$files = $session->get('fileselement.'.$filter_item, null);
+
+				if (!$files)
 				{
-					jimport('joomla.error.log');
-					$log = JLog::getInstance();
-					$log->addEntry(array('comment' => $filepath));
+					$files = array();
 				}
-					
-				$db 	= JFactory::getDBO();
-				$user	= JFactory::getUser();
-				
-				$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-				$filepath = $path . $filename;
-				$filesize = file_exists($filepath) ? filesize($filepath) : 0;
-				
-				$obj = new stdClass();
-				$obj->filename    = $filename;
-				$obj->filename_original = $filename_original;
-				$obj->altname     = $filetitle ? $filetitle : $filename_original;
-
-				$obj->url         = 0;
-				$obj->secure      = $secure;
-				$obj->ext         = $ext;
-
-				$obj->description = $filedesc;
-				$obj->language    = strlen($filelang) ? $filelang : '*';
-				$obj->access      = strlen($fileaccess) ? $fileaccess : 1;				
-
-				$obj->hits        = 0;
-				$obj->size        = $filesize;
-				$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
-				$obj->uploaded_by = $user->get('id');
-					
-				// Insert file record in DB
-				$db->insertObject('#__flexicontent_files', $obj);
-					
-				// Get id of new file record
-				$file_id = (int)$db->insertid();
-
-				$option = JRequest::getVar('option');
-				$filter_item = $app->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
-				if($filter_item) {
-					$session = JFactory::getSession();
-					$files = $session->get('fileselement.'.$filter_item, null);
-
-					if(!$files) {
-						$files = array();
-					}
-					$files[] = $db->insertid();
-					$session->set('fileselement.'.$filter_item, $files);
-				}
-				
-			// b. Custom Folder mode
-			} else {
-				$file_id = 0;
-			}
-			
-			// JSON output: Terminate printing a message
-			if ($format == 'json') {
-				if ($task=='uploads') {
-					// Return Success JSON-RPC response
-					die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
-				} else {
-					jexit('FLEXI_UPLOAD_COMPLETE');
-				}
-			// Normal output: Redirect setting a message
-			} else {
-				if ($task=='uploads') {
-					die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
-				} else {
-					$app->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
-					if ( !$return ) return $file_id;  // No return URL, return the file ID
-					$this->setRedirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&". JSession::getFormToken() ."=1" , '');
-				}
+				$files[] = $file_id;
+				$session->set('fileselement.'.$filter_item, $files);
 			}
 		}
+
+		// b. Custom Folder mode
+		else
+		{
+			$file_id = 0;
+		}
+
+
+		// Terminate with proper messaging
+		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
+		$this->exitMessages = array( 0 => array('message' => 'FLEXI_UPLOAD_COMPLETE') );
+		$this->exitLogTexts = array();
+		$this->exitSuccess  = true;
+
+		return $this->terminate($file_id, $exitMessages);
 	}
-	
-	
+
+
 	function ftpValidate()
 	{
 		// Set FTP credentials, if given
@@ -415,34 +401,41 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function addurl()
+	function addurl($Fobj = null, & $exitMessages = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app = JFactory::getApplication();
-		$jinput = $app->input;
-		
-		$return   = $jinput->get( 'return-url', null, 'base64' );
-		$filename = $jinput->get( 'file-url-data', null, 'string');
+
+		// Force interactive run mode, if given parameters
+		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
+		$file_id = 0;
+
+		$filename = $this->input->get('file-url-data', null, 'string');
 		$filename = flexicontent_html::dataFilter($filename, 4000, 'URL', 0);  // Validate file URL
-		$altname  = $jinput->get( 'file-url-title', null, 'string' );
-		$ext      = $jinput->get( 'file-url-ext', null, 'alnum' );
-		$filedesc = $jinput->get( 'file-url-desc', '');  // Default filtering
-		$filelang = $jinput->get( 'file-url-lang', '*', 'string');
-		$filesize = $jinput->get( 'file-url-size', 0, 'int');
-		$size_unit= $jinput->get( 'size_unit', 'KBs', 'cmd');
+		$altname  = $this->input->get('file-url-title', null, 'string');
+
+		$filedesc   = $this->input->get('file-url-desc', '');  // Joomla default text-filters for the usergroup
+		$filelang   = $this->input->get('file-url-lang', '*', 'string');
+		$fileaccess = $this->input->get('file-url-access', 1, 'int');
+		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
+
+		$ext      = $this->input->get('file-url-ext', null, 'alnum');
+		$filesize = $this->input->get('file-url-size', 0, 'int');
+		$size_unit= $this->input->get('size_unit', 'KBs', 'cmd');
 
 		jimport('joomla.utilities.date');
 
 		// check if the form fields are not empty
 		if (!$filename || !$altname)
 		{
-			JError::raiseNotice(1, JText::_( 'FLEXI_WARNFILEURLFORM' ));
-			if ($return) {
-				$app->redirect(base64_decode($return)."&". JSession::getFormToken() ."=1");
-			}
-			return;
+			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARNFILEURLFORM') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
 		}
 
 		$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
@@ -472,84 +465,97 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$obj->hits        = 0;
 		$obj->size        = $filesize;
-		$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
+		$obj->uploaded    = JFactory::getDate('now')->toSql();
 		$obj->uploaded_by = $user->get('id');
 
 		$db->insertObject('#__flexicontent_files', $obj);
 
-		$app->enqueueMessage(JText::_( 'FLEXI_FILE_ADD_SUCCESS' ));
+		// Get id of new file record
+		$file_id = (int) $db->insertid();
 
-		$option = $jinput->get('option', '', 'cmd');
-		$filter_item = $app->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
-		if($filter_item) {
+		$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
+
+		if ($filter_item)
+		{
 			$session = JFactory::getSession();
 			$files = $session->get('fileselement.'.$filter_item, null);
 
 			if(!$files) {
 				$files = array();
 			}
-			$files[] = $db->insertid();
+			$files[] = $file_id;
 			$session->set('fileselement.'.$filter_item, $files);
 		}
 
-		// REDIRECT
-		if ($return) {
-			$app->redirect(base64_decode($return)."&". JSession::getFormToken() ."=1");
-		}
+		// Terminate with proper messaging
+		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
+		$this->exitMessages = array( 0 => array('message' => 'FLEXI_FILE_ADD_SUCCESS') );
+		$this->exitLogTexts = array();
+		$this->exitSuccess  = true;
+
+		return $this->terminate($file_id, $exitMessages);
 	}
+
 
 	/**
 	 * Upload a file from a server directory
 	 *
 	 * @since 1.0
 	 */
-	function addlocal($Fobj=null)
+	function addlocal($Fobj = null, & $exitMessages = null)
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
+		static $imported_files = array();
+		$file_ids = array();
+
 		$app    = JFactory::getApplication();
 		$db 		= JFactory::getDBO();
 		$user		= JFactory::getUser();
-		$params = JComponentHelper::getParams( 'com_flexicontent' );
+		$params = JComponentHelper::getParams('com_flexicontent');
 		
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
-		static $imported_files = array();
-		
-		$return		= $Fobj ? $Fobj->return_url     : JRequest::getVar( 'return-url', null, 'post', 'base64' );
-		$filesdir	= $Fobj ? $Fobj->file_dir_path  : JRequest::getVar( 'file-dir-path', '', 'post' );
-		$regexp		= $Fobj ? $Fobj->file_filter_re : JRequest::getVar( 'file-filter-re', '.', 'post' );
-		$secure		= $Fobj ? $Fobj->secure         : JRequest::getInt( 'secure', 1, 'post' );
-		$keep			= $Fobj ? $Fobj->keep           : JRequest::getInt( 'keep', 1, 'post' );
-		
-		$secure		= $secure ? 1 : 0;  // A correction for future compatibility, so that secure may have more values
-		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
-		
-		$filedesc   = JRequest::getVar( 'file-desc', '' );
-		$filelang   = JRequest::getVar( 'file-lang', '*' );
-		$fileaccess = JRequest::getVar( 'file-access', 1 );
-		
-		// allowed extensions
-		$filterext	=  JRequest::getVar( 'file-filter-ext', '', 'post' );
-		$filterext	= $filterext ? explode(',', $filterext) : array();
-		foreach($filterext as $_i => $_ext) $filterext[$_i] = strtolower($_ext);
-		
-		$confext = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
-		
-		// (optionally) Limit COMPONENT configured extensions, to those extensions requested by the FORM/URL variable
-		$allowed	= $filterext ? array_intersect($filterext, $confext) : $confext;
-	
+		$is_importcsv = $this->task == 'importcsv';
+
+		// Get file properties
+		$secure  = $Fobj ? $Fobj->secure : $this->input->get('secure', 1, 'int');
+		$secure  = $secure ? 1 : 0;
+
+		$filedesc   = $this->input->get('file-desc', '');  // Joomla default text-filters for the usergroup
+		$filelang   = $this->input->get('file-lang', '*', 'string');
+		$fileaccess = $this->input->get('file-access', 1, 'int');
+		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
+
+		// Get folder path and filename regexp
+		$filesdir = $Fobj ? $Fobj->file_dir_path  : $this->input->get('file-dir-path', '', 'string');
+		$regexp   = $Fobj ? $Fobj->file_filter_re : $this->input->get('file-filter-re', '.', 'string');
+
+		// Delete after adding flag
+		$keep = $Fobj ? $Fobj->keep : $this->input->get('keep', 1, 'int');
+
+		// Get desired extensions from request
+		$filter_ext = $this->input->get('file-filter-ext', '', 'string');
+		$filter_ext	= $filter_ext ? explode(',', $filter_ext) : array();
+		foreach($filter_ext as $_i => $_ext) $filter_ext[$_i] = strtolower($_ext);
+
+		// Get extensions allowed by configuration, and intersect them with desired extensions
+		$upload_extensions = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_ext = $filter_ext ? array_intersect($filter_ext, $upload_extensions) : $upload_extensions;
+
 		jimport('joomla.utilities.date');
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 
+		// Get files
 		$filesdir = JPath::clean(JPATH_SITE . $filesdir . DS);
-		
 		$filenames = JFolder::files($filesdir, $regexp);
 
-		// create the folder if it doesnt exists
-		if (!JFolder::exists($destpath)) { 
-			if (!JFolder::create($destpath)) { 
+		// Create the folder if it does not exists
+		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
+		if (!JFolder::exists($destpath))
+		{ 
+			if (!JFolder::create($destpath))
+			{
 				JError::raiseWarning(100, JText::_('Error. Unable to create folders'));
 				return;
 			} 
@@ -560,19 +566,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if (!$filesdir)
 		{
 			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILE_DIR' ));
-			if (!$return) return;  // REDIRECT only if this was requested
-			$app->redirect(base64_decode($return)."&". JSession::getFormToken() ."=1");
+
+			if ($this->return)
+				$app->redirect($this->return ."&". JSession::getFormToken() ."=1");
+			else
+				return null;
 		}
 		
 		$added = array();
 		$excluded = array();
-		$file_ids = array();
 		if ($filenames)
 		{
 			for ($n=0; $n<count($filenames); $n++)
 			{
 				$ext = strtolower(JFile::getExt($filesdir . $filenames[$n]));
-				if ( !in_array($ext, $allowed) )
+				if ( !in_array($ext, $allowed_ext) )
 				{
 					$excluded[] = $filenames[$n];
 					continue;
@@ -609,7 +617,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 					$obj->hits        = 0;
 					$obj->size        = $filesize;
-					$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
+					$obj->uploaded    = JFactory::getDate('now')->toSql();
 					$obj->uploaded_by = $user->get('id');
 
 					// Add the record to the DB
@@ -635,17 +643,24 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		else
 		{
-			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILES_IN_DIR' ));
-			if (!$return) return;  // REDIRECT only if this was requested
-			$app->redirect(base64_decode($return)."&". JSession::getFormToken() ."=1");
+			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARN_NO_FILES_IN_DIR') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_ids, $exitMessages);
 		}
-		
-					
-		if (!$return) return $file_ids;  // REDIRECT only if this was requested
-		$app->redirect(base64_decode($return)."&". JSession::getFormToken() ."=1");
+
+		// Terminate with proper messaging
+		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
+		$this->exitMessages = array( 0 => array('message' => 'FLEXI_FILE_ADD_SUCCESS') );
+		$this->exitLogTexts = array();
+		$this->exitSuccess  = true;
+
+		return $this->terminate($file_ids, $exitMessages);
 	}
-	
-	
+
+
 	/**
 	 * Logic for editing a file
 	 *
@@ -656,40 +671,59 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	function edit()
 	{	
 		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+
+		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+
+		$this->input->set('view', 'file');
+		$this->input->set('hidemainmenu', 1);
+
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', 'default', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
+
+		// Get/Create the model
 		$model	= $this->getModel('file');
 		$file		= $model->getFile();
-		
-		JRequest::setVar( 'view', 'file' );
-		JRequest::setVar( 'hidemainmenu', 1 );
-		
+
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->setModel($model, true);
+		$view->document = $document;
+
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
 		$caneditown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
 		$is_authorised = $canedit || $caneditown;
 		
 		// check access
-		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager', '');
+		if ( !$is_authorised )
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			return;
 		}
 		
 		// Check if record is checked out by other editor
-		if ( $model->isCheckedOut( $user->get('id') ) ) {
-			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager', '');
+		if ( $model->isCheckedOut( $user->get('id') ) )
+		{
+			$app->setHeader('status', '400 Bad Request', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
 			return;
 		}
 		
 		// Checkout the record and proceed to edit form
-		if ( !$model->checkout() ) {
-			JError::raiseWarning( 500, $model->getError() );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager', '');
+		if ( !$model->checkout() )
+		{
+			$app->setHeader('status', '400 Bad Request', true);
+			$this->setRedirect($this->returnURL, $model->getError(), 'error');
 			return;
 		}
-		
-		parent::display();
+
+		$view->display();
 	}
 	
 	/**
@@ -705,15 +739,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		//require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
-		$user  = JFactory::getUser();
-		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
-		
-		$fieldid   = JRequest::getVar( 'fieldid', 0);
-		$u_item_id = JRequest::getVar( 'u_item_id', 0);
-		$file_mode = JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
-		
-		if ($file_mode == 'folder_mode') {
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDBO();
+
+		$fieldid    = $this->input->get('fieldid', 0, 'int');
+		$u_item_id  = $this->input->get('u_item_id', 0, 'int');
+		$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
+
+		if ($file_mode == 'folder_mode')
+		{
 			$filename = rawurldecode( JRequest::getVar('filename') );
 			//$filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
@@ -741,15 +776,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( $this->return_url, '');
+			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+			$this->setRedirect( $this->returnURL, '');
 			return;
 		}
-		
-		$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
+
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid, array());
-		
-		
+
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
@@ -800,7 +834,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$cache->clean();
 		}
 		
-		$this->setRedirect( $this->return_url, $msg );
+		$this->setRedirect( $this->returnURL, $msg );
 	}
 	
 	/**
@@ -816,13 +850,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
-		$jinput = JFactory::getApplication()->input;
+		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
 		$file		= $model->getFile();
 
-		$task = $jinput->get('task', '', 'cmd');
-		$data = $jinput->post->getArray();  // Default filtering will remove HTML
+		$data = $this->input->post->getArray();  // Default filtering will remove HTML
 
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
@@ -831,7 +864,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
@@ -849,21 +882,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 		else
 		{
-			// Get file size from submitted field (file URL)
+			// Get file size from submitted field (file URL), set to zero if no size unit specified
 			$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
 			$size_unit = (int) @ $arr_sizes[$data['size_unit']];
-			if ( $size_unit )
-				$data['size'] = ((int)$data['size']) * $size_unit;
-			else
-				$data['size'] = 0;
+			$data['size'] = ((int)$data['size']) * $size_unit;
 
 		  // Validate file URL
 			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
 		}
 
+		// Validate access level exists (set to public otherwise)
+		$data['access'] = flexicontent_html::dataFilter($data['access'], 11, 'ACCESSLEVEL', 0);
+
 		if ($model->store($data))
 		{
-			switch ($task)
+			switch ($this->task)
 			{
 				case 'apply' :
 					$edit_task = "task=filemanager.edit";
@@ -887,49 +920,28 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$this->setRedirect($link, $msg);
 	}
-	
-	
+
+
 	/**
 	 * logic for cancel an action
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function cancel()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
-		$user		= JFactory::getUser();
-		$model	= $this->getModel('file');
-		$file		= $model->getFile();
-		
-		$task = JRequest::getVar('task');
-		$post = JRequest::get( 'post' );
-		
-		// calculate access
-		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
-		$is_authorised = $canedit || $caneditown;
-		
-		// check access
-		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
-			return;
-		}
-		
-		// Check In the file and redirect ...
-		$file = JTable::getInstance('flexicontent_files', '');
-		$file->bind(JRequest::get('post'));
-		$file->checkin();
 
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager' );
+		//$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$data  = $this->input->get->post->get('id', 0, 'int');
+		$this->input->set('cid', (int) $data['id']);
+
+		$this->checkin();
 	}
-	
-	
+
+
 	/**
 	 * Check in a record
 	 *
@@ -938,9 +950,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	function checkin()
 	{
 		$tbl = 'flexicontent_files';
-		$redirect_url = $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : $this->return_url;
+		$redirect_url = 'index.php?option=com_flexicontent&view=filemanager';
 		flexicontent_db::checkin($tbl, $redirect_url, $this);
-		return;// true;
 	}
 	
 	
@@ -982,9 +993,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		//require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();
-		$app   = JFactory::getApplication();
 		
 		// calculate access
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
@@ -993,14 +1004,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( $this->return_url, '');
+			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+			$this->setRedirect( $this->returnURL, '');
 			return;
 		}
-		
-		$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
+
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid, array());
-		
+
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
@@ -1039,7 +1050,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$cache->clean();
 		}
 		
-		$this->setRedirect( $this->return_url, $msg);
+		$this->setRedirect( $this->returnURL, $msg);
 	}
 	
 	
@@ -1057,7 +1068,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$user  = JFactory::getUser();
 		$model = $this->getModel('filemanager');
-		$task  = JRequest::getVar( 'task' );
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		JArrayHelper::toInteger($cid, array(0));
 		
@@ -1071,8 +1081,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( $this->return_url, '');
+			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+			$this->setRedirect( $this->returnURL, '');
 			return;
 		}
 		
@@ -1088,11 +1098,19 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$cache->clean();
 		}
 		
-		$this->setRedirect($this->return_url, $msg);
+		$this->setRedirect($this->returnURL, $msg);
 	}
-	
-	
-	/* Restructure a FILES array for easier usage */
+
+
+
+	// **************
+	// Helper methods
+	// **************
+
+
+	/*
+	 * Restructure a FILES array for easier usage
+	 */
 	function refactorFilesArray(&$f)
 	{
 		if ( empty($f['name']) || !is_array($f['name']) )  return $f; // nothing more to do
@@ -1127,5 +1145,89 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return $r2;
 		else
 			return $r1;
+	}
+
+
+	/*
+	 * Terminate
+	 * - either returning file id(s)
+	 * - or setting HTTP header and doing a JSON response with data or error message
+	 * - or setting HTTP header and enqueuing an error/success message and doing a redirect
+	 */
+	function terminate($exitData = null, & $exitMessages = null)
+	{
+		// CASE 1: interactive mode
+		if ($this->runMode=='interactive')
+		{
+			// Return messages to the caller
+			$exitMessages = array();
+			foreach	($this->exitMessages as $msg)
+			{
+				$exitMessages[] = array(key($msg) => JText::_(reset($msg)));
+			}
+
+			return $exitData;
+		}
+
+
+		// Standalone modes, set HTTP headers, also get value of 'status' header
+		$app = JFactory::getApplication();
+		$httpStatus = $this->exitSuccess ? '200 OK' : '400 Bad Request';
+
+		foreach	($this->exitHttpHead as $header)
+		{
+			if (key($header) == 'status')
+			{
+				$httpStatus = key($header);
+			}
+			$app->setHeader(key($header), reset($header), true);
+		}
+
+
+		// CASE 2: standalone mode with JSON response:  Set HTTP headers, and create a jsonrpc response 
+		if ($this->format == 'json')
+		{
+			if ( !empty($this->exitLogTexts) )
+			{
+				$log_filename = 'filemanager_upload_'.($user->id).'.php';
+				jimport('joomla.log.log');
+				JLog::addLogger(
+					array(
+						'text_file' => $log_filename,  // Sets the format of each line
+            'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+					),
+					JLog::ALL,  // Sets messages of all log levels to be sent to the file
+					array('com_flexicontent.filemanager')  // category of logged messages
+				);
+				foreach	($this->exitLogTexts as $msg)
+				{
+					JLog::add(reset($msg), key($msg), 'com_flexicontent.filemanager');
+				}
+			}
+
+			$msg_text_all = '';
+			foreach	($this->exitMessages as $msg)
+			{
+				$msg_text_all .= ' <br/> ' . JText::_(reset($msg), true);
+			}
+
+			if ($this->exitSuccess)
+				jexit('{"jsonrpc" : "2.0", "result" : "'.$msg_text_all.'", "id" : "id"}');
+			else
+				jexit('{"jsonrpc" : "2.0", "error" : {"code": '.$httpStatus.', "message": "'.$msg_text_all.'"}, "id" : "id"}');
+		}
+
+
+		// CASE 3: standalone mode with HTML response:  Set HTTP headers, enqueue messages and optionally redirect
+		foreach	($this->exitMessages as $msg)
+		{
+			$app->enqueueMessage(JText::_(reset($msg)), key($msg));
+		}
+
+		// Redirect or return 
+		if ($this->returnURL)
+			$app->redirect($this->returnURL . ($httpStatus == '403 Forbidden' ? '' : '&'. JSession::getFormToken() . '=1'));
+		else
+			return ! $this->exitSuccess ? false : null;
 	}
 }

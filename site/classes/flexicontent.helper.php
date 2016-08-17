@@ -1599,49 +1599,60 @@ class flexicontent_html
 	// Server-Side validation
 	static function dataFilter( $v, $maxlength=0, $validation='string', $check_callable=0 )
 	{
+		// validation: Strip HTML and cut the text
 		if ($validation=='-1') return flexicontent_html::striptagsandcut( $v, $maxlength );
 		
+		// validation: via function call
 		$v = $maxlength ? substr($v, 0, $maxlength) : $v;
-		if ($check_callable) {
+		if ($check_callable)
+		{
 			if (strpos($validation, '::') !== false && is_callable(explode('::', $validation)))
+			{
 				return call_user_func(explode('::', $validation), $v);   // A callback class method
-			
+			}			
 			elseif (function_exists($validation))
+			{
 				return call_user_func($validation, $v);  // A callback function
+			}
 		}
-		
+
 		// Map integer validation code to custom validation types
 		$_map = array('1'=>'safehtml_decode_first', '2'=>'joomla_text_filters', '3'=>'safehtml_allow_encoded');
 		$validation = isset($_map[$validation])  ?  $_map[$validation]  :  $validation;
 		
 		// Create a safe-HTML or a no-HTML filter
 		if ($validation=='safehtml_decode_first' || $validation=='safehtml_allow_encoded')
+		{
 			$safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
+		}
 		else if ($validation!='joomla_ug_text_filters')
+		{
 			$noHtmlFilter = JFilterInput::getInstance();
-		
+		}
+
 		// Do the filtering
+		$validation = strtoupper($validation);
 		switch ($validation)
 		{
-			case 'safehtml_decode_first':
+			case 'SAFEHTML_DECODE_FIRST':
 				// Allow safe HTML ... but also decode HTML special characters before filtering
 				// Decoding allows removal of e.g. &lt;badtag&gt; ... &lt;/badtag&gt;
 				$v = $safeHtmlFilter->clean($v, 'string');
 				break;
 				
-			case 'safehtml_allow_encoded':
+			case 'SAFEHTML_ALLOW_ENCODED':
 				// Allow safe HTML ... and allow ANY HTML if encoded, e.g. allows &lt;i&gt; ... &lt;/i&gt;
 				$v = $safeHtmlFilter->clean($v, 'html');
 				break;
 				
-			case 'joomla_text_filters':
+			case 'JOOMLA_TEXT_FILTERS':
 				// Filter according to user group Text Filters
 				$v = JComponentHelper::filterText($v);
 				break;
 
 			case 'ACCESSLEVEL':
 				// Filter using known access levels
-				if (!is_integer($v))
+				if ( ((int) $v) != $v )
 				{
 					$v = 1;  // Public
 					break;
@@ -1661,7 +1672,7 @@ class flexicontent_html
 				if (!$found) $v = 1;
 				break;
 
-			case 'URL': case 'url':
+			case 'URL':
 				// This cleans some of the more dangerous characters but leaves special characters that are valid.
 				$v = trim($noHtmlFilter->clean($v, 'HTML'));
 				
@@ -1672,7 +1683,7 @@ class flexicontent_html
 				$v = JStringPunycode::urlToPunycode( $v );
 				break;
 				
-			case 'EMAIL': case 'email':
+			case 'EMAIL':
 				// Use the Joomla mail helper to validate emails
 				jimport('joomla.mail.helper');
 				if ( !JMailHelper::isEmailAddress($v) ) $v = '';
@@ -6950,7 +6961,6 @@ class flexicontent_db
 		if (count($other_err))  $msg .= '<br/><br/>'.implode('<br/> ', $other_err);
 		
 		$controller->setRedirect( $redirect_url, $msg, ($other_err ? 'error' : 'message') );
-		return;// true;
 	}
 	
 	
