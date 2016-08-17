@@ -63,10 +63,10 @@ class FlexicontentViewFile extends JViewLegacy {
 		}
 		
 		// Build access level list
-		//$lists['access'] = JHTML::_('access.assetgrouplist', 'access', $row->access, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
-		
 		$options = JHtml::_('access.assetgroups');
-		// Add number if it has been deleted
+		//$lists['access'] = JHTML::_('access.assetgrouplist', 'access', $row->access, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
+
+		// Add current row access level number, if it has does not exist
 		$found = false;
 		foreach ($options as $o)
 		{
@@ -77,6 +77,7 @@ class FlexicontentViewFile extends JViewLegacy {
 			}
 		}
 		if (!$found) array_unshift($options, JHtml::_('select.option', $row->access, /*JText::_('FLEXI_ACCESS').': '.*/$row->access) );
+
 		$elementid = $fieldname = 'access';
 		$attribs = 'class="use_select2_lib"';
 		$lists['access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $row->access, $elementid, $translate=true );

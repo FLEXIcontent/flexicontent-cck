@@ -366,7 +366,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			$files = array();
 			foreach ($filelist as $fileid)
 			{
-				if ($fileid && $fileid != $file) {
+				if ($fileid && $fileid != $file)
+				{
 					$files[] = (int)$fileid;
 				}
 			}
@@ -385,30 +386,34 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$require_ftp = !JClientHelper::hasCredentials('ftp');
 		
 		//assign data to template
-		$this->assignRef('target_dir', $target_dir);
-		$this->assignRef('optional_cols', $optional_cols);
-		$this->assignRef('cols', $cols);
-		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('params'     , $cparams);
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('rows'       , $rows);
-		$this->assignRef('folder_mode', $folder_mode);
-		$this->assignRef('pagination' , $pagination);
-		$this->assignRef('CanFiles'        , $perms->CanFiles);
-		$this->assignRef('CanUpload'       , $perms->CanUpload);
-		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
-		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
-		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
-		$this->assignRef('langs', $langs);
+		$this->target_dir = $target_dir;
+		$this->optional_cols = $optional_cols;
+		$this->cols = $cols;
+		$this->count_filters = $count_filters;
+
+		$this->params = $cparams;
+		$this->lists  = $lists;
+		$this->rows   = $rows;
+		$this->langs  = $langs;
+
+		$this->folder_mode = $folder_mode;
+		$this->pagination = $pagination;
+
+		$this->CanFiles   = $perms->CanFiles;
+		$this->CanUpload  = $perms->CanUpload;
+		$this->CanViewAllFiles = $perms->CanViewAllFiles;
+
+		$this->assigned_fields_labels = $assigned_fields_labels;
+		$this->assigned_fields_icons  = $assigned_fields_icons;
 
 		$this->require_ftp = $require_ftp;
 		$this->layout  = $layout;
 		$this->field   = !empty($field) ? $field : null;
 		$this->fieldid = $fieldid;
 		$this->u_item_id  = $u_item_id;
-		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
+
+		$this->option = $option;
+		$this->view   = $view;
 
 		if ($view=='fileselement')
 		{
