@@ -114,7 +114,6 @@ class FlexicontentControllerTags extends FlexicontentController
 		$tbl = 'flexicontent_tags';
 		$redirect_url = 'index.php?option=com_flexicontent&view=tags';
 		flexicontent_db::checkin($tbl, $redirect_url, $this);
-		return;// true;
 	}
 	
 	
@@ -226,13 +225,10 @@ class FlexicontentControllerTags extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
-		$jinput = $app->input;
-
 		// TODO: Use JForm for tags ... 
-		//$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
-		$data  = $jinput->get->post->get('id', 0, 'int');
-		$jinput->set('cid', (int) $data['id']);
+		//$data = $this->input->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$data = $this->input->get->post->get('id', 0, 'int');
+		$this->input->set('cid', (int) $data['id']);
 
 		$this->checkin();
 	}

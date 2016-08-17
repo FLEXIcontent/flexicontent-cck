@@ -64,13 +64,12 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
+		$app   = JFactory::getApplication();
 		$model = $this->getModel('field');
 		$user  = JFactory::getUser();
-		$app   = JFactory::getApplication();
-		$jinput = $app->input;
 
-		$task  = $jinput->get('task', '', 'cmd');
-		$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data, validation will follow
+		$task  = $this->input->get('task', '', 'cmd');
+		$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data, validation will follow
 
 		// calculate access
 		$field_id = (int) $data['id'];
@@ -85,7 +84,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			$app->setHeader('status', 403, true);
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
 
-			if ($jinput->get('fc_doajax_submit'))
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -111,7 +110,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			// Redirect back to the edit form
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 
-			if ($jinput->get('fc_doajax_submit'))
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -157,7 +156,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		JFactory::getApplication()->enqueueMessage($msg, 'message');
 		$this->setRedirect($link);  // , $msg
 
-		if ($jinput->get('fc_doajax_submit'))
+		if ($this->input->get('fc_doajax_submit'))
 		{
 			jexit(flexicontent_html::get_system_messages_html());
 		}
@@ -174,7 +173,6 @@ class FlexicontentControllerFields extends FlexicontentController
 		$tbl = 'flexicontent_fields';
 		$redirect_url = 'index.php?option=com_flexicontent&view=fields';
 		flexicontent_db::checkin($tbl, $redirect_url, $this);
-		return;// true;
 	}
 	
 	
@@ -187,10 +185,11 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function publish()
 	{
-		$user	 = JFactory::getUser();
+		$user  = JFactory::getUser();
 		$model = $this->getModel('fields');
-		$cid  = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id = (int)$cid[0];
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		$field_id = (int) $cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
@@ -237,11 +236,12 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function unpublish()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$model = $this->getModel('fields');
 		$user  = JFactory::getUser();
-		$field_id = (int)$cid[0];
-		
+		$model = $this->getModel('fields');
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		$field_id = (int) $cid[0];
+
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
@@ -292,11 +292,12 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function toggleprop()
 	{
-		$user   = JFactory::getUser();
-		$model  = $this->getModel('fields');
-		$cid    = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$propname = JRequest::getCmd( 'propname', null, 'default' );
-		$field_id = (int)$cid[0];
+		$user  = JFactory::getUser();
+		$model = $this->getModel('fields');
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		$field_id = (int) $cid[0];
+		$propname = $this->input->get('propname', null, 'cmd');
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -346,10 +347,11 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function remove()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$model = $this->getModel('fields');
 		$user  = JFactory::getUser();
-		$field_id = (int)$cid[0];
+		$model = $this->getModel('fields');
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		$field_id = (int) $cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -393,11 +395,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
-		$jinput = $app->input;
-
-		$data  = $jinput->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
-		$jinput->set('cid', (int) $data['id']);
+		$data = $this->input->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
+		$this->input->set('cid', (int) $data['id']);
 
 		$this->checkin();
 	}
@@ -412,13 +411,13 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function edit()
 	{
-		JRequest::setVar( 'view', 'field' );
-		JRequest::setVar( 'hidemainmenu', 1 );
-		
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
-		
+
+		$this->input->set('view', 'field');
+		$this->input->set('hidemainmenu', 1);
+
 		// Get/Create the view
 		$viewType   = $document->getType();
 		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
@@ -432,8 +431,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		$view->setModel($model, true);
 		$view->document = $document;
 		
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id = (int)$cid[0];
+		$cid = $this->input->get('cid', array(0), 'array');
+		$field_id = (int) $cid[0];
 
 		// calculate access
 		$is_authorised = !$field_id ?
@@ -481,8 +480,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		
+
+		// Get ids of the fields
+		$cid = $this->input->get('cid', array(0), 'array');
+
 		// calculate access
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
 		
@@ -539,9 +540,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
-		
+
+		// Get ids of the fields
+		$cid = $this->input->get('cid', array(0), 'array');
+		$order = $this->input->get('order', array(0), 'array');
+
 		// calculate access
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
 		
@@ -572,9 +575,10 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$user  = JFactory::getUser();
 		$model = $this->getModel('fields');
-		$task  = JRequest::getVar( 'task' );
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id = (int)$cid[0];
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		$field_id = (int) $cid[0];
+		$task  = $this->input->get('task', '', 'cmd');
 		
 		// calculate access
 		$asset = 'com_flexicontent.field.' . $field_id;
@@ -617,15 +621,16 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		// Initialize variables
 		$app = JFactory::getApplication();
-		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
-
-		// Get model, user, ids of copied fields
-		$model = $this->getModel('fields');
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$task  = JRequest::getVar( 'task', 'copy' );
-		
+		$task   = $this->input->get('task', 'copy', 'cmd');
+		$option = $this->input->get('option', '', 'cmd');
+
+		// Get model
+		$model = $this->getModel('fields');
+
+		// Get ids of the fields
+		$cid = $this->input->get('cid', array(0), 'array');
+
 		// calculate access
 		$is_authorised = $user->authorise('flexicontent.copyfields', 'com_flexicontent');
 		
