@@ -1036,17 +1036,17 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Handle Template related work
 		// ****************************
 
-		// (a) Get the item layouts
-		$themes			= flexicontent_tmpl::getTemplates();
-		$tmpls_all	= $themes->items;
-
-		// (b) Get Content Type allowed templates
+		// (a) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
 
-		// (c) Load language file
+		// (b) Load language file of currently selected template
 		$_ilayout = $item->itemparams->get('ilayout', $type_default_layout);
 		if ($_ilayout) FLEXIUtilities::loadTemplateLanguageFile( $_ilayout );
+
+		// (c) Get the item layouts, checking template of current layout for modifications
+		$themes			= flexicontent_tmpl::getTemplates($_ilayout);
+		$tmpls_all	= $themes->items;
 
 		// (d) Get allowed layouts adding default layout (unless all templates are already allowed ... array is empty)
 		if ( empty($allowed_tmpls) ) {
@@ -1084,7 +1084,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 		}
 
-		$this->assignRef('tmpls',		$tmpls);
+		$this->tmpls = $tmpls;
 		
 		// Clear custom form data from session
 		$app->setUserState($form->option.'.edit.'.$form->context.'.custom', false);
@@ -1735,7 +1735,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Create title of the custom fields default TAB (field manager TAB)
 		if ($item->type_id) {
 			$_str = JText::_('FLEXI_DETAILS');
-			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1, NULL);
+			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
 			
 			$types_arr = flexicontent_html::getTypesList();
 			$type_lbl = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : '';

@@ -65,13 +65,15 @@ class JFormFieldItemlayout extends JFormFieldList
 		$controller	= $jinput->get('controller', '', 'cmd');
 		
 		// Get RECORED id of current view
-		if (!$app->isAdmin()) {
-			// FRONTEND, use "id" from request
-			$pk = $jinput->get('id', 0, 'int');
-		} else {
-			// BACKEND, use "cid" array from request
+		$id = $jinput->get('id', array(0), 'array');
+		JArrayHelper::toInteger($id, array(0));
+		$pk = (int) $id[0];
+		
+		if (!$pk)
+		{
 			$cid = $jinput->get('cid', array(0), 'array');
-			$pk = (int)$cid[0];
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = (int) $cid[0];
 		}
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item

@@ -801,7 +801,7 @@ $tabCnt[$tabSetCnt] = 0;
 //$type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' );
 if ($this->row->type_id) {
 	$_str = JText::_('FLEXI_DETAILS');
-	$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1, NULL);
+	$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
 	
 	$type_lbl = $this->typesselected->name;
 	$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
@@ -1398,7 +1398,7 @@ if ( count($FC_jfields_html) ) : ?>
 					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
 					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 					
-					if ($tmpl->name != $item_layout) continue;
+					if (!$item_layout || $tmpl->name != $item_layout) continue;
 					
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
