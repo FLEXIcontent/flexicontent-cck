@@ -10,9 +10,9 @@
 		</fieldset>
 		
 		<fieldset name="author_override_cat_config" label="FLEXI_AUTHORING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="override_currcat_config" type="radio" default="0" label="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG" description="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG_DESC" labelclass="label label-info" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="override_currcat_config" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG" description="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG_DESC" labelclass="label label-info" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" hide_list="override_cat_conf" show_list="">FLEXI_NO</option>
+				<option value="1" hide_list="" show_list="override_cat_conf">FLEXI_YES</option>
 			</field>
 		</fieldset>
 		
