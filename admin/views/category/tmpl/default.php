@@ -320,7 +320,12 @@ $this->document->addScriptDeclaration($js);
 				<div class="tabbertab" id="tabset_cat_params_layout_tab" data-icon-class="icon-palette fc-display-params-icon" >
 					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
 
-					<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important; padding: 8px !important">
+					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
+						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
+					</span>
+					<div class="fcclear"></div>
+
+					<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
 						<h3 class="themes-title">
 							<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 						</h3>
@@ -355,6 +360,11 @@ $this->document->addScriptDeclaration($js);
 
 						<div class="tabbertab" id="tabset_layout_params_tab" data-icon-class="icon-palette" >
 							<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
+
+							<div class="fc-success fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important;" id="__category_inherited_layout__">
+								<?php echo JText::_( 'FLEXI_TMPL_USING_INHERITED_CATEGORY_LAYOUT' ). ': <b>'. $this->iparams->get('clayout') .'</b>'; ?>
+							</div>
+							<div class="fcclear"></div>
 
 							<div class="fc-sliders-plain-outer">
 								<?php

@@ -561,8 +561,6 @@
 		<fieldset name="cat_items_list" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 		<field name="" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_items.php" level="level3" class="alert alert-success fcpadded" />
-		<field name="" type="separator" default="" level="level_br" />
-
 		<field name="" type="separator" default="FLEXI_ITEMS_LIST" level="tabset_start" box_type="1"/>
 
 			<field name="" type="separator" default="FLEXI_ITEMS_BASIC_N_ORDERING" icon_class="icon-file-2" level="tab_open" box_type="1"/>
@@ -1016,7 +1014,7 @@
 	<fields name="templates">
 			
 			<!-- Do not modify default value (XML file) ... default category layout 'blog', as currently, it is hard coded in (a) the frontend category's view.html.php and (b) in the backend category manager listing -->
-			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" />
+			<field name="clayout" type="categorylayout" default="" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" />
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_LAYOUT_SWITCHER" description="" level="level1" />
