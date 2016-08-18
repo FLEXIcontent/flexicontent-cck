@@ -177,7 +177,12 @@ $this->document->addScriptDeclaration($js);
 		
 		<div class="fc_tabset_inner">
 			
-			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important; padding: 8px !important">
+			<span class="btn-group input-append" style="margin: 2px 0px 6px;">
+				<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
+			</span>
+			<div class="fcclear"></div>
+
+			<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
 				<h3 class="themes-title">
 					<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 				</h3>
