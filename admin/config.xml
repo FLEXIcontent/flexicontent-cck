@@ -699,9 +699,7 @@
 
 	<field name="" type="separator" default="FLEXI_ITEMS_LIST" icon_class="icon-list" level="tab_open" box_type="1" remove_boxes="2" />
 
-		<field name="" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_items.php" level="level3" class="alert alert-success fcpadded" />
-		<field name="" type="separator" default="" level="level_br" />
-
+	<field name="" type="separator" default="FLEXI_LAYOUT_FILE_IS" value_printf="category_items.php" level="level3" class="alert alert-success fcpadded" />
 	<field name="" type="separator" default="FLEXI_ITEMS_LIST" level="tabset_start" box_type="1" remove_boxes="2" class="fcparams_tabset" />
 
 		<field name="" type="separator" default="FLEXI_ITEMS_BASIC_N_ORDERING" icon_class="icon-file-2" level="tab_open" box_type="1" remove_boxes="2" />
