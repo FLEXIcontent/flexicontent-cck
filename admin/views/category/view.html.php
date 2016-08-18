@@ -35,6 +35,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
+		$jinput   = $app->input;
 		
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
@@ -55,9 +56,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$cid    =	$row->id;
 		$isnew  = !$cid;
+
+		$view       = $jinput->get('view', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
 		
 		// Check category is checked out by different editor / administrator
-		if ( !$isnew && $model->isCheckedOut( $user->get('id') ) ) {
+		if ( !$isnew && $model->isCheckedOut( $user->get('id') ) )
+		{
 			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
@@ -307,6 +312,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->tmpls    = $tmpls;
 		$this->cparams  = $cparams;
 		$this->iparams  = $iparams;
+		$this->view     = $view;
+		$this->controller = $controller;
 
 		parent::display($tpl);
 	}

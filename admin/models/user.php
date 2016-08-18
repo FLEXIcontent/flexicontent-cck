@@ -52,17 +52,30 @@ class FlexicontentModelUser extends UsersModelUser
 	function __construct()
 	{
 		parent::__construct();
+		
+		$jinput = JFactory::getApplication()->input;
 
-		$array = JRequest::getVar('cid',  array(0), '', 'array');
-		$array = is_array($array) ? $array : array($array);
-		$id = $array[0];
-		if(!$id) {
-			$post = JRequest::get( 'post' );
-			$data = FLEXI_J16GE ? @$post['jform'] : $post;
-			$id = @$data['id'];
+		$id = $jinput->get('id', array(0), 'array');
+		JArrayHelper::toInteger($id, array(0));
+		$pk = (int) $id[0];
+
+		if (!$pk)
+		{
+			$cid = $jinput->get('cid', array(0), 'array');
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = (int) $cid[0];
 		}
-		$this->setId((int)$id);
+		
+		if (!$pk)
+		{
+			$data = $jinput->get('jform', array('id'=>0), 'array');
+			$pk = (int) $data['id'];
+		}
+		$this->setId((int)$pk);
+
+		$this->populateState();
 	}
+
 
 	/**
 	 * Method to set the identifier
@@ -83,7 +96,8 @@ class FlexicontentModelUser extends UsersModelUser
 	 *
 	 * @access	public
 	 */
-	function getId() {
+	function getId()
+	{
 		return $this->_id;
 	}
 

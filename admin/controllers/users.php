@@ -89,9 +89,10 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$db  = JFactory::getDBO();
 		$me  = JFactory::getUser();
 		$acl = JFactory::getACL();
-		$MailFrom	= $app->getCfg('mailfrom');
-		$FromName	= $app->getCfg('fromname');
-		$SiteName	= $app->getCfg('sitename');
+		$config = JFactory::getConfig();
+		$MailFrom	= $config->get('mailfrom');
+		$FromName	= $config->get('fromname');
+		$SiteName	= $config->get('sitename');
 
  		// Create a new JUser object for the given user id, and calculate / retrieve some information about the user
  		$id = JRequest::getVar( 'id', 0, 'post', 'int');

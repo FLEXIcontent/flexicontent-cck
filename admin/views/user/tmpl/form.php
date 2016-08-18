@@ -1,4 +1,21 @@
 <?php
+/**
+ * @version 1.5 stable $Id: default.php 1079 2012-01-02 00:18:34Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 defined('_JEXEC') or die('Restricted access');
 
 $cid = JRequest::getVar( 'cid', array(0) );
@@ -354,297 +371,300 @@ $this->document->addScriptDeclaration($js);
 	</div>
 </div>
 
+
+<div style="margin:0 0 12px 0; background-color:#222; " class="fcsep_level0">
+	<?php echo JText::_('FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG'); ?>
+</div>
+
+
 		<div style="margin-bottom: 32px;">
 		<?php
 			$fieldSet = $this->jform_authorbasic->getFieldset('author_override_cat_config');
 			
-			if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-			endif;
-			
-			foreach ($fieldSet as $field) :
-				//echo '<div class="fc-mssg fc-info" style="margin-bottom: 12px;">'.JText::_($field->description).'</div>';
-				//echo '<span class="label label-info" style="padding: 6px;">'. JText::_( $field->getAttribute('label') ).'</span> &nbsp; ';
-				echo str_replace('class=', ' style="padding: 6px; margin: 0 12px 0 0;" class=', $field->label);
-				echo $field->input;
-				echo '<div class="fcclear"></div>';
-			endforeach;
-		?>
-		</div>
-		
-		<span style="margin:0 0 12px 0; background-color:#777; " class="fcsep_level0">Category Parameters (override)</span>
-
-		
-		<div class="fctabber" id="user_cats_params_tabset">
-
-			<div class="tabbertab" id="tabset_cat_props_display_header_tab" data-icon-class="icon-info-circle fc-display-params-icon" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
-				
-				<?php /*echo '<h3 class="themes-title">' . JText::_( 'FLEXI_CAT_DISPLAY_HEADER' ) . '</h3>';*/ ?>
-				<?php echo JHtml::_('tabs.start','cat-tabs-header-'.$this->form->getValue("id"), array('useCookie'=>1)); ?>
-				
-					<?php
-					$display_fsets = array('cat_info_options', 'subcats_info_options', 'peercats_info_options');
-					foreach ($display_fsets as $name) :
-					
-						$fieldSet = $this->jform_authorcat->getFieldset($name);
-						
-						$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
-						echo JHtml::_('tabs.panel',JText::_($label), $name.'-options');
-						
-						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-						endif;
-						?>
-						
-						<fieldset class="panelform">
-							<?php foreach ($fieldSet as $field) : ?>
-								<?php echo $field->label; ?>
-								<?php echo $field->input; ?>
-							<?php endforeach; ?>
-						</fieldset>
-					<?php endforeach; ?>
-				
-				<?php echo JHtml::_('tabs.end'); ?>
-				
-			</div>
-		
-		
-			<div class="tabbertab" id="tabset_cat_props_search_filter_form_tab" data-icon-class="icon-search fc-display-params-icon" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'); ?> </h3>
-				
-				<?php
-				$fieldSet = $this->jform_authorcat->getFieldset('cat_items_search_filter_form');
-				
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
 					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
 				?>
-				
-				<fieldset class="panelform">
-					<?php foreach ($fieldSet as $field) : ?>
-						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
-					<?php endforeach; ?>
-				</fieldset>
-				
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_LAYOUT'), 'cat-params-layout');*/?>
-			
-			
-			<div class="tabbertab" id="fcform_tabset-author-template-options" data-icon-class="icon-palette fc-display-params-icon" >
-				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_LAYOUT' ); ?> </h3>
-				
-				<fieldset class="panelform">
-					
-					<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important; padding: 8px !important">
+
+				<?php foreach ($fieldSet as $field) :
+					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+					<div class="control-group">
+						<div class="control-label">'.$field->label.'</div>
+						<div class="controls">
+						'.$field->input.'
+						</div>
+					</div>
+					';
+				endforeach; ?>
+		</div>
+
+
+		<div class="override_cat_conf" style="margin-bottom: 16px !important;">
+
+			<div class="fctabber tabset_cat_params fcparams_tabset" id="tabset_cat_params">
+
+				<div class="tabbertab" id="tabset_cat_params_display_header_tab" data-icon-class="icon-info-circle fc-display-params-icon" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
+
+					<?php
+					$fieldSet = $this->jform_authorcat->getFieldset('cats_display');
+
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
+					?>
+
+					<?php foreach ($fieldSet as $field) :
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+							'.$field->input.'
+							</div>
+						</div>
+						';
+					endforeach; ?>
+
+				</div><!-- tabbertab FLEXI_CAT_DISPLAY_HEADER -->
+
+
+				<div class="tabbertab" id="tabset_cat_params_search_filter_form_tab" data-icon-class="icon-search fc-display-params-icon" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'); ?> </h3>
+
+					<?php
+					$fieldSet = $this->jform_authorcat->getFieldset('cat_search_filter_form');
+
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
+					?>
+
+					<?php foreach ($fieldSet as $field) :
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+							'.$field->input.'
+							</div>
+						</div>
+						';
+					endforeach; ?>
+
+				</div><!-- tabbertab FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM -->
+
+
+				<div class="tabbertab" id="tabset_cat_params_layout_tab" data-icon-class="icon-palette fc-display-params-icon" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
+
+					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
+						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
+					</span>
+					<div class="fcclear"></div>
+
+					<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
 						<h3 class="themes-title">
 							<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 						</h3>
 						<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 					</div>
-					<div class="fcclear"></div>
-					
+					<div class="fcclear"></div><br/>
+
 					<?php
 					foreach($this->jform_authorcat->getGroup('templates') as $field):
 						$_name  = $field->fieldname;
 						if ($_name!='clayout' && $_name!='clayout_mobile') continue;
-						
+
 						$_value = $this->params_authorcat->get($_name);
-						
+
 						// setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)
 						//$field->setup($field->element, $_value, $field->group);
-						
+
 						$field->setValue($_value);
-						
-						if ($field->hidden): echo $field->input;
-						else:
-							echo $field->label;
-							echo $field->input;
-							echo '<div class="fcclear"></div>';
-						endif;
-					endforeach;
-					?>
-				</fieldset>
 
-
-				<div class="fctabber tabset_cat_props" id="tabset_layout">
-	
-					<div class="tabbertab" id="tabset_layout_params_tab" data-icon-class="icon-palette" >
-						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
-
-
-						<div class="fc-sliders-plain-outer">
-							<?php
-							echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
-							$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-							$cat_layout = $this->params_authorcat->get('clayout');
-							
-							foreach ($this->tmpls as $tmpl) :
-								$form_layout = $tmpl->params;
-								$label = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-								echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
-								
-								if ($tmpl->name != $cat_layout) continue;
-								
-								$fieldSets = $form_layout->getFieldsets($groupname);
-								foreach ($fieldSets as $fsname => $fieldSet) : ?>
-									<fieldset class="panelform params_set">
-									
-									<?php
-									if (isset($fieldSet->label) && trim($fieldSet->label)) :
-										echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
-									endif;
-									if (isset($fieldSet->description) && trim($fieldSet->description)) :
-										echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-									endif;
-									
-									foreach ($form_layout->getFieldset($fsname) as $field) :
-										
-										if ($field->getAttribute('not_inherited')) continue;
-										if ($field->getAttribute('cssprep')) continue;
-										
-										$fieldname = $field->fieldname;
-										//$value = $form_layout->getValue($fieldname, $groupname);
-										
-										$input_only = !$field->label || $field->hidden;
-										echo
-											($input_only ? '' :
-											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-												$form_layout->getLabel($fieldname, $groupname)).'
-											<div class="container_fcfield">
-											').
-											
-											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-													//$this->getInheritedFieldDisplay($field, $this->iparams)
-													$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
-												)
-											).
-											
-											($input_only ? '' : '
-											</div>
-											');
-									endforeach; ?>
-									
-									</fieldset>
-									
-								<?php endforeach; //fieldSets ?>
-							<?php endforeach; //tmpls ?>
-							
-							<?php echo JHtml::_('sliders.end'); ?>
-							
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+								'.$field->input.'
+							</div>
 						</div>
+						';
+					endforeach; ?>
 
-					</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'), 'cat-params-layout-swithcer');*/ ?>
+					<div class="fctabber tabset_cat_props" id="tabset_layout">
+
+						<div class="tabbertab" id="tabset_layout_params_tab" data-icon-class="icon-palette" >
+							<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
+
+							<div class="fc-success fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important;" id="__category_inherited_layout__">
+								<?php echo JText::_( 'FLEXI_TMPL_USING_INHERITED_CATEGORY_LAYOUT' ). ': <b>'. $this->params_authorcat->get('clayout') .'</b>'; ?>
+							</div>
+							<div class="fcclear"></div>
+
+							<div class="fc-sliders-plain-outer">
+								<?php
+								echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
+								$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+								$cat_layout = $this->params_authorcat->get('clayout');
+
+								foreach ($this->tmpls as $tmpl) :
+
+									$form_layout = $tmpl->params;
+									$label = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+									echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+
+									if (!$cat_layout || $tmpl->name != $cat_layout) continue;
+
+									$fieldSets = $form_layout->getFieldsets($groupname);
+									foreach ($fieldSets as $fsname => $fieldSet) : ?>
+										<fieldset class="panelform params_set">
+
+										<?php
+										if (isset($fieldSet->label) && trim($fieldSet->label)) :
+											echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
+										endif;
+										if (isset($fieldSet->description) && trim($fieldSet->description)) :
+											echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+										endif;
+
+										foreach ($form_layout->getFieldset($fsname) as $field) :
+
+											if ($field->getAttribute('not_inherited')) continue;
+											if ($field->getAttribute('cssprep')) continue;
+
+											$fieldname = $field->fieldname;
+											//$value = $form_layout->getValue($fieldname, $groupname, @ $this->row->params[$fieldname]);
+
+											$input_only = !$field->label || $field->hidden;
+											echo
+												($input_only ? '' :
+												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+													$form_layout->getLabel($fieldname, $groupname)).'
+												<div class="container_fcfield">
+												').
+
+												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+													str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+														//$this->getInheritedFieldDisplay($field, $this->iparams)
+														$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+													)
+												).
+
+												($input_only ? '' : '
+												</div>
+												');
+										endforeach; ?>
+
+										</fieldset>
+
+									<?php endforeach; //fieldSets ?>
+								<?php endforeach; //tmpls ?>
+
+								<?php echo JHtml::_('sliders.end'); ?>
+
+							</div><!-- class="fc-sliders-plain-outer" -->
+
+						</div><!-- tabbertab FLEXI_LAYOUT_PARAMETERS -->
 
 
-					<div class="tabbertab" id="tabset_cat_params_layout_switcher_tab" data-icon-class="icon-grid fc-display-params-icon" >
-						<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'); ?> </h3>
-						
-						<fieldset class="panelform">
+						<div class="tabbertab" id="tabset_layout_switcher_tab" data-icon-class="icon-grid" >
+							<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'); ?> </h3>
+
 							<?php
 							foreach($this->jform_authorcat->getGroup('templates') as $field):
 								$_name  = $field->fieldname;
 								if ($_name=='clayout' || $_name=='clayout_mobile') continue;
-								
+
 								$_value = $this->params_authorcat->get($_name);
-								
+
 								// setValue(), is ok if input property, has not been already created, otherwise we need to re-initialize (which clears input)
 								//$field->setup($field->element, $_value, $field->group);
-								
+
 								$field->setValue($_value);
-								
-								if ($field->hidden): echo $field->input;
-								else:
-									echo $field->label;
-									echo $field->input;
-									echo '<div class="fcclear"></div>';
-								endif;
-							endforeach;
-							?>
-						</fieldset>
-						
-					</div>
 
-				</div>
+								echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+								<div class="control-group">
+									<div class="control-label">'.$field->label.'</div>
+									<div class="controls">
+										'.$field->input.'
+									</div>
+								</div>
+								';
+							endforeach; ?>
 
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_AUTHOR_ITEMS_LIST'), 'cat-params-items-list');*/?>
-		
-		
-			<div class="tabbertab" id="fcform_tabset-author-items-list" data-icon-class="icon-list-2 fc-display-params-icon" >
-				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_AUTHOR_ITEMS_LIST' ); ?> </h3>
-				
-				<?php
-				echo JHtml::_('tabs.start','cat-tabs-items-list-'.$this->form->getValue("id"), array('useCookie'=>1));
-				
-				$fieldSets = $this->jform_authorcat->getFieldsets('authorcatparams');
-				$skip_fsets = array('cat_basic'=>1, 'cat_info_options'=>1, 'subcats_info_options'=>1, 'peercats_info_options'=>1, 'cat_rss_feeds'=>1, 'cat_items_search_filter_form'=>1, 'cat_notifications_conf'=>1);
-				
-				foreach ($fieldSets as $name => $fieldSet) :
-					
-					if ( isset($skip_fsets[$name]) ) continue;
-					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
-					echo JHtml::_('tabs.panel', str_replace(':',':<br/>', JText::_($label)), $name.'-options');
-					
+						</div><!-- tabbertab FLEXI_CATEGORY_LAYOUT_SWITCHER -->
+
+					</div><!-- fctabber FLEXI_LAYOUT -->
+
+				</div><!-- tabbertab FLEXI_LAYOUT -->
+
+
+				<div class="tabbertab tabbertabdefault" id="tabset_cat_params_itemslist_tab" data-icon-class="icon-list-2 fc-display-params-icon" >
+					<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_AUTHOR_ITEMS_LIST' ); ?> </h3>
+
+					<?php
+					$fieldSet = $this->jform_authorcat->getFieldset('cat_items_list');
+
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
-					
-					<fieldset class="panelform">
+
+					<?php foreach ($fieldSet as $field) :
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+								'.$field->input.'
+							</div>
+						</div>
+						';
+					endforeach; ?>
+
+				</div><!-- tabbertab FLEXI_CAT_DISPLAY_ITEMS_LIST -->
+
+
+				<div class="tabbertab" id="tabset_cat_params_rss_feeds_tab" data-icon-class="icon-feed fc-rss-params-icon" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PARAMS_CAT_RSS_FEEDS'); ?> </h3>
+
 					<?php
-					foreach ($this->jform_authorcat->getFieldset($name) as $field) :
-						echo $field->label;
-						echo $field->input;
-					endforeach;
+					$fieldSet = $this->jform_authorcat->getFieldset('cat_rss_feeds');
+
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
 					?>
-					</fieldset>
-					
-				<?php endforeach; ?>
-				
-				<?php echo JHtml::_('tabs.end'); ?>
-				
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PARAMS_CAT_RSS_FEEDS'), 'cat-params-rss');*/?>
+
+					<?php foreach ($fieldSet as $field) :
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+								'.$field->input.'
+							</div>
+						</div>
+						';
+					endforeach; ?>
+
+				</div><!-- tabbertab FLEXI_PARAMS_CAT_RSS_FEEDS -->
+
+			</div><!-- fctabber tabset_cat_props -->
 
 
-			<div class="tabbertab" id="tabset_cat_props_rss_feeds_tab" data-icon-class="icon-feed fc-rss-params-icon" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PARAMS_CAT_RSS_FEEDS'); ?> </h3>
-				
-				<?php
-				$fieldSet = $this->jform_authorcat->getFieldset('cat_rss_feeds');
-				
-				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-				endif;
-				?>
-				
-				<fieldset class="panelform">
-				<?php
-				foreach ($fieldSet as $field) :
-					echo $field->label;
-					echo $field->input;
-				endforeach;
-				?>
-				</fieldset>
-				
-			</div>
 
-		</div><!-- fctabber -->
+	<div class="fcclear"></div>
 
-
-	
-	<div class="clr"></div>
-
+	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="id" value="<?php echo $this->user->get('id'); ?>" />
 	<input type="hidden" name="cid[]" value="<?php echo $this->user->get('id'); ?>" />
-	<input type="hidden" name="controller" value="users" />
-	<input type="hidden" name="view" value="user" />
-	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="controller" value="<?php echo $this->controller; ?>" />
+	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
 	<?php if (FLEXI_J16GE ? !$this->me->authorise( 'com_users', 'email_events' ) : !$this->me->authorize( 'com_users', 'email_events' )) { ?>
 	<input type="hidden" name="sendEmail" value="0" />
 	<?php } ?>
 	<?php echo JHTML::_( 'form.token' ); ?>
+
 </form>
-</div>
+</div><!-- id:flexicontent -->

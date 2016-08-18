@@ -29,23 +29,26 @@ class FlexicontentViewUser extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		global $mainframe;
-
 		//initialise variables
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$db       = JFactory::getDBO();
-		$me       = JFactory::getUser();
-		
-		$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
-		JArrayHelper::toInteger($cid, array(0));
-		$edit = JRequest::getVar('edit',true);
-		if (!$cid) $edit = false;
-		
+		$jinput   = $app->input;
+
+		$db  = JFactory::getDBO();
+		$me  = JFactory::getUser();
+
+		$cid = $jinput->get('cid', array(0), 'array');
+		$cid = (int) $cid[0];
+
 		$form = $this->get('Form');
 		$form->setValue('password',		null);
 		$form->setValue('password2',	null);
 		
-		$form_folder = FLEXI_J16GE ? 'forms'.DS : '';
+		$form_folder = 'forms'.DS;
+		$isnew = !$cid;
+
+		$view       = $jinput->get('view', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
 
 		
 		// *****************
@@ -70,10 +73,10 @@ class FlexicontentViewUser extends JViewLegacy
 		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 
 		//create the toolbar
-		if ( $edit ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_USER' ), 'authoredit' );
-		} else {
+		if ( $isnew ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_USER' ), 'authoradd' );
+		} else {
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_USER' ), 'authoredit' );
 		}
 		
 		$ctrl = 'users.';
@@ -83,7 +86,7 @@ class FlexicontentViewUser extends JViewLegacy
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		JToolBarHelper::help( 'screen.users.edit' );
 		
-		$user   = $edit  ?  JUser::getInstance($cid[0])  :  JUser::getInstance();
+		$user   = $cid  ?  JUser::getInstance($cid)  :  JUser::getInstance();
 		$myuser = JFactory::getUser();
 		$acl    = JFactory::getACL();
 		
@@ -122,7 +125,7 @@ class FlexicontentViewUser extends JViewLegacy
 		{
 			$query = 'SELECT *'
 			. ' FROM #__contact_details'
-			. ' WHERE user_id = '.(int) $cid[0]
+			. ' WHERE user_id = ' . $cid
 			;
 			$db->setQuery( $query );
 			$contact = $db->loadObjectList();
@@ -148,9 +151,8 @@ class FlexicontentViewUser extends JViewLegacy
 		// *************************************************************************************************
 		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$author_user_id = (int) $cid[0];
 		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
-		$flexiauthor_extdata->load( $author_user_id );
+		$flexiauthor_extdata->load( $cid );
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 		
 		
@@ -254,27 +256,30 @@ class FlexicontentViewUser extends JViewLegacy
 		// ************************
 		// Assign variables to view
 		// ************************
-		
+
 		$this->document = $document;
 		$this->lists = $lists;
-		
+
+		$this->view = $view;
+		$this->controller = $controller;
+
 		$this->me   = $me;
 		$this->user = $user;
 		$this->usergroups = $usergroups;
 		$this->contact = $contact;
-		
+
 		$this->cparams = $cparams;
-		
+
 		$this->params_authorbasic = $params_authorbasic;
 		$this->params_authorcat   = $params_authorcat;
-		
+
 		$this->jform_authorbasic = $jform_authorbasic;
 		$this->jform_authorcat   = $jform_authorcat;
-		
+
 		$this->tmpls = $tmpls;
 		$this->form  = $form;
 		$this->params_author = $params_author;
-		
+
 		parent::display($tpl);
 	}
 }

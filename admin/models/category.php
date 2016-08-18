@@ -55,24 +55,29 @@ class FlexicontentModelCategory extends JModelAdmin
 	{
 		parent::__construct();
 		
-		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-		JArrayHelper::toInteger($cid, array(0));
-		$pk = (int) $cid[0];
-		
-		if (!$pk) {
-			// Try id variable too
-			$cid = JRequest::getVar('id',  0, '', 'array');
+		$jinput = JFactory::getApplication()->input;
+
+		$id = $jinput->get('id', array(0), 'array');
+		JArrayHelper::toInteger($id, array(0));
+		$pk = (int) $id[0];
+
+		if (!$pk)
+		{
+			$cid = $jinput->get('cid', array(0), 'array');
 			JArrayHelper::toInteger($cid, array(0));
 			$pk = (int) $cid[0];
 		}
 		
-		// Make sure id variable is set (needed by J3.0+ controller)
-		JRequest::setVar('id', (int)$pk);
-		
+		if (!$pk)
+		{
+			$data = $jinput->get('jform', array('id'=>0), 'array');
+			$pk = (int) $data['id'];
+		}
 		$this->setId((int)$pk);
-		
+
 		$this->populateState();
 	}
+
 
 	/**
 	 * Method to set the identifier
@@ -85,8 +90,12 @@ class FlexicontentModelCategory extends JModelAdmin
 		// Set category id and wipe data
 		$this->_id	    	= $id;
 		$this->_category	= null;
+
+		// Make sure id variable is set (needed by J3.0+ controller)
+		JFactory::getApplication()->input->set('id', $id);
 	}
-	
+
+
 	/**
 	 * Overridden get method to get properties from the category
 	 *
@@ -98,13 +107,16 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_loadCategory()) {
-			if(isset($this->_category->$property)) {
+		if ($this->_loadCategory())
+		{
+			if(isset($this->_category->$property))
+			{
 				return $this->_category->$property;
 			}
 		}
 		return $default;
 	}
+
 
 	/**
 	 * Method to get category data
@@ -117,7 +129,6 @@ class FlexicontentModelCategory extends JModelAdmin
 	{
 		if ($this->_loadCategory())
 		{
-
 		}
 		else  $this->_initCategory();
 
@@ -319,7 +330,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		$layout_data = array();
 
 		// Filter / validate the selected clayout parameters
-		if( $layoutpath && isset($raw_data['layouts'][$clayout]) )
+		if ( $layoutpath && isset($raw_data['layouts'][$clayout]) )
 		{
 			// Attempt to parse the XML file
 			$xml = simplexml_load_file($layoutpath);
@@ -904,19 +915,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		// Get id from user state
 		$pk = $this->_id;
-		if ( !$pk ) {
-			$cid = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id');
-			if ( empty($cid) ) $pk = 0;
-			else {
-				JArrayHelper::toInteger($cid, array(0));
-				$pk = $cid[0];
-			}
-		}
-		if ( !$pk ) {
-			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-		}
 		$this->setState($this->getName().'.id', $pk);
 		
 		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {

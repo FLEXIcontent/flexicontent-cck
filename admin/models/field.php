@@ -95,7 +95,8 @@ class FlexicontentModelField extends JModelAdmin
 	 *
 	 * @access	public
 	 */
-	function getId() {
+	function getId()
+	{
 		return $this->_id;
 	}
 	
@@ -659,25 +660,17 @@ class FlexicontentModelField extends JModelAdmin
 	protected function populateState()
 	{
 		$app = JFactory::getApplication('administrator');
+		$jinput = $app->input;
 
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', 'com_flexicontent');
+		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension')))
+		{
+			$extension = $jinput->get('extension', 'com_flexicontent', 'cmd');
 		}
-		
+
 		// Get id from user state
 		$pk = $this->_id;
-		if ( !$pk ) {
-			$cid = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id');
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-		}
-		if ( !$pk ) {
-			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-		}
 		$this->setState($this->getName().'.id', $pk);
-		
+
 		$this->setState('com_flexicontent.'.$this->getName().'.extension', $extension);
 		$parts = explode('.',$extension);
 		// extract the component name
@@ -686,8 +679,8 @@ class FlexicontentModelField extends JModelAdmin
 		$this->setState('com_flexicontent.'.$this->getName().'.section', (count($parts)>1)?$parts[1]:null);
 
 		// Load the parameters.
-		//$params	= JComponentHelper::getParams('com_flexicontent');
-		//$this->setState('params', $params);
+		$params	= JComponentHelper::getParams('com_flexicontent');
+		$this->setState('params', $params);
 	}
 	
 	/**
