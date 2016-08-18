@@ -157,8 +157,8 @@ foreach ($items as $i => $item) :
 		<!-- BOF item title -->
 		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
 			<span class="fc_item_title" itemprop="name">
-			<?php $_title = ( StringHelper::strlen($item->title) > $this->params->get('title_cut_text',200) ) ?
-				StringHelper::substr($item->title, 0, $this->params->get('title_cut_text',200)) . ' ...' : $item->title; ?>
+			<?php $_title = ( StringHelper::strlen($item->title) > (int) $this->params->get('title_cut_text',200) ) ?
+				StringHelper::substr($item->title, 0, (int) $this->params->get('title_cut_text',200)) . ' ...' : $item->title; ?>
 			<?php if ($this->params->get('link_titles', 0)) : ?>
    			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
 					<?php echo $_title; ?>

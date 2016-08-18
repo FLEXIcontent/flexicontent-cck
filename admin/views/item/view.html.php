@@ -840,16 +840,10 @@ class FlexicontentViewItem extends JViewLegacy
 		// ******************************
 		// Assign data to VIEW's template
 		// ******************************
-		$this->assignRef('document'     , $document);
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('row'      		, $item);
-		if (FLEXI_J16GE) {
-			$this->assignRef('form'				, $form);
-		} else {
-			$this->assignRef('editor'			, $editor);
-			$this->assignRef('pane'				, $pane);
-			$this->assignRef('formparams'	, $formparams);
-		}
+		$this->document = $document;
+		$this->lists  = $lists;
+		$this->row    = $item;
+		$this->form   = $form;
 		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
 		$this->assignRef('langs'        , $langs);
 		$this->assignRef('typesselected', $typesselected);

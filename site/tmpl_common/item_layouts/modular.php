@@ -162,8 +162,8 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
 			<span class="fc_item_title" itemprop="name">
 			<?php
-				echo ( StringHelper::strlen($item->title) > $this->params->get('title_cut_text',200) ) ?
-					StringHelper::substr($item->title, 0, $this->params->get('title_cut_text',200)) . ' ...'  :  $item->title;
+				echo ( StringHelper::strlen($item->title) > (int) $this->params->get('title_cut_text',200) ) ?
+					StringHelper::substr($item->title, 0, (int) $this->params->get('title_cut_text',200)) . ' ...'  :  $item->title;
 			?>
 			</span>
 		<?php echo '</h'.$itemTitleHeaderLevel; ?>>

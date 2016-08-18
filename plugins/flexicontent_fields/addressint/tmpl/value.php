@@ -49,9 +49,14 @@ static $addressint_map_styles = array();
 
 if ( !isset($addressint_map_styles[$field->id]) )
 {
-	$map_style = $field->parameters->get('map_style','');
-	json_decode($map_style);
-	if (json_last_error() == JSON_ERROR_NONE)
+	$map_style = trim($field->parameters->get('map_style',''));
+
+	if (!$map_style)
+	{
+		json_decode($map_style);
+	}
+
+	if (!$map_style || json_last_error() == JSON_ERROR_NONE)
 	{
 		$addressint_map_styles[$field->id] = $map_style;
 	}
