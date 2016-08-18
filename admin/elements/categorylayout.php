@@ -94,7 +94,7 @@ if ( ! @$attributes['skipparams'] )
 		$ext_view = $view;
 		$doc 	= JFactory::getDocument();
 		$js 	= "
-var tmpl = ['".$lays."'];
+var clayout_names = ['".$lays."'];
 
 function clayout_disablePanel(element)
 {
@@ -169,20 +169,30 @@ function clayout_loadPanel(element)
 	}
 }
 
-function clayout_activatePanel(active)
+
+function clayout_activatePanel(active_layout_name)
 {
-	var inactives = jQuery.grep(tmpl, function( item, index ) {
-		return item != active;
+	var inactives = jQuery.grep(clayout_names, function( layout_name, index )
+	{
+		return layout_name != active_layout_name;
 	});
-	
-	inactives.each(function(el){
-		clayout_disablePanel(el);
+
+	inactives.each(function(layout_name)
+	{
+		clayout_disablePanel(layout_name);
 	});
-	
-	if (active) {
-		clayout_loadPanel(active);
+
+	if (active_layout_name)
+	{
+		clayout_loadPanel(active_layout_name);
+		if ( jQuery('#__category_inherited_layout__') ) jQuery('#__category_inherited_layout__').hide();
+	}
+	else
+	{
+		if ( jQuery('#__category_inherited_layout__') ) jQuery('#__category_inherited_layout__').show();
 	}
 }
+
 
 jQuery(document).ready(function() {
 	clayout_activatePanel('".$value."');

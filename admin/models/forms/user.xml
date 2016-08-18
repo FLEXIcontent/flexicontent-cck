@@ -55,7 +55,7 @@
 	</fields>
 	
 	<fields name="templates">
-		<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" class="use_select2_lib" />
+		<field name="clayout" type="categorylayout" default="" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" class="use_select2_lib" />
 	</fields>
 	
 </form>
