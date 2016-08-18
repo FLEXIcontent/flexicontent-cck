@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1245 2012-04-12 05:16:57Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1079 2012-01-02 00:18:34Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,236 +39,177 @@ $this->document->addScriptDeclaration($js);
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-horizontal">
 
 
+	<div class="container-fluid" style="padding: 0px !important; margin-bottom: 12px !important;">
 
-<div class="container-fluid" style="padding: 0px !important; margin-bottom: 12px !important;">
+		<div class="span6 full_width_980">
 
-	<div class="span6 full_width_980">
+			<span class="label-fcouter">
+				<?php echo str_replace('" class="', '" class="label label-fcinner ', $this->form->getLabel('title')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->form->getInput('title'); ?>
+			</div>
 
-		<span class="label-fcouter">
-			<?php echo str_replace('" class="', '" class="label label-fcinner ', $this->form->getLabel('title')); ?>
-		</span>
-		<div class="container_fcfield">
-			<?php echo $this->form->getInput('title'); ?>
-		</div>
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('alias')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->form->getInput('alias'); ?>
+			</div>
 
-		<div class="fcclear"></div>
-		<span class="label-fcouter">
-			<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('alias')); ?>
-		</span>
-		<div class="container_fcfield">
-			<?php echo $this->form->getInput('alias'); ?>
-		</div>
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('language')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->form->getInput('language'); ?>
+			</div>
 
-		<div class="fcclear"></div>
-		<span class="label-fcouter">
-			<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('language')); ?>
-		</span>
-		<div class="container_fcfield">
-			<?php echo $this->form->getInput('language'); ?>
-		</div>
+		</div><!-- span6 EOF -->
 
-	</div><!-- span6 EOF -->
+		<div class="span6 full_width_980">
 
-	<div class="span6 full_width_980">
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('published')); ?>
+			</span>
+			<div class="container_fcfield">
+					<?php echo $this->form->getInput('published'); ?>
+			</div>
 
-		<span class="label-fcouter">
-			<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('published')); ?>
-		</span>
-		<div class="container_fcfield">
-				<?php echo $this->form->getInput('published'); ?>
-		</div>
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('parent_id')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->Lists['parent_id']; ?>
+			</div>
 
-		<div class="fcclear"></div>
-		<span class="label-fcouter">
-			<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('parent_id')); ?>
-		</span>
-		<div class="container_fcfield">
-			<?php echo $this->Lists['parent_id']; ?>
-		</div>
+		</div><!-- span6 EOF -->
 
-	</div><!-- span6 EOF -->
-
-</div><!-- container-fluid -->
-
+	</div><!-- container-fluid -->
 
 
-<div class="container-fluid" style="padding: 0px !important;">
-	<div class="span6 full_width_1340" style="margin-bottom: 16px !important;">
+
+	<div class="container-fluid" style="padding: 0px !important;">
+		<div class="span6 full_width_1340" style="margin-bottom: 16px !important;">
 
 		<?php /*echo JHtml::_('tabs.start','core-tabs-cat-props-'.$this->form->getValue("id"), array('useCookie'=>1));*/ ?>
 			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_DESCRIPTION' ), 'cat-description');*/ ?>
 
-		<div class="fctabber tabset_cat_props fcparams_tabset" id="tabset_cat_props">
+			<div class="fctabber tabset_cat_props fcparams_tabset" id="tabset_cat_props">
 
-			<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-file-2" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?> </h3>
+				<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-file-2" >
+					<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?> </h3>
 
-				<div class="flexi_params">
-					<?php echo $this->form->getInput('description'); ?>
-				</div>
-
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_IMAGE'), 'cat-image');*/ ?>
-
-
-			<div class="tabbertab" id="tabset_cat_props_image_tab" data-icon-class="icon-image" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_IMAGE'); ?> </h3>
-
-				<?php
-				$fieldSet = $this->form->getFieldset('cat_basic');
-
-				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-				endif;
-				?>
-
-				<?php foreach ($fieldSet as $field) :
-					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
-					<div class="control-group">
-						<div class="control-label">'.$field->label.'</div>
-						<div class="controls">
-							'.$field->input /* non-inherited */ .'
-						</div>
+					<div class="flexi_params">
+						<?php echo $this->form->getInput('description'); ?>
 					</div>
-					';
-				endforeach; ?>
 
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PUBLISHING'), 'publishing-details');*/ ?>
+				</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_IMAGE'), 'cat-image');*/ ?>
 
 
-			<div class="tabbertab" id="tabset_cat_props_publishing_tab" data-icon-class="icon-calendar" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
-
-				<fieldset class="panelform">
-					<?php echo $this->form->getLabel('created_user_id'); ?>
-					<?php echo $this->form->getInput('created_user_id'); ?>
-
-					<?php if (intval($this->form->getValue('created_time'))) : ?>
-						<?php echo $this->form->getLabel('created_time'); ?>
-						<?php echo $this->form->getInput('created_time'); ?>
-					<?php endif; ?>
-
-					<?php if ($this->form->getValue('modified_user_id')) : ?>
-						<?php echo $this->form->getLabel('modified_user_id'); ?>
-						<?php echo $this->form->getInput('modified_user_id'); ?>
-
-						<?php echo $this->form->getLabel('modified_time'); ?>
-						<?php echo $this->form->getInput('modified_time'); ?>
-					<?php endif; ?>
-
-					<?php echo $this->form->getLabel('hits'); ?>
-					<?php echo $this->form->getInput('hits'); ?>
-
-					<?php echo $this->form->getLabel('access'); ?>
-					<?php echo $this->form->getInput('access'); ?>
-				</fieldset>
-
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_META_SEO'), 'metaseo-options');*/ ?>
-
-
-			<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
-
-				<fieldset class="panelform">
-					<?php echo $this->form->getLabel('metadesc'); ?>
-					<?php echo $this->form->getInput('metadesc'); ?>
-
-					<?php echo $this->form->getLabel('metakey'); ?>
-					<?php echo $this->form->getInput('metakey'); ?>
-
-					<?php foreach($this->form->getGroup('metadata') as $field): ?>
-						<?php if ($field->hidden): echo $field->input; ?>
-						<?php else: ?>
-							<?php echo $field->label; ?>
-							<?php echo $field->input; /* non-inherited */?>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</fieldset>
-
-			</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_ASSOCIATIONS'), 'content-notifications');*/ ?>
-
-
-			<?php if ($useAssocs) : ?>
-			<!-- Associations tab -->
-			<div class="tabbertab" id="tabset_cat_props_assocs_tab" data-icon-class="icon-flag">
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?> </h3>
-				<?php echo $this->loadTemplate('associations'); ?>
-			</div> <!-- end tab -->
-			<?php endif; ?><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_NOTIFICATIONS_CONF'), 'cat-perms');*/ ?>
-
-
-			<div class="tabbertab" id="tabset_cat_props_content_notifications_tab" data-icon-class="icon-mail" >
-				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_NOTIFICATIONS_CONF'); ?> </h3>
-
-			<?php if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) ) : ?>
-
-				<?php
-				$fieldSet = $this->form->getFieldset('cat_notifications_conf');
-
-				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-				endif;
-				?>
-
-				<?php foreach ($fieldSet as $field) :
-					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
-					<div class="control-group">
-						<div class="control-label">'.$field->label.'</div>
-						<div class="controls">
-							'.$this->getInheritedFieldDisplay($field, $this->iparams).'
-						</div>
-					</div>
-					';
-				endforeach; ?>
-
-			<?php else :
-
-				$_comp_state = JText::_( $this->cparams->get('enable_notifications', 0) ? 'FLEXI_ENABLED' : 'FLEXI_DISABLED' );
-			 echo '<div class="alert alert-info">'.JText::sprintf('FLEXI_ABOUT_INACTIVE_CONTENT_NOTIFICATIONS', '<b>'.JText::_('FLEXI_DISABLED').'</b>', '<b>'.$_comp_state.'</b>').'</div>';
-
-			endif; ?><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PERMISSIONS'), 'cat-assocs');*/ ?>
-
-			</div>
-
-
-			<?php if ( $this->perms->CanRights ) : ?>
-			<!-- Permissions tab -->
-			<div class="tabbertab fcperms_tab" id="tabset_cat_props_perms_tab" data-icon-class="icon-power-cord">
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
-
-				<div class="fc_tabset_inner">
-					<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-				</div>
-
-			</div> <!-- end tab -->
-			<?php endif; ?>
-
-
-		</div><!-- fctabber tabset_cat_props EOF --><?php /*echo JHtml::_('tabs.end');*/ ?>
-
-	</div><!-- span6 EOF -->
-
-
-	<div class="span6 full_width_1340" style="margin-bottom: 12px !important;">
-
-		<?php /*echo JHtml::_('tabs.start','core-tabs-cat-params-'.$this->form->getValue("id"), array('useCookie'=>1));*/ ?>
-			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_CAT_DISPLAY_HEADER' ), 'cat-params-header');*/ ?>
-
-			<div class="fctabber tabset_cat_params fcparams_tabset" id="tabset_cat_params">
-
-				<div class="tabbertab" id="tabset_cat_params_display_header_tab" data-icon-class="icon-info-circle fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
-
-					<?php /*echo JHtml::_('tabs.start','cat-tabs-header-'.$this->form->getValue("id"), array('useCookie'=>1));*/ ?>
+				<div class="tabbertab" id="tabset_cat_props_image_tab" data-icon-class="icon-image" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_IMAGE'); ?> </h3>
 
 					<?php
-					//$display_fsets = array('cat_info_options', 'subcats_info_options', 'peercats_info_options');
-					//foreach ($display_fsets as $name) :
+					$fieldSet = $this->form->getFieldset('cat_basic');
 
-					//	$fieldSet = $this->form->getFieldset($name);
-					$fieldSet = $this->form->getFieldset('cats_display');
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
+					?>
 
-					//$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
-					//echo JHtml::_('tabs.panel', JText::_($label), $name.'-options');
+					<?php foreach ($fieldSet as $field) :
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+								'.$field->input /* non-inherited */ .'
+							</div>
+						</div>
+						';
+					endforeach; ?>
+
+				</div><!-- tabbertab FLEXI_IMAGE -->
+				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PUBLISHING'), 'publishing-details');*/ ?>
+
+
+				<div class="tabbertab" id="tabset_cat_props_publishing_tab" data-icon-class="icon-calendar" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
+
+					<fieldset class="panelform">
+						<?php echo $this->form->getLabel('created_user_id'); ?>
+						<?php echo $this->form->getInput('created_user_id'); ?>
+
+						<?php if (intval($this->form->getValue('created_time'))) : ?>
+							<?php echo $this->form->getLabel('created_time'); ?>
+							<?php echo $this->form->getInput('created_time'); ?>
+						<?php endif; ?>
+
+						<?php if ($this->form->getValue('modified_user_id')) : ?>
+							<?php echo $this->form->getLabel('modified_user_id'); ?>
+							<?php echo $this->form->getInput('modified_user_id'); ?>
+
+							<?php echo $this->form->getLabel('modified_time'); ?>
+							<?php echo $this->form->getInput('modified_time'); ?>
+						<?php endif; ?>
+
+						<?php echo $this->form->getLabel('hits'); ?>
+						<?php echo $this->form->getInput('hits'); ?>
+
+						<?php echo $this->form->getLabel('access'); ?>
+						<?php echo $this->form->getInput('access'); ?>
+					</fieldset>
+
+				</div><!-- tabbertab FLEXI_PUBLISHING -->
+				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_META_SEO'), 'metaseo-options');*/ ?>
+
+
+				<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
+
+					<fieldset class="panelform">
+						<?php echo $this->form->getLabel('metadesc'); ?>
+						<?php echo $this->form->getInput('metadesc'); ?>
+
+						<?php echo $this->form->getLabel('metakey'); ?>
+						<?php echo $this->form->getInput('metakey'); ?>
+
+						<?php foreach($this->form->getGroup('metadata') as $field): ?>
+							<?php if ($field->hidden): echo $field->input; ?>
+							<?php else: ?>
+								<?php echo $field->label; ?>
+								<?php echo $field->input; /* non-inherited */?>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</fieldset>
+
+				</div><!-- tabbertab FLEXI_META_SEO -->
+
+
+				<?php if ($useAssocs) : ?>
+				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_ASSOCIATIONS'), 'content-notifications');*/ ?>
+
+				<!-- Associations tab -->
+				<div class="tabbertab" id="tabset_cat_props_assocs_tab" data-icon-class="icon-flag">
+					<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?> </h3>
+
+					<?php echo $this->loadTemplate('associations'); ?>
+
+				</div><!-- tabbertab FLEXI_ASSOCIATIONS -->
+
+				<?php endif; ?>
+				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_NOTIFICATIONS_CONF'), 'cat-perms');*/ ?>
+
+
+				<div class="tabbertab" id="tabset_cat_props_content_notifications_tab" data-icon-class="icon-mail" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_NOTIFICATIONS_CONF'); ?> </h3>
+
+				<?php if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) ) : ?>
+
+					<?php
+					$fieldSet = $this->form->getFieldset('cat_notifications_conf');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
@@ -286,10 +227,63 @@ $this->document->addScriptDeclaration($js);
 						';
 					endforeach; ?>
 
-					<?php /*endforeach;*/ ?>
-					<?php /*echo JHtml::_('tabs.end');*/ ?>
+				<?php else :
 
-				</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'), 'cat-params-search-filter-form');*/ ?>
+					$_comp_state = JText::_( $this->cparams->get('enable_notifications', 0) ? 'FLEXI_ENABLED' : 'FLEXI_DISABLED' );
+				 echo '<div class="alert alert-info">'.JText::sprintf('FLEXI_ABOUT_INACTIVE_CONTENT_NOTIFICATIONS', '<b>'.JText::_('FLEXI_DISABLED').'</b>', '<b>'.$_comp_state.'</b>').'</div>';
+
+				endif; ?>
+
+				</div><!-- tabbertab FLEXI_ASSOCIATIONS -->
+
+
+				<?php if ( $this->perms->CanRights ) : ?>
+				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PERMISSIONS'), 'cat-assocs');*/ ?>
+
+				<div class="tabbertab fcperms_tab" id="tabset_cat_props_perms_tab" data-icon-class="icon-power-cord">
+					<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+
+					<div class="fc_tabset_inner">
+						<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+					</div>
+
+				</div><!-- tabbertab FLEXI_ASSOCIATIONS -->
+
+				<?php endif; ?>
+
+
+			</div><!-- fctabber tabset_cat_props EOF --><?php /*echo JHtml::_('tabs.end');*/ ?>
+
+		</div><!-- span6 EOF -->
+
+
+		<div class="span6 full_width_1340" style="margin-bottom: 12px !important;">
+
+			<div class="fctabber tabset_cat_params fcparams_tabset" id="tabset_cat_params">
+
+				<div class="tabbertab" id="tabset_cat_params_display_header_tab" data-icon-class="icon-info-circle fc-display-params-icon" >
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
+
+					<?php
+					$fieldSet = $this->form->getFieldset('cats_display');
+
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
+					?>
+
+					<?php foreach ($fieldSet as $field) :
+						echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+						<div class="control-group">
+							<div class="control-label">'.$field->label.'</div>
+							<div class="controls">
+								'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+							</div>
+						</div>
+						';
+					endforeach; ?>
+
+				</div><!-- tabbertab FLEXI_CAT_DISPLAY_HEADER -->
 
 
 				<div class="tabbertab" id="tabset_cat_params_search_filter_form_tab" data-icon-class="icon-search fc-display-params-icon" >
@@ -314,7 +308,7 @@ $this->document->addScriptDeclaration($js);
 						';
 					endforeach; ?>
 
-				</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_LAYOUT'), 'cat-params-layout');*/?>
+				</div><!-- tabbertab FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM -->
 
 
 				<div class="tabbertab" id="tabset_cat_params_layout_tab" data-icon-class="icon-palette fc-display-params-icon" >
@@ -427,9 +421,9 @@ $this->document->addScriptDeclaration($js);
 
 								<?php echo JHtml::_('sliders.end'); ?>
 
-							</div>
+							</div><!-- class="fc-sliders-plain-outer" -->
 
-						</div>
+						</div><!-- tabbertab FLEXI_LAYOUT_PARAMETERS -->
 
 
 						<div class="tabbertab" id="tabset_layout_switcher_tab" data-icon-class="icon-grid" >
@@ -458,11 +452,11 @@ $this->document->addScriptDeclaration($js);
 								';
 							endforeach; ?>
 
-						</div>
+						</div><!-- tabbertab FLEXI_CATEGORY_LAYOUT_SWITCHER -->
 
-					</div>
+					</div><!-- fctabber FLEXI_LAYOUT -->
 
-				</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_CAT_DISPLAY_ITEMS_LIST'), 'cat-params-items-list');*/ ?>
+				</div><!-- tabbertab FLEXI_LAYOUT -->
 
 
 				<div class="tabbertab tabbertabdefault" id="tabset_cat_params_itemslist_tab" data-icon-class="icon-list-2 fc-display-params-icon" >
@@ -471,9 +465,9 @@ $this->document->addScriptDeclaration($js);
 					<?php
 					$fieldSet = $this->form->getFieldset('cat_items_list');
 
-						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
-						endif;
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+					endif;
 					?>
 
 					<?php foreach ($fieldSet as $field) :
@@ -487,7 +481,7 @@ $this->document->addScriptDeclaration($js);
 						';
 					endforeach; ?>
 
-				</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PARAMS_CAT_RSS_FEEDS'), 'cat-params-rss');*/ ?>
+				</div><!-- tabbertab FLEXI_CAT_DISPLAY_ITEMS_LIST -->
 
 
 				<div class="tabbertab" id="tabset_cat_params_rss_feeds_tab" data-icon-class="icon-feed fc-rss-params-icon" >
@@ -512,7 +506,7 @@ $this->document->addScriptDeclaration($js);
 						';
 					endforeach; ?>
 
-				</div><?php /*echo JHtml::_('tabs.panel', (1 ? '&nbsp;' : JText::_('FLEXI_PARAMETERS_HANDLING')), 'cat-params-handling');*/ ?>
+				</div><!-- tabbertab FLEXI_PARAMS_CAT_RSS_FEEDS -->
 
 
 				<div class="tabbertab" id="tabset_cat_props_params_handling_tab" data-icon-class="icon-wrench" >
@@ -549,22 +543,22 @@ $this->document->addScriptDeclaration($js);
 						</div>
 					</fieldset>
 
-			</div>
+				</div><!-- tabbertab FLEXI_PARAMETERS_HANDLING -->
 
-		</div><!-- fctabber tabset_cat_props --><?php /*echo JHtml::_('tabs.end');*/ ?>
+			</div><!-- fctabber tabset_cat_props -->
 
-	</div><!-- span6 -->
+		</div><!-- span6 -->
 
-</div><!-- container-fluid -->
+	</div><!-- container-fluid -->
+	<div class="fcclear"></div>
 
-
-	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="id" value="<?php echo $this->form->getValue('id'); ?>" />
-	<input type="hidden" name="controller" value="category" />
-	<input type="hidden" name="view" value="category" />
+	<input type="hidden" name="controller" value="<?php echo $this->controller; ?>" />
+	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<?php echo $this->form->getInput('extension'); ?>
+	<?php echo JHTML::_( 'form.token' ); ?>
 
 </form>
 </div><!-- id:flexicontent -->

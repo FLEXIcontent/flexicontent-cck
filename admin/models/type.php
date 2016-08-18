@@ -95,7 +95,8 @@ class FlexicontentModelType extends JModelAdmin
 	 *
 	 * @access	public
 	 */
-	function getId() {
+	function getId()
+	{
 		return $this->_id;
 	}
 	
@@ -289,6 +290,8 @@ class FlexicontentModelType extends JModelAdmin
 	 */
 	function store($data)
 	{
+		$app = JFactory::getApplication();
+
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
 		$type = $this->getTable('flexicontent_types', '');
 		
@@ -296,53 +299,22 @@ class FlexicontentModelType extends JModelAdmin
 		$isnew = ! (boolean) $data['id'];
 		if ($data['id'])  $type->load($data['id']);
 		
-		// Build attibutes INI string
-		if (FLEXI_J16GE) {
-			// Retrieve form data these are subject to basic filtering
-			$jform = JRequest::getVar('jform', array(), 'post', 'array');
-			
-			$ilayout = $data['attribs']['ilayout'];
-			if( !empty($jform['layouts'][$ilayout]) ) {
-				$data['attribs'] = array_merge($data['attribs'], $jform['layouts'][$ilayout]);
-			}
-			
-			// JSON encoding allows to use new lines etc, handled by 'flexicontent_types' (extends JTable for flexicontent_types)
-			//$data['attribs'] = json_encode($data['attribs']);
-			// bind it to the table
-			if (!$type->bind($data)) {
-				$this->setError( $this->_db->getErrorMsg() );
-				return false;
-			}
-		}
+		// Retrieve form data these are subject to basic filtering
+		$jform = $app->input->post->get('jform', array(), 'array');
 		
-		else {
-			// bind it to the table
-			if (!$type->bind($data)) {
-				$this->setError( $this->_db->getErrorMsg() );
-				return false;
-			}
-			
-			if (is_array($data['params']))
-			{
-				// Get layout parameters
-				$ilayout = $data['params']['ilayout'];
-				$tmpl_params = $data['layouts'][$ilayout];
-				
-				// Clear parameters of all layouts
-				unset($data['layouts']);
-				
-				// Merge the parameters of currently selected layout
-				$data['params'] = array_merge($data['params'], $tmpl_params);
-				
-				$txt = array ();
-				foreach ($data['params'] as $k => $v) {
-					if (is_array($v)) {
-						$v = implode('|', $v);
-					}
-					$txt[] = "$k=$v";
-				}
-				$type->attribs = implode("\n", $txt);
-			}
+		// Merge attributes
+		$ilayout = $data['attribs']['ilayout'];
+		if( !empty($jform['layouts'][$ilayout]) )
+		{
+			$data['attribs'] = array_merge($data['attribs'], $jform['layouts'][$ilayout]);
+		}
+
+		// JSON encoding allows to use new lines etc, handled by 'flexicontent_types' (extends JTable for flexicontent_types)
+		//$data['attribs'] = json_encode($data['attribs']);
+		// bind it to the table
+		if (!$type->bind($data)) {
+			$this->setError( $this->_db->getErrorMsg() );
+			return false;
 		}
 		
 		// Put the new types in last position, currently this column is missing
@@ -473,25 +445,6 @@ class FlexicontentModelType extends JModelAdmin
 
 
 	/**
-	 * Override JModelAdmin::preprocessForm to ensure the correct plugin group is loaded.
-	 *
-	 * @param   JForm   $form   A JForm object.
-	 * @param   mixed   $data   The data expected for the form.
-	 * @param   string  $group  The name of the plugin group to import (defaults to "content").
-	 *
-	 * @return  void
-	 *
-	 * @since   1.6
-	 * @throws  Exception if there is an error in the form event.
-	 */
-	protected function preprocessForm(JForm $form, $data, $group = 'content')
-	{
-		// Trigger the default form events.
-		parent::preprocessForm($form, $data, $plugin_type='_none_');  // by default content plugins are imported, skip them
-	}
-
-
-	/**
 	 * Method to get a single record.
 	 *
 	 * @param   integer  $pk  The id of the primary key.
@@ -536,7 +489,26 @@ class FlexicontentModelType extends JModelAdmin
 		if ($pk) $items[$pk] = $item;
 		return $item;
 	}
-	
+
+
+	/**
+	 * Override JModelAdmin::preprocessForm to ensure the correct plugin group is loaded.
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $group  The name of the plugin group to import (defaults to "content").
+	 *
+	 * @return  void
+	 *
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
+	 */
+	protected function preprocessForm(JForm $form, $data, $group = 'content')
+	{
+		// Trigger the default form events.
+		parent::preprocessForm($form, $data, $plugin_type='_none_');  // by default content plugins are imported, skip them
+	}
+
 
 	/**
 	 * Auto-populate the model state.
@@ -548,25 +520,17 @@ class FlexicontentModelType extends JModelAdmin
 	protected function populateState()
 	{
 		$app = JFactory::getApplication('administrator');
+		$jinput = $app->input;
 
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', 'com_flexicontent');
+		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension')))
+		{
+			$extension = $jinput->get('extension', 'com_flexicontent', 'cmd');
 		}
-		
+
 		// Get id from user state
 		$pk = $this->_id;
-		if ( !$pk ) {
-			$cid = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id');
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-		}
-		if ( !$pk ) {
-			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
-		}
 		$this->setState($this->getName().'.id', $pk);
-		
+
 		$this->setState('com_flexicontent.'.$this->getName().'.extension', $extension);
 		$parts = explode('.',$extension);
 		// extract the component name
@@ -575,8 +539,8 @@ class FlexicontentModelType extends JModelAdmin
 		$this->setState('com_flexicontent.'.$this->getName().'.section', (count($parts)>1)?$parts[1]:null);
 
 		// Load the parameters.
-		//$params	= JComponentHelper::getParams('com_flexicontent');
-		//$this->setState('params', $params);
+		$params	= JComponentHelper::getParams('com_flexicontent');
+		$this->setState('params', $params);
 	}
 	
 	/**
