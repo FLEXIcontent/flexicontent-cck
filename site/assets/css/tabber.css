@@ -52,7 +52,8 @@ ul.tabbernav > li.tabberactive a:hover {
 	transition-timing-function: ease-in;
 }
 .tabberlive .tabbertab h2.tabberheading,
-.tabberlive .tabbertab h3.tabberheading {
+.tabberlive .tabbertab h3.tabberheading,
+.tabberlive .tabbernav .tabberheading.hidden {
 	display: none !important;
 }
 body .tabberlive,
