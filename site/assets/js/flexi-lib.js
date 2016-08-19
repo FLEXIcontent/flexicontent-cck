@@ -572,17 +572,19 @@
 	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
 	function fc_bootstrapAttach(sel)
 	{
+		var sbox = jQuery(sel);
+
 		// Turn radios into btn-group
-		jQuery(sel).find('.radio.btn-group label').addClass('btn');
+		sbox.find('.radio.btn-group label').addClass('btn');
 		
-		jQuery(sel).find('fieldset.btn-group').each(function() {
+		sbox.find('fieldset.btn-group').each(function() {
 			if (jQuery(this).prop('disabled')) {
 				jQuery(this).css('pointer-events', 'none').off('click');
 				jQuery(this).find('.btn').addClass('disabled');
 			}
 		});
 		
-		jQuery(sel).find('.btn-group label:not(.active)').click(function()
+		sbox.find('.btn-group label:not(.active)').click(function()
 		{
 			var label = jQuery(this);
 			var input = jQuery('#' + label.attr('for'));
@@ -601,7 +603,7 @@
 			}
 		});
 		
-		jQuery(sel).find('.btn-group input[checked="checked"]').each(function()
+		sbox.find('.btn-group input[checked="checked"]').each(function()
 		{
 			var input = jQuery(this);
 			if (input.val() == '') {
@@ -1154,19 +1156,21 @@
 	function fc_attachSelect2(sel)
 	{
 		sel = typeof sel !== 'undefined' && sel ? sel : 'body';
+		var sbox = jQuery(sel);
+		var s2_elems = sbox.find('select.use_select2_lib');
 
 		if (window.skip_select2_js)
 		{
-			jQuery(sel).find('select.use_select2_lib')
+			s2_elems
 				//.filter(function(){return !jQuery(this).attr('multiple');})
 				.removeClass('use_select2_lib').addClass('fc_isselect fc_ismobile fc_no_js_attach');
-			jQuery(sel).find('.fc_mobile_label').show();
+			sbox.find('.fc_mobile_label').show();
 			return;
 		}
 
 
 		// Attach select2 to specific to select elements having specific CSS class, for select-multiple show values as togglable checkboxes
-		jQuery(sel).find('select.use_select2_lib').each(function()
+		s2_elems.each(function()
 		{
 			var sel_EL = jQuery(this);
 			if ( !sel_EL.attr('multiple') )
@@ -1186,7 +1190,7 @@
 
 
 		// Customization of SELECT2 JS selectors
-		jQuery(sel).find('div.use_select2_lib').each(function()
+		sbox.find('div.use_select2_lib').each(function()
 		{
 			var el_container = jQuery(this);
 			var sel_EL = el_container.next('select');
@@ -1237,7 +1241,7 @@
 
 
 		// MULTI-SELECT2:
-		jQuery(sel).find('select.use_select2_lib').on('select2-open', function()
+		s2_elems.on('select2-open', function()
 		{
 
 			// Add events to handle focusing the text filter box (hide inner label)
@@ -1371,7 +1375,7 @@
 
 		
 		// MULTI-SELECT2: Handle highlighting selected value
-		jQuery(sel).find('div.use_select2_lib.select2-container-multi input').on('keydown', function()
+		sbox.find('div.use_select2_lib.select2-container-multi input').on('keydown', function()
 		{
 			var el = jQuery(this);
 			setTimeout(function() {
@@ -1388,12 +1392,29 @@
 
 
 		// SELECT2: scrollbar wrap problem
-		jQuery(sel).find('select.use_select2_lib').on('loaded open', function()
+		s2_elems.on('loaded open', function()
 		{
 			var ul = jQuery('#select2-drop ul.select2-results');
 			var needsScroll= ul.prop('scrollHeight') > ul.prop('clientHeight');
 			if (needsScroll) ul.css('overflow-y', 'scroll');
 			else  ul.css('overflow-y', 'auto');
+		});
+
+		// init select2 sortable
+		sbox.find(".fc_select2_sortable").select2Sortable();
+		
+		// destroy select2 sortable
+		sbox.find(".fc_select2_sortable").select2Sortable("destroy");
+		
+		// manually trigger the sorting
+		sbox.find(".fc_select2_sortable").select2SortableOrder();
+		
+		// custom options
+		sbox.find(".fc_select2_sortable").select2Sortable({
+		    bindOrder: "formSubmit", // or "sortableStop"
+		    sortableOptions: {
+		        // please refer to jQuery UI sortable API (http://api.jqueryui.com/sortable/)
+		    }
 		});
 	}
 
