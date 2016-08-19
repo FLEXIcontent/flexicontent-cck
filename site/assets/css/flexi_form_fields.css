@@ -609,3 +609,20 @@ iframe.sharedmedia {
 	width: 14px;
 	margin-top: 6px;
 }
+.fc_field_relitems .select2-search-field {
+	display: none !important;
+}
+.fc_field_relitems.select2-container-multi {
+	max-width: 70% !important;
+}
+.fc_select2_sortable.select2-container-multi .select2-choices .select2-search-choice > div:after {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	font-size: 14px;
+	vertical-align: top;
+	content: "z";
+}
+.fc_select2_sortable.select2-container-multi .select2-choices .select2-search-choice > div {
+	white-space: nowrap !important;
+}
