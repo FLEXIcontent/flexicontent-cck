@@ -2030,13 +2030,8 @@ div.current ul.config-option-list li {
 }
 
 /* .control-group .control-label label */
-*:not(.form-vertical) > div.control-group div.control-label label.hasPopover,
-*:not(.form-vertical) > div.control-group div.control-label label.hasTooltip,
-div.current ul.config-option-list li label.hasPopover,
-div.current ul.config-option-list li label.hasTooltip {
-	color: white;
-	background-color: #999;
-	
+*:not(.form-vertical) > div.control-group div.control-label label,
+div.current ul.config-option-list li label {
 	font-size: 12px;
 	font-weight: bold; 
 	text-align: right;
@@ -2054,6 +2049,12 @@ div.current ul.config-option-list li label.hasTooltip {
 	display: inline-block;
 	border-radius: 3px;
 }
+*:not(.form-vertical) > div.control-group div.control-label label:not(.label),
+div.current ul.config-option-list li label:not(.label) {
+	color: white;
+	background-color: #999;
+}
+
 
 /* .control-group .controls */
 *:not(.form-vertical) > div.control-group div.controls {
@@ -2081,4 +2082,9 @@ div.current ul.config-option-list li label.hasTooltip {
 *:not(.form-vertical) > .control-label .label {
 	width: auto;
 	display: inline-block;
+}
+
+.control_special_box  .control-label {
+	max-width: 300px !important;
+	width: auto !important;
 }
