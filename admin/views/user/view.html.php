@@ -169,7 +169,8 @@ class FlexicontentViewUser extends JViewLegacy
 		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>"; exit;
 		
 		// Read XML file
-		$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
+		//$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
+		$xml_string = file_get_contents($auth_xml);
 		
 		// Load the form description from the XML string
 		$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
@@ -201,7 +202,8 @@ class FlexicontentViewUser extends JViewLegacy
 		$jform_authorcat->load($xml_string, $isFile=false);
 		
 		// Set DB parameter values into the JForm object
-		foreach ($jform_authorcat->getFieldset() as $fsetname => $field) {
+		foreach ($jform_authorcat->getFieldset() as $fsetname => $field)
+		{
 			$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
 		}
 		

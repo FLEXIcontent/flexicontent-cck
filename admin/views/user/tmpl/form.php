@@ -98,6 +98,9 @@ $this->document->addScriptDeclaration($js);
 
 	<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
 
+		<div class="fcsep_level_h">
+			<?php echo JText::_('FLEXI_USER'); ?>
+		</div>
 	
 		<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
 			<span class="label-fcouter">
@@ -331,29 +334,43 @@ $this->document->addScriptDeclaration($js);
 
 	</div>
 
+<?php
+	$skip_fsets = array('author_override_cat_config'=>1);
+	$fieldSets = $this->jform_authorbasic->getFieldsets('authorbasicparams');
+	$total_fsets = count($fieldSets) - count($skip_fsets);
+	
+	foreach ($fieldSets as $name => $fieldSet) :
+		if ( isset($skip_fsets[$name]) ) continue;
+		$single_fset = reset($fieldSets);
+		$single_fset_label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
+	endforeach;
+?>
 	
 	<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+
+		<?php if ($total_fsets==1) : ?>
+		<div class="fcsep_level_h">
+			<?php echo JText::_($single_fset_label); ?>
+		</div>
+		<?php endif; ?>
 
 		<div class="fctabber" id="user_authoring_params_tabset">
 
 			<?php
-			$skip_fsets = array('author_override_cat_config'=>1);
-			
-			$fieldSets = $this->jform_authorbasic->getFieldsets('authorbasicparams');
 			foreach ($fieldSets as $name => $fieldSet) :
-			
+
 				if ( isset($skip_fsets[$name]) ) continue;
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
 			?>
-			
+
 			<div class="tabbertab" id="fcform_tabset_<?php echo $name.'-options'; ?>" data-icon-class="icon-pencil" >
-				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( $label ); ?> </h3>
-				
+				<h3 class="tabberheading <?php if ($total_fsets==1) echo 'hidden'; ?>"> <?php echo JText::_( $label ); ?> </h3>
+
 				<?php
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
 					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
-				
+
 				echo '<fieldset class="panelform">';
 				foreach ($this->jform_authorbasic->getFieldset($name) as $field) :
 					echo $field->label;
@@ -361,7 +378,7 @@ $this->document->addScriptDeclaration($js);
 				endforeach;
 				echo '</fieldset>';
 				?>
-				
+
 			</div>
 			
 			<?php endforeach; ?><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_META_SEO'), 'metaseo-options');*/ ?>
@@ -372,12 +389,12 @@ $this->document->addScriptDeclaration($js);
 </div>
 
 
-<div style="margin:0 0 12px 0; background-color:#222; " class="fcsep_level0">
-	<?php echo JText::_('FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG'); ?>
+<div class="fcsep_level_h">
+	<?php echo JText::_('FLEXI_DISPLAY_PARAMETERS'); ?>
 </div>
 
 
-		<div style="margin-bottom: 32px;">
+		<div style="margin-bottom: 32px;" class="control_special_box">
 		<?php
 			$fieldSet = $this->jform_authorbasic->getFieldset('author_override_cat_config');
 			

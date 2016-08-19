@@ -366,6 +366,7 @@ div .flexi_buttons button:not(.btn):hover {
 	padding: 0 0 0 20px;
 	display: inline-block;
 }
+.fcsep_level_h,
 .fcsep_level0,
 .fcsep_level1,
 .fcsep_level2,
@@ -377,6 +378,16 @@ div .flexi_buttons button:not(.btn):hover {
 	float: left;
 	font-size: 12px;
 	line-height: 1.5em;
+}
+.fcsep_level_h {
+	margin: 0 0 12px 0;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: #123973;
+	color: white;
+	font-size: 14px;
+	padding: 6px 16px;
+	font-family: Verdana, "Lucida Console";
 }
 .fcsep_level0 {
 	background-color: #0066AA;
@@ -2705,12 +2716,8 @@ div.current ul.config-option-list li {
 	width: 15%;
 	border: 0;
 }
-*:not(.form-vertical) > div.control-group div.control-label label.hasPopover,
-*:not(.form-vertical) > div.control-group div.control-label label.hasTooltip,
-div.current ul.config-option-list li label.hasPopover,
-div.current ul.config-option-list li label.hasTooltip {
-	color: white;
-	background-color: #999;
+*:not(.form-vertical) > div.control-group div.control-label label,
+div.current ul.config-option-list li label {
 	font-size: 12px;
 	font-weight: bold;
 	text-align: right;
@@ -2725,6 +2732,11 @@ div.current ul.config-option-list li label.hasTooltip {
 	white-space: normal;
 	display: inline-block;
 	border-radius: 3px;
+}
+*:not(.form-vertical) > div.control-group div.control-label label:not(.label),
+div.current ul.config-option-list li label:not(.label) {
+	color: white;
+	background-color: #999;
 }
 *:not(.form-vertical) > div.control-group div.controls {
 	min-width: 60%;
@@ -2746,6 +2758,10 @@ div.current ul.config-option-list li label.hasTooltip {
 *:not(.form-vertical) > .control-label .label {
 	width: auto;
 	display: inline-block;
+}
+.control_special_box  .control-label {
+	max-width: 300px !important;
+	width: auto !important;
 }
 #flexicontent.flexicontent {
 	margin-bottom: 24px;
