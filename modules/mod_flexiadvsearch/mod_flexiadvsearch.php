@@ -16,6 +16,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 // Decide whether to show module contents
 $app    = JFactory::getApplication();

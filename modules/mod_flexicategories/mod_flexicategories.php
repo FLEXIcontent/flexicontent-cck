@@ -9,6 +9,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 // Include the helper functions only once
 require_once __DIR__ . '/helper.php';
