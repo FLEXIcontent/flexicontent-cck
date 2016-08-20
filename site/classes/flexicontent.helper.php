@@ -1142,6 +1142,7 @@ class flexicontent_html
 				$framework_path = JURI::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
 				$document->addScriptVersion($framework_path.'/select2.min.js', $ver);
+				$document->addScriptVersion($framework_path.'/select2.sortable.js', $ver);
 				$document->addStyleSheetVersion($framework_path.'/select2.css', $ver);
 				
 				$lang_code = flexicontent_html::getUserCurrentLang();
