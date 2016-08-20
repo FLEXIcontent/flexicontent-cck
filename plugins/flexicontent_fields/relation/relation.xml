@@ -49,8 +49,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="maxtitlechars" type="text" default="40" label="FLEXI_RIFLD_TITLE_MAXLEN" description="FLEXI_RIFLD_TITLE_MAXLEN_DESC" />
-			
-			<field name="orderby_form" type="list" default="alpha" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC">
+			<field name="orderby_form" type="list" default="alpha" label="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC">
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
@@ -65,6 +64,13 @@
 				<!--option value="commented">FLEXI_ORDER_MOST_COMMENTED</option-->
 				<!--option value="rated">FLEXI_ORDER_BEST_RATED</option-->
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_LIST_OF_SELECTED_ITEMS" level="level2" />
+			<field name="" type="separator" default="FLEXI_RIFLD_ALLOW_SORTING_ITEMS_INFO" level="level3" class="alert alert-info fcpadded" />
+			<field name="selected_items_sortable" type="radio" default="0" label="FLEXI_RIFLD_ALLOW_SORTING_ITEMS" description="FLEXI_RIFLD_ALLOW_SORTING_ITEMS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 
 
@@ -141,6 +147,7 @@
 			<field name="itemslist_acclvl" type="accesslevel" default="1" label="FLEXI_RIFLD_ITEMS_LIST_ACCESS" description="FLEXI_RIFLD_ITEMS_LIST_ACCESS_DESC" depend_class="button-relation-mode" />
 
 
+			<field name="" type="separator" default="" level="level_br" />
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" tab_class="s-cblue" level="tabset_start" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_RIFLD_FILTER_ITEMS" icon_class="icon-search" level="tab_open" box_type="1" />
@@ -161,8 +168,9 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" icon_class="icon-refresh" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_DESC" level="level3" class="alert alert-info fcpadded" />			
 
+			<!--field name="" type="separator" default="FLEXI_ITEMS_ORDER_DESC" level="level3" class="alert alert-info fcpadded" /-->
+			<field name="" type="separator" default="FLEXI_RIFLD_MANUAL_ORDER_ITEMS_INFO" level="level3" class="alert alert-warning fcpadded" depend_class="manual_order" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -179,7 +187,9 @@
 				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 				<option value="random">FLEXI_ORDER_RANDOM</option>
+				<option value="manual" show_list="manual_order" hide_list="manual_order">FLEXI_ORDER_MANUAL_ORDER</option>
 			</field>
+
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level2" />
 			<field name="orderbycustomfield" type="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

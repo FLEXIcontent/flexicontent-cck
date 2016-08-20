@@ -386,6 +386,7 @@ body .fc-nowrap-box,
 #flexicontent .fc-field-props-box {
 	display: inline-block;
 	float: left;
+	margin-right: 4px;
 }
 
 
@@ -394,7 +395,8 @@ body .fc-nowrap-box,
  ***********************/
  
 #flexicontent .fc-xpended {
-	margin-top: 12px;
+	margin-top: 0;
+	margin-bottom: 12px;
 	margin-right: 12px;
 }
 #flexicontent .fc-xpended-btns {
@@ -462,7 +464,8 @@ body .fc-nowrap-box,
 #flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	margin-left: 0px;
+	margin-left: 0px !important;
+	margin-right: 0px !important;
 }
 #flexicontent [class^="fc-xpended"] > select:not(:last-child),
 #flexicontent [class*="fc-xpended"] > select:not(:last-child),
@@ -472,7 +475,7 @@ body .fc-nowrap-box,
 #flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
-	margin-right: 0px;
+	margin-right: 0px !important;
 }
 #flexicontent [class*="fc-xpended"] > div.select2-container .select2-input {
 	border-radius: 4px;

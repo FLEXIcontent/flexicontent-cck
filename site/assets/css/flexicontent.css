@@ -441,6 +441,9 @@ body .fcsep_level4.alert,
 body .fcsep_level4.alert.fcpadded {
 	padding-top: 2px;
 	padding-bottom: 2px;
+	max-width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
 }
 .fcsep_level_br {
 	line-height: 16px;
@@ -875,9 +878,11 @@ body .fc-nowrap-box,
 #flexicontent .fc-field-props-box {
 	display: inline-block;
 	float: left;
+	margin-right: 4px;
 }
 #flexicontent .fc-xpended {
-	margin-top: 12px;
+	margin-top: 0;
+	margin-bottom: 12px;
 	margin-right: 12px;
 }
 #flexicontent .fc-xpended-btns {
@@ -939,7 +944,8 @@ body .fc-nowrap-box,
 #flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	margin-left: 0px;
+	margin-left: 0px !important;
+	margin-right: 0px !important;
 }
 #flexicontent [class^="fc-xpended"] > select:not(:last-child),
 #flexicontent [class*="fc-xpended"] > select:not(:last-child),
@@ -949,7 +955,7 @@ body .fc-nowrap-box,
 #flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
-	margin-right: 0px;
+	margin-right: 0px !important;
 }
 #flexicontent [class*="fc-xpended"] > div.select2-container .select2-input {
 	border-radius: 4px;
@@ -2604,13 +2610,22 @@ table.fc_uploader_header_tbl td:last-child {
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
 	color: darkorange;
+	font-size: 11px;
 }
 .select2-container .select2-choice.fc_highlight_disabled span,
 .fc_highlight_disabled {
-	color: gray;
-	font-weight: normal;
-	text-decoration: line-through;
-	font-style: italic;
+	color: gray !important;
+	font-weight: normal !important;
+	text-decoration: line-through !important;
+	font-style: italic !important;
+}
+.select2-container-multi.select2_fc_checkboxes .select2-search-choice-close {
+	display: none;
+}
+.select2-container-multi.select2_fc_checkboxes .select2-choices li.select2-search-choice {
+	font-size: 12px !important;
+	padding-left: 6px !important;
+	padding-right: 6px !important;
 }
 #fc_filter_form_blocker {
 	display: none;

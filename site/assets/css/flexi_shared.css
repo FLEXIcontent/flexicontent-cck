@@ -1588,13 +1588,22 @@ table.fc_uploader_header_tbl td:last-child {
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
 	color: darkorange;
+	font-size: 11px;
 }
 .select2-container .select2-choice.fc_highlight_disabled span,
 .fc_highlight_disabled {
-	color: gray;
-	font-weight: normal;
-	text-decoration: line-through;
-	font-style: italic;
+	color: gray !important;
+	font-weight: normal !important;
+	text-decoration: line-through !important;
+	font-style: italic !important;
+}
+.select2-container-multi.select2_fc_checkboxes .select2-search-choice-close {
+	display: none;
+}
+.select2-container-multi.select2_fc_checkboxes .select2-choices li.select2-search-choice {
+	font-size: 12px !important;
+	padding-left: 6px !important;
+	padding-right: 6px !important;
 }
 #fc_filter_form_blocker {
 	display: none;
