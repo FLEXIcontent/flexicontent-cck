@@ -1179,7 +1179,7 @@
 					minimumResultsForSearch: 10
 				});
 			}
-			else
+			else if (!sel_EL.hasClass('fc_select2_no_check'))
 			{
 				sel_EL.select2({
 					minimumResultsForSearch: 10,

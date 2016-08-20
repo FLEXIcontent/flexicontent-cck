@@ -137,6 +137,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 		$selected_items_label = $field->parameters->get( 'selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL' ) ;
+		$selected_items_sortable = $field->parameters->get( 'selected_items_sortable', 0 ) ;
 		
 		
 		// ***********************************************
@@ -213,6 +214,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
 				.' FROM #__content AS i '
 				.' WHERE i.id IN (' . implode(',', $_itemids) . ')'
+				.' ORDER BY FIELD(i.id, '. implode(',', $_itemids) .')'
 				;
 			$db->setQuery($query);
 			$items_arr = $db->loadObjectList();
@@ -251,10 +253,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$common_css_js_added = true;
 			flexicontent_html::loadFramework('select2');
 			
-			$css = ''
-				.'#s2id_'.$elementid.' .select2-search-field { display: none !important; }'
-				.'#s2id_'.$elementid.'.select2-container-multi { max-width: 70% !important; }'
-				;
+			$css = '';
 			if ($css) $document->addStyleDeclaration($css);
 		}
 		
@@ -282,7 +281,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
 			$skip_subtrees=array(), $disable_subtrees=array()
 		);
-		
+
+		$_classes = 'use_select2_lib fc_select2_no_check fc_field_relitems' . $required . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$field->html .= '
 		<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 		
@@ -300,9 +300,10 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-selected-items">
 				<label class="'.$add_on_class.' fc-lbl selected-items-lbl" for="'.$elementid.'">'.JText::_($selected_items_label).'</label>
-				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="use_select2_lib fc_no_js_attach '.$required.'" '.$size.' >
+				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' >
 					'.$items_options_select.'
 				</select>
+				'.($selected_items_sortable ? '<span class="add-on"><span class="icon-info hasTooltip" title="You may sort to select display order"></span>' . JText::_('FLEXI_ORDER') . '</span>' : '').'
 			</div>
 			
 		</div>
@@ -343,7 +344,7 @@ function fcrelation_field_".$elementid."_add_related(el)
 
 jQuery(document).ready(function()
 {
-	setTimeout(function() {
+	/*setTimeout(function() {
 		jQuery('#".$elementid."').select2('destroy').select2({
 			formatNoMatches: function() {
 				return '';
@@ -351,7 +352,7 @@ jQuery(document).ready(function()
 			dropdownCssClass: 'select2-hidden',
 			minimumResultsForSearch: -1
 		});
-	}, 100);
+	}, 100);*/
 	
 	jQuery('#".$elementid."').change(function()
 	{

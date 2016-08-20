@@ -374,9 +374,6 @@
 	padding: 4px 16px;
 	background: url(../images/arrow-in-out.png) 16px 4px no-repeat white;
 }
-#flexicontent ul.fcfield-sortables > li span.fcfield-expand-view.fcfont-icon:after {
-	content: "h";
-}
 #flexicontent span.fcfield-expand-view:before {
 	color: black;
 }
@@ -384,7 +381,6 @@
 	content: "<";
 	color: black;
 	font-size: 16px;
-	padding: 0 8px 0 0;
 	vertical-align: middle;
 }
 #flexicontent .fcfield-delvalue:not(.fcfont-icon) {
@@ -615,13 +611,9 @@ iframe.sharedmedia {
 .fc_field_relitems.select2-container-multi {
 	max-width: 70% !important;
 }
-.fc_select2_sortable.select2-container-multi .select2-choices .select2-search-choice > div:after {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
-	font-size: 14px;
-	vertical-align: top;
-	content: "z";
+.fc_field_relitems.select2-container-multi .select2-choices {
+	padding-left: 6px !important;
+	padding-right: 6px !important;
 }
 .fc_select2_sortable.select2-container-multi .select2-choices .select2-search-choice > div {
 	white-space: nowrap !important;

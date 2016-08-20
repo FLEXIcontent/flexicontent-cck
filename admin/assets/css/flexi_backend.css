@@ -405,19 +405,6 @@ table.adminlist.fcmanlist {
 	background: transparent url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
 }
-.fc_filter_html .select2-search-choice div,
-.select2-container .select2-choice.fc_highlight span,
-.fc_highlight {
-	color: darkorange;
-	font-size: 11px;
-}
-.select2-container .select2-choice.fc_highlight_disabled span,
-.fc_highlight_disabled {
-	color: gray !important;
-	font-weight: normal !important;
-	text-decoration: line-through !important;
-	font-style: italic !important;
-}
 .flexicontent #fc-filters-box [class^="icon-arrow-"] {
 	vertical-align: middle;
 	font-size: 18px;
