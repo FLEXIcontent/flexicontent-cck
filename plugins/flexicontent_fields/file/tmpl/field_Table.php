@@ -115,6 +115,7 @@ foreach($field->value as $file_id)
 		<td class="inlinefile-access-data-cell">
 			<span class="inlinefile-access-data">
 				'.JHTML::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
+			</span>
 		</td>
 	</tr>' : '').
 	
