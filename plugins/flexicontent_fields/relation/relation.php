@@ -282,7 +282,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$skip_subtrees=array(), $disable_subtrees=array()
 		);
 
-		$_classes = 'use_select2_lib fc_select2_no_check fc_field_relitems' . $required . ($selected_items_sortable ? ' fc_select2_sortable' : '');
+		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . $required . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$field->html .= '
 		<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 		
@@ -344,16 +344,6 @@ function fcrelation_field_".$elementid."_add_related(el)
 
 jQuery(document).ready(function()
 {
-	/*setTimeout(function() {
-		jQuery('#".$elementid."').select2('destroy').select2({
-			formatNoMatches: function() {
-				return '';
-			},
-			dropdownCssClass: 'select2-hidden',
-			minimumResultsForSearch: -1
-		});
-	}, 100);*/
-	
 	jQuery('#".$elementid."').change(function()
 	{
 		var selitems_selector = jQuery('#".$elementid."');

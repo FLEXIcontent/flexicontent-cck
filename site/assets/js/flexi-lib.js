@@ -1,4 +1,4 @@
-	
+
 	window.fc_init_hide_dependent = 1;
 	window.fc_refreshing_dependent = 0;
 	window.fc_dependent_params = {};
@@ -1173,18 +1173,35 @@
 		s2_elems.each(function()
 		{
 			var sel_EL = jQuery(this);
-			if ( !sel_EL.attr('multiple') )
+			
+			var sel2ops = { minimumResultsForSearch: 10 };
+			
+			if ( sel_EL.hasClass('fc_select2_noselect') )
 			{
-				sel_EL.select2({
-					minimumResultsForSearch: 10
-				});
+				sel2ops.formatNoMatches = function() { return ''; };
+				sel2ops.dropdownCssClass = 'select2-hidden';
+				sel2ops.minimumResultsForSearch = -1;
 			}
-			else if (!sel_EL.hasClass('fc_select2_no_check'))
+			if (sel_EL.attr('multiple') && !sel_EL.hasClass('fc_select2_no_check'))
 			{
-				sel_EL.select2({
-					minimumResultsForSearch: 10,
-					closeOnSelect : false
-				}).addClass('select2_fc_checkboxes');
+				sel2ops.closeOnSelect = false;
+			}
+			
+			if (sel_EL.attr('multiple') && !sel_EL.hasClass('fc_select2_no_check'))
+				sel_EL.select2(sel2ops).addClass('select2_fc_checkboxes');
+			else
+				sel_EL.select2(sel2ops);
+
+			// Set initially selected data (this allows setting order too)
+			if ( sel_EL.get(0).hasAttribute('data-select2-initdata') )
+			{
+				sel_EL.select2('data', sel_EL.data('select2-initdata'));
+			}
+			
+			// Make sortable if requested
+			if ( sel_EL.hasClass('fc_select2_sortable') )
+			{
+				sel_EL.select2_sortable();
 			}
 		});
 
@@ -1398,23 +1415,6 @@
 			var needsScroll= ul.prop('scrollHeight') > ul.prop('clientHeight');
 			if (needsScroll) ul.css('overflow-y', 'scroll');
 			else  ul.css('overflow-y', 'auto');
-		});
-
-		// init select2 sortable
-		sbox.find(".fc_select2_sortable").select2Sortable();
-		
-		// destroy select2 sortable
-		sbox.find(".fc_select2_sortable").select2Sortable("destroy");
-		
-		// manually trigger the sorting
-		sbox.find(".fc_select2_sortable").select2SortableOrder();
-		
-		// custom options
-		sbox.find(".fc_select2_sortable").select2Sortable({
-		    bindOrder: "formSubmit", // or "sortableStop"
-		    sortableOptions: {
-		        // please refer to jQuery UI sortable API (http://api.jqueryui.com/sortable/)
-		    }
 		});
 	}
 

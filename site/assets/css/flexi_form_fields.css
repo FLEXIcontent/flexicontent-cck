@@ -605,13 +605,13 @@ iframe.sharedmedia {
 	width: 14px;
 	margin-top: 6px;
 }
-.fc_field_relitems .select2-search-field {
+.fc_select2_noselect .select2-search-field {
 	display: none !important;
 }
-.fc_field_relitems.select2-container-multi {
+.fc_select2_noselect.select2-container-multi {
 	max-width: 70% !important;
 }
-.fc_field_relitems.select2-container-multi .select2-choices {
+.fc_select2_noselect.select2-container-multi .select2-choices {
 	padding-left: 6px !important;
 	padding-right: 6px !important;
 }
