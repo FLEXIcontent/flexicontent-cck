@@ -47,6 +47,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="sortable" type="radio" default="0" label="FLEXI_FIELD_ALLOW_SORTABLE" description="FLEXI_FIELD_ALLOW_SORTABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_OPTIONS_PER_VALUE" description="" level="level3" />
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_OPTIONS" description="FLEXI_FIELD_MAX_OPTIONS_DESC" />
@@ -152,7 +156,7 @@
 			</field>
 			<field name="icon_size" type="hidden" default="" label="FLEXI_ICON_SIZE" description="" />
 			<field name="icon_color" type="hidden" default="" label="FLEXI_ICON_COLOR" description="" />
-			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group btn-group-yesno">
+			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

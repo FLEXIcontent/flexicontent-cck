@@ -116,8 +116,8 @@
 			</field>
 			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_PROMPT_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_PROMPT_TEXT_DESC" />
 			<field name="use_jslib" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="using_jslib" hide_list="">FLEXI_NO</option>
-				<option value="2" show_list="" hide_list="using_jslib">prettyCheckable / Select2</option>
+				<option value="0" show_list="not_using_jslib" hide_list="">FLEXI_NO</option>
+				<option value="2" show_list="" hide_list="not_using_jslib">prettyCheckable / Select2</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" />
@@ -189,7 +189,7 @@
 				<option value="64">64x64</option>
 			</field>
 			<field name="icon_color" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font view_with_image"/>
-			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group btn-group-yesno">
+			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

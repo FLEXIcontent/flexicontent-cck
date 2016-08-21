@@ -67,7 +67,8 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
-		$cascade_after  = (int)$field->parameters->get('cascade_after', 0);
+		$cascade_after  = (int) $field->parameters->get('cascade_after', 0);
+		$sortable       = self::$valueIsArr && (int) $field->parameters->get('sortable', 0);
 		
 		
 		// ****************
@@ -101,6 +102,11 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			// DISPLAY using select2 JS
 			$use_jslib = $field->parameters->get( 'use_jslib', 1 ) ;
 			$use_select2 = $use_jslib==1 || $use_jslib==2;
+			if ($sortable && !$use_select2)
+			{
+				$use_select2 = true;
+				$error_msg = '<div class="alert alert-warning fc-small fc-iblock">Sortable property enabled, please also enable using select2 JS (usage of it forced to ON)</div><div class="fcclear"></div>';
+			}
 			static $select2_added = null;
 		  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 
@@ -132,7 +138,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			$fftype = self::$valueIsArr ? 'checkbox' : 'radio';
 
 			// Applicable only for radioimage/checkboximage fields, it allows a more compact display in item form
-			$form_vals_display = (int) $field->parameters->get( 'form_vals_display', 1 ) ;  // 0: label, 1: image, 2: both
+			$form_vals_display = self::$usesImages && (int) $field->parameters->get( 'form_vals_display', 1 ) ;  // 0: label, 1: image, 2: both
 
 			// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
 			$pretext   = $field->parameters->get( 'pretext_form', '' ) ;
@@ -171,7 +177,10 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// Initialise property with default value
 		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
 		{
-			$field->value = $default_values;
+			if (self::$valueIsArr && !empty($field->ingroup))
+				$field->value = array($default_values);
+			else
+				$field->value = $default_values;
 		}
 		
 		// CSS classes of value container
@@ -243,8 +252,13 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			// Extra attributes
 			if (!empty($default_values))
 				$attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
-			if (self::$valueIsArr && ($max_values || $min_values || $exact_values))
-				$input_classes[] = 'validate-sellimitations';
+			if (self::$valueIsArr)
+			{
+				if ($max_values || $min_values || $exact_values)
+					$input_classes[] = 'validate-sellimitations';
+				if ($sortable)
+					$input_classes[] = 'fc_select2_sortable';
+			}
 		}
 
 		// Form element classes
@@ -554,7 +568,8 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		foreach ($values as $value)
 		{
 			// Compatibility for serialized values
-			if ( self::$valueIsArr ) {
+			if ( self::$valueIsArr )
+			{
 				if (is_array($value));
 				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
 					$value = unserialize($value);
@@ -622,6 +637,21 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 
 			if (!$ajax)
 			{
+				// Set order of selected values for the case that field is sortable
+				if ($sortable && $display_as_select)
+				{
+					$d = array();
+					foreach($value as $v)
+					{
+						if ( isset($options[$v]) && $v != '_field_selection_prompt_' )
+						{
+							$d[] = (object) array('id' => $options[$v]->value, 'text' => $options[$v]->text);
+						}
+					}
+					//$per_val_js .= 'jQuery("#'.$elementid_n.'").select2("data", '.json_encode($d).');';
+					$attribs .= ' data-select2-initdata = "' . htmlentities(json_encode($d), ENT_QUOTES, 'UTF-8') . '"';
+				}
+
 				$field->html[] = '
 					'.($display_as_select ?
 						$opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
@@ -684,7 +714,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				$values_msg = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="fcclear"></div>';
 			}
 		
-			// Add message to every value if inside field group
+			// Add VALUE message to every value if inside field group
 			if ( !empty($values_msg) )
 			{
 				if (!$use_ingroup) {
@@ -695,9 +725,20 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				}
 			}
 		}
+
+		// Add ERROR message to every value if inside field group
+		if ( !empty($error_msg) )
+		{
+			if (!$use_ingroup) {
+				$field->html = $error_msg . $field->html;
+			} else {
+				foreach($field->html as & $html) $html = $error_msg . $html;
+				unset($html);
+			}
+		}
 	}
-	
-	
+
+
 	function & getLimitedProps(&$field, &$item, $cascade_prompt='Please select above', $ajax=false, $i=0)
 	{
 		// some parameter shortcuts
@@ -714,7 +755,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				if (!$ajax) {
 					//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 					$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
-					$elements = array($prompt);
+					$elements = array('_field_selection_prompt_' => $prompt);
 				}
 				return $elements;
 			}
@@ -763,7 +804,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			if ( !is_array($elements) ) {
 				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
-				$elements = array($prompt);
+				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
 			}
 		}
@@ -774,7 +815,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			if ( !is_array($elements) ) {
 				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
-				$elements = array($prompt);
+				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
 			}
 			if ($cascade_after)
@@ -791,7 +832,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		if (empty($elements)) {
 			//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
-			$elements = array(0=>$prompt);
+			$elements = array('_field_selection_prompt_' => $prompt);
 			return $elements;
 		} else {
 			$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
@@ -801,7 +842,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			{
 				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
-				array_unshift($elements, $prompt);
+				$elements = array('_field_selection_prompt_' => $prompt) + $elements;
 			}
 		}
 		
@@ -922,17 +963,20 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// Value creation
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$text_or_value  = (int) $field->parameters->get( 'text_or_value', 2 ) ;
-		
-		// image specific or image related variables
-		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-		$imgpath  = JURI::root(true) .'/'. $imagedir;
+		$text_or_value  = (int) $field->parameters->get( 'text_or_value', (self::$usesImages ? 2 : 1) ) ;
 		$tooltip_class = 'hasTooltip';
-		
-		$image_type = (int)$field->parameters->get( 'image_type', 0 ) ;
-		$icon_size = (int)$field->parameters->get( 'icon_size', $field->parameters->get( 'icon_size_form') ) ;
-		$icon_color = $field->parameters->get( 'icon_color', $field->parameters->get( 'icon_color_form') ) ;
-		
+
+		// image specific or image related variables
+		if (self::$usesImages)
+		{
+			$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
+			$imgpath  = JURI::root(true) .'/'. $imagedir;
+
+			$image_type = (int)$field->parameters->get( 'image_type', 0 ) ;
+			$icon_size = (int)$field->parameters->get( 'icon_size', $field->parameters->get( 'icon_size_form') ) ;
+			$icon_color = $field->parameters->get( 'icon_color', $field->parameters->get( 'icon_color_form') ) ;
+		}
+
 		switch($separatorf)
 		{
 			case 0:
@@ -1049,12 +1093,13 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// Account for fact that ARRAY form elements are not submitted if they do not have a value
 		if ( $use_ingroup )
 		{
+			$empty_value = self::$valueIsArr ? array() : null;
 			$custom = JFactory::getApplication()->input->get('custom', array(), 'array');
 			if ( isset($custom['_fcfield_valueholder_'][$field->name]) ) 
 			{
 				$holders = $custom['_fcfield_valueholder_'][$field->name];
 				$vals = array();
-				foreach($holders as $i => $v)  $vals[]  =  isset($post[(int)$i]) ? $post[(int)$i] : null;
+				foreach($holders as $i => $v)  $vals[]  =  isset($post[(int)$i]) ? $post[(int)$i] : $empty_value;
 				$post = $vals;
 			}
 		}
