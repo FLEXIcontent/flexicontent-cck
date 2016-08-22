@@ -895,10 +895,14 @@ class plgFlexicontent_fieldsFile extends FCField
 				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
 				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
-				$v['secure']     = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
+				if( $new_file )
+				{
+					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
+				}
 				
 				// UPDATE existing file
-				if( !$new_file && $file_id ) {
+				if( !$new_file && $file_id )
+				{
 					$dbdata = array();
 					
 					$dbdata['id'] = $file_id;
@@ -906,8 +910,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					if ($iform_desc)   $dbdata['description'] = $v['file-desc'];
 					if ($iform_lang)   $dbdata['language'] = $v['file-lang'];
 					if ($iform_access) $dbdata['access'] = $v['file-access'];
-					// !! Do not change folder for existing files
-					//if ($iform_dir) {  $dbdata['secure'] = $v['secure'];
+					//if ($iform_dir)  $dbdata['secure'] = $v['secure'];  // !! Do not change folder for existing files
 					
 					// Load file data from DB
 					$row = JTable::getInstance('flexicontent_files', '');

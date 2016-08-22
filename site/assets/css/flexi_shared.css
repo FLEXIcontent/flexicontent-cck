@@ -793,7 +793,7 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
-	margin: 1px 2px;
+	margin: 1px 2px 1px 6px;
 	float: left;
 }
 form div.container_fcfield > input,
@@ -1688,6 +1688,7 @@ div.current ul.config-option-list li fieldset {
 }
 *:not(.form-vertical) > div.control-group {
 	margin-bottom: 2px;
+	clear: both;
 }
 fieldset.form-vertical div.control-group {
 	margin-bottom: 8px;
