@@ -1,20 +1,24 @@
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 1px 2px 1px 3px;
+	margin: 1px 2px 1px 6px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 1px 2px;
+	margin: 1px 2px 1px 6px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select {
 	display: inline-block;
-	margin: 1px 2px;
+	margin: 1px 2px 1px 6px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
 }
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
 .flexicontent textarea,
-.flexicontent fieldset.radio {
-	margin: 1px 2px 1px 3px;
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
+	margin: 1px 2px 1px 6px;
 }
 .flexicontent form {
 	margin: 0px;
@@ -1815,7 +1819,7 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
-	margin: 1px 2px;
+	margin: 1px 2px 1px 6px;
 	float: left;
 }
 form div.container_fcfield > input,
@@ -2710,6 +2714,7 @@ div.current ul.config-option-list li fieldset {
 }
 *:not(.form-vertical) > div.control-group {
 	margin-bottom: 2px;
+	clear: both;
 }
 fieldset.form-vertical div.control-group {
 	margin-bottom: 8px;
