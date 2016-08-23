@@ -3957,6 +3957,35 @@ class flexicontent_html
 	}
 
 
+	static function loadComponentLanguage($client = 0)
+	{
+		static $loaded = array();
+		if (isset($loaded[$client])) return;
+
+		if (JFactory::getApplication()->isAdmin() && $client = 0) return;
+
+		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
+		JFactory::getLanguage()->load('com_flexicontent', ($client ? JPATH_ADMINISTRATOR : JPATH_SITE), 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load('com_flexicontent', ($client ? JPATH_ADMINISTRATOR : JPATH_SITE), null, $force_reload = false, $load_default = true);
+		$loaded[$client] = true;
+	}
+
+
+	static loadModuleLanguage($modulename)
+	{
+		static $loaded = array();
+		if (isset($loaded[$modulename])) return;
+		
+		// Load english language file for current module then override (forcing a reload) with current language file
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, null, $force_reload = true, $load_default = true);
+		
+		// Load component frontend language file
+		flexicontent_html::loadComponentLanguage($client = 0);
+		$loaded[$modulename] = true;
+	}
+
+
 	/**
 	 * Method to get Site (Frontend) default language
 	 * NOTE: ... this is the default language of created content for J1.5, but in J1.6+ is '*' (=all)
@@ -4817,15 +4846,14 @@ class flexicontent_upload
 		// ***************************************
 		
 		$format = strtolower(flexicontent_upload::getExt($file['name']));
-		
-		$allowed_exts = $params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
-		$allowed_exts = preg_split("/[\s]*,[\s]*/", $allowed_exts);
 
-		foreach($allowed_exts as $a => $allowed_ext) $allowed_exts[$a] = strtolower($allowed_ext);
-		
-		$ignored = explode(',', $params->get( 'ignore_extensions' ));
-		foreach($ignored as $a => $ignored_ext) $ignored[$a] = strtolower($ignored_ext);
-		if (!in_array($format, $allowed_exts) && !in_array($format,$ignored))
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_exts = array_flip($allowed_exts);
+
+		$ignored_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('ignore_extensions')));
+		$ignored_exts = array_flip($ignored_exts);
+
+		if (!isset($allowed_exts[$format]) && !isset($ignored_exts[$format]))
 		{
 			$err = 'FLEXI_WARNFILETYPE';
 			return false;
@@ -4859,7 +4887,7 @@ class flexicontent_upload
 
 			}
 			
-			else if (!in_array($format, $ignored))
+			else if ( !isset($ignored_exts[$format]) )
 			{
 				// if its not an image...and we're not ignoring it
 				$allowed_mime = explode(',', $params->get('upload_mime'));
@@ -5983,11 +6011,13 @@ class FLEXIUtilities
 	{
 		static $fc_plgs;
 
-		if ( !isset( $fc_plgs[$fieldtype] ) ) {
+		if ( !isset( $fc_plgs[$fieldtype] ) )
+		{
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
 			$plgfolder = DS.strtolower($fieldtype);
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
-			if(file_exists($path)) require_once($path);
+			if (file_exists($path))
+				require_once($path);
 			else {
 				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"),'error');
 				return;
@@ -5995,7 +6025,8 @@ class FLEXIUtilities
 
 			// 2. Create plugin instance
 			$class = "plgFlexicontent_fields{$fieldtype}";
-			if( class_exists($class) ) {
+			if (class_exists($class))
+			{
 				// Create class name of the plugin
 				$className = 'plg'.'flexicontent_fields'.$fieldtype;
 				// Create a plugin instance

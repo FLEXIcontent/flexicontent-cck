@@ -21,9 +21,9 @@ $show_itemcount   = $this->params->get('show_itemcount_peercat', 0);
 $show_subcatcount = $this->params->get('show_subcatcount_peercat', 0);
 $itemcount_label   = ($show_itemcount==2   ? ' '.JText::_('FLEXI_ITEM_S').' ' : '');
 $peercatcount_label = ($show_subcatcount==2 ? ' '.JText::_('FLEXI_CATEGORIES').' ' : '');
-$show_description_image_peercat = $this->params->get('show_description_image_peercat', 0);
-$show_description_peercat     = $this->params->get('show_description_peercat', 0);
-$description_cut_text_peercat = $this->params->get('description_cut_text_peercat', 120);
+$show_description_image_peercat = (int) $this->params->get('show_description_image_peercat', 0);
+$show_description_peercat     = (int) $this->params->get('show_description_peercat', 0);
+$description_cut_text_peercat = (int) $this->params->get('description_cut_text_peercat', 120);
 
 // Classes for sub-category containers
 $peercats_lbl_class = ($show_description_peercat || $show_description_image_peercat) ? "fc_inline_clear"  : "fc_inline";

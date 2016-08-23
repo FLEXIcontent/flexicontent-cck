@@ -793,7 +793,7 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
-	margin: 1px 2px 1px 6px;
+	margin: 1px 2px 1px 0px;
 	float: left;
 }
 form div.container_fcfield > input,
@@ -957,9 +957,9 @@ body .label-fcouter > label.fc_tooltip_icon,
 body .label-fcinner.fc_tooltip_icon,
 #flexicontent .label-fcouter > label.fc_tooltip_icon,
 #flexicontent .label-fcinner.fc_tooltip_icon {
-	padding: 8px 8px 8px 20px !important;
-	background-image: url(../images/comment.png);
-	background-position: 2px 5px;
+	padding: 8px 8px 8px 21px !important;
+	background-image: url(../images/information.png);
+	background-position: 3px 5px;
 	background-repeat: no-repeat;
 }
 body .nowrap_box .label-fcouter,
@@ -1362,6 +1362,7 @@ table.fc-form-tbl.fcfullwidth {
 }
 table.fc-form-tbl.fcfullwidth td.key {
 	width: 114px;
+	padding-right: 8px;
 }
 table.fc-form-tbl.fcfullwidth td.key .label {
 	white-space: unset;
@@ -1383,6 +1384,9 @@ table.fc-form-tbl fieldset {
 }
 table.fc-form-tbl td.data {
 	vertical-align: top;
+}
+table.fc-form-tbl td.key > .fc-prop-lbl {
+	margin: 0 8px 0;
 }
 #fileman_tabset {
 	margin-bottom: 32px;
