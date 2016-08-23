@@ -887,32 +887,32 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			if ($linkto_url) $urllink =
 				'<tr>
-					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label></td>
+					<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label></td>
 					<td><input class="imglink" size="40" name="'.$fieldname_n.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 				</tr>';
 			if ($usealt) $alt =
 				'<tr>
-					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_ALT' ).'</label></td>
+					<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_ALT' ).'</label></td>
 					<td><input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.(isset($value['alt']) ? $value['alt'] : $default_alt).'" type="text" /></td>
 				</tr>';
 			if ($usetitle) $title =
 				'<tr>
-					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td>
+					<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td>
 					<td><input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.(isset($value['title']) ? $value['title'] : $default_title).'" type="text" /></td>
 				</tr>';
 			if ($usedesc) $desc =
 				'<tr>
-					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td>
+					<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td>
 					<td><textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="24" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
 				</tr>';
 			if ($usecust1) $cust1 =
 				'<tr>
-					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label></td>
+					<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label></td>
 					<td><input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.(isset($value['cust1']) ? $value['cust1'] : $default_cust1).'" type="text" /></td>
 				</tr>';
 			if ($usecust2) $cust2 =
 				'<tr>
-					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label></td>
+					<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label></td>
 					<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.(isset($value['cust2']) ? $value['cust2'] : $default_cust2).'" type="text" /></td>
 				</tr>';
 			
@@ -975,7 +975,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<table class="fc-form-tbl fcfullwidth fcimg_dbfile_tbl fcimg_dbfile_tbl_'.$field->id.'" >
 						<tr class="img_newfile_row">
 							'.($select_existing_n ? '
-							<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</label></td>' : '').'
+							<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</label></td>' : '').'
 							<td style="white-space: normal;">'.
 								'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile" class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
 								$uploadLimitsTxt.
@@ -985,7 +985,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						</tr>
 						'.($select_existing_n ? '
 						<tr class="img_existingfile_row">
-							<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).'</label></td>
+							<td class="key"><label class="fc-prop-lbl">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).'</label></td>
 							<td>'.$select_existing_n.'</td>
 						</tr>
 						' : '').'
