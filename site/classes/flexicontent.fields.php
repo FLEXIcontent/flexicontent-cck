@@ -2009,33 +2009,84 @@ class FlexicontentFields
 	{
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=0);
 	}
-	
-	
+
+
+	// Get a pdf parser for parsing the text of PDF files to be added to the search index
+	static function getPDFParser()
+	{
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$index_pdf_files = $cparams->get('index_pdf_files', 0);
+		$pdfparser_path = $cparams->get('pdfparser_path', '');
+		
+		static $parser = null;
+		if ($parser !== null) return $parser;
+		$parser = false;
+
+		if (!$index_pdf_files || !$pdfparser_path) return $parser;
+
+		jimport('joomla.filesystem.path' );
+		$pdfparser_path = JPATH::clean($pdfparser_path);
+
+		if (! is_dir($pdfparser_path) || ! is_readable($pdfparser_path))
+		{
+			// Try relative to Joomla path
+			$_pdfparser_path = JPATH::clean(JPATH_SITE.DS.$pdfparser_path);
+			if (! is_dir($_pdfparser_path) || ! is_readable($_pdfparser_path))
+			{
+				JFactory::getApplication()->enqueueMessage('PDF parser path does not seem to be exist and to be readable: '. $pdfparser_path .' please correct path');
+				return $parser;
+			}
+			$pdfparser_path = $_pdfparser_path;
+		}
+		
+		$vendor_path = JPATH::clean($pdfparser_path.DS.'vendor');
+		if (! is_dir($vendor_path) || ! is_readable($vendor_path))
+		{
+			JFactory::getApplication()->enqueueMessage('PDF parser path does not seem to have installed dependent libraries in vendor subfolder: '. $vendor_path .' please run composer');
+			return $parser;
+		}
+		
+		require_once(JPATH::clean($vendor_path.DS.'autoload.php'));
+		require_once(JPATH::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
+		
+		// Create paser
+		$parser = new \Smalot\PdfParser\Parser();
+		
+		// Parse pdf file and build necessary objects.
+		//$pdf = $parser->parseFile(JPATH_COMPONENT_SITE.DS.'librairies'.DS.'pdfparser'.DS.'samples'.DS.'Document1_foxitreader.pdf');
+		//$text = $pdf->getText();
+		//echo $text; exit;
+
+		return $parser;
+	}
+
+
 	// Get a language specific handler for parsing the text to be added to the search index
 	// e.g. doing word segmentation for a language that does not space-separate the words
 	static function getLangHandler($language)
 	{
-		$cparams   = JComponentHelper::getParams('com_flexicontent');
+		if ($language != 'th-TH') return false;
+
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
-		
-		if ($language == 'th-TH' && $filter_word_like_any==0)
-		{
-			jimport('joomla.filesystem.file');
-			$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
-			if ( JFile::exists($segmenter_path) )
-			{
-				require_once ($segmenter_path);
-				// Apply caching to dictionary parsing regardless of cache setting ...
-				$handlercache = JFactory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
-				$handlercache->setCaching(1);         // Force cache ON
-				$handlercache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
-				$dictionary = $handlercache->call(array('Segment', 'loadDictionary'));
-				Segment::setDictionary($dictionary);
-				$handler = new Segment();
-				return $handler;
-			}
-		}
-		return false;
+
+		if ($filter_word_like_any != 0) return false;
+
+		jimport('joomla.filesystem.file');
+		$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
+
+		if (! JFile::exists($segmenter_path)) return false;
+
+		require_once ($segmenter_path);
+		// Apply caching to dictionary parsing regardless of cache setting ...
+		$handlercache = JFactory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
+		$handlercache->setCaching(1);         // Force cache ON
+		$handlercache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
+		$dictionary = $handlercache->call(array('Segment', 'loadDictionary'));
+		Segment::setDictionary($dictionary);
+		$handler = new Segment();
+
+		return $handler;
 	}
 	
 	
@@ -2047,7 +2098,22 @@ class FlexicontentFields
 		
 		// * Per language handlers e.g. word segmenter objects (add spaces between words for language without spaces)
 		static $lang_handlers = array();
-		
+		static $pdf_parser = null;
+		static $search_prefix = null;
+
+		// Get search prefix
+		if ( $search_prefix === null )
+		{
+			$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		}
+
+		// Get PDF parser for indexing PDF files
+		if ( $pdf_parser === null && !empty($field->field_isfile) )
+		{
+			$pdf_parser = FlexicontentFields::getPDFParser();
+		}
+
+
 		if ( !$for_advsearch )
 		{
 			// Check if field type supports text search, this will also skip fields wrongly marked as text searchable
@@ -2056,15 +2122,15 @@ class FlexicontentFields
 				return;
 			}
 		}
-		
+
 		else {
 			$field->ai_query_vals = array();
-			
+
 			// Check if field type supports advanced search text searchable or filterable, this will also skip fields wrongly marked
 			if ( !($fi->supportadvsearch && $field->isadvsearch) && !($fi->supportadvfilter && $field->isadvfilter) )
 				return;
 		}
-		
+
 		// A null indicates that we do not have posted data,
 		// instead indexer is running and we should retrieve values from the DB executing an SQL query
 		if ($values===null) {
@@ -2073,12 +2139,10 @@ class FlexicontentFields
 			$items_values = !is_array($values) ? array($values) : $values;
 			$items_values = array($field->item_id => $items_values);
 		}
-		
+
 		// Make sure posted data is an array 
 		$unserialize = (isset($field->unserialize)) ? $field->unserialize : ( count($required_props) || count($search_props) );
-		
-		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-		
+
 		// Create the new search data
 		foreach($items_values as $itemid => $item_values) 
 		{
@@ -2090,8 +2154,8 @@ class FlexicontentFields
 			}
 			$lang_handler = $lang_handlers[$language];
 			
-			
-			if ( !empty($field->isindexed) && !$field->iscore ) {
+			if ( !empty($field->isindexed) && !$field->iscore )
+			{
 				// Get Elements of the field these will be cached if they do not depend on the item ...
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
 				$item_pros = false;
@@ -2099,41 +2163,70 @@ class FlexicontentFields
 				// Map index field vlaues to their real properties
 				$item_values = FlexicontentFields::indexedField_getValues($field, $elements, $item_values, $prepost_prop='');
 			}
-				
+			
 			$searchindex = array();
 			foreach($item_values as $vi => $v)
 			{
 				// Make sure multi-property data are unserialized
-				if ($unserialize) {
+				if ($unserialize)
+				{
 					$data = @ unserialize($v);
 					$v = ($v === 'b:0;' || $data !== false) ? $data : $v;
 				}
-				
-				// Check value that current should not be included in search index
+
+				// Check value is not empty
 				if ( !is_array($v) && !strlen($v) ) continue;
-				foreach ($required_props as $cp) if (!@$v[$cp]) continue;
-				
+
+				// If has field 'required/search' properties, then check field is multi-property (value is array)
+				if ( !is_array($v) && (count($required_props) || count($search_props)) ) continue;
+
 				// Skip multi-property fields if search properties are not specified
-				if ( !count($search_props) && is_array($v)) continue;
+				if ( is_array($v) && !count($search_props) ) continue;
+				
+				// Check required properties were specified
+				$required_exists = true;
+				foreach ($required_props as $cp)
+				{
+					if ( !strlen(@$v[$cp]) ) $required_exists = false;
+				}
+				if (!$required_exists) continue;
 				
 				// Create search value
 				$search_value = array();
-				foreach ($search_props as $sp) {
+				foreach ($search_props as $sp)
+				{
 					if ( isset($v[$sp]) && strlen($v[$sp]) ) $search_value[] = $v[$sp];
 				}
 				
+				// Support for indexing text in PDF files
+				if ( $pdf_parser && !empty($field->field_isfile) && strtolower(flexicontent_upload::getExt($v['filename'])) == 'pdf' )
+				{				
+					$abspath = JPath::clean( ($v['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) .DS. $v['filename'] );  //echo $abspath . "<br/>";  					//echo "<pre>"; print_r($v); echo "</pre>";
+					$pdf_data = $pdf_parser->parseFile($abspath);
+					$search_value[] = $pdf_data->getText();  // echo $text; exit;
+				}
+
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
 				$searchindex[$vi] = (count($search_props))  ?  implode($props_spacer, $search_value)  :  $v;
 				$searchindex[$vi] = $filter_func ? $filter_func($searchindex[$vi]) : $searchindex[$vi];
 			}
 			
+			if (!empty($pdf_data))
+			{
+				//echo "<pre>";
+				//print_r($searchindex);
+				//exit;
+			}
+			
 			// * Use word segmenter (if it was created) to add spaces between words
-			if ($lang_handler) {
-				foreach($searchindex as $i => $_searchindex) {
+			if ($lang_handler)
+			{
+				foreach($searchindex as $i => $_searchindex)
+				{
 					$searchindex[$i] = implode(' ', $lang_handler->get_segment_array($clear_previous = true, $_searchindex));
 				}
 			}
-			
+
 			if ( !$for_advsearch )
 			{
 				$field->search[$itemid] = implode(' | ', $searchindex);
