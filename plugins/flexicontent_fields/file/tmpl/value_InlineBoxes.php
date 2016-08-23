@@ -121,15 +121,15 @@ foreach($values as $file_id)
 	if ($display_size)
 	{
 		$sizeinfo = '<span class="fcfile_size">';
-		$sizeinfo .= '<span class="fcfile_size_label label">' .JTEXT::_('FLEXI_SIZE'). '</span> ';
+		$sizeinfo .= '<span class="fcfile_size_label label">' .JTEXT::_('FLEXI_FIELD_FILE_SIZE'). '</span> ';
 		if ( !is_numeric($_size) )
 			$sizeinfo .= '<span class="fcfile_size_value value">'.$_size.'</span>';
 		else if ($display_size==1)
-			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_KBS').'</span>';
 		else if ($display_size==2)
-			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_MBS').'</span>';
 		else
-			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_GBS').'</span>';
 		$sizeinfo .= '</span>';
 	}
 	
@@ -144,7 +144,7 @@ foreach($values as $file_id)
 		}
 		if ( $add_hits_txt ) {
 			$hits .= '
-				<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_HITS'). '</span>
+				<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_FIELD_FILE_HITS'). '</span>
 				<span class="fcfile_hits_value value">'.$file_data->hits.'</span>
 			';
 		}
