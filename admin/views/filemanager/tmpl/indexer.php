@@ -17,12 +17,16 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
 $ctrl_task = FLEXI_J16GE ? 'task=filemanager.' : 'controller=filemanager&task=';
-$indexer_name = JRequest::getVar('indexer','fileman_files');
+$pdf_parser = FlexicontentFields::getPDFParser();
+
+$indexer_name = JFactory::getApplication()->get('indexer', 'fileman_files', 'cmd');
+$rebuildmode  = JFactory::getApplication()->get('rebuildmode', '', 'cmd');
 ?>
 <div>&nbsp;</div>
 <div style="heading">
-	Indexer Running ... <br/>
+	Indexer Running ... <?php echo $pdf_parser ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
 	
 <script type="text/javascript">
 jQuery(document).ready(function() {
@@ -46,7 +50,7 @@ jQuery(document).ready(function() {
 		var start_time = new Date().getTime();
 		
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo JRequest::getVar('rebuildmode','');?>",
+			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>",
 			success: function(response, status2, xhr2) {
 				var request_time = new Date().getTime() - start_time;
 				total_time += request_time;
