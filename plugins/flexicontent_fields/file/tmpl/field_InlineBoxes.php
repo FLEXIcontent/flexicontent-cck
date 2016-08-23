@@ -57,7 +57,7 @@ foreach($field->value as $file_id)
 
 			<div class="'.$input_grp_class.' fc-xpended-row inlinefile-data-actions">
 				<label class="'.$add_on_class.' fc-lbl inlinefile-data-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-data-lbl" for="'.$elementid_n.'_file-data-txt">
-					'.($fields_box_placing==1 ? $field->label.' - ' : ''). JText::_('FLEXI_FIELD_'.$FT.'_SELECTED_FILE').'
+					' . JText::_('FLEXI_FIELD_'.$FT.'_SELECT_FILE') . '
 				</label>
 				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" class="fc_fileid" />'.'
 				'.(! $field->parameters->get('use_myfiles', '1') ? '
