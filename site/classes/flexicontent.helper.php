@@ -3971,7 +3971,7 @@ class flexicontent_html
 	}
 
 
-	static loadModuleLanguage($modulename)
+	static function loadModuleLanguage($modulename)
 	{
 		static $loaded = array();
 		if (isset($loaded[$modulename])) return;
