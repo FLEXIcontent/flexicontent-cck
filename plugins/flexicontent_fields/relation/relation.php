@@ -303,7 +303,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' >
 					'.$items_options_select.'
 				</select>
-				'.($selected_items_sortable ? '<span class="add-on"><span class="icon-info hasTooltip" title="You may sort to select display order"></span>' . JText::_('FLEXI_ORDER') . '</span>' : '').'
+				'.($selected_items_sortable ? '
+				<span class="add-on"><span class="icon-info hasTooltip" title="'.JText::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO').'"></span>' . JText::_('FLEXI_ORDER') . '</span>' : '').'
 			</div>
 			
 		</div>
