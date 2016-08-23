@@ -736,6 +736,18 @@ class plgFlexicontent_fieldsSelect extends FCField
 				unset($html);
 			}
 		}
+
+		// Add sort message to every value if inside field group
+		$sortable_msg = $sortable ? '<div style="display: inline-block; vertical-align: middle; padding: 0px 4px 0px 8px;"><span class="icon-info hasTooltip" title="'.JText::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO').'"></span>' . JText::_('FLEXI_ORDER') . '</div> ' : '';
+		if ( !empty($sortable_msg) )
+		{
+			if (!$use_ingroup) {
+				$field->html = $sortable_msg . $field->html;
+			} else {
+				foreach($field->html as & $html) $html = $sortable_msg . $html;
+				unset($html);
+			}
+		}
 	}
 
 
