@@ -374,13 +374,13 @@ $r = 0;
 		
 		<?php if ( $this->lists['orderby'] ) : ?>
 			<div class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
-				<?php if ($this->lists['orderby_2nd']) echo '<span class="label">1</span> '; ?><div class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></div>
+				<?php if ($this->lists['orderby_2nd']) echo '<div class="label fc_orderby_level_lbl">1</div>'; ?><div class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></div>
 			</div>
 		<?php endif; ?>
 		
 		<?php if ( $this->lists['orderby_2nd'] ) : ?>
 			<div class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1); ?>">
-				<span class="label">2</span> <div class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></div>
+				<div class="label fc_orderby_level_lbl">2</div><div class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></div>
 			</div>
 		<?php endif; ?>
 		

@@ -91,7 +91,7 @@ class modFlexicontentHelper
 		$display_voting_feat	= $params->get('display_voting_feat');
 		$display_comments_feat= $params->get('display_comments_feat');
 		$mod_readmore_feat		= $params->get('mod_readmore_feat');
-		$mod_cut_text_feat 		= $params->get('mod_cut_text_feat');
+		$mod_cut_text_feat 		= (int)$params->get('mod_cut_text_feat');
 		$mod_do_stripcat_feat	= $params->get('mod_do_stripcat_feat', 1);
 		$mod_use_image_feat 	= $params->get('mod_use_image_feat');
 		$mod_link_image_feat 	= $params->get('mod_link_image_feat');

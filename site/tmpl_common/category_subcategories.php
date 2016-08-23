@@ -21,9 +21,9 @@ $show_itemcount   = $this->params->get('show_itemcount', 1);
 $show_subcatcount = $this->params->get('show_subcatcount', 0);
 $itemcount_label   = ($show_itemcount==2   ? ' '.JText::_('FLEXI_ITEM_S').' ' : '');
 $subcatcount_label = ($show_subcatcount==2 ? ' '.JText::_('FLEXI_CATEGORIES').' ' : '');
-$show_description_image_subcat = $this->params->get('show_description_image_subcat', 0);
-$show_description_subcat     = $this->params->get('show_description_subcat', 0);
-$description_cut_text_subcat = $this->params->get('description_cut_text_subcat', 120);
+$show_description_image_subcat = (int) $this->params->get('show_description_image_subcat', 0);
+$show_description_subcat     = (int) $this->params->get('show_description_subcat', 0);
+$description_cut_text_subcat = (int) $this->params->get('description_cut_text_subcat', 120);
 
 // Classes for sub-category containers
 $subcats_lbl_class = ($show_description_subcat || $show_description_image_subcat) ? "fc_inline_clear"  : "fc_inline";

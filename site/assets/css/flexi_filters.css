@@ -39,7 +39,7 @@ fieldset.fc_filter_set legend .fc_legend_text {
 }
 fieldset.fc_search_set legend .fc_legend_text.hasTooltip,
 fieldset.fc_filter_set legend .fc_legend_text.hasTooltip {
-	background: lightyellow url(../images/note.gif) no-repeat 10px 50%;
+	background: transparent url(../images/note.gif) no-repeat 10px 50%;
 	border: 1px solid lightgray;
 	color: gray;
 	display: block;
