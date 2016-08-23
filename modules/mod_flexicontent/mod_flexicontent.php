@@ -53,6 +53,9 @@ if ( $show_mod )
 	global $fc_content_plg_microtime;
 	$fc_content_plg_microtime = 0;
 	
+	// Include helpers class file
+	require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+	
 	static $mod_initialized = null;
 	$modulename = 'mod_flexicontent';
 	if ($mod_initialized === null)

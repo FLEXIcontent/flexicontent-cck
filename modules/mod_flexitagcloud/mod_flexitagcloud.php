@@ -47,6 +47,9 @@ if ( $show_mod )
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
 	
+	// Include helpers class file
+	require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+	
 	static $mod_initialized = null;
 	$modulename = 'mod_flexitagcloud';
 	if ($mod_initialized === null)
