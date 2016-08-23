@@ -31,7 +31,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -825,7 +824,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$Fobj->file_filter_re = preg_quote($filename);
 					$Fobj->secure = 0;
 					$Fobj->keep   = 1;
-					
+
 					$upload_err = null;
 					$file_ids = $fman->addlocal($Fobj, $upload_err);
 					$v = !empty($file_ids) ? reset($file_ids) : false; // Get fist element
@@ -947,7 +946,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
-					
+
 					// Add file by calling filemanager controller upload() task, which will do the data filtering too
 					$fman = new FlexicontentControllerFilemanager();
 					$fman->runMode = 'interactive';
@@ -1017,7 +1016,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$return_data = array();
 		$new_ids = array();
 		$values = is_array($value) ? $value : array($value);
-		foreach ($values as $file_id) {
+		foreach ($values as $file_id)
+		{
 			$f = (int)$file_id;
 			if ( !isset($cached_data[$f]) && $f)
 				$new_ids[] = $f;
@@ -1036,13 +1036,15 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			$db->setQuery($query);
 			$new_data = $db->loadObjectList('id');
 
-			if ($new_data) foreach($new_data as $file_id => $file_data) {
+			if ($new_data) foreach($new_data as $file_id => $file_data)
+			{
 				$cached_data[$file_id] = $file_data;
 			}
 		}
 		
 		// Finally get file data in correct order
-		foreach($values as $file_id) {
+		foreach($values as $file_id)
+		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
 				$return_data[$file_id] = $cached_data[$f];

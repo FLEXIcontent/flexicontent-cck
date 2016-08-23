@@ -31,7 +31,6 @@ class plgFlexicontent_fieldsFile extends FCField
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -847,7 +846,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					$filename = basename($v);
 					$sub_folder = dirname($v);
 					$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
-					
+
 					// Add by calling the filemanager upload() task in interactive mode
 					$fman = new FlexicontentControllerFilemanager();
 					$fman->runMode = 'interactive';
@@ -1006,7 +1005,6 @@ class plgFlexicontent_fieldsFile extends FCField
 					{
 						JFactory::getApplication()->enqueueMessage($upload_err, $err_type);
 					}
-
 				}
 				
 				else {
@@ -1075,12 +1073,15 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-		
+
+		$field->field_isfile = true;
+		$field->unserialize = 0;
+
 		if ($post===null) {
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 			$values = null;
 			$field->field_rawvalues = 1;
-			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename';
+			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename, file.secure';
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
@@ -1088,6 +1089,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
+
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
@@ -1098,19 +1100,24 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
-		
-		if ($post) {
+
+		$field->field_isfile = true;
+		$field->unserialize = 0;
+
+		if ($post===null) {
+			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
+			$values = null;
+			$field->field_rawvalues = 1;
+			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename, file.secure';
+			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
+			$field->field_groupby      = null;
+		} else {
 			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
-		} else {
-			$field->unserialize = 0;
-			$field->field_rawvalues = 1;
-			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename';
-			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
-			$field->field_groupby      = null;
 		}
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
+
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 	
@@ -1127,7 +1134,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$return_data = array();
 		$new_ids = array();
 		$values = is_array($value) ? $value : array($value);
-		foreach ($values as $file_id) {
+		foreach ($values as $file_id)
+		{
 			$f = (int)$file_id;
 			if ( !isset($cached_data[$f]) && $f)
 				$new_ids[] = $f;
@@ -1146,13 +1154,15 @@ class plgFlexicontent_fieldsFile extends FCField
 			$db->setQuery($query);
 			$new_data = $db->loadObjectList('id');
 
-			if ($new_data) foreach($new_data as $file_id => $file_data) {
+			if ($new_data) foreach($new_data as $file_id => $file_data)
+			{
 				$cached_data[$file_id] = $file_data;
 			}
 		}
 		
 		// Finally get file data in correct order
-		foreach($values as $file_id) {
+		foreach($values as $file_id)
+		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
 				$return_data[$file_id] = $cached_data[$f];
