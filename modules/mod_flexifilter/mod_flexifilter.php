@@ -51,13 +51,7 @@ if ( $show_mod )
 	$modulename = 'mod_flexifilter';
 	if ($mod_initialized === null)
 	{
-		// Load english language file for current module then override (forcing a reload) with current language file
-		JFactory::getLanguage()->load($modulename, JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
-		JFactory::getLanguage()->load($modulename, JPATH_SITE, null, $force_reload = true, $load_default = true);
-		
-		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = false, $load_default = true);
+		flexicontent_html::loadModuleLanguage($modulename);
 		$mod_initialized = true;
 	}
 	

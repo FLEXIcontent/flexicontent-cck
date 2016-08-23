@@ -1,11 +1,20 @@
 <?php
-/*
- * Package : FLEXIContent
- * @subpackage : fcfield parent field plugin.
- * @copyright : (c) 2015 http://www.flexicontent.org.
- * Created by : Suriya Kaewmungmuang(iamkeng,enjoyman), ColorPack Co.,Ltd., Georgios Papadakis
+/**
+ * @version 1.5 stable $Id: flexicontent.fields.php 1990 2014-10-14 02:17:49Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
-*/
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
@@ -19,6 +28,7 @@ class FCField extends JPlugin
 	protected $field = null;
 	protected $item = null;
 	protected $vars = null;
+	protected $autoloadLanguage = false;
 	
 	
 	// ***********
@@ -27,14 +37,30 @@ class FCField extends JPlugin
 	public function __construct(&$subject, $params)
 	{
 		parent::__construct( $subject, $params );
-		if(!$this->fieldtypes)
+
+		if (!$this->fieldtypes)
+		{
 			$this->fieldtypes = self::$field_types;
+		}
+
 		$class = strtolower(get_class($this));
 		$fieldtype = str_replace('plgflexicontent_fields', '', $class);
+
 		self::$field_types = array_merge(array($fieldtype), self::$field_types);
 		$this->fieldtypes = array_merge(array($fieldtype), $this->fieldtypes);
-		foreach($this->fieldtypes as $ft) {
-			JPlugin::loadLanguage('plg_flexicontent_fields_'.$fieldtype, JPATH_ADMINISTRATOR);
+
+		static $initialized = array();
+		foreach($this->fieldtypes as $ft)
+		{
+			if ( isset($initialized[$ft]) ) continue;
+			$initialized[$ft] = true;
+
+			// Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
+			// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
+			$extension_name = 'plg_flexicontent_fields_'.$ft;
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+			//JPlugin::loadLanguage('plg_flexicontent_fields_'.$fieldtype, JPATH_ADMINISTRATOR);
 		}
 	}
 	

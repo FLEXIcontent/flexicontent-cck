@@ -35,9 +35,6 @@ body #flexicontent span.fc-prop-lbl {
 	font-size: 13px;
 	color: #040507;
 }
-body table.fc-form-tbl td.key > .fc-prop-lbl {
-	margin: 0 8px 0;
-}
 #flexicontent .fcradiocheckimage label.fccheckradio_lbl {
 	vertical-align: unset !important;
 }

@@ -539,8 +539,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		foreach($filter_ext as $_i => $_ext) $filter_ext[$_i] = strtolower($_ext);
 
 		// Get extensions allowed by configuration, and intersect them with desired extensions
-		$upload_extensions = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
-		$allowed_ext = $filter_ext ? array_intersect($filter_ext, $upload_extensions) : $upload_extensions;
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_exts = $filter_ext ? array_intersect($filter_ext, $allowed_exts) : $allowed_exts;
+		$allowed_exts = array_flip($allowed_exts);
 
 		jimport('joomla.utilities.date');
 		jimport('joomla.filesystem.file');
@@ -580,7 +581,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			for ($n=0; $n<count($filenames); $n++)
 			{
 				$ext = strtolower(JFile::getExt($filesdir . $filenames[$n]));
-				if ( !in_array($ext, $allowed_ext) )
+				if ( !isset($allowed_exts[$ext]) )
 				{
 					$excluded[] = $filenames[$n];
 					continue;

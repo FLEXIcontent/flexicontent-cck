@@ -113,11 +113,12 @@ class FlexicontentViewField extends JViewLegacy
 			}
 		}
 		
-		// load plugin's english language file then override with current language file
+		// Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
+		// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
 		$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
-		
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+
 		//check which properties are supported by current field
 		$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 		
