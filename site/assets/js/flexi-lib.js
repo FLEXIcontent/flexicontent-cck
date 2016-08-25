@@ -1281,11 +1281,20 @@
 			}
 
 
-		}).on('select2-close', function()
+		}).on('select2-close', function(e)
 		{
 
 			// Add events to handle bluring the text filter box (show inner label)
 			var sel_EL = jQuery(this);
+			
+			// Re-open if this was closed while selecting, FOR select2 v4, use 'select2:closing' instead
+			if ( sel_EL.data('field_being_selected') )
+			{
+				sel_EL.select2('open');
+				jQuery('#select2-drop').find('.select2-no-results').remove();
+				return;
+			}
+			
 			var el = sel_EL.parent().find('.select2-input');
 			var el_label = el.prevAll('.fc_has_inner_label');
 			if (el_label) el_label.show();
@@ -1345,8 +1354,9 @@
 
 			// SELECT2: Handle change event
 			var sel_EL = jQuery(this);
-			sel_EL.data('field_being_selected', null);
 			
+			// Clear 'being_selected' FLAG but not the 'being_edited', as this will be done by the 'close' event, also stop event propagation if 'being_edited'
+			sel_EL.data('field_being_selected', null);
 			if (sel_EL.data('field_being_edited'))
 			{
 				e.preventDefault();
@@ -1360,7 +1370,10 @@
 				jQuery('#select2-drop').find('.select2-selected-visible, .select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
 				jQuery('#select2-drop').find('.select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
 				
-				sel_EL.data('set_selected_values', null).select2('val', nVals).trigger('change');
+				sel_EL.data('set_selected_values', null).select2('val', nVals);
+				
+				// We will not trigger change on the select TAG, we will trigger this when selection finishes, by closing the drop-down
+				if (!sel_EL.data('field_being_edited')) sel_EL.trigger('change');
 			}
 
 
