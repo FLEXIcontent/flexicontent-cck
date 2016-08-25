@@ -3975,8 +3975,8 @@ class FlexicontentFields
 
 		return FlexicontentFields::createItemsListHTML($params, $item_list, $isform, $parentfield, $parentitem, $_item_data);
 	}
-	
-	
+
+
 	// Helper method to create SQL query for retrieving items list data
 	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, $states=array(1,-5,2))
 	{
@@ -4069,16 +4069,48 @@ class FlexicontentFields
 		}
 		$orderby_join = '';
 		
-		// Create JOIN for ordering items by a custom field (use SFC)
-		if ( 'field' == $order[1] ) {
+		// Create JOIN for ordering items by a custom field (use SFX)
+		if ( 'field' == $order[1] )
+		{
 			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid'.$sfx, 0);
-			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+			$orderbycustomfieldint = (int)$params->get('orderbycustomfieldint'.$sfx, 0);
+			if ($orderbycustomfieldint == 4)
+			{
+				$orderby_join .= '
+					LEFT JOIN (
+						SELECT rf.item_id, SUM(fdat.hits) AS file_hits
+						FROM #__flexicontent_fields_item_relations AS rf
+						LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = rf.value
+				 		WHERE rf.field_id='.$orderbycustomfieldid.'
+				 		GROUP BY rf.item_id
+				 	) AS dl ON dl.item_id = i.id';
+			}
+			else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 		}
 		
 		// Create JOIN for ordering items by a custom field (Level 2)
-		if ( $sfx=='' && 'field' == $order[2] ) {
+		if ( $sfx=='' && 'field' == $order[2] )
+		{
 			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
-			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+			$orderbycustomfieldint_2nd = (int)$params->get('orderbycustomfieldint'.'_2nd', 0);
+			if ($orderbycustomfieldint_2nd == 4)
+			{
+				$orderby_join .= '
+					LEFT JOIN (
+						SELECT f2.item_id, SUM(fdat2.hits) AS file_hits2
+						FROM #__flexicontent_fields_item_relations AS f2
+						LEFT JOIN #__flexicontent_files AS fdat2 ON fdat2.id = f2.value
+				 		WHERE f2.field_id='.$orderbycustomfieldid_2nd.'
+				 		GROUP BY f2.item_id
+				 	) AS dl2 ON dl2.item_id = i.id';
+			}
+			else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+		}
+		
+		// Create JOIN for ordering items by author's name
+		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+			$orderby_col = '';
+			$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 		}
 		
 		// Create JOIN for ordering items by a most commented
@@ -4088,15 +4120,20 @@ class FlexicontentFields
 		}
 		
 		// Create JOIN for ordering items by a most rated
-		if ( in_array('rated', $order) ) {
-			$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+		if ( in_array('rated', $order) )
+		{
+			$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
+			$voting_field->parameters = new JRegistry($voting_field->attribs);
+			$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
+			$_weights = array();			
+			for ($i = 1; $i <= 9; $i++)
+			{
+				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
+			}
+			$orderby_col   = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
 			$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 		}
 		
-		// Create JOIN for ordering items by author name
-		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
-			$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
-		}
 		
 		// Because query includes specific items it should be fast
 		$query = 'SELECT i.*, ext.*,'
