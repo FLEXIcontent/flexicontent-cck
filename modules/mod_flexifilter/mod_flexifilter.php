@@ -65,7 +65,7 @@ if ( $show_mod )
 	// initialize various variables
 	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');	
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	
 	// Styling parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');

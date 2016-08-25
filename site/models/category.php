@@ -522,12 +522,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// Set order array (2-level) in case it is later needed
 			$this->_category->_order_arr = $order;
-			
+
 			// Create JOIN for ordering items by a custom field (Level 1)
-			if ( 'field' == $order[1] ) {
+			if ( 'field' == $order[1] )
+			{
 				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
 				$orderbycustomfieldint = (int)$params->get('orderbycustomfieldint', 0);
-				if ($orderbycustomfieldint==4) {
+				if ($orderbycustomfieldint == 4)
+				{
 					$orderby_join .= '
 						LEFT JOIN (
 							SELECT rf.item_id, SUM(fdat.hits) AS file_hits
@@ -539,12 +541,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 				else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 			}
-			if ( 'custom:' == substr($order[1], 0, 7) ) {
+
+			if ( 'custom:' == substr($order[1], 0, 7) )
+			{
 				$order_parts = preg_split("/:/", $order[1]);
 				$_field_id = (int) @ $order_parts[1];
 				$_o_method = @ $order_parts[2];
-				if ($_field_id && count($order_parts)==4) {
-					if ($_o_method=='file_hits') {
+
+				if ($_field_id && count($order_parts)==4)
+				{
+					if ($_o_method=='file_hits')
+					{
 						$orderby_join .= '
 							LEFT JOIN (
 								SELECT rf.item_id, SUM(fdat.hits) AS file_hits
@@ -557,12 +564,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 					else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
 				}
 			}
-			
+
 			// Create JOIN for ordering items by a custom field (Level 2)
-			if ( 'field' == $order[2] ) {
+			if ( 'field' == $order[2] )
+			{
 				$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
 				$orderbycustomfieldint_2nd = (int)$params->get('orderbycustomfieldint'.'_2nd', 0);
-				if ($orderbycustomfieldint_2nd==4) {
+				if ($orderbycustomfieldint_2nd==4)
+				{
 					$orderby_join .= '
 						LEFT JOIN (
 							SELECT f2.item_id, SUM(fdat2.hits) AS file_hits2
@@ -574,12 +583,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 				else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 			}
-			if ( 'custom:' == substr($order[2], 0, 7) ) {
+
+			if ( 'custom:' == substr($order[2], 0, 7) )
+			{
 				$order_parts = preg_split("/:/", $order[2]);
 				$_field_id = (int) @ $order_parts[1];
 				$_o_method = @ $order_parts[2];
-				if ($_field_id && count($order_parts)==4) {
-					if ($_o_method=='file_hits') {
+
+				if ($_field_id && count($order_parts)==4)
+				{
+					if ($_o_method=='file_hits')
+					{
 						$orderby_join .= '
 							LEFT JOIN (
 								SELECT f2.item_id, SUM(fdat2.hits) AS file_hits2
@@ -592,7 +606,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
 				}
 			}
-			
+
 			// Create JOIN for ordering items by author's name
 			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
 				$orderby_col = '';
@@ -606,8 +620,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			
 			// Create JOIN for ordering items by a most rated
-			if ( in_array('rated', $order) ) {
-				$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+			if ( in_array('rated', $order) )
+			{
+				$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
+				$voting_field->parameters = new JRegistry($voting_field->attribs);
+				$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
+				$_weights = array();			
+				for ($i = 1; $i <= 9; $i++)
+				{
+					$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
+				}
+				$orderby_col   = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
 				$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 			}
 		} else {
