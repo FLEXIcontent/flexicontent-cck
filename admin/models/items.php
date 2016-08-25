@@ -1362,46 +1362,53 @@ class FlexicontentModelItems extends JModelLegacy
 				$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_prefix.$escaped_search.'*', false ).' IN BOOLEAN MODE)';
 			}
 		}
-		
-		
+
+
 		// ***************************************************
 		// Date range filtering (creation and/or modification)
 		// ***************************************************
 		
 		$nullDate = $this->_db->getNullDate();
 		
-		if ($date == 1) {
-			if ($startdate && !$enddate) {  // from only
-				$where[] = ' i.created >= ' . $this->_db->Quote($startdate);
+		if ($startdate || $enddate)
+		{
+			$_where = array();
+
+			if ($date == 1)
+			{
+				if ($startdate) $_where[] = ' i.created >= ' . $this->_db->Quote($startdate);
+				if ($enddate)   $_where[] = ' i.created <= ' . $this->_db->Quote($enddate);
+				$where[] = '( ' . implode(' AND ', $_where) . ' )';
 			}
-			if (!$startdate && $enddate) { // to only
-				$where[] = ' i.created <= ' . $this->_db->Quote($enddate);
+			else if ($date == 2)
+			{
+				if ($startdate)  $_where[] = '( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+				if ($enddate)    $_where[] = '( i.modified <= ' . $this->_db->Quote($enddate)   . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . '))';
+				$where[] = '( ' . implode(' AND ', $_where) . ' )';
 			}
-			if ($startdate && $enddate) { // date range
-				$where[] = '( i.created >= ' . $this->_db->Quote($startdate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . ' )';
+			else if ($date == 3)
+			{
+				if ($startdate) $_where[] = '( i.publish_up >= ' . $this->_db->Quote($startdate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+				if ($enddate)   $_where[] = '( i.publish_up <= ' . $this->_db->Quote($enddate) . ' OR ( i.publish_up = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
+				$where[] = '( ' . implode(' AND ', $_where) . ' )';
+			}
+			else if ($date == 4)
+			{
+				if ($startdate) $_where[] = ' i.publish_down >= ' . $this->_db->Quote($startdate);
+				if ($enddate)   $_where[] = ' i.publish_down <= ' . $this->_db->Quote($enddate);
+				$where[] = '( ' . implode(' AND ', $_where) . ' )';
 			}
 		}
-		
-		if ($date == 2) {
-			if ($startdate && !$enddate) {  // from only
-				$where[] = '( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . '))';
-			}
-			if (!$startdate && $enddate) { // to only
-				$where[] = '( i.modified <= ' . $this->_db->Quote($enddate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . '))';
-			}
-			if ($startdate && $enddate) { // date range
-				$where[] = '(( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . ')) AND ( i.modified <= ' . $this->_db->Quote($enddate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . ')))';
-			}
-		}
-		
-		
+
+
 		// *************************************************
 		// Finally create the AND clause of the WHERE clause
 		// *************************************************
 		
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		return $where;
 	}
+
 
 	/**
 	 * Method to copy items
