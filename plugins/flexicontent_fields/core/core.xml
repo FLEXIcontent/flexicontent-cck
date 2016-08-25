@@ -1043,7 +1043,29 @@
 				<option value="2">FLEXI_YES_ASK_USER</option>
 			</field>
 			<field name="guest_no_acc_url" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_URL" description="FLEXI_FIELD_VOTE_NO_ACCESS_URL_DESC" />
+
+		</fieldset>
+		<fieldset name="group-voting-unrated" repeat="1" icon_class="icon-question" label="FLEXI_VOTE_UNRATED" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+
+			<field name="" type="separator" default="FLEXI_VOTE_DEFAULT_RATING_AND_WEIGHTS" level="level1"/>
 			
+			<field name="" type="separator" default="" level="level_br" />
+			<field name="" type="separator" default="FLEXI_VOTE_DEFAULT_RATING_INFO" level="level2" />
+			<field name="default_rating" type="integer" default="50" first="0" last="100" step="5" label="FLEXI_VOTE_DEFAULT_RATING" description="FLEXI_VOTE_DEFAULT_RATING_DESC" />
+			
+			<field name="" type="separator" default="" level="level_br" />
+			<field name="" type="separator" default="FLEXI_VOTE_RATING_WEIGHTS_INFO" level="level2" />
+			<field name="vote_1_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num1" />
+			<field name="vote_2_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num2" />
+			<field name="vote_3_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num3" />
+			<field name="vote_4_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num4" />
+			<field name="vote_5_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num5" />
+			<field name="vote_6_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num6" />
+			<field name="vote_7_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num7" />
+			<field name="vote_8_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num8" />
+			<field name="vote_9_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num9" />
+
 		</fieldset>
 		<!--fieldset name="group-voting-reviews" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			

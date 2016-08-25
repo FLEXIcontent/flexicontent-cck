@@ -43,11 +43,7 @@ class modFlexicontentHelper
 		$view   = JRequest::getVar('view');
 		
 		// Get IDs of user's access view levels
-		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		
-		// get the component parameters
-		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		
 		// get module ordering parameters
 		$ordering		= $params->get('ordering', array());
@@ -672,8 +668,8 @@ class modFlexicontentHelper
 		$user			= JFactory::getUser();
 		$view			= JRequest::getVar('view');
 		$option		= JRequest::getVar('option');
-		$fparams 	= $app->getParams('com_flexicontent');
-		$show_noauth 	= $fparams->get('show_noauth', 0);
+		$flexiparams 	= $app->getParams('com_flexicontent');
+		$show_noauth 	= $flexiparams->get('show_noauth', 0);
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
@@ -1625,13 +1621,24 @@ class modFlexicontentHelper
 		
 		$display_voting	= $params->get('display_voting');
 		$display_voting_feat = $params->get('display_voting_feat');
-		
+
 		// Decide to JOIN (or not) with rating TABLE, needed when displaying ratings and/or when ordering by ratings
 		$add_rated = $display_voting_feat || $display_voting || in_array('rated', $ordering);
 		
 		// Additional select and joins for ratings
-		$select_rated     = in_array('rated', $ordering) ? ', (cr.rating_sum / cr.rating_count) * 20 AS votes' : '';
-		$select_rated    .= $add_rated ? ', cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
+		$select_rated = $add_rated ? ', cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
+		if ( in_array('rated', $ordering) )
+		{
+			$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
+			$voting_field->parameters = new JRegistry($voting_field->attribs);
+			$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
+			$_weights = array();			
+			for ($i = 1; $i <= 9; $i++)
+			{
+				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
+			}
+			$select_rated   = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
+		}
 		$join_rated_type  = in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
 		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
 		
