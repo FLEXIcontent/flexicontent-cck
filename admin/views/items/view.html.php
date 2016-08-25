@@ -562,6 +562,8 @@ class FlexicontentViewItems extends JViewLegacy
 		// build item dates option list
 		$dates[1] = JText::_( 'FLEXI_CREATED' );
 		$dates[2] = JText::_( 'FLEXI_REVISED' );
+		$dates[3] = JText::_( 'FLEXI_PUBLISH_UP' );
+		$dates[4] = JText::_( 'FLEXI_PUBLISH_DOWN' );
 		$_dates = array();
 		foreach ($dates as $i => $v) {
 			$_dates[] = JHTML::_('select.option', $i, $v);
