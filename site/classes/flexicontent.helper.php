@@ -6791,8 +6791,8 @@ class flexicontent_db
 					case 4:  $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
 					default: $order_col = $cf.'.value'; break;  // Text
 				}
-				$order_dir = $params->get('orderbycustomfielddir'.$sfx, 'ASC');
-				if ($order_type != 4)
+				$order_dir = strtoupper($params->get('orderbycustomfielddir'.$sfx, 'ASC')) == 'ASC' ? 'ASC' : 'DESC';
+				if ($order_type != 4 && $order_dir=='ASC')
 				{
 					$order_col = 'ISNULL('.$cf.'.value), ' . $order_col;
 				}
@@ -6845,8 +6845,8 @@ class flexicontent_db
 						case 'file_hits': $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
 						default:          $order_col = $cf.'.value'; break;
 					}
-					$order_dir = strtolower($order_parts[3])=='desc' ? 'DESC' : 'ASC';
-					if ($order_type != 'file_hits')
+					$order_dir = strtoupper($order_parts[3])=='DESC' ? 'DESC' : 'ASC';
+					if ($order_type != 'file_hits' && $order_dir=='ASC')
 					{
 						$order_col = 'ISNULL('.$cf.'.value), ' . $order_col;
 					}
