@@ -35,14 +35,17 @@ if ($ff_placement){
 
 <?php echo $filter_form_body; ?>
 
-	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['filter_order_Dir']; ?>" />
+
+	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="view" value="category" />
-	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 	<input type="hidden" name="layout" value="<?php echo $this->layout_vars['layout']; ?>" />
+
+	<input type="hidden" name="letter" value="<?php echo JFactory::getApplication()->input->get('letter'); ?>" id="alpha_index" />
+	<input type="hidden" name="listall" value="<?php echo JFactory::getApplication()->input->get('listall'); ?>" />
 </form>
 
 <?php
