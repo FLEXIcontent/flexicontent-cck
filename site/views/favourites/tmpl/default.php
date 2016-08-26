@@ -141,9 +141,10 @@ $items	= & $this->items;
 	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
 ?>
 
-<input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
 <input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="" />
+
+<input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="view" value="favourites" />
 <input type="hidden" name="task" value="" />
 </form>
