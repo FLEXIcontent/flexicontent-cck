@@ -1342,6 +1342,7 @@
 					if (v != e.val) nVals[i++] = v;
 					else found = 1;
 				});
+
 				if (!found) nVals[i++] = e.val;
 				sel_EL.data('set_selected_values', nVals);
 				sel_EL.data('field_being_edited', true);
@@ -1369,11 +1370,9 @@
 			{
 				jQuery('#select2-drop').find('.select2-selected-visible, .select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
 				jQuery('#select2-drop').find('.select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
-				
-				sel_EL.data('set_selected_values', null).select2('val', nVals);
-				
-				// We will not trigger change on the select TAG, we will trigger this when selection finishes, by closing the drop-down
-				if (!sel_EL.data('field_being_edited')) sel_EL.trigger('change');
+
+				// Specific values were requested to be set, but first clear data value, to prevent loop in the change event
+				sel_EL.data('set_selected_values', null).select2('val', nVals).trigger('change');
 			}
 
 
