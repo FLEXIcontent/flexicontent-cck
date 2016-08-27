@@ -181,13 +181,13 @@ var JFormValidator = function()
 			// Check number of values limitations
 			var errorMessage = false;
 			if ( min_values && count < min_values) {
-				errorMessage = 'Minimum number of values: '+min_values;
+				errorMessage = Joomla.JText._('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT') + ': ' + min_values;
 			}
 			else if ( max_values && count > max_values) {
-				errorMessage = 'Maximum number of values: '+max_values;
+				errorMessage = Joomla.JText._('FLEXI_FIELD_SELECT_UP_TO_PROMPT') + ': ' + max_values;
 			}
 			else if ( exact_values && count != exact_values) {
-				errorMessage = 'Number of values must be exactly : '+exact_values;
+				errorMessage = Joomla.JText._('FLEXI_FIELD_SELECT_EXACTLY_PROMPT') + ': ' + exact_values;
 			}
 
 			var $el = jQuery(el);
