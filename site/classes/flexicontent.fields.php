@@ -2102,6 +2102,7 @@ class FlexicontentFields
 		static $lang_handlers = array();
 		static $pdf_parser = null;
 		static $search_prefix = null;
+		static $indexed_pdfs = array();
 
 		// Get search prefix
 		if ( $search_prefix === null )
@@ -2199,13 +2200,33 @@ class FlexicontentFields
 				{
 					if ( isset($v[$sp]) && strlen($v[$sp]) ) $search_value[] = $v[$sp];
 				}
-				
+
 				// Support for indexing text in PDF files
+				$err_msg = '';
 				if ( $pdf_parser && !empty($field->field_isfile) && strtolower(flexicontent_upload::getExt($v['filename'])) == 'pdf' )
-				{				
+				{
 					$abspath = JPath::clean( ($v['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) .DS. $v['filename'] );  //echo $abspath . "<br/>";  					//echo "<pre>"; print_r($v); echo "</pre>";
-					$pdf_data = $pdf_parser->parseFile($abspath);
-					$search_value[] = $pdf_data->getText();  // echo $text; exit;
+					if ( isset($indexed_pdfs[$abspath]) )
+					{
+						if (strlen($indexed_pdfs[$abspath])) $search_value[] = $indexed_pdfs[$abspath];
+					}
+					else
+					{
+						try {
+							//JFactory::getApplication()->enqueueMessage(($for_advsearch ? 'Parsing (ADV Index)' : 'Parsing (BASIC Index)') . ': ' . $abspath, 'message');
+							$pdf_data = @ $pdf_parser->parseFile($abspath);
+							$search_value[] = $indexed_pdfs[$abspath] = @ $pdf_data->getText();
+						}
+						catch (Exception $e) {
+							$indexed_pdfs[$abspath] = '';
+							$err_msg = (JFactory::getApplication()->isAdmin() ? implode(' ', error_get_last()) . ' <br/> ' : '' )  .  $e->getMessage();
+						}
+					}
+				}
+
+				if ($err_msg)
+				{
+					JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
 				}
 
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
@@ -2250,7 +2271,7 @@ class FlexicontentFields
 		}
 		
 		//if ($field->id==NN) echo $field->name . ": " . print_r($values, true) . "<br/>";
-		//if ($field->id==NN) if ( !empty($searchindex) ) implode(' | ', $searchindex) ."<br/><br/>";
+		//if ($field->id==NN) if ( !empty($searchindex) ) echo implode(' | ', $searchindex) ."<br/><br/>";
 	}
 	
 	
