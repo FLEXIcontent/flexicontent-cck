@@ -191,7 +191,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 	 */
 	function remove()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$model = $this->getModel('reviews');
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {

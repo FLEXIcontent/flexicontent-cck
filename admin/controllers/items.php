@@ -653,7 +653,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
 		
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid = $this->input->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid);
+
 		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
 		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
 		
@@ -718,12 +720,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get variables: model, user, item id, new ordering
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
-		
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
-		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
-		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
-		
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		$order = $this->input->get('order', array(0), 'array');
+		$ord_catid = $this->input->get('ord_catid', array(0), 'array');
+		$prev_order = $this->input->get('prev_order', array(0), 'array');
+
 		JArrayHelper::toInteger($cid);
 		JArrayHelper::toInteger($order);
 		JArrayHelper::toInteger($ord_catid);

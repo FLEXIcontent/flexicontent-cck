@@ -208,9 +208,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				if (!file_exists($targetDir))  @mkdir($targetDir);
 				$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
 
-				ini_set('track_errors', 1);
-				if (!$out = @fopen("{$filePath_tmp}", "ab")) {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$filePath_tmp. ' fopen failed. reason: ' .@$php_errormsg. '"}, "id" : "id"}');
+				if (!$out = @fopen("{$filePath_tmp}", "ab"))
+				{
+					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$filePath_tmp. ' fopen failed. reason: ' . implode(' ', error_get_last()) . '"}, "id" : "id"}');
 				}
 			}
 			
@@ -750,8 +750,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if ($file_mode == 'folder_mode')
 		{
-			$filename = rawurldecode( JRequest::getVar('filename') );
+			$filename = rawurldecode( $this->input->get('filename') );
 			//$filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
+
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
 			$field = $db->loadObject();
 			$field->parameters = new JRegistry($field->attribs);
@@ -1069,7 +1070,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$user  = JFactory::getUser();
 		$model = $this->getModel('filemanager');
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$cid = $this->input->get('cid', array(0), 'array');
 		JArrayHelper::toInteger($cid, array(0));
 		
 		$file_id = (int)$cid[0];
@@ -1087,7 +1088,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 		
-		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$accesses = $this->input->get('access', array(0), 'array');
+		JArrayHelper::toInteger($accesses);
 		$access = $accesses[$file_id];
 		
 		if(!$model->saveaccess( $file_id, $access )) {
