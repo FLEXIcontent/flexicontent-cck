@@ -114,6 +114,8 @@ class JFormFieldQfcategory extends JFormField
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 		
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
 		
@@ -123,13 +125,15 @@ class JFormFieldQfcategory extends JFormField
 		
 		if ($language && $option=='com_flexicontent' && $view=='category')
 		{
-			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
-			$assocs_id = $cid[0];
-			if (!$assocs_id) {
-				$id = JRequest::getVar( 'id', array(0), $hash='default', 'array' );
-				JArrayHelper::toInteger($id, array(0));
-				$assocs_id = $id[0];
+			$id = $jinput->get('id', array(0), 'array');
+			JArrayHelper::toInteger($id);
+			$assocs_id = (int) $id[0];
+			
+			if (!$assocs_id)
+			{
+				$cid = $jinput->get('cid', array(0), 'array');
+				JArrayHelper::toInteger($cid);
+				$assocs_id = (int) $cid[0];
 			}
 		}
 		$link = 'index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component';

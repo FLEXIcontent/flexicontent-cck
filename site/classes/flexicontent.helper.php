@@ -6948,7 +6948,9 @@ class flexicontent_db
 	 */
 	static function checkin($tbl, $redirect_url, & $controller)
 	{
-		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid);
+
 		$user = JFactory::getUser();
 		$controller->setRedirect( $redirect_url, '' );
 

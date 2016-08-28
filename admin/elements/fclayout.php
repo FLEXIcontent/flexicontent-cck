@@ -59,6 +59,8 @@ class JFormFieldFclayout extends JFormFieldList
 		$value = $value ? $value : $attributes['default'];
 		
 		// Get current extension and id being edited
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
 		$view   = JRequest::getVar('view');
 		$option = JRequest::getVar('option');
 		if (
@@ -66,11 +68,11 @@ class JFormFieldFclayout extends JFormFieldList
 			$option == 'com_advancedmodules' ||
 			($option == 'com_falang' && JRequest::getVar('catid')=='modules')
 		) $view = 'module';
-		
-		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-		JArrayHelper::toInteger($cid, array(0));
+
+		$cid = $jinput->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid);
 		$pk = $cid[0];
-		if (!$pk) $pk = JRequest::getInt( 'id', 0 );
+		if (!$pk) $pk = $jinput->get('id', 0, 'int');
 		
 		
 		// Initialize variables.

@@ -18,7 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$cid = JRequest::getVar( 'cid', array(0) );
+$cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
+JArrayHelper::toInteger($cid);
+
 $edit		= JRequest::getVar('edit',true);
 $text = intval($edit) ? JText::_( 'Edit' ) : JText::_( 'New' );
 $cparams = JComponentHelper::getParams ('com_media');

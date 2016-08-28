@@ -2594,7 +2594,7 @@ class ParentClassItem extends JModelAdmin
 					
 					// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexSearch', array( &$field, &$postdata[$field->name], &$item ));
-					if ( strlen(@$field->search[$item->id]) ) $searchindex[] = $field->search[$item->id];
+					if ( isset($field->search[$item->id]) && strlen($field->search[$item->id]) ) $searchindex[] = $field->search[$item->id];
 					//echo $field->name .":".@$field->search[$item->id]."<br/>";
 				}
 			}
@@ -3934,6 +3934,7 @@ class ParentClassItem extends JModelAdmin
 
 			// Load XML file of the ilayout and filter / validate selected ilayout parameters
 			$layout_data = array();
+			$fset = 'attribs';
 			if ( $layoutpath && isset($params['layouts'][$new_ilayout]) )
 			{
 				// Attempt to parse the XML file
@@ -3950,9 +3951,7 @@ class ParentClassItem extends JModelAdmin
 					$tmpl_params = $xml->asXML();
 					$jform->load($tmpl_params);
 
-					$fset = 'attribs';
 					$layout_data[$fset] = $params['layouts'][$new_ilayout];
-
 					//foreach ($jform->getGroup($fset) as $field) { if ( !empty($field->getAttribute('filter')) ) echo $field->fieldname .' filt: '. $field->getAttribute('filter') . "<br/>"; } exit;
 
 					// Filter and validate the resulting data
