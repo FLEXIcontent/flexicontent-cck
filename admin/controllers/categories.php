@@ -115,7 +115,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$perms = FlexicontentHelperPerm::getPerm();
 		$CanCats = $perms->CanCats;
 		
-		$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid = $this->input->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid);
 		$msg = '';
 		
 		if (!is_array( $cid ) || count( $cid ) < 1)
@@ -247,7 +248,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$perms = FlexicontentHelperPerm::getPerm();
 		$CanCats = $perms->CanCats;
 		
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid = $this->input->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid);
 		$msg = '';
 
 		if (!is_array( $cid ) || count( $cid ) < 1)
@@ -317,11 +319,14 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$user  = JFactory::getUser();
 		$task  = JRequest::getVar( 'task' );
 		$model = $this->getModel('categories');
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id    = (int)$cid[0];
+
+		$cid = $this->input->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid);
+		$id = (int) $cid[0];
 		
 		// Get new category access
-		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$accesses = $this->input->get('access', array(0), 'array');
+		JArrayHelper::toInteger($accesses);
 		$access = $accesses[$id];
 
 		// Check authorization for access setting task

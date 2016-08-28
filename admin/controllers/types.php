@@ -383,7 +383,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 
 		$model = $this->getModel('types');
 		$task  = JRequest::getVar( 'task' );
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$id    = (int)$cid[0];
 
 		// calculate access
@@ -429,7 +429,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$model = $this->getModel('types');
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
 
 		// calculate access
 		$perms = FlexicontentHelperPerm::getPerm();
