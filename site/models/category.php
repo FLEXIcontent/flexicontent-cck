@@ -153,7 +153,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	public function __construct()
 	{
 		// Set category id and call constrcuctor
-		$cid		= JRequest::getInt('cid', 0);
+		$cid = JFactory::getApplication()->input->get('cid', 0, 'int');
 		$this->setId((int)$cid);  // This will set the category id and clear all member variables
 		parent::__construct();
 		
@@ -176,20 +176,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$view   = $jinput->get('view', '', 'cmd');
 		$p      = $option.'.'.$view.'.';
 		
-		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
+		$this->_layout = $app->input->get('layout', '', 'cmd');  // !! This should be empty for empty for 'category' layout
 		
 		// Force layout to be have proper value
 		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
 		{
 			//JError::raiseNotice(0, "'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin");
 			$this->_layout = '';
-			JRequest::setVar('layout', '');
+			$app->input->set('layout', '');
 		}
 		
-		$this->_clayout = JRequest::getCmd('clayout', '');  // !! This should be empty for using view's configured clayout (template)
+		$this->_clayout = $jinput->get('clayout', '', 'cmd');  // !! This should be empty for using view's configured clayout (template)
 		
 		if ($this->_layout=='author') {
-			$this->_authorid = JRequest::getInt('authorid', 0);
+			$this->_authorid = $jinput->get('authorid', 0, 'int');
 		}
 		else if ($this->_layout=='myitems') {
 			$this->_authorid = $user->id;
@@ -198,11 +198,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_uid = $user->id;
 		}
 		else if ($this->_layout=='tags') {
-			$_tagid = JRequest::getInt('tagid', '');
+			$_tagid = $jinput->get('tagid', 0, 'int');
 			$this->_tagid = $_tagid;
 		}
 		else if ($this->_layout=='mcats') {
-			$_cids = JRequest::getVar('cids', '');
+			$_cids = $jinput->get('cids', '');
 			if ( !is_array($_cids) ) {
 				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
 				$_cids = explode(',', $_cids);
@@ -241,8 +241,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// ******************************************************************************
 
 		// Set filter order variables into state
-		$this->setState('filter_order', JRequest::getCmd('filter_order', 'i.title', 'default'));
-		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'ASC', 'default'));
+		$this->setState('filter_order', $jinput->get('filter_order', 'i.title', 'cmd'));
+		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 		
 		// Get minimum word search length
 		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
@@ -315,17 +315,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
 		$this->_active_limit = strlen( $app->input->get('limit') );
 		$limit = $this->_active_limit ? $app->input->get('limit', 0, 'int') : $this->_params->get('limit');
-		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
-		
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
-		$app->input->set('limitstart', $limitstart);
-		
 		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-		
-		
+
+
 		// Allow limit zero to achieve a category view without items
 		if ($limit <= 0)
 		{
@@ -345,10 +337,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				$limit_before = (int) $cparams->get('limit_before_search_filt', 0);
 				$limit = $use_limit_before  ?  $limit_before  :  $limit;
-				JRequest::setVar('limit', $limit);
 				$app->input->set('limit', $limit);
 				$this->setState('limit', $limit);
 			}
+			
+			// Get limitstart, and in case limit has been changed, adjust it accordingly
+			$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
+			$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+			$this->setState('limitstart', $limitstart);
+
+			// Make sure it is limitstart is set
+			$app->input->set('limitstart', $limitstart);
+			$app->input->set('start', $limitstart);
 			
 			try {
 				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
@@ -382,18 +382,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Assign total number of items found this will be used to decide whether to do item counting per filter value
 			global $fc_catview;
 			$fc_catview['view_total']  = $this->_total;
-			
-			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
-				$this->_data = $this->_getList( $query, $limitstart, $limit );
-			} else {
-				$this->setState('limitstart', 0);
-				$this->setState('start', 0);
-				JRequest::setVar('start', 0);
-				JRequest::setVar('limitstart', 0);
-				$app->input->set('start', 0);
-				$app->input->set('limitstart', 0);
-				$this->_data = $this->_getList( $query, 0, $limit );
-			}*/
 			
 			// 4, get item data
 			if (count($query_ids)) $query = $this->_buildQuery($query_ids);
@@ -641,7 +629,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$select_access = $this->_buildAccessSelect();
 			
 			// Create JOIN (and select column) of image field used as item image in RSS feed
-			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
+			$feed_image_source = $jinput->get('type', '', 'cmd') == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
 			if ($feed_image_source) {
 				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
 				$feed_img_col = ', img.value as image';
@@ -1064,14 +1052,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Create WHERE clause part for Text Search 
 		// ****************************************
 		
-		$text = JRequest::getString('filter', JRequest::getString('q', ''), 'default');
+		$text = $app->input->get('filter', $app->input->get('q', '', 'string'), 'string');
 		
 		// Check for LIKE %word% search, for languages without spaces
 		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
 		
 		$phrase = $filter_word_like_any ?
-			JRequest::getWord('searchphrase', JRequest::getWord('p', 'any'),   'default') :
-			JRequest::getWord('searchphrase', JRequest::getWord('p', 'exact'), 'default');
+			$app->input->get('searchphrase', $app->input->get('p', 'any', 'word'), 'word') :
+			$app->input->get('searchphrase', $app->input->get('p', 'exact', 'word'), 'word') ;
 		
 		$si_tbl = 'flexicontent_items_ext';
 		
@@ -1103,8 +1091,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
 					if (empty($words)) {
 						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
-						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						$app->input->set('ignoredwords', implode(' ', $stopwords));
+						$app->input->set('shortwords', implode(' ', $shortwords));
 						$_text_match = ' 0=1 ';
 					} else {
 						// speed optimization ... 2-level searching: first require ALL words, then require exact text
@@ -1120,8 +1108,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$stopwords = array();
 					$shortwords = array();
 					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
-					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					$app->input->set('ignoredwords', implode(' ', $stopwords));
+					$app->input->set('shortwords', implode(' ', $shortwords));
 					
 					$newtext = '+' . implode( '* +', $words ) . '*';
 					$quoted_text = $db->escape($newtext, true);
@@ -1138,8 +1126,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 						$stopwords = array();
 						$shortwords = array();
 						if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
-						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						$app->input->set('ignoredwords', implode(' ', $stopwords));
+						$app->input->set('shortwords', implode(' ', $shortwords));
 						
 						$newtext = implode( '* ', $words ) . '*';
 						$quoted_text = $db->escape($newtext, true);
@@ -1182,7 +1170,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
 		
 		// Override text search auto-complete category ids with those of filter 13
-		$f13_val = JRequest::getVar('filter_13');
+		$f13_val = $app->input->get('filter_13');
 		if ( isset($filters[13]) && !empty($f13_val) )
 		{
 			$cparams->set('txt_ac_cid', 'NA');
@@ -1194,7 +1182,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			$filt_vals  = JRequest::getVar('filter_'.$filter->id, '', '');
+			$filt_vals = $app->input->get('filter_'.$filter->id, '');
 			
 			// Skip filters without value
 			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
@@ -1232,7 +1220,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildAlphaIndexWhere()
 	{
 		// Get alpha index request variable and do some security checks, by removing any quotes and other non-valid characters
-		$alpha = JRequest::getVar('letter', NULL, 'request', 'string');
+		$alpha = JFactory::getApplication()->input->get('letter', NULL, 'string');
 		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
 		
 		if (StringHelper::strlen($alpha)==0) {
@@ -1887,7 +1875,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Maybe these should not be changed ... and instead the view will get correct value from state !!
 		$params->set('clayout', $clayout);
-		JRequest::setVar('clayout', $clayout);
 		$app->input->set('clayout', $clayout);
 	}
 	
@@ -1912,7 +1899,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// a. Clone component parameters ... we will use these as parameters base for merging
 		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
 		
-		$debug_inheritcid = JRequest::getCmd('print') ? 0 : $compParams->get('debug_inheritcid');
+		$debug_inheritcid = $app->input->get('print', null, 'cmd') ? 0 : $compParams->get('debug_inheritcid');
 		if ($debug_inheritcid) {
 			$merge_stack = array();
 			array_push($merge_stack, "CLONED COMPONENT PARAMETERS");
