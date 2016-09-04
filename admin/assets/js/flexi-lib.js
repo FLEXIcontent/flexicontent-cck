@@ -114,5 +114,10 @@ jQuery(document).ready(function(){
 
 		}
 	});//.disableSelection();
+	
+	//ABILITY TO HIDE MENU ITEMS
+	 jQuery("#flexicontent #submenu li").each(function(i) {
+        jQuery(this).addClass("flexi" + (i+1));
+        });
 });
 
