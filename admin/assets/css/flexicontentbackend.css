@@ -3786,3 +3786,5 @@ ul.import-failed li {
 	min-width: 50px;
 	box-sizing: border-box;
 }
+/**/
+.admintable .row {margin-left: 0 !important;}
