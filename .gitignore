@@ -15,12 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
-site/templates/blog-1/
-site/templates/default-1/
-site/templates/faq-1/
-site/templates/items-tabbed-1/
-site/templates/presentation-1/
-site/librairies/pdfparser/
+
 
 # External tool builders
 .externalToolBuilders/
@@ -50,6 +45,15 @@ Desktop.ini
 # Mac crap
 .DS_Store
 
-#cache
+# cache
 cache
+
+# other
 flexicontent-cck.zip
+site/templates/blog-1/
+site/templates/default-1/
+site/templates/faq-1/
+site/templates/items-tabbed-1/
+site/templates/presentation-1/
+site/librairies/pdfparser/
+site/librairies/phpthumb/phpThumb.config_OVERRIDE.php

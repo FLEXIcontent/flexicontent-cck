@@ -1,8 +1,6 @@
 <?php
-
 // THIS FILES IS NOT OVERWRITTEN BY FLEXICONTENT
 // PLEASE ADD YOUR CUSTOM CONFIGURATION STRINGS HERE
-
 
 // * DocumentRoot configuration
 // phpThumb() depends on $_SERVER['DOCUMENT_ROOT'] to resolve path/filenames. This value is usually correct,

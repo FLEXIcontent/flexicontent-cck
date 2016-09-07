@@ -358,6 +358,9 @@ table.admintable fieldset {
 	margin: 0 !important;
 	padding: 0 !important;
 }
+table.admintable .row {
+	margin-left: 0 !important;
+}
 dl.tabs {
 	float: left;
 	margin: 10px 0 -1px;
