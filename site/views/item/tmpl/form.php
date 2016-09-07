@@ -486,7 +486,7 @@ if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1
 						$ff_id = 'jfdata_'.$t->shortcode.'_title';
 						$ff_name = 'jfdata['.$t->shortcode.'][title]';
 						?>
-						<input class="inputbox fc_form_title fcfield_textval" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="40" maxlength="254" />
+						<input class="inputbox fc_form_title" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="40" maxlength="254" />
 					</div>
 				<?php endif; ?>
 			<?php endforeach; ?>
@@ -536,7 +536,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 						$ff_id = 'jfdata_'.$t->shortcode.'_alias';
 						$ff_name = 'jfdata['.$t->shortcode.'][alias]';
 						?>
-						<input class="inputbox fc_form_alias fcfield_textval" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="40" maxlength="254" />
+						<input class="inputbox fc_form_alias" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="40" maxlength="254" />
 					</div>
 				<?php endif; ?>
 			<?php endforeach; ?>
@@ -779,7 +779,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
 				<div class="fcclear"></div>
 				<div id="tags">
-					<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
+					<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"
 						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
 						title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
 					/>
