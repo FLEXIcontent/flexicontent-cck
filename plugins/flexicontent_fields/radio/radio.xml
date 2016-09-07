@@ -237,7 +237,7 @@
 				<option value="1" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_QUERY</option>
 				<option value="2" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_ELEMENTS</option>
 			</field>
-			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field->id}' AND value != '' GROUP BY value" />
+			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" hint="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field->id}' AND value != '' GROUP BY value" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			

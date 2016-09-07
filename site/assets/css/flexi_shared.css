@@ -478,9 +478,8 @@ div#tags {
 	float: left;
 }
 div#tags #input-tags {
-	margin: 0px;
 	width: auto;
-	box-sizing: border-box;
+	vertical-align: top;
 }
 div#tags #input_new_tag {
 	display: inline-block;
@@ -1038,10 +1037,9 @@ body .span6 .container_fcfield,
 }
 body .input-fcmax.container_fcfield input,
 #flexicontent .input-fcmax.container_fcfield input {
-	width: 96%;
+	width: 90%;
 	padding-left: 2%;
 	padding-right: 2%;
-	margin: 0;
 }
 body .container_fcfield input.input-xxlarge,
 #flexicontent .container_fcfield input.input-xxlarge {
