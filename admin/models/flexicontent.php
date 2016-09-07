@@ -856,11 +856,40 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.path');
-		
+
+		$conf_override_file = JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
+
+		// CHECK phpThumb configuration override file exists and create it, if it does not exist
+		if ( !JFile::exists($conf_override_file) )
+		{
+			$file_contents =
+				'<?php'."\n".
+				'// THIS FILES IS NOT OVERWRITTEN BY FLEXICONTENT'."\n".
+				'// PLEASE ADD YOUR CUSTOM CONFIGURATION STRINGS HERE'."\n".
+				''."\n".
+				'// * DocumentRoot configuration'."\n".
+				'// phpThumb() depends on $_SERVER[\'DOCUMENT_ROOT\'] to resolve path/filenames. This value is usually correct,'."\n".
+				'// but has been known to be broken on some servers. This value allows you to override the default value.'."\n".
+				'// Do not modify from the auto-detect default value unless you are having problems.'."\n".
+				''."\n".
+				'// $PHPTHUMB_CONFIG[\'document_root\'] =  ...;'."\n";
+
+			// write .htaccess file
+			$fh = @ fopen($conf_override_file, 'w');
+			if (!$fh) {
+				JFactory::getApplication()->enqueueMessage( 'Cannot create/write file: '.$conf_override_file, 'notice' );
+			} else {
+				fwrite($fh, $file_contents);
+				fclose($fh);
+			}
+		}
+
+
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 		
 		// CHECK phpThumb cache exists and create the folder
-		if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) ) {
+		if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) )
+		{
 			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
@@ -869,11 +898,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// CHECK phpThumb cache permissions
 		$perms = JPath::getPermissions($phpthumbcache);
 		$return = preg_match('/rwx....../i', $perms) ? true : false;  //'/rwxr.xr.x/i'
-		if ( $return && preg_match('/....w..w./i', $perms) ) {
+		if ( $return && preg_match('/....w..w./i', $perms) )
+		{
 			JPath::setPermissions($phpthumbcache, '0600', '0700');
 		}
+		
 		// If permissions not good check if we can change them
-		if ( !$return && !JPath::canChmod($phpthumbcache) ) {
+		if ( !$return && !JPath::canChmod($phpthumbcache) )
+		{
 			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
