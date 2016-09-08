@@ -163,10 +163,10 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		}
 		
 		// Case of uploader column not applicable or not allowed
-		if (!$folder_mode && !$perms->CanViewAllFiles) unset($this->cols['uploader']);
+		if (!$folder_mode && !$perms->CanViewAllFiles) unset($cols['uploader']);
 		
 		if ($filter_ext) $count_filters++;
-		if ($filter_uploader && !empty($this->cols['uploader'])) $count_filters++;
+		if ($filter_uploader && !empty($cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
 		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
@@ -348,8 +348,11 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_ext, '-'/*1*/);
 
 		//build uploader filterlist
-		$lists['uploader'] = ($filter_uploader || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_UPLOADERS').'</div>' : '').
-			flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_uploader, '-'/*1*/);
+		if ($perms->CanViewAllFiles && !empty($cols['uploader']))
+		{
+			$lists['uploader'] = ($filter_uploader || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_UPLOADERS').'</div>' : '').
+				flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_uploader, '-'/*1*/);
+		}
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
