@@ -21,7 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 $ctrl_task = FLEXI_J16GE ? 'task=filemanager.' : 'controller=filemanager&task=';
 $pdf_parser = FlexicontentFields::getPDFParser();
 
-$indexer_name = JFactory::getApplication()->get('indexer', 'fileman_files', 'cmd');
+$indexer_name = JFactory::getApplication()->get('indexer', 'fileman_default', 'cmd');
 $rebuildmode  = JFactory::getApplication()->get('rebuildmode', '', 'cmd');
 ?>
 <div>&nbsp;</div>

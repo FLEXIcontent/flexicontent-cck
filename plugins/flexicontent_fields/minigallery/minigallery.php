@@ -158,6 +158,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect
 			//.'&amp;filter_uploader='.$user->id
 			.'&amp;targetid=%s'
+			.'&amp;existing_class=fc_filedata_storage_name'
 			.'&amp;' . JSession::getFormToken() . '=1';
 		
 		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
@@ -205,12 +206,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				var description = typeof file_data.description !== 'undefined' ? file_data.description : '';
 				var language    = typeof file_data.language    !== 'undefined' ? file_data.language    : '';
 				
+				var strorage_name = typeof file_data.filename !== 'undefined' ? file_data.filename : file;
 				var altname = typeof file_data.altname !== 'undefined' ? file_data.altname : '';
 				var displaytitle = altname && (altname!=file) ? altname : '-';
 				var hidden_text  = altname && (altname!=file) ? file+'<br/>'+altname : '';
 				
 				var container = jQuery('#'+targetid).closest('.fcfieldval_container');
 				container.find('.fc_fileid').val(id);
+				container.find('.fc_filedata_storage_name').html(strorage_name);
 				
 				container.find('.fc_filedata_txt_nowrap').html(hidden_text).show();
 				container.find('.fc_filedata_txt').removeClass('file_unpublished').val(file).blur();

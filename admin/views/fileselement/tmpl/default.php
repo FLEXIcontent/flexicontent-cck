@@ -68,8 +68,8 @@ if ($this->folder_mode) $list_total_cols -= 7;
 if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0) $list_total_cols -= (count($this->optional_cols) - count($this->cols));
 
 // Currently multi-uploading is supported / finished only for LAYOUT 'image'
-$_forced_secure_val = $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
-$_forced_secure_int = $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? '0' : '1');
+$_forced_secure_val = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
+$_forced_secure_int = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? '0' : '1');
 $_tmpl = $this->view=='fileselement' ? 'component' : '';
 
 $uconf = new JRegistry();
@@ -80,7 +80,7 @@ if (!empty($this->field))
 }
 
 $is_inline_input = strlen($uconf->get('inputmode')) && $uconf->get('inputmode', 0) == 0;
-$enable_multi_uploader = $this->view=='filemanager' || $is_inline_input;
+$enable_multi_uploader = $this->view=='filemanager' || $is_inline_input || $this->layout == 'image';
 ?>
 
 <script type="text/javascript">
@@ -533,7 +533,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<?php endif; ?>
 				</span>
 
-				<?php if ($this->fieldid && $this->CanViewAllFiles && !empty($this->cols['uploader'])) : /* WHEN using field id (fileselement view) place filter outside the filter box */ ?>
+				<?php if ( $this->fieldid && isset($this->lists['uploader']) ) : /* WHEN using field id (fileselement view) place filter outside the filter box */ ?>
 				<div class="fc-filter nowrap_box">
 					<div <?php echo $fcfilter_attrs_row; ?> >
 						<?php echo $this->lists['uploader']; ?>
@@ -577,7 +577,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					</div>
 				</div>
 
-				<?php if (!$this->fieldid && $this->CanViewAllFiles && !empty($this->cols['uploader'])) : ?>
+				<?php if ( !$this->fieldid && isset($this->lists['uploader']) ) : ?>
 				<div class="fc-filter nowrap_box">
 					<div <?php echo $fcfilter_attrs_row; ?> >
 						<?php echo $this->lists['uploader'].' &nbsp; &nbsp; &nbsp;'; ?>
@@ -706,7 +706,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					// Check if file is NOT an known / allowed image, and skip it if LAYOUT is 'image' otherwise display a 'type' icon
 					if ( !in_array($ext, $imageexts)) {
-						if ( $this->layout=='image')
+						if ( $this->layout == 'image' )
 							continue;
 						else
 							$thumb_or_icon = JHTML::image($row->icon, $row->filename);
@@ -766,7 +766,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					if ($this->folder_mode) {
 						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."', 0, '".$filename_original."');document.getElementById('file{$i}').className='striketext';";
 					} else {
-						$img_assign_link = "var file_data = _file_data[ '".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', '".$this->targetid."', file_data);";
+						$img_assign_link = "var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', '".$this->targetid."', file_data);";
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
@@ -789,7 +789,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					<td class="left">
 						<?php
-							$_filename_original = $row->filename_original ? $row->filename_original :$row->filename;
+							$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
 							if (StringHelper::strlen($row->filename_original) > 100) {
 								$filename_cut = htmlspecialchars(flexicontent_html::striptagsandcut($_filename_original, 100) . '...', ENT_QUOTES, 'UTF-8');
 							} else {
@@ -803,12 +803,11 @@ flexicontent_html::loadFramework('flexi-lib');
 						'; ?>
 						
 						<?php
-						if (!$this->folder_mode && $row->altname != $row->filename_displayed) {
-							if (StringHelper::strlen($row->altname) > 100) {
-								echo '<br/><small>'.StringHelper::substr( htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8'), 0 , 100).'... </small>';
-							} else {
-								echo '<br/><small>'.htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8').'</small>';
-							}
+						if (!$this->folder_mode && $row->filename != $row->filename_displayed)
+						{
+							echo StringHelper::strlen($row->filename) > 100 ?
+								'<br/><small>'.StringHelper::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 100).'... </small>' :
+								'<br/><small>'.htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8').'</small>' ;
 						}
 						?>
 					</td>
