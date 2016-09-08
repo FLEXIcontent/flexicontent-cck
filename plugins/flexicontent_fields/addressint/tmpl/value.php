@@ -49,22 +49,17 @@ static $addressint_map_styles = array();
 
 if ( !isset($addressint_map_styles[$field->id]) )
 {
+	$addressint_map_styles[$field->id] = null;
 	$map_style = trim($field->parameters->get('map_style',''));
 
-	if (!$map_style)
+	if ( strlen($map_style) )
 	{
 		json_decode($map_style);
+		if (json_last_error() == JSON_ERROR_NONE)
+			$addressint_map_styles[$field->id] = $map_style;
+		else
+			echo '<div class="alert alert-warning"> Bad map styling was set for Address International field #: '. $field->id.'</div>';
 	}
-
-	if (!$map_style || json_last_error() == JSON_ERROR_NONE)
-	{
-		$addressint_map_styles[$field->id] = $map_style;
-	}
-	else
-	{
-		$addressint_map_styles[$field->id] = null;
-		echo '<div class="alert alert-warning"> Bad map styling was set for Address International field #: '. $field->id.'</div>';
-	}		 
 }
 $map_style = $addressint_map_styles[$field->id];
 
