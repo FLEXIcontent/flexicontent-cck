@@ -166,10 +166,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		}
 		
 		// Case of uploader column not applicable or not allowed
-		if (!$folder_mode && !$perms->CanViewAllFiles) unset($this->cols['uploader']);
+		if (!$folder_mode && !$perms->CanViewAllFiles) unset($cols['uploader']);
 		
 		if ($filter_ext) $count_filters++;
-		if ($filter_uploader && !empty($this->cols['uploader'])) $count_filters++;
+		if ($filter_uploader && !empty($cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
 		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
@@ -179,6 +179,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
 		$autoselect       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       0, 				  'int' );
+		$existing_class   = $app->getUserStateFromRequest( $option.'.'.$_view.'.existing_class',   'existing_class', 'existingname','string' );
 		
 		$folder_param			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_param',     'folder_param',		 'dir',				'string' );
 		$append_item			= $app->getUserStateFromRequest( $option.'.'.$_view.'.append_item',      'append_item',      1, 				  'int' );
@@ -304,10 +305,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 				
 				// Find and mark file usage by filename search
 				var original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');  // newly selected field values, not yet saved in DB
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');  // existing field values, already saved in DB
+				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
 				
 				var imgobjs = Array();
-				for(i=0,n=original_objs.length; i<n; i++)  {
+				for (i=0,n=original_objs.length; i<n; i++)
+				{
 					if (original_objs[i].value) imgobjs.push(original_objs[i].value);
 					if (delfilename!='' && original_objs[i].value == delfilename)
 					{
@@ -315,7 +317,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 						remove_existing_files_from_list = 1;
 					}
 				}
-				for(i=0,n=existing_objs.length; i<n; i++) {
+				for (i=0,n=existing_objs.length; i<n; i++)
+				{
 					if (existing_objs[i].value) imgobjs.push(existing_objs[i].value);
 					if (delfilename!='' && existing_objs[i].value == delfilename)
 					{
@@ -324,14 +327,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 					}
 				}
 				
-				if ( remove_existing_files_from_list || remove_new_files_from_list ) {
+				if ( remove_existing_files_from_list || remove_new_files_from_list )
+				{
 					mssg = '".JText::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
 					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".JText::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
 					alert( mssg );
 					window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '2');
 				}
 				
-				for(i=0,n=imgobjs.length; i<n; i++) {
+				for (i=0,n=imgobjs.length; i<n; i++)
+				{
 					var rows = jQuery.find('a[data-filename=\"'+ imgobjs[i] +'\"]');
 					jQuery(rows).addClass('striketext');
 				}
@@ -378,19 +383,22 @@ class FlexicontentViewFileselement extends JViewLegacy
 			jQuery(document).ready(function()
 			{
 				// Find and mark file usage by filename search
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
-				for(i=0,n=existing_objs.length; i<n; i++) {
-					var rows = jQuery.find('a[data-filename=\"'+ existing_objs[i].value +'\"]');
+				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
+				for (i=0,n=existing_objs.length; i<n; i++)
+				{
+					var rows = jQuery.find('a[data-filename=\"'+ existing_objs[i].innerHTML +'\"]');
 					jQuery(rows).addClass('striketext');
 				}
 				
 				// Find and mark file usage by fileid search
 				var id_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." input.contains_fileid');
 				var imgids = Array();
-				for(i=0,n=id_objs.length; i<n; i++) {
+				for (i=0,n=id_objs.length; i<n; i++)
+				{
 					if ( id_objs[i].value) imgids.push(id_objs[i].value);
 				}
-				for(i=0,n=imgids.length; i<n; i++) {
+				for (i=0,n=imgids.length; i<n; i++)
+				{
 					var rows = jQuery.find('a[data-fileid=\"'+ imgids[i] +'\"]');
 					jQuery(rows).addClass('striketext');
 				}
@@ -495,8 +503,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 			flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_ext, '-'/*1*/);
 
 		//build uploader filterlist
-		$lists['uploader'] = ($filter_uploader || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_UPLOADERS').'</div>' : '').
-			flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_uploader, '-'/*1*/);
+		if ($perms->CanViewAllFiles && !empty($cols['uploader']))
+		{
+			$lists['uploader'] = ($filter_uploader || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_UPLOADERS').'</div>' : '').
+				flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_uploader, '-'/*1*/);
+		}
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
