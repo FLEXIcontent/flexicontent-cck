@@ -137,14 +137,14 @@
 
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level2" depend_class="client-resize use-myfiles-on"  />
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" depend_class="client-resize use-myfiles-on"  class="alert alert-info fcpadded"/>
-			<field name="resize_on_upload" type="multilist" subtype="radio" default="1" label="FLEXI_RESIZE_ON_UPLOADED_IMAGE" description="FLEXI_RESIZE_ON_UPLOADED_IMAGE_DESC" depend_class="client-resize use-myfiles-on"  class="btn-group btn-group-yesno">
+			<field name="resize_on_upload" type="multilist" subtype="radio" default="" label="FLEXI_RESIZE_ON_UPLOADED_IMAGE" description="FLEXI_RESIZE_ON_UPLOADED_IMAGE_DESC" depend_class="client-resize use-myfiles-on"  class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="upload_max_w" type="text" default="4000" size="5" label="FLEXI_IMAGE_WIDTH" description="..." depend_class="client-resize use-myfiles-on"  />
-			<field name="upload_max_h" type="text" default="3000" size="5" label="FLEXI_IMAGE_HEIGHT" description=".." depend_class="client-resize use-myfiles-on"  />
-			<field name="upload_method" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" depend_class="client-resize use-myfiles-on" class="btn-group group-fcinfo">
+			<field name="upload_max_w" type="text" default="" size="5" label="FLEXI_IMAGE_WIDTH" description="..." depend_class="client-resize use-myfiles-on"  />
+			<field name="upload_max_h" type="text" default="" size="5" label="FLEXI_IMAGE_HEIGHT" description=".." depend_class="client-resize use-myfiles-on"  />
+			<field name="upload_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" depend_class="client-resize use-myfiles-on" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_COMPONENT_SETTING</option>
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
