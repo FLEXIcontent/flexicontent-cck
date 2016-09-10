@@ -171,6 +171,13 @@ icon-typeadd:before,
 .icon-advindexdirty:before {
 	content: "\e001";
 }
+@media (min-width: 1020px) {
+	#toolbar-purge,
+	#toolbar-custom_order,
+	#toolbar-download {
+		margin-left: 32px;
+	}
+}
 .flexicontent #adminForm a.saveorder {
 	float: none !important;
 	vertical-align: middle !important;
