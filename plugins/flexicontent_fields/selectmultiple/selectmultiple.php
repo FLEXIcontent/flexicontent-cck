@@ -144,7 +144,7 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 			$fftype = self::$valueIsArr ? 'checkbox' : 'radio';
 
 			// Applicable only for radioimage/checkboximage fields, it allows a more compact display in item form
-			$form_vals_display = self::$usesImages && (int) $field->parameters->get( 'form_vals_display', 1 ) ;  // 0: label, 1: image, 2: both
+			$form_vals_display = self::$usesImages ? (int) $field->parameters->get( 'form_vals_display', 1 ) : 0 ;  // 0: label, 1: image, 2: both
 
 			// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
 			$pretext   = $field->parameters->get( 'pretext_form', '' ) ;
