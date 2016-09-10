@@ -313,8 +313,27 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}
 		
-		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);
-		
+		//$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', 'search.purge', false);
+		$btn_icon = 'icon-trash';
+		$btn_name = 'purge';
+		$btn_task = 'search.purge';
+		$extra_js = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_INDEX_ADVANCED_PURGE',
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm='FLEXI_DELETE_INDEX_CONFIRM',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+
+		//$toolbar->appendButton('Confirm', 'Update ?', 'shuffle', 'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES', 'search.custom_order', false);
+		$btn_icon = 'icon-shuffle';
+		$btn_name = 'custom_order';
+		$btn_task = 'search.custom_order';
+		$extra_js = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES',
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm='Update',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+
+		// Configuration button
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 		if ($perms->CanConfig) {

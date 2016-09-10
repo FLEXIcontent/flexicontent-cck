@@ -39,6 +39,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		parent::__construct();
 	}
 
+
 	function purge()
 	{
 		$model = $this->getModel('search');
@@ -47,4 +48,11 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 
+
+	function custom_order()
+	{
+		flexicontent_db::setValues_commonDataTypes(null, true);
+		$msg = JText::_('FLEXI_CUSTOM_ORDER_INDEXES_UPDATED');
+		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
+	}
 }

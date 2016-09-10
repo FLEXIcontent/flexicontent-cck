@@ -866,7 +866,10 @@ class FlexicontentController extends JControllerLegacy
 		$nullDate	= $db->getNullDate();
 		
 		$model  = $this->getModel('flexicontent');
-		$missing_indexes = $model->getExistDBindexes($check_only=false);
+
+		$update_queries = array();
+		$missing_indexes = $model->getExistDBindexes($check_only=false, $update_queries);
+
 		if ( !empty($missing_indexes) )
 		{
 			$app = JFactory::getApplication();
@@ -905,7 +908,21 @@ class FlexicontentController extends JControllerLegacy
 					$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
 					$file_contents = "".time();
 					JFile::write($file, $file_contents);
-					
+
+					if ( isset($update_queries[$tblname]) )
+					{
+						$db->setQuery($update_queries[$tblname]);
+						try { $result = $db->execute(); }
+						catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+
+						if (!$result)
+						{
+							echo '<span class="install-notok"></span>';
+							if ($db->getErrorNum()) echo $db->getErrorMsg();
+							jexit();
+						}
+					}
+
 					foreach($index_cmds as $index_type => $index_clause)
 					{
 						$query  = "ALTER TABLE `#__".$tblname."` ";
@@ -1206,7 +1223,8 @@ class FlexicontentController extends JControllerLegacy
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
 				$categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				if(!$categories || !count($categories)) {
+				if (!$categories || !count($categories))
+				{
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
 					$db->setQuery($query);
@@ -1224,7 +1242,7 @@ class FlexicontentController extends JControllerLegacy
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$tags = $db->loadColumn();
 				$f = new stdClass();
 				$f->id					= 14;
 				$f->iscore			= 1;
@@ -1235,7 +1253,8 @@ class FlexicontentController extends JControllerLegacy
 				if ($add_tags) $fields[] = $f;
 
 				// Add field values to field value versioning table
-				foreach($fields as $field) {
+				foreach($fields as $field)
+				{
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id   = $field->id;
@@ -1247,10 +1266,13 @@ class FlexicontentController extends JControllerLegacy
 					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder.",suborder : ".$obj->suborder."<br />";
 					//echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
-					if( !$field->iscore ) {
+
+					if (!$field->iscore)
+					{
 						unset($obj->version);
 						//echo "inserting into __flexicontent_fields_item_relations<br />";
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
+						flexicontent_db::setValues_commonDataTypes($obj);
 					}
 					//$searchindex 	.= @$field->search;
 				}
