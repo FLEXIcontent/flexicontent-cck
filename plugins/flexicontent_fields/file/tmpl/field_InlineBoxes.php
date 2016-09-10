@@ -34,7 +34,7 @@ foreach($field->value as $file_id)
 		<div class="inlinefile-data-box">
 
 			<div style="display:inline-block;">
-				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</div>
+				<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 				<div class="fc_filedata_txt_nowrap">'.$filename_original.'</div>
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original.'" />
 				'.(!$iform_title ? '<br/>
