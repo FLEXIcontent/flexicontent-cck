@@ -21,8 +21,8 @@ defined('_JEXEC') or die('Restricted access');
 $ctrl_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
 $pdf_parser = FlexicontentFields::getPDFParser();
 
-$indexer_name = JFactory::getApplication()->get('indexer', 'advanced', 'cmd');
-$rebuildmode  = JFactory::getApplication()->get('rebuildmode', '', 'cmd');
+$indexer_name = JFactory::getApplication()->input->get('indexer', 'advanced', 'cmd');
+$rebuildmode  = JFactory::getApplication()->input->get('rebuildmode', '', 'cmd');
 ?>
 <div>&nbsp;</div>
 <div style="heading">
