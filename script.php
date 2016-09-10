@@ -695,8 +695,18 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
 					}
 					
+					if ($fi_rels_tbl_exists && !array_key_exists('value_integer', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `value_integer` BIGINT(20) NULL AFTER `value`";
+					}
+					if ($fi_rels_tbl_exists && !array_key_exists('value_decimal', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `value_decimal` DECIMAL(65,15) NULL AFTER `value_integer`";
+					}
+					if ($fi_rels_tbl_exists && !array_key_exists('value_datetime', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `value_datetime` DATETIME NULL AFTER `value_decimal`";
+					}
+					
 					/*if ($fi_rels_tbl_exists && !array_key_exists('qindex01', $tbl_fields['#__flexicontent_fields_item_relations'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value`";
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value_datetime`";
 					}
 					if ($fi_rels_tbl_exists && !array_key_exists('qindex02', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex02` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex01`";

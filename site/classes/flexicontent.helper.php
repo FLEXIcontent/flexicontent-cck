@@ -6342,6 +6342,23 @@ class FLEXIUtilities
 class flexicontent_db
 {
 	/**
+	 * Method to set value for custom field 's common data types (INTEGER, DECIMAL(65,15), DATETIME)
+	 * 
+	 * @return string
+	 * @since 1.5
+	 */
+	static function setValues_commonDataTypes($obj, $all=false)
+	{
+		$db = JFactory::getDBO();
+		$query = 'UPDATE #__flexicontent_fields_item_relations'
+			. ' SET value_integer = CAST(value AS SIGNED), value_decimal = CAST(value AS DECIMAL(65,15)), value_datetime = CAST(value AS DATETIME) '
+			. (!$all ? ' WHERE item_id = ' . (int) $obj->item_id . ' AND field_id = ' . (int) $obj->field_id . ' AND valueorder = ' . (int) $obj->valueorder. ' AND suborder = ' . (int) $obj->suborder : '');
+		$db->setQuery($query);
+		$db->execute();
+	}
+	
+	
+	/**
 	 * Method to get the (language filtered) name of all access levels
 	 * 
 	 * @return string
@@ -6788,9 +6805,9 @@ class flexicontent_db
 				$order_type = $params->get('orderbycustomfieldint'.$sfx, 0);
 				switch( $order_type )
 				{
-					case 1:  $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;  // Integer
-					case 2:  $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break; // Decimal
-					case 3:  $order_col = 'CAST('.$cf.'.value AS DATE)';  break;  // Date
+					case 1:  $order_col = $cf.'.value_integer';  break;   // Integer  // 'CAST('.$cf.'.value AS SIGNED)'
+					case 2:  $order_col = $cf.'.value_decimal'; break;    // Decimal  // 'CAST('.$cf.'.value AS DECIMAL(65,15))'
+					case 3:  $order_col = $cf.'.value_datetime';  break;  // Date     // 'CAST('.$cf.'.value AS DATETIME)'
 					case 4:  $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
 					default: $order_col = $cf.'.value'; break;  // Text
 				}
@@ -6842,9 +6859,9 @@ class flexicontent_db
 					$order_type = strtolower($order_parts[2]);
 					switch( $order_type )
 					{
-						case 'int':       $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;
-						case 'decimal':   $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break;
-						case 'date':      $order_col = 'CAST('.$cf.'.value AS DATE)'; break;
+						case 'int':       $order_col = $cf.'.value_integer';  break;   // Integer  // 'CAST('.$cf.'.value AS SIGNED)'
+						case 'decimal':   $order_col = $cf.'.value_decimal'; break;    // Decimal  // 'CAST('.$cf.'.value AS DECIMAL(65,15))'
+						case 'date':      $order_col = $cf.'.value_datetime'; break;   // Date     // 'CAST('.$cf.'.value AS DATETIME)'
 						case 'file_hits': $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
 						default:          $order_col = $cf.'.value'; break;
 					}

@@ -1650,17 +1650,21 @@ class FlexicontentModelItems extends JModelLegacy
 				
 				foreach($fields as $field)
 				{
-					if (strlen($field->value)) {
+					if (strlen($field->value))
+					{
+						$field->item_id = $row->id;
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
-							.' VALUES(' . $field->field_id . ', ' . $row->id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value) . ')'
+							. ' VALUES(' . $field->field_id . ', ' . $field->item_id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value)
+							. ')'
 							;
 						$this->_db->setQuery($query);
 						$this->_db->execute();
+						flexicontent_db::setValues_commonDataTypes($field);
 					}
 				}
-				
-				
-				if($use_versioning) {
+
+				if ($use_versioning)
+				{
 					$v = new stdClass();
 					$v->item_id 		= (int)$item->id;
 					$v->version_id		= 1;
@@ -1679,9 +1683,11 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery($query);
 				$curversions = $this->_db->loadObjectList();
 
-				foreach ($curversions as $cv) {
+				foreach ($curversions as $cv)
+				{
 					$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
-						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value) . ')'
+						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value)
+						. ')'
 						;
 					$this->_db->setQuery($query);
 					$this->_db->execute();

@@ -2690,6 +2690,7 @@ class ParentClassItem extends JModelAdmin
 			
 			$ver_query_vals = array();
 			$rel_query_vals = array();
+			$rel_update_objs = array();
 			
 			foreach($fields as $field)
 			{
@@ -2719,12 +2720,16 @@ class ParentClassItem extends JModelAdmin
 					//$obj->qindex03 = isset($qindex_values['qindex03']) ? $qindex_values['qindex03'] : NULL;
 					
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
-					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
+					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting')
+					{
 						// Insert only if value non-empty
-						if ( !empty($field->use_suborder) && is_array($postvalue) ) {
+						if ( !empty($field->use_suborder) && is_array($postvalue) )
+						{
 							$obj->suborder = 1;
-							foreach ($postvalue as $v) {
+							foreach ($postvalue as $v)
+							{
 								$obj->value = $v;
+								//echo "<pre>"; print_r($obj); echo "</pre>";
 								if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 								else $ver_query_vals[] = "("
 									.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$obj->version. "," .$this->_db->Quote($obj->value)
@@ -2736,6 +2741,7 @@ class ParentClassItem extends JModelAdmin
 						else if ( isset($obj->value) && strlen(trim($obj->value)) )    // ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
 						//else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
+							//echo "<pre>"; print_r($obj); echo "</pre>";
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 							else $ver_query_vals[] = "("
 								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$obj->version. "," .$this->_db->Quote($obj->value)
@@ -2752,12 +2758,23 @@ class ParentClassItem extends JModelAdmin
 						unset($obj->version);
 						if ( !empty($field->use_suborder) && is_array($postvalue) ) {
 							$obj->suborder = 1;
-							foreach ($postvalue as $v) {
+							foreach ($postvalue as $v)
+							{
 								$obj->value = $v;
-								if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-								else $rel_query_vals[] = "("
-									.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
-								.")";
+
+								if (! $mval_query)
+								{
+									$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+									flexicontent_db::setValues_commonDataTypes($obj);
+								}
+								else
+								{
+									$rel_query_vals[] = "("
+										.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
+									.")";
+									$rel_update_objs[] = clone($obj);
+								}
+
 								$obj->suborder++;
 							}
 							unset($v);
@@ -2765,23 +2782,41 @@ class ParentClassItem extends JModelAdmin
 						else if ( isset($obj->value) && strlen(trim($obj->value)) )    // ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
 						//else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
-							if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-							else $rel_query_vals[] = "("
-								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
-								//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
-							.")";
+							if (! $mval_query)
+							{
+								$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+								flexicontent_db::setValues_commonDataTypes($obj);
+							}
+							else
+							{
+								$rel_query_vals[] = "("
+									.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
+									//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
+								.")";
+								$rel_update_objs[] = clone($obj);
+							}
 							
 							// Save field value in all translating items, if current field is untranslatable
 							// NOTE: item itself is not include in associated translations, no need to check for it and skip it
-							if (count($assoc_item_ids) && $field->untranslatable) {
-								foreach($assoc_item_ids as $t_item_id) {
+							if (count($assoc_item_ids) && $field->untranslatable)
+							{
+								foreach($assoc_item_ids as $t_item_id)
+								{
 									//echo "setting Untranslatable value for item_id: ".$t_item_id ." field_id: ".$field->id."<br/>";
 									$obj->item_id = $t_item_id;
-									if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-									else $rel_query_vals[] = "("
-										.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
-										//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
-									.")";
+									if (! $mval_query)
+									{
+										$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+										flexicontent_db::setValues_commonDataTypes($obj);
+									}
+									else
+									{
+										$rel_query_vals[] = "("
+											.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
+											//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
+										.")";
+										$rel_update_objs[] = clone($obj);
+									}
 								}
 							}
 						}
@@ -2789,13 +2824,14 @@ class ParentClassItem extends JModelAdmin
 					$i++;
 				}
 			}
-			
-			
+
+
 			// *********************************************
 			// Insert values in item fields versioning table
 			// *********************************************
 			
-			if ( count($ver_query_vals) ) {
+			if ( count($ver_query_vals) )
+			{
 				$query = "INSERT INTO #__flexicontent_items_versions "
 					." (field_id,item_id,valueorder,suborder,version,value"
 					//.",qindex01,qindex02,qindex03"
@@ -2805,13 +2841,14 @@ class ParentClassItem extends JModelAdmin
 				$this->_db->execute();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
-			
-			
+
+
 			// *******************************************
 			// Insert values in item fields relation table
 			// *******************************************
 			
-			if ( count($rel_query_vals) ) {
+			if ( count($rel_query_vals) )
+			{
 				$query = "INSERT INTO #__flexicontent_fields_item_relations "
 					." (field_id,item_id,valueorder,suborder,value"
 					//.",qindex01,qindex02,qindex03"
@@ -2821,8 +2858,12 @@ class ParentClassItem extends JModelAdmin
 				$this->_db->execute();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
-			
-			
+
+			// Update values of common data types
+			foreach($rel_update_objs as $obj) flexicontent_db::setValues_commonDataTypes($obj);
+			//echo "<pre>"; print_r($rel_update_objs); exit;
+
+
 			// **************************************************************
 			// Save other versioned item data into the field versioning table
 			// **************************************************************
@@ -3215,9 +3256,13 @@ class ParentClassItem extends JModelAdmin
 		$versionrecords = $this->_db->loadObjectList();
 		
 		// restore the old values
-		foreach ($versionrecords as $versionrecord) {
-			if(!(int)$versionrecord->iscore)
+		foreach ($versionrecords as $versionrecord)
+		{
+			if (!(int)$versionrecord->iscore)
+			{
 				$this->_db->insertObject('#__flexicontent_fields_item_relations', $versionrecord);
+				flexicontent_db::setValues_commonDataTypes($versionrecord);
+			}
 		}
 		$query = "UPDATE #__content SET version='$version' WHERE id='$id';";
 		$this->_db->setQuery($query);

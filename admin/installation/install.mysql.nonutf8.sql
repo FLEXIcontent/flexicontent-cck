@@ -52,11 +52,17 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   `valueorder` int(11) NOT NULL default '1',
   `suborder` int(11) NOT NULL default '1',
   `value` mediumtext NOT NULL,
+  `value_integer` bigint(20) NULL,
+  `value_decimal` decimal(65,15) NULL,
+  `value_datetime` datetime NULL,
   PRIMARY KEY  (`field_id`,`item_id`,`valueorder`,`suborder`),
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
   KEY `valueorder` (`valueorder`),
-  KEY `value` (`value`(32))
+  KEY `value` (`value`(32)),
+  KEY `value_integer` (`value_integer`),
+  KEY `value_decimal` (`value_decimal`),
+  KEY `value_datetime` (`value_datetime`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
