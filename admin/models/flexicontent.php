@@ -724,7 +724,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistDBindexes($check_only=true)
+	function getExistDBindexes($check_only=true, & $update_queries = array())
 	{
 		static $missing;
 		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
@@ -740,6 +740,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'flexicontent_items_tmp'=>array('alias'=>0, 'state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0),
 			'flexicontent_fields_item_relations'=>array(
 				'value'=>32,
+				'value_integer'=>array('update'=>'CAST(value AS SIGNED)'),
+				'value_decimal'=>array('update'=>'CAST(value AS DECIMAL(65,15))'),
+				'value_datetime'=>array('update'=>'CAST(value AS DATETIME)'),
 				'PRIMARY'=>array(
 					'custom_drop'=>'DROP PRIMARY KEY',
 					'custom_add'=>'ADD PRIMARY KEY',
@@ -786,7 +789,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					JFile::delete($file);
 				}
 			}
-			
+
+			$_update_clauses = array();
 			foreach($indexnames as $indexname => $iconf)
 			{
 				$query = "SELECT COUNT(1) AS IndexIsThere "
@@ -797,18 +801,39 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						" HAVING IndexIsThere = ".count($iconf['cols'])
 					: "");
 				//if (is_array($iconf) && !empty($iconf['cols'])) echo $query ."<br/>";
+
 				$this->_db->setQuery($query);
 				$exists = $this->_db->loadResult();
-				if ($indexing_started) {
+
+				if ($indexing_started)
+				{
 					if ($exists) {
 						JFile::delete($file);
 						continue;
 					}
 					else $missing[$tblname]['__indexing_started__'] = 1;
-				} else if (!$exists) {
+				}
+
+				else if (!$exists)
+				{
 					$all_started = false;
+
+					// Check for case that index is a column name needed an UPDATE query
+					if ( is_array($iconf) && !empty($iconf['update']))
+					{
+						$colname = $indexname;
+						$_update_clauses[] = $colname . ' = ' . $iconf['update'];
+						unset($iconf['update']);
+						if (empty($iconf)) $iconf = 0;
+					}
+
 					$missing[$tblname][$indexname] = $iconf;
 				}
+			}
+
+			if (count($_update_clauses))
+			{
+				$update_queries[$tblname] = 'UPDATE #__' . $tblname . ' SET ' . implode(' , ', $_update_clauses);
 			}
 		}
 		
@@ -1304,7 +1329,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
 				$categories = $db->loadColumn();
-				if(!$categories || !count($categories)) {
+				if (!$categories || !count($categories))
+				{
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
 					$db->setQuery($query);
@@ -1333,7 +1359,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				if ($add_tags) $fieldsvals[] = $f;
 
 				// Add field values to field value versioning table
-				foreach($fieldsvals as $fieldval) {
+				foreach($fieldsvals as $fieldval)
+				{
 					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id   = $fieldval->id;
@@ -1345,10 +1372,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder.",suborder : ".$obj->suborder."<br />";
 					//echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
-					if( $clean_database && !$fieldval->iscore ) { // If clean_database is on we need to re-add the deleted values
+					if( $clean_database && !$fieldval->iscore )  // If clean_database is on we need to re-add the deleted values
+					{
 						unset($obj->version);
 						//echo "inserting into __flexicontent_fields_item_relations<br />";
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
+						flexicontent_db::setValues_commonDataTypes($obj);
 					}
 					//$searchindex 	.= @$fieldval->search;
 				}
