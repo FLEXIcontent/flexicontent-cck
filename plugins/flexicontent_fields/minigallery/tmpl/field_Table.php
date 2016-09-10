@@ -37,7 +37,7 @@ foreach($field->value as $file_id)
 	$field->html[] = '
 	<div class="fcclear"></div>
 	<div style="display:inline-block;">
-		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</div>
+		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$filename_original.'</div>
 		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original.'" />
 		'.(!$iform_title ? '<br/><div class="'.$input_grp_class.'"><span class="'.$add_on_class.' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</span><span class="'.$add_on_class.' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span></div>' : '').'
