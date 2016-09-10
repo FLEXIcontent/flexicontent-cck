@@ -2681,7 +2681,7 @@ table.fc_uploader_header_tbl td:last-child {
 	display: block;
 	z-index: 1001;
 	position: fixed;
-	top: 50%;
+	top: 35%;
 	left: 50%;
 	color: black;
 	background: white 30px 40px no-repeat;
