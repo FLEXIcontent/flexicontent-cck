@@ -1130,10 +1130,12 @@ class flexicontent_html
 					jQuery.fn.chosen_fc = jQuery.fn.chosen;
 					jQuery.fn.chosen = function(){
 						var args = arguments;
+						var result;
 						jQuery(this).each(function() {
 							if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
-							jQuery(this).chosen_fc(args);
+							result = jQuery(this).chosen_fc(args);
 						});
+						return result;
 					};
 				}
 				";

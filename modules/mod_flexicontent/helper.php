@@ -163,40 +163,63 @@ class modFlexicontentHelper
 			}
 		}
 		
-		// get module fields parameters
-		$use_fields 			= $params->get('use_fields', 1);
-		$display_label 			= $params->get('display_label');
-		$fields = array_map( 'trim', explode(',', $params->get('fields')) );
-		if ($fields[0]=='') $fields = array();
-		
+		// Custom fields displayed for featured items
+		$use_fields_feat 			= $params->get('use_fields_feat', 1);
+		$display_label_feat 	= $params->get('display_label_feat');
+
+		$fields_feat = $params->get('fields_feat', array());
+		if ( !is_array($fields_feat) )
+		{
+			$fields_feat = array_map( 'trim', explode(',', $fields_feat) );
+			$fields_feat = $fields_feat[0] == '' ? array() : $fields_feat;
+		}
+
+		// Custom fields displayed for standard items
+		$use_fields    = $params->get('use_fields', 1);
+		$display_label = $params->get('display_label');
+
+		$fields = $params->get('fields', array());
+		if ( !is_array($fields) )
+		{
+			$fields = array_map( 'trim', explode(',', $fields) );
+			$fields = $fields[0] == '' ? array() : $fields;
+		}
+
 		// get fields that when empty cause an item to be skipped
-		$skip_items = (int)$params->get('skip_items', 0);
-		$skiponempty_fields = array_map( 'trim', explode(',', $params->get('skiponempty_fields')) );
-		if ($skiponempty_fields[0]=='') $skiponempty_fields = array();
-		
-		if ($params->get('maxskipcount',50) > 100) {
-  		$params->set('maxskipcount',100);
+		$skip_items = (int) $params->get('skip_items', 0);
+
+		$skiponempty_fields = !$skip_items ? array() : $params->get('skiponempty_fields', array());
+		if ( !is_array($skiponempty_fields) )
+		{
+			$skiponempty_fields = array_map( 'trim', explode(',', $skiponempty_fields) );
+			$skiponempty_fields = $skiponempty_fields[0] == '' ? array() : $skiponempty_fields;
+		}
+		$params->set('skiponempty_fields', $skiponempty_fields);  // Set calculated array to be used by other code
+
+		if ($params->get('maxskipcount', 50) > 100)
+		{
+  		$params->set('maxskipcount', 100);
 		}
 		
 		$striptags_onempty_fields = $params->get('striptags_onempty_fields');
 		$onempty_fields_combination = $params->get('onempty_fields_combination');
 		
-		// featured
-		$use_fields_feat 			= $params->get('use_fields_feat', 1);
-		$display_label_feat 	= $params->get('display_label_feat');
-		$fields_feat = array_map( 'trim', explode(',', $params->get('fields_feat')) );
-		if ($fields_feat[0]=='') $fields_feat = array();
-
 		//$mod_fc_run_times['query_items']= $modfc_jprof->getmicrotime();
 		
 		$cat_items_arr = array();
-		if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
-		foreach ($ordering as $ord) {
+		if ( !is_array($ordering) )
+		{
+			$ordering = explode(',', $ordering);
+		}
+		foreach ($ordering as $ord)
+		{
 			$items_arr = modFlexicontentHelper::getItems($params, $ord);
 			if ( empty($items_arr) ) continue;
-			foreach ($items_arr as $catid => $items) {
+			foreach ($items_arr as $catid => $items)
+			{
 				if ( !isset($cat_items_arr[$catid]) ) $cat_items_arr[$catid] = array();
-				for ($i=0; $i<count($items); $i++) {
+				for ($i=0; $i<count($items); $i++)
+				{
 					$items[$i]->featured = ($i < $featured) ? 1 : 0;
 					$items[$i]->fetching = $ord;
 					$cat_items_arr[$catid][] = $items[$i];
@@ -210,7 +233,7 @@ class modFlexicontentHelper
 		// The big time cost goes into rendering the fields ... 
 		// We need to create the display of the fields before examining if they are empty.
 		// The hardcoded limit of max items skipped is 100.
-		if ( $skip_items && count($skiponempty_fields) )
+		if ( count($skiponempty_fields) )
 		{
 			$mod_fc_run_times['empty_fields_filter'] = $modfc_jprof->getmicrotime();
 			
@@ -234,8 +257,7 @@ class modFlexicontentHelper
 					//echo "$i . {$item->title}<br/>";
 					
 					// Check to initialize counter for this ordering 
-					if (!isset($order_count[$item->fetching]))
-						$order_count[$item->fetching] = 0;
+					if (!isset($order_count[$item->fetching]))  $order_count[$item->fetching] = 0;
 						
 					// Check if enough encountered for this ordering
 					if ($order_count[$item->fetching] >= $count)  continue;
@@ -246,37 +268,54 @@ class modFlexicontentHelper
 					// Now check for empty field display or empty field values, if so item must be skipped
 					foreach($skiponempty_fields as $skipfield_name)
 					{
-						if ($skip_items==2) {
+						if (!isset($item->fields[$skipfield_name]))
+						{
+							continue;  // FIELD NOT FOUND / OR NOT ASSIGNED TO TYPE, continue with next field. NOTE: If you want to skip items that do have the field assigned to them then, "Type scope should be used"
+						}
+						
+						if ($skip_items==2)
+						{
 							// We will check field's display
 							FlexicontentFields::getFieldDisplay($item, $skipfield_name, null, 'display', 'module');
 							$skipfield_data = @ $item->fields[$skipfield_name]->display;
-						} else {
+						}
+						else
+						{
 							// We will check field's value
 							$skipfield_iscore = $item->fields[$skipfield_name]->iscore;
 							$skipfield_id = $item->fields[$skipfield_name]->id;
 							$skipfield_data = $skipfield_iscore ? $item->{$skipfield_name} : @ $item->fieldvalues[$skipfield_id];
 						}
-						
+
 						// Strip HTML Tags
 						if ($striptags_onempty_fields)
+						{
 							$skipfield_data = strip_tags ($skipfield_data);
-						
+						}
+
 						// Decide if field is empty
 						$skipfield_isempty = is_array($skipfield_data) ? !count($skipfield_data) : !strlen(trim($skipfield_data));
 						
-						if ( $skipfield_isempty ) {
-							if ($onempty_fields_combination=='any') {
+						if ( $skipfield_isempty )
+						{
+							if ($onempty_fields_combination=='any')
+							{
 								$skip_curritem = 1;
 								break;
 							}
-						} else {
-							if ($onempty_fields_combination == 'all') {
+						}
+						else
+						{
+							if ($onempty_fields_combination == 'all')
+							{
 								$skip_curritem = 0;
 								break;
 							}
 						}
 					}
-					if ($skip_curritem) {
+
+					if ($skip_curritem)
+					{
 						//echo "Skip: $i . {$item->title}<br/>";
 						if(!isset($order_skipcount[$item->fetching]) ) $order_skipcount[$item->fetching] = 0;
 						$order_skipcount[$item->fetching]++;
@@ -782,11 +821,8 @@ class modFlexicontentHelper
 		
 		
 		// get module fetching parameters
-		if ($params->get('skip_items',0) ) {
-		  $count = (int)$params->get('maxskipcount', 50);
-		} else {
-		  $count = (int)$params->get('count', 5);
-		}
+		$skiponempty_fields = $params->get('skip_items', 0) ? $params->get('skiponempty_fields') : array();
+		$count = count($skiponempty_fields) ? (int) $params->get('maxskipcount', 50) : (int) $params->get('count', 5);
 
 		// get module display parameters
 		$mod_image 			= $params->get('mod_image');
