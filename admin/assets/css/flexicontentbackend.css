@@ -12,6 +12,7 @@
 	border-radius: 4px;
 	height: auto;
 }
+.controls input[type="text"]:not(.minicolors),
 .controls textarea,
 .controls fieldset.radio,
 .controls fieldset.checkbox,
