@@ -619,6 +619,7 @@
 	
 	function fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector, noFX)
 	{
+		var emptySet = jQuery();
 		jQuery.each( toBeUpdated, function( i, val ) {
 			var c = jQuery(this);
 			var dlist = c.data('fc_depend_list');
@@ -628,18 +629,15 @@
 			jQuery.each(dlist, function( i, val ) { if(val<=0) delete dlist[i]; if(val>=1) dlist[i]=1 ;});
 			c.data('fc_depend_list', dlist);
 			
-			if ( jQuery.isEmptyObject(dlist) || forced=='1' ) {
-				!toggleParent ? c.slideDown(noFX ? 0 : 500) :
-					(toggleParentSelector ?
-						c.parents(toggleParentSelector).slideDown(noFX ? 0 : 500) :
-						c.parents().eq(toggleParent).slideDown(noFX ? 0 : 500)
-					);
-			} else {
-				!toggleParent ? c.slideUp(noFX ? 0 : 'fast') :
-					(toggleParentSelector ?
-						c.parents(toggleParentSelector).slideUp(noFX ? 0 : 'fast') :
-						c.parents().eq(toggleParent).slideUp(noFX ? 0 : 'fast')
-					);
+			var toggledBox = !toggleParent ? emptySet : (toggleParentSelector ? c.parents(toggleParentSelector) : c.parents().eq(toggleParent));
+			
+			if ( jQuery.isEmptyObject(dlist) || forced=='1' )
+			{
+				toggledBox.length ? toggledBox.slideDown(noFX ? 0 : 500) : c.slideDown(noFX ? 0 : 500);
+			}
+			else
+			{
+				toggledBox.length ? toggledBox.slideUp(noFX ? 0 : 500) : c.slideUp(noFX ? 0 : 500);
 			}
 		});
 		
