@@ -323,7 +323,15 @@
 .news.mod_flexicontent_wrapper .voting_value,
 .news.mod_flexicontent_wrapper .voting_value_feat .voting,
 .news.mod_flexicontent_wrapper .voting_value .voting {
-	display: inline-block;
+	display: block;
+}
+.news.mod_flexicontent_wrapper div.fcvote > ul.fcvote_list {
+	clear: none !important;
+}
+.news.mod_flexicontent_wrapper div.fcvote-label-outer {
+	clear: none !important;
+	display: inline-block !important;
+	float: none !important;
 }
 
 
