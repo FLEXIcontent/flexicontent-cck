@@ -153,18 +153,10 @@ $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_fle
 $img_path = JURI::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
-$img_limit_dims=" max-width:100%; max-height:100%;";
-if ($item_img_fit_feat==0 || $content_layout_feat <= 1) {
-	$img_force_dims_feat .= $img_limit_dims;
-}
+$img_auto_dims_css_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 
 // image of STANDARD items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims=" width: 100%; height: auto; display: block !important; border: 0 !important;";
-$img_limit_dims=" max-width:100%; max-height:100%;";
-if ($item_img_fit==0 || $content_layout <= 1) {
-	$img_force_dims .= $img_limit_dims;
-}
+$img_auto_dims_css=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 
 
 // *****************************************
@@ -376,7 +368,14 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php
-				if ($rowcount%$item_columns_feat==0) {
+				$img_force_dims_css_feat = $img_auto_dims_css_feat;
+				if ($item_img_fit_feat==0/* || $content_layout_feat <= 3*/)
+				{
+					$img_force_dims_css_feat .= ($item->image_w ? ' max-width:'. $item->image_w.'px; ' : '') . ($item->image_h ? ' max-height:'. $item->image_h.'px; ' : '');
+				}
+
+				if ($rowcount%$item_columns_feat==0)
+				{
 					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
 					$rowtoggler = !$rowtoggler;
 				}
@@ -420,10 +419,10 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				<div class="image_featured <?php echo $img_container_class_feat;?>">
 					<?php if ($mod_link_image_feat) : ?>
 						<a href="<?php echo $item->link; ?>">
-							<img style="<?php echo $img_force_dims_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+							<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 						</a>
 					<?php else : ?>
-						<img style="<?php echo $img_force_dims_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</div>
 				
@@ -554,7 +553,14 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
-				if ($rowcount%$item_columns_std==0) {
+				$img_force_dims_css = $img_auto_dims_css;
+				if ($item_img_fit==0/* || $content_layout <= 3*/)
+				{
+					$img_force_dims_css .= ($item->image_w ? ' max-width:'. $item->image_w.'px; ' : '') . ($item->image_h ? ' max-height:'. $item->image_h.'px; ' : '');
+				}
+
+				if ($rowcount%$item_columns_std==0)
+				{
 					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
 					$rowtoggler = !$rowtoggler;
 				}
@@ -601,10 +607,10 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				<div class="image_standard <?php echo $img_container_class;?>">
 					<?php if ($mod_link_image) : ?>
 						<a href="<?php echo $item->link; ?>">
-							<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+							<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 						</a>
 					<?php else : ?>
-						<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</div>
 				

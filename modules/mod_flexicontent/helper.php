@@ -360,6 +360,8 @@ class modFlexicontentHelper
 					// image processing
 					$thumb = '';
 					$thumb_rendered = '';
+					$_thumb_w = $mod_width_feat;
+					$_thumb_h = $mod_height_feat;
 					if ($mod_use_image_feat)
 					{
 						if ($mod_image_custom_display)
@@ -369,6 +371,7 @@ class modFlexicontentHelper
 							$varname = $varname ? $varname : 'display';
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							$src = '';
+							$_thumb_w = $_thumb_h = 0;
 						}
 						else if ($mod_image_custom_url)
 						{
@@ -386,6 +389,8 @@ class modFlexicontentHelper
 							} else {
 								$src = '';
 								$thumb = @ $img_field->thumbs_src[ $mod_use_image_feat ][0];
+								$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image_feat[0], 120) : 0;
+								$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
 							}
 							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
 								$src = flexicontent_html::extractimagesrc($row);
@@ -441,8 +446,10 @@ class modFlexicontentHelper
 							$lists[$ord]['featured'][$i]->date_modified .= '<span class="date_value_feat">' . $modified_date . '</span>';
 						}
 					}
-					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
+					$lists[$ord]['featured'][$i]->image_rendered = $thumb_rendered;
 					$lists[$ord]['featured'][$i]->image = $thumb;
+					$lists[$ord]['featured'][$i]->image_w	= $_thumb_w;
+					$lists[$ord]['featured'][$i]->image_h	= $_thumb_h;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
 					$lists[$ord]['featured'][$i]->hits_rendered = '';
 					if ($display_hits_feat && $has_access_hits) {
@@ -496,6 +503,8 @@ class modFlexicontentHelper
 					// image processing
 					$thumb = '';
 					$thumb_rendered = '';
+					$_thumb_w = $mod_width;
+					$_thumb_h = $mod_height;
 					if ($mod_use_image)
 					{
 						if ($mod_image_custom_display)
@@ -505,6 +514,7 @@ class modFlexicontentHelper
 							$varname = $varname ? $varname : 'display';
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							$src = '';  // Clear src no rendering needed
+							$_thumb_w = $_thumb_h = 0;
 						}
 						else if ($mod_image_custom_url)
 						{
@@ -523,6 +533,8 @@ class modFlexicontentHelper
 							} else {
 								$src = '';
 								$thumb = @ $img_field->thumbs_src[ $mod_use_image ][0];
+								$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image[0], 120) : 0;
+								$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image[0], 90) : 0;
 							}
 							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
 								$src = flexicontent_html::extractimagesrc($row);
@@ -581,8 +593,10 @@ class modFlexicontentHelper
 							$lists[$ord]['standard'][$i]->date_modified .= '<span class="date_value_feat">' . $modified_date . '</span>';
 						}
 					}
-					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
-					$lists[$ord]['standard'][$i]->image	= $thumb;
+					$lists[$ord]['standard'][$i]->image_rendered = $thumb_rendered;
+					$lists[$ord]['standard'][$i]->image = $thumb;
+					$lists[$ord]['standard'][$i]->image_w	= $_thumb_w;
+					$lists[$ord]['standard'][$i]->image_h	= $_thumb_h;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
 					$lists[$ord]['standard'][$i]->hits_rendered = '';
 					if ($display_hits && $has_access_hits) {
