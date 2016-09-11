@@ -220,7 +220,6 @@ class modFlexicontentHelper
 				if ( !isset($cat_items_arr[$catid]) ) $cat_items_arr[$catid] = array();
 				for ($i=0; $i<count($items); $i++)
 				{
-					$items[$i]->featured = ($i < $featured) ? 1 : 0;
 					$items[$i]->fetching = $ord;
 					$cat_items_arr[$catid][] = $items[$i];
 				}
@@ -270,7 +269,12 @@ class modFlexicontentHelper
 					{
 						if (!isset($item->fields[$skipfield_name]))
 						{
-							continue;  // FIELD NOT FOUND / OR NOT ASSIGNED TO TYPE, continue with next field. NOTE: If you want to skip items that do have the field assigned to them then, "Type scope should be used"
+							if ($onempty_fields_combination=='any')
+							{
+								$skip_curritem = 1;
+								break;
+							}
+							else continue;
 						}
 						
 						if ($skip_items==2)
@@ -389,12 +393,13 @@ class modFlexicontentHelper
 			$ord = "__start__";
 			foreach ( $rows as $row )  // Single pass of rows
 			{
-			  if ($ord != $row->fetching) {  // Detect change of next ordering group
+			  if ($ord != $row->fetching)  // Detect change of next ordering group
+				{
 					$ord = $row->fetching;
 			    $i = 0;
 			  }
 			  
-				if ($row->featured)
+				if ($i < $featured)
 				{
 					// image processing
 					$thumb = '';
@@ -667,9 +672,11 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->access 	= $row->access;
 					$lists[$ord]['standard'][$i]->featured 	= 0;
 	
-					if ($use_fields && @$row->fields && $fields) {
+					if ($use_fields && @$row->fields && $fields)
+					{
 						$lists[$ord]['standard'][$i]->fields = array();
-						foreach ($fields as $field) {
+						foreach ($fields as $field)
+						{
 							if ( !isset($row->fields[$field]) ) continue;
 							/*$lists[$ord]['standard'][$i]->fields[$field] = new stdClass();
 							$lists[$ord]['standard'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
@@ -2105,7 +2112,8 @@ class modFlexicontentHelper
 	/*
 	 * Retrieve comments for given items, item array has the structure: items[catid][ordername][]
 	 */
-	public static function getComments(&$params, &$items) {
+	public static function getComments(&$params, &$items)
+	{
 		$db = JFactory::getDBO();
 		
 		$list_comments = $params->get('list_comments');
@@ -2113,8 +2121,10 @@ class modFlexicontentHelper
 		if (!$list_comments && !$list_comments_feat) return array();
 		
 		$item_ids = array();
-		foreach($items as $catid => $cat_items) {
-			foreach($cat_items as $ord => $ord_items) {
+		foreach($items as $catid => $cat_items)
+		{
+			foreach($cat_items as $ord => $ord_items)
+			{
 				if ($list_comments)
 					foreach($ord_items['standard'] as $item) $item_ids[] = $item->id;
 				if ($list_comments_feat)
