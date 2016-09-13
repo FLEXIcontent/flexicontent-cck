@@ -241,6 +241,7 @@ class modFlexicontentHelper
 			//$skip_params = new JRegistry();
 			//$skip_params->set('fields',$fields_list);
 			
+			$filtered_rows_arr = array();
 			foreach($cat_items_arr as $catid => $cat_items)
 			{
 				// 1. The filtered rows
