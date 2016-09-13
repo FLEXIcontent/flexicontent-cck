@@ -122,6 +122,12 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_EXTWL_URLTARGET" level="level2" />
+			<field name="use_target" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_HITS" level="level2" />
 			<field name="use_hits" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -156,7 +162,7 @@
 
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/extendedweblink/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			
-			<field name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET" description="FLEXI_EXTWL_URLTARGET" >
+			<field name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET_DEFAULT" description="FLEXI_EXTWL_URLTARGET_DEFAULT_DESC" >
 				<option value="">FLEXI_EXTWL_NOTARGET</option>
 				<option value="_blank">FLEXI_EXTWL_BLANK</option>
 				<option value="_parent">FLEXI_EXTWL_PARENT</option>
