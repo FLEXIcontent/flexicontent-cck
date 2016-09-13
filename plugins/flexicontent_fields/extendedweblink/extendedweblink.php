@@ -80,52 +80,51 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		// *********************************************************
 		// URL title, linking text, CSS class, HTML tag id (optional)
 		// **********************************************************
-		
+
 		// Default value
+		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
 		$default_title = $default_title ? JText::_($default_title) : '';
-		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
-		
-		
+
+
 		// *****************************
 		// URL other optional properties
 		// *****************************
+
+		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
 		$default_text = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
 		$default_text = $default_text ? JText::_($default_text) : '';
-		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		
+		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
 		$default_class = ($item->version == 0 || $class_usage > 0) ? $field->parameters->get( 'default_class', '' ) : '';
 		$default_class = $default_class ? JText::_($default_class) : '';
-		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		// Css class names
 		$class_choices = $field->parameters->get( 'class_choices', '') ;
 		if ($useclass==2) $class_options = $this->getClassOptions($class_choices);
 		
+		$useid      = $field->parameters->get( 'use_id', 0 ) ;
 		$id_usage   = $field->parameters->get( 'id_usage', 0 ) ;
 		$default_id = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
 		$default_id = $default_id ? JText::_($default_id) : '';
-		$useid      = $field->parameters->get( 'use_id', 0 ) ;
-		
-		// **********
-		// Hits usage
-		// **********
+
+		$usetarget      = $field->parameters->get( 'use_target', 0 ) ;
 		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
-		
-		
+
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		
+
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0]['link']  = $default_link;
 			$field->value[0]['title'] = $default_title;
-			$field->value[0]['linktext']  = $default_text;
+			$field->value[0]['linktext']= $default_text;
 			$field->value[0]['class'] = $default_class;
 			$field->value[0]['id']    = $default_id;
+			$field->value[0]['target']= '';  // do not set viewing default
 			$field->value[0]['hits']  = 0;
 			$field->value[0] = serialize($field->value[0]);
 		}
@@ -215,10 +214,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				";
 			
 			if ($useclass) $js .= "
-				theInput = newField.find('input.urlclass').first();
-				theInput.val(".json_encode($default_class).");
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
+				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
+				theField.val(".json_encode($default_class).");
+				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
+				theField.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
 				newField.find('.urlclass-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
 				";
 			
@@ -228,6 +227,15 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
 				newField.find('.urlid-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
+				";
+			
+			// Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time ...
+			if ($usetarget) $js .= "
+				theInput = newField.find('input.ulrtarget').first();
+				theInput.val('');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][target]');
+				theInput.attr('target','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
+				newField.find('.ulrtarget-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
 				";
 			
 			if ($usehits) $js .="
@@ -375,7 +383,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				</div>';
 			
 			$autoprefix = '';
-			if ($allow_relative_addrs==2) {
+			if ($allow_relative_addrs==2)
+			{
 				$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_EXTWL_IS_RELATIVE_DESC', 1, 1);
 				$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
 				$autoprefix = '
@@ -392,7 +401,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 			
 			$title = '';
-			if ($usetitle) {
+			if ($usetitle)
+			{
 				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
 				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
 				$title = '
@@ -403,7 +413,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 			
 			$linktext = '';
-			if ($usetext) {
+			if ($usetext)
+			{
 				$value['linktext'] = !empty($value['linktext']) ? $value['linktext'] : $default_text;
 				$value['linktext'] = htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8');
 				$linktext = '
@@ -414,33 +425,60 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 			
 			$class = '';
-			if ($useclass) {
+			if ($useclass)
+			{
 				$value['class'] = !empty($value['class']) ? $value['class'] : $default_class;
 				$value['class'] = htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8');
 			}
-			if ($useclass==1) {
+
+			if ($useclass==1)
+			{
 				$class = '
 					<div class="'.$input_grp_class.' fc-xpended-row">
 						<label class="'.$add_on_class.' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
 						<input class="urlclass fcfield_textval" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.$value['class'].'" />
 					</div>';
-			} else if ($useclass==2) {
+			}
+			else if ($useclass==2)
+			{
 				$class_attribs = ' class="urlclass use_select2_lib" ';
 				$class = '
 					<div class="'.$input_grp_class.' fc-xpended-row">
 						<label class="'.$add_on_class.' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
-						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $class_elementid = $elementid_n.'_class').'
+						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $elementid_n.'_class').'
 					</div>';
 			}
 			
 			$id = '';
-			if ($useid) {
+			if ($useid)
+			{
 				$value['id'] = !empty($value['id']) ? $value['id'] : $default_id;
 				$value['id'] = htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8');
 				$id = '
 				<div class="'.$input_grp_class.' fc-xpended-row">
 					<label class="'.$add_on_class.' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLID' ).'</label>
 					<input class="urlid fcfield_textval" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.$value['id'].'" />
+				</div>';
+			}
+			
+			$target = '';
+			if ($usetarget)
+			{
+				// Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time ...
+				$value['target'] = !empty($value['target']) ? $value['target'] : '';
+				$value['target'] = htmlspecialchars($value['target'], ENT_COMPAT, 'UTF-8');
+				$target_attribs = ' class="urltarget use_select2_lib" ';
+				$target_options = array(
+					(object) array('value'=>'', 'text'=>JText::_('FLEXI_DEFAULT')),
+					(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_EXTWL_BLANK')),
+					(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_EXTWL_PARENT')),
+					(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_EXTWL_SELF')),
+					(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_EXTWL_TOP'))
+				);
+				$target = '
+				<div class="'.$input_grp_class.' fc-xpended-row">
+					<label class="'.$add_on_class.' fc-lbl ulrtarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLTARGET' ).'</label>
+					'.JHTML::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
 				</div>';
 			}
 			
@@ -469,6 +507,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				'.$autoprefix.'
 				'.$title.'
 				'.$linktext.'
+				'.$target.'
 				'.$class.'
 				'.$id.'
 				'.$hits.'
@@ -527,8 +566,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		
 		// some parameter shortcuts
 		$tooltip_class = 'hasTooltip';
-		$target       = $field->parameters->get( 'target', '' );
-		$target_param = $target ? ' target="'.$target.'"' : '';
+
+		$usetarget      = $field->parameters->get( 'use_target', 0 ) ;
+		
+		// Needed by legacy layouts that make use of 'target_param'
+		$default_target = $field->parameters->get( 'target', '' );
+		$target_param = $default_target ? ' target="'.$default_target.'"' : '';
+
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
@@ -564,17 +608,20 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			if (!strlen($default_link)) {
+		if ( empty($values) )
+		{
+			if (!strlen($default_link))
+			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
 			$values = array();
 			$values[0]['link']  = $default_link;
 			$values[0]['title'] = $default_title;
-			$values[0]['linktext']  = $default_text;
+			$values[0]['linktext']= $default_text;
 			$values[0]['class'] = $default_class;
 			$values[0]['id']    = $default_id;
+			$values[0]['target']= '';  // do not set viewing default
 			$values[0]['hits']  = 0;
 			$values[0] = serialize($values[0]);
 		}
@@ -728,10 +775,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			$newpost[$new]['link'] = empty($link) ? '' : $prefix.$link;
 			
 			// Validate other value properties
-			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 0);
-			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$v['id'], 0, 'STRING', 0);
-			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$v['class'], 0, 'STRING', 0);
-			$newpost[$new]['linktext']= flexicontent_html::dataFilter(@$v['linktext'], 0, 'STRING', 0);
+			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
+			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
+			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
+			$newpost[$new]['linktext']= flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
+			$newpost[$new]['target']  = flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
 			$newpost[$new]['hits']    = (int) @ $v['hits'];
 			
 			$new++;
@@ -843,7 +891,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	
 	
 	// Create once the options for field properties that have drop down-selection
-	function getClassOptions($class_choices) {
+	function getClassOptions($class_choices)
+	{
 		// Parse the elements used by field unsetting last element if empty
 		$choices = preg_split("/[\s]*%%[\s]*/", $class_choices);
 		if ( empty($choices[count($choices)-1]) )	unset($choices[count($choices)-1]);
