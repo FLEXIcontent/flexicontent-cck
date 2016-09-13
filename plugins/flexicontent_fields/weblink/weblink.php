@@ -578,7 +578,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$newpost[$new]['link'] = empty($link) ? '' : $prefix.$link;
 			
 			// Validate other value properties
-			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 0);
+			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
 			$newpost[$new]['hits']    = (int) @ $v['hits'];
 			
 			$new++;
