@@ -25,13 +25,13 @@
 		</field>
 		<field name="image_selector" type="fcmedia" label="MEDIA SELECTOR" />
 		<field name="tag" type="hidden" label="FLEXI_TAGS" description="JFIELD_TAGS_DESC" class="" required="false" multiple="true" />
-		<field name="cid" type="categorytree" size="40" label="FLEXI_SECONDARY_CATEGORIES" description="FLEXI_CATEGORIES_NOTES" class="mcat fcfield_selectmulval" multiple="true" />
+		<field name="cid" type="categorytree" size="40" label="FLEXI_SECONDARY_CATEGORIES" description="FLEXI_CATEGORIES_NOTES" class="mcat " multiple="true" />
 		<field name="featured_cid" type="categorytree" size="10" label="FLEXI_FEATURED_CATEGORIES" description="FLEXI_FEATURED_CATEGORIES_DESC" class="use_select2_lib" multiple="true" top="3" />
 		<field name="catid" type="categorytree" label="FLEXI_PRIMARY_CATEGORY" description="FLEXI_CATEGORIES_NOTES" class="scat use_select2_lib" required="true" top="2" />
 		<field name="buttonspacer" description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION" type="spacer" />
 		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="created_by" type="user" label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" class="" />
-		<field name="created_by_alias" type="text" label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC" class="fcfield_textval" size="20" />
+		<field name="created_by_alias" type="text" label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC" class="" size="20" />
 		<field name="modified" type="calendar" class="readonly" label="COM_CONTENT_FIELD_MODIFIED_LABEL" description="COM_CONTENT_FIELD_MODIFIED_DESC" size="22" readonly="true" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="modified_by" type="hidden" filter="unset" />
 		<field name="checked_out" type="hidden" filter="unset" />
@@ -41,8 +41,8 @@
 		<field name="version" type="text" class="readonly" label="COM_CONTENT_FIELD_VERSION_LABEL" size="6" description="COM_CONTENT_FIELD_VERSION_DESC" readonly="true" filter="unset" />
 		<field name="versioncomment" type="textarea" label="FLEXI_VERSION_COMMENT" description="FLEXI_VERSION_COMMENT_DESC" class="inputbox" rows="3" cols="30" />
 		<field name="ordering" type="text" label="JFIELD_ORDERING_LABEL" description="JFIELD_ORDERING_DESC" class="inputbox" size="6" default="0" />
-		<field name="metadesc" type="textarea" label="FLEXI_DESCRIPTION" description="JFIELD_META_DESCRIPTION_DESC" class="fcfield_textareaval" rows="3" cols="46" />
-		<field name="metakey" type="textarea" label="FLEXI_KEYWORDS" description="JFIELD_META_KEYWORDS_DESC" class="fcfield_textareaval" rows="3" cols="46" />
+		<field name="metadesc" type="textarea" label="FLEXI_DESCRIPTION" description="JFIELD_META_DESCRIPTION_DESC" class="" rows="3" cols="46" />
+		<field name="metakey" type="textarea" label="FLEXI_KEYWORDS" description="JFIELD_META_KEYWORDS_DESC" class="" rows="3" cols="46" />
 		<field name="access" type="accesslevel" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" class="use_select2_lib" size="1" />
 		<field name="hits" type="hidden" label="JGLOBAL_HITS" description="COM_CONTENT_FIELD_HITS_DESC" class="readonly" size="6" readonly="true" filter="unset" />
 		<field name="score" type="hidden" label="FLEXI_SCORE" description="FLEXI_SCORE_DESC" class="readonly" size="6" readonly="true" filter="unset" />
@@ -108,7 +108,7 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="readmore" type="text" size="30" default="" label="FLEXI_ALTLINK_TEXTE" description="PARAMALTREADMORE" class="fcfield_textval" />
+		<field name="readmore" type="text" size="30" default="" label="FLEXI_ALTLINK_TEXTE" description="PARAMALTREADMORE" class="" />
 	</fieldset>
 	
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
@@ -139,7 +139,7 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="custom_ititle" type="text" default="" size="30" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" class="fcfield_textval" />
+		<field name="custom_ititle" type="text" default="" size="30" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" class="" />
 		<field name="addcat_title" type="fcradio" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
@@ -172,8 +172,8 @@
 			<option value="left">COM_CONTENT_LEFT</option>
 			<option value="none">COM_CONTENT_NONE</option>
 		</field>
-		<field name="image_intro_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
-		<field name="image_intro_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
+		<field name="image_intro_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
+		<field name="image_intro_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
 		
 		<field name="" type="separator" default="FLEXI_IMAGES_COMP_FULLIMG" description="FLEXI_IMAGES_COMP_FULLIMG_DESC" level="level3" />
 		<field name="image_fulltext" type="fcmedia" label="COM_CONTENT_FIELD_FULL_LABEL" description="COM_CONTENT_FIELD_FULL_DESC" labelclass="fc-prop-lbl" />
@@ -183,8 +183,8 @@
 			<option value="left">COM_CONTENT_LEFT</option>
 			<option value="none">COM_CONTENT_NONE</option>
 		</field>
-		<field name="image_fulltext_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
-		<field name="image_fulltext_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
+		<field name="image_fulltext_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
+		<field name="image_fulltext_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
 	
 </fields>	
 
@@ -192,8 +192,8 @@
 		
 		<field name="" type="separator" default="FLEXI_URLS_LINK_A" description="FLEXI_URLS_LINK_A_DESC" level="level3" />
 		<field name="urla" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLA_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
-		<field name="urlatext" type="text" label="COM_CONTENT_FIELD_URLA_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
-		<field name="targeta" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="fcfield_textval">
+		<field name="urlatext" type="text" label="COM_CONTENT_FIELD_URLA_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
+		<field name="targeta" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
 			<option value="0">JBROWSERTARGET_PARENT</option>
 			<option value="1">JBROWSERTARGET_NEW</option>
@@ -203,8 +203,8 @@
 		
 		<field name="" type="separator" default="FLEXI_URLS_LINK_B" description="FLEXI_URLS_LINK_B_DESC" level="level3" />
 		<field name="urlb" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLB_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
-		<field name="urlbtext" type="text" label="COM_CONTENT_FIELD_URLB_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
-		<field name="targetb" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="fcfield_textval">
+		<field name="urlbtext" type="text" label="COM_CONTENT_FIELD_URLB_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
+		<field name="targetb" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
 			<option value="0">JBROWSERTARGET_PARENT</option>
 			<option value="1">JBROWSERTARGET_NEW</option>
@@ -214,8 +214,8 @@
 
 		<field name="" type="separator" default="FLEXI_URLS_LINK_C" description="FLEXI_URLS_LINK_C_DESC" level="level3" />
 		<field name="urlc" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLC_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
-		<field name="urlctext" type="text" label="COM_CONTENT_FIELD_URLC_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="fcfield_textval" />
-		<field name="targetc" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="fcfield_textval">
+		<field name="urlctext" type="text" label="COM_CONTENT_FIELD_URLC_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
+		<field name="targetc" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
 			<option value="0">JBROWSERTARGET_PARENT</option>
 			<option value="1">JBROWSERTARGET_NEW</option>
@@ -235,9 +235,9 @@
 			<option value="index, nofollow">FLEXI_INDEX_NOFOLLOW</option>
 			<option value="noindex, nofollow">FLEXI_NOINDEX_NOFOLLOW</option>
 		</field>
-		<field name="xreference" type="text" default="" size="30" label="FLEXI_FIELD_XREFERENCE_LABEL" description="FLEXI_FIELD_XREFERENCE_DESC" class="fcfield_textval" />
-		<field name="author" type="text" default="" size="30" label="FLEXI_AUTHOR" description="FLEXI_METADATA_AUTHOR_DESC" class="fcfield_textval" />
-		<field name="rights" type="textarea" default="" rows="3" cols="46" label="FLEXI_META_RIGHTS_LABEL" description="FLEXI_META_RIGHTS_DESC" filter="string" class="fcfield_textareaval" />
+		<field name="xreference" type="text" default="" size="30" label="FLEXI_FIELD_XREFERENCE_LABEL" description="FLEXI_FIELD_XREFERENCE_DESC" class="" />
+		<field name="author" type="text" default="" size="30" label="FLEXI_AUTHOR" description="FLEXI_METADATA_AUTHOR_DESC" class="" />
+		<field name="rights" type="textarea" default="" rows="3" cols="46" label="FLEXI_META_RIGHTS_LABEL" description="FLEXI_META_RIGHTS_DESC" filter="string" class="" />
 </fields>
 
 </form>
