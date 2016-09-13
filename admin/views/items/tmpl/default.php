@@ -921,29 +921,26 @@ jQuery(document).ready(function(){
 					$row_modified = strtotime($row->modified);
 					if (!$row_modified)  $row_modified = strtotime($row->created);
 					
-					foreach($this->lang_assocs[$row->id] as $assoc_item) {
+					foreach($this->lang_assocs[$row->id] as $assoc_item)
+					{
 						if ($assoc_item->id==$row->id) continue;
 
 						$assoc_modified = strtotime($assoc_item->modified);
 						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
-						$_class = ( $assoc_modified < $row_modified ) ? ' fc_assoc_outdated' : '';
 						
 						$_link  = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $assoc_item->id;
 						$_title = flexicontent_html::getToolTip(
-							JText::_( $assoc_modified < $row_modified ? 'FLEXI_OUTDATED' : 'FLEXI_UPTODATE'),
+							JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS'),
 							//JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION').
-							($assoc_item->lang=='*' ? JText::_("All") : $this->langs->{$assoc_item->lang}->name).' <br/><br/> '.
+							( !empty($this->langs->{$assoc_item->lang}->imgsrc) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
+							($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$assoc_item->lang}->name).' <br/> '.
 							$assoc_item->title, 0, 1
 						);
 						
-						echo '<a class="fc_assoc_translation '.$tip_class.$_class.'" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
-						//echo $assoc_item->id;
-						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
-							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
-						} else if( !empty($assoc_item->lang) ) {
-							echo $assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $assoc_item->lang;
-						}
-						echo "</a>";
+						echo '
+						<a class="fc_assoc_translation label label-association ' . $tip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" target="_blank" href="'.$_link.'" title="'.$_title.'" >
+							'.($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : strtoupper($assoc_item->shortcode)).'
+						</a>';
 					}
 				}
 				?>
@@ -1068,12 +1065,17 @@ jQuery(document).ready(function(){
 			
 			<td class="col_tag">
 				<?php
+					$row_tags = array();
 					foreach ($row->tagids as $key => $_itag)
 					{
-						if ( !isset($this->itemTags[$_itag]) ) continue;
-						$tag = & $this->itemTags[$_itag];
-						echo '<span class="badge">'.$tag->name.'</span> ';
+						if ( isset($this->itemTags[$_itag]) )
+						{
+							$row_tags[] = ' <span class="badge">'.$this->itemTags[$_itag]->name.'</span> ';
+						}
 					}
+					echo count($row->tagids) > 2 ?
+						' <span class="hasTooltip" title="'.flexicontent_html::getToolTip('', implode(' ', $row_tags), 0, 1).'">' . count($row->tagids) .' <i class="icon-tags"></i></span>' :
+						implode(' ', $row_tags) ;
 				?>
 			</td>
 			
