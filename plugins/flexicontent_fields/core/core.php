@@ -133,13 +133,14 @@ class plgFlexicontent_fieldsCore extends FCField
 					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
-					
-					// Add prefix / suffix
-					$field->{$prop} = $pretext.JHTML::_( 'date', $item->created, $dateformat ).$posttext;
-					
-					// Add microdata property
-					$itemprop = $field->parameters->get('microdata_itemprop', 'dateCreated');
-					if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+
+					$viewlayout = $field->parameters->get('viewlayout', '');
+					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+
+					// Create created HTML
+					$field->{$prop} = array();
+					include(self::getFormPath('core', $viewlayout, 'created'));
+					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					break;
 				
 				case 'createdby': // created by
@@ -154,13 +155,14 @@ class plgFlexicontent_fieldsCore extends FCField
 					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
-					
-					// Add prefix / suffix
-					$field->{$prop} = $pretext.JHTML::_( 'date', $item->modified, $dateformat ).$posttext;
-					
-					// Add microdata property
-					$itemprop = $field->parameters->get('microdata_itemprop', 'dateModified');
-					if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+
+					$viewlayout = $field->parameters->get('viewlayout', '');
+					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+
+					// Create modified HTML
+					$field->{$prop} = array();
+					include(self::getFormPath('core', $viewlayout, 'modified'));
+					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					break;
 				
 				case 'modifiedby': // modified by
@@ -170,24 +172,14 @@ class plgFlexicontent_fieldsCore extends FCField
 	
 				case 'title': // title
 					$field->value[] = $item->title;
-					$field->{$prop} = $pretext.$item->title.$posttext;
-					
-					// Get ogp configuration
-					$useogp     = $field->parameters->get('useogp', 1);
-					$ogpinview  = $field->parameters->get('ogpinview', array());
-					$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-					$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
-					
-					if ($useogp && $field->{$prop}) {
-						if ( in_array($view, $ogpinview) ) {
-							$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
-							JFactory::getDocument()->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
-						}
-					}
-					
-					// Add microdata property (currently no parameter in XML for this field)
-					$itemprop = $field->parameters->get('microdata_itemprop', 'name');
-					if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+
+					$viewlayout = $field->parameters->get('viewlayout', '');
+					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+
+					// Create title HTML
+					$field->{$prop} = array();
+					include(self::getFormPath('core', $viewlayout, 'title'));
+					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					break;
 	
 				case 'hits': // hits
@@ -253,10 +245,10 @@ class plgFlexicontent_fieldsCore extends FCField
 						global $globalnoroute;
 						if ( !is_array($globalnoroute) ) $globalnoroute = array();
 						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
-						
+
 						$viewlayout = $field->parameters->get('viewlayout', '');
 						$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-						
+
 						// Create categories HTML
 						$field->{$prop} = array();
 						include(self::getFormPath('core', $viewlayout, 'categories'));
@@ -275,10 +267,10 @@ class plgFlexicontent_fieldsCore extends FCField
 					
 					if ($tags) :
 						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
-						
+
 						$viewlayout = $field->parameters->get('viewlayout', '');
 						$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-						
+
 						// Create tags HTML
 						$field->{$prop} = array();
 						include(self::getFormPath('core', $viewlayout, 'tags'));
