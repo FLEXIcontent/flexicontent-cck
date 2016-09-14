@@ -153,7 +153,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
 		$fieldid    = $this->input->get('fieldid', 0, 'int');
-		$u_item_id  = $this->input->get('u_item_id', 0, 'int');
+		$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
 		$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 		
 		$model = $this->getModel('filemanager');
@@ -745,7 +745,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$db     = JFactory::getDBO();
 
 		$fieldid    = $this->input->get('fieldid', 0, 'int');
-		$u_item_id  = $this->input->get('u_item_id', 0, 'int');
+		$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
 		$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 
 		if ($file_mode == 'folder_mode')
