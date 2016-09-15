@@ -36,7 +36,7 @@ foreach ($values as $value)
 		$value = strlen($value) ? array($value) : array();
 	
 	// Skip empty if not in field group
-	if ( !count($value) && !$is_ingroup )
+	if ( !count($value) && !$is_ingroup && !$display_all )
 		continue;
 	
 	$html  = array();
