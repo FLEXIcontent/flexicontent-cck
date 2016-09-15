@@ -865,13 +865,13 @@ if ( ( !isset($all_tab_fields['lang']) && $captured['lang'] )  ||  ( flexiconten
 if ( $this->perms['canright'] ) : ob_start(); // perms ?>
 	<?php
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function(){
-			var slideaccess = new Fx.Slide('tabacces');
-			var slidenoaccess = new Fx.Slide('notabacces');
-			slideaccess.hide();
-			$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-				slideaccess.toggle();
-				slidenoaccess.toggle();
+		jQuery(document).ready(function()
+		{
+			jQuery('fieldset.flexiaccess legend + div#tabacces').hide();
+			jQuery('fieldset.flexiaccess legend').on('click', function(ev)
+			{
+				var panel = jQuery(this).next();
+				panel.is(':visible') ? panel.slideUp(600) : panel.slideDown(600);
 			});
 		});
 	");
