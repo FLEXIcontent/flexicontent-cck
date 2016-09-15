@@ -19,7 +19,20 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
+		<fieldset name="group-fcloadmodule-config" repeat="1" icon_class="icon-cog" label="Configuration" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="module_method" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="1" show_list="module-mode" hide_list="position-mode">FLEXI_FIELD_MODULE_UNIQUE</option>
+				<option value="2" show_list="position-mode" hide_list="module-mode">FLEXI_FIELD_MODULE_POSITION</option>
+			</field>
+			<field name="modules" type="fcmodules" default="" label="FLEXI_FIELD_MODULE_MODULES_LIST" depend_class="module-mode" description="FLEXI_FIELD_MODULE_MODULES_LIST_DESC" />
+			<field name="position" type="fcpositions" default="" label="FLEXI_FIELD_MODULE_POSITIONS_LIST" depend_class="position-mode" description="FLEXI_FIELD_MODULE_POSITIONS_LIST_DESC" />
+			<field name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
+			<field name="mod_params" type="textarea" rows="8" cols="50" default="" label="FLEXI_CUSTOM_MODULE_PER_ITEM" depend_class="module-mode" description="FLEXI_CUSTOM_MODULE_PER_ITEM_DESC" />
+		</fieldset>
+
+
+		<fieldset name="group-fcloadmodule-viewing" repeat="1" icon_class="icon-eye" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -35,17 +48,6 @@
 			</field>
 			<!--field name="frontend_hidden" type="hidden" default="1" /-->
 			<!--field name="backend_hidden" type="hidden" default="1" /-->
-		</fieldset>
-		
-		<fieldset name="group-fcloadmodule-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="module_method" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MODULE_METHOD" description="FLEXI_FIELD_MODULE_METHOD_DESC" toggle_related="1" class="btn-group btn-group-yesno">
-				<option value="1" show_list="module-mode" hide_list="position-mode">FLEXI_FIELD_MODULE_UNIQUE</option>
-				<option value="2" show_list="position-mode" hide_list="module-mode">FLEXI_FIELD_MODULE_POSITION</option>
-			</field>
-			<field name="modules" type="fcmodules" default="" label="FLEXI_FIELD_MODULE_MODULES_LIST" depend_class="module-mode" description="FLEXI_FIELD_MODULE_MODULES_LIST_DESC" />
-			<field name="position" type="fcpositions" default="" label="FLEXI_FIELD_MODULE_POSITIONS_LIST" depend_class="position-mode" description="FLEXI_FIELD_MODULE_POSITIONS_LIST_DESC" />
-			<field name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
-			<field name="mod_params" type="textarea" rows="8" cols="50" default="" label="FLEXI_CUSTOM_MODULE_PER_ITEM" depend_class="module-mode" description="FLEXI_CUSTOM_MODULE_PER_ITEM_DESC" />
 		</fieldset>
 		
 	</fields>
