@@ -61,13 +61,15 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$field->html = array();
 		$n = 0;
 		$value = unserialize($field->value[0]);
-		foreach ($mod_params as $mod_param) {
+		foreach ($mod_params as $mod_param)
+		{
+			if ( !strlen($mod_param) ) continue;
+
 			list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
-			
-			$param_value = @$value[$param_name];
-			
+			$param_value = @ $value[$param_name];
+
 			$field->html[] = $param_label.
-				': <input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="inputbox" type="text" size="40" value="'.$param_value.'" />'
+				': <input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="input-xlarge" type="text" size="40" value="'.$param_value.'" />'
 				;
 			$n++;
 		}
@@ -143,6 +145,8 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 			$custom_mod_params = array();
 			foreach ($mod_params as $mod_param)
 			{
+				if ( !strlen($mod_param) ) continue;
+
 				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
 				$custom_mod_params[ $param_name ] = $value[$param_name];
 			}

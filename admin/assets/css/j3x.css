@@ -255,10 +255,6 @@ div fieldset.panelform fieldset.radio label {
 	margin-top: 4px;
 	width: auto !important;
 }
-div fieldset.panelform {
-	padding: 0px !important;
-	margin: 0px !important;
-}
 div fieldset.panelform ul.adminformlist > li {
 	clear: both;
 }
