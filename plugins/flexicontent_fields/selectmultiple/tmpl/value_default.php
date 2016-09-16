@@ -1,14 +1,15 @@
 <?php
 
 // Prepare for looping
-if ( $display_all ) {
+if ( $display_all )
+{
 	// non-selected value shortcuts
-  $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
-  $ns_posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_posttext', '' ), 'ns_posttext' );
-  $ns_pretext  = $ns_pretext . '<div class="fc_field_unsused_val">';
-  $ns_posttext = '</div>' . $ns_posttext;
+	$ns_pretext  = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
+	$ns_posttext = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_posttext', '' ), 'ns_posttext' );
+	$ns_pretext  = $ns_pretext . '<div class="fc_field_unsused_val">';
+	$ns_posttext = '</div>' . $ns_posttext;
 	$ns_pretext  = $remove_space ? $ns_pretext : $ns_pretext . ' ';
-  $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
+	$ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
 }
 
 
@@ -24,7 +25,8 @@ if ($text_or_value > 1)
 foreach ($values as $value)
 {
 	// Compatibility for serialized values
-	if ( $multiple && self::$valueIsArr ) {
+	if ( $multiple && self::$valueIsArr )
+	{
 		if ( is_array($value) );
 		else if (@unserialize($value)!== false || $value === 'b:0;' ) {
 			$value = unserialize($value);
@@ -33,11 +35,12 @@ foreach ($values as $value)
 	
 	// Make sure value is an array
 	if (!is_array($value))
+	{
 		$value = strlen($value) ? array($value) : array();
+	}
 	
 	// Skip empty if not in field group
-	if ( !count($value) && !$is_ingroup && !$display_all )
-		continue;
+	if ( !count($value) && !$is_ingroup && !$display_all )  continue;
 	
 	$html  = array();
 	$index = array();
@@ -79,7 +82,8 @@ foreach ($values as $value)
 	// CASE b. Display only selected elements
 	else
 	{
-		foreach ($value as $v) {
+		foreach ($value as $v)
+		{
 			// Skip empty/invalid values but add empty display, if in field group
 			$element = !strlen($v) ? false : @$elements[ $v ];
 			if ( !$element ) {
