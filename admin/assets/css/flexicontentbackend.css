@@ -12,7 +12,7 @@
 	border-radius: 4px;
 	height: auto;
 }
-.controls input[type="text"]:not(.minicolors),
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) input[type="text"]:not(.minicolors),
 .controls textarea,
 .controls fieldset.radio,
 .controls fieldset.checkbox,
@@ -1680,6 +1680,11 @@ div label.lang_box img {
 	margin: 3px !important;
 	border-width: 0px !important;
 	background: unset !important;
+}
+div fieldset.panelform {
+	padding: 0px !important;
+	margin: 0px !important;
+	width: 100% !important;
 }
 #flexicontent .ui-sortable > li {
 	background-color: white;

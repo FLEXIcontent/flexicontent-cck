@@ -3234,7 +3234,7 @@ class flexicontent_html
 			<div class="fcvote fcvote-box-'.$xid.'">
 				<div class="nowrap_box fcvote-label-outer">
 					'.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '').'
-					<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
+					<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
 						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '').
 						( $counter==-1 || $counter==0 ? '' :
 							($show_percentage && (int)$percent ? ' - ' : '').
@@ -3332,7 +3332,7 @@ class flexicontent_html
 		if (!$users_counter && !$users_list_type)  return;
 		
 		$favuserlist = '
-			<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">
+			<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">
 				'.($users_counter ? JText::_('FLEXI_TOTAL').': '.$favourites.' '.JText::_('FLEXI_USERS') : '');
 		
 		if ( $users_list_type )
@@ -4752,14 +4752,56 @@ class flexicontent_html
 
 class flexicontent_upload
 {
-	static function makeSafe($file) {//The range \xE01-\xE5B is thai language.
-		$file = str_replace(" ", "", $file);
-		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\xE01-\xE5B\.\_\- ]#', '#^\.#');
-		//$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
-		return preg_replace($regex, '', $file);
+	static function makeSafe($file, $language = null)
+	{
+		// Replace spaces with dash after removing any leading / trailing spaces
+		$file = str_replace(" ", "-", trim($file));
+
+		// Remove any trailing dots, as those aren't ever valid file names
+		$file = rtrim($file, '.');
+
+		// Regex for replacing non safe characters
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
+
+		// Language transliteration should include given language, and also site + admin defaults (most useful is site default)
+		$lang_params = JComponentHelper::getParams('com_languages');
+		$lang_site_default  = $lang_params->get('site', '*');
+		$lang_admin_default = $lang_params->get('admin', '*');
+
+		$langs[$language]   = $language && $language != '*';
+		$langs[$lang_site_default]  = $lang_site_default != '*';
+		$langs[$lang_admin_default] = $lang_admin_default != '*';
+
+		// Try to transliterate according to given language and site + admin default languages
+		$file_safe = false;
+		foreach($langs as $language => $do)
+		{
+			if ($do)
+			{
+				$transformed = JLanguage::getInstance($language)->transliterate($file);
+				$file_safe = $transformed ? preg_replace($regex, '', $transformed) : false;
+
+				// Stop trying transliterations if a complete job was done
+				if ($transformed && $transformed == $file_safe)
+				{
+					break;
+				}
+				$file_safe = false;
+			}
+		}
+
+		// Finally if none of transliterations did a complete job, e.g. because wrong language(s) tried, then avoid bad looking filenames by using current time
+		if ( !$file_safe )
+		{
+			$ext = pathinfo($file, PATHINFO_EXTENSION);
+			$file_safe = date('Y-m-d-H-i-s') .'.'. $ext;
+		}
+
+		// Return filename that is filesystem safe
+		return $file_safe;
 	}
-	
-	
+
+
 	static function parseByteLimit($limit)
 	{
 		if (is_numeric($limit)) return $limit;  // already in bytes
@@ -4777,8 +4819,8 @@ class flexicontent_upload
 		}
 		return $v;
 	}
-	
-	
+
+
 	/**
 	 * Gets upload Limits
 	 *
@@ -4802,8 +4844,8 @@ class flexicontent_upload
 		}
 		return $limit;
 	}
-	
-	
+
+
 	/**
 	 * Gets the extension of a file name
 	 *
@@ -4826,26 +4868,35 @@ class flexicontent_upload
 	 * @return string The file extension
 	 * @since 1.5
 	 */
-	static function check(&$file, &$err, &$params)
+	static function check(&$file, &$err, &$params, $language=null)
 	{
-		if (!$params) {
+		if (!$params)
+		{
 			$params = JComponentHelper::getParams( 'com_flexicontent' );
 		}
 
-		if(empty($file['name'])) {
+
+		// ************************
+		// Check non-empty filename
+		// ************************
+		
+		if(empty($file['name']))
+		{
 			$err = 'FLEXI_PLEASE_INPUT_A_FILE';
 			return false;
 		}
 
 		jimport('joomla.filesystem.file');
-		$file['altname'] = $file['name'];
-		if ($file['name'] !== JFile::makesafe($file['name'])) {
-			//$err = JText::_('FLEXI_WARNFILENAME').','.$file['name'].'|'.JFile::makesafe($file['name'])."<br/>";
-			//return false;
-			$file['name'] = date('Y-m-d-H-i-s').".".flexicontent_upload::getExt($file['name']);
-		}
+
+
+		// ***************************************************************
+		// Make filename safe, transliterating according to given language
+		// ***************************************************************
 		
-		
+		$language = $language ? $language : (!empty($file['language']) ? $file['language'] : '*');   // * would usually be interpretted as frontend site default language
+		$file['name'] = flexicontent_upload::makesafe($file['name'], $language);
+
+
 		// ***************************************
 		// Check if the image file type is allowed
 		// ***************************************
@@ -4863,8 +4914,8 @@ class flexicontent_upload
 			$err = 'FLEXI_WARNFILETYPE';
 			return false;
 		}
-		
-		
+
+
 		// **************
 		// Check filesize
 		// **************
@@ -4875,7 +4926,11 @@ class flexicontent_upload
 			$err = 'FLEXI_WARNFILETOOLARGE';
 			return false;
 		}
-		
+
+
+		// **********************************************
+		// Check extension and mime type are both allowed
+		// **********************************************
 		
 		$imginfo = null;
 		$images = explode( ',', $params->get( 'image_extensions' ));
@@ -4923,10 +4978,10 @@ class flexicontent_upload
 				}
 			}
 		}
-		
-		
+
+
 		// ***************************
-		// Check fof XSS safe contents
+		// Check for XSS safe contents
 		// ***************************
 		
 		$xss_check = JFile::read($file['tmp_name'], false, 256);
@@ -4951,10 +5006,10 @@ class flexicontent_upload
 		
 		return true;
 	}
-	
-	
+
+
 	/**
-	* Sanitize the image file name and return an unique string
+	* Sanitize the file name and return an unique string
 	*
 	* @since 1.0
 	*
@@ -4967,38 +5022,34 @@ class flexicontent_upload
 	{
 		jimport('joomla.filesystem.file');
 
-		//check for any leading/trailing dots and remove them (trailing shouldn't be possible cause of the getEXT check)
-		$filename = preg_replace( "/^[.]*/", '', $filename );
-		$filename = preg_replace( "/[.]*$/", '', $filename ); //shouldn't be necessary, see above
+		// Check for any trailing dots and remove them (trailing shouldn't be possible cause of the getExt check)
+		$filename = rtrim($filename, '.');
 
-		//we need to save the last dot position cause preg_replace will also replace dots
+		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
+		$filename = trim(preg_replace($regex, '-', $filename));
+
+		// Find last dot position and use it to seperate extension from file name
 		$lastdotpos = strrpos( $filename, '.' );
+		$name = substr( $filename, 0, $lastdotpos );
+		$ext  = substr( $filename, $lastdotpos + 1 );
 
-		//replace invalid characters
-		$chars = '[^0-9a-zA-Z()_-]';
-		$filename 	= strtolower( preg_replace( "/$chars/", '-', $filename ) );
-
-		//get the parts before and after the dot (assuming we have an extension...check was done before)
-		$beforedot	= substr( $filename, 0, $lastdotpos );
-		$afterdot 	= substr( $filename, $lastdotpos + 1 );
-
-		//make a unique filename for the image and check it is not already taken
-		//if it is already taken keep trying till success
-		if (JFile::exists( $base_Dir . $beforedot . '.' . $afterdot ))
+		// Make a unique filename and check it is not already taken, if already taken keep incrementing version till finding a new name
+		if (JFile::exists( $base_Dir . $name . '.' . $ext ))
 		{
-			$version = 1;
-			while( JFile::exists( $base_Dir . $beforedot . '-' . $version . '.' . $afterdot ) )
+			$unique_num = 1;
+			while( JFile::exists( $base_Dir . $name . '-' . $unique_num . '.' . $ext ) )
 			{
-				$version++;
+				$unique_num++;
 			}
-			//create out of the seperated parts the new filename
-			$filename = $beforedot . '-' . $version . '.' . $afterdot;
-		} else {
-			$filename = $beforedot . '.' . $afterdot;
+
+			// Create new filename out of the seperated name and ext parts adding the unique number to it
+			$filename = $name . '-' . $unique_num . '.' . $ext;
 		}
 
 		return $filename;
 	}
+
 
 	/**
 	* Sanitize folders and return an unique string
@@ -5014,21 +5065,21 @@ class flexicontent_upload
 	{
 		jimport('joomla.filesystem.folder');
 
-		//replace invalid characters
-		$chars = '[^0-9a-zA-Z()_-]';
-		$folder 	= strtolower( preg_replace( "/$chars/", '-', $folder ) );
+		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
+		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
+		$folder = trim(preg_replace($regex, '-', $folder));
 
 		//make a unique folder name for the image and check it is not already taken
 		if (JFolder::exists( $base_Dir . $folder ))
 		{
-			$version = 1;
-			while( JFolder::exists( $base_Dir . $folder . '-' . $version )) {
-				$version++;
+			$unique_num = 1;
+			while( JFolder::exists( $base_Dir . $folder . '-' . $unique_num ))
+			{
+				$unique_num++;
 			}
-			//create out of the seperated parts the new folder name
-			$foldername = $folder . '-' . $version;
-		} else {
-			$foldername = $folder;
+
+			// Create new folder name appending the unique number to it
+			$foldername = $folder . '-' . $unique_num;
 		}
 
 		return $foldername;
