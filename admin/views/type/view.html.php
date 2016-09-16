@@ -101,7 +101,15 @@ class FlexicontentViewType extends JViewLegacy
 				$value = $tparams->get($fieldname);
 				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
-		}		
+		}
+		
+		// check access level exists
+		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+		}
 		
 		// assign permissions
 		$permission = FlexicontentHelperPerm::getPerm();

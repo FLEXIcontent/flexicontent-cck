@@ -1001,7 +1001,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. 'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 				. 'GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats, '
 				. 'GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist, '
-				. 'level.title AS access_level, '
+				. 'CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level, '
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order, ' : ''
 					)

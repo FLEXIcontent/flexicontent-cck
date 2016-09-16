@@ -350,7 +350,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 					$columns[] = '('.$assigned_query.') AS assigned_'.$field_type;
 				}
 			}
-			$columns[] = 'level.title AS access_level';
+			$columns[] = 'CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', f.access) ELSE level.title END AS access_level';
 		}
 		
 		$query = 'SELECT '. implode(', ', $columns)

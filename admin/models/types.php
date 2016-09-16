@@ -190,7 +190,7 @@ class FlexicontentModelTypes extends JModelList
 			$this->getState(
 				'list.select',
 				't.*'
-				.', u.name AS editor, level.title AS access_level'
+				.', u.name AS editor, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', t.access) ELSE level.title END AS access_level'
 				.', (SELECT COUNT(*) FROM #__flexicontent_items_ext AS i WHERE i.type_id = t.id) AS iassigned '
 				.', COUNT(rel.type_id) AS fassigned, t.attribs AS config'
 			)
