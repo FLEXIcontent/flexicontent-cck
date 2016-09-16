@@ -1229,6 +1229,15 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
+		// check access level exists
+		$level_name = flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+		}
+		
+		
 		// build field for notifying subscribers
 		if ( !$subscribers )
 		{

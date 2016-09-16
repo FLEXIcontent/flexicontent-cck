@@ -148,7 +148,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 	function _buildQuery()
 	{
 		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, i.language AS lang'
-			. ', u.name AS author, t.name AS type_name, level.title AS access_level'
+			. ', u.name AS author, t.name AS type_name, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
 			. ' FROM #__content AS i'
 			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'

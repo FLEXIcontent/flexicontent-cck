@@ -774,7 +774,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build access level filter
 		$levels = JHtml::_('access.assetgroups');
-		array_unshift($levels, JHtml::_('select.option', '', 'FLEXI_DO_NOT_CHANGE'/*'JOPTION_SELECT_ACCESS'*/) );
+		array_unshift($levels, JHtml::_('select.option', '', 'FLEXI_DO_NOT_CHANGE') );
 		$fieldname =  $elementid = 'access';
 		$attribs = 'class="use_select2_lib"';
 		$lists['access'] = JHTML::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $value='', $elementid, $translate=true );

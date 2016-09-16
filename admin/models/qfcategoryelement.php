@@ -87,7 +87,7 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$query = $this->_db->getQuery(true);
 		$query->select(
 				'c.*'
-				.', u.name AS author, level.title AS access_level'
+				.', u.name AS author, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', c.access) ELSE level.title END AS access_level'
 				.', c.params as config, l.title AS language_title');
 		$query->from('#__categories AS c');
 		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');

@@ -4314,14 +4314,17 @@ class flexicontent_html
 	 *
 	 * @return	string	The required HTML for the SELECT tag.
 	 */
-	static function userlevel($name, $selected, $attribs = '', $params = true, $id = false, $createlist = true) {
+	static function userlevel($name, $selected, $attribs = '', $extra_options = true, $id = false, $createlist = true)
+	{
 		static $options;
-		if(!$options) {
+		if (!$options)
+		{
 			$db		= JFactory::getDbo();
 			$query	= $db->getQuery(true);
 			$query->select('a.id AS value, a.title AS text');
 			$query->from('#__viewlevels AS a');
-			if (!$createlist) {
+			if (!$createlist)
+			{
 				$query->where('a.id="'.$selected.'"');
 			}
 			$query->group('a.id');
@@ -4330,27 +4333,40 @@ class flexicontent_html
 
 			// Get the options.
 			$db->setQuery($query);
-			$options = $db->loadObjectList();
+			$options = $db->loadObjectList('value');
 
 			// Check for a database error.
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			if ( !$options ) return null;
-
-			if (!$createlist) {
-				return $options[0]->text;  // return ACCESS LEVEL NAME
+			
+			// Return ACCESS LEVEL NAME
+			if (!$createlist)
+			{
+				$_option = reset($options);
+				return $_option->text;
 			}
 
 			// If params is an array, push these options to the array
-			if (is_array($params)) {
-				$options = array_merge($params,$options);
+			if (is_array($extra_options))
+			{
+				$options = array_merge($extra_options, $options);
 			}
 			// If all levels is allowed, push it into the array.
-			elseif ($params) {
+			elseif ($extra_options)
+			{
 				//array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_ACCESS_SHOW_ALL_LEVELS')));
 			}
 		}
-
-		return JHtml::_('select.genericlist', $options, $name,
+		
+		$ops = $options;
+		
+		$selected_arr = is_array($selected) ? $selected : array($selected);
+		foreach($selected_arr as $sel)
+		{
+			if ( !isset($ops[$sel]) ) $ops[] = (object) array('value'=>$sel, 'text'=>$sel);
+		}
+		
+		return JHtml::_('select.genericlist', $ops, $name,
 			array(
 				'list.attr' => $attribs,
 				'list.select' => $selected,
