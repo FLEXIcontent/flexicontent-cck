@@ -1017,7 +1017,13 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
 		// we make sure that values should be an array of arrays
-		$values = $multiple && self::$valueIsArr ? $values : array($values);
+		$is_2lvl_arr = false;
+		if (is_array($values))
+		{
+			$v = reset($values);
+			$is_2lvl_arr = is_array($v);
+		}
+		$values = ($multiple && self::$valueIsArr) || $is_2lvl_arr ? $values : array($values);
 		if ( !$values ) $values = array();
 		
 		
