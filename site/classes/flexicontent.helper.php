@@ -4793,8 +4793,8 @@ class flexicontent_upload
 		// Finally if none of transliterations did a complete job, e.g. because wrong language(s) tried, then avoid bad looking filenames by using current time
 		if ( !$file_safe )
 		{
-			$ext = pathinfo($file, PATHINFO_EXTENSION);
-			$file_safe = date('Y-m-d-H-i-s') .'.'. $ext;
+			$ext = self::getExt($file);
+			$file_safe = date('Y-m-d_H.i.s') .'.'. $ext;
 		}
 
 		// Return filename that is filesystem safe
@@ -4855,7 +4855,9 @@ class flexicontent_upload
 	 */
 	static function getExt($filename)
 	{
-		return pathinfo($filename, PATHINFO_EXTENSION);
+		$dot = strrpos($filename, '.') + 1;
+		return substr($filename, $dot);
+		//return pathinfo($filename, PATHINFO_EXTENSION);
 	}
 
 
@@ -5029,12 +5031,12 @@ class flexicontent_upload
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
 		$filename = trim(preg_replace($regex, '-', $filename));
 
-		// Find last dot position and use it to seperate extension from file name
+		// Get name part and extension part from the file name
 		$lastdotpos = strrpos( $filename, '.' );
 		$name = substr( $filename, 0, $lastdotpos );
 		$ext  = substr( $filename, $lastdotpos + 1 );
 
-		// Make a unique filename and check it is not already taken, if already taken keep incrementing version till finding a new name
+		// Make a unique filename by checking if it is already taken, if already taken keep incrementing counter till finding a new name
 		if (JFile::exists( $base_Dir . $name . '.' . $ext ))
 		{
 			$unique_num = 1;
@@ -5043,7 +5045,7 @@ class flexicontent_upload
 				$unique_num++;
 			}
 
-			// Create new filename out of the seperated name and ext parts adding the unique number to it
+			// Create new filename out of the name and ext parts adding the unique number to it
 			$filename = $name . '-' . $unique_num . '.' . $ext;
 		}
 
