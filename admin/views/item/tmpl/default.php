@@ -1057,7 +1057,7 @@ if ($this->row->type_id) {
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
 		
 		<div class="fc_tabset_inner">
-			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important;">
+			<div class="alert alert-info fc-small fc-iblock">
 			<?php
 				// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 				$site_zone = JFactory::getApplication()->getCfg('offset');

@@ -518,36 +518,32 @@ class FlexicontentViewItem extends JViewLegacy
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
 		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
 		
-		// *** BOF: J2.5 SPECIFIC SELECT LISTS
-		if (FLEXI_J16GE)
+		// build featured flag
+		$fieldname = 'jform[featured]';
+		$elementid = 'jform_featured';
+		/*
+		$options = array();
+		$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
+		$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+		$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
+		*/
+		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+		$attribs = ' class="'.$classes.'" ';
+		$i = 1;
+		$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
+		$lists['featured'] = '';
+		foreach ($options as $option_id => $option_label)
 		{
-			// build featured flag
-			$fieldname = 'jform[featured]';
-			$elementid = 'jform_featured';
-			/*
-			$options = array();
-			$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
-			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
-			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
-			*/
-			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-			$attribs = ' class="'.$classes.'" ';
-			$i = 1;
-			$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
-			$lists['featured'] = '';
-			foreach ($options as $option_id => $option_label) {
-				$checked = $option_id==$item->featured ? ' checked="checked"' : '';
-				$elementid_no = $elementid.'_'.$i;
-				if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-				if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.JText::_($option_label).'</label>';
-				$i++;
-			}
+			$checked = $option_id==$item->featured ? ' checked="checked"' : '';
+			$elementid_no = $elementid.'_'.$i;
+			if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
+				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+			if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.JText::_($option_label).'</label>';
+			$i++;
 		}
-		// *** EOF: J1.5 SPECIFIC SELECT LISTS
 		
 		// build version approval list
 		$fieldname = 'jform[vstate]';
@@ -573,6 +569,15 @@ class FlexicontentViewItem extends JViewLegacy
 				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
 			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
 			$i++;
+		}
+		
+		
+		// check access level exists
+		$level_name = flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
 		}
 		
 		

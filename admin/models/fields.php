@@ -284,7 +284,7 @@ class FlexicontentModelFields extends JModelList
 		$query->select(
 			$this->getState( 'list.select',
 				't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, GROUP_CONCAT(rel.type_id SEPARATOR  ",") AS typeids, '.
-				' level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendly'
+				' CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', t.access) ELSE level.title END AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendly'
 			)
 		);
 		$query->from('#__flexicontent_fields AS t');

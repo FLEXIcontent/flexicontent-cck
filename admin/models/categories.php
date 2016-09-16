@@ -280,7 +280,7 @@ class FlexicontentModelCategories extends JModelList
 			$this->getState(
 				'list.select',
 				'c.*'
-				.', u.name AS editor, level.title AS access_level'
+				.', u.name AS editor, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', c.access) ELSE level.title END AS access_level'
 				// because of multi-multi category-item relation it is faster to calculate ITEM COUNT with a seperate query
 				// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
 				// the more categories are listed (query LIMIT) the bigger the performance difference ...
