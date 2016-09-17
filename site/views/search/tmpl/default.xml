@@ -142,7 +142,7 @@
 				<option value="0" show_list="" hide_list="disp_img">FLEXI_NO</option>
 				<option value="1" show_list="disp_img" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="fcr_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" class="disp_img"/>
+			<field name="fcr_image" type="fcimage" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" class="disp_img"/>
 			<field name="fcr_position" type="radio" default="0" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="disp_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_IMAGE_LEFT</option>
 				<option value="1">FLEXI_IMAGE_RIGHT</option>

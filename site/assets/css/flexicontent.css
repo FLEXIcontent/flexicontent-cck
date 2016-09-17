@@ -2955,6 +2955,7 @@ hr.fcclearline {
 	float: left;
 	margin: 0px 0px 0px 0px;
 }
+.fc_delete_link,
 .fc_state_toggle_link {
 	float: left;
 	margin: 5px 0px 0px 5px;
@@ -2962,6 +2963,10 @@ hr.fcclearline {
 .fc_state_toggle_link_nopad {
 	float: left;
 	margin: 0px 0px 0px 0px;
+}
+.contentheading {
+	display: inline-block;
+	margin: 2px 6px;
 }
 #flexicontent .fc_item_title,
 #flexicontent .fc_item_title a {
