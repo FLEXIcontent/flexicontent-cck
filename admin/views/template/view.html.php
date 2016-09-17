@@ -183,6 +183,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		// **************************
 		
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('touch-punch');
 		//JHTML::_('behavior.tooltip');
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
