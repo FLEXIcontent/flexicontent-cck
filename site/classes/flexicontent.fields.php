@@ -98,7 +98,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function &getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = false, $use_tmpl = true)
+	static function & getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = false, $use_tmpl = true)
 	{
 		static $expired_cleaned = false;
 		
@@ -383,8 +383,140 @@ class FlexicontentFields
 		
 		return $items;
 	}
-	
-	
+
+
+	/*
+	* Create editing HTML of a field
+	*/
+	static function getFieldFormDisplay($field, $item, $user)
+	{
+		// *****************************************************************************************
+		// Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type-specific label & description
+		// *****************************************************************************************
+
+		if ($field->iscore)
+		{
+			// Load field customization per CONTENT TYPE. NOTE: this is only for CORE fields, CUSTOM fields do not have per CONTENT TYPE customizations
+			FlexicontentFields::loadFieldConfig($field, $item);
+
+			// Special case: create MAINTEXT field (description field), by calling the display function of the textarea field (will also check for tabs)
+			if ($field->field_type == 'maintext')
+			{
+				if ( isset($item->item_translations) )
+				{
+					$shortcode = substr($item->language ,0,2);
+					foreach ($item->item_translations as $lang_id => $t)
+					{
+						if ($shortcode == $t->shortcode) continue;
+						$field->name = array('jfdata',$t->shortcode,'text');
+						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
+						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+						$t->fields->text->tab_labels = $field->tab_labels;
+						$t->fields->text->html = $field->html;
+						unset( $field->tab_labels );
+						unset( $field->html );
+					}
+				}
+				$field->name = 'text';
+				// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish/Falang data
+				$field->value[0] = $item->text; // do not decode special characters this was handled during saving !
+				// Render the field's (form) HTML
+				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+			}
+
+			return;
+		}
+
+
+		// ***************************************************************************************
+		// Create editing HTML of the field NOTE: this is DONE only for CUSTOM fields, since form
+		// field html is created by the form itself for all CORE fields, (except for 'text' field)
+		// ***************************************************************************************
+
+		// Check for field configured to be inside a field group and skip it
+		if ($field->parameters->get('use_ingroup', 0) && empty($field->ingroup))
+		{
+			$field->formhidden = 3;
+			return;
+		}
+
+		$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+		if ($is_editable)
+		{
+			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
+			if ($field->untranslatable)
+			{
+				$msg = !isset($field->html) ?
+					'<div class="alert alert-info fc-warning fc-iblock" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>' :
+					'<div class="alert alert-info fc-small fc-iblock" style="margin:0 4px 6px 4px; max-width: unset;">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>' ;
+
+				if (!is_array($field->html))
+				{
+					$field->html = $msg .' <div class="fcclear"></div> '. $field->html;
+				}
+				else
+				{
+					$field->html = array();
+					foreach($field->html as $i => & $field_html)  $field->html[$i] = $msg .' <div class="fcclear"></div> '. $field_html;
+					unset($field_html);
+				}
+			}
+		}
+
+		// Non-editable message only
+		else if ($field->valueseditable==1) {
+			$msg = '<div class="alert alert-info fc-small fc-iblock">' . JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
+
+			// Handle non-editable field inside fieldgroup
+			if (!empty($field->ingroup))
+			{
+				$field->html = array();
+				foreach($field->value as $i => $v) $field->html[$i]= $msg;
+			}
+			else
+			{
+				$field->html = $msg;
+			}
+		}
+
+		// Non-editable message only + display values
+		else if ($field->valueseditable==2) {
+			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
+
+			$msg = '<div class="alert alert-info fc-small fc-iblock">' . JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
+			if (!is_array($field->display))
+			{
+				$field->html = $msg .' <div class="fcclear"></div> <div class="fc-non-editable-value">'. $field->display .'</div>';
+			}
+			else
+			{
+				$field->html = array();
+				foreach($field->display as $i => & $field_display)  $field->html[$i] = $msg .' <div class="fcclear"></div> <div class="fc-non-editable-value">'. $field_display .'</div>';
+				unset($field_display);
+			}
+		}
+
+		else if ($field->valueseditable==3) {
+			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
+			if (!is_array($field->display))
+			{
+				$field->html = '<div class="fc-non-editable-value">'. $field->display .'</div>';
+			}
+			else
+			{
+				$field->html = array();
+				foreach($field->display as $i => & $field_display)  $field->html[$i] = '<div class="fc-non-editable-value">'. $field_display .'</div>';
+				unset($field_display);
+			}
+		}
+
+		else if ($field->valueseditable==4) {
+			$field->html = '';
+			$field->formhidden = 4;
+		}
+	}
+
+
 	/**
 	 * Method to render (display method) a field on demand and return the display
 	 * 
@@ -392,7 +524,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	static function &getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
+	static function & getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
 	{
 		// 1. Convert to array of items if not an array already
 		if ( empty($item_arr) ) {
@@ -1334,7 +1466,8 @@ class FlexicontentFields
 	// ***********************************************************
 	
 	// Method to create field parameters in an optimized way, and also apply Type Customization for CORE fields
-	static function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1) {
+	static function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1)
+	{
 		$db = JFactory::getDBO();
 		static $tparams = array();
 		static $tinfo   = array();
@@ -3846,7 +3979,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function &getFilters($filt_param='filters', $usage_param='use_filters', & $params = null, $check_access=true)
+	static function & getFilters($filt_param='filters', $usage_param='use_filters', & $params = null, $check_access=true)
 	{
 		// Parameter that controls using these filters
 		$filters = array();
