@@ -30,6 +30,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		

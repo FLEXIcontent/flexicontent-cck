@@ -46,6 +46,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		$use_ingroup = 0; // Field grouped should not be recursively grouped
+
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		$compact_edit = $field->parameters->get('compact_edit', 0);
@@ -53,7 +55,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$db = JFactory::getDBO();
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		$app  = JFactory::getApplication();
+		$isAdmin = $app->isAdmin();
 		
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -86,12 +91,13 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		{
 			$grouped_field->ingroup = 1;
 			$grouped_field->item_id = $item->id;
-			FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayField', array(&$grouped_field, &$item));
+
+			//FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayField', array(&$grouped_field, &$item));
+			FlexicontentFields::getFieldFormDisplay($grouped_field, $item, $user);
 			unset($grouped_field->ingroup);
 		}
-		
-		
-		
+
+
 		$js = "";
 		$css = "";
 		
@@ -124,28 +130,47 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			// Create function call for add/deleting Field values
 			$addField_pattern = "
 				var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
-				fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
-				var newSubLabel = fieldval_box.prev('label.sub_label');
-				var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
-				newSubLabel.attr('id', newLabelFor + '-lbl');
-				newSubLabel.attr('for', newLabelFor);
-				newSubLabel.attr('data-for', newLabelFor);
-				addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);";
-			$delField_pattern = "
-				if(rowCount".$field->id." == 1)
+				if (typeof addField_GRP_FID_ !== 'undefined')
 				{
-					// We need to update the current grouped label of the field if this was the last element being re-added
-					var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
 					fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
 					var newSubLabel = fieldval_box.prev('label.sub_label');
 					var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
+					newSubLabel.attr('id', newLabelFor + '-lbl');
 					newSubLabel.attr('for', newLabelFor);
 					newSubLabel.attr('data-for', newLabelFor);
+					addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);
 				}
-				deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
+				else {
+					// Clear displayed values of other value-set
+					fieldval_box.find('.fc-non-editable-value').html('-');
+				}
+				";
+			$delField_pattern = "
+				if (typeof deleteField_GRP_FID_ !== 'undefined')
+				{
+					if (rowCount".$field->id." == 1)
+					{
+						// We need to update the current grouped label of the field if this was the last element being re-added
+						var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
+						fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
+						var newSubLabel = fieldval_box.prev('label.sub_label');
+						var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
+						newSubLabel.attr('for', newLabelFor);
+						newSubLabel.attr('data-for', newLabelFor);
+					}
+					deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
+				}
 				";
 			$addField_funcs = $delField_funcs = '';
-			foreach($grouped_fields as $field_id => $grouped_field) {
+			foreach($grouped_fields as $field_id => $grouped_field)
+			{
+				if ($grouped_field->formhidden == 4) continue;
+				if ($isAdmin) {
+					if ( $grouped_field->parameters->get('backend_hidden')  ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(2,3))) ) continue;
+				} else {
+					if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
+				}
+
 				$addField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($addField_pattern, $grouped_field->name)  );
 				$delField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($delField_pattern, $grouped_field->name)  );
 			}
@@ -287,7 +312,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		
 		$field->html = array();
-		for($n = 0; $n < $max_count; $n++)
+		for ($n = 0; $n < $max_count; $n++)
 		{
 			$field->html[$n] = '
 				'.($use_ingroup ? '' : '
@@ -301,7 +326,15 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			
 			// Append item-form display HTML of the every field in the group
 			$i = 0;
-			foreach($grouped_fields as $field_id => $grouped_field) {
+			foreach($grouped_fields as $field_id => $grouped_field)
+			{
+				if ($grouped_field->formhidden == 4) continue;
+				if ($isAdmin) {
+					if ( $grouped_field->parameters->get('backend_hidden')  ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(2,3))) ) continue;
+				} else {
+					if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
+				}
+
 				$lbl_class = 'flexi label sub_label';
 				$lbl_title = '';
 				// field has tooltip
@@ -328,7 +361,15 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		// Non value HTML
 		$non_value_html = '';
-		foreach($grouped_fields as $field_id => $grouped_field) {
+		foreach($grouped_fields as $field_id => $grouped_field)
+		{
+			if ($grouped_field->formhidden == 4) continue;
+			if ($isAdmin) {
+				if ( $grouped_field->parameters->get('backend_hidden')  ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(2,3))) ) continue;
+			} else {
+				if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
+			}
+
 			$non_value_html .= @$grouped_field->html[-1];
 		}
 		
@@ -466,8 +507,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			// Render HTML of fields in the group
 			$method = 'display';
 			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
-			foreach($grouped_fields as $grouped_field) {
-
+			foreach($grouped_fields as $grouped_field)
+			{
 				// Render the display method for the given field
 				$_values = $grouped_field->value;
 				$grouped_field->ingroup = 1;  // render as array
