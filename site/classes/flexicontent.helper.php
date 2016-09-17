@@ -1045,9 +1045,11 @@ class flexicontent_html
 		
 		// Get frameworks that are configured to be loaded manually in frontend (e.g. via the Joomla template)
 		$app = JFactory::getApplication();
+
 		static $load_frameworks = null;
 		static $load_jquery = null;
-		if ( !isset($load_frameworks[$framework]) ) {
+		if ( !isset($load_frameworks[$framework]) )
+		{
 			$flexiparams = JComponentHelper::getParams('com_flexicontent');
 			//$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
 			//$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
@@ -1072,6 +1074,16 @@ class flexicontent_html
 		{
 			case 'jQuery':
 				if ($load_jquery) flexicontent_html::loadJQuery(1, 1, 1, 1, $params);
+				break;
+			
+			case 'touch-punch':
+				$mobileDetector = flexicontent_html::getMobileDetector();
+				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
+				if ($isMobile)
+				{
+					if ($load_jquery) flexicontent_html::loadJQuery();
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
+				}
 				break;
 			
 			case 'mCSB':
