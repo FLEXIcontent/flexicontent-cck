@@ -45,19 +45,16 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
 	{
 
 		$images 	= array();
-		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
+		$images[] = JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
 		$db = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$valcolumn = 'name';
-		if (@$attributes['valcolumn']) {
+		if (@$attributes['valcolumn'])
+		{
 			$valcolumn = $attributes['valcolumn'];
 		}
 		
@@ -67,13 +64,16 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
 		. ' AND field_type = ' . $db->Quote('image')
 		. ' ORDER BY label ASC, id ASC'
 		;
-		
+
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
-		foreach ($fields as $field) {
-			$images[] = JHTMLSelect::option($field->value, JText::_('FLEXI_FIELD') .': '. $field->text); 
+		$images[] = JHTML::_('select.optgroup', JText::_('FLEXI_FIELD') );
+		foreach ($fields as $field)
+		{
+			$images[] = JHTMLSelect::option($field->value, $field->text); 
 		}
+		$images[] = JHTML::_('select.optgroup', '' );
 
 		return $images;
 	}
