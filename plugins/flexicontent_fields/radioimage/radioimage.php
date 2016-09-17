@@ -53,6 +53,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$ajax = !empty($field->isAjax);
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup) && !$ajax) return;
 		
@@ -380,7 +381,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
 
 					".(!$placeInsideLabel ?
-						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
+						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
 						"elem.closest('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."   // special case for field with image place input and image inside labels
 					nr++;
 				});

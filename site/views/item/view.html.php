@@ -860,69 +860,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
 		{
-			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
-			// NOTE: the field parameters are already created so there is not need to call this for CUSTOM fields, which do not have CONTENT TYPE customizations
-			if ($field->iscore) {
-				FlexicontentFields::loadFieldConfig($field, $item);
-			}
-
-			// b. Create field 's editing HTML (the form field)
-			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
-			if (!$field->iscore)
-			{
-				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
-				
-				if ($is_editable) {
-					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
-					if ($field->untranslatable) {
-						$field->html =
-							(!isset($field->html) ? '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div><div class="fcclear"></div>' : '').
-							'<div class="alert alert-info fc-small fc-iblock" style="margin:0 4px 6px 4px; max-width: unset;">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>'. "\n" . (isset($field->html) ? '<div class="fcclear"></div>'.$field->html : '');
-					}
-				}
-				
-				else if ($field->valueseditable==1) {
-					$field->html = '<div class="fc-mssg fc-note">'. JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
-				}
-				
-				else if ($field->valueseditable==2) {
-					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
-					$field->html = '<div class="fc-mssg fc-note">'. JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>'."\n".$field->display;
-				}
-				
-				else if ($field->valueseditable==3) {
-					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
-					$field->html = $field->display;
-				}
-				
-				else if ($field->valueseditable==4) {
-					$field->html = '';
-					$field->formhidden = 4;
-				}
-			}
-
-			// c. Create main text field, via calling the display function of the textarea field (will also check for tabs)
-			if ($field->field_type == 'maintext')
-			{
-				if ( isset($item->item_translations) ) {
-					$shortcode = substr($item->language ,0,2);
-					foreach ($item->item_translations as $lang_id => $t)	{
-						if ($shortcode == $t->shortcode) continue;
-						$field->name = array('jfdata',$t->shortcode,'text');
-						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
-						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
-						$t->fields->text->tab_labels = $field->tab_labels;
-						$t->fields->text->html = $field->html;
-						unset( $field->tab_labels );
-						unset( $field->html );
-					}
-				}
-				$field->name = 'text';
-				// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish/Falang data
-				$field->value[0] = $item->text; // do not decode special characters this was handled during saving !
-				// Render the field's (form) HTML
-				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
-			}
+			FlexicontentFields::getFieldFormDisplay($field, $item, $user);
 		}
 		if ( $print_logging_info ) $fc_run_times['render_field_html'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 

@@ -112,6 +112,9 @@ body .fc-mssg-inline.fc-noborder,
 body .fc-mssg.fc-noborder {
 	border-width: 0;
 }
+body .fc-mssg-inline.fc-nomargin {
+	margin: 1px 0 2px 0px;
+}
 #flexicontent ul.statetoggler {
 	float: none;
 	margin: 0;
