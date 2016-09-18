@@ -124,6 +124,12 @@
 				<option value="btn btn-inverse" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_INVERSE</option>
 			</field>
 			<field name="flexi_button_class_advanced_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" class="disp_advlink custom_advlink_class input-xxlarge" />
+			<field name="linkadvsearch_pos" type="radio" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC" class="disp_gobtn btn-group group-fcinfo">
+				<option value="right">FLEXI_BUTTON_RIGHT</option>
+				<option value="left">FLEXI_BUTTON_LEFT</option>
+				<option value="top">FLEXI_BUTTON_TOP</option>
+				<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
+			</field>
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">

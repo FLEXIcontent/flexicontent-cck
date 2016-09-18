@@ -232,7 +232,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	width: 15%;
 	max-width: 200px;
 	padding: 6px 1%;
-	margin: 2px 2px 0px 0px;
+	margin: 2px 2% 0px 0px;
 	text-align: left;
 }
 
@@ -350,20 +350,12 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	background: url(../images/magnifier-left.png) 98% 6px no-repeat white;
 }
 
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter:focus,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter:focus {
-}
-
 .fc_filter_html .input-append > input.fc_text_filter,
 .fc_filter_html .input-append > input.fc_field_filter,
 .fc_filter_html .input-append > input.fc_text_filter:focus,
 .fc_filter_html .input-append > input.fc_field_filter:focus {
 	margin-top: 0px;
 	margin-right: 0px;
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
 }
 .fc_filter_html .input-append .select2-container .select2-choices {
 	margin-right: 0px !important; /* fix append to multi-select2 */
@@ -373,8 +365,6 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html .input-prepend > input.fc_text_filter:focus,
 .fc_filter_html .input-prepend > input.fc_field_filter:focus {
 	margin-left: 0px;
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
 }
 /* enlarge field in views ... (non-module) */
 input.fc_text_filter:not(.fc_iscalendar),
@@ -468,6 +458,12 @@ span.fc_field_filter {
 }
 .fc_filter_html input.fc_text_filter {
 	margin: 3px 0px;
+}
+.fc_filter_html.fc_text_search input {
+	width: unset;
+}
+.fc_filter_html.fc_text_search > * {
+	margin: 2px;
 }
 
 
