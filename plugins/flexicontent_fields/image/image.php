@@ -2730,11 +2730,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($phpThumb->RenderToFile($output_filename)) {
 				return true;
 			} else {
-				echo 'Failed:<pre>' . implode("\n\n", $phpThumb->debugmessages) . '</pre><br />';
+				//echo 'Failed:<pre>' . implode("\n\n", $phpThumb->debugmessages) . '</pre><br />';
 				return false;
 			}
 		} else {
-			echo 'Failed2:<pre>' . $phpThumb->fatalerror . "\n\n" . implode("\n\n", $phpThumb->debugmessages) . '</pre><br />';
+			//echo 'Failed2:<pre>' . $phpThumb->fatalerror . "\n\n" . implode("\n\n", $phpThumb->debugmessages) . '</pre><br />';
 			return false;
 		}
 	}

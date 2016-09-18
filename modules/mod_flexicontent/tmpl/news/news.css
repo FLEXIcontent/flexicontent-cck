@@ -391,7 +391,7 @@
 	color: #08c;
 	cursor:pointer;
 	-webkit-transition: all 0.4s; transition: all 0.4s;
-	vertical-align: middle;
+	vertical-align: top;
 }
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon,
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon span {
