@@ -76,29 +76,26 @@ if ( $show_mod )
 	$width     = intval($params->get('width', 20));
 	$maxlength = $width > 20 ? $width : 20;
 	
-	// Buttons and their positions
+	// Buttons and their positions, and their types (image or text)
 	
 	// Go button
-	$button        = $params->get('button', '');
-	$button_pos    = $params->get('button_pos', 'left');
-	
-	//Direct button
-	$direct        = $params->get('direct_button', '');
-	$direct_pos    = $params->get('direct_pos', 'left');
-	
-	// Buttons as image or as text
-	
-	// Go button
+	$button       = $params->get('button', '');
+	$button_pos   = $params->get('button_pos', 'left');
 	$button_as    = $params->get('button_as', '');
 	$button_text  = JText::_($params->get('button_text', 'FLEXI_ADV_MOD_GO'));
 	$button_image = $params->get('button_image', 'components/com_flexicontent/assets/images/magnifier.png');
 	
 	// Direct button
+	$direct       = $params->get('direct_button', '');
+	$direct_pos   = $params->get('direct_pos', 'left');
 	$direct_as    = $params->get('direct_as', '');
 	$direct_text  = JText::_($params->get('direct_text', 'FLEXI_ADV_MOD_DIRECT'));
 	$direct_image = $params->get('direct_image', 'components/com_flexicontent/assets/images/question.png');
 
+	// Link to search view button ('Advanced')
 	$linkadvsearch     = $params->get('linkadvsearch', 1);
+	$linkadvsearch_pos = $params->get('linkadvsearch_pos', 'bottom');
+	$linkadvsearch_as  = '';
 	$linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_ADVANCED_SEARCH'));
 	
 	

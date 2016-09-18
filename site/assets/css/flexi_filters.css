@@ -178,7 +178,7 @@ form > .fc_filter_line {
 	width: 15%;
 	max-width: 200px;
 	padding: 6px 1%;
-	margin: 2px 2px 0px 0px;
+	margin: 2px 2% 0px 0px;
 	text-align: left;
 }
 .fc_filter .fc_filter_html,
@@ -284,8 +284,6 @@ form > .fc_filter_line {
 .fc_filter_html .input-append > input.fc_field_filter:focus {
 	margin-top: 0px;
 	margin-right: 0px;
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
 }
 .fc_filter_html .input-append .select2-container .select2-choices {
 	margin-right: 0px !important;
@@ -295,8 +293,6 @@ form > .fc_filter_line {
 .fc_filter_html .input-prepend > input.fc_text_filter:focus,
 .fc_filter_html .input-prepend > input.fc_field_filter:focus {
 	margin-left: 0px;
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
 }
 input.fc_text_filter:not(.fc_iscalendar),
 input.fc_text_filter:not(.fc_iscalendar):focus,
@@ -380,6 +376,12 @@ span.fc_field_filter {
 }
 .fc_filter_html input.fc_text_filter {
 	margin: 3px 0px;
+}
+.fc_filter_html.fc_text_search input {
+	width: unset;
+}
+.fc_filter_html.fc_text_search > * {
+	margin: 2px;
 }
 .fc_has_inner_label,
 .fc_has_inner_prompt {
