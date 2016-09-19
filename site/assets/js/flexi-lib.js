@@ -107,6 +107,12 @@
 			buttons: {
 				/*'Close': function() { jQuery(this).dialog('close'); }*/
 			},
+			open: function(ev, ui){
+				// Close on click outside of modal popup
+				jQuery('.ui-widget-overlay').bind('click', function(){
+					obj.dialog('close');
+				});
+			},
 			// Clear contents after dialog closes
 			close: function(ev, ui) {
 				// Allow parent document to scroll again
