@@ -1133,8 +1133,8 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					</table>
 					
-					<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
-					<span id="upload-clear"></span>
+					<br/>
+					<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
 					
 					<?php echo JHTML::_( 'form.token' ); ?>
 					<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
@@ -1260,7 +1260,8 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					</table>
 
-					<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
+					<br/>
+					<input type="submit" id="file-url-submit" class="btn btn-success validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
 
 				</fieldset>
 			</fieldset>
