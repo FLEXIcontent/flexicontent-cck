@@ -70,6 +70,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$img_field_name = $image_dbdata->name;
 		}
 		
+		$uri = clone JUri::getInstance();
+		$domain = $uri->toString(array('scheme', 'host', 'port'));
+		$site_base_url = JURI::base(true).'/';
 		foreach ( $cats as $cat )
 		{
 			// strip html from feed item title
@@ -78,7 +81,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($cat->slug));
+			$link = /*$domain .*/ JRoute::_(FlexicontentHelperRoute::getCategoryRoute($cat->slug));
 
 			// strip html from feed item description text
 			$description	= $cat->description; //$feed_summary ? $cat->description : '';
@@ -162,7 +165,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			//$item->author    = $author;
 			//$item->category  = $this->escape( $category->title );
 
-			// loads item info into rss array
+			// add item data into FEEDs array
 			$doc->addItem( $item );
 		}
 	}

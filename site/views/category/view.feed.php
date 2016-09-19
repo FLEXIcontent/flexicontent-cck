@@ -124,7 +124,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = $domain . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $category->slug, 0, $item));
+			$link = /*$domain .*/ JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $category->slug, 0, $item));
 
 			// strip html from feed item description text
 			$description	= $feed_summary ? $item->introtext.$item->fulltext : $item->introtext;
@@ -208,7 +208,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			//$JF_item->author    = $author;
 			$JF_item->category    = $this->escape( $category->title );
 
-			// loads item info into rss array
+			// add item data into FEEDs array
 			$document->addItem( $JF_item );
 		}
 		
