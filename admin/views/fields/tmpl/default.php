@@ -69,7 +69,8 @@ $rows_byid = array();
 foreach ($this->rows as $row)
 {
 	// Parse parameters, limited to some types, but maybe parse for all
-	if ( in_array($row->field_type, array('groupmarker', 'coreprops', 'fieldgroup', 'select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')) ) {
+	if ( in_array($row->field_type, array('groupmarker', 'coreprops', 'fieldgroup', 'select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')) )
+	{
 		$row->parameters = new JRegistry($row->attribs);
 	}
 	$rows_byid[$row->id] = $row;
@@ -94,9 +95,14 @@ foreach ($this->allrows as $row)
 		$grouping_field = $f2g_map[$row->id];
 		$grouped_fields[ $grouping_field->id ][ $row->id ] = $row;    // used to display information for: FIELDGROUP feature (and in future for more cases)
 		
-		if ( isset($rows_byid[$row->id]) ) {
+		if ( isset($rows_byid[$row->id]) )
+		{
 			// field of group is included in current list add info to it
 			$rows_byid[$row->id]->grouping_field = $grouping_field;
+			if (empty($rows_byid[$row->id]->parameters))
+			{
+				$rows_byid[$row->id]->parameters = new JRegistry($rows_byid[$row->id]->attribs);
+			}
 		}
 	}
 }
@@ -441,7 +447,8 @@ function delAllFilters() {
 
 			<td>
 				<?php
-				if (isset($row->grouping_field)) {
+				if (isset($row->grouping_field) && $row->parameters->get('use_ingroup'))
+				{
 					$_r = $row->grouping_field;
 					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;id='. $_r->id;
 					echo '

@@ -456,7 +456,6 @@ class FlexicontentFields
 				}
 				else
 				{
-					$field->html = array();
 					foreach($field->html as $i => & $field_html)  $field->html[$i] = $msg .' <div class="fcclear"></div> '. $field_html;
 					unset($field_html);
 				}
@@ -464,7 +463,8 @@ class FlexicontentFields
 		}
 
 		// Non-editable message only
-		else if ($field->valueseditable==1) {
+		else if ($field->valueseditable==1)
+		{
 			$msg = '<div class="alert alert-info fc-small fc-iblock">' . JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
 
 			// Handle non-editable field inside fieldgroup
@@ -480,7 +480,8 @@ class FlexicontentFields
 		}
 
 		// Non-editable message only + display values
-		else if ($field->valueseditable==2) {
+		else if ($field->valueseditable==2)
+		{
 			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
 
 			$msg = '<div class="alert alert-info fc-small fc-iblock">' . JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
@@ -496,7 +497,8 @@ class FlexicontentFields
 			}
 		}
 
-		else if ($field->valueseditable==3) {
+		else if ($field->valueseditable==3)
+		{
 			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
 			if (!is_array($field->display))
 			{
@@ -510,7 +512,8 @@ class FlexicontentFields
 			}
 		}
 
-		else if ($field->valueseditable==4) {
+		else if ($field->valueseditable==4)
+		{
 			$field->html = '';
 			$field->formhidden = 4;
 		}
@@ -2236,6 +2239,7 @@ class FlexicontentFields
 		static $pdf_parser = null;
 		static $search_prefix = null;
 		static $indexed_pdfs = array();
+		static $pdf_count = 0;
 
 		// Get search prefix
 		if ( $search_prefix === null )
@@ -2347,6 +2351,8 @@ class FlexicontentFields
 					{
 						try {
 							//JFactory::getApplication()->enqueueMessage(($for_advsearch ? 'Parsing (ADV Index)' : 'Parsing (BASIC Index)') . ': ' . $abspath, 'message');
+							$pdf_count++;
+							if ($pdf_count % 5 == 0)  gc_collect_cycles();   // Call garbage collector every nnn PDF file parsings
 							$pdf_data = @ $pdf_parser->parseFile($abspath);
 							$search_value[] = $indexed_pdfs[$abspath] = @ $pdf_data->getText();
 						}

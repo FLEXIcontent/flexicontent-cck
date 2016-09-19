@@ -691,7 +691,7 @@ body .alert.fc-iblock {
 }
 body .alert.fc-small.fc-iblock {
 	display: inline-block;
-	margin: 1px 4px;
+	margin: 1px 4px 1px 2px;
 	vertical-align: middle;
 	min-height: 1em;
 }
@@ -2394,8 +2394,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent form select.fcfield_selectval.inlineval,
 #flexicontent form select.fcfield_selectmulval.inlineval,
 #flexicontent form input.fcfield_textval.inlineval {
-	margin-left: 0px;
-	margin-right: 0px;
 	min-width: 0;
 	width: auto;
 }
@@ -2521,9 +2519,10 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_img_preview_btn:before {
 	font-size: 24px;
 }
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_props_edit_btn,
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_img_preview_btn {
 	width: unset;
-	margin: 0px 16px 0px 12px;
+	margin: 0px 8px 0px 2px;
 	padding: 8px 6px;
 	vertical-align: top;
 }
