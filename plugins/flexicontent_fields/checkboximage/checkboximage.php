@@ -483,9 +483,9 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
-				// Disable clicks
+				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
 				var btn = fieldval_box ? false : jQuery(el);
-				if (btn) btn.css('pointer-events', 'none').off('click');
+				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
 
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
@@ -497,7 +497,7 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if (rowCount".$field->id." > 1)
 				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
@@ -505,9 +505,6 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
-
-				// If not removing re-enable clicks
-				else if (btn) btn.css('pointer-events', '').on('click');
 			}
 			";
 			
