@@ -1412,6 +1412,26 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	width: auto;
 	overflow: visible;
 }
+#multiple_uploader.fc_file_uploading .fileprops_message.fc_ajax_message_box {
+	position: absolute;
+	display: inline-block;
+	z-index: 1;
+	margin: 0;
+	padding: 0;
+}
+#multiple_uploader.fc_file_uploading .fc_ajax_message_box .alert-heading {
+	display: none;
+}
+#multiple_uploader.fc_file_uploading .fileprops_message .fc-mssg,
+#multiple_uploader.fc_file_uploading .fileprops_message .alert {
+	position: absolute;
+	display: inline-block;
+	z-index: 1;
+	margin: 0;
+	padding: 4px 12px;
+	box-sizing: border-box;
+	min-height: 32px;
+}
 #multiple_uploader.fc_file_uploading .plupload_container.fc_uploader_hide_preview span.plupload_img_preview {
 	display: none !important;
 }
@@ -1455,14 +1475,18 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	white-space: normal;
 	word-wrap: break-word;
 }
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn-group.fc_uploader_row_btns {
+	margin: 0px 6px 0px 0px;
+}
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_img_preview_btn:before {
-	font-size: 24px;
+	font-size: 18px;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_props_edit_btn,
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_img_preview_btn {
 	width: unset;
-	margin: 0px 8px 0px 2px;
-	padding: 8px 6px;
+	min-width: 20px;
+	margin: 0px 0px 0px 0px;
+	padding: 8px 4px;
 	vertical-align: top;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist span.plupload_img_preview {
@@ -1515,7 +1539,7 @@ table.fc_uploader_header_tbl td:last-child {
 	#multiple_uploader.fc_file_uploading .plupload_file_size,
 	#multiple_uploader.fc_file_uploading .plupload_file_status,
 	#multiple_uploader.fc_file_uploading .plupload_progress {
-		width: 60px;
+		width: 72px;
 	}
 }
 @media (max-width: 640px) {
@@ -1528,8 +1552,8 @@ table.fc_uploader_header_tbl td:last-child {
 	#multiple_uploader.fc_file_uploading .plupload_container {
 		min-width: 400px;
 	}
-	#multiple_uploader.fc_file_uploading .fc_img_preview_btn {
-		display: none !important;
+	#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name {
+		width: 150px;
 	}
 }
 @media (max-width: 580px) {
@@ -1562,6 +1586,10 @@ table.fc_uploader_header_tbl td:last-child {
 	#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist span.plupload_img_preview > img {
 		max-height: 32px;
 		max-width: 64px;
+	}
+	#multiple_uploader.fc_file_uploading .fileprops_message .fc-mssg,
+	#multiple_uploader.fc_file_uploading .fileprops_message .alert {
+		min-height: 28px;
 	}
 }
 .filemanager img {

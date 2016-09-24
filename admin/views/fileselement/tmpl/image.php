@@ -80,10 +80,67 @@ if (!empty($this->field))
 }
 
 $is_inline_input = strlen($uconf->get('inputmode')) && $uconf->get('inputmode', 0) == 0;
-$enable_multi_uploader = $this->view=='filemanager' || $is_inline_input || $this->layout == 'image';
+$enable_multi_uploader = 1; //$this->view=='filemanager' || $is_inline_input;
 ?>
 
 <script type="text/javascript">
+
+var fc_file_props_handle = null;
+var fc_file_mul_uploader = null;
+var fc_file_folder_mode  = <?php echo $this->folder_mode ? 1 : 0; ?>;
+
+function filePropsForm_submit(obj, uploader)
+{
+	fc_file_props_handle.dialog('close');  // Close form dialog
+
+	// Get form, form data
+	var form = jQuery(obj.form);
+	var data = form.serialize();	
+
+	// Mark EDIT button of the FILE row, as having file properties
+	var btn = form.data("edit_btn");	
+	if (btn) btn.addClass('btn-success');
+
+	// Store file properties of the current FILE row, so that they can be reloaded and re-edited, without contacting WEB server
+	var file_id = form.find('[name="uploader_file_id"]').val();	
+	var form_data = jQuery(uploader.settings.container).data("form_data");
+	if (!form_data) form_data = {};
+	form_data[file_id] = form.serializeObject();
+	jQuery(uploader.settings.container).data("form_data", form_data);
+
+	// Set data
+	var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
+	props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">Applying</div>");
+	props_msg_box.css({display: '', opacity: ''});   // show message
+	props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // hide preview image
+
+	// Store file properties into USER's session by sending them to the SERVER
+	jQuery.ajax({
+		url: obj.form.action,
+		type: 'POST',
+		dataType: "json",
+		data: data,
+		success: function(data) {
+			props_msg_box.html('');
+			try {
+				var response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
+				jQuery('#system-message-container').html(!!response.sys_messages ? response.sys_messages : '');
+				props_msg_box = jQuery('#'+response.row_id).find(".fileprops_message");
+				props_msg_box.append(response.result);
+				setTimeout(function(){ props_msg_box.fadeOut(1000); }, 1000);
+				setTimeout(function(){ props_msg_box.parent().find('.plupload_img_preview').css('display', '') }, 2000);
+				//window.console.log(response);
+			} catch(err) {
+				props_msg_box.html("<span class=\"alert alert-warning fc-iblock\">': "+err.message+"</span>");
+			}
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			props_msg_box.html('');
+			alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+		}
+	});
+}
+
 
 jQuery(document).ready(function() {
 	var use_mul_upload = <?php echo $enable_multi_uploader ? 1 : 0; ?>;
@@ -101,6 +158,7 @@ jQuery(document).ready(function() {
 	if (use_mul_upload) jQuery('#filemanager-1').hide();
 });
 
+
 // delete active filter
 function delFilter(name)
 {
@@ -114,7 +172,8 @@ function delFilter(name)
 		filter.val('');
 }
 
-function delAllFilters() {
+function delAllFilters()
+{
 	delFilter('search');
 	delFilter('filter_uploader');
 	delFilter('filter_lang');
@@ -140,12 +199,17 @@ endforeach;
 </script>
 
 
-
 <?php
 
 // *********************
 // BOF multi-uploader JS
 // *********************
+
+if ($enable_multi_uploader)
+{
+	JText::script("FLEXI_FILE_PROPERTIES", true);
+	$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', FLEXI_VHASH);
+}
 
 $has_field_upload_maxsize   = !empty($this->field) && strlen($this->field->parameters->get('upload_maxsize'));
 $has_field_resize_on_upload = !empty($this->field) && strlen($this->field->parameters->get('resize_on_upload'));
@@ -176,22 +240,8 @@ if ($enable_multi_uploader)
 	
 	// Add plupload Queue handling functions and initialize a plupload Queue
 	$js = '
-	// Handle the PostInit event. At this point, we will know which runtime
-	// has loaded, and whether or not drag-drop functionality is supported.
-	// --
-	// NOTE: we use the "PostInit" instead of the "Init" event in order for the "dragdrop" feature to be correct defined
-	function fc_plupload_handle_init( uploader, params )
-	{
-		jQuery(uploader.settings.container).find(".plupload_header_content").prepend(\'<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="fc_plupload_toggleThumbs(this);"><span class="icon-image"></span> Thumbnails</span>\');
-		if(window.console) window.console.log( uploader.features );
-	}
-	
-	function fc_plupload_toggleThumbs(obj)
-	{
-		jQuery(obj).closest(".plupload_container").toggleClass("fc_uploader_hide_preview");
-	}
+	// Auto-resize the currently open dialog vertically or horizontally
 
-	/* Auto-resize the currently open dialog vertically or horizontally */
 	function fc_plupload_resize_now()
 	{
 		var window_h = jQuery( window ).height();
@@ -202,120 +252,26 @@ if ($enable_multi_uploader)
 		var plupload_filelist_h = max_filelist_h > (window_h - 320) ? (window_h - 320) : max_filelist_h;
 		jQuery(".plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)").css({ "height": plupload_filelist_h+"px" });
 	}
-
 	var fc_plupload_resize = fc_debounce_exec(fc_plupload_resize_now, 200, false);
 
-	jQuery(window).resize(function() {
+
+	jQuery(window).resize(function()
+	{
 		fc_plupload_resize();
 	});
 
-	// Handle the files-added event. This is different that the queue-changed event.
-	// Since at this point, we have an opportunity to reject files from the queue.
-	function fc_plupload_handle_filesAdded( uploader, files )
-	{
-		//if(window.console) window.console.log( "Files added." );
 
-		// Since the full list is recreated, on new file(s) added. We need to loop through all
-		// files and update their client-side preview, and not only through the newly addede files
-		for ( var i = 0 ; i < uploader.files.length ; i++ )   //for ( var i = 0 ; i < files.length ; i++ )
-		{
-			if ( uploader.files[i].name.match(/\.(jpg|jpeg|png|gif)$/i) )
-			{
-				showImagePreview( uploader.files[i] );  //showImagePreview( files[i] );
-			}
-			else
-			{
-				var tagid = uploader.files[i].id;
-				var item = jQuery("#"+tagid).find(".plupload_file_name");
-				item.css("width", "auto");
-				item.find("span").css("width", "auto");
-				item.closest("li").css("width", "auto");
-			}
-		}
-	}
-	
-	var fc_loaded_imgs = {};
-	
-	// Create client side image preview. This is given a File object (as presented by Plupload),
-	// and show the client-side-only preview of the selected image object.
-	function showImagePreview( file )
-	{
-		var tagid = file.id;
-		var row = jQuery("#"+tagid);
-		var item = row.find(".plupload_file_name");
-
-		var box = jQuery("<span class=\"plupload_img_preview\"></span>").insertAfter( item );
-		var prev_handle = jQuery("<span class=\"btn fc_img_preview_btn icon-eye\"></span></span>").insertBefore( box );
-
-		// Try to use already loaded image
-		var image_loaded = typeof fc_loaded_imgs[tagid] != "undefined";
-		if (!image_loaded)
-		{
-			fc_loaded_imgs[tagid] = jQuery( "<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" />" );
-		}
-		row.addClass("fc_uploader_is_image");
-		fc_loaded_imgs[tagid].appendTo( box );
-
-
-		// Add zoom-in-out on click
-		prev_handle.add(fc_loaded_imgs[tagid]).on( "click", function()
-		{
-			// Close any open previews
-			var row, btn, img_box;
-			row = jQuery(this).closest("li");
-			btn = row.find(".fc_img_preview_btn");
-			img_box = row.find(".plupload_img_preview");
-
-			row.closest("ul").find("li:not(\'#" + btn.closest("li").attr("id") + "\') .btn.fc_img_preview_btn.active").trigger("click");
-			if (row.hasClass("fc_uploader_zoomed"))
-			{
-				btn.removeClass("active btn-info");
-				row.removeClass("fc_uploader_zoomed");
-				setTimeout(function(){ row.removeClass("fc_uploader_zooming"); }, 400);
-			}
-			else {
-				if (row.hasClass("fc_uploader_zooming")) return;
-				row.addClass("fc_uploader_zooming fc_uploader_zoomed");
-				btn.addClass("active btn-info");
-			}
-		});
-		
-		if (image_loaded) return; // Done if image has been loaded already
-
-
-		// Create an instance of the mOxie Image object.  --  Wiki: https://github.com/moxiecode/moxie/wiki/Image
-		// This utility object provides several means of reading in and loading image data from various sources.
-		file.preloader = new mOxie.Image();
-	
-		// Define the onload BEFORE you execute the load() command as load() does not execute async.
-		file.preloader.onload = function()
-		{
-			// This will scale the image (in memory) before it tries to render it. This just reduces the amount of Base64 data that needs to be rendered.
-			// Use higher resultion to allow zooming and also for better thumbnail
-			this.downsize( 800, 600 );
-
-			// Now that the image is preloaded, grab the Base64 encoded data URL. This will show the image without making an Network request using the client-side file binary.
-			fc_loaded_imgs[tagid].prop( "src", this.getAsDataURL() );
-		};
-
-		// Calling the .getSource() on the file will return an instance of mOxie.File, which is a unified file wrapper that can be used across the various runtimes.
-		// Wiki: https://github.com/moxiecode/plupload/wiki/File
-		file.preloader.load( file.getSource() );
-	}
-
-
-	var uploader = 0;
 	function showUploader()
 	{
 		// Already initialized
-		if (uploader)
+		if (fc_file_mul_uploader)
 		{
-			//uploader.splice();  // empty it
+			//fc_file_mul_uploader.splice();  // empty it, ... not needed and problematic ... commented out
 		}
 		
 		else if ("'.$plupload_mode.'"=="ui")
 		{
-	    uploader = jQuery("#multiple_uploader").plupload({
+	    fc_file_mul_uploader = jQuery("#multiple_uploader").plupload({
 				// General settings
 				runtimes : "html5,html4,flash,silverlight",
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
@@ -369,12 +325,14 @@ if ($enable_multi_uploader)
 					BeforeUpload: function (up, file) {
 						// Called right before the upload for a given file starts, can be used to cancel it if required
 						up.settings.multipart_params = {
-							filename: file.name
+							filename: file.name,
+							uploader_file_id: file.id
 						};
 					},
 
 					PostInit: fc_plupload_handle_init,
-					FilesAdded: fc_plupload_handle_filesAdded,
+					FilesAdded: fc_plupload_handle_filesChanged,
+					FilesRemoved: fc_plupload_handle_filesChanged,
 
 					UploadComplete: function (up, files) {
 						if(window.console) window.console.log("All Files Uploaded");
@@ -385,8 +343,9 @@ if ($enable_multi_uploader)
 	    });
 
 			// Binding event handlers is also possible after initialization
-			//uploader.bind(\'PostInit\', fc_plupload_handle_init);
-			//uploader.bind(\'FilesAdded\', fc_plupload_handle_filesAdded);
+			//fc_file_mul_uploader.bind(\'PostInit\', fc_plupload_handle_init);
+			//fc_file_mul_uploader.bind(\'FilesAdded\', fc_plupload_handle_filesChanged);
+			//fc_file_mul_uploader.bind(\'FilesRemoved\', fc_plupload_handle_filesChanged);
 		}
 
 		else
@@ -446,12 +405,14 @@ if ($enable_multi_uploader)
 					{
 						// Called right before the upload for a given file starts, can be used to cancel it if required
 						up.settings.multipart_params = {
-							filename: file.name
+							filename: file.name,
+							uploader_file_id: file.id
 						};
 					},
 
 					PostInit: fc_plupload_handle_init,
-					FilesAdded: fc_plupload_handle_filesAdded,
+					FilesAdded: fc_plupload_handle_filesChanged,
+					FilesRemoved: fc_plupload_handle_filesChanged,
 
 					UploadComplete: function (up, files)
 					{
@@ -463,11 +424,12 @@ if ($enable_multi_uploader)
 			});
 			
 			// Need to make 2nd call to get the created uploader instance
-			uploader = jQuery("#multiple_uploader").pluploadQueue();
+			fc_file_mul_uploader = jQuery("#multiple_uploader").pluploadQueue();
 			
 			// It is also possible to bind events also after initialization
-			//uploader.bind(\'PostInit\', fc_plupload_handle_init);
-			//uploader.bind(\'FilesAdded\', fc_plupload_handle_filesAdded);
+			//fc_file_mul_uploader.bind(\'PostInit\', fc_plupload_handle_init);
+			//fc_file_mul_uploader.bind(\'FilesAdded\', fc_plupload_handle_filesChanged);
+			//fc_file_mul_uploader.bind(\'FilesRemoved\', fc_plupload_handle_filesChanged);
 		}
 	};
 	';
@@ -491,6 +453,7 @@ flexicontent_html::loadFramework('flexi-lib');
 ?>
 
 <div id="flexicontent" class="flexicontent">
+
 
 
 <?php /* echo JHtml::_('tabs.start'); */ ?>
@@ -1052,6 +1015,101 @@ flexicontent_html::loadFramework('flexi-lib');
 			';
 			?>
 
+		<div id="filePropsForm_box_outer" style="display:none;">
+			<fieldset class="actions flexicontent" id="filePropsForm_box">
+				<form action="<?php echo $action_url . 'saveprops'; ?>&amp;format=raw" name="filePropsForm" id="filePropsForm" method="get" enctype="multipart/form-data">
+					
+					<!--span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_FILE_PROPERTIES'); ?></span-->
+					<table class="fc-form-tbl" id="file-props-form-container">
+					
+					<?php if (!$this->folder_mode) : ?>
+						<tr>
+							<td id="file-props-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
+								<label class="label" id="file-props-title-lbl" for="file-props-title">
+								<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
+								</label>
+							</td>
+							<td id="file-props-title-container">
+								<input type="text" id="file-props-title" size="44" class="required input-xxlarge" name="file-props-title" />
+							</td>
+						</tr>
+					<?php endif; ?>
+
+					<?php if (!$this->folder_mode) : ?>
+						<tr>
+							<td id="file-props-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
+								<label class="label" id="file-props-desc-lbl" for="file-props-desc_uploadFileForm">
+								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+								</label>
+							</td>
+							<td id="file-props-desc-container" style="vertical-align: top;">
+								<textarea name="file-props-desc" cols="24" rows="3" id="file-props-desc_uploadFileForm" class="input-xxlarge"></textarea>
+							</td>
+						</tr>
+
+						<tr>
+							<td id="file-props-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
+								<label class="label" id="file-props-lang-lbl" for="file-props-lang">
+								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+								</label>
+							</td>
+							<td id="file-props-lang-container">
+								<?php echo str_replace('file-lang', 'file-props-lang', $this->lists['file-lang']); ?>
+							</td>
+						</tr>
+
+						<tr>
+							<td id="file-props-access-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
+								<label class="label" id="file-props-access-lbl" for="file-props-access">
+								<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
+								</label>
+							</td>
+							<td id="file-props-access-container">
+								<?php echo str_replace('file-access', 'file-props-access', $this->lists['file-access']); ?>
+							</td>
+						</tr>
+
+						<?php if ($this->target_dir==2) : ?>
+						<tr>
+							<td id="file-props-secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
+								<label class="label" id="file-props-secure-lbl">
+								<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
+								</label>
+							</td>
+							<td id="file-props-secure-container">
+								<?php
+								//echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_filePropsForm' );
+								$_options = array();
+								$_options['0'] = JText::_( 'FLEXI_MEDIA' );
+								$_options['1'] = JText::_( 'FLEXI_SECURE' );
+								echo flexicontent_html::buildradiochecklist($_options, 'secure', /*selected*/1, /*type*/0, /*attribs*/'', /*tagid*/'secure_filePropsForm');
+								?>
+							</td>
+						</tr>
+						<?php endif; ?>
+					<?php endif; ?>
+
+						<tr>
+							<td style="text-align:right; padding: 12px 4px;">
+								<input type="button" id="file-props-apply" class="btn btn-success" onclick="filePropsForm_submit(this, jQuery('#multiple_uploader').pluploadQueue()); return false;" value="<?php echo JText::_( 'FLEXI_APPLY' ); ?>"/>
+							</td>
+							<td style="text-align:left; padding: 12px 4px;">
+								<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>"/>
+							</td>
+						</tr>
+					</table>
+										
+					<?php echo JHTML::_( 'form.token' ); ?>
+					<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
+					<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
+					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
+					<?php echo strlen($_forced_secure_int) ? '<input type="hidden" name="secure" value="'.$_forced_secure_int.'" />' : ''; ?>
+					<input type="hidden" name="uploader_file_id" value="" />
+				</form>
+				
+			</fieldset>
+		</div>
+
 		
 			<fieldset class="actions" id="filemanager-1">
 				<form action="<?php echo $action_url . 'upload'; ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
@@ -1132,7 +1190,7 @@ flexicontent_html::loadFramework('flexi-lib');
 								$_options = array();
 								$_options['0'] = JText::_( 'FLEXI_MEDIA' );
 								$_options['1'] = JText::_( 'FLEXI_SECURE' );
-								echo flexicontent_html::buildradiochecklist($_options, 'secure', /*selected*/1, /*type*/1, /*attribs*/'', /*tagid*/'secure_uploadFileForm');
+								echo flexicontent_html::buildradiochecklist($_options, 'secure', /*selected*/1, /*type*/0, /*attribs*/'', /*tagid*/'secure_uploadFileForm');
 								?>
 							</td>
 						</tr>
@@ -1141,8 +1199,7 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					</table>
 					
-					<br/>
-					<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
+					<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>" style="margin: 16px 48px 0 48px;" />
 					
 					<?php echo JHTML::_( 'form.token' ); ?>
 					<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
@@ -1268,11 +1325,11 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					</table>
 
-					<br/>
 					<input type="submit" id="file-url-submit" class="btn btn-success validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
 
 				</fieldset>
 			</fieldset>
+
 			<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
 			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout='.$this->layout.($_forced_secure_val ? '&filter_secure='.$_forced_secure_val : '')); ?>" />
 		</form>

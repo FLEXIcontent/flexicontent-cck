@@ -120,9 +120,30 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return $this->terminate($file_id, $exitMessages);
 		}
 
+		$uid = $data_from_sess = $uploader_file_data = false;
+
 		if ($this->task=='uploads')
 		{
 			$file = $this->input->files->get('file', '', 'array');
+			$uid  = $this->input->get('uploader_file_id', '', 'string');
+
+			$session = JFactory::getSession();
+			$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
+
+			$data_from_sess = @ $uploader_file_data[$uid];
+			if ($data_from_sess)
+			{
+				$filetitle  = $data_from_sess['filetitle'];
+				$filedesc   = $data_from_sess['filedesc'];
+				$filelang   = $data_from_sess['filelang'];
+				$fileaccess = $data_from_sess['fileaccess'];
+				$secure     = $data_from_sess['secure'];
+
+				$fieldid    = $data_from_sess['fieldid'];
+				$u_item_id  = $data_from_sess['u_item_id'];
+				$file_mode  = $data_from_sess['file_mode'];
+			}
+			//print_r($uid); echo "\n"; print_r($uploader_file_data); exit();
 		}
 		else
 		{
@@ -142,20 +163,23 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			if (strlen($fname_level2))  $file = $file[$fname_level2];
 			if (strlen($fname_level3))  $file = $file[$fname_level3];
 		}
-
-		$secure  = $this->input->get('secure', 1, 'int');
-		$secure  = $secure ? 1 : 0;
-
-		$filetitle  = $this->input->get('file-title', '', 'string');
-		$filedesc   = $this->input->get('file-desc', '');  // Joomla default text-filters for the usergroup
-		$filelang   = $this->input->get('file-lang', '*', 'string');
-		$fileaccess = $this->input->get('file-access', 1, 'int');
-		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
-
-		$fieldid    = $this->input->get('fieldid', 0, 'int');
-		$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
-		$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 		
+		if (empty($data_from_sess))
+		{
+			$secure  = $this->input->get('secure', 1, 'int');
+			$secure  = $secure ? 1 : 0;
+
+			$filetitle  = $this->input->get('file-title', '', 'string');
+			$filedesc   = $this->input->get('file-desc', '');  // Joomla default text-filters for the usergroup
+			$filelang   = $this->input->get('file-lang', '*', 'string');
+			$fileaccess = $this->input->get('file-access', 1, 'int');
+			$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
+
+			$fieldid    = $this->input->get('fieldid', 0, 'int');
+			$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
+			$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
+		}
+
 		$model = $this->getModel('filemanager');
 		if ($file_mode != 'folder_mode' && $fieldid)
 		{
@@ -232,15 +256,27 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			@fclose($in);
 			
 			// If not last chunk terminate further execution
-			if ($chunk < $chunks - 1) {
+			if ($chunk < $chunks - 1)
+			{
 				// Return Success JSON-RPC response
 				die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
 			}
+
+			// Remove no longer needed file properties from session data
+			else if ( $uid && isset($uploader_file_data[$uid]) )
+			{
+				unset($uploader_file_data[$uid]);
+				$session->set('uploader_file_data', $uploader_file_data, 'flexicontent');
+			}
+
+			// Clear the temporary filename, from user state
 			$app->setUserState( $fileName, null );
 			
 			// Cleanup left-over files
-			if (file_exists($targetDir)) {
-				foreach (new DirectoryIterator($targetDir) as $fileInfo) {
+			if (file_exists($targetDir))
+			{
+				foreach (new DirectoryIterator($targetDir) as $fileInfo)
+				{
 					if ($fileInfo->isDot()) {
 						continue;
 					}
