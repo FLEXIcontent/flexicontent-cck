@@ -2828,7 +2828,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Get file filesize and extension
 		$dlfile->size = filesize($dlfile->abspath);
-		$dlfile->ext  = strtolower(JFile::getExt($dlfile->filename));
+		$dlfile->ext  = strtolower(flexicontent_upload::getExt($dlfile->filename));
 		
 		// Set content type of file (that is an archive for multi-download)
 		$ctypes = array(

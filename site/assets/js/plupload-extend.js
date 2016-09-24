@@ -1,4 +1,5 @@
 
+	var fc_file_props_handle = null;
 	var fc_plupload_loaded_imgs = {};
 	
 	// Handle the PostInit event. At this point, we will know which runtime
@@ -48,21 +49,23 @@
 	// Create client side image preview. This is given a File object (as presented by Plupload),
 	// and show the client-side-only preview of the selected image object.
 
-	function fc_plupload_extend_row( uploader, i, item )
+	function fc_plupload_extend_row( uploader, i, item, params )
 	{
+		params = typeof params == "undefined" ? {} : params;
+		params.edit_properties = typeof params.edit_properties == "undefined" ? 1 : params.edit_properties;
+		
 		var file = uploader.files[i];
 		var row_id = file.id;
 		var row = jQuery("#"+row_id);
 		var item = row.find(".plupload_file_name");
 		var is_img = file.name.match(/\.(jpg|jpeg|png|gif)$/i);
 
-
 		/*
 		 * Add properties editing button
 		 */
 		var btn_box = jQuery("<span class=\"btn-group fc_uploader_row_btns\"></span>").insertAfter( item );
 
-		if (1 || !fc_file_folder_mode)
+		if (params.edit_properties)
 		{
 			var properties_handle = jQuery("<span class=\"btn fc_props_edit_btn icon-pencil\"></span>").appendTo( btn_box );
 			var fileprops_message = jQuery("<div class=\"fileprops_message fc_ajax_message_box\"></div>").insertAfter( btn_box );
@@ -163,5 +166,83 @@
 			// Wiki: https://github.com/moxiecode/plupload/wiki/File
 			file.preloader.load( file.getSource() );
 		}
+	}
+
+
+	function fc_plupload_submit_props_form(obj, uploader)
+	{
+		fc_file_props_handle.dialog('close');  // Close form dialog
+	
+		// Get form, form data
+		var form = jQuery(obj.form);
+		var data = form.serialize();	
+	
+		// Mark EDIT button of the FILE row, as having file properties
+		var btn = form.data("edit_btn");	
+		if (btn) btn.addClass('btn-success');
+	
+		// Store file properties of the current FILE row, so that they can be reloaded and re-edited, without contacting WEB server
+		var file_id = form.find('[name="uploader_file_id"]').val();	
+		var form_data = jQuery(uploader.settings.container).data("form_data");
+		if (!form_data) form_data = {};
+		form_data[file_id] = form.serializeObject();
+		jQuery(uploader.settings.container).data("form_data", form_data);
+	
+		// Update file row so that new filename is displayed
+		var new_filename = form.find('[name="file-props-name"]').val();
+		new_filename = removeSpecial( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
+		if (new_filename != '')
+		{
+			var old_filename = jQuery(uploader.settings.container).find('li .plupload_file_name').text();
+			jQuery(uploader.settings.container).find('li .plupload_file_name').html('<span>'+new_filename+'</span>');
+	
+			// Set new filename into the files data of the uploader
+			for ( var i = 0 ; i < uploader.files.length ; i++ )
+			{
+				var file = uploader.files[i];
+				if (uploader.files[i].name == old_filename)
+				{
+					uploader.files[i].name = new_filename;
+				}
+			}
+		}
+	
+		// Set data
+		var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
+		props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">Applying</div>");
+		props_msg_box.css({display: '', opacity: ''});   // show message
+		props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
+	
+		// Hide uploader buttons until server responds
+		var uploader_footer = jQuery(uploader.settings.container).find('.plupload_filelist_footer')
+		uploader_footer.hide();
+	
+		// Store file properties into USER's session by sending them to the SERVER
+		jQuery.ajax({
+			url: obj.form.action,
+			type: 'POST',
+			dataType: "json",
+			data: data,
+			success: function(data) {
+				uploader_footer.show();  // Show uploader buttons previously hidden
+				props_msg_box.html('');  // Start with empting the row's message box
+				try {
+					var response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
+					jQuery('#system-message-container').html(!!response.sys_messages ? response.sys_messages : '');
+					props_msg_box.append(response.result);
+					setTimeout(function(){ props_msg_box.fadeOut(1000); }, 1000);
+					setTimeout(function(){ props_msg_box.parent().find('.plupload_img_preview').css('display', '') }, 2000);
+					//window.console.log(response);
+				} catch(err) {
+					props_msg_box.html("<span class=\"alert alert-warning fc-iblock\">': "+err.message+"</span>");
+				};
+				uploader_footer.show();  // Show uploader buttons previously hidden
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				uploader_footer.show();  // Show uploader buttons previously hidden
+				props_msg_box.html('');
+				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
 	}
 
