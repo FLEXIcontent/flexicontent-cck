@@ -357,7 +357,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				newField.find('a.addfile_".$field->id."').each(function(index, value) {
 					jQuery(this).on('click', function() {
 						var url = jQuery(this).attr('href');
-						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT_IMAGE', true)."'});
 						return false;
 					});
 				});
@@ -659,7 +659,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				jQuery('a.addfile_".$field->id."').each(function(index, value) {
 					jQuery(this).on('click', function() {
 						var url = jQuery(this).attr('href');
-						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT_IMAGE', true)."'});
 						return false;
 					});
 				});
@@ -860,7 +860,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				';
 				if ( $field->parameters->get('select_in_modal', 1) ) {
 					$change .= '
-						<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj, null, null, null, {\'title\': \''.JText::_('FLEXI_SELECT_IMAGE').'\'}); ">
+						<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj, null, null, null, {\'title\': \''.JText::_('FLEXI_SELECT_IMAGE', true).'\'}); ">
 							<i class="icon-search"></i>
 							'.JText::_('FLEXI_SELECT').'
 						</span>
@@ -2542,7 +2542,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			//get the extension to record it in the DB
-			$ext		= strtolower(JFile::getExt($filename));
+			$ext = strtolower(flexicontent_upload::getExt($filename));
 			
 			// - we allow Joomla default security to execute
 			// - if user really uploads an image file, it should not be trigger anyway
@@ -2636,7 +2636,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$filepath = $destpath.$prefix.$filename;
 		
 		// Parameters for phpthumb
-		$ext = strtolower(JFile::getExt($filename));
+		$ext = strtolower(flexicontent_upload::getExt($filename));
 		$default_widths = array('l'=>800,'m'=>400,'s'=>120,'b'=>40);
 		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
 		$w			= $field->parameters->get('w_'.$size, $default_widths[$size]);

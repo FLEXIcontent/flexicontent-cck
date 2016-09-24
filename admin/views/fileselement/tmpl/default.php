@@ -85,88 +85,6 @@ $enable_multi_uploader = 1; //$this->view=='filemanager' || $is_inline_input;
 
 <script type="text/javascript">
 
-var fc_file_props_handle = null;
-var fc_file_mul_uploader = null;
-var fc_file_folder_mode  = <?php echo $this->folder_mode ? 1 : 0; ?>;
-
-function filePropsForm_submit(obj, uploader)
-{
-	fc_file_props_handle.dialog('close');  // Close form dialog
-
-	// Get form, form data
-	var form = jQuery(obj.form);
-	var data = form.serialize();	
-
-	// Mark EDIT button of the FILE row, as having file properties
-	var btn = form.data("edit_btn");	
-	if (btn) btn.addClass('btn-success');
-
-	// Store file properties of the current FILE row, so that they can be reloaded and re-edited, without contacting WEB server
-	var file_id = form.find('[name="uploader_file_id"]').val();	
-	var form_data = jQuery(uploader.settings.container).data("form_data");
-	if (!form_data) form_data = {};
-	form_data[file_id] = form.serializeObject();
-	jQuery(uploader.settings.container).data("form_data", form_data);
-
-	// Update file row so that new filename is displayed
-	var new_filename = form.find('[name="file-props-name"]').val();
-	new_filename = removeSpecial( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
-	if (new_filename != '')
-	{
-		var old_filename = jQuery(uploader.settings.container).find('li .plupload_file_name').text();
-		jQuery(uploader.settings.container).find('li .plupload_file_name').html('<span>'+new_filename+'</span>');
-
-		// Set new filename into the files data of the uploader
-		for ( var i = 0 ; i < uploader.files.length ; i++ )
-		{
-			var file = uploader.files[i];
-			if (uploader.files[i].name == old_filename)
-			{
-				uploader.files[i].name = new_filename;
-			}
-		}
-	}
-
-	// Set data
-	var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
-	props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">Applying</div>");
-	props_msg_box.css({display: '', opacity: ''});   // show message
-	props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
-
-	// Hide uploader buttons until server responds
-	var uploader_footer = jQuery(uploader.settings.container).find('.plupload_filelist_footer')
-	uploader_footer.hide();
-
-	// Store file properties into USER's session by sending them to the SERVER
-	jQuery.ajax({
-		url: obj.form.action,
-		type: 'POST',
-		dataType: "json",
-		data: data,
-		success: function(data) {
-			uploader_footer.show();  // Show uploader buttons previously hidden
-			props_msg_box.html('');  // Start with empting the row's message box
-			try {
-				var response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
-				jQuery('#system-message-container').html(!!response.sys_messages ? response.sys_messages : '');
-				props_msg_box.append(response.result);
-				setTimeout(function(){ props_msg_box.fadeOut(1000); }, 1000);
-				setTimeout(function(){ props_msg_box.parent().find('.plupload_img_preview').css('display', '') }, 2000);
-				//window.console.log(response);
-			} catch(err) {
-				props_msg_box.html("<span class=\"alert alert-warning fc-iblock\">': "+err.message+"</span>");
-			};
-			uploader_footer.show();  // Show uploader buttons previously hidden
-		},
-		error: function (xhr, ajaxOptions, thrownError) {
-			uploader_footer.show();  // Show uploader buttons previously hidden
-			props_msg_box.html('');
-			alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-		}
-	});
-}
-
-
 jQuery(document).ready(function() {
 	var use_mul_upload = <?php echo $enable_multi_uploader ? 1 : 0; ?>;
 	if (use_mul_upload)
@@ -265,8 +183,9 @@ if ($enable_multi_uploader)
 	
 	// Add plupload Queue handling functions and initialize a plupload Queue
 	$js = '
+	var fc_file_mul_uploader = null;
+	
 	// Auto-resize the currently open dialog vertically or horizontally
-
 	function fc_plupload_resize_now()
 	{
 		var window_h = jQuery( window ).height();
@@ -277,15 +196,16 @@ if ($enable_multi_uploader)
 		var plupload_filelist_h = max_filelist_h > (window_h - 320) ? (window_h - 320) : max_filelist_h;
 		jQuery(".plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)").css({ "height": plupload_filelist_h+"px" });
 	}
+
+
 	var fc_plupload_resize = fc_debounce_exec(fc_plupload_resize_now, 200, false);
-
-
 	jQuery(window).resize(function()
 	{
 		fc_plupload_resize();
 	});
 
 
+	// Load pluploader if not already loaded
 	function showUploader()
 	{
 		// Already initialized
@@ -1118,7 +1038,7 @@ flexicontent_html::loadFramework('flexi-lib');
 
 						<tr>
 							<td style="text-align:right; padding: 12px 4px;">
-								<input type="button" id="file-props-apply" class="btn btn-success" onclick="filePropsForm_submit(this, jQuery('#multiple_uploader').pluploadQueue()); return false;" value="<?php echo JText::_( 'FLEXI_APPLY' ); ?>"/>
+								<input type="button" id="file-props-apply" class="btn btn-success" onclick="fc_plupload_submit_props_form(this, jQuery('#multiple_uploader').pluploadQueue()); return false;" value="<?php echo JText::_( 'FLEXI_APPLY' ); ?>"/>
 							</td>
 							<td style="text-align:left; padding: 12px 4px;">
 								<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>"/>

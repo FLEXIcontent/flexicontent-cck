@@ -352,7 +352,7 @@
 			<field name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level2" />
 			<field name="w_l" type="text" default="800" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_l" type="text" default="600" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_l" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
+			<field name="method_l" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
@@ -370,7 +370,7 @@
 			<field name="" type="separator" default="FLEXI_MEDIUM_IMAGES" description="FLEXI_MEDIUM_IMAGES_DESC" level="level2" />
 			<field name="w_m" type="text" default="400" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_m" type="text" default="300" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_m" type="radio" default="0" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
+			<field name="method_m" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
@@ -388,7 +388,7 @@
 			<field name="" type="separator" default="FLEXI_SMALL_IMAGES" description="FLEXI_SMALL_IMAGES_DESC" level="level2" />
 			<field name="w_s" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_s" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_s" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
+			<field name="method_s" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
@@ -409,7 +409,7 @@
 			
 			<field name="w_b" type="text" default="40" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
 			<field name="h_b" type="text" default="30" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-			<field name="method_b" type="radio" default="1" label="FLEXI_FIELD_IMAGE_METHOD" description="FLEXI_FIELD_IMAGE_METHOD_DESC" class="btn-group group-fcinfo">
+			<field name="method_b" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>

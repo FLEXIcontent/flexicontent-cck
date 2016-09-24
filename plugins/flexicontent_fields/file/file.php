@@ -162,7 +162,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			.'&amp;existing_class=fc_filedata_storage_name'
 			.'&amp;' . JSession::getFormToken() . '=1';
 		
-		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
+		$_prompt_txt = JText::_( 'FLEXI_FIELD_FILE_SELECT_FILE' );  //JText::_( 'FLEXI_ADD_FILE' );
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
@@ -195,7 +195,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
 				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
 				
-				fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+				fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."'});
 				return false;
 			}
 			
