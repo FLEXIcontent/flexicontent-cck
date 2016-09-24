@@ -1500,3 +1500,26 @@
 			return o;
 		}
 	}
+
+
+	if (typeof removeSpecial == "undefined")
+	{
+		function removeSpecial (text)
+		{
+			var result = '';
+			if (!text) return result;
+
+			var num_reg = new RegExp('[0-9]+$');
+			var lower = text.toLowerCase();
+			var upper = text.toUpperCase();
+
+			for (var i=0; i<lower.length; ++i)
+			{
+				if (num_reg.test(text[i]) || (lower[i] != upper[i]) || (lower[i].trim() === ''))
+				{
+					result += text[i];
+				}
+			}
+			return result;
+		}
+	}
