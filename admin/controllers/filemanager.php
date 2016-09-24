@@ -616,7 +616,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			for ($n=0; $n<count($filenames); $n++)
 			{
-				$ext = strtolower(JFile::getExt($filesdir . $filenames[$n]));
+				$ext = strtolower(flexicontent_upload::getExt($filesdir . $filenames[$n]));
 				if ( !isset($allowed_exts[$ext]) )
 				{
 					$excluded[] = $filenames[$n];

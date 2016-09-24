@@ -4883,9 +4883,9 @@ class flexicontent_upload
 	 */
 	static function getExt($filename)
 	{
-		$dot = strrpos($filename, '.') + 1;
-		return substr($filename, $dot);
-		//return pathinfo($filename, PATHINFO_EXTENSION);
+		//$dot = strrpos($filename, '.');
+		//return $dot === false ? false : (string) substr($filename, $dot + 1);
+		return pathinfo($filename, PATHINFO_EXTENSION);
 	}
 
 
@@ -5645,7 +5645,7 @@ class flexicontent_images
 			{
 				$ext = $rows[$i]->ext;
 			} else {
-				$ext = strtolower(JFile::getExt($rows[$i]->filename));
+				$ext = strtolower(flexicontent_upload::getExt($rows[$i]->filename));
 			}
 			switch ($ext)
 			{
