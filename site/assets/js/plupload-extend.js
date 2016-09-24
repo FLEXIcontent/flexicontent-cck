@@ -62,7 +62,7 @@
 		 */
 		var btn_box = jQuery("<span class=\"btn-group fc_uploader_row_btns\"></span>").insertAfter( item );
 
-		if (!fc_file_folder_mode)
+		if (1 || !fc_file_folder_mode)
 		{
 			var properties_handle = jQuery("<span class=\"btn fc_props_edit_btn icon-pencil\"></span>").appendTo( btn_box );
 			var fileprops_message = jQuery("<div class=\"fileprops_message fc_ajax_message_box\"></div>").insertAfter( btn_box );
@@ -85,6 +85,11 @@
 				fc_restore_form_field_values(form, file_data);
 				form.find('[name="uploader_file_id"]').val(file_id);
 
+				// Get current filename and extension from the file row
+				var file_name = btn.closest("li").find('.plupload_file_name').text();
+				form.find('[name="file-props-name-ext"]').val( file_name.split('.').pop() );
+				form.find('[name="file-props-name"]').val( file_name.replace(/\.[^/.]+$/, '') );
+				
 				// Now show the form
 				fc_file_props_handle = fc_showAsDialog(form_box, null, null, null, { title: Joomla.JText._('FLEXI_FILE_PROPERTIES') });
 			});

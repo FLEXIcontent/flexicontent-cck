@@ -50,7 +50,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$props = array();
 
 		$props['filetitle']  = $this->input->get('file-props-title', '', 'string');
-		$props['filedesc']   = $this->input->get('file-props-desc', '');  // Joomla default text-filters for the usergroup
+		$props['filedesc']   = flexicontent_html::dataFilter($this->input->get('file-props-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
 		$props['filelang']   = $this->input->get('file-props-lang', '*', 'string');
 		$props['fileaccess'] = flexicontent_html::dataFilter($this->input->get('file-props-access', 1, 'int'), 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 		$props['secure']     = $this->input->get('secure', 1, 'int') ? 1 : 0;

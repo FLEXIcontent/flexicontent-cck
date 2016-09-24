@@ -108,11 +108,34 @@ function filePropsForm_submit(obj, uploader)
 	form_data[file_id] = form.serializeObject();
 	jQuery(uploader.settings.container).data("form_data", form_data);
 
+	// Update file row so that new filename is displayed
+	var new_filename = form.find('[name="file-props-name"]').val();
+	new_filename = removeSpecial( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
+	if (new_filename != '')
+	{
+		var old_filename = jQuery(uploader.settings.container).find('li .plupload_file_name').text();
+		jQuery(uploader.settings.container).find('li .plupload_file_name').html('<span>'+new_filename+'</span>');
+
+		// Set new filename into the files data of the uploader
+		for ( var i = 0 ; i < uploader.files.length ; i++ )
+		{
+			var file = uploader.files[i];
+			if (uploader.files[i].name == old_filename)
+			{
+				uploader.files[i].name = new_filename;
+			}
+		}
+	}
+
 	// Set data
 	var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
 	props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">Applying</div>");
 	props_msg_box.css({display: '', opacity: ''});   // show message
-	props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // hide preview image
+	props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
+
+	// Hide uploader buttons until server responds
+	var uploader_footer = jQuery(uploader.settings.container).find('.plupload_filelist_footer')
+	uploader_footer.hide();
 
 	// Store file properties into USER's session by sending them to the SERVER
 	jQuery.ajax({
@@ -121,20 +144,22 @@ function filePropsForm_submit(obj, uploader)
 		dataType: "json",
 		data: data,
 		success: function(data) {
-			props_msg_box.html('');
+			uploader_footer.show();  // Show uploader buttons previously hidden
+			props_msg_box.html('');  // Start with empting the row's message box
 			try {
 				var response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
 				jQuery('#system-message-container').html(!!response.sys_messages ? response.sys_messages : '');
-				props_msg_box = jQuery('#'+response.row_id).find(".fileprops_message");
 				props_msg_box.append(response.result);
 				setTimeout(function(){ props_msg_box.fadeOut(1000); }, 1000);
 				setTimeout(function(){ props_msg_box.parent().find('.plupload_img_preview').css('display', '') }, 2000);
 				//window.console.log(response);
 			} catch(err) {
 				props_msg_box.html("<span class=\"alert alert-warning fc-iblock\">': "+err.message+"</span>");
-			}
+			};
+			uploader_footer.show();  // Show uploader buttons previously hidden
 		},
 		error: function (xhr, ajaxOptions, thrownError) {
+			uploader_footer.show();  // Show uploader buttons previously hidden
 			props_msg_box.html('');
 			alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 		}
@@ -1035,7 +1060,19 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					<!--span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_FILE_PROPERTIES'); ?></span-->
 					<table class="fc-form-tbl" id="file-props-form-container">
-					
+
+						<tr>
+							<td id="file-props-name-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
+								<label class="label" id="file-props-name-lbl" for="file-props-name">
+								<?php echo JText::_( 'FLEXI_FILE_FILENAME' ); ?>
+								</label>
+							</td>
+							<td id="file-props-name-container">
+								<input type="text" id="file-props-name" class="required input-xlarge" name="file-props-name" /> .
+								<input type="text" id="file-props-name-ext" class="required input-small" name="file-props-name-ext" readonly="readonly" size="6" />
+							</td>
+						</tr>
+
 					<?php if (!$this->folder_mode) : ?>
 						<tr>
 							<td id="file-props-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
@@ -1047,9 +1084,7 @@ flexicontent_html::loadFramework('flexi-lib');
 								<input type="text" id="file-props-title" size="44" class="required input-xxlarge" name="file-props-title" />
 							</td>
 						</tr>
-					<?php endif; ?>
 
-					<?php if (!$this->folder_mode) : ?>
 						<tr>
 							<td id="file-props-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 								<label class="label" id="file-props-desc-lbl" for="file-props-desc_uploadFileForm">

@@ -170,7 +170,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$secure  = $secure ? 1 : 0;
 
 			$filetitle  = $this->input->get('file-title', '', 'string');
-			$filedesc   = $this->input->get('file-desc', '');  // Joomla default text-filters for the usergroup
+			$filedesc   = flexicontent_html::dataFilter($this->input->get('file-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
 			$filelang   = $this->input->get('file-lang', '*', 'string');
 			$fileaccess = $this->input->get('file-access', 1, 'int');
 			$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
@@ -452,7 +452,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$filename = flexicontent_html::dataFilter($filename, 4000, 'URL', 0);  // Validate file URL
 		$altname  = $this->input->get('file-url-title', null, 'string');
 
-		$filedesc   = $this->input->get('file-url-desc', '');  // Joomla default text-filters for the usergroup
+		$filedesc   = flexicontent_html::dataFilter($this->input->get('file-url-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
 		$filelang   = $this->input->get('file-url-lang', '*', 'string');
 		$fileaccess = $this->input->get('file-url-access', 1, 'int');
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
@@ -557,7 +557,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$secure  = $Fobj ? $Fobj->secure : $this->input->get('secure', 1, 'int');
 		$secure  = $secure ? 1 : 0;
 
-		$filedesc   = $this->input->get('file-desc', '');  // Joomla default text-filters for the usergroup
+		$filedesc   = flexicontent_html::dataFilter($this->input->get('file-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
 		$filelang   = $this->input->get('file-lang', '*', 'string');
 		$fileaccess = $this->input->get('file-access', 1, 'int');
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
@@ -894,6 +894,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file		= $model->getFile();
 
 		$data = $this->input->post->getArray();  // Default filtering will remove HTML
+		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
 
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
