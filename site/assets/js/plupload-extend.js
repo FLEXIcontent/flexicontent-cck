@@ -90,8 +90,14 @@
 
 				// Get current filename and extension from the file row
 				var file_name = btn.closest("li").find('.plupload_file_name').text();
-				form.find('[name="file-props-name-ext"]').val( file_name.split('.').pop() );
-				form.find('[name="file-props-name"]').val( file_name.replace(/\.[^/.]+$/, '') );
+				
+				var name_parts = file_name.split('.');
+				var part_ext  = name_parts.length == 1 ? '' : name_parts[name_parts.length-1];
+				var regexp = new RegExp('.'+part_ext+'$');
+				var part_name = file_name.replace(regexp, '');
+				
+				form.find('[name="file-props-name-ext"]').val( part_ext );
+				form.find('[name="file-props-name"]').val( part_name );
 				
 				// Now show the form
 				fc_file_props_handle = fc_showAsDialog(form_box, null, null, null, { title: Joomla.JText._('FLEXI_FILE_PROPERTIES') });
@@ -190,7 +196,7 @@
 	
 		// Update file row so that new filename is displayed
 		var new_filename = form.find('[name="file-props-name"]').val();
-		new_filename = removeSpecial( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
+		new_filename = fc_plupload_sanitize_filename( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
 		if (new_filename != '')
 		{
 			var old_filename = jQuery(uploader.settings.container).find('li .plupload_file_name').text();
@@ -246,3 +252,20 @@
 		});
 	}
 
+
+	function fc_plupload_sanitize_filename(text)
+	{
+		var result = '';
+		if (!text) return result;
+
+		var validChars = new RegExp('[A-Za-z0-9\.\_\-]+');
+
+		for (var i = 0; i < text.length; ++i)
+		{
+			if (validChars.test(text[i]))
+			{
+				result += text[i];
+			}
+		}
+		return result;
+	}

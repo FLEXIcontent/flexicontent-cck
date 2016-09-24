@@ -1502,24 +1502,28 @@
 	}
 
 
-	if (typeof removeSpecial == "undefined")
+	function fc_remove_non_alphanum_chars(text, allowed_chars)
 	{
-		function removeSpecial (text)
+		var result = '';
+		if (!text) return result;
+		allowed_chars = typeof allowed == 'undefined' ? '' : allowed_chars;
+
+		var num_reg = new RegExp('[0-9]+$');
+		var allowed_reg = new RegExp('['+allowed_chars+']+$');
+		
+		var lower = text.toLowerCase();
+		var upper = text.toUpperCase();
+
+		for (var i = 0; i < lower.length; ++i)
 		{
-			var result = '';
-			if (!text) return result;
-
-			var num_reg = new RegExp('[0-9]+$');
-			var lower = text.toLowerCase();
-			var upper = text.toUpperCase();
-
-			for (var i=0; i<lower.length; ++i)
+			if (num_reg.test(text[i]) || (lower[i] != upper[i]) || (lower[i].trim() === ''))
 			{
-				if (num_reg.test(text[i]) || (lower[i] != upper[i]) || (lower[i].trim() === ''))
-				{
-					result += text[i];
-				}
+				result += text[i];
 			}
-			return result;
+			else if (allowed_chars.length && allowed_reg.test(text[i]))
+			{
+				result += text[i];
+			}
 		}
+		return result;
 	}
