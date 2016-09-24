@@ -4878,14 +4878,20 @@ class flexicontent_upload
 	 * Gets the extension of a file name
 	 *
 	 * @param string $file The file name
-	 * @return string The file extension
+	 * @return string | boolean  The file extension or false if file does not have extension
 	 * @since 1.5
 	 */
-	static function getExt($filename)
+	static function getExt($file)
 	{
-		//$dot = strrpos($filename, '.');
-		//return $dot === false ? false : (string) substr($filename, $dot + 1);
-		return pathinfo($filename, PATHINFO_EXTENSION);
+		$dot = strrpos($file, '.');
+
+		if ($dot === false)
+		{
+			return false;
+		}
+		
+		return (string) substr($file, $dot + 1);
+		//return pathinfo($file, PATHINFO_EXTENSION);
 	}
 
 
