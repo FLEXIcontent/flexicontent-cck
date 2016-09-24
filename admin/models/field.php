@@ -212,7 +212,7 @@ class FlexicontentModelField extends JModelAdmin
 			$field->positions			= array();
 			$field->published			= 1;
 			$field->attribs				= null;
-			$field->access				= 0;
+			$field->access				= 1;
 			$this->_field					= $field;
 			return (boolean) $this->_field;
 		}

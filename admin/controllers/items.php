@@ -1042,7 +1042,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg .= JText::_( 'FLEXI_IMPORT_NO_ERROR' );		
 		}
     
-		$msg .= '<p class="button-close"><input type="button" class="fc_button" onclick="window.parent.document.adminForm.submit();" value="'.JText::_( 'FLEXI_CLOSE' ).'" /><p>';
+		$msg .= '<p class="button-close"><input type="button" class="fc_button" onclick="window.parent.document.adminForm.submit();" value="'.JText::_( 'FLEXI_CLOSE_REFRESH_DASHBOARD' ).'" /><p>';
 
 		echo $msg;
 	}

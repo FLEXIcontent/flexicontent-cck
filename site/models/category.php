@@ -629,7 +629,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$select_access = $this->_buildAccessSelect();
 			
 			// Create JOIN (and select column) of image field used as item image in RSS feed
-			$feed_image_source = $jinput->get('type', '', 'cmd') == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
+			$feed_image_source = $jinput->get('format', '', 'cmd') == "feed"  ?  (int) $params->get('feed_image_source', 0)  :  0;
 			if ($feed_image_source) {
 				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
 				$feed_img_col = ', img.value as image';
