@@ -274,8 +274,4 @@ class FlexicontentModelFile extends JModelAdmin
 
 		return $data;
 	}
-	
-	
-	
 }
-?>

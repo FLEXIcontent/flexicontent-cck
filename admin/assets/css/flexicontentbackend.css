@@ -2493,6 +2493,10 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	box-sizing: border-box;
 	min-height: 32px;
 }
+#multiple_uploader.fc_file_uploading > .plupload_scroll.plupload_wrapper {
+	float: left;
+	clear: both;
+}
 #multiple_uploader.fc_file_uploading .plupload_container.fc_uploader_hide_preview span.plupload_img_preview {
 	display: none !important;
 }
