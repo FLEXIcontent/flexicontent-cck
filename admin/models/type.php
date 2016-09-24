@@ -201,7 +201,7 @@ class FlexicontentModelType extends JModelAdmin
 			$type->published	= 1;
 			$type->itemscreatable= 0;
 			$type->attribs		= null;
-			$type->access			= 0;
+			$type->access			= 1;
 			$this->_type			= $type;
 			return (boolean) $this->_type;
 		}

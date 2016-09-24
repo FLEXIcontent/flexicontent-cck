@@ -1441,3 +1441,62 @@
 			if (jQuery(el).get(0).hasAttribute("data-rel")) jQuery(el).attr("rel", jQuery(el).attr("data-rel"));
 		});
 	});
+
+
+	/* Restore the given form fields values into the given form */
+	function fc_restore_form_field_values(form, data)
+	{
+		if (!data)
+		{
+			form[0].reset();
+
+			var elements = Array.from(form[0].elements);
+	 	 	for (var i = 0, l = elements.length; i < l; i++)
+	 	 	{
+				var el = jQuery(elements[i]);
+				var tagName = elements[i].tagName;
+				var inputType = tagName != 'INPUT' ? false : elements[i].type;
+				if (tagName == 'SELECT' || (inputType && inputType!='BUTTON'))
+				{
+					el.trigger('change');
+				}
+			}
+
+			return;
+		}
+
+		jQuery.each(data, function(name, val)
+		{
+			var el = form.find('[name="'+name+'"]'),
+			type = el.attr('type');
+
+			switch(type)
+			{
+				case 'checkbox':  el.attr('checked', 'checked'); break;
+				case 'radio':     el.filter('[value="'+val+'"]').attr('checked', 'checked'); break;
+				default: el.val(val);
+			}
+			el.trigger('change');
+		});
+	}
+
+
+	if (typeof jQuery.fn.serializeObject == "undefined")
+	{
+		jQuery.fn.serializeObject = function()
+		{
+			var o = {};
+			var a = this.serializeArray();
+			jQuery.each(a, function() {
+				if (o[this.name]) {
+					if (!o[this.name].push) {
+						o[this.name] = [o[this.name]];
+					}
+					o[this.name].push(this.value || '');
+				} else {
+					o[this.name] = this.value || '';
+				}
+			});
+			return o;
+		}
+	}

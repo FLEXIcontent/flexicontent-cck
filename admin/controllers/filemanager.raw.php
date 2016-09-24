@@ -39,8 +39,37 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		parent::__construct();
 	}
-	
-	
+
+
+	function saveprops()
+	{
+		// Set tree data into session
+		$session = JFactory::getSession();
+		$uid  = $this->input->get('uploader_file_id', '', 'string');
+		$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
+		$props = array();
+
+		$props['filetitle']  = $this->input->get('file-props-title', '', 'string');
+		$props['filedesc']   = $this->input->get('file-props-desc', '');  // Joomla default text-filters for the usergroup
+		$props['filelang']   = $this->input->get('file-props-lang', '*', 'string');
+		$props['fileaccess'] = flexicontent_html::dataFilter($this->input->get('file-props-access', 1, 'int'), 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
+		$props['secure']     = $this->input->get('secure', 1, 'int') ? 1 : 0;
+
+		$props['fieldid']    = $this->input->get('fieldid', 0, 'int');
+		$props['u_item_id']  = $this->input->get('u_item_id', 0, 'cmd');
+		$props['file_mode']  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
+
+		$uploader_file_data[$uid] = & $props;
+		$session->set('uploader_file_data', $uploader_file_data, 'flexicontent');
+
+		//$app = JFactory::getApplication();
+		//$app->enqueueMessage('<pre>'.print_r($props, true).'</pre>', 'message');
+
+		// Return Success JSON-RPC response
+		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-nobgimage fc-success fc-iblock fc-left\">Applied</div>", "row_id" : '.json_encode($uid).', "sys_messages" : '.json_encode(flexicontent_html::get_system_messages_html()).'}');
+	}
+
+
 	/**
 	 * count the rows
 	 *

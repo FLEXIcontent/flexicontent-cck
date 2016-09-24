@@ -1667,6 +1667,28 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	width: auto;
 	overflow: visible;
 	
+	.fileprops_message.fc_ajax_message_box {
+		position: absolute;
+		display: inline-block;
+		z-index: 1;
+		margin: 0;
+		padding: 0;
+	}
+	.fc_ajax_message_box .alert-heading {
+		display: none;
+	}
+	.fileprops_message .fc-mssg,
+	.fileprops_message .alert {
+		position: absolute;
+		display: inline-block;
+		z-index: 1;
+		margin: 0;
+		padding: 4px 12px;
+
+		box-sizing: border-box;
+		min-height: 32px;
+	}
+	
 	.plupload_container.fc_uploader_hide_preview {
 		span.plupload_img_preview {
 			display: none !important;
@@ -1719,14 +1741,18 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 					word-wrap: break-word;
 				}
 			}
+			.btn-group.fc_uploader_row_btns {
+				margin: 0px 6px 0px 0px;
+			}
 			.btn.fc_img_preview_btn:before {
-				font-size: 24px;
+				font-size: 18px;
 			}
 			.btn.fc_props_edit_btn,
 			.btn.fc_img_preview_btn {
 				width: unset;
-				margin: 0px 8px 0px 2px;
-				padding: 8px 6px;
+				min-width: 20px;
+				margin: 0px 0px 0px 0px;
+				padding: 8px 4px;
 				vertical-align: top;
 			}
 			span.plupload_img_preview {
@@ -1784,7 +1810,7 @@ table.fc_uploader_header_tbl {
 @media (max-width: 720px) {
 	#multiple_uploader.fc_file_uploading {
 		.plupload_file_size, .plupload_file_status, .plupload_progress {
-			width: 60px;
+			width: 72px;
 		}
 	}
 }
@@ -1800,9 +1826,17 @@ table.fc_uploader_header_tbl {
 		.plupload_container {
 			min-width: 400px;
 		}
-		.fc_img_preview_btn {
-			display: none !important;
+		.plupload_scroll
+		{
+			ul.plupload_filelist {
+				.plupload_file_name {
+					width: 150px;
+				}
+			}
 		}
+		/*.fc_img_preview_btn {
+			display: none !important;
+		}*/
 	}
 }
 @media (max-width: 580px) {
@@ -1847,6 +1881,10 @@ table.fc_uploader_header_tbl {
 					max-width: 64px;
 				}
 			}
+		}
+		.fileprops_message .fc-mssg,
+		.fileprops_message .alert {
+			min-height: 28px;
 		}
 	}
 }

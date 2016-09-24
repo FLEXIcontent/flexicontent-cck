@@ -184,7 +184,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			$category->published			= 1;
 			$category->editor				= null;
 			$category->ordering				= 0;
-			$category->access				= 0;
+			$category->access				= 1;
 			$category->params				= null;
 			$category->count				= 0;
 			$this->_category				= $category;
