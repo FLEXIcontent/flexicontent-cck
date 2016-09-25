@@ -1523,11 +1523,28 @@
 
 	if (typeof isIE == "undefined")
 	{
+		window.fc_ie_version_number = null;
 		isIE = function()
 		{
-			var userAgent = navigator.userAgent.toLowerCase();
-			return (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
+			if (window.fc_ie_version_number === null)
+			{
+				var userAgent = navigator.userAgent.toLowerCase();
+				window.fc_ie_version_number = (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
+			}
+			return window.fc_ie_version_number;
 		}
+	}
+
+
+	window.fc_has_flash_addon_enabled = false;
+	fc_has_flash_addon = function()
+	{
+		try {
+			window.fc_has_flash_addon_enabled = Boolean(new ActiveXObject("ShockwaveFlash.ShockwaveFlash"));
+		} catch(exception) {
+			window.fc_has_flash_addon_enabled = ("undefined" != typeof navigator.mimeTypes["application/x-shockwave-flash"]);
+		}
+		return window.fc_has_flash_addon_enabled;
 	}
 
 

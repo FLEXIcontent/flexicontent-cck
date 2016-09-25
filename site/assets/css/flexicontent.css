@@ -2578,6 +2578,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.fc_uploader_zooming.fc_uploader_zoomed span.plupload_img_preview > img {
 	max-height: 50% !important;
+	max-width: 50% !important;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete .plupload_file_action {
 	margin-left: 0px;

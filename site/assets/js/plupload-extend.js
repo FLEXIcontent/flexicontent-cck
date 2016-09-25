@@ -9,13 +9,17 @@
 
 	function fc_plupload_handle_init( uploader, params )
 	{
+		//if(window.console) window.console.log( "PostInit event" );
 		var uploader_container = jQuery(uploader.settings.container);
 
-		uploader_container.find(".plupload_header_content").prepend('\
-			<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
-				<span class="icon-image"></span> Thumbnails\
-			</span>\
-		');
+		if (uploader_container.find('.fc_plupload_toggleThumbs_btn').length==0)
+		{
+			uploader_container.find(".plupload_header_content").prepend('\
+				<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
+					<span class="icon-image"></span> Thumbnails\
+				</span>\
+			');
+		}
 	}
 
 
@@ -51,6 +55,9 @@
 
 	function fc_plupload_extend_row( uploader, i, item, params )
 	{
+		var IEversion = isIE();
+		var is_IE8_IE9 = IEversion && IEversion < 10;
+
 		params = typeof params == "undefined" ? {} : params;
 		params.edit_properties = typeof params.edit_properties == "undefined" ? 1 : params.edit_properties;
 		
@@ -58,7 +65,8 @@
 		var row_id = file.id;
 		var row = jQuery("#"+row_id);
 		var item = row.find(".plupload_file_name");
-		var is_img = file.name.match(/\.(jpg|jpeg|png|gif)$/i);
+		var is_img = is_IE8_IE9 && !fc_has_flash_addon() ? 0 : file.name.match(/\.(jpg|jpeg|png|gif)$/i);
+
 
 		/*
 		 * Add properties editing button
@@ -216,7 +224,7 @@
 
 		// Set data
 		var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
-		props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">Applying</div>");
+		props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">"+Joomla.JText._('FLEXI_APPLYING_DOT')+"</div>");
 		props_msg_box.css({display: '', opacity: ''});   // show message
 		props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
 
@@ -239,7 +247,7 @@
 					props_msg_box.append(response.result);
 					setTimeout(function(){ props_msg_box.fadeOut(1000); }, 1000);
 					setTimeout(function(){ props_msg_box.parent().find('.plupload_img_preview').css('display', '') }, 2000);
-					//window.console.log(response);
+					//if(window.console) window.console.log(response);
 				} catch(err) {
 					props_msg_box.html("<span class=\"alert alert-warning fc-iblock\">': "+err.message+"</span>");
 				};
