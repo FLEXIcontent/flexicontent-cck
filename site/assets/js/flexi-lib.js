@@ -7,21 +7,20 @@
 	
 	function fc_getAutoSizePos(winwidth, winheight, params)
 	{
-		
-		var autoWidth  = typeof winwidth === 'undefined'  || !winwidth;
-		var autoHeight = typeof winheight === 'undefined' || !winheight;
-		
+		var maxWidth  = typeof winwidth === 'undefined'  ? 0 : winwidth;
+		var maxHeight = typeof winheight === 'undefined' ? 0 : winheight;
+		var w = maxWidth  ? maxWidth  : jQuery( window ).width() - 70;
+		var h = maxHeight ? maxHeight : jQuery( window ).height() - 120;
+
+		// Add fixed scrolling class and ... also add auto-width / auto-height classes so dimensions are treated as MAX values
 		params.dialogClass = typeof params.dialogClass !== 'undefined'  ?  params.dialogClass  :  'fc-fixed-dialog';
-		if (autoWidth)  params.dialogClass += ' fc-autow-dialog';
-		if (autoHeight) params.dialogClass += ' fc-autoh-dialog';
-		
-		var w = typeof winwidth !== 'undefined' && winwidth  ? winwidth  : jQuery( window ).width() - 70;
-		var h = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 120;
-		
+		params.dialogClass += ' fc-autow-dialog';
+		params.dialogClass += ' fc-autoh-dialog';
+
 		params.winwidth  = w  > (jQuery( window ).width() - 70)   ? (jQuery( window ).width() - 70)  :  w;
 		params.winheight = h  > (jQuery( window ).height() - 120) ? (jQuery( window ).height() - 120) : h;
 		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
-		
+
 		params.winleft = (jQuery( window ).width()  - params.winwidth)  / 2 + 5;
 		params.wintop  = (jQuery( window ).height() - params.winheight) / 2 - 5;
 		//window.console.log ('winleft : ' + params.winleft + ', wintop : ' + params.wintop);
@@ -36,7 +35,7 @@
 		var input = document.getElementById(input_id);
 		var msg_box = document.getElementById(msg_id);
 		var _msg = '';
-		
+
 		var input_files = input.files;
 		if (input_files && input_files[0]) {
 			var imageType = /image.*/;
@@ -61,8 +60,8 @@
 		}
 		msg_box.nodeName == 'INPUT' ? msg_box.value = input.value : msg_box.innerHTML = input.value;
 	}
-	
-	
+
+
 	// Display content in modal popup
 	function fc_showAsDialog(obj, winwidth, winheight, closeFunc, params)
 	{
@@ -73,7 +72,7 @@
 		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
 		var keepPlace = !!params.keepPlace;
 		var visibleOnClose = !!params.visibleOnClose;
-		
+
 		// Because allowing moving modal to be moved out of form (under body), we need to set form ATTRIBUTE to form, for any form elements inside it
 		if (!keepPlace)
 		{
@@ -89,7 +88,7 @@
 				}
 			}
 		}
-		
+
 		var parent = obj.parent();
 		var theDialog = obj.dialog({
 			title: params.title,
@@ -131,16 +130,20 @@
 			}
 		})
 		.dialog('widget').next('.ui-widget-overlay').css('background', 'gray');  // Add an overlay
-		
+
 		// Manually move the dialog content back into its proper position, (the extra dialog container will be destroyed on dialog close)
 		if (keepPlace) obj.parent().appendTo(parent);
-		
+
 		// Open the dialog manually
 		theDialog = obj.dialog('open');
-		
+		theDialog.data('fc_dialog_params', params);
+		theDialog.data('fc_dialog_maxwidth', winwidth);
+		theDialog.data('fc_dialog_maxheight', winheight);
+		obj.parent().data('fc_dialog', theDialog);
+
 		// Stop scrolling of parent document
 		jQuery(document.body).addClass('fc-no-scroll');
-		
+
 		// Return a reference of the dialog to the caller
 		return theDialog;
 	}
@@ -1110,16 +1113,32 @@
 	/* Auto-resize the currently open dialog vertically or horizontally */
 	function fc_dialog_resize_now(boxWsel, boxHsel, contentSel)
 	{
-		params = {};
-		params = fc_getAutoSizePos(0, 0, params);
-
 		boxWsel = typeof boxWsel != 'undefined' ? boxWsel : '.ui-dialog.fc-autow-dialog';
 		boxHsel = typeof boxHsel != 'undefined' ? boxHsel : '.ui-dialog.fc-autoh-dialog';
 		contentSel = typeof contentSel != 'undefined' ? contentSel : '.ui-dialog-content';
-		
-		jQuery(boxWsel).css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' });
-		jQuery(boxHsel).css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
-		
+
+		// Resize the modal(s)
+		var dialogs = jQuery(boxWsel + ' , '+ boxHsel);
+		dialogs.each(function( index )
+		{
+			var dialog_box = jQuery(this);
+			var theDialog = dialog_box.data('fc_dialog');
+			if (theDialog)
+			{
+				var params = theDialog.data('fc_dialog_params');
+				var maxwidth  = theDialog.data('fc_dialog_maxwidth');
+				var maxheight = theDialog.data('fc_dialog_maxheight');
+				params = params || {};
+				maxwidth  = maxwidth || 0;
+				maxheight = maxheight || 0;
+				params = fc_getAutoSizePos(maxwidth, maxheight, params);
+
+				dialog_box.css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' });
+				dialog_box.css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
+			}
+		});
+
+		// Fix modal's inner container adding unneeded scrollbar
 		var dialogs = jQuery(boxHsel);
 		dialogs.each(function( index )
 		{
@@ -1498,6 +1517,16 @@
 				}
 			});
 			return o;
+		}
+	}
+
+
+	if (typeof isIE == "undefined")
+	{
+		isIE = function()
+		{
+			var userAgent = navigator.userAgent.toLowerCase();
+			return (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
 		}
 	}
 

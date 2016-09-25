@@ -2579,6 +2579,24 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.fc_uploader_zooming.fc_uploader_zoomed span.plupload_img_preview > img {
 	max-height: 50% !important;
 }
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete .plupload_file_action {
+	margin-left: 0px;
+	width: 31px;
+	padding: 0;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete .plupload_file_action > a {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: #efefef;
+	border: 1px solid #c0c0c0;
+	border-radius: 4px;
+	display: inline-block;
+	margin: -2px 0 0 8px;
+	padding: 6px 0 6px 12px;
+}
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete .plupload_file_action > a:hover {
+	background-color: #e7e7e7;
+}
 table.fc_uploader_header_tbl {
 	border-collapse: collapse;
 }

@@ -11,11 +11,11 @@
 	{
 		var uploader_container = jQuery(uploader.settings.container);
 
-		uploader_container.find(".plupload_header_content").prepend(`
-			<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="uploader_container.toggleClass("fc_uploader_hide_preview");">
-				<span class="icon-image"></span> Thumbnails
-			</span>
-		`);
+		uploader_container.find(".plupload_header_content").prepend('\
+			<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
+				<span class="icon-image"></span> Thumbnails\
+			</span>\
+		');
 	}
 
 
@@ -90,17 +90,17 @@
 
 				// Get current filename and extension from the file row
 				var file_name = btn.closest("li").find('.plupload_file_name').text();
-				
+
 				var name_parts = file_name.split('.');
 				var part_ext  = name_parts.length == 1 ? '' : name_parts[name_parts.length-1];
 				var regexp = new RegExp('.'+part_ext+'$');
 				var part_name = file_name.replace(regexp, '');
-				
+
 				form.find('[name="file-props-name-ext"]').val( part_ext );
 				form.find('[name="file-props-name"]').val( part_name );
-				
+
 				// Now show the form
-				fc_file_props_handle = fc_showAsDialog(form_box, null, null, null, { title: Joomla.JText._('FLEXI_FILE_PROPERTIES') });
+				fc_file_props_handle = fc_showAsDialog(form_box, 800, 600, null, { title: Joomla.JText._('FLEXI_FILE_PROPERTIES') });
 			});
 		}
 
@@ -180,20 +180,21 @@
 		fc_file_props_handle.dialog('close');  // Close form dialog
 	
 		// Get form, form data
-		var form = jQuery(obj.form);
+		var IEversion = isIE();
+		var form = (!IEversion || IEversion > 8) ? jQuery(obj.form) : jQuery(obj).closest('form');
 		var data = form.serialize();	
-	
+
 		// Mark EDIT button of the FILE row, as having file properties
 		var btn = form.data("edit_btn");	
 		if (btn) btn.addClass('btn-success');
-	
+
 		// Store file properties of the current FILE row, so that they can be reloaded and re-edited, without contacting WEB server
 		var file_id = form.find('[name="uploader_file_id"]').val();	
 		var form_data = jQuery(uploader.settings.container).data("form_data");
 		if (!form_data) form_data = {};
 		form_data[file_id] = form.serializeObject();
 		jQuery(uploader.settings.container).data("form_data", form_data);
-	
+
 		// Update file row so that new filename is displayed
 		var new_filename = form.find('[name="file-props-name"]').val();
 		new_filename = fc_plupload_sanitize_filename( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
@@ -212,20 +213,20 @@
 				}
 			}
 		}
-	
+
 		// Set data
 		var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
 		props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">Applying</div>");
 		props_msg_box.css({display: '', opacity: ''});   // show message
 		props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
-	
+
 		// Hide uploader buttons until server responds
 		var uploader_footer = jQuery(uploader.settings.container).find('.plupload_filelist_footer')
 		uploader_footer.hide();
-	
+
 		// Store file properties into USER's session by sending them to the SERVER
 		jQuery.ajax({
-			url: obj.form.action,
+			url: form.attr('action'),
 			type: 'POST',
 			dataType: "json",
 			data: data,

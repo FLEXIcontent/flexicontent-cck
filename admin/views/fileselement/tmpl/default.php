@@ -81,12 +81,15 @@ if (!empty($this->field))
 
 $is_inline_input = strlen($uconf->get('inputmode')) && $uconf->get('inputmode', 0) == 0;
 $enable_multi_uploader = 1; //$this->view=='filemanager' || $is_inline_input;
-?>
 
-<script type="text/javascript">
-
+$js = "
 jQuery(document).ready(function() {
-	var use_mul_upload = <?php echo $enable_multi_uploader ? 1 : 0; ?>;
+	var use_mul_upload = ".($enable_multi_uploader ? 1 : 0).";
+	var IEversion = isIE();
+	var is_IE8_IE9 = IEversion && IEversion < 10;
+	if (is_IE8_IE9) fctabber['fileman_tabset'].tabShow(1);
+	
+	//if (is_IE8_IE9) use_mul_upload = 0;
 	if (use_mul_upload)
 	{
 		// Show TAB and plupload manager
@@ -97,7 +100,8 @@ jQuery(document).ready(function() {
 		// Also set filelist height
 		fc_plupload_resize_now();
 	}
-	fctabber['fileman_tabset'].tabShow(0);
+	if (!is_IE8_IE9) fctabber['fileman_tabset'].tabShow(0);  // uploader does not initialize properly when hidden in IE8 / IE9
+
 	if (use_mul_upload) jQuery('#filemanager-1').hide();
 });
 
@@ -128,21 +132,21 @@ function delAllFilters()
 }
 
 var _file_data = new Array();
-<?php
+";
+
 // Output file data JSON encoded so that they are available to JS code
 // but exclude parameters and other array data from encoding since we will not need them
-foreach ($this->rows as $i => $row) :
+foreach ($this->rows as $i => $row)
+{
 	$data = new stdClass();
 	foreach($row as $j => $d) {
 		if (!is_array($d) && !is_object($d)) $data->$j = utf8_encode($d);
 	}
-	echo '  _file_data['.$i.'] = '.json_encode($data).";\n";
-endforeach;
-?>
-</script>
+	$js .= '  _file_data['.$i.'] = '.json_encode($data).";\n";
+}
+$document->addScriptDeclaration($js);
 
 
-<?php
 
 // *********************
 // BOF multi-uploader JS
@@ -175,7 +179,6 @@ $perms = FlexicontentHelperPerm::getPerm();  // get global perms
 if ($enable_multi_uploader)
 {
 	// Load plupload JS framework
-	$doc = JFactory::getDocument();
 	$pluploadlib = JURI::root(true).'/components/com_flexicontent/librairies/plupload/';
 	$plupload_mode = 'runtime';  // 'runtime,ui'
 	flexicontent_html::loadFramework('plupload', $plupload_mode);
@@ -208,17 +211,21 @@ if ($enable_multi_uploader)
 	// Load pluploader if not already loaded
 	function showUploader()
 	{
+		var IEversion = isIE();
+		var runtimes = IEversion && IEversion >= 10  ?  "html5,html4,flash,silverlight"  :  "flash,silverlight,html4";
+
 		// Already initialized
 		if (fc_file_mul_uploader)
 		{
-			//fc_file_mul_uploader.splice();  // empty it, ... not needed and problematic ... commented out
+			//fc_file_mul_uploader.refresh();  // refreash it
+			//fc_file_mul_uploader.splice();   // empty it, ... not needed and problematic ... commented out
 		}
 		
 		else if ("'.$plupload_mode.'"=="ui")
 		{
 	    fc_file_mul_uploader = jQuery("#multiple_uploader").plupload({
 				// General settings
-				runtimes : "html5,html4,flash,silverlight",
+				runtimes : runtimes,
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
 				prevent_duplicates : true,
 				
@@ -293,7 +300,7 @@ if ($enable_multi_uploader)
 		{
 			jQuery("#multiple_uploader").pluploadQueue({
 				// General settings
-				runtimes : "html5,html4,flash,silverlight",
+				runtimes : runtimes,
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
 				prevent_duplicates : true,
 				
@@ -371,7 +378,7 @@ if ($enable_multi_uploader)
 	};
 	';
 	
-	$doc->addScriptDeclaration($js);
+	$document->addScriptDeclaration($js);
 }
 
 // *********************
@@ -900,7 +907,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<td rowspan="3" style="text-align: center;" class="fc_hidden_960">
 					'.($enable_multi_uploader ? '
 						<div class="fc-mssg fc-info" style="margin: 0px 0 8px 0; padding-top: 4px; padding-bottom: 4px; width: 100%; box-sizing: border-box;">'.JText::_('Please edit file properties<br/>after you upload the files').'</div>
-						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); jQuery(\'#multiple_uploader\').height(210); setTimeout(function(){showUploader()}, 100);"
+						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); jQuery(\'#multiple_uploader\').height(210); setTimeout(function(){showUploader(); fc_plupload_resize_now();}, 100);"
 							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'" style=""
 						>
 							'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
