@@ -66,7 +66,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		//$app->enqueueMessage('<pre>'.print_r($props, true).'</pre>', 'message');
 
 		// Return Success JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-nobgimage fc-success fc-iblock fc-left\">Applied</div>", "row_id" : '.json_encode($uid).', "sys_messages" : '.json_encode(flexicontent_html::get_system_messages_html()).'}');
+		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-nobgimage fc-success fc-iblock fc-left\">'.JText::_('FLEXI_APPLIED').'</div>", "row_id" : '.json_encode($uid).', "sys_messages" : '.json_encode(flexicontent_html::get_system_messages_html()).'}');
 	}
 
 

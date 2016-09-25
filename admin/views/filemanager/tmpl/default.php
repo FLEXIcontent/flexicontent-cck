@@ -92,16 +92,21 @@ jQuery(document).ready(function() {
 	//if (is_IE8_IE9) use_mul_upload = 0;
 	if (use_mul_upload)
 	{
-		// Show TAB and plupload manager
+		// Show uploader's outer container
 		jQuery('#filemanager-2').show();
+		jQuery('#multiple_uploader').css('min-height', 180);
+
+		// Init uploader
 		showUploader();
-		jQuery('#multiple_uploader').height(210);
 
 		// Also set filelist height
 		fc_plupload_resize_now();
 	}
-	if (!is_IE8_IE9) fctabber['fileman_tabset'].tabShow(0);  // uploader does not initialize properly when hidden in IE8 / IE9
 
+	// Uploader does not initialize properly when hidden in IE8 / IE9 with 'runtime': 'html4' (it does if using 'runtime': 'flash')
+	if (!is_IE8_IE9 && !fc_has_flash_addon()) fctabber['fileman_tabset'].tabShow(0);
+
+	// Hide basic uploader form if using multi-uploader script
 	if (use_mul_upload) jQuery('#filemanager-1').hide();
 });
 
@@ -155,6 +160,7 @@ $document->addScriptDeclaration($js);
 if ($enable_multi_uploader)
 {
 	JText::script("FLEXI_FILE_PROPERTIES", true);
+	JText::script("FLEXI_APPLYING_DOT", true);
 	$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', FLEXI_VHASH);
 }
 
@@ -212,12 +218,20 @@ if ($enable_multi_uploader)
 	function showUploader()
 	{
 		var IEversion = isIE();
-		var runtimes = IEversion && IEversion >= 10  ?  "html5,html4,flash,silverlight"  :  "flash,silverlight,html4";
+		var is_IE8_IE9 = IEversion && IEversion < 10;
+
+		var runtimes = !is_IE8_IE9  ?  "html5,flash,silverlight,html4"  : "flash,html4";  //,silverlight,html5
+		if (!fc_file_mul_uploader && is_IE8_IE9)
+		{
+			if (!fc_has_flash_addon()) jQuery("<div class=\"alert alert-warning fc-iblock\">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</div>").insertBefore("#multiple_uploader");
+		}
 
 		// Already initialized
+		//window.console.log("showUploader ...");
 		if (fc_file_mul_uploader)
 		{
-			//fc_file_mul_uploader.refresh();  // refreash it
+			//window.console.log("exists");
+			//fc_file_mul_uploader.refresh();  // refresh it
 			//fc_file_mul_uploader.splice();   // empty it, ... not needed and problematic ... commented out
 		}
 		
@@ -282,7 +296,8 @@ if ($enable_multi_uploader)
 					FilesAdded: fc_plupload_handle_filesChanged,
 					FilesRemoved: fc_plupload_handle_filesChanged,
 
-					UploadComplete: function (up, files) {
+					UploadComplete: function (up, files)
+					{
 						if(window.console) window.console.log("All Files Uploaded");
 						window.document.body.innerHTML = "<span class=\"fc_loading_msg\">Reloading ... please wait</span>";
 						window.location.reload(true);  //window.location.replace(window.location.href);
@@ -298,6 +313,7 @@ if ($enable_multi_uploader)
 
 		else
 		{
+			//window.console.log("creating");
 			jQuery("#multiple_uploader").pluploadQueue({
 				// General settings
 				runtimes : runtimes,
@@ -929,7 +945,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<td rowspan="3" style="text-align: center;" class="fc_hidden_960">
 					'.($enable_multi_uploader ? '
 						<div class="fc-mssg fc-info" style="margin: 0px 0 8px 0; padding-top: 4px; padding-bottom: 4px; width: 100%; box-sizing: border-box;">'.JText::_('Please edit file properties<br/>after you upload the files').'</div>
-						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); jQuery(\'#multiple_uploader\').height(210); setTimeout(function(){showUploader(); fc_plupload_resize_now();}, 100);"
+						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); /*jQuery(\'#multiple_uploader\').css(\'min-height\', 180);*/ setTimeout(function(){showUploader(); fc_plupload_resize_now();}, 100);"
 							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'" style=""
 						>
 							'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
@@ -1191,7 +1207,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<fieldset class="actions" id="filemanager-2" style="display:none;">
 				<div id="multiple_uploader" class="fc_file_uploading" style="height: 0px;">
 					<div id="multiple_uploader_failed" class="alert alert-warning">
-						There was some JS error or JS issue, plupload script failed to start
+						There was some JS error or JS issue, file uploader script failed to start
 					</div>
 				</div>
 			</fieldset>
