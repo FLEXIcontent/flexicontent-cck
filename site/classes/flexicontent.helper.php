@@ -5104,6 +5104,7 @@ class flexicontent_upload
 		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
 		$folder = trim(preg_replace($regex, '-', $folder));
+		$foldername = $folder;
 
 		//make a unique folder name for the image and check it is not already taken
 		if (JFolder::exists( $base_Dir . $folder ))
