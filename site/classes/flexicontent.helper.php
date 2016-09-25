@@ -4887,7 +4887,7 @@ class flexicontent_upload
 
 		if ($dot === false)
 		{
-			return false;
+			return '';
 		}
 		
 		return (string) substr($file, $dot + 1);
