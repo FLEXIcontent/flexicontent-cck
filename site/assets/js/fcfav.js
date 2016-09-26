@@ -9,9 +9,9 @@ function FCFav(id, type, add_counter)
 	
 	var favurl = live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id+'&type='+type
 
-	var onote_msg_box_start = '<div class="fc-mssg-inline fc-note fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
-	var osucc_msg_box_start = '<div class="fc-mssg-inline fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">';
-	var _box_start = '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage';
+	var onote_msg_box_start = '<div class="fc-mssg fc-note fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
+	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">';
+	var _box_start = '<div class="fc-mssg fc-info fc-iblock fc-nobgimage';
 	
 	
 	var div = document.getElementById('fcfav-reponse_'+type+'_'+id);

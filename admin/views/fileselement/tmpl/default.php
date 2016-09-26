@@ -902,7 +902,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<table class="fc_uploader_header_tbl">
 				<tr class="fc-about-size-limits">
 					<td>
-						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
 					</td>
 					<td>
 						<span class="fc-sys-upload-limit-box fc-about-conf-size-limit">
@@ -935,7 +935,7 @@ flexicontent_html::loadFramework('flexi-lib');
 				'.($resize_on_upload ? '
 				<tr class="fc-about-dim-limits">
 					<td>
-						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">
 							'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'
 							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
 						</div>
@@ -953,7 +953,7 @@ flexicontent_html::loadFramework('flexi-lib');
 
 				<tr class="fc-about-crop-quality-limits">
 					<td>
-						<div class="alert alert-info" style="padding: 0 8px; margin: 2px 0; text-align: left;">
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">
 							'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'
 							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
 						</div>

@@ -1542,7 +1542,10 @@ class flexicontent_html
 			
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				
+
+				$js .= "
+					var jbase_folder_fc = ".json_encode(JURI::root(true)).";
+				";
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				break;
@@ -3114,8 +3117,9 @@ class flexicontent_html
 			$document = JFactory::getDocument();
 			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
 			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
-
-			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
+			$document->addScriptDeclaration('
+				var fcvote_rfolder = "'.JURI::root(true).'";
+			');
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= JURI::root(true).'/'.$image;
@@ -3425,10 +3429,9 @@ class flexicontent_html
 			JText::script('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED',true);
 			JText::script('FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true);
 			JText::script('FLEXI_TOTAL',true);
-			$js = "
-				var fcfav_rfolder = '".JURI::root(true)."';
-			";
-			$document->addScriptDeclaration($js);
+			$document->addScriptDeclaration('
+				var fcfav_rfolder = "'.JURI::root(true).'";
+			');
 			
 			$js_and_css_added = true;
 		}

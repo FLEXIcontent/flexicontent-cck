@@ -663,7 +663,7 @@ body .fc-mssg.fc-success {
 body .fc-mssg-inline.fc-info,
 body .fc-mssg.fc-info {
 	background: #D9EDF7 url(../images/information.png) no-repeat 10px 50%;
-	color: #3A87AD;
+	color: #31708f;
 	border-color: #9CD8F1;
 }
 body .alert.fc-error {
@@ -2454,6 +2454,16 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 #fileman_tabset div.tabbertab {
 	padding: 8px 16px 16px 16px;
 }
+#fileman_tabset .fc-about-box {
+	padding: 0 8px;
+	margin: 2px 0;
+	text-align: left;
+	float: left;
+	width: 100%;
+	box-sizing: border-box;
+	display: block;
+	font-size: 14px;
+}
 .fc-sys-upload-limit-box img,
 .fc-php-upload-limit-box img {
 	vertical-align: top;
@@ -2489,7 +2499,8 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	display: inline-block;
 	z-index: 1;
 	margin: 0;
-	padding: 4px 12px;
+	padding-top: 6px;
+	padding-bottom: 4px;
 	box-sizing: border-box;
 	min-height: 32px;
 }
