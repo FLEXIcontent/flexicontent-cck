@@ -224,7 +224,7 @@
 
 		// Set data
 		var props_msg_box = jQuery("li#"+file_id).find(".fileprops_message");
-		props_msg_box.html("<div class=\"fc-mssg fc-nobgimage fc-info\">"+Joomla.JText._('FLEXI_APPLYING_DOT')+"</div>");
+		props_msg_box.html("<div class=\"fc_loading_msg\">"+Joomla.JText._('FLEXI_APPLYING_DOT')+"</div>");
 		props_msg_box.css({display: '', opacity: ''});   // show message
 		props_msg_box.parent().find('.plupload_img_preview').css('display', 'none');  // Hide preview image
 
