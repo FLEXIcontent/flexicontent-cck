@@ -45,7 +45,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		// Set tree data into session
 		$session = JFactory::getSession();
-		$uid  = $this->input->get('uploader_file_id', '', 'string');
+		$file_row_id = $this->input->get('file_row_id', '', 'string');
 		$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 		$props = array();
 
@@ -59,14 +59,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$props['u_item_id']  = $this->input->get('u_item_id', 0, 'cmd');
 		$props['file_mode']  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 
-		$uploader_file_data[$uid] = & $props;
+		$uploader_file_data[$file_row_id] = & $props;
 		$session->set('uploader_file_data', $uploader_file_data, 'flexicontent');
 
 		//$app = JFactory::getApplication();
 		//$app->enqueueMessage('<pre>'.print_r($props, true).'</pre>', 'message');
 
 		// Return Success JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-success fc-iblock fc-left\">'.JText::_('FLEXI_APPLIED').'</div>", "row_id" : '.json_encode($uid).', "sys_messages" : '.json_encode(flexicontent_html::get_system_messages_html()).'}');
+		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-success fc-iblock fc-left\">'.JText::_('FLEXI_APPLIED').'</div>", "row_id" : '.json_encode($file_row_id).', "sys_messages" : '.json_encode(flexicontent_html::get_system_messages_html()).'}');
 	}
 
 

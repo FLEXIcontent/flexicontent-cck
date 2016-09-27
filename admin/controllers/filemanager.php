@@ -120,17 +120,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return $this->terminate($file_id, $exitMessages);
 		}
 
-		$uid = $data_from_sess = $uploader_file_data = false;
+		$file_row_id = $data_from_sess = $uploader_file_data = false;
 
 		if ($this->task=='uploads')
 		{
 			$file = $this->input->files->get('file', '', 'array');
-			$uid  = $this->input->get('uploader_file_id', '', 'string');
+			$file_row_id = $this->input->get('file_row_id', '', 'string');
 
 			$session = JFactory::getSession();
 			$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 
-			$data_from_sess = @ $uploader_file_data[$uid];
+			$data_from_sess = @ $uploader_file_data[$file_row_id];
 			if ($data_from_sess)
 			{
 				$filetitle  = $data_from_sess['filetitle'];
@@ -143,7 +143,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$u_item_id  = $data_from_sess['u_item_id'];
 				$file_mode  = $data_from_sess['file_mode'];
 			}
-			//print_r($uid); echo "\n"; print_r($uploader_file_data); exit();
+			//print_r($file_row_id); echo "\n"; print_r($uploader_file_data); exit();
 		}
 		else
 		{
@@ -263,9 +263,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			}
 
 			// Remove no longer needed file properties from session data
-			else if ( $uid && isset($uploader_file_data[$uid]) )
+			else if ( $file_row_id && isset($uploader_file_data[$file_row_id]) )
 			{
-				unset($uploader_file_data[$uid]);
+				unset($uploader_file_data[$file_row_id]);
 				$session->set('uploader_file_data', $uploader_file_data, 'flexicontent');
 			}
 

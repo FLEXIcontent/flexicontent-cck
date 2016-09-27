@@ -288,7 +288,7 @@ if ($enable_multi_uploader)
 						// Called right before the upload for a given file starts, can be used to cancel it if required
 						up.settings.multipart_params = {
 							filename: file.name,
-							uploader_file_id: file.id
+							file_row_id: file.id
 						};
 					},
 
@@ -366,7 +366,7 @@ if ($enable_multi_uploader)
 						// Called right before the upload for a given file starts, can be used to cancel it if required
 						up.settings.multipart_params = {
 							filename: file.name,
-							uploader_file_id: file.id
+							file_row_id: file.id
 						};
 					},
 
@@ -1074,7 +1074,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 					<?php echo strlen($_forced_secure_int) ? '<input type="hidden" name="secure" value="'.$_forced_secure_int.'" />' : ''; ?>
-					<input type="hidden" name="uploader_file_id" value="" />
+					<input type="hidden" name="file_row_id" value="" />
 				</form>
 				
 			</fieldset>
