@@ -160,8 +160,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$typesselected = $model->getTypesselected();
 		
 		// Get and merge type parameters
-		$tparams    = $this->get( 'Typeparams' );
-		$tparams    = new JRegistry($tparams);
+		$tparams = $this->get( 'Typeparams' );
+		$tparams = new JRegistry($tparams);
 		$params->merge($tparams);       // Apply type configuration if it type is set
 		
 		// Get user allowed permissions on the item ... to be used by the form rendering
@@ -600,10 +600,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
 		if ( 1 )
 		{
-			if ($tparams->get('cid_allowed_parent')) {
+			if ($tparams->get('cid_allowed_parent'))
+			{
 				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('cid_allowed_parent'), $depth_limit=0);
 				$disabled_cats = $tparams->get('cid_allowed_parent_disable', 1) ? array($tparams->get('cid_allowed_parent')) : array();
-			} else {
+			}
+			else
+			{
 				$cid_tree = & $categories;
 				$disabled_cats = array();
 			}
@@ -657,7 +660,8 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
 		
-		if ($tparams->get('catid_allowed_parent')) {
+		if ($tparams->get('catid_allowed_parent'))
+		{
 			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
 			$disabled_cats = $tparams->get('catid_allowed_parent_disable', 1) ? array($tparams->get('catid_allowed_parent')) : array();
 		} else {

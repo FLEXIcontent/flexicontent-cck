@@ -54,23 +54,28 @@ class FlexicontentController extends JControllerLegacy
 	 * @return void
 	 * @since 1.0
 	 */
-	function getsefurl() {
-		$view = JRequest::getVar('view');
-		if ($view=='category') {
-			$cid = (int) JRequest::getVar('cid');
-			if ($cid) {
-				$db = JFactory::getDBO();
-				$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-					.' FROM #__categories AS c WHERE c.id = '.$cid;
-				$db->setQuery( $query );
-				$categoryslug = $db->loadResult();
-				echo JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
-			}
+	function getsefurl()
+	{
+		// Initialize variables
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDBO();
+		$jinput = $app->input;
+
+		$view = $jinput->get('view', '', 'cmd');
+		$cid  = $jinput->get('cid', 0, 'int');
+
+		if ($view=='category' && $cid)
+		{
+			$query = 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+				.' FROM #__categories AS c WHERE c.id = '.$cid;
+			$db->setQuery( $query );
+			$categoryslug = $db->loadResult();
+			echo JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
 		}
 		jexit();
 	}
-	
-	
+
+
 	/**
 	 * Logic to get text search autocomplete strings
 	 *
@@ -81,25 +86,26 @@ class FlexicontentController extends JControllerLegacy
 	function txtautocomplete()
 	{
 		global $globalcats;
-		$app    = JFactory::getApplication();
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$option = JRequest::getVar('option');
 		$use_tmp = true;
-		
-		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
-		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
-		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
-		
+
 		// Get request variables
-		$type = JRequest::getVar('type');
-		$text = JRequest::getVar('text');
-		$pageSize = JRequest::getInt('pageSize', 20);
-		$pageNum  = JRequest::getInt('pageNum', 1);
-		
-		$usesubs = JRequest::getInt('usesubs', 1);
-		
-		$cid   = JRequest::getInt('cid', 0);
-		$cids  = JRequest::getVar('cids', '');
+		$option  = $jinput->get('option', '', 'cmd');
+		$type    = $jinput->get('type', '', 'cmd');
+		$text    = $jinput->get('text', '', 'string');
+
+		$pageSize = $jinput->get('pageSize', 20, 'int');
+		$pageNum  = $jinput->get('pageNum', 1, 'int');		
+		$usesubs  = $jinput->get('usesubs', 1, 'int');		
+
+		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
+		$filtercat    = $cparams->get('filtercat', 0);      // Filter items using currently selected language
+		$show_noauth  = $cparams->get('show_noauth', 0);   // Show unauthorized items
+
+		$cid  = $jinput->get('cid', 0, 'int');
+		$cids = $jinput->get('cids', '', 'string');
 		
 		// CASE 1: Single category view, zero or string means ignore and use 'cids'
 		if ( $cid )
@@ -258,7 +264,8 @@ class FlexicontentController extends JControllerLegacy
 	}
 	
 	
-	function isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index') {
+	function isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
+	{
 		$db = JFactory::getDBO();
 		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
@@ -281,10 +288,14 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function remove()
 	{
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'id', array(), '', 'array' );
-		JArrayHelper::toInteger($cid);
+
+		$cid = $jinput->get('id', array(), 'array');
+		JArrayHelper::toInteger($cid, array());
 		
 		require_once(JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."models".DS."items.php");
 		$model = new FlexicontentModelItems;
@@ -369,7 +380,6 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
@@ -400,7 +410,7 @@ class FlexicontentController extends JControllerLegacy
 		// If new make sure that type id is set too, before creating the model
 		if ($isnew)
 		{
-			$typeid = JRequest::setvar('typeid', (int) @ $data['type_id']);
+			$typeid = $jinput->set('typeid', (int) @ $data['type_id']);
 		}
 		
 		// Get the model
@@ -545,6 +555,7 @@ class FlexicontentController extends JControllerLegacy
 		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
+		$fc_doajax_submit = $jinput->get('fc_doajax_submit', 0, 'int');
 		
 		// *** MANUALLY CHECK CAPTCHA ***
 		$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
@@ -555,9 +566,10 @@ class FlexicontentController extends JControllerLegacy
 		if ($display_captcha)
 		{
 			$c_plugin = $params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
-			if ($c_plugin) {
+			if ($c_plugin)
+			{
 				$c_name = 'captcha_response_field';
-				$c_value = JRequest::getString($c_name);
+				$c_value = $jinput->get($c_name, '', 'string');
 				$c_id = $c_plugin=='recaptcha' ? 'dynamic_recaptcha_1' : 'fc_dynamic_captcha';
 				$c_namespace = 'fc_item_form';
 				
@@ -576,9 +588,9 @@ class FlexicontentController extends JControllerLegacy
 					$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 					
 					// Redirect back to the edit form
-					$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+					$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base() );
 					
-					if ( JRequest::getVar('fc_doajax_submit') )
+					if ( $fc_doajax_submit )
 					{
 						echo flexicontent_html::get_system_messages_html();
 						exit();  // Ajax submit, do not rerender the view
@@ -615,7 +627,7 @@ class FlexicontentController extends JControllerLegacy
 			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
 			// Redirect back to the edit form
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base() );
 
 			if ($jinput->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
@@ -699,8 +711,9 @@ class FlexicontentController extends JControllerLegacy
 		if ($isnew && !$canAdd)
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( JRequest::getVar('fc_doajax_submit') ) {
+			$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base() );
+			if ( $fc_doajax_submit )
+			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -712,8 +725,9 @@ class FlexicontentController extends JControllerLegacy
 		if (!$isnew && !$canEdit)
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( JRequest::getVar('fc_doajax_submit') ) {
+			$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base() );
+			if ( $fc_doajax_submit )
+			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -725,8 +739,9 @@ class FlexicontentController extends JControllerLegacy
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
 			JError::raiseWarning( 403, $msg );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( JRequest::getVar('fc_doajax_submit') ) {
+			$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base() );
+			if ( $fc_doajax_submit )
+			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -766,9 +781,9 @@ class FlexicontentController extends JControllerLegacy
 			// Saving has failed check-in and redirect back to the item form,
 			// Redirect back to the edit form reloading the posted data
 			$model->checkin();
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base() );
 			
-			if ( JRequest::getVar('fc_doajax_submit') )
+			if ( $fc_doajax_submit )
 			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
@@ -1010,12 +1025,13 @@ class FlexicontentController extends JControllerLegacy
 		// ****************************************
 		
 		// REDIRECT CASE FOR APPLYING: Save and reload the item edit form
-		if ($task=='apply' || $task=='apply_type') {
+		if ($task=='apply' || $task=='apply_type')
+		{
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			
 			// Create the URL
 			global $globalcats;
-			$Itemid = JRequest::getInt('Itemid', 0);  // maintain current menu item if this was given
+			$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug, $Itemid));
 			$link = $item_url
 				.(strstr($item_url, '?') ? '&' : '?').'task=edit'
@@ -1023,15 +1039,15 @@ class FlexicontentController extends JControllerLegacy
 			
 			// Important pass referer back to avoid making the form itself the referer
 			// but also check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise set referer to HOME page
-			$referer = JRequest::getString('referer', JURI::base(), 'post');
+			$referer = $jinput->get('referer', JURI::base(), 'string');
 			if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base();
 			$return = '&return='.base64_encode( $referer );
 			$link .= $return;
 		}
 		
 		// REDIRECT CASES FOR SAVING
-		else {
-			
+		else
+		{
 			// REDIRECT CASE: Return to a custom page after creating a new item (e.g. a thanks page)
 			if ( $newly_submitted_item && $submit_redirect_url_fe ) {
 				$link = $submit_redirect_url_fe;
@@ -1047,7 +1063,7 @@ class FlexicontentController extends JControllerLegacy
 				$msg = $newly_submitted_item ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
 				
 				// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
-				$link = JRequest::getString('referer', JURI::base(), 'post');
+				$link = $jinput->get('referer', JURI::base(), 'string');
 				if ( ! flexicontent_html::is_safe_url($link) ) {
 					if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$link, 'notice' );
 					$link = JURI::base();
@@ -1068,12 +1084,19 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function approval()
 	{
-		$cid = JRequest::getInt( 'cid', 0 );
+		// Initialize variables
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+
+		$cid  = $jinput->get('cid', 0, 'int');
 		
-		if ( !$cid ) {
+		if ( !$cid )
+		{
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_APPROVAL_SELECT_ITEM_SUBMIT' ) );
-		} else {
+		}
+		else
+		{
 			// ... we use some strings from administrator part
 			// load english language file for 'com_flexicontent' component then override with current language file
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -1082,8 +1105,8 @@ class FlexicontentController extends JControllerLegacy
 			$model = $this->getModel( FLEXI_ITEMVIEW );
 			$msg = $model->approval( array($cid) );
 		}
-		
-		$this->setRedirect( $_SERVER['HTTP_REFERER'], $msg );
+
+		$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base(), $msg );
 	}
 	
 	
@@ -1286,6 +1309,10 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		// Initialize variables
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
 		
 		// Initialize some variables
 		$user    = JFactory::getUser();
@@ -1318,7 +1345,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		// since the task is cancel, we go back to the form referer
-		$referer = JRequest::getString('referer', JURI::base(), 'post');
+		$referer = $jinput->get('referer', JURI::base(), 'string');
 		
 		// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
 		if ( ! flexicontent_html::is_safe_url($referer) ) {
@@ -1338,23 +1365,32 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function vote()
 	{
-		$id = JRequest::getInt('id', 0);
-		$cid = JRequest::getInt('cid', 0);
-		$url = JRequest::getString('url', '');
-		$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
-		
-		// Check that the pased URL variable is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
-		if ( ! $url || ! flexicontent_html::is_safe_url($url) ) {
-			if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
-			$url = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='.$id);
+		// Initialize variables
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+
+		$id   = $jinput->get('id', 0, 'int');
+		$cid  = $jinput->get('cid', 0, 'int');
+		$url  = $jinput->get('url', '', 'string');
+
+		// Check that the given URL variable is 'safe' (allowed), e.g. not an offsite URL
+		if ( ! $url || ! flexicontent_html::is_safe_url($url) )
+		{
+			if (! $url)
+			{
+				$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
+				if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
+			}
+			global $globalcats;
+			$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
+			$url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, $globalcats[$cid]->slug, $Itemid));
 		}
-		
+
 		// Finally store the vote
-		JRequest::setVar('no_ajax', 1);
+		$jinput->set('no_ajax', 1);
 		$this->ajaxvote();
-		
-		$msg = '';
-		$this->setRedirect($url, $msg );
+
+		$this->setRedirect($url);
 	}
 	
 	
@@ -1366,11 +1402,15 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function ajaxfav()
 	{
-		$user  = JFactory::getUser();
-		$db    = JFactory::getDBO();
-		$id    = JRequest::getInt('id', 0);
-		$type  = JRequest::getCMD('type', 'item');
-		if ($type!='item' && $type!='category') {
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$jinput = $app->input;
+
+		$id   = $jinput->get('id', 0, 'int');
+		$type = $jinput->get('type', 'item', 'cmd');
+		if ($type!='item' && $type!='category')
+		{
 			echo 'Type: '. $type .' not supported';
 			jexit();
 		}
@@ -1418,12 +1458,14 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function getreviewform()
 	{
-		$html_tagid = JRequest::getCmd('tagid', '' );
-		$content_id  = JRequest::getInt('content_id', '' );
-		$review_type = JRequest::getCmd('review_type', 'item' );
-		
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db	= JFactory::getDBO();
+		$db   = JFactory::getDBO();
+		$jinput = $app->input;
+
+		$html_tagid  = $jinput->get('tagid', '', 'cmd');
+		$content_id  = $jinput->get('content_id', 0, 'int');
+		$review_type = $jinput->get('review_type', 'item', 'cmd');
 		
 		
 		// ******************************
@@ -1512,22 +1554,25 @@ class FlexicontentController extends JControllerLegacy
 	
 	function storereviewform()
 	{
-		$review_id   = JRequest::getInt('review_id', 0);
-		$content_id  = JRequest::getInt('content_id', '' );
-		$review_type = JRequest::getCmd('review_type', 'item' );
-		
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db	= JFactory::getDBO();
+		$db   = JFactory::getDBO();
+		$jinput = $app->input;
+
+		$review_id   = $jinput->get('review_id', 0, 'int');
+		$content_id  = $jinput->get('content_id', 0, 'int');
+		$review_type = $jinput->get('review_type', 'item', 'cmd');
+
 		$error = false;
-		
+
 		// Validate title
-		$title = flexicontent_html::dataFilter(JRequest::getVar('title'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
+		$title = flexicontent_html::dataFilter($jinput->get('title', '', 'string'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
 		
 		// Validate email
-		$email = $user->id ? $user->email : flexicontent_html::dataFilter(JRequest::getVar('email'), $maxlength=255, 'EMAIL', 0);  // Validate email
+		$email = $user->id ? $user->email : flexicontent_html::dataFilter($jinput->get('email', '', 'string'), $maxlength=255, 'EMAIL', 0);  // Validate email
 		
 		// Validate text
-		$text = flexicontent_html::dataFilter(JRequest::getVar('text'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
+		$text = flexicontent_html::dataFilter($jinput->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
 		
 		
 		// ******************************
@@ -1631,23 +1676,24 @@ class FlexicontentController extends JControllerLegacy
 		$db   = JFactory::getDBO();
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		
-		$no_ajax			= JRequest::getInt('no_ajax');
-		$user_rating	= JRequest::getInt('user_rating');
-		$cid 			= JRequest::getInt('cid');
-		$xid 			= JRequest::getVar('xid');
-		
+		$jinput  = $app->input;
+
+		$no_ajax     = $jinput->get('no_ajax', 0, 'int');
+		$user_rating = $jinput->get('user_rating', 0, 'int');
+		$cid = $jinput->get('cid', 0, 'int');
+		$xid = $jinput->get('xid', '', 'cmd');
+
 		// Compatibility in case the voting originates from joomla's voting plugin
 		if ($no_ajax && !$cid)
 		{
-			$cid = JRequest::getInt('id'); // Joomla 's content plugin uses 'id' HTTP request variable
+			$cid = $jinput->get('id', 0, 'int');  // Joomla 's content plugin uses 'id' HTTP request variable
 		}
-		
-		
+
+
 		// *******************************************************************
 		// Check for invalid xid (according to voting field/type configuration
 		// *******************************************************************
-		
+
 		$xid = empty($xid) ? 'main' : $xid;
 		$int_xid  = (int)$xid;
 		if ($xid!='main' && !$int_xid)
@@ -1656,10 +1702,13 @@ class FlexicontentController extends JControllerLegacy
 			$error = "ajaxvote(): invalid xid '".$xid."' was given";
 			
 			// Set responce
-			if ($no_ajax) {
+			if ($no_ajax)
+			{
 				$app->enqueueMessage( $error, 'notice' );
 				return;
-			} else {
+			}
+			else
+			{
 				$result	= new stdClass();
 				$result->percentage = '';
 				$result->htmlrating = '';
@@ -1900,8 +1949,10 @@ class FlexicontentController extends JControllerLegacy
 			// ***********************************************************
 			
 			// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
-			if ( !$db_itemratings ) {
-				if ($voteIsComplete) {
+			if ( !$db_itemratings )
+			{
+				if ($voteIsComplete)
+				{
 					$query = ' INSERT '.$dbtbl
 						. ' SET content_id = '.(int)$cid.', '
 						. '  lastip = '.$currip_quoted.', '
@@ -1915,7 +1966,8 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			// Voting record exists for this item, check if user has already voted
-			else {
+			else
+			{
 				if ( (int)$_xid && !isset($xids[$_xid]) && $_xid!='main' ) continue;  // just in case there are some old records in session table 'vote_history'
 				//echo $db_itemratings->rating_sum. " - ".$rating_diff. "\n";
 				
@@ -1961,7 +2013,8 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 			
-			if ($_xid=='main') {
+			if ($_xid=='main')
+			{
 				$result->rating_sum_main  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $main_rating_diff : $main_rating);
 				$result->ratingcount_main = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
 				$result->percentage_main  = !$result->ratingcount_main ? 0 : (($result->rating_sum_main / $result->ratingcount_main) * (100 / $rating_resolution));
@@ -1970,8 +2023,10 @@ class FlexicontentController extends JControllerLegacy
 					: '')
 					.($main_counter_show_percentage ? (int)$result->percentage_main.'%' : '');
 			}
+
 			// In case of composite voting being OFF only the above will be added
-			else if ($_xid==$xid) {
+			else if ($_xid==$xid)
+			{
 				$result->rating_sum  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $rating_diff : $_rating);
 				$result->ratingcount = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
 				$result->percentage  = !$result->ratingcount ? 0 : (($result->rating_sum / $result->ratingcount) * (100 / $rating_resolution));
@@ -1990,7 +2045,8 @@ class FlexicontentController extends JControllerLegacy
 		if ($xid=='main') $result->html_main = $html;
 		else $result->html = $html;
 		
-		if ($int_xid) {
+		if ($int_xid)
+		{
 			$result->message = '
 				<div class="fc-mssg fc-warning fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -2011,7 +2067,10 @@ class FlexicontentController extends JControllerLegacy
 					<b>'.($old_main_rating ? (100*($old_main_rating / $max_rating)) .'% => ' : '').  (100*($main_rating / $max_rating)).'%</b>
 				</div>';
 			}
-		} else {
+		}
+
+		else
+		{
 			$result->message_main ='
 				<div class="fc-mssg fc-success fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -2042,21 +2101,24 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function getajaxtags()
 	{
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
+		$jinput  = $app->input;
 
+		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
 		if (!$authorized) return;
 		
-		$id 	= JRequest::getInt('id', 0);
-		$model 	= $this->getModel(FLEXI_ITEMVIEW);
-		$tags 	= $model->getAlltags();
+		$id    = $jinput->get('id', 0, 'int');
+		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$tags  = $model->getAlltags();
 
-		$used = null;
-
-		if ($id) {
+		$used  = null;
+		if ($id)
+		{
 			$used = $model->getUsedtagsIds($id);
 		}
-		if(!is_array($used)){
+		if (!is_array($used))
+		{
 			$used = array();
 		}
 
@@ -2065,8 +2127,10 @@ class FlexicontentController extends JControllerLegacy
 		for( $i = 0, $n; $i < $n; $i++ ){
 			$tag = $tags[$i];
 
-			if( ( $i % 5 ) == 0 ){
-				if( $i != 0 ){
+			if ( ($i % 5) == 0 )
+			{
+				if ($i != 0)
+				{
 					$rsp .= '</div>';
 				}
 				$rsp .=  '<div class="qf_tagline">';
@@ -2092,14 +2156,15 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function addtagx()
 	{
-
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$name = JRequest::getString('name', '');
-		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
+		$jinput  = $app->input;
 
+		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
 		if (!$authorized) return;
-		
-		$model 	= $this->getModel(FLEXI_ITEMVIEW);
+
+		$name  = $jinput->get('name', '', 'string');
+		$model = $this->getModel(FLEXI_ITEMVIEW);
 		$model->addtag($name);
 	}
 	
@@ -2113,17 +2178,32 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		$name 	= JRequest::getString('name', '');
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$cid   = (int)$array[0];
-		
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
+
+		$name = $jinput->get('name', '', 'string');
+		$cid  = $jinput->get('id', array(0), 'array');
+		JArrayHelper::toInteger($cid, array(0));
+		$cid  = (int) $cid[0];
+
+		if ($cid)
+		{
+			echo "0|Tag not found";
+			jexit();
+		}
+
+		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
+		{
+			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
+			jexit();
+		}
+
 		// Check if tag exists (id exists or name exists)
 		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
-		$model 	= new FlexicontentModelTag();
-		//$model 	= $this->getModel('tag');
+		$model = new FlexicontentModelTag();
 		$model->setId($cid);
 		$tag = $model->getTag($name);
-		
+
 		if ($tag && $tag->id)
 		{
 			// Since tag was found just output the loaded tag
@@ -2132,19 +2212,7 @@ class FlexicontentController extends JControllerLegacy
 			echo $id."|".$name;
 			jexit();
 		}
-		
-		if ($cid)
-		{
-			echo "0|Tag not found";
-			jexit();
-		}
-		
-		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
-		{
-			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
-			jexit();
-		}
-		
+
 		// Add the new tag and output it so that it gets loaded by the form
 		try {
 			$result = $model->addtag($name);
@@ -2154,8 +2222,8 @@ class FlexicontentController extends JControllerLegacy
 		}
 		jexit();
 	}
-	
-	
+
+
 	/**
 	 * Add favourite
 	 * deprecated to ajax favs 
@@ -2165,22 +2233,29 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function addfavourite()
 	{
-		$cid 	= JRequest::getInt('cid', 0);
-		$id 	= JRequest::getInt('id', 0);
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
 
-		$model 	= $this->getModel(FLEXI_ITEMVIEW);
-		if ($model->addfav()) {
-			$msg = JText::_( 'FLEXI_FAVOURITE_ADDED' );
-		} else {
-			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_ADDED' ).': '.$model->getError();
-			JError::raiseWarning(500, $msg);
+		$id  = $jinput->get('id', 0, 'int');
+		$cid = $jinput->get('cid', 0, 'int');
+
+		$model = $this->getModel(FLEXI_ITEMVIEW);
+		if ($model->addfav())
+		{
+			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_ADDED'), 'message');
 		}
-		
-		$cache = JFactory::getCache('com_flexicontent');
-		$cache->clean();
+		else
+		{
+			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_NOT_ADDED').': '.$model->getError(), 'error');
+		}
 
-		$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='. $id, false), $msg );
+		global $globalcats;
+		$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
+		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, @ $globalcats[$cid]->slug, $Itemid));
+
+		$this->setRedirect($item_url);
 	}
+
 
 	/**
 	 * Remove favourite
@@ -2191,24 +2266,32 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function removefavourite()
 	{
-		$cid 	= JRequest::getInt('cid', 0);
-		$id 	= JRequest::getInt('id', 0);
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
 
-		$model 	= $this->getModel(FLEXI_ITEMVIEW);
-		if ($model->removefav()) {
-			$msg = JText::_( 'FLEXI_FAVOURITE_REMOVED' );
-		} else {
-			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_REMOVED' ).': '.$model->getError();
-			JError::raiseWarning(500, $msg);
+		$id  = $jinput->get('id', 0, 'int');
+		$cid = $jinput->get('cid', 0, 'int');
+
+		$model = $this->getModel(FLEXI_ITEMVIEW);
+		if ($model->removefav())
+		{
+			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_REMOVED'), 'message');
 		}
-		
-		$cache = JFactory::getCache('com_flexicontent');
-		$cache->clean();
-		
-		if ($cid) {
-			$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='. $id, false), $msg );
-		} else {
-			$this->setRedirect(JRoute::_('index.php?view=favourites', false), $msg );
+		else
+		{
+			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_NOT_REMOVED').': '.$model->getError(), 'error');
+		}
+
+		if ($id)
+		{
+			global $globalcats;
+			$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, @ $globalcats[$cid]->slug, $Itemid));
+			$this->setRedirect($item_url);
+		}
+		else
+		{
+			$this->setRedirect(JRoute::_('index.php?view=favourites'));
 		}
 	}
 
@@ -2284,32 +2367,41 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Import and Initialize some joomla API variables
 		jimport('joomla.filesystem.file');
+
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		$task  = JRequest::getVar( 'task', 'download' );
 		$session = JFactory::getSession();
-		$method  = JRequest::getVar( 'method', 'download' );
+		$jinput  = $app->input;
+
+		$task   = $jinput->get('task', 'download', 'cmd');
+		$method = $jinput->get('method', 'download', 'cmd');
+
 		if ($method!='view' && $method!='download') die('unknown download method:' . $method);
-		
-		
+
+
 		// *******************************************************************************************************************
 		// Single file download (via HTTP request) or multi-file downloaded (via a folder structure in session or in DB table)
 		// *******************************************************************************************************************
-		
+
 		if ($task == 'download_tree')
 		{
 			// TODO: maybe move this part in module
-			$cart_id = JRequest::getVar( 'cart_id', 0 );
-			if (!$cart_id) {
+			$cart_id = $jinput->get('cart_id', 0, 'int');
+			if (!$cart_id)
+			{
 				// Get zTree data and parse JSON string
-				$tree_var = JRequest::getVar( 'tree_var', "" );
-				if ($session->has($tree_var, 'flexicontent')) {
-					$ztree_nodes_json = $session->get($tree_var, false,'flexicontent');
+				$tree_var = $jinput->get('tree_var', '', 'string');
+				if ($session->has($tree_var, 'flexicontent'))
+				{
+					$ztree_nodes_json = $session->get($tree_var, false, 'flexicontent');
 				}
 				$nodes = json_decode($ztree_nodes_json);
-			} else {
-				$cart_token = JRequest::getVar( 'cart_token', '' );
+			}
+
+			else
+			{
+				$cart_token = $jinput->get('cart_token', '', 'cmd');
 				
 				$query = ' SELECT * FROM #__flexicontent_downloads_cart WHERE id='. $cart_id;
 				$db->setQuery( $query );
@@ -2324,7 +2416,8 @@ class FlexicontentController extends JControllerLegacy
 			
 			
 			// Some validation check
-			if ( !is_array($nodes) ) {
+			if ( !is_array($nodes) )
+			{
 				$app->enqueueMessage("Tree structure is empty or invalid", 'notice');
 				$this->setRedirect('index.php', '');
 				return;
@@ -2337,19 +2430,22 @@ class FlexicontentController extends JControllerLegacy
 			$tree_files = $this->_traverseFileTree($nodes, $targetpath);
 			//echo "<pre>"; print_r($tree_files); jexit();
 			
-			if ( empty($tree_files) ) {
+			if ( empty($tree_files) )
+			{
 				$app->enqueueMessage("No files selected for download", 'notice');
 				$this->setRedirect('index.php', '');
 				return;
 			}
-		} else {
+		}
+		else
+		{
 			$file_node = new stdClass();
-			$file_node->fieldid   = JRequest::getInt( 'fid', 0 );
-			$file_node->contentid = JRequest::getInt( 'cid', 0 );
-			$file_node->fileid    = JRequest::getInt( 'id', 0 );
-			
-			$coupon_id    = JRequest::getInt( 'conid', 0 );
-			$coupon_token = JRequest::getString( 'contok', '' );
+			$file_node->fieldid   = $jinput->get('fid', 0, 'int');
+			$file_node->contentid = $jinput->get('cid', 0, 'int');
+			$file_node->fileid    = $jinput->get('id', 0, 'int');
+
+			$coupon_id    = $jinput->get('conid', 0, 'int');
+			$coupon_token = $jinput->get('contok', '', 'string');
 			
 			if ( $coupon_id )
 			{
@@ -2368,14 +2464,17 @@ class FlexicontentController extends JControllerLegacy
 				$db->setQuery( $query );
 				$coupon = $db->loadObject();
 				
-				if ($db->getErrorNum())  {
+				if ($db->getErrorNum())
+				{
 					echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 					jexit();
 				}
 				
-				if ($coupon) {
+				if ($coupon)
+				{
 					$slink_valid_coupon = !$coupon->has_reached_limit && !$coupon->has_expired ;
-					if ( !$slink_valid_coupon ) {
+					if ( !$slink_valid_coupon )
+					{
 						$query = ' DELETE FROM #__flexicontent_download_coupons WHERE id='. $coupon->id;
 						$db->setQuery( $query );
 						$db->execute();
@@ -2386,27 +2485,28 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$tree_files = array($file_node);
 		}
-		
-		
+
+
 		// **************************************************
 		// Create and Execute SQL query to retrieve file info
 		// **************************************************
-		
+
 		// Create SELECT OR JOIN / AND clauses for checking Access
 		$access_clauses['select'] = '';
 		$access_clauses['join']   = '';
 		$access_clauses['and']    = '';
 		$using_access = empty($cart_token_matches) && empty($slink_valid_coupon);
-		if ( $using_access ) {
+		if ( $using_access )
+		{
 			// note CURRENTLY multi-download feature does not use coupons
 			$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = true, $include_file = true );
 		}
-		
-		
+
+
 		// ***************************
 		// Get file data for all files
 		// ***************************
-		
+
 		$fields_props = array();
 		$fields_conf  = array();
 		$valid_files  = array();
@@ -2417,8 +2517,9 @@ class FlexicontentController extends JControllerLegacy
 			$field_id   = (int) $file_node->fieldid;
 			$content_id = (int) $file_node->contentid;
 			$file_id    = (int) $file_node->fileid;
-			
-			if ( !isset($fields_conf[$field_id]) ) {
+
+			if ( !isset($fields_conf[$field_id]) )
+			{
 				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
 				$fld = $db->loadObject();
@@ -2456,7 +2557,8 @@ class FlexicontentController extends JControllerLegacy
 					;
 			$db->setQuery($query);
 			$file = $db->loadObject();
-			if ($db->getErrorNum())  {
+			if ($db->getErrorNum())
+			{
 				echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 				jexit();
 			}
@@ -2906,23 +3008,24 @@ class FlexicontentController extends JControllerLegacy
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		
+		$jinput  = $app->input;
+
 		// Get HTTP REQUEST variables
-		$field_id   = JRequest::getInt( 'fid', 0 );
-		$content_id = JRequest::getInt( 'cid', 0 );
-		$order      = JRequest::getInt( 'ord', 0 );
-		
-		
+		$field_id   = $jinput->get('fid', 0, 'int');
+		$content_id = $jinput->get('cid', 0, 'int');
+		$order      = $jinput->get('ord', 0, 'int');
+
+
 		// **************************************************
 		// Create and Execute SQL query to retrieve file info
 		// **************************************************
-		
+
 		// Create SELECT OR JOIN / AND clauses for checking Access
 		$access_clauses['select'] = '';
 		$access_clauses['join']   = '';
 		$access_clauses['and']    = '';
 		$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = true, $include_file = false );
-		
+
 		$query  = 'SELECT value'
 				. $access_clauses['select']
 				.' FROM #__flexicontent_fields_item_relations AS rel'
@@ -2939,23 +3042,26 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		$link_data = $db->loadObject();
-		if ($db->getErrorNum()) {
+		if ($db->getErrorNum())
+		{
 			echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 			jexit();
 		}
-		
-		
+
+
 		// **************************************************************
 		// Check if file was found AND IF user has required Access Levels
 		// **************************************************************
-		
+
 		if ( empty($link_data) || (!$link_data->has_content_access || !$link_data->has_field_access) )
 		{
-			if (empty($link_data)) {
+			if (empty($link_data))
+			{
 				$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
 			}
-			
-			else {
+
+			else
+			{
 				$msg  = JText::_('FLEXI_ALERTNOTAUTH');
 				$msg .= ""
 					.(!$link_data->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
@@ -2973,28 +3079,29 @@ class FlexicontentController extends JControllerLegacy
 			$this->setRedirect('index.php', '');
 			return;
 		}
-		
-		
+
+
 		// **********************
 		// Increment hits counter
 		// **********************
-		
+
 		// recover the link array (url|title|hits)
 		$link = unserialize($link_data->value);
-		
+
 		// get the url from the array
 		$url = $link['link'];
-		
+
 		// Check if url is absolute aka has protocol, if not check and prepend Joomla 's current root
 		$protocol = parse_url($url, PHP_URL_SCHEME);
-		if (!$protocol) {
+		if (!$protocol)
+		{
 			$url .= (substr($url, 0, 1) == '/')  ?  ''  :  JURI::root(true) . '/';
 		}
-		
+
 		// update the hit count
 		$link['hits'] = (int)$link['hits'] + 1;
 		$value = serialize($link);
-		
+
 		// update the array in the DB
 		$query 	= 'UPDATE #__flexicontent_fields_item_relations'
 				.' SET value = ' . $db->Quote($value)
@@ -3010,8 +3117,8 @@ class FlexicontentController extends JControllerLegacy
 			JError::raiseWarning( 500, $e->getMessage() );
 			return;
 		}
-		
-		
+
+
 		// ***************************
 		// Finally redirect to the URL
 		// ***************************
@@ -3019,8 +3126,8 @@ class FlexicontentController extends JControllerLegacy
 		@header("Location: ".$url."","target=blank");
 		$app->close();
 	}
-	
-	
+
+
 	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
 	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
@@ -3068,7 +3175,11 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
+
+		$app   = JFactory::getApplication();
+		$perms = FlexicontentHelperPerm::getPerm();
+		$jinput = $app->input;
+
 		@ob_end_clean();
 		//header("Content-type:text/json");
 		//header('Content-type: application/json');
@@ -3076,57 +3187,75 @@ class FlexicontentController extends JControllerLegacy
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
-		
-		$perms = FlexicontentHelperPerm::getPerm();
-		if ( !$perms->CanUseTags ) {
+
+		if ( !$perms->CanUseTags )
+		{
 			$array =  array("{\"id\":\"0\",\"name\":\"You have no access\"}");
-		} else {
-			$model   = $this->getModel(FLEXI_ITEMVIEW);
-			$tagobjs = $model->gettags(JRequest::getVar('q'));
-			$array   = array();
-			if ($tagobjs) foreach($tagobjs as $tag) {
+		}
+		else
+		{
+			$model = $this->getModel(FLEXI_ITEMVIEW);
+			$tagobjs = $model->gettags($jinput->get('q', '', 'string'));
+
+			$array = array();
+			if ($tagobjs) foreach($tagobjs as $tag)
+			{
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
-			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"".($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found')."\"}");
+
+			if (empty($array))
+			{
+				$array[] = "{\"id\":\"0\",\"name\":\"" . ($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found') . "\"}";
+			}
 		}
-		
+
 		echo "[\n" . implode(",\n", $array) . "\n]";
 		exit;
 	}
-	
-	
+
+
 	function search()
 	{
+		$app = JFactory::getApplication();
+		$jinput = $app->input;
+
 		// Strip characters that will cause errors
 		$badchars = array('#','>','<','\\'); 
-		$searchword = trim(str_replace($badchars, '', JRequest::getString('searchword', JRequest::getString('q'))));
-		
+		$searchword = $jinput->get('q', '', 'string');
+		$searchword = $jinput->get('searchword', $searchword, 'string');
+		$searchword = trim( str_replace($badchars, '', $searchword) );
+
 		// If searchword is enclosed in double quotes, then strip quotes and do exact phrase matching
-		if (substr($searchword,0,1) == '"' && substr($searchword, -1) == '"') { 
+		if (substr($searchword,0,1) == '"' && substr($searchword, -1) == '"')
+		{
 			$searchword = substr($searchword,1,-1);
-			JRequest::setVar('p', 'exact');
-			JRequest::setVar('searchphrase', 'exact');
-			JRequest::setVar('q', $searchword);
-			JRequest::setVar('searchword', $searchword);
+			$jinput->set('p', 'exact');
+			$jinput->set('searchphrase', 'exact');
+			$jinput->set('q', $searchword);
+			$jinput->set('searchword', $searchword);
 		}
 		
 		// If no current menu itemid, then set it using the first menu item that points to the search view
-		if (!JRequest::getVar('Itemid', 0)) {
+		$Itemid = $jinput->get('Itemid', 0, 'int');
+		if (!$Itemid)
+		{
 			$menus = JFactory::getApplication()->getMenu();
 			$items = $menus->getItems('link', 'index.php?option=com_flexicontent&view=search');
-	
-			if(isset($items[0])) {
-				JRequest::setVar('Itemid', $items[0]->id);
+
+			if(isset($items[0]))
+			{
+				$jinput->set('Itemid', $items[0]->id);
 			}
 		}
-		
+
 		// Go through display task of this controller instead of parent class, so that cacheable and safeurlparams can be decided properly
-		JRequest::setVar('view', 'search');
+		$jinput->set('view', 'search');
 		$this->display();
 	}
 	
 	
-	function doPlgAct() {
+	function doPlgAct()
+	{
 		FLEXIUtilities::doPlgAct();
 	}
 }

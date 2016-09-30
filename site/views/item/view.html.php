@@ -42,12 +42,15 @@ class FlexicontentViewItem  extends JViewLegacy
 	function display( $tpl = null )
 	{
 		// check for form layout
-		if($this->getLayout() == 'form' || in_array(JRequest::getVar('task'), array('add','edit')) ) {
-			// Important set layout to be form since various category view SEF links have this variable set
+		if($this->getLayout() == 'form' || in_array(JRequest::getVar('task'), array('add','edit')) )
+		{
+			// Important set layout to be form since various category view SEF links may have this variable set
 			$this->setLayout('form');
 			$this->_displayForm($tpl);
 			return;
-		} else {
+		}
+		else
+		{
 			$this->setLayout('item');
 		}
 
@@ -96,6 +99,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
 		$start_microtime = microtime(true);
+
 		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -575,6 +579,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Load JS/CSS files
 		// *****************
 		
+		// Add JS frameworks
 		$has_J2S = false;
 		foreach ($fields as $field)
 		{
@@ -699,11 +704,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		$hasTmpEdit = false;
 		$hasCoupon  = false;
 		// Check session
-		if ($session->has('rendered_uneditable', 'flexicontent')) {
+		if ($session->has('rendered_uneditable', 'flexicontent'))
+		{
 			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 			$hasTmpEdit = !empty( $rendered_uneditable[$model->get('id')] );
 			$hasCoupon  = !empty( $rendered_uneditable[$model->get('id')] ) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 		}
+
 		if (!$isnew)
 		{
 			// EDIT action
@@ -722,7 +729,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			$canEdit = $model->getItemAccess()->get('access-edit');
 			
 			// If no edit privilege, check if edit COUPON was provided
-			if ( !$canEdit ) {
+			if ( !$canEdit )
+			{
 				$edittok = JRequest::getCmd('edittok', false);
 				if ($edittok)
 				{
@@ -748,8 +756,10 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 			
 			// Edit check finished, throw error if needed
-			if (!$canEdit) {
-				if ($user->guest) {
+			if (!$canEdit)
+			{
+				if ($user->guest)
+				{
 					$uri		= JFactory::getURI();
 					$return		= $uri->toString();
 					$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
@@ -762,18 +772,24 @@ class FlexicontentViewItem  extends JViewLegacy
 
 					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
 					$app->redirect( $url );
-				} else if ($unauthorized_page) {
+				}
+				else if ($unauthorized_page)
+				{
 					//  unauthorized page via global configuration
 					JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 					$app->redirect($unauthorized_page);
-				} else {
+				}
+				else
+				{
 					// user isn't authorize to edit this content
 					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
 					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 				}
 			}
+		}
 
-		} else {
+		else
+		{
 			// CREATE action
 			// Get create access, this includes check of creating in at least one category, and type's "create items"
 			$canAdd = $model->getItemAccess()->get('access-create');
@@ -781,7 +797,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			$canAssignToCategory = $canAdd || $overrideCategoryACL;  // can create in any category -OR- category ACL override is enabled
 			
 			// Check if Content Type can be created by current user
-			if ( empty($canCreateType) ) {
+			if ( empty($canCreateType) )
+			{
 				if ($new_typeid) {
 					// not needed, already done be model when type_id is set, check and remove
 					$canCreateType = $model->canCreateType( array($new_typeid) );  // Can create given Content Type
@@ -1044,7 +1061,8 @@ class FlexicontentViewItem  extends JViewLegacy
 	{
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();	// get current user
-		$item     = $this->get('Item');		// get the item from the model
+		$model    = $this->getModel();
+		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO means unversioned data
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 
@@ -1135,11 +1153,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
 		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
 		
-		// *** BOF: J2.5 SPECIFIC SELECT LISTS
-		if (FLEXI_J16GE)
-		{
-		}
-		// *** EOF: J1.5 SPECIFIC SELECT LISTS
 		
 		// build version approval list
 		$fieldname = 'jform[vstate]';
@@ -1255,10 +1268,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
 		if ( 1 )
 		{
-			if ($params->get('cid_allowed_parent')) {
+			if ($params->get('cid_allowed_parent'))
+			{
 				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$params->get('cid_allowed_parent'), $depth_limit=0);
 				$disabled_cats = $params->get('cid_allowed_parent_disable', 1) ? array($params->get('cid_allowed_parent')) : array();
-			} else {
+			}
+			else
+			{
 				$cid_tree = & $categories;
 				$disabled_cats = array();
 			}
@@ -1312,7 +1328,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
 		
-		if ($params->get('catid_allowed_parent')) {
+		if ($params->get('catid_allowed_parent'))
+		{
 			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$params->get('catid_allowed_parent'), $depth_limit=0);
 			$disabled_cats = $params->get('catid_allowed_parent_disable', 1) ? array($params->get('catid_allowed_parent')) : array();
 		} else {
@@ -1386,15 +1403,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		$disable_langs = $params->get('disable_languages_fe', array());
 		
 		// Build languages list
-		if (FLEXI_J16GE || FLEXI_FISH) {
-			$item_lang = $item->language;  // Model has already set default language according to parameters
-			$langdisplay = $params->get('langdisplay_fe', 2);
-			$langconf = array();
-			$langconf['flags'] = $params->get('langdisplay_flags_fe', 1);
-			$langconf['texts'] = $params->get('langdisplay_texts_fe', 1);
-			$field_attribs = $langdisplay==2 ? 'class="use_select2_lib"' : '';
-			$lists['languages'] = flexicontent_html::buildlanguageslist( 'jform[language]', $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
-		}
+		$item_lang = $item->language;  // Model has already set default language according to parameters
+		$langdisplay = $params->get('langdisplay_fe', 2);
+		$langconf = array();
+		$langconf['flags'] = $params->get('langdisplay_flags_fe', 1);
+		$langconf['texts'] = $params->get('langdisplay_texts_fe', 1);
+		$field_attribs = $langdisplay==2 ? 'class="use_select2_lib"' : '';
+		$lists['languages'] = flexicontent_html::buildlanguageslist( 'jform[language]', $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
 
 		return $lists;
 	}
