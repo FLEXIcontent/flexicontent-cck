@@ -3226,6 +3226,10 @@ table.adminlist.fcmanlist {
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
 	margin: 0 6px 0 2px !important;
 }
+.flexicontent #fc-filters-box .fc-filter [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
+.flexicontent #fc-filters-box .fc-filter [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen {
+	white-space: nowrap !important;
+}
 .flexicontent #fc-filters-box .fc-filter .label {
 	font-size: 11px;
 	padding: 4px 4px;
