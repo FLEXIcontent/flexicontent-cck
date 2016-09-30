@@ -50,8 +50,8 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		
 		$document	= JFactory::getDocument();
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
 		
 		$mod_params	= $field->parameters->get( 'mod_params', '') ;
 		$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);

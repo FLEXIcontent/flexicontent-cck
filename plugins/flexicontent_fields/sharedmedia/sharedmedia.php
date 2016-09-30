@@ -118,6 +118,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		
 		$js = "";
 		$css = "";
+		$field_name_js = str_replace('-', '_', $field->name);
 		
 		if ($multiple) // handle multiple records
 		{
@@ -171,8 +172,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_'+el_name);
 				}
 				newField.find('.sm_preview').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview');
-				newField.find('.sm_fetch_btn').attr('onclick','fetchData_".$field->name."(\'".$elementid."_'+uniqueRowNum".$field->id."+'\')');
-				newField.find('.sm_clear_btn').attr('onclick','clearData_".$field->name."(\'".$elementid."_'+uniqueRowNum".$field->id."+'\')');
+				newField.find('.sm_fetch_btn').attr('onclick','fetchData_".$field_name_js."(\'".$elementid."_'+uniqueRowNum".$field->id."+'\')');
+				newField.find('.sm_clear_btn').attr('onclick','clearData_".$field_name_js."(\'".$elementid."_'+uniqueRowNum".$field->id."+'\')');
 				newField.find('.fcfield_sm_mssg').attr('id','fcfield_sm_mssg_".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 			
@@ -195,7 +196,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				jQuery('#' + element_id + '_url').val('');
 				
 				// Clear and hide old value fields
-				clearData_".$field->name."(element_id);
+				clearData_".$field_name_js."(element_id);
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -264,28 +265,28 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		
 		// JS CODE to handle fetching media DATA
 		$js .= '
-		var fc_mediaID_'.$field->name.';
-		var fc_elemID_'.$field->name.';
+		var fc_mediaID_'.$field_name_js.';
+		var fc_elemID_'.$field_name_js.';
 		
 		
-		function clearData_'.$field->name.'(element_id)
+		function clearData_'.$field_name_js.'(element_id)
 		{
 			// Clear embed Data and its preview HTML
-			setEmbedData_'.$field->name.'("", "", element_id);
+			setEmbedData_'.$field_name_js.'("", "", element_id);
 			
 			// Clear META Data
-			setMetaData_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""}, element_id);
+			setMetaData_'.$field_name_js.'({title:"", author:"", duration:"", description:"", thumb:""}, element_id);
 			
 			// Clear other data
 			jQuery("#" + element_id + "_height").val("");
 			jQuery("#" + element_id + "_width").val("");
 			
 			// Hide the value rows
-			toggleMETArows_'.$field->name.'(element_id, -1);
+			toggleMETArows_'.$field_name_js.'(element_id, -1);
 		}
 		
 		
-		function fetchData_'.$field->name.'(element_id)
+		function fetchData_'.$field_name_js.'(element_id)
 		{
 			element_id = typeof element_id === "undefined" || !element_id  ?  "'.$elementid.'_0" : element_id;
 			var msg_box = jQuery("#fcfield_sm_mssg_"+element_id);
@@ -294,7 +295,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			msg_box.html("");
 			
 			// Clear existing value
-			clearData_'.$field->name.'(element_id);
+			clearData_'.$field_name_js.'(element_id);
 			
 			// if URL field is empty then nothing to do, else continue with creating the fetch URL
 			var url = jQuery("#"+element_id+"_url").val();
@@ -332,8 +333,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 			
 			// Global variables, needed if set-embed-data functions are called as callbacks, thus these can not be passed as parameters
-			fc_elemID_'.$field->name.' = element_id;
-			fc_mediaID_'.$field->name.' = mediaID;
+			fc_elemID_'.$field_name_js.' = element_id;
+			fc_mediaID_'.$field_name_js.' = mediaID;
 			
 			// Create AJAX url
 			var ajax_url;
@@ -343,15 +344,15 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				'.($debug_to_console ? 'window.console.log("Media ID: "+mediaID);' : '').'
 				switch(apiType)
 				{
-					case "youtube"    : ajax_url = "https://www.googleapis.com/youtube/v3/videos?id="+mediaID+"&key='.$youtube_key.'&part=snippet,contentDetails,statistics,status";/*&callback=youtubeCallback_'.$field->name.'";*/  break;
-					case "vimeo"      : ajax_url = "//vimeo.com/api/v2/video/"+mediaID+".json";/*?callback=vimeoCallback_'.$field->name.'";*/  break;
-					case "dailymotion": ajax_url = "https://api.dailymotion.com/video/"+mediaID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title";/*&callback=dailymotionCallback_'.$field->name.'";*/  break;
+					case "youtube"    : ajax_url = "https://www.googleapis.com/youtube/v3/videos?id="+mediaID+"&key='.$youtube_key.'&part=snippet,contentDetails,statistics,status";/*&callback=youtubeCallback_'.$field_name_js.'";*/  break;
+					case "vimeo"      : ajax_url = "//vimeo.com/api/v2/video/"+mediaID+".json";/*?callback=vimeoCallback_'.$field_name_js.'";*/  break;
+					case "dailymotion": ajax_url = "https://api.dailymotion.com/video/"+mediaID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title";/*&callback=dailymotionCallback_'.$field_name_js.'";*/  break;
 				}
 				ajax_type = "json";
 			}
 			else {
 				// try embed.ly
-				ajax_url = "https://api.embed.ly/1/oembed?url="+encodeURIComponent(url)+"&key='.$embedly_key.'&maxwidth=1280&wmode=transparent&secure='.$force_ssl.'&autoplay='.$autostart.'&callback=_cbfunc_'.$field->name.'";
+				ajax_url = "https://api.embed.ly/1/oembed?url="+encodeURIComponent(url)+"&key='.$embedly_key.'&maxwidth=1280&wmode=transparent&secure='.$force_ssl.'&autoplay='.$autostart.'&callback=_cbfunc_'.$field_name_js.'";
 				ajax_type = "html";
 			}
 			
@@ -363,7 +364,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					'.($debug_to_console ? 'window.console.log("Received Server response");' : '').'
 					var response;
 					try {
-						if (ajax_type=="html") 	data = data.replace(/_cbfunc_'.$field->name.'\(/, "").replace(/\)?;?$/, "");
+						if (ajax_type=="html") 	data = data.replace(/_cbfunc_'.$field_name_js.'\(/, "").replace(/\)?;?$/, "");
 						response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
 						'.($debug_to_console ? 'window.console.log("Calling callback "+(apiType ? apiType : "embedly")+" function on data:");' : '').'
 						'.($debug_to_console ? 'window.console.log(response);' : '').'
@@ -371,13 +372,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 						{
 							switch(apiType)
 							{
-								case "youtube"     : youtubeCallback_'.$field->name.'(response, mediaID, element_id);  break;
-								case "vimeo"       : vimeoCallback_'.$field->name.'(response, mediaID, element_id);  break;
-								case "dailymotion" : dailymotionCallback_'.$field->name.'(response, mediaID, element_id);  break;
+								case "youtube"     : youtubeCallback_'.$field_name_js.'(response, mediaID, element_id);  break;
+								case "vimeo"       : vimeoCallback_'.$field_name_js.'(response, mediaID, element_id);  break;
+								case "dailymotion" : dailymotionCallback_'.$field_name_js.'(response, mediaID, element_id);  break;
 							}
 						}
 						else {
-							embedlyCallback_'.$field->name.'(response, element_id);
+							embedlyCallback_'.$field_name_js.'(response, element_id);
 						}
 					} catch(err) {
 						msg_box.html("<span class=\"alert alert-warning fc-iblock\">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_RESPONSE_PARSING_FAILED', true).': "+err.message+"</span>");
@@ -400,7 +401,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function youtubeDurationToSeconds_'.$field->name.'(duration)
+		function youtubeDurationToSeconds_'.$field_name_js.'(duration)
 		{
 		  var match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
 		  var hours = (parseInt(match[1]) || 0);
@@ -410,19 +411,19 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function youtubeCallback_'.$field->name.'(data, mediaID, element_id)
+		function youtubeCallback_'.$field_name_js.'(data, mediaID, element_id)
 		{
-			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field->name.' : mediaID;    // *** mediaID not set if called as callback
-			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field->name.' : element_id;    // *** element_id not set if called as callback
+			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field_name_js.' : mediaID;    // *** mediaID not set if called as callback
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;    // *** element_id not set if called as callback
 			
 			if (typeof data === "object" && typeof data.error === "undefined" ) {
 				if (data.items.length == 0) {
 					jQuery("#fcfield_sm_mssg_" + element_id).html("<span class=\"alert alert-warning fc-iblock\">Not found</span>");
 					return;
 				}
-				toggleMETArows_'.$field->name.'(element_id, 1);
-				setEmbedData_'.$field->name.'("youtube", mediaID, element_id);
-				setMetaData_'.$field->name.'({title: data.items[0].snippet.title, author: data.items[0].snippet.channelTitle, duration: youtubeDurationToSeconds_'.$field->name.'(data.items[0].contentDetails.duration), description: data.items[0].snippet.description, thumb: data.items[0].snippet.thumbnails.medium.url}, element_id);
+				toggleMETArows_'.$field_name_js.'(element_id, 1);
+				setEmbedData_'.$field_name_js.'("youtube", mediaID, element_id);
+				setMetaData_'.$field_name_js.'({title: data.items[0].snippet.title, author: data.items[0].snippet.channelTitle, duration: youtubeDurationToSeconds_'.$field_name_js.'(data.items[0].contentDetails.duration), description: data.items[0].snippet.description, thumb: data.items[0].snippet.thumbnails.medium.url}, element_id);
 				jQuery("#fcfield_sm_mssg_" + element_id).html("");
 			} else {
 				var errorText = typeof data === "object" ? data.error.message : data;
@@ -431,15 +432,15 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function vimeoCallback_'.$field->name.'(data, mediaID, element_id)
+		function vimeoCallback_'.$field_name_js.'(data, mediaID, element_id)
 		{
-			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field->name.' : mediaID;    // *** mediaID not set if called as callback
-			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field->name.' : element_id;    // *** element_id not set if called as callback
+			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field_name_js.' : mediaID;    // *** mediaID not set if called as callback
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;    // *** element_id not set if called as callback
 			
 			if (typeof data === "object" && data.type != "error") {
-				toggleMETArows_'.$field->name.'(element_id, 1);
-				setEmbedData_'.$field->name.'("vimeo", mediaID, element_id);
-				setMetaData_'.$field->name.'({title: data[0].title, author: data[0].user_name, duration: data[0].duration, description: data[0].description, thumb: data[0].thumbnail_small}, element_id);
+				toggleMETArows_'.$field_name_js.'(element_id, 1);
+				setEmbedData_'.$field_name_js.'("vimeo", mediaID, element_id);
+				setMetaData_'.$field_name_js.'({title: data[0].title, author: data[0].user_name, duration: data[0].duration, description: data[0].description, thumb: data[0].thumbnail_small}, element_id);
 				jQuery("#fcfield_sm_mssg_" + element_id).html("");
 			} else {
 				var errorText = typeof data === "object" ? data.error_message : data;
@@ -448,15 +449,15 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function dailymotionCallback_'.$field->name.'(data, mediaID, element_id)
+		function dailymotionCallback_'.$field_name_js.'(data, mediaID, element_id)
 		{
-			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field->name.' : mediaID;    // *** mediaID not set if called as callback
-			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field->name.' : element_id;    // *** element_id not set if called as callback
+			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field_name_js.' : mediaID;    // *** mediaID not set if called as callback
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;    // *** element_id not set if called as callback
 			
 			if (typeof data === "object" && typeof data.error === "undefined") {
-				toggleMETArows_'.$field->name.'(element_id, 1);
-				setEmbedData_'.$field->name.'("dailymotion", mediaID, element_id);
-				setMetaData_'.$field->name.'({title: data.title, author: data["owner.screenname"], duration: data.duration, description: data.description, thumb: data.thumbnail_60_url}, element_id);
+				toggleMETArows_'.$field_name_js.'(element_id, 1);
+				setEmbedData_'.$field_name_js.'("dailymotion", mediaID, element_id);
+				setMetaData_'.$field_name_js.'({title: data.title, author: data["owner.screenname"], duration: data.duration, description: data.description, thumb: data.thumbnail_60_url}, element_id);
 				jQuery("#fcfield_sm_mssg_" + element_id).html("");
 			} else {
 				var errorText = typeof data === "object" ? data.error.message : data;
@@ -465,9 +466,9 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function embedlyCallback_'.$field->name.'(data, element_id)
+		function embedlyCallback_'.$field_name_js.'(data, element_id)
 		{
-			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field->name.' : element_id;    // *** element_id not set if called as callback
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;    // *** element_id not set if called as callback
 			
 			if (typeof data === "object" && data.type != "error") {
 				if (data.type == "video" || data.type == "rich")
@@ -475,10 +476,10 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					var urlregex = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 					if (data.html.match(urlregex) != null)
 					{
-						toggleMETArows_'.$field->name.'(element_id, 1);
+						toggleMETArows_'.$field_name_js.'(element_id, 1);
 						var embed_url = data.html.match(urlregex)[0];
-						setEmbedData_'.$field->name.'("embed.ly:"+data.provider_name.toLowerCase(), embed_url, element_id);
-						setMetaData_'.$field->name.'({title: data.title, author: data.author_name, duration: "", description: data.description, thumb: data.thumbnail_url}, element_id);
+						setEmbedData_'.$field_name_js.'("embed.ly:"+data.provider_name.toLowerCase(), embed_url, element_id);
+						setMetaData_'.$field_name_js.'({title: data.title, author: data.author_name, duration: "", description: data.description, thumb: data.thumbnail_url}, element_id);
 						jQuery("#fcfield_sm_mssg_" + element_id).html("");
 					} else {
 						jQuery("#fcfield_sm_mssg_" + element_id).html("IFRAME SRC parameter not found in response");
@@ -496,10 +497,10 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function setEmbedData_'.$field->name.'(apiType, mediaID, element_id)
+		function setEmbedData_'.$field_name_js.'(apiType, mediaID, element_id)
 		{
-			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field->name.' : mediaID;
-			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field->name.' : element_id;
+			mediaID = typeof mediaID === "undefined" || !mediaID  ?  fc_mediaID_'.$field_name_js.' : mediaID;
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;
 			
 			if (apiType=="") mediaID = "";
 			document.getElementById(element_id+"_api_type").value  = apiType;
@@ -521,7 +522,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				}
 				preview_html += mediaID + \'" style="width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;" allowFullScreen></iframe>\';
 				document.getElementById(element_id+"_preview").innerHTML = preview_html;
-				setTimeout(function() { setHeight_'.$field->name.'("iframe.sharedmedia", 2/3); }, 200);
+				setTimeout(function() { setHeight_'.$field_name_js.'("iframe.sharedmedia", 2/3); }, 200);
 			}
 			else {
 				document.getElementById(element_id+"_preview").innerHTML = "";
@@ -529,9 +530,9 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		
-		function setMetaData_'.$field->name.'(data, element_id)
+		function setMetaData_'.$field_name_js.'(data, element_id)
 		{
-			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field->name.' : element_id;
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;
 			
 			jQuery("#"+element_id+"_title").val(data.title);
 			jQuery("#"+element_id+"_author").val(data.author);
@@ -540,7 +541,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			jQuery("#"+element_id+"_thumb").val(data.thumb);
 		}
 		
-		function toggleMETArows_'.$field->name.'(element_id, action)
+		function toggleMETArows_'.$field_name_js.'(element_id, action)
 		{
 			action = typeof action === "undefined" ? 0 : action;
 			if (action==1)
@@ -551,7 +552,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").closest("tr").toggle(0);  // compatibility ?: toggle instantly
 		}
 		
-		function setHeight_'.$field->name.'(selector, factor)
+		function setHeight_'.$field_name_js.'(selector, factor)
 		{
 			jQuery(selector).each( function() {
 	  		jQuery(this).css("height", parseInt(factor*jQuery(this).width()));
@@ -559,13 +560,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		jQuery(window).resize(function() {
-			setHeight_'.$field->name.'("iframe.sharedmedia", 2/3);
+			setHeight_'.$field_name_js.'("iframe.sharedmedia", 2/3);
 		});
 		
 		jQuery(document).ready(function(){
-			setHeight_'.$field->name.'("iframe.sharedmedia", 2/3);
+			setHeight_'.$field_name_js.'("iframe.sharedmedia", 2/3);
 			jQuery(document).on("mouseenter", ".fcfieldval_container_'.$field->id.'", function(event) {
-				setHeight_'.$field->name.'("iframe.sharedmedia", 2/3);
+				setHeight_'.$field_name_js.'("iframe.sharedmedia", 2/3);
 			});
 		});
 		';
@@ -664,10 +665,10 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				</tr>
 				<tr>
 					<td style="text-align:right; padding:0 8px 4px 0;">
-						<a href="javascript:;" class="btn btn-primary btn-small sm_fetch_btn" id="'.$elementid_n.'_fetch_btn" title="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'" onclick="fetchData_'.$field->name.'(\''.$elementid_n.'\'); return false;"><i class="icon-loop"></i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'</a>
+						<a href="javascript:;" class="btn btn-primary btn-small sm_fetch_btn" id="'.$elementid_n.'_fetch_btn" title="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'" onclick="fetchData_'.$field_name_js.'(\''.$elementid_n.'\'); return false;"><i class="icon-loop"></i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'</a>
 					</td>
 					<td style="text-align:left; padding:0 8px 4px 0;">
-						'.($use_ingroup ? '<a href="javascript:;" class="btn btn-warning btn-small sm_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearData_'.$field->name.'(\''.$elementid_n.'\'); return false;" ><i class="icon-cancel"></i>'.JText::_('FLEXI_CLEAR').'</a>' : '').'
+						'.($use_ingroup ? '<a href="javascript:;" class="btn btn-warning btn-small sm_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearData_'.$field_name_js.'(\''.$elementid_n.'\'); return false;" ><i class="icon-cancel"></i>'.JText::_('FLEXI_CLEAR').'</a>' : '').'
 						<input type="hidden" class="sm_embed_url" id="'.$elementid_n.'_embed_url" name="'.$fieldname_n.'[embed_url]" value="'.htmlspecialchars($value['embed_url'], ENT_COMPAT, 'UTF-8').'" />
 					</td>
 				</tr>
