@@ -99,32 +99,6 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		}
 
 
-
-		// ******************
-		// SCOPE PARAMETERS
-		// ******************
-		
-		// categories scope parameters
-		$method_cat = $field->parameters->get('method_cat', 1);
-		$usesubcats = $field->parameters->get('usesubcats', 0 );
-		
-		$catids = $field->parameters->get('catids');
-		if ( empty($catids) )							$catids = array();
-		else if ( ! is_array($catids) )		$catids = !FLEXI_J16GE ? array($catids) : explode("|", $catids);
-				
-		// types scope parameters
-		$method_types = $field->parameters->get('method_types', 1);
-		
-		$types = $field->parameters->get('types');
-		if ( empty($types) )							$types = array();
-		else if ( ! is_array($types) )		$types = !FLEXI_J16GE ? array($types) : explode("|", $types);
-		
-		// other limits of scope parameters
-		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
-		$onlypublished = $field->parameters->get( 'onlypublished', 1 );
-		$ownedbyuser   = $field->parameters->get( 'ownedbyuser', 0 );
-		
-		
 		// ******************
 		// EDITING PARAMETERS
 		// ******************
@@ -138,74 +112,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$required 	= $required ? ' required' : '';
 		$selected_items_label = $field->parameters->get( 'selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL' ) ;
 		$selected_items_sortable = $field->parameters->get( 'selected_items_sortable', 0 ) ;
-		
-		
-		// ***********************************************
-		// Get & check Global category related permissions
-		// ***********************************************
-		
-		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-		
-		
-		// ****************************************************
-		// Calculate categories to use for retrieving the items
-		// ****************************************************
-		
-		$allowed_cats = $disallowed_cats = false;
-		
-		// Get user allowed categories
-		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false, $check_published = true);
-		//$usercats = FlexicontentHelperPerm::returnAllCats($check_published=true, $specific_catids=null);
-		
-		// Find (if configured) , descendants of the categories
-		if ($usesubcats) {
-			global $globalcats;
-			$_catids = array();
-			foreach ($catids as $catid) {
-				$subcats = $globalcats[$catid]->descendantsarray;
-				foreach ($subcats as $subcat)  $_catids[(int)$subcat] = 1;
-			}
-			$catids = array_keys($_catids);
-		}
-		
-		
-		// **************
-		// CATEGORY SCOPE
-		// **************
-		
-		// Include method
-		if ( $method_cat == 3 ) {
-			
-			$allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);
-			if ( !empty($allowed_cats) ) {
-				$where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
-			} else {
-				$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
-				return;
-			}
-		}
-		
-		// Exclude method
-		else if ( $method_cat == 2 ) {
-			$disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);
-			if ( !empty($disallowed_cats) ) {
-				$where[] = " rel.catid NOT IN (".implode(',',$disallowed_cats ).") ";
-			}
-		}
-		
-		// ALL user allowed categories
-		else if (!$viewallcats) {
-			$allowed_cats = $usercats;
-			if ( !empty($allowed_cats) ) {
-				$where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
-			} else {
-				$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_ANY_CATEGORIES');
-				return;
-			}
-		}
-		
-		
+
+
 		// *****************************************************
 		// Item retrieving query ... put together and execute it
 		// *****************************************************
@@ -225,51 +133,25 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// *******************************************************
 		// Create category tree to use for selecting related items
 		// *******************************************************
+
+		// Get categories without filtering
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
-		$tree = flexicontent_cats::getCategoriesTree();  // Get categories without filtering
-		if ($allowed_cats) {
-			foreach ($allowed_cats as $catid) {
-				$allowedtree[$catid] = $tree[$catid];
-			}
+		$tree = flexicontent_cats::getCategoriesTree();
+
+		// Get allowed categories
+		$allowed_cats = self::getAllowedCategories($field);
+		if (empty($allowed_cats))
+		{
+			$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
+			return;
 		}
-		if ($disallowed_cats) {
-			foreach ($disallowed_cats as $catid) {
-				unset($tree[$catid]);
-			}
-			$allowedtree = & $tree;
+
+		// Add categories that will be used by the category selector
+		foreach ($allowed_cats as $catid)
+		{
+			$allowedtree[$catid] = $tree[$catid];
 		}
-		if (!$allowed_cats && !$disallowed_cats) {
-			$allowedtree = & $tree;
-		}
-		
-		
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
-		
-		static $common_css_js_added = false;
-	  if ( !$common_css_js_added )
-	  {
-			$common_css_js_added = true;
-			flexicontent_html::loadFramework('select2');
-			
-			$css = '';
-			if ($css) $document->addStyleDeclaration($css);
-		}
-		
-    // The split up the items
-		$items_options_select = '';
-		$state_shortname = array(1=>'P', 0=>'U', -1=>'A', -3=>'PE', -4=>'OQ', -5=>'IP');
-		foreach($items_arr as $itemdata) {
-			$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
-			if ($prepend_item_state) {
-				$statestr = "[". @$state_shortname[$itemdata->state]."] ";
-				$itemtitle = $statestr.$itemtitle." ";
-			}
-			$itemid = $itemdata->id;
-			$items_options_select .= '<option selected="selected" value="'.$_itemids_catids[$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
-		}
-		
+
 		$cat_selected = count($allowedtree)==1 ? reset($allowedtree) : '';
 		$cat_selecor_box_style = count($allowedtree)==1 ? 'style="display:none;" ' :'';
 		
@@ -281,6 +163,45 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
 			$skip_subtrees=array(), $disable_subtrees=array()
 		);
+
+
+		// *************************************************************
+    // Create the selected items field (items selected as 'related')
+		// *************************************************************
+
+		$items_options_select = '';
+		$state_shortname = array(1=>'P', 0=>'U', -1=>'A', -3=>'PE', -4=>'OQ', -5=>'IP');
+		foreach($items_arr as $itemdata)
+		{
+			$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
+			if ($prepend_item_state)
+			{
+				$statestr = "[". @$state_shortname[$itemdata->state]."] ";
+				$itemtitle = $statestr.$itemtitle." ";
+			}
+			$itemid = $itemdata->id;
+			$items_options_select .= '<option selected="selected" value="'.$_itemids_catids[$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
+		}
+
+
+		// *************
+		// Add needed JS
+		// *************
+
+		static $common_css_js_added = false;
+	  if ( !$common_css_js_added )
+	  {
+			$common_css_js_added = true;
+			flexicontent_html::loadFramework('select2');
+			
+			$css = '';
+			if ($css) $document->addStyleDeclaration($css);
+		}
+
+
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
 
 		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . $required . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$field->html .= '
@@ -366,7 +287,13 @@ jQuery(document).ready(function()
 		var catid = parseInt(cat_selector.val());
 		
 		var item_selector = jQuery('#".$elementid."_item_selector');
-		if (!catid) {
+
+		// Remove any previous error message
+		item_selector.parent().find('.fc-relation-field-error').remove();
+
+		// Check for empty category
+		if (!catid)
+		{
 			item_selector.empty();
 			item_selector.append('<option value=\"\">-</option>');
 			item_selector.val('').trigger('change');  // trigger change event to update select2 display
@@ -405,7 +332,7 @@ jQuery(document).ready(function()
 			item_selector.empty();
 			
 			if (data=='')                   item_selector.append('<option value=\"\">".JText::_('FLEXI_RIFLD_ERROR')."</option>');
-			else if (data.error!='')        item_selector.append('<option value=\"\">'+data.error+'</option>');
+			else if (data.error!='')        item_selector.append('<option value=\"\">-</option>');
 			else if (!data.options.length)  item_selector.append('<option value=\"\">".JText::_('FLEXI_RIFLD_NO_ITEMS')."</option>');
 			else {
 				item_selector.append('<option value=\"\">'+'- ".JText::_('FLEXI_RIFLD_ADD_ITEM', true)."'+' -</option>');
@@ -423,9 +350,14 @@ jQuery(document).ready(function()
 			// Trigger change event to update select2 display
 			item_selector.val('').trigger('change');
 			
-			// Remove loading animation and show item selector
+			// Remove loading animation
 			sel2_item_selector.next().remove();
-			sel2_item_selector.show();
+
+			// Show the item selector or display the error message
+			if (data && data.error!='')
+				jQuery('<span class=\"add-on fc-relation-field-error\"> <span class=\"icon-warning\"></span> '+data.error+'</span>').insertAfter(item_selector);
+			else
+				sel2_item_selector.show();
 		});
 		
 	});
@@ -754,9 +686,83 @@ jQuery(document).ready(function()
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
-	
-	
+
+
+	static function getAllowedCategories(& $field)
+	{
+		// Get API objects / data
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
+
+		// categories scope parameters
+		$use_cat_acl = $field->parameters->get('use_cat_acl', 1);
+		$method_cat = $field->parameters->get('method_cat', 1);
+		$usesubcats = $field->parameters->get('usesubcats', 0 );
+		
+		$catids = $field->parameters->get('catids');
+		if ( empty($catids) )							$catids = array();
+		else if ( ! is_array($catids) )		$catids = !FLEXI_J16GE ? array($catids) : explode("|", $catids);
+
+
+		// ***********************************************
+		// Get & check Global category related permissions
+		// ***********************************************
+		
+		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
+		
+		
+		// ****************************************************
+		// Calculate categories to use for retrieving the items
+		// ****************************************************
+		
+		$allowed_cats = $disallowed_cats = false;
+		
+		// Get user allowed categories
+		$usercats = $use_cat_acl && !$viewallcats ?
+			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false, $check_published = true) :
+			FlexicontentHelperPerm::returnAllCats($check_published=true, $specific_catids=null) ;
+		
+		// Find (if configured) , descendants of the categories
+		if ($usesubcats)
+		{
+			global $globalcats;
+			$_catids = array();
+			foreach ($catids as $catid)
+			{
+				$subcats = $globalcats[$catid]->descendantsarray;
+				foreach ($subcats as $subcat)  $_catids[(int)$subcat] = 1;
+			}
+			$catids = array_keys($_catids);
+		}
+
+
+		// ****************************************************************
+		// Decided allowed categories according to method of CATEGORY SCOPE
+		// ****************************************************************
+		
+		// Include method
+		if ( $method_cat == 3 )
+		{
+			$allowed = array_intersect($usercats, $catids);
+			return $allowed;
+		}
+
+		// Exclude method
+		else if ( $method_cat == 2 )
+		{
+			$allowed = array_diff($usercats, $catids);
+			return $allowed;
+		}
+
+		// Neither INCLUDE / nor EXCLUDE method, return all user 's allowed categories
+		else
+		{
+			return $usercats;
+		}
+	}
+
+
 	// Method called via AJAX to get dependent values
 	function getCategoryItems()
 	{
@@ -789,6 +795,7 @@ jQuery(document).ready(function()
 		{
 			exit( json_encode($response) );
 		}
+		$request_catids = array($catid);
 		
 		
 		
@@ -798,9 +805,9 @@ jQuery(document).ready(function()
 		
 		$field = JTable::getInstance( $_type = 'flexicontent_fields', $_prefix = '', $_config = array() );
 		
-		if ( !$field->load( $field_id ) )           $response['error'] = 'relation field not found';
-		else if ( $field->field_type!='relation' )  $response['error'] = 'relation field is not a relation field';
-		else if ( !isset($uacc[$field->access]) )   $response['error'] = 'relation field has non-allowed access level';
+		if ( !$field->load( $field_id ) )           $response['error'] = 'field not found';
+		else if ( $field->field_type!='relation' )  $response['error'] = 'field id is not a relation field';
+		else if ( !isset($uacc[$field->access]) )   $response['error'] = 'you do not have access level to use this field';
 		
 		if ( $response['error'] )
 		{
@@ -820,11 +827,21 @@ jQuery(document).ready(function()
 			$item->created_by = $user->id;
 		}
 		else if ( !$item->load( $item_id ) )       $response['error'] = 'content item not found';
-		else if ( !isset($uacc[$item->access]) )   $response['error'] = 'content item has non-allowed access level';
-		
+		else
+		{
+			$asset = 'com_content.article.' . $item->id;
+			$isOwner = $item->created_by == $user->get('id');
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+			if ( !$canEdit )
+			{
+				$response['error'] = 'content item has non-allowed access level';
+			}
+		}
+
 		if ( $response['error'] )
 		{
 			exit( json_encode($response) );
+			exit;
 		}
 		
 		
@@ -837,109 +854,72 @@ jQuery(document).ready(function()
 		
 		// Some needed parameters
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
-		
-		
-		// ***********************************************
-		// Get & check Global category related permissions
-		// ***********************************************
-		
-		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-		
-		
+
+
 		// ****************
 		// SCOPE PARAMETERS
 		// ****************
-		
-		// categories scope parameters
-		$method_cat = $field->parameters->get('method_cat', 1);
-		$usesubcats = $field->parameters->get('usesubcats', 0 );
-		
-		$catids = array($catid);  //$field->parameters->get('catids');
-		
+
+		// NOTE: categories scope parameters ... not used here, since category scope is checked by calling getAllowedCategories()
+
 		// types scope parameters
 		$method_types = $field->parameters->get('method_types', 1);
-		
+
 		$types = $field->parameters->get('types');
 		if ( empty($types) )							$types = array();
 		else if ( ! is_array($types) )		$types = !FLEXI_J16GE ? array($types) : explode("|", $types);
-		
+
 		// other limits of scope parameters
 		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
 		$onlypublished = $field->parameters->get( 'onlypublished', 1 );
 		$ownedbyuser   = $field->parameters->get( 'ownedbyuser', 0 );
 		
 		
-		// ****************************************************
-		// Calculate categories to use for retrieving the items
-		// ****************************************************
-		
-		$allowed_cats = $disallowed_cats = false;
-		
-		// Get user allowed categories
-		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false, $check_published = true);
-		//$usercats = FlexicontentHelperPerm::returnAllCats($check_published=true, $specific_catids=null);
-		
-		// Find (if configured) , descendants of the categories
-		if ($usesubcats) {
+		// *********************************************
+		// Item retrieving query ... CREATE WHERE CLAUSE
+		// *********************************************
+		$where = array();
+
+
+		// CATEGORY SCOPE
+		$allowed_cats = self::getAllowedCategories($field);
+		if (empty($allowed_cats))
+		{
+			echo json_encode( array('error' => JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')) );
+			exit;
+		}
+
+		// Check given category (-ies) is in the allowed categories
+		$catids = array_intersect($allowed_cats, $request_catids);
+		if ( empty($catids) )
+		{
+			echo json_encode( array('error' => JText::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')) );
+			exit;
+		}
+
+		// Also include subcategory items
+		$subcat_items = $field->parameters->get('subcat_items', 1 );
+		if ($subcat_items)
+		{
 			global $globalcats;
 			$_catids = array();
-			foreach ($catids as $catid) {
+			foreach ($catids as $catid)
+			{
 				$subcats = $globalcats[$catid]->descendantsarray;
 				foreach ($subcats as $subcat)  $_catids[(int)$subcat] = 1;
 			}
 			$catids = array_keys($_catids);
 		}
-		
-		// ... TODO: retrieve items via AJAX
-		
-		// *********************************************
-		// Item retrieving query ... CREATE WHERE CLAUSE
-		// *********************************************
-		$where = array();
-		
-		
-		// **************
-		// CATEGORY SCOPE
-		// **************
-		
-		// Include method
-		if ( $method_cat == 3 ) {
-			
-			$allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);
-			if ( !empty($allowed_cats) ) {
-				$where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
-			} else {
-				echo json_encode( array('error' => JText::_('FLEXI_CANNOT_EDIT_FIELD') .' - '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')) );
-				exit;
-			}
-		}
-		
-		// Exclude method
-		else if ( $method_cat == 2 ) {
-			$disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);
-			if ( !empty($disallowed_cats) ) {
-				$where[] = " rel.catid NOT IN (".implode(',',$disallowed_cats ).") ";
-			}
-		}
-		
-		// ALL user allowed categories
-		else if (!$viewallcats) {
-			$allowed_cats = $usercats;
-			if ( !empty($allowed_cats) ) {
-				$where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
-			} else {
-				echo json_encode( array('error' => JText::_('FLEXI_CANNOT_EDIT_FIELD') .' - '. JText::_('FLEXI_NO_ACCESS_TO_USE_ANY_CATEGORIES')) );
-				exit;
-			}
-		}
-		
-		
+		$where[] = ' rel.catid IN (' . implode(',', $catids ) . ') ';
+
+
 		// TYPE SCOPE
-		if ( ($method_types == 2 || $method_types == 3) && ( !count($types) || empty($types[0]) ) ) {
+		if ( ($method_types == 2 || $method_types == 3) && ( !count($types) || empty($types[0]) ) )
+		{
 			echo json_encode( array('error' => 'Content Type scope is set to include/exclude but no Types are selected in field configuration, please set to "ALL" or select types to include/exclude') );
 			exit;
 		}
+
 		if ($method_types == 2)       $where[] = ' ie.type_id NOT IN (' . implode(',', $types) . ')';   // exclude method
 		else if ($method_types == 3)  $where[] = ' ie.type_id IN (' . implode(',', $types) . ')';       // include method
 		
