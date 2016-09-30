@@ -591,7 +591,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
 		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
 		
-		//JHtml::_('behavior.framework', true);
+		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');

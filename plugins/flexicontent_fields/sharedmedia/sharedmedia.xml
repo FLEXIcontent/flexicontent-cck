@@ -195,15 +195,21 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_CONFIG" level="level2" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_CONFIG" level="level3" />
 			<field name="embedly_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_API_KEY_DESC" labelclass="label-info" />
 			<field name="force_ssl" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FORCESSL" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FORCESSL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_CONFIG" level="level2" depend_class="disp-native-apis" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_CONFIG" level="level3" depend_class="disp-native-apis" />
 			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY_DESC" depend_class="disp-native-apis" labelclass="label-info" />
+
+			<field name="" type="separator" default="Debug" level="level1" />
+			<field name="debug_to_console" type="radio" default="0" label="Javascript debug" description="Enable this to add debug information to browser console about AJAX server API calls" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 		</fieldset>
 		
