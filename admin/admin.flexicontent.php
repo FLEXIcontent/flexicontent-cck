@@ -225,7 +225,7 @@ if ( $print_logging_info && $format=='html')
 // ******************************************************************
 // (If needed) Compile LESS files as CSS (call the less proprocessor)
 // ******************************************************************
-if ( $format == 'html' )
+if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 {
 	$start_microtime = microtime(true);
 	
