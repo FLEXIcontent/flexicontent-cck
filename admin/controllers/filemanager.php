@@ -895,6 +895,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$data = $this->input->post->getArray();  // Default filtering will remove HTML
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
+		$data['hits'] = (int) $data['hits'];
 
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
