@@ -74,8 +74,7 @@ class flexicontent_files extends JTable
 	
 	// overloaded check function
 	function check()
-	{		
+	{
 		return true;
 	}
 }
-?>

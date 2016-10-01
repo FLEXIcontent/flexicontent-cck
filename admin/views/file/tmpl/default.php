@@ -118,6 +118,17 @@ if (!$this->row->url)
 		</tr>
 
 		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_HITS', 'FLEXI_DOWNLOAD_HITS', 1, 1); ?>">
+				<label class="label" for="access">
+					<?php echo JText::_( 'FLEXI_HITS' ); ?>
+				</label>
+			</td>
+			<td>
+				<input type="text" id="hits" name="hits" value="<?php echo $this->row->hits; ?>" maxlength="10" class="input-small" />
+			</td>
+		</tr>
+
+		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
 				<label class="label" for="mime_ext">
 					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
@@ -818,7 +829,6 @@ if (!$this->row->url)
 <input type="hidden" name="filename" value="<?php echo $this->row->filename; ?>" />
 <input type="hidden" name="ext" value="<?php echo $this->row->ext; ?>" />
 <?php endif; ?>
-<input type="hidden" name="hits" value="<?php echo $this->row->hits; ?>" />
 <input type="hidden" name="url" value="<?php echo $this->row->url; ?>" />
 <input type="hidden" name="secure" value="<?php echo $this->row->secure; ?>" />
 <input type="hidden" name="uploaded" value="<?php echo $this->row->uploaded; ?>" />
