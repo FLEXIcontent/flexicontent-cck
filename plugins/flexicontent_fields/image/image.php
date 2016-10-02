@@ -18,6 +18,9 @@ jimport('cms.plugin.plugin');
 JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
 JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
 
+if (!defined('_FC_CONTINUE_'))  define('_FC_CONTINUE_', 0);
+if (!defined('_FC_BREAK_'))  define('_FC_BREAK_', -1);
+
 class plgFlexicontent_fieldsImage extends JPlugin
 {
 	static $field_types = array('image');
@@ -1034,6 +1037,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+
+		$app  = JFactory::getApplication();
+		$jinput = $app->input;
 		
 		$image_source = $field->parameters->get('image_source', 0);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
@@ -1049,7 +1055,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$app       = JFactory::getApplication();
 			$document	 = JFactory::getDocument();
-			$option    = JRequest::getVar('option');
+			$option    = $jinput->get('option', '', 'cmd');
 			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 			
@@ -1079,11 +1085,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Current view variable / FLAGs
 		// *****************************
 		
-		$realview = JRequest::getVar('view', FLEXI_ITEMVIEW);
-		$view = JRequest::getVar('flexi_callview', $realview);
-		$isFeedView = JRequest::getCmd('format', null) == 'feed';
+		$realview = $jinput->get('view', FLEXI_ITEMVIEW, 'cmd');
+		$view = $jinput->get('flexi_callview', $realview, 'cmd');
 		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
 		$isSite = $app->isSite();
+		$is_FE_html_view = $jinput->get('format', 'html', 'cmd') == 'html' && $isSite;
 		
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -1168,7 +1174,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = $values ? $values : $field->value;
 		
 		// Intro-full mode get their values from item's parameters
-		if ( $image_source == -1 ) {
+		if ( $image_source == -1 )
+		{
 			$values = array();
 			
 			// Use 'intro' image in multi-item listings
@@ -1206,23 +1213,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				//echo "<pre>"; print_r($image_IF); echo "</pre>"; exit;
 			}
 		}
-		
+
+
 		// Check for deleted image files or image files that cannot be thumbnailed,
 		// rebuilding thumbnails as needed, and then assigning checked values to a new array
 		$usable_values = array();
-		if ($values) foreach ($values as $index => $value) {
+		if ($values) foreach ($values as $index => $value)
+		{
 			$value	= unserialize($value);
 			if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item) )  $usable_values[] = $values[$index];
 			else if ($is_ingroup) $usable_values[] = $values[$index]; // ADD empty value if in fieldgroup
 		}
 		$values = & $usable_values;
-		
+
+
 		// Allow for thumbnailing of the default image
 		$field->using_default_value = false;
-		if ( !count($values) ) {
+		if ( !count($values) )
+		{
 			// Create default image to be used if  (a) no image assigned  OR  (b) images assigned have been deleted
 			$default_image = $field->parameters->get( 'default_image', '');
-			if ( $default_image ) {
+			if ( $default_image )
+			{
 				$image_DF = array();
 				// field attributes (default value specific)
 				$image_DF['default_image'] = $default_image;  // holds complete relative path and indicates that it is default image for field
@@ -1236,7 +1248,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$image_DF['urllink'] = '';
 				
 				// Create thumbnails for default image
-				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $image_DF, $item) ) $values = array(serialize($image_DF));
+				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $image_DF, $item) )
+				{
+					$values = array(serialize($image_DF));
+				}
+
 				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
 				$multiple_image_usages = true;
 				$extra_prefix = 'fld'.$field->id.'_';
@@ -1248,7 +1264,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ******************************************************************
 		// Check for no values and no default value, and return empty display
 		// ******************************************************************
-		if ( empty($values) ) {
+		if ( empty($values) )
+		{
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
 		}
@@ -1259,31 +1276,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **************************************
 		// Default display method depends on view
 		// **************************************
-		
-		if ($prop=='display' && ($view==FLEXI_ITEMVIEW || $view=='category')) {
+
+		if ($prop=='display' && ($view==FLEXI_ITEMVIEW || $view=='category'))
+		{
 			$_method = $view==FLEXI_ITEMVIEW ?
 				$field->parameters->get( 'default_method_item',  'display' ) :
 				$field->parameters->get( 'default_method_cat',  'display_single_total') ;
-		} else {
+		}
+		else
+		{
 			$_method = $prop;
 		}
 		$cat_link_single_to = $field->parameters->get( 'cat_link_single_to', 1) ;
-		
+
 		// Calculate some flags, SINGLE image display and Link-to-Item FLAG
 		$isSingle = isset(self::$single_displays[$_method]);
 		$linkToItem = $_method == 'display_link' || $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
-		
-		
+
+
 		// ************************
 		// JS gallery configuration
 		// ************************
 		$usepopup   = (int)$field->parameters->get( 'usepopup',  1 ) ; // use JS gallery
 		$popuptype  = (int)$field->parameters->get( 'popuptype', 1 ) ; // JS gallery type
-		
+
 		// Different for mobile clients
 		$popuptype_mobile = (int)$field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
 		$popuptype = $useMobile ? $popuptype_mobile : $popuptype;
-		
+
 		// Enable/Disable GALLERY JS according to current view and according to other parameters
 		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category','backend'));
 		$popupinview  = FLEXIUtilities::paramToArray($popupinview);
@@ -1291,39 +1311,39 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
 		if ($view=='module' && !in_array('module',$popupinview)) $usepopup = 0;
 		if ($isItemsManager && !in_array('backend',$popupinview)) $usepopup = 0;
-		
+
 		// Enable/Disable GALLERY JS if linking to item view
 		if ($linkToItem) $usepopup = 0;
-		
+
 		// Only allow multibox and fancybox in items manager, in other cases force fancybox
 		if ($isItemsManager && !in_array($popuptype, array(1,4))) $popuptype = 4;
-		
+
 		// Displays that need special container are not allowed when field in a group, force fancybox
 		$no_container_needed = array(1,2,3,4,6);
 		if ( $is_ingroup && !in_array($popuptype, $no_container_needed) ) $popuptype = 4;
-		
+
 		// Optionally group images from all image fields of current item ... or of all items in view too
 		$grouptype  = $field->parameters->get( 'grouptype', 1 ) ;
 		//$grouptype = $multiple ? 0 : $grouptype;  // Field in gallery mode: Force grouping of images per field (current item)
-		
+
 		// Needed by some js galleries
 		$thumb_w_s = $field->parameters->get( 'w_s', 120);
 		$thumb_h_s = $field->parameters->get( 'h_s',  90);
-		
-		
+
+
 		// ******************************
 		// Hovering ToolTip configuration
 		// ******************************
 		$uselegend  = $field->parameters->get( 'uselegend', 1 ) ;
 		$tooltip_class = 'hasTooltip';
-		
+
 		// Enable/disable according to current view
 		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
 		$legendinview  = FLEXIUtilities::paramToArray($legendinview);
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
 		if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
 		if ($isItemsManager && !in_array('backend',$legendinview)) $uselegend = 0;
-		
+
 		// Load the tooltip library according to configuration, FLAG is an array to have a different check per field ID
 		// This is needed ONLY for fields that also have a configuration parameter, for this field is NEEDED 
 		static $tooltips_added = array();
@@ -1333,32 +1353,33 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($add_tooltips && $uselegend) JHtml::_('bootstrap.tooltip');
 			$tooltips_added[$field->id] = true;
 		}
-		
+
+
 		// **************************************
 		// Title/Description in inline thumbnails
 		// **************************************
-		
+
 		$showtitle = $field->parameters->get( 'showtitle', 0 ) ;
 		$showdesc  = $field->parameters->get( 'showdesc', 0 ) ;
-		
-		
+
+
 		// *************************
 		// Link to URL configuration
 		// *************************
-		
+
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
 		$isLinkToPopup = $linkto_url && ($url_target=='multibox' || $url_target=='fancybox');
-		
+
 		// Force opening in new window in backend, if URL target is _self
 		if ($isItemsManager && $url_target=='_self') $url_target = "_blank";
-		
+
 		// Only allow multibox (and TODO: add fancybox) when linking to URL, in other cases force fancybox
 		if ($isLinkToPopup && $url_target=='multibox') $popuptype = 1;
 		if ($isLinkToPopup && $url_target=='fancybox') $popuptype = 4;
 		else if ($linkto_url) $usepopup = 0;
-		
-		
+
+
 		// ************************************
 		// Social website sharing configuration
 		// ************************************
@@ -1369,6 +1390,85 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$ogpthumbsize= $field->parameters->get('ogpthumbsize', 2);
 		
 		
+
+
+
+
+		// *************************************
+		// Create thumb paths and thumb base URL
+		// *************************************
+
+		// Extra thumbnails sub-folder for various
+		if ( $field->using_default_value )
+		{
+			$extra_folder = '';  // default value
+		}
+
+		else
+		{
+			// Intro-full image mode
+			if ( $image_source == -1 )
+			{
+				$extra_folder = 'intro_full';
+			}
+
+			// Media manager mode
+			else if ( $image_source == -2 )
+			{
+				$extra_folder = 'mediaman';
+			}
+
+			// Various Folder-mode(s) ... TODO: $image_source > 1
+			else if ( $image_source >= 1 )
+			{
+				$extra_folder = 'item_'.$u_item_id.'_field_'.$field->id;  // Folder-mode 1
+			}
+
+			// DB-mode
+			else
+			{
+				$extra_folder = '';
+			}
+		}
+
+		// Create thumbs/image Folder and URL paths
+		$thumb_folder  = JPATH_SITE .DS. JPath::clean( $dir .($extra_folder ? DS.$extra_folder : '') );
+		$thumb_urlpath = $dir_url .($extra_folder ? '/'. $extra_folder : '');
+		
+		if ( $field->using_default_value )
+		{
+			// default image of this field, these are relative paths up to site root
+			$orig_urlpath  = str_replace('\\', '/', dirname($image_DF['default_image']));
+		}
+		else
+		{
+			// Intro-full image mode, image names are relative paths up to the site root
+			if ( $image_source == -1 )
+			{
+				$orig_urlpath  = str_replace('\\', '/', dirname($image_IF['image_path']));
+			}
+
+			// Media manager mode, image names are paths relative to the site root
+			else if ( $image_source == -2 )
+			{
+				$orig_urlpath = array();  // calculate later inside value loop
+			}
+
+			// Various Folder-mode(s) ... TODO: $image_source > 1
+			else if ( $image_source >= 1 )
+			{
+				$orig_urlpath  = $thumb_urlpath . '/original';  // Folder-mode 1
+			}
+
+			// DB-mode
+			else
+			{
+				$orig_urlpath = str_replace('\\', '/', $configured_file_path);
+			}
+		}
+
+
+
 		// **********************************************
 		// Load the configured (or the forced) JS gallery
 		// **********************************************
@@ -1378,7 +1478,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			// MultiBox maybe added in extra cases besides popup
 			// (a) in Item manager, (b) When linking to URL in popup target
-			$view_allows_mb  = $isItemsManager || ($isSite && !$isFeedView);
+			$view_allows_mb  = $isItemsManager || $is_FE_html_view;
 			$config_needs_mb = $isLinkToPopup  || ($usepopup && $popuptype == 1);
 			if ( $view_allows_mb && $config_needs_mb )
 			{
@@ -1420,12 +1520,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// Regardless if above has added multibox , we will add a different JS gallery if so configured because it maybe needed
-			if ( !$isSite || $isFeedView ) {
-				// Is backend OR it is a feed view, do not add any JS library
+			if ( !$is_FE_html_view )
+			{
+				// Is backend OR it is not an HTML view, do not add any JS library
 			}
-			
-			else if ( $usepopup ) {
-				
+
+			else if ( $usepopup )
+			{
 				switch ($popuptype)
 				{
 				// Add Fancybox image popup
@@ -1440,7 +1541,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				case 5:
 					$inline_gallery = 1; // unused
 					
-					if (!$gallerifficadded) {
+					if (!$gallerifficadded)
+					{
 						flexicontent_html::loadFramework('galleriffic');
 						$gallerifficadded = true;
 						
@@ -1507,7 +1609,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// Add Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
 				case 7:
-					if (!$elastislideadded) {
+					if (!$elastislideadded)
+					{
 						flexicontent_html::loadFramework('elastislide');
 						$elastislideadded = true;
 					}
@@ -1540,7 +1643,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// Add PhotoSwipe popup carousel gallery
 				case 8:
-					if (!$photoswipeadded) {
+					if (!$photoswipeadded)
+					{
 						flexicontent_html::loadFramework('photoswipe');
 						$photoswipeadded = true;
 					}
@@ -1548,57 +1652,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 			}
 		}
-		
-		
-		// *******************************
-		// Prepare for value handling loop
-		// *******************************
-		
-		// Extra thumbnails sub-folder for various
-		if ( $field->using_default_value ) {
-			$extra_folder = '';  // default value
-		}
-		else if ( $image_source == -1 ) {
-			$extra_folder = 'intro_full';  // intro-full images mode
-		}
-		else if ( $image_source == -2 ) {
-			$extra_folder = 'mediaman';  // media manager mode
-		}
-		else if ( $image_source >= 1 ) {
-			$extra_folder = 'item_'.$u_item_id.'_field_'.$field->id;  // Folder-mode 1
-			//if ( $image_source > 1 ) ; // TODO
-		}
-		else {
-			$extra_folder = '';  // DB-mode
-		}
-		
-		// Create thumbs/image Folder and URL paths
-		$thumb_folder  = JPATH_SITE .DS. JPath::clean( $dir .($extra_folder ? DS.$extra_folder : '') );
-		$thumb_urlpath = $dir_url .($extra_folder ? '/'. $extra_folder : '');
-		
-		if ( $field->using_default_value ) {
-			// default image of this field, these are relative paths up to site root
-			$orig_urlpath  = str_replace('\\', '/', dirname($image_DF['default_image']));
-		}
-		else if ( $image_source == -1 ) {
-			// intro-full image values, these are relative paths up to the site root
-			$orig_urlpath  = str_replace('\\', '/', dirname($image_IF['image_path']));
-		}
-		else if ( $image_source == -2 ) {
-			// via media manager, image names are paths relative to the site root
-			$orig_urlpath = array();  // calculate later inside value loop
-		}
-		else if ( $image_source >= 1 ) {
-			// various Folder-mode(s)
-			$orig_urlpath  = $thumb_urlpath . '/original';
-			//if ( $image_source > 1 ) ; // TODO
-		}
-		else {
-			// DB-mode
-			$orig_urlpath = str_replace('\\', '/', $configured_file_path);
-		}
-		
+
+
+
+		// ************************************************************
 		// Initialize value handling arrays and loop's common variables
+		// ************************************************************
+
 		$i = -1;
 		$field->{$prop} = array();
 		$field->thumbs_src['backend'] = array();
@@ -1628,13 +1688,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ***************
 		// The values loop
 		// ***************
-		
+
+		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
 		foreach ($values as $val)
 		{
+			// Include common layout code for preparing values, but you may copy here to customize
+			//$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
+			//if ($result === _FC_CONTINUE_) continue;
+			//if ($result === _FC_BREAK_) break;
+
 			// Unserialize value's properties and check for empty original name property
 			$value	= unserialize($val);
 			$image_subpath = trim(@$value['originalname']);
-			if ( !strlen($image_subpath) ) {
+			
+			if ( !strlen($image_subpath) )
+			{
 				if ($is_ingroup) $field->{$prop}[] = '';  // add empty position to the display array
 				continue;
 			}
@@ -1756,7 +1824,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->thumbs_path['original'][] = JPATH_SITE.DS.$srco;
 			
 			// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
-			if ( ($isSite && !$isFeedView) && $useogp ) {
+			if ( $is_FE_html_view && $useogp )
+			{
 				if ( in_array($view, $ogpinview) ) {
 					switch ($ogpthumbsize)
 					{
@@ -1794,59 +1863,63 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
 					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
+
 				case 'display_small':
 					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
 					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
+
 				case 'display_medium':
 					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
 					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
+
 				case 'display_large':
 					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
 					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
+
 				case 'display_original':
 					$img_legend   = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
 					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
+
 				case 'display': default:
 					$img_legend   = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
 					$img_nolegend = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 			}
-			
-			
+
+
 			// *************************************************
 			// Create thumbnail appending text (not linked text)
 			// *************************************************
-			
+
 			// For galleries that are not inline/special, we can have inline text ??
 			$inline_info = '';
-			if ( $linkto_url || ($prop=='display_large' || $prop=='display_original') || !$usepopup || ($popuptype != 5 && $popuptype != 7) )
+			if ( $linkto_url || ($prop=='display_large' || $prop=='display_original') || !$usepopup || !$value_list_has_containers )
 			{
 				// Add inline display of title/desc
 				if ( ($showtitle && $title ) || ($showdesc && $desc) )
 					$inline_info = '<div class="fc_img_tooltip_data alert alert-info" style="'.$style.'" >';
-				
+
 				if ( $showtitle && $title )
 					$inline_info .= '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
 				if ( $showdesc && $desc )
 					$inline_info .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
-				
+
 				if ( ($showtitle && $title ) || ($showdesc && $desc) )
 					$inline_info .= '</div>';
 			}
-			
-			
+
+
 			// *********************************************
 			// FINALLY CREATE the field display variable ...
 			// *********************************************
-			
-			if ( $linkToItem ) {
-				
-				// CASE 0: Add single image display information (e.g. image count)
-				
+
+			// CASE 0: Add single image display information (e.g. image count)
+			if ( $linkToItem )
+			{
 				$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 				$field->{$prop}[] =
 				'<span style="display: inline-block; text-align:center; ">
@@ -1861,18 +1934,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// If single display and not in field group then do not add more images
 				if (!$is_ingroup && $isSingle) break;
-				
-			} else if ($linkto_url) {
-				
-				// CASE 1: Handle linking to a URL instead of image zooming popup
-				
-				if (!$urllink) {
-					// CASE: Just image thumbnail since url link is empty
+			}
+
+			// CASE 1: Handle linking to a URL instead of image zooming popup
+			else if ($linkto_url)
+			{
+				// CASE: Just image thumbnail since url link is empty
+				if (!$urllink)
+				{
 					$field->{$prop}[] = $pretext.'<div class="fc_img_container">'.$img_legend.$inline_info.'</div>'.$posttext;
 				}
-				
-				else if ($url_target=='multibox') {
-					// CASE: Link to URL that opens inside a popup via multibox
+
+				// CASE: Link to URL that opens inside a popup via multibox
+				else if ($url_target=='multibox')
+				{
 					$field->{$prop}[] = $pretext.'
 					<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
 						'.$img_legend.'
@@ -1880,9 +1955,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>
 					'.$inline_info.$posttext;
 				}
-				
-				else if ($url_target=='fancybox') {
-					// CASE: Link to URL that opens inside a popup via fancybox
+
+				// CASE: Link to URL that opens inside a popup via fancybox
+				else if ($url_target=='fancybox')
+				{
 					$field->{$prop}[] = $pretext.'
 					<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;" '.
 						'onclick="jQuery.fancybox.open([{ type: \'iframe\', href: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $title.': '.$desc : $title).'\' }], { padding : 0});"
@@ -1891,32 +1967,37 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</span>
 					'.$inline_info.$posttext;
 				}
-				
-				else {
-					// CASE: Just link to URL without popup
+
+				// CASE: Just link to URL without popup
+				else
+				{
 					$field->{$prop}[] = $pretext.'
 					<a href="'.$urllink.'" target="'.$url_target.'">
 						'.$img_legend.'
 					</a>
 					'.$inline_info.$posttext;
 				}
-				
-			} else if (
+
+			}
+
+			// CASE 2: // No gallery code ... just apply pretext/posttext
+			else if
+			(
 				!$usepopup || // Plain Thumbnail List without any (popup / inline) gallery code
 				($prop=='display_large' || $prop=='display_original') // No popup if image is the largest OR original thumbs
-			) {
-				
-				// CASE 2: // No gallery code ... just apply pretext/posttext
+			)
+			{
 				$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
-				
-			} else if ($popuptype == 5 || $popuptype == 7) {
-			
-				// CASE 3: Inline/special galleries OR --> GALLERIES THAT NEED SPECIAL ENCLOSERS
+			}
+
+			// CASE 3: Inline/special galleries OR --> GALLERIES THAT NEED SPECIAL ENCLOSERS
+			else if ($value_list_has_containers)
+			{
 				// !!! ... pretext/posttext/inline_info/etc not meaningful or not supported or not needed
-				
 				switch ($popuptype)
 				{
-				case 5:   // Galleriffic inline slideshow gallery
+				// Galleriffic inline slideshow gallery
+				case 5:
 					$group_str = '';   // image grouping: not needed / not applicatble
 					$field->{$prop}[] =
 						'<a href="'.$srcl.'" class="fc_image_thumb thumb" name="drop">
@@ -1927,7 +2008,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							<br/>'.$desc.'
 						</div>';
 					break;
-				case 7:   // Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
+
+				// Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
+				case 7:
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
 					$title_attr = $desc ? $desc : $title;
 					$img_legend_custom ='
@@ -1940,17 +2023,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							'.$img_legend_custom.'
 						</a></li>';
 					break;
-				default: // ERROR unhandled INLINE GALLERY case
+
+				// ERROR unhandled INLINE GALLERY case
+				default:
 					$field->{$prop}[] = ' Unhandled INLINE GALLERY case in image with field name: {$field->name} '; break;
 				}
-			
-			} else {  
-				
-				// CASE 4: Popup galleries
-				
+			}
+
+			// CASE 4: Popup galleries
+			else
+			{
 				switch ($popuptype)
 				{
-				case 1:   // Multibox image popup
+				// Multibox image popup
+				case 1:
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = $pretext.
 						'<a style="'.$style.'" href="'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb" '.$group_str.' >
@@ -1959,7 +2045,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? '<span class="badge">'.$title.'</span> '.$desc : $title).'</div>'
 						.$inline_info.$posttext;
 					break;
-				case 2:   // Rokbox image popup
+
+				// Rokbox image popup
+				case 2:
 					$title_attr = $desc ? $desc : $title;
 					$group_str = '';   // no support for image grouping
 					$field->{$prop}[] = $pretext.
@@ -1968,7 +2056,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						</a>'
 						.$inline_info.$posttext;
 					break;
-				case 3:   // JCE popup image popup
+
+				// JCE popup image popup
+				case 3:
 					$title_attr = $desc ? $title.': '.$desc : $title;  // does not support HTML
 					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
 					$field->{$prop}[] = $pretext.
@@ -1977,7 +2067,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						</a>'
 						.$inline_info.$posttext;
 					break;
-				case 4:   // Fancybox image popup
+
+				// Fancybox image popup
+				case 4:
 					$title_attr = $desc ? '<span class=\'badge\'>'.$title.'</span> '.$desc : $title;
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = $pretext.
@@ -1986,7 +2078,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						</a>'
 						.$inline_info.$posttext;
 					break;
-				case 6:   // (Widgetkit) SPOTlight image popup
+
+				// (Widgetkit) SPOTlight image popup
+				case 6:
 					$title_attr = $desc ? $desc : $title;
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = $pretext.
@@ -1998,7 +2092,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						</a>'
 						.$inline_info.$posttext;
 					break;
-				case 8:   // PhotoSwipe popup carousel gallery
+
+				// PhotoSwipe popup carousel gallery
+				case 8:
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = $pretext.
 						'<a style="'.$style.'" href="'.$srcl.'" '.$group_str.' class="fc_image_thumb">
@@ -2006,21 +2102,24 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						</a>'
 						.$inline_info.$posttext;
 					break;
-				default:  // Unknown / Other Gallery Type, just add thumbails ... maybe pretext/posttext/separator/opentag/closetag will add a gallery
+
+				// Unknown / Other Gallery Type, just add thumbails ... maybe pretext/posttext/separator/opentag/closetag will add a gallery
+				default:
 					$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
 					break;
 				}
 			}
 		}
-		
-		
+
+
 		// **************************************************************
 		// Apply separator and open/close tags and handle SPECIAL CASEs:
 		// by adding (container) HTML required by some JS image libraries
 		// **************************************************************
 		
 		// Using in field group, return array
-		if ( $is_ingroup ) {
+		if ( $is_ingroup )
+		{
 			return;
 		}
 		
@@ -2031,13 +2130,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Check for no values found
-		if ( !count($field->{$prop}) ) {
+		if ( !count($field->{$prop}) )
+		{
 			$field->{$prop} = '';
 			return;
 		}
 		
 		// Galleriffic inline slideshow gallery
-		if ($usepopup && $popuptype == 5) {
+		if ($usepopup && $popuptype == 5)
+		{
 			$field->{$prop} = '
 			<div id="gf_container">
 				<div id="gallery" class="content">
@@ -2061,7 +2162,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
-		else if ($usepopup && $popuptype == 7) {
+		else if ($usepopup && $popuptype == 7)
+		{
 			//$max_width = $field->parameters->get( 'w_l', 800 );
 			
 			// this should be size of previewer aka size of large image thumbnail
@@ -2370,9 +2472,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( empty($post) ) return;
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
+
 		if ( !$is_importcsv ) return;
 		
 		$values = array();
@@ -2487,7 +2594,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function uploadOriginalFile($field, &$post, $file)
 	{
 		$app    = JFactory::getApplication();
-		$format = JRequest::getVar( 'format', 'html', '', 'cmd');
+		$jinput = $app->input;
+		$format = $jinput->get('format', 'html', 'cmd');
 		$err    = null;
 		
 		// Get the component configuration
