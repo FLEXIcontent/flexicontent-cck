@@ -424,8 +424,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');	
 
 			// Load google maps library
-			$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
-			$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&key=' . $google_maps_js_api_key : ''));
+			flexicontent_html::loadFramework('google-maps', '', $field->parameters);
 		}
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
