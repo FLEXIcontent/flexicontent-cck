@@ -304,7 +304,9 @@ foreach ($this->values as $n => $value)
 			';
 			
 			$document = JFactory::getDocument();
-			$document->addScript('https://maps.googleapis.com/maps/api/js' . ($google_maps_js_api_key ? '?key=' . $google_maps_js_api_key : ''));
+
+			// Load google maps library
+			flexicontent_html::loadFramework('google-maps', '', $field->parameters);
 			$document->addScriptDeclaration($js);
 		}
 	}

@@ -1118,7 +1118,11 @@ class flexicontent_html
 			case 'masonry':
 				$framework_path = JURI::root(true).$lib_path.'/masonry';
 				$document->addScript($framework_path.'/masonry.pkgd.min.js');
-				
+				break;
+
+			case 'google-maps':
+				$google_maps_js_api_key = $params->get('google_maps_js_api_key', $params->get('apikey'));
+				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&amp;key=' . $google_maps_js_api_key : ''));
 				break;
 			
 			case 'select2':
