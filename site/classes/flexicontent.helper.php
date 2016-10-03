@@ -818,8 +818,10 @@ class flexicontent_html
 		if (!count($layout_names))  return false;
 		
 		$app    = JFactory::getApplication();
-		$option = JRequest::getCmd('option');
-		$layout = JRequest::getCmd('layout');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$layout = $jinput->get('layout', '', 'cmd');
+
 		$svar = $layout ? '.'.$layout : '.category';
 		$layout_typename = $layout_type=='clayout' ? 'category' : 'items';
 
@@ -829,8 +831,8 @@ class flexicontent_html
 		if ($layout) $svar .= '.category'.JRequest::getInt('cid');*/
 		
 		//$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$layout_type, $layout_type, $default_layout, 'cmd' );
-		$layout = $app->input->get($layout_type, $default_layout, 'cmd') ;
-		
+		$layout = $jinput->get($layout_type, $default_layout, 'cmd') ;
+
 		$_switcher_label = $params->get($layout_type.'_switcher_label', 0);
 		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
 		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
@@ -7377,18 +7379,20 @@ function FLEXISubmenu($cando)
 {
 	$perms   = FlexicontentHelperPerm::getPerm();
 	$app     = JFactory::getApplication();
+	$jinput  = $app->input;
 	$session = JFactory::getSession();
 	$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 	
 	// Check access to current management tab
 	$not_authorized = isset($perms->$cando) && !$perms->$cando;
-	if ( $not_authorized ) {
+	if ( $not_authorized )
+	{
 		$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 	}
 	
 	// Get post-installation FLAG (session variable), and current view (HTTP request variable)
 	$dopostinstall = $session->get('flexicontent.postinstall');
-	$view = JRequest::getVar('view', 'flexicontent');
+	$view = $jinput->get('view', 'flexicontent', 'cmd');
 	
 	// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
 	$addEntry = array(FLEXI_J30GE ? 'JHtmlSidebar' : 'JSubMenuHelper', 'addEntry');
@@ -7438,6 +7442,8 @@ function FLEXISubmenu($cando)
 			'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 				'<span class="fcsb-icon-plugins"></span>'.JText::_( 'FLEXI_PLUGINS' ).
 			'</a>', '', false);
+
+		if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-translations"></span>'.JText::_( 'Translation packages' ), 'http://www.flexicontent.org/downloads/download-translation-flexicontent.html', 0);
 	}
 }
 
@@ -7485,18 +7491,22 @@ class flexicontent_ajax
 {
 	static function call_extfunc()
 	{
-		$exttype = JRequest::getVar( 'exttype', 'modules' );
-		$extname = JRequest::getVar( 'extname', '' );
-		$extfunc = JRequest::getVar( 'extfunc', '' );
-		$extfolder = JRequest::getVar( 'extfolder', '' );
-		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+
+		$exttype = $jinput->get('exttype', 'modules', 'cmd');
+		$extname = $jinput->get('extname', '', 'cmd');
+		$extfunc = $jinput->get('extfunc', '', 'cmd');
+		$extfolder = $jinput->get('extfolder', '', 'cmd');
+
 		if ($exttype!='modules' && $exttype!='plugins') { echo 'only modules and plugins are supported'; jexit(); }  // currently supporting only module and plugins
 		if (!$extname || !$extfunc) { echo 'function or extension name not set'; jexit(); }  // require variable not set
 		if ($exttype=='plugins' && $extfolder=='') { echo 'plugin folder is not set'; jexit(); }  // currently supporting only module and plugins		
 		
-		if ($exttype=='modules') {
+		if ($exttype=='modules')
+		{
 			// Import module helper file
-			$helper_path = JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php';
+			$helper_path = JPath::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
 			if ( !file_exists($helper_path) ) { echo "no helper file found at expected path, filepath is ".$helper_path; jexit(); }
 			require_once ($helper_path);
 			
@@ -7506,7 +7516,8 @@ class flexicontent_ajax
 			$obj = new $classname();
 		}
 		
-		else {  // exttype is 'plugins'
+		else  // exttype is 'plugins'
+		{
 			// Load Flexicontent Field (the Plugin file) if not already loaded
 			$plgfolder = DS.strtolower($extname);
 			$path = JPATH_ROOT.DS.'plugins'.DS.$extfolder.$plgfolder.DS.strtolower($extname).'.php';
