@@ -879,6 +879,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		static $return;
 		if ($return!==null) return $return;
 		
+		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.path');
 
