@@ -68,11 +68,11 @@ if($this->check['connect'] == 0) {
 					echo '<strong><span style="color:darkgreen">'.JText::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</span></strong>';
 				} elseif( $this->check['current'] == -1 ) {
 					echo '
-					<strong><span style="color:darkorange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' /*'FLEXI_OLD_VERSION_INSTALLED'*/ ).'</span></strong>
-					<a class="btn btn-primary" href="http://www.flexicontent.org/downloads/latest-version.html" target="_blank" style="margin:4px;">'.JText::_( 'Download' ) .'</a>
+					<strong><span style="color:darkorange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' ).'</span></strong>
+					<a class="btn btn-small btn-primary" href="http://www.flexicontent.org/downloads/latest-version.html" target="_blank" style="margin:4px;">'.JText::_( 'FLEXI_DOWNLOAD' ) .'</a>
 					';
 				} else {
-					echo '<strong><span style="color:#777">'.JText::_( 'You have installed a newer version than the latest official version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</span></strong>';
+					echo '<strong><span style="color:#777">'.JText::_( 'FLEXI_NEWER_THAN_OFFICIAL_INSTALLED' ).'</span></strong>';
 				}
 			?>
 			</td>
