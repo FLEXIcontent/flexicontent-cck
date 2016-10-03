@@ -36,8 +36,8 @@ class com_flexicontentInstallerScript
 	* preflight runs before anything else and while the extracted files are in the uploaded temp folder.
 	* If preflight returns false, Joomla will abort the update and undo everything already done.
 	*/
-	function preflight( $type, $parent ) {
-		
+	function preflight( $type, $parent )
+	{
 		// Make sure that fatal errors are printed
 		error_reporting(E_ERROR);
 		ini_set('display_errors',1);
@@ -186,6 +186,7 @@ class com_flexicontentInstallerScript
 		define('FLEXI_NEW_INSTALL', $type=='install' ? 1 : 0);
 	}
 
+
 	/*
 	* $parent is the class calling this method.
 	* install runs after the database scripts are executed.
@@ -296,9 +297,9 @@ class com_flexicontentInstallerScript
 			$jinstaller->setOverwrite(true);
 			$jinstaller->setUpgrade(true);
 			
-			if ($jinstaller->install($extensions[$i]['folder'])) {
+			if ($jinstaller->install($extensions[$i]['folder']))
+			{
 				$extensions[$i]['status'] = true;
-				
 				$ext_manifest = $jinstaller->getManifest();
 				$ext_manifest_name = $ext_manifest->name;
 				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
@@ -317,9 +318,12 @@ class com_flexicontentInstallerScript
 					$db->setQuery($query);
 					$db->execute();
 				}
-			} else {
+			}
+			else
+			{
 				$extensions[$i]['status'] = false;
-				if ( !FLEXI_NEW_INSTALL ) {
+				if ( !FLEXI_NEW_INSTALL )
+				{
 					$error = true;
 					break;
 				}

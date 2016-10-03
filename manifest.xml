@@ -223,7 +223,7 @@
 		<module name="mod_flexifilter"     folder="modules/mod_flexifilter">FLEXIcontent - Content Lists Filtering</module>
 		<module name="mod_flexitagcloud"   folder="modules/mod_flexitagcloud">FLEXIcontent - Tags Cloud</module>
 		<module name="mod_flexiadvsearch"  folder="modules/mod_flexiadvsearch">FLEXIcontent - Search</module>
-		<module name="mod_flexigooglemaps" folder="modules/mod_flexigooglemaps">FLEXIcontent - Google Maps</module>
+		<module name="mod_flexigooglemap"  folder="modules/mod_flexigooglemap">FLEXIcontent - Google Maps</module>
 	</additional>
 
 	<!--updateservers>

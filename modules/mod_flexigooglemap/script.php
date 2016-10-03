@@ -32,6 +32,7 @@ class mod_flexigooglemapInstallerScript
 	 */
 	function install($parent)
 	{
+		//echo '<p>The module has been installed</p>';
 	}
 
 

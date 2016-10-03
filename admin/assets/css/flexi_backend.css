@@ -121,6 +121,9 @@ icon-typeadd:before,
 .fcsb-icon-plugins:before {
 	content: "2";
 }
+.fcsb-icon-translations:before {
+	content: "5";
+}
 .icon-test:before {
 	content: "l";
 	color: #51a351;
