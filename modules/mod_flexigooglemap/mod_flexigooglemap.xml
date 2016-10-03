@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<extension type="module" version="3.0" client="site" method="upgrade">
+	
+	<name>mod_flexigooglemap</name>
+	<author>Berges Yannick</author>
+	<creationDate>Janvier 2016</creationDate>
+	<authorEmail>yannick@com3elles.com</authorEmail>
+	<authorUrl>www.com3elles.com</authorUrl>
+
+	<version>0.9.2</version>
+	<copyright>Copyright (C) 2005 - 2015 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<description>FLEXI_GOOGLEMAP_INTRO</description>
+
+	<scriptfile>install.php</scriptfile>
+
+	<files>
+		<filename module="mod_flexigooglemap">mod_flexigooglemap.php</filename>
+		<folder>tmpl</folder>
+		<folder>language</folder>
+		<folder>assets</folder>
+		<folder>elements</folder>
+		<filename>helper.php</filename>
+		<filename>index.html</filename>
+		<filename>mod_flexigooglemap.xml</filename>
+	</files>
+
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.mod_flexigooglemap.ini</language>
+		<language tag="fr-FR">fr-FR/fr-FR.mod_flexigooglemap.ini</language>
+	</languages>
+
+	<config>
+
+		<fields name="params">
+
+			<fieldset name="basic" addfieldpath="modules/mod_flexigooglemap/elements/">
+
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_CONFIG" level="level1" />
+				<field
+					name="catidmode" type="radio" default="0"
+					label="FLEXI_GOOGLEMAP_CATIDMODE" description="FLEXI_GOOGLEMAP_CATIDMODE_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_CATID_MANUAL</option>
+					<option value="1">FLEXI_GOOGLEMAP_CATID_CURRENT</option>
+				</field>
+
+				<field name="catid" type="flexicategories" multiple="false" label="FLEXI_GOOGLEMAP_CAT" description="FLEXI_GOOGLEMAP_DESC" showon="catidmode:0"/>
+
+				<field name="fieldaddressid" type="sql" default="10" label="FLEXI_GOOGLEMAP_ADDRESSFIELD" query="SELECT id AS value, concat( name, ' (', id, ')') AS title FROM #__flexicontent_fields WHERE field_type='addressint'" description="FLEXI_GOOGLEMAP_ADDRESSFIELD_DESC" value_field="title"/>
+				<field
+					name="apikey" type="text" default=""
+					label="FLEXI_GOOGLEMAP_APIKEY" description="FLEXI_GOOGLEMAP_APIKEY_DESC"
+				/>
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_DISPLAY" level="level1" />
+				<field
+					name="maptype" type="list" default="ROADMAP"
+					label="FLEXI_GOOGLEMAP_MAPTYPE" description="FLEXI_GOOGLEMAP_MAPTYPE_DESC"
+					>
+					<option value="ROADMAP">FLEXI_GOOGLEMAP_ROADMAP</option>
+					<option value="HYBRID">FLEXI_GOOGLEMAP_HYBRID</option>
+					<option value="SATELLITE">FLEXI_GOOGLEMAP_SATELLITE</option>
+					<option value="TERRAIN">FLEXI_GOOGLEMAP_TERRAIN</option>
+				</field>
+				<field
+					name="width" type="text"
+					default="300px" label="FLEXI_GOOGLEMAP_WIDTH"
+					description="FLEXI_GOOGLEMAP_WIDTH_DESC"
+				/>
+				<field
+					name="height" type="text"
+					default="600px" label="FLEXI_GOOGLEMAP_height"
+					description="FLEXI_GOOGLEMAP_HEIGHT_DESC"
+				/>
+				<field
+					name="ratiomap" type="text"
+					default="75%" label="FLEXI_GOOGLEMAP_RATIOMAP"
+					description="FLEXI_GOOGLEMAP_RATIOMAP_DESC"
+				/>
+				<field
+					name="maxzoommarker" type="text"
+					default="15" label="FLEXI_GOOGLEMAP_MAXZOOMMARKER"
+					description="FLEXI_GOOGLEMAP_MAXZOOMMARKER_DESC"
+				/>
+
+				<field
+					name="count" type="list"
+					default="" label="FLEXI_GOOGLEMAP_NBITEM"
+					description="FLEXI_GOOGLEMAP_NBITEM_DESC">
+					<option	value="">FLEXI_GOOGLEMAP_NOLIMITE</option>
+					<option	value="DESC LIMIT 10">10</option>
+					<option	value="DESC LIMIT 50">50</option>
+					<option	value="DESC LIMIT 100">100</option>
+					<option	value="DESC LIMIT 150">150</option>
+					<option	value="DESC LIMIT 200">200</option>
+					<option	value="DESC LIMIT 250">250</option>
+					<option	value="DESC LIMIT 300">300</option>
+					<option	value="DESC LIMIT 350">350</option>
+					<option	value="DESC LIMIT 400">400</option>
+					<option	value="DESC LIMIT 450">450</option>
+					<option	value="DESC LIMIT 500">500</option>
+					<option	value="DESC LIMIT 1000">1000</option>
+				</field>
+
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSDISPLAY" level="level2" />
+
+				<field name="markerimage" type="media" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
+				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_DESC" preview="true" preview_width="80" preview_height="80" />
+
+				<field
+					name="lettermarkermode" type="radio"
+					default="0" label="FLEXI_GOOGLEMAP_LETTERMARKERMODE"
+					description="FLEXI_GOOGLEMAP_LETTERMARKERMODE_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_NO</option>
+					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+				</field>
+
+				<field
+					name="markercolor" type="list"
+					default="redpt" label="FLEXI_GOOGLEMAP_MARKERSCOLOR"
+					description="FLEXI_GOOGLEMAP_MARKERSCOLOR_DESC"
+					showon="lettermarkermode:1">
+					<option	value="red">FLEXI_GOOGLEMAP_MARKERSCOLOR_RED</option>
+					<option	value="green">FLEXI_GOOGLEMAP_MARKERSCOLOR_GREEN</option>
+				</field>
+				<field
+					name="lettermarker" type="text"
+					default="A" label="FLEXI_GOOGLEMAP_LETTERMARKER"
+					description="FLEXI_GOOGLEMAP_LETTERMARKER_DESC"
+					showon="lettermarkermode:1"
+				/>
+				<field
+					name="animationmarker" type="radio"
+					default="1" label="FLEXI_GOOGLEMAP_ANIMATIONMARKER"
+					description="FLEXI_GOOGLEMAP_ANIMATIONMARKER_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_NO</option>
+					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+				</field>
+
+				<field name="mapstyle" type="textarea" hint="[Your style code]" label="FLEXI_GOOGLEMAP_STYLE" description="FLEXI_GOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw"/>
+
+
+
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING" level="level2" />
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />
+				
+				<field
+					name="clustermode" type="radio"
+					default="1" label="FLEXI_GOOGLEMAP_CLUSTERMODE"
+					description="FLEXI_GOOGLEMAP_CLUSTERMODE_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_NO</option>
+					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+				</field>
+
+				<field name="imgcluster" type="media" directory="mod_flexigooglemap/cluster" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
+				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_DESC" preview="true" preview_width="80" preview_height="80" showon="clustermode:1"/>
+				<field
+					name="gridsize" type="text"
+					default="50" label="FLEXI_GOOGLEMAP_GRIDESIZE"
+					description="FLEXI_GOOGLEMAP_GRIDESIZE_DESC"
+					showon="clustermode:1"
+				/>
+				<field
+					name="maxzoom" type="text"
+					default="15" label="FLEXI_GOOGLEMAP_MAXZOOM"
+					description="FLEXI_GOOGLEMAP_MAXZOOM_DESC"
+					showon="clustermode:1"
+				/>
+
+
+
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_INFOWINDOWS" level="level1" />
+				<field
+					name="uselink" type="radio"
+					default="1" label="FLEXI_GOOGLEMAP_USELINK"
+					description="FLEXI_GOOGLEMAP_USELINK_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_NO</option>
+					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+				</field>
+
+				<field
+					name="linkmode" type="radio"
+					default="" label="FLEXI_GOOGLEMAP_LINKMODE"
+					description="FLEXI_GOOGLEMAP_LINKMODE_DESC"
+					class="btn-group btn-group-yesno" showon="uselink:1"
+					>
+					<option value="_blank">FLEXI_GOOGLEMAP_BLANK</option>
+					<option value="">FLEXI_GOOGLEMAP_SAME</option>
+				</field>
+
+				<field
+					name="$forced_itemid" type="text"
+					default="" label="FLEXI_GOOGLEMAP_FORCEITEMID"
+					description="FLEXI_GOOGLEMAP_FORCEITEMID_DESC"
+					showon="uselink:1"
+				/>
+
+				<field
+					name="infotextmode" type="radio"
+					default="0" label="FLEXI_GOOGLEMAP_INFOTEXTMODE"
+					description="FLEXI_GOOGLEMAP_INFOTEXTMODE_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
+					<option value="1">FLEXI_GOOGLEMAP_INFOTEXTMODE_FULL</option>
+				</field>
+
+				<field
+					name="useadress" type="radio"
+					default="1" label="FLEXI_GOOGLEMAP_USEADDRESS"
+					description="FLEXI_GOOGLEMAP_USEADDRESS_DESC"
+					class="btn-group btn-group-yesno" showon="infotextmode:0"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_NO</option>
+					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+				</field>
+
+				<field name="relitem_html" type="textarea" cols="38" rows="5" default="your text {{fieldname}}" label="FLEXI_GOOGLEMAP_HTML_WITH_REPLACEMENTS" description="FLEXI_GOOGLEMAP_HTML_WITH_REPLACEMENTS_DESC"  showon="infotextmode:1"/>
+
+				<field
+					name="usedirection" type="radio"
+					default="1" label="FLEXI_GOOGLEMAP_USEDIRECTION"
+					description="FLEXI_GOOGLEMAP_USEDIRECTION_DESC"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="0">FLEXI_GOOGLEMAP_NO</option>
+					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+				</field>
+
+				<field
+					name="directionname" type="text"
+					default="FLEXI_GOOGLEMAP_DIRECTIONNAME_TXT" label="FLEXI_GOOGLEMAP_DIRECTIONNAME"
+					description="FLEXI_GOOGLEMAP_DIRECTIONNAME_DESC" class="input-xxlarge"
+					showon="usedirection:1"
+				/>
+
+				<field
+					name="readmore" type="text"
+					default="FLEXI_GOOGLEMAP_READMORE_TXT" label="FLEXI_GOOGLEMAP_READMORE"
+					description="FLEXI_GOOGLEMAP_READMORE_DESC" class="input-xxlarge"
+				/>
+
+			</fieldset>
+
+
+			<fieldset name="advanced">
+
+				<field
+					name="cache"
+					type="list"
+					default="1"
+					label="COM_MODULES_FIELD_CACHING_LABEL"
+					description="COM_MODULES_FIELD_CACHING_DESC">
+					<option
+					value="1">JGLOBAL_USE_GLOBAL</option>
+					<option
+					value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+				</field>
+
+			</fieldset>
+
+		</fields>
+
+	</config>
+
+	<!--updateservers>
+		<server type="extension" priority="1" name="FLEXI googlemap update">https://update.com3elles.com/mod_flexigooglemap/mod_flexigooglemap_update.xml</server>
+	</updateservers-->
+
+</extension>
