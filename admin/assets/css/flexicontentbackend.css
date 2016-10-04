@@ -1072,8 +1072,8 @@ div.fc-inherited-value {
 }
 .ui-dialog.fc-fixed-dialog {
 	position: fixed;
-	top: 40px !important;
-	left: 30px !important;
+	top: 40px;
+	left: 30px;
 	overflow: auto;
 }
 .flexicontent .ui-autocomplete {
@@ -3867,4 +3867,7 @@ ul.import-failed li {
 .adminlist.fcmanlist .btn.btn-small.fc-assignments-btn {
 	min-width: 50px;
 	box-sizing: border-box;
+}
+body .j-sidebar-container {
+	padding-bottom: 36px;
 }
