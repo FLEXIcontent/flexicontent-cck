@@ -136,6 +136,8 @@
 
 		// Open the dialog manually
 		theDialog = obj.dialog('open');
+
+		// Add modal's data to the data of the parent of the HTML container: max-width, max-height, params, dialog reference
 		theDialog.data('fc_dialog_params', params);
 		theDialog.data('fc_dialog_maxwidth', winwidth);
 		theDialog.data('fc_dialog_maxheight', winheight);
@@ -162,7 +164,8 @@
 		
 		// Get container creating it if it does not exist
 		var container = jQuery('#'+tagid);
-		if (!container.length) {
+		if (!container.length)
+		{
 			container = jQuery('<div id="'+tagid+'"></div>').appendTo(document.body);
 		}
 		
@@ -175,7 +178,8 @@
 		
 		// Add the iframe
 		var iframe;
-		if (!no_iframe) {
+		if (!no_iframe)
+		{
 			iframe = jQuery('<iframe id="'+tagid+'_frame" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
 			container.append(iframe);
 			iframe.load(function() {
@@ -183,8 +187,8 @@
 				iframe.show().css('visibility', 'visible');
 				loading.hide();
 				
-				// Remove unneeded scroll bar inside iframe document
-				iframe.contents().find('body').css({ 'height': 'unset' });
+				// Remove unneeded scroll bar inside iframe document, new browser security disallows this ?
+				//iframe.contents().find('body').css({ 'height': 'unset' });
 			});
 		}
 		
@@ -232,7 +236,13 @@
 		
 		// Open the dialog manually
 		var theDialog = container.dialog('open');
-		
+
+		// Add modal's data to the data of the parent of the HTML container: max-width, max-height, params, dialog reference
+		theDialog.data('fc_dialog_params', params);
+		theDialog.data('fc_dialog_maxwidth', winwidth);
+		theDialog.data('fc_dialog_maxheight', winheight);
+		container.parent().data('fc_dialog', theDialog);
+
 		// Attach on-load function to the iframe
 		if (!no_iframe && loadFunc)
 		{
@@ -1146,14 +1156,17 @@
 			var content_box = dialog_box.find(contentSel);
 			var h = dialog_box.height() - content_box.prev().outerHeight(true) - content_box.next().outerHeight(true);
 			content_box.css({ 'height': h+'px', 'margin': '0', 'box-sizing': 'border-box' });
-			var body = content_box.find('iframe').contents().find('body');
-			body.css({ 'height': 'unset' });
+
+			// Remove unneeded scroll bar inside iframe document, new browser security disallows this ?
+			//var body = content_box.find('iframe').contents().find('body');
+			//body.css({ 'height': 'unset' });
 		});
 	}
 
 
 	/* Debounced function execution by the given 'wait' time, forcing single function execution within the given 'wait' time */
-	function fc_debounce_exec(func, wait, immediate) {
+	function fc_debounce_exec(func, wait, immediate)
+	{
 		var timeout;
 		return function() {
 			var context = this, args = arguments;

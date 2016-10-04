@@ -262,7 +262,7 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 		<?php if ($clustermode)
 		{
 			echo "
-			var mcOptions = {gridSize:$gridsize, maxZoom:$maxzoom, imagePath: 'images/mod_flexigooglemap/cluster/$imgcluster'};
+			var mcOptions = {gridSize:$gridsize, maxZoom:$maxzoom, imagePath: '$imgcluster'};
 			var marker = new MarkerClusterer(map, markers, mcOptions);
 			";
 		}
