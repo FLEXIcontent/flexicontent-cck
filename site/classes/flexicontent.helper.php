@@ -7442,8 +7442,10 @@ function FLEXISubmenu($cando)
 			'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 				'<span class="fcsb-icon-plugins"></span>'.JText::_( 'FLEXI_PLUGINS' ).
 			'</a>', '', false);
-
-		if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-translations"></span>'.JText::_( 'Translation packages' ), 'http://www.flexicontent.org/downloads/download-translation-flexicontent.html', 0);
+		if ($perms->CanConfig)	call_user_func($addEntry,
+			'<a href="http://www.flexicontent.org/downloads/download-translation-flexicontent.html?tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
+				'<span class="fcsb-icon-translations"></span>'.JText::_( 'Translation packages' ).
+			'</a>', '', false);
 	}
 }
 
