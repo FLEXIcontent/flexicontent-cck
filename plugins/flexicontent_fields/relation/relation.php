@@ -591,10 +591,10 @@ jQuery(document).ready(function()
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' ct.id AS value, ct.title AS text';
 		$filter->filter_valuesfrom   = null;  // use default
-		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED) AND ct.state = 1 AND ct.publish_up < UTC_TIMESTAMP() AND (ct.publish_down = "0000-00-00 00:00:00" OR ct.publish_down > UTC_TIMESTAMP())';
+		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = fi.value_integer AND ct.state = 1 AND ct.publish_up < UTC_TIMESTAMP() AND (ct.publish_down = "0000-00-00 00:00:00" OR ct.publish_down > UTC_TIMESTAMP())';
 		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses
-		$filter->filter_groupby = ' GROUP BY CAST(fi.value AS UNSIGNED) '; // * will be be appended with , fi.item_id
+		$filter->filter_groupby = ' GROUP BY fi.value_integer '; // * will be be appended with , fi.item_id
 		$filter->filter_having  = null;  // use default
 		$filter->filter_orderby = $orderby; // use field ordering setting
 		
@@ -609,7 +609,7 @@ jQuery(document).ready(function()
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$filter->filter_colname     = ' CAST(rel.value AS UNSIGNED)';
+		$filter->filter_colname     = ' rel.value_integer';
 		$filter->filter_valuesjoin  = null;   // use default
 		$filter->filter_valueformat = null;   // use default
 		
@@ -641,9 +641,9 @@ jQuery(document).ready(function()
 		
 		if ($post===null) {
 			$values = null;
-			$field->field_valuesselect = ' CAST(fi.value AS UNSIGNED) AS value_id, ct.title AS value';
-			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
-			$field->field_groupby      = ' GROUP BY CAST(fi.value AS UNSIGNED) ';
+			$field->field_valuesselect = ' fi.value_integer AS value_id, ct.title AS value';
+			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = fi.value_integer';
+			$field->field_groupby      = ' GROUP BY fi.value_integer ';
 		} else if (!empty($post)) {
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID
@@ -668,9 +668,9 @@ jQuery(document).ready(function()
 		
 		if ($post===null) {
 			$values = null;
-			$field->field_valuesselect = ' CAST(fi.value AS UNSIGNED) AS value_id, ct.title AS value';
-			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
-			$field->field_groupby      = ' GROUP BY CAST(fi.value AS UNSIGNED) ';
+			$field->field_valuesselect = ' fi.value_integer AS value_id, ct.title AS value';
+			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = fi.value_integer';
+			$field->field_groupby      = ' GROUP BY fi.value_integer ';
 		} else if (!empty($post)) {
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID 
