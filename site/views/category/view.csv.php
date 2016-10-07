@@ -109,29 +109,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		// 2. Output HEADERS row
 		// *********************
 		
-		// 2a. Output CORE properties titles
-		$props = array('title'=>'title', 'created_by'=>'author', 'created'=>'created');
+		// Map of CORE to item properties
+		$props = array('title'=>'title', 'created_by'=>'author', 'modified_by'=>'modifier', 'created'=>'created', 'modified'=>'modified');
+
+		$total_fields = 0;
 		$delim = "";
 		$item0 = reset($items);
 		
-		$total_fields = 0;
-		foreach($props as $field_name => $prop)
-		{
-			$field = $item0->fields[$field_name];
-			FlexicontentFields::loadFieldConfig($field, $item0);
-
-			if ( !$field->parameters->get('include_in_csv_export', 0) )
-			{
-				continue;
-			}
-
-			echo $delim . $this->encodeCSVField($prop);
-			$delim = ",";
-			$total_fields++;
-		}
-
-
-		// 2b. Output CUSTOM field titles
+		// Output field titles
 		foreach( $item0->fields as $field )
 		{
 			FlexicontentFields::loadFieldConfig($field, $item0);
@@ -142,6 +127,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 
 			echo $delim . $this->encodeCSVField($field->label);
+			$delim = ",";
 			$total_fields++;
 		}
 		echo "\n";
@@ -160,32 +146,31 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		foreach($items as $item)
 		{
-			// 3a. CORE properties
 			$delim = "";
-			foreach($props as $prop)
-			{
-				echo $delim . $this->encodeCSVField($item->$prop);
-				$delim = ",";
-			}
-
-			// 3b. CUSTOM fields
-			foreach($item0->fields as $field)
+			foreach($item0->fields as $field_name => $field)
 			{
 				if ( !$field->parameters->get('include_in_csv_export', 0) )
 				{
 					continue;
 				}
 
-				if (!isset($item->fieldvalues[$field->id]))
+				echo $delim;
+				$delim = ",";
+
+				if ($field->iscore)
 				{
-					echo $delim;
-					continue;
+					$prop = isset($props[$field_name]) ? $props[$field_name] : $field_name;
+					echo $this->encodeCSVField( $item->$prop );
 				}
-				echo $delim . $this->encodeCSVField(implode("\t", $item->fieldvalues[$field->id]));
+
+				else if (isset($item->fieldvalues[$field->id]))
+				{
+					echo $this->encodeCSVField( implode("\t", $item->fieldvalues[$field->id]) );
+				}
 			}
 
 			echo "\n";
 		}
+		jexit();  // need to exist here !! to avoid any other output
 	}
 }
-?>
