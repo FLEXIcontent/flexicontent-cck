@@ -132,4 +132,3 @@ define('FLEXI_PHP_RECOMMENDED',	'5.4.0');
 define('FLEXI_VERSION', '3.2.0-dev');
 define('FLEXI_RELEASE',	'');
 define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
-?>

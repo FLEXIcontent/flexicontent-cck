@@ -296,7 +296,9 @@ if ( $format == 'html' )
 	//JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
 	
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
-	$js = 'var fc_validateOnSubmitForm = 1;';
+	$js = '
+		var fc_validateOnSubmitForm = 1;
+	';
 	$document->addScriptDeclaration( $js );
 	
 	// Load bootstrap CSS
