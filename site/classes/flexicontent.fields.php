@@ -1652,8 +1652,34 @@ class FlexicontentFields
 	// Methods (a) for INDEXED FIELDs, and (b) for replacement field values / item properties
 	// **************************************************************************************
 	
+	// Common method to get the column expressions used to create the field's elements
+	static function indexedField_getColsExprs($field, $item, $field_elements)
+	{
+		$q = preg_replace('/\b(as\s+)(value|text|image|valgrp)\b\s*(,)?\s*/i', 'AS \2\3 ', $field_elements);		
+		$q = preg_replace('/^\s*(select)\b\s*/i', '', $q);		
+		$q = substr($q, 0, stripos($q, 'from'));		
+		$q = preg_split('/(AS value,?\s*|AS text,?\s*|AS image,?\s*|AS valgrp,?\s*)/i', $q, -1, PREG_SPLIT_DELIM_CAPTURE);
+		array_pop($q);
+		
+		$cols = array();
+		$step = 0;
+		$prev = '';
+		foreach($q as $d)
+		{
+			if ($step % 2 == 1)
+			{
+				$d = preg_replace('/\b(as\s+)(value|text|image|valgrp)\b\s*(,)?\s*/i', '\2', $d);
+				$cols[$d] = $prev;
+			}
+			$prev = $d;
+			$step++;
+		}
+		return $cols;
+	}
+
+
 	// Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
-	static function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false, $and_clause=false)
+	static function indexedField_getElements($field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false, $and_clause=false)
 	{
 		static $_elements_cache = null;
 		if ( isset($_elements_cache[$field->id]) ) return $_elements_cache[$field->id];
@@ -1683,18 +1709,21 @@ class FlexicontentFields
 		
 		// TODO: examine this in combination with canCache
 		//$field_elements = FlexicontentFields::replaceFieldValue( $field, $item, $field_elements, 'field_elements' );
-		
-		if ($sql_mode) {  // SQL mode, parameter field_elements contains an SQL query
-			
+
+
+		// SQL mode, parameter field_elements contains an SQL query
+		if ($sql_mode)
+		{
 			$db = JFactory::getDBO();
 			
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros, $canCache);
-			if ($query && $and_clause) {
-				$query = preg_replace('/_valgrp_in_/ui', $and_clause, $query);
+			if ($query)
+			{
+				$query = preg_replace('/_valgrp_in_/ui', ($and_clause ? $and_clause : ' 1 '), $query);
 			}
-			
+
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
 			if ( $query ) {
 				$db->setQuery($query);
@@ -1705,21 +1734,25 @@ class FlexicontentFields
 					$results[$val]->text  = JText::_($result->text);  // the text label
 				}
 			}
-			
+
 			// !! CHECK: DB query failed or produced an error (AN EMPTY ARRAY IS NOT AN ERROR)
 			if (!$query || !is_array($results)) {
 				if ( $canCache && !$and_clause ) $_elements_cache[$field->id] = false;
 				return false;
 			}
-			
-		} else { // Elements mode, parameter field_elements contain list of allowed values
-			
+		}
+
+
+		// Elements mode, parameter field_elements contain list of allowed values
+		else
+		{
 			// Parse the elements used by field unsetting last element if empty
 			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
-			if ( empty($listelements[count($listelements)-1]) ) {
+			if ( empty($listelements[count($listelements)-1]) )
+			{
 				unset($listelements[count($listelements)-1]);
 			}
-			
+
 			$props_needed = 2 + count($extra_props);
 			// Split elements into their properties: value, label, extra_prop1, extra_prop2
 			$listarrays = array();
@@ -1741,19 +1774,23 @@ class FlexicontentFields
 				$results[$val]->value = $listelement_props[0];
 				$results[$val]->text  = $lang_filter_values ? JText::_($listelement_props[1]) : $listelement_props[1];
 				$el_prop_count = 2;
-				if (!empty($extra_props)) {
-					foreach ($extra_props as $extra_prop) {
+				if (!empty($extra_props))
+				{
+					foreach ($extra_props as $extra_prop)
+					{
 						$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
 						$el_prop_count++;
 					}
-				} else {
-					foreach ($default_extra_props as $extra_prop) {
+				}
+				else
+				{
+					foreach ($default_extra_props as $extra_prop)
+					{
 						$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
 						$el_prop_count++;
 					}
 				}
 			}
-			
 		}
 		
 		// Return found elements, caching them if possible (if no item specific elements are used)

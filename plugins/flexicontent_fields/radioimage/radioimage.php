@@ -760,9 +760,11 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		if ($cascade_after)
 		{
 			$_valgrps = $ajax ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
-			if (empty($_valgrps)) {
+			if (empty($_valgrps))
+			{
 				$elements = array();
-				if (!$ajax) {
+				if (!$ajax)
+				{
 					//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 					$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 					$elements = array('_field_selection_prompt_' => $prompt);
@@ -773,7 +775,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		
 		if ($sql_mode)  // SQL query mode
 		{
-			$and_clause = '';
+			$and_clause = false;
 			if ($cascade_after)
 			{
 				// Filter out values not in the the value group, this is done by modifying the SQL query
@@ -782,30 +784,13 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);
 
-				//$and_clause = ' AND valgroup IN ('.implode(',', $_valgrps).')';
-
-				// Use value from the valgrp select expression to build where clause, to avoid "alias in where clause" issue, append or create the where clause
-				$and_clause = preg_match("/where/i", $field_elements) ? ' AND ' : ' WHERE ';
-
-				// Maybe put that scan in a function or use another if have in framework, the _valgrp_in_ substitute is not needed anymore, but sequence must be value, text, valgrp or value, text, image, valgrp
-				if (preg_match("/as image/i", $field_elements))
+				// Parse query to find column expressions used to create field's elements
+				$element_cols = FlexicontentFields::indexedField_getElements($field, $item, $field_elements);
+				$and_clause = ' 0 ';
+				if ( isset($element_cols[$valgrp]) )
 				{
-					$field_elements_pos = stripos($field_elements, 'as image,');
-					$field_elements_str = substr($field_elements, $field_elements_pos);
-					$field_elements_str_two = substr($field_elements_str, strlen('as image,'));
+					$and_clause = $element_cols['valgrp'] . ' IN ('.implode(',', $_valgrps).')';
 				}
-				else
-				{
-					$field_elements_pos = stripos($field_elements, 'as text,');
-					$field_elements_str = substr($field_elements, $field_elements_pos);
-					$field_elements_str_two = substr($field_elements_str, strlen('as text,'));
-				}
-
-				$field_elements_second_pos = stripos($field_elements_str_two, 'as valgrp');
-				$field_elements_str_three = substr($field_elements_str_two, 0, $field_elements_second_pos);
-
-				$valgrp_expression = trim($field_elements_str_three);
-				$and_clause .= $valgrp_expression . ' IN ('.implode(',', $_valgrps).')';
 			}
 
 			$item_pros = true;
