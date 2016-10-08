@@ -2,7 +2,7 @@
 <extension type="component" version="3.4.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
-	<creationDate>16 July 2016</creationDate>
+	<creationDate>08 October 2016</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, FLEXIcontent Team</author>
 	<authorEmail>noreply@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
@@ -226,8 +226,8 @@
 		<module name="mod_flexigooglemap"  folder="modules/mod_flexigooglemap">FLEXIcontent - Google Maps</module>
 	</additional>
 
-	<!--updateservers>
-		<server type="extension" priority="1" name="FLEXIcontent CCK xupdate">https://www.flexicontent.org/com_flexicontent_update.xml</server>
-	</updateservers-->
+	<updateservers>
+		<server type="extension" priority="1" name="FLEXIcontent CCK update">https://raw.githubusercontent.com/FLEXIcontent/flexicontent-cck/master/update.xml</server>
+	</updateservers>
 		
 </extension>
