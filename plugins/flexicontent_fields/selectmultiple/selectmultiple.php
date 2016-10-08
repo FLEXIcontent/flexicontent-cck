@@ -787,11 +787,37 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 				$_elements = array();
 				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);
-				$and_clause = ' AND valgroup IN ('.implode(',', $_valgrps).')';
+
+				//$and_clause = ' AND valgroup IN ('.implode(',', $_valgrps).')';
+
+				// Use value from the valgrp select expression to build where clause, to avoid "alias in where clause" issue, append or create the where clause
+				$and_clause = preg_match("/where/i", $field_elements) ? ' AND ' : ' WHERE ';
+
+				// Maybe put that scan in a function or use another if have in framework, the _valgrp_in_ substitute is not needed anymore, but sequence must be value, text, valgrp or value, text, image, valgrp
+				if (preg_match("/as image/i", $field_elements))
+				{
+					$field_elements_pos = stripos($field_elements, 'as image,');
+					$field_elements_str = substr($field_elements, $field_elements_pos);
+					$field_elements_str_two = substr($field_elements_str, strlen('as image,'));
+				}
+				else
+				{
+					$field_elements_pos = stripos($field_elements, 'as text,');
+					$field_elements_str = substr($field_elements, $field_elements_pos);
+					$field_elements_str_two = substr($field_elements_str, strlen('as text,'));
+				}
+
+				$field_elements_second_pos = stripos($field_elements_str_two, 'as valgrp');
+				$field_elements_str_three = substr($field_elements_str_two, 0, $field_elements_second_pos);
+
+				$valgrp_expression = trim($field_elements_str_three);
+				$and_clause .= $valgrp_expression . ' IN ('.implode(',', $_valgrps).')';
 			}
+
 			$item_pros = true;
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
-			if ( !is_array($elements) ) {
+			if ( !is_array($elements) )
+			{
 				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
 				$elements = array('_field_selection_prompt_' => $prompt);
