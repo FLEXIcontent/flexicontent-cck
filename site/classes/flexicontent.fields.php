@@ -1691,9 +1691,11 @@ class FlexicontentFields
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros, $canCache);
-			if ($query && $and_clause) {
-				$query = preg_replace('/_valgrp_in_/ui', $and_clause, $query);
-			}
+//REMOVE		if ($query && $and_clause) {
+//REMOVE		$query = preg_replace('/_valgrp_in_/ui', $and_clause, $query);
+//REMOVE		}
+			// add the value group clause taken from the select expression
+                        $query .= $and_clause;
 			
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
 			if ( $query ) {
