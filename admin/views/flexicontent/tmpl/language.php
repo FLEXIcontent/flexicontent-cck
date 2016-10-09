@@ -134,7 +134,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
 						<th colspan="2" style="text-align:left;">
-							<label class="flexi_label" style="width: auto !important; max-width: 400px !important;">
+							<label class="label" style="width: auto !important; max-width: 400px !important;">
 								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_TITLE' ); ?>
 							</label>
 						</th>
@@ -218,7 +218,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
 						<th style="text-align:left;" colspan="2">
-							<label class="flexi_label" style="width: auto !important; max-width:400px !important;">
+							<label class="label" style="width: auto !important; max-width:400px !important;">
 								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?>
 							</label>
 						</th>

@@ -675,7 +675,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				$captcha_obj = JCaptcha::getInstance($c_plugin, array('namespace' => $c_namespace));
 				if ($captcha_obj) {
 					$captcha_field = $captcha_obj->display($c_name, $c_id, $c_class);
-					$label_class  = 'flexi_label';
+					$label_class  = 'label';
 					$label_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 					$label_tooltip = flexicontent_html::getToolTip(null, 'FLEXI_CAPTCHA_ENTER_CODE_DESC', 1, 1);
 					$captcha_field = '

@@ -5,6 +5,7 @@ body .fc-close {
 	font-weight: bold;
 	line-height: 18px;
 	opacity: 0.2;
+	filter: alpha(opacity=20);
 	text-shadow: 0 1px 0 #FFFFFF;
 	margin-top: -2px;
 }
@@ -12,6 +13,7 @@ body .fc-close:hover {
 	color: #000000;
 	cursor: pointer;
 	opacity: 0.4;
+	filter: alpha(opacity=40);
 	text-decoration: none;
 	background: none;
 }

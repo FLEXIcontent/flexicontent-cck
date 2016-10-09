@@ -98,11 +98,7 @@ hr.fcclearline {
 	font-size: 14px;
 	color: black;
 	background-color: #eeeeee;
-	background: -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background: -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background: -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background: -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background: -o-linear-gradient(top,#eeeeee,#dddddd);
 	background: linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 	.fc.rounded.corners(4px);
@@ -113,11 +109,7 @@ hr.fcclearline {
 }
 #flexicontent .buttons > a:not(.btn):hover {
 	background-color: #dddddd;
-	background: -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background: -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background: -moz-linear-gradient(top,#dddddd,#cccccc);
-	background: -ms-linear-gradient(top,#dddddd,#cccccc);
-	background: -o-linear-gradient(top,#dddddd,#cccccc);
 	background: linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#cccccc);
 	border: 1px solid #bbbbbb;
@@ -326,11 +318,7 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title {
 	background-color: #dddddd;
-	background: url('../images/search.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background: url('../images/search.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -o-linear-gradient(top,#eeeeee,#dddddd);
 	background: url('../images/search.png') no-repeat 2px 5px, linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 	border: 1px solid lightgray;
@@ -346,11 +334,7 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title:hover {
 	background-color: #cccccc;
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -moz-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -ms-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -o-linear-gradient(top,#dddddd,#cccccc);
 	background: url('../images/toggle_blue.png') no-repeat 2px 5px, linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
 }
@@ -459,9 +443,11 @@ div table.adminform td {
 #flexicontent .item_total .fc_clayout_box label {
 	padding: 1px 2px;
 	opacity: 0.8;
+	filter: alpha(opacity=80);
 }
 #flexicontent .item_total .fc_clayout_box label:hover {
 	opacity: 1;
+	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
 	height: 48px;
@@ -844,17 +830,18 @@ div .fc_field_unsused_val {
 }
 div .fc_field_unsused_val,
 div .fc_field_unsused_val .fc_ifield_val_txt {
- font-style: italic;
- text-decoration: line-through;
+	font-style: italic;
+	text-decoration: line-through;
 }
 div .fc_field_unsused_val .fc_ifield_val_txt {
- opacity: 0.7;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
 }
 div .fc_field_unsused_val [class^="fc-icon-"], 
 div .fc_field_unsused_val [class*=" fc-icon-"],
 div .fc_field_unsused_val img {
- opacity:0.4;
- filter:alpha(opacity=40); /* For IE8 and earlier */
+	opacity:0.4;
+	filter:alpha(opacity=40);
 }
 .fc_ifield_val_box {
 	float: left;
