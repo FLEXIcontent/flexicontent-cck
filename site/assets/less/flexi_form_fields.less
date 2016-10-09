@@ -87,8 +87,6 @@
 	background-color: white !important;
 	border-radius: 4px;
 	border: 1px solid #d0d0d0 !important;
-	moz-box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
-	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
 	box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
 }
 
@@ -114,8 +112,6 @@
 /* FIELD-GROUP: value container (contains grouped fields) */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox {
 	border: 0px solid lightgray;  /* better drag-n-drop ordering */
-	moz-box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
-	-webkit-box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
 	box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
 	border-radius: 2px;
 	width: 100%;
@@ -258,11 +254,7 @@
 	cursor: pointer;
 	
 	background-color: white;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#d0d0d0));
 	background-image: -webkit-linear-gradient(top,white,#d0d0d0);
-	background-image: -moz-linear-gradient(top,white,#d0d0d0);
-	background-image: -ms-linear-gradient(top,white,#d0d0d0);
-	background-image: -o-linear-gradient(top,white,#d0d0d0);
 	background-image: linear-gradient(to bottom,white,#d0d0d0);
 	/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=#d0d0d0);*//*filter prevents background image in ie8/ie9*/
 }
@@ -304,11 +296,7 @@
 #flexicontent .fcfield-button:hover,
 #flexicontent .fcfield-button-add:hover a {
 	background-color: #f0f0f0;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(#f0f0f0),to(#c0c0c0));
 	background-image: -webkit-linear-gradient(top,#f0f0f0,#c0c0c0);
-	background-image: -moz-linear-gradient(top,#f0f0f0,#c0c0c0);
-	background-image: -ms-linear-gradient(top,#f0f0f0,#c0c0c0);
-	background-image: -o-linear-gradient(top,#f0f0f0,#c0c0c0);
 	background-image: linear-gradient(to bottom,#f0f0f0,#c0c0c0);
 	/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#c0c0c0);*/
 }
@@ -561,6 +549,7 @@ table.fcimg_dbfile_tbl {
 	color: #888;
 	text-decoration: line-through;
 	opacity: 0.5;
+	filter: alpha(opacity=50);
 	text-style: italic;
 }
 #flexicontent img.fc_preview_thumb {

@@ -93,8 +93,8 @@ span.orderingcat {
 	padding: 2px 4px;
 	background: white;
 }
-span.maincat a: hover {
-	text-decoration: none !improtant;
+span.maincat a:hover {
+	text-decoration: none !important;
 }
 span.maincat a {
 	color: black;
@@ -116,10 +116,8 @@ h3.themes-title small {
 	font-weight: normal;
 }
 .pane-disabled {
-	filter: alpha(opacity=40);
-	-moz-opacity: 0.4;
-	-khtml-opacity: 0.4;
 	opacity: 0.4;
+	filter: alpha(opacity=40);
 	font-style: oblique;
 }
 div.records_container,
@@ -189,6 +187,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_unused {
 	width: 100px;
 	opacity: 0.65;
+	filter: alpha(opacity=65);
 }
 .records_container > ul > li.fcrecord,
 .positions_container > ul > li.fields {
@@ -240,6 +239,7 @@ ul.fcrecords {
 	cursor: move;
 	border: 0;
 	opacity: 0.8;
+	filter: alpha(opacity=80);
 }
 .records_container .addfield_handle.fc_end {
 	min-width: 200px;
@@ -363,6 +363,7 @@ table.adminlist td.yellow,
 table.adminlist tbody tr td.yellow,
 table.adminlist tbody tr.row0 td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
+	background: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 	background: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 }
 table.adminlist tbody th {
@@ -390,6 +391,7 @@ table.adminlist tbody tr.row1 td {
 }
 table.adminlist tbody tr.row0:hover,
 table.adminlist tbody tr.row1:hover {
+	background: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 	background: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 }
 table.adminlist tbody tr.row0:hover td,
@@ -661,11 +663,7 @@ body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #333;
 	background-color: #e6e6e6;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(#ffffff),to(#e6e6e6));
 	background-image: -webkit-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: -moz-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: -ms-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: -o-linear-gradient(top,#ffffff,#e6e6e6);
 	background-image: linear-gradient(to bottom,#ffffff,#e6e6e6);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e6e6e6);
 	background-repeat: repeat-x;
@@ -898,14 +896,9 @@ table.adminform td #search {
 	float: right;
 	margin: 0px;
 	padding: 0px;
-	color: auto;
+	color: unset;
 	font-size: 12px;
 	font-style: normal;
-}
-#flexicontent span.flexi_label label label {
-	float: right;
-	margin: auto;
-	padding: auto;
 }
 #flexicontent .flexi_params > label,
 #flexicontent fieldset.panelform > label,
@@ -1104,17 +1097,15 @@ body.contentpane.modal #flexicontent {
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess,
 fieldset.adminform,
-#flexicontent fieldset.customfields_set,
 #flexicontent fieldset.params_set {
 	border: 1px solid lightgray !important;
-	margin: 16x 6px !important;
+	margin: 8px 4px !important;
 	padding: 4px 4px 4px 4px !important;
 	width: auto !important;
 	min-width: inherit !important;
 	display: block;
 }
 #flexicontent fieldset.params_set legend,
-#flexicontent fieldset.customfields_set legend,
 #flexicontent fieldset.basicfields_set legend {
 	padding: 0px 6px;
 	width: auto;
@@ -1145,7 +1136,6 @@ fieldset.adminform legend {
 	padding-right: 0px;
 }
 .fc_legend_box {
-	font-weight: bottom;
 	border-bottom: 1px dashed gray;
 }
 .key.tbl_group {
@@ -1711,7 +1701,6 @@ table.fc_uploader_header_tbl td:last-child {
 	height: 22px;
 	border-radius: 4px;
 	background-color: #f5f5f5;
-	-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 	box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 	position: relative;
 	left: -15px;

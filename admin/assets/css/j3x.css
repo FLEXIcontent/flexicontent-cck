@@ -178,8 +178,6 @@ select {
 	margin-bottom: 3px;
 }
 :not(.fc-sliders-plain-outer) > .pane-sliders .panel h3 {
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
 	border-radius: 3px;
 	font-size: 12px;
 	font-weight: bold;

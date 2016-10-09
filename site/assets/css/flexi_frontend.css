@@ -76,16 +76,10 @@ hr.fcclearline {
 	font-size: 14px;
 	color: black;
 	background-color: #eeeeee;
-	background: -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background: -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background: -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background: -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background: -o-linear-gradient(top,#eeeeee,#dddddd);
 	background: linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border: 1px solid #cccccc;
 	padding: 0px 8px;
 	vertical-align: top;
@@ -93,11 +87,7 @@ hr.fcclearline {
 }
 #flexicontent .buttons > a:not(.btn):hover {
 	background-color: #dddddd;
-	background: -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background: -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background: -moz-linear-gradient(top,#dddddd,#cccccc);
-	background: -ms-linear-gradient(top,#dddddd,#cccccc);
-	background: -o-linear-gradient(top,#dddddd,#cccccc);
 	background: linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#cccccc);
 	border: 1px solid #bbbbbb;
@@ -173,8 +163,6 @@ hr.fcclearline {
 	padding: 1px;
 	border: 1px solid lightgray;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 }
 #flexicontent .catdescription {
 	margin: 0 0 0.5em 0;
@@ -253,17 +241,11 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title {
 	background-color: #dddddd;
-	background: url('../images/search.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background: url('../images/search.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -o-linear-gradient(top,#eeeeee,#dddddd);
 	background: url('../images/search.png') no-repeat 2px 5px, linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 	border: 1px solid lightgray;
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	padding: 4px 4px 4px 25px;
 	cursor: pointer;
 	-webkit-touch-callout: none;
@@ -275,11 +257,7 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title:hover {
 	background-color: #cccccc;
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -moz-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -ms-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -o-linear-gradient(top,#dddddd,#cccccc);
 	background: url('../images/toggle_blue.png') no-repeat 2px 5px, linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
 }
@@ -307,8 +285,6 @@ div table.adminform td {
 	background: #efefef;
 	border: 1px solid #c0c0c0;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	float: left;
 	margin-right: 2px;
 	padding: 6px;
@@ -359,9 +335,11 @@ div table.adminform td {
 #flexicontent .item_total .fc_clayout_box label {
 	padding: 1px 2px;
 	opacity: 0.8;
+	filter: alpha(opacity=80);
 }
 #flexicontent .item_total .fc_clayout_box label:hover {
 	opacity: 1;
+	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
 	height: 48px;
@@ -603,8 +581,6 @@ img.fc_field_image {
 	padding: 1px;
 	border: 1px solid lightgray;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;
@@ -660,6 +636,7 @@ div .fc_field_unsused_val .fc_ifield_val_txt {
 }
 div .fc_field_unsused_val .fc_ifield_val_txt {
 	opacity: 0.7;
+	filter: alpha(opacity=70);
 }
 div .fc_field_unsused_val [class^="fc-icon-"],
 div .fc_field_unsused_val [class*=" fc-icon-"],
@@ -685,8 +662,6 @@ div .fc_field_unsused_val img {
 }
 div.fc-fieldgrp-value-box {
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border: 1px solid lightgray;
 	display: block;
 	float: left;
@@ -740,8 +715,6 @@ div.fc-fieldgrp-value-box {
 .flexicontent.fcsearch .inputbox {
 	border: 1px solid lightgray;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	padding: 2px;
 	height: auto;
 }
@@ -777,8 +750,6 @@ div.fc-fieldgrp-value-box {
 	padding: 1px;
 	border: 1px solid #aaaaaa;
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 }
 fc_search_result_date .fc-mssg-inline,
 fc_search_result_category .fc-mssg-inline {
@@ -787,8 +758,6 @@ fc_search_result_category .fc-mssg-inline {
 .flexicontent.fcsearch .highlight {
 	background: none repeat scroll 0 0 #FFFFAA;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	color: darkred;
 	font-weight: normal;
 	padding: 3px 5px;
@@ -876,8 +845,6 @@ table.admintable td {
 #flexicontent.fcdirectory .fccat_image {
 	border: 1px solid #dddddd;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	float: left;
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
@@ -898,8 +865,6 @@ table.admintable td {
 #flexicontent.fcdirectory .fcsubcat_image {
 	border: 1px solid #dddddd;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	float: left;
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
@@ -1026,8 +991,6 @@ div.flexi.value,
 }
 div.fc-custom-fields-box {
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border: 1px solid #dddddd;
 	display: block;
 	float: left;
@@ -1064,8 +1027,6 @@ div.fc-field-box {
 	max-width: 150px;
 	min-width: auto;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	line-height: 100%;
 	border-width: 0px;
 	margin: 0px 6px 6px 0px;

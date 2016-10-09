@@ -113,7 +113,7 @@ label input[type="radio"].fc_checkradio,
 .flexicontent label input[type="radio"]:not(.skip_fccr) {
 	width: auto !important;
 	margin: 3px 3px 0px 0px !important;
-	padding: auto !important;
+	padding: unset !important;
 	opacity: inherit !important;
 	display: inline !important;
 	vertical-align: bottom !important;
@@ -243,10 +243,7 @@ input[type="radio"].fc_checkradio_bar + label {
 	vertical-align: middle !important;
 	cursor: pointer !important;
 	background-color: #f5f5f5 !important;
-	background-image: -moz-linear-gradient(top,#fff,#e6e6e6) !important;
-	background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#e6e6e6)) !important;
 	background-image: -webkit-linear-gradient(top,#fff,#e6e6e6) !important;
-	background-image: -o-linear-gradient(top,#fff,#e6e6e6) !important;
 	background-image: linear-gradient(to bottom,#fff,#e6e6e6) !important;
 	background-repeat: repeat-x !important;
 	border: 1px solid #ccc !important;
@@ -255,16 +252,12 @@ input[type="radio"].fc_checkradio_bar + label {
 	border-bottom-color: #b3b3b3 !important;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0) !important;
 	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !important;
-	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
-	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
 	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
 }
 input[type="checkbox"].fc_checkradio_bar:checked + label,
 input[type="radio"].fc_checkradio_bar:checked + label {
 	background-image: none !important;
 	outline: 0 !important;
-	-webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
-	-moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
 	box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
 	background-color: #e0e0e0 !important;
 }
@@ -297,8 +290,6 @@ div .flexi_buttons button:not(.btn) {
 	float: none !important;
 	height: auto !important;
 	border: 1px solid #cccccc;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border-radius: 4px;
 	line-height: 1.5em;
 	font-size: 12px;
@@ -312,11 +303,7 @@ div .flexi_buttons button:not(.btn) {
 	font-weight: bold;
 	color: #FFFFFF;
 	background-color: #eeeeee;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background-image: -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background-image: -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background-image: -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background-image: -o-linear-gradient(top,#eeeeee,#dddddd);
 	background-image: linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 }
@@ -333,7 +320,7 @@ div .fc_button.fcsimple:not(.btn) {
 	border-radius: 4px;
 	border-style: solid;
 	border-width: 1px;
-	box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
 	color: #333;
 	cursor: pointer;
 	display: inline-block;
@@ -350,7 +337,6 @@ div .fc_button.fcsimple:not(.btn):focus {
 	color: #333333;
 	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
 	background-color: #e6e6e6;
-	*background-color: #d9d9d9;
 	text-decoration: none;
 	background-position: 0 -15px;
 	-webkit-transition: background-position 0.1s linear;
@@ -363,11 +349,7 @@ div .fc_buttons button:not(.btn):hover,
 div .flexi_buttons button:not(.btn):hover {
 	border: 1px solid #bbbbbb;
 	background-color: #dddddd;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background-image: -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background-image: -moz-linear-gradient(top,#dddddd,#cccccc);
-	background-image: -ms-linear-gradient(top,#dddddd,#cccccc);
-	background-image: -o-linear-gradient(top,#dddddd,#cccccc);
 	background-image: linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
 }
@@ -379,7 +361,7 @@ div .flexi_buttons button:not(.btn):hover {
 }
 .fc_loading_msg {
 	font-size: 14px;
-	font-size: times;
+	font-family: times;
 	padding: 4px 0px 4px 30px;
 	background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
 	display: inline-block;
@@ -609,6 +591,7 @@ body .fc-close {
 	font-weight: bold;
 	line-height: 18px;
 	opacity: 0.2;
+	filter: alpha(opacity=20);
 	text-shadow: 0 1px 0 #FFFFFF;
 	margin-top: -2px;
 }
@@ -616,6 +599,7 @@ body .fc-close:hover {
 	color: #000000;
 	cursor: pointer;
 	opacity: 0.4;
+	filter: alpha(opacity=40);
 	text-decoration: none;
 	background: none;
 }
@@ -1154,8 +1138,8 @@ span.orderingcat {
 	padding: 2px 4px;
 	background: white;
 }
-span.maincat a: hover {
-	text-decoration: none !improtant;
+span.maincat a:hover {
+	text-decoration: none !important;
 }
 span.maincat a {
 	color: black;
@@ -1177,10 +1161,8 @@ h3.themes-title small {
 	font-weight: normal;
 }
 .pane-disabled {
-	filter: alpha(opacity=40);
-	-moz-opacity: 0.4;
-	-khtml-opacity: 0.4;
 	opacity: 0.4;
+	filter: alpha(opacity=40);
 	font-style: oblique;
 }
 div.records_container,
@@ -1250,6 +1232,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_unused {
 	width: 100px;
 	opacity: 0.65;
+	filter: alpha(opacity=65);
 }
 .records_container > ul > li.fcrecord,
 .positions_container > ul > li.fields {
@@ -1301,6 +1284,7 @@ ul.fcrecords {
 	cursor: move;
 	border: 0;
 	opacity: 0.8;
+	filter: alpha(opacity=80);
 }
 .records_container .addfield_handle.fc_end {
 	min-width: 200px;
@@ -1424,6 +1408,7 @@ table.adminlist td.yellow,
 table.adminlist tbody tr td.yellow,
 table.adminlist tbody tr.row0 td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
+	background: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 	background: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 }
 table.adminlist tbody th {
@@ -1451,6 +1436,7 @@ table.adminlist tbody tr.row1 td {
 }
 table.adminlist tbody tr.row0:hover,
 table.adminlist tbody tr.row1:hover {
+	background: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 	background: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 }
 table.adminlist tbody tr.row0:hover td,
@@ -1722,11 +1708,7 @@ body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #333;
 	background-color: #e6e6e6;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(#ffffff),to(#e6e6e6));
 	background-image: -webkit-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: -moz-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: -ms-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: -o-linear-gradient(top,#ffffff,#e6e6e6);
 	background-image: linear-gradient(to bottom,#ffffff,#e6e6e6);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e6e6e6);
 	background-repeat: repeat-x;
@@ -1959,14 +1941,9 @@ table.adminform td #search {
 	float: right;
 	margin: 0px;
 	padding: 0px;
-	color: auto;
+	color: unset;
 	font-size: 12px;
 	font-style: normal;
-}
-#flexicontent span.flexi_label label label {
-	float: right;
-	margin: auto;
-	padding: auto;
 }
 #flexicontent .flexi_params > label,
 #flexicontent fieldset.panelform > label,
@@ -2165,17 +2142,15 @@ body.contentpane.modal #flexicontent {
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess,
 fieldset.adminform,
-#flexicontent fieldset.customfields_set,
 #flexicontent fieldset.params_set {
 	border: 1px solid lightgray !important;
-	margin: 16x 6px !important;
+	margin: 8px 4px !important;
 	padding: 4px 4px 4px 4px !important;
 	width: auto !important;
 	min-width: inherit !important;
 	display: block;
 }
 #flexicontent fieldset.params_set legend,
-#flexicontent fieldset.customfields_set legend,
 #flexicontent fieldset.basicfields_set legend {
 	padding: 0px 6px;
 	width: auto;
@@ -2206,7 +2181,6 @@ fieldset.adminform legend {
 	padding-right: 0px;
 }
 .fc_legend_box {
-	font-weight: bottom;
 	border-bottom: 1px dashed gray;
 }
 .key.tbl_group {
@@ -2772,7 +2746,6 @@ table.fc_uploader_header_tbl td:last-child {
 	height: 22px;
 	border-radius: 4px;
 	background-color: #f5f5f5;
-	-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 	box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 	position: relative;
 	left: -15px;
@@ -2956,16 +2929,10 @@ hr.fcclearline {
 	font-size: 14px;
 	color: black;
 	background-color: #eeeeee;
-	background: -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background: -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background: -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background: -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background: -o-linear-gradient(top,#eeeeee,#dddddd);
 	background: linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border: 1px solid #cccccc;
 	padding: 0px 8px;
 	vertical-align: top;
@@ -2973,11 +2940,7 @@ hr.fcclearline {
 }
 #flexicontent .buttons > a:not(.btn):hover {
 	background-color: #dddddd;
-	background: -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background: -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background: -moz-linear-gradient(top,#dddddd,#cccccc);
-	background: -ms-linear-gradient(top,#dddddd,#cccccc);
-	background: -o-linear-gradient(top,#dddddd,#cccccc);
 	background: linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#cccccc);
 	border: 1px solid #bbbbbb;
@@ -3053,8 +3016,6 @@ hr.fcclearline {
 	padding: 1px;
 	border: 1px solid lightgray;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 }
 #flexicontent .catdescription {
 	margin: 0 0 0.5em 0;
@@ -3133,17 +3094,11 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title {
 	background-color: #dddddd;
-	background: url('../images/search.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
 	background: url('../images/search.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -moz-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -ms-linear-gradient(top,#eeeeee,#dddddd);
-	background: url('../images/search.png') no-repeat 2px 5px, -o-linear-gradient(top,#eeeeee,#dddddd);
 	background: url('../images/search.png') no-repeat 2px 5px, linear-gradient(to bottom,#eeeeee,#dddddd);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
 	border: 1px solid lightgray;
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	padding: 4px 4px 4px 25px;
 	cursor: pointer;
 	-webkit-touch-callout: none;
@@ -3155,11 +3110,7 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title:hover {
 	background-color: #cccccc;
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
 	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -moz-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -ms-linear-gradient(top,#dddddd,#cccccc);
-	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -o-linear-gradient(top,#dddddd,#cccccc);
 	background: url('../images/toggle_blue.png') no-repeat 2px 5px, linear-gradient(to bottom,#dddddd,#cccccc);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
 }
@@ -3187,8 +3138,6 @@ div table.adminform td {
 	background: #efefef;
 	border: 1px solid #c0c0c0;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	float: left;
 	margin-right: 2px;
 	padding: 6px;
@@ -3239,9 +3188,11 @@ div table.adminform td {
 #flexicontent .item_total .fc_clayout_box label {
 	padding: 1px 2px;
 	opacity: 0.8;
+	filter: alpha(opacity=80);
 }
 #flexicontent .item_total .fc_clayout_box label:hover {
 	opacity: 1;
+	filter: alpha(opacity=100);
 }
 #flexicontent .item_total .fc_clayout_box img {
 	height: 48px;
@@ -3483,8 +3434,6 @@ img.fc_field_image {
 	padding: 1px;
 	border: 1px solid lightgray;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 }
 div .fc_image_thumb {
 	display: inline-block;
@@ -3540,6 +3489,7 @@ div .fc_field_unsused_val .fc_ifield_val_txt {
 }
 div .fc_field_unsused_val .fc_ifield_val_txt {
 	opacity: 0.7;
+	filter: alpha(opacity=70);
 }
 div .fc_field_unsused_val [class^="fc-icon-"],
 div .fc_field_unsused_val [class*=" fc-icon-"],
@@ -3565,8 +3515,6 @@ div .fc_field_unsused_val img {
 }
 div.fc-fieldgrp-value-box {
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border: 1px solid lightgray;
 	display: block;
 	float: left;
@@ -3620,8 +3568,6 @@ div.fc-fieldgrp-value-box {
 .flexicontent.fcsearch .inputbox {
 	border: 1px solid lightgray;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	padding: 2px;
 	height: auto;
 }
@@ -3657,8 +3603,6 @@ div.fc-fieldgrp-value-box {
 	padding: 1px;
 	border: 1px solid #aaaaaa;
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 }
 fc_search_result_date .fc-mssg-inline,
 fc_search_result_category .fc-mssg-inline {
@@ -3667,8 +3611,6 @@ fc_search_result_category .fc-mssg-inline {
 .flexicontent.fcsearch .highlight {
 	background: none repeat scroll 0 0 #FFFFAA;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	color: darkred;
 	font-weight: normal;
 	padding: 3px 5px;
@@ -3756,8 +3698,6 @@ table.admintable td {
 #flexicontent.fcdirectory .fccat_image {
 	border: 1px solid #dddddd;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	float: left;
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
@@ -3778,8 +3718,6 @@ table.admintable td {
 #flexicontent.fcdirectory .fcsubcat_image {
 	border: 1px solid #dddddd;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	float: left;
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
@@ -3906,8 +3844,6 @@ div.flexi.value,
 }
 div.fc-custom-fields-box {
 	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
 	border: 1px solid #dddddd;
 	display: block;
 	float: left;
@@ -3944,8 +3880,6 @@ div.fc-field-box {
 	max-width: 150px;
 	min-width: auto;
 	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	line-height: 100%;
 	border-width: 0px;
 	margin: 0px 6px 6px 0px;
