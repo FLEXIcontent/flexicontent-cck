@@ -328,6 +328,14 @@ class FlexicontentViewItems extends JViewLegacy
 		$btn_task = 'items.checkin';
 		JToolbarHelper::checkin($btn_task);
 		
+		if ( $cparams->get('show_csvbutton_be', 0) )
+		{
+			$full_js     = "window.location.replace('" .JURI::base().'index.php?option=com_flexicontent&view=items&format=csv'. "')";
+			flexicontent_html::addToolBarButton(
+				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
+		}
+
 		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
 		if ($perms->CanConfig) {
 			$session = JFactory::getSession();
