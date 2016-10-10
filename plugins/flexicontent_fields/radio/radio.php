@@ -932,6 +932,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 		
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) && !$is_ingroup;  // NOT supported inside fielgroup yet
+    $display_all = $prop=='csv_export' ? 0 : $display_all;
 		if ( empty($values) && !$display_all ) {
 			if (!$is_ingroup) {
 				$field->{$prop} = ''; $field->display_index = '';
@@ -1003,6 +1004,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 			$separatorf = '&nbsp;';
 			break;
 		}
+		if ($prop == 'csv_export') $separatorf = ', ';
 		
 		
 		// Get indexed element values
@@ -1040,10 +1042,10 @@ class plgFlexicontent_fieldsRadio extends FCField
 		$display_index = array();
 		
 		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
-		
-		
+
+
 		// Add microdata to every group of values if field -- is -- in a field group
-		if ($is_ingroup && $itemprop) {
+		if ($is_ingroup && $itemprop && $prop!='csv_export') {
 			foreach($field->{$prop} as $n => $disp_html) {
 				$field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 			}
@@ -1055,8 +1057,9 @@ class plgFlexicontent_fieldsRadio extends FCField
 		{
 			if ($multiple && self::$valueIsArr) {
 				// Values separator, field 's opening / closing texts, were already applied for every array of values
-				$field->{$prop} = implode("", $field->{$prop});
-				$field->display_index = implode("", $display_index);
+				$sep = $prop!='csv_export' ? '' : ' -- ';
+				$field->{$prop} = implode($sep, $field->{$prop});
+				$field->display_index = implode($sep, $display_index);
 			} else {
 				// Apply values separator, and field 's opening / closing texts
 				$field->{$prop} = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $field->{$prop}) . $closetag;
