@@ -793,9 +793,10 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 				// Parse query to find column expressions used to create field's elements
 				$element_cols = FlexicontentFields::indexedField_getColsExprs($field, $item, $field_elements);
 				$and_clause = ' 0 ';
+				$valgrp = 'valgrp';
 				if ( isset($element_cols[$valgrp]) )
 				{
-					$and_clause = $element_cols['valgrp'] . ' IN ('.implode(',', $_valgrps).')';
+					$and_clause = $element_cols[$valgrp] . ' IN ('.implode(',', $_valgrps).')';
 				}
 			}
 
