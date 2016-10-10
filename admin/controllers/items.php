@@ -1529,7 +1529,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		echo $rsp;
 	}
-	
+
 
 	/**
 	 * Method to fetch the votes
@@ -1548,6 +1548,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		echo $html;
 		exit;
 	}
+
 
 	/**
 	 * Method to get hits
@@ -1569,7 +1570,5 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		exit;
 	}
-
-	
 	
 }

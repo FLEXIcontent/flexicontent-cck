@@ -29,7 +29,7 @@ jimport('joomla.filesystem.file');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends JViewLegacy
+class FlexicontentViewItems extends JViewLegacy
 {
 	function encodeCSVField($string)
 	{
@@ -58,14 +58,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get model
 		$model  = $this->getModel();
 
-		// Get the category, loading category data and doing parameters merging
-		$category = $this->get('Category');
-
 		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
-		$params = $category->parameters;
+		$params = JComponentHelper::getParams( 'com_flexicontent' );
 
 		// Check if CSV export button is enabled for current view
-		if ( !$params->get('show_csvbutton', 0) ) die('CSV export not enabled for this view');
+		if ( ! $params->get('show_csvbutton_be', 0) ) die('CSV export not enabled for this view');
 
 
 
