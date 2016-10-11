@@ -1157,7 +1157,7 @@ class FlexicontentController extends JControllerLegacy
 		if ($view=='favourites' || ($view=='category' && $layout=='favs')) $cachable = false;
 		
 		// AVOID MAKING TOO LARGE (case 1): search view or other view with TEXT search active
-		else if ($view=='search' || $jinput->get('filter')) $cachable = false;
+		else if ($view=='search' || $jinput->get('filter', '', 'string')) $cachable = false;
 				
 		// AVOID MAKING TOO LARGE: (case 2) some field filters are active
 		else {

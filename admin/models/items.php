@@ -564,7 +564,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$formName ='adminForm';
 		
 		// Set view to category before rendering the filters HTML
-		$view   = $jinput->get('view');
+		$view   = $jinput->get('view', '', 'cmd');
 		$jinput->set('view', 'category');
 		
 		foreach($this->_custom_filters as $filter)

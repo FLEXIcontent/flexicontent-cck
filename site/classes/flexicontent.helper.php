@@ -607,7 +607,7 @@ class flexicontent_html
 		$app = JFactory::getApplication();
 		
 		$default_limit = $app->getUserState('use_limit_before_search_filt') ? $params->get('limit_before_search_filt') : $params->get('limit');
-		$limit_given = strlen( $app->input->get('limit') );
+		$limit_given = strlen( $app->input->get('limit', '', 'string') );
 		$limit = $limit_given ? $app->input->get('limit', 0, 'int') : $default_limit;
 		
 		flexicontent_html::loadFramework('select2');

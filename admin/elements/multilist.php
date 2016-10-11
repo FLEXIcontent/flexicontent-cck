@@ -159,7 +159,7 @@ class JFormFieldMultiList extends JFormField
 			self::$css_js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
 
-			if ( JFactory::getApplication()->input->get('option') != 'com_flexicontent' )
+			if ( JFactory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
 			{
 				$js = "
 				jQuery(document).ready(function(){

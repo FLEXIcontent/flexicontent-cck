@@ -934,7 +934,7 @@ class FlexicontentFields
 		
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 		JRequest::setVar('option', 'com_content');
-		JRequest::setVar("isflexicontent", "yes");
+		JRequest::setVar('isflexicontent', 'yes');
 		
 		// Trigger content plugins on field's HTML display, as if they were a "joomla article"
 		if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$field, &$item->parameters, $limitstart), $plg_arr);

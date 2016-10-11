@@ -1,6 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-if ( JFactory::getApplication()->input->get('print') ) return;
+if ( JFactory::getApplication()->input->get('print', 0, 'int') ) return;
 
 ob_start();
 
@@ -44,8 +44,8 @@ if ($ff_placement){
 	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 	<input type="hidden" name="layout" value="<?php echo $this->layout_vars['layout']; ?>" />
 
-	<input type="hidden" name="letter" value="<?php echo JFactory::getApplication()->input->get('letter'); ?>" id="alpha_index" />
-	<input type="hidden" name="listall" value="<?php echo JFactory::getApplication()->input->get('listall'); ?>" />
+	<input type="hidden" name="letter" value="<?php echo JFactory::getApplication()->input->get('letter', '', 'string'); ?>" id="alpha_index" />
+	<input type="hidden" name="listall" value="<?php echo JFactory::getApplication()->input->get('listall', 0, 'int'); ?>" />
 </form>
 
 <?php

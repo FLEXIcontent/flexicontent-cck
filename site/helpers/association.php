@@ -36,8 +36,8 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 	public static function getAssociations($id = 0, $view = null)
 	{
 		$jinput = JFactory::getApplication()->input;
-		$view   = is_null($view) ? $jinput->get('view') : $view;
-		$id     = empty($id) ? $jinput->getInt('id') : $id;
+		$view   = is_null($view) ? $jinput->get('view', '', 'cmd') : $view;
+		$id     = empty($id) ? $jinput->get('id', 0, 'int') : $id;
 
 		if ($view == 'item')
 		{

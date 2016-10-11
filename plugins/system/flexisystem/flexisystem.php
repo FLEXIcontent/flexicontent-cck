@@ -60,7 +60,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		if ( $task=='config.store' )
 		{
-			$comp = $jinput->get('comp');
+			$comp = $jinput->get('comp', '', 'cmd');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
 			$comp = str_replace('com_flexicontent.item.', 'com_content.article.', $comp);
 			$jinput->set('comp', $comp);
@@ -74,10 +74,10 @@ class plgSystemFlexisystem extends JPlugin
 					$comp_other = $comp == 'com_content'  ?  'com_flexicontent'  :  'com_content';
 					$permissions = array(
 						'component' => $comp_other,
-						'action'    => $jinput->get('action'),
-						'rule'      => $jinput->get('rule'),
-						'value'     => $jinput->get('value'),
-						'title'     => $jinput->get('title', '', 'RAW')
+						'action'    => $jinput->get('action', '', 'cmd'),
+						'rule'      => $jinput->get('rule', '', 'cmd'),
+						'value'     => $jinput->get('value', '', 'cmd'),
+						'title'     => $jinput->get('title', '', 'string')
 					);
 					
 					JLoader::register('ConfigModelApplication', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_config'.DS.'model'.DS.'application.php');
@@ -887,7 +887,7 @@ class plgSystemFlexisystem extends JPlugin
 	public function set_cache_control()
 	{
 		$jinput = JFactory::getApplication()->input;
-		$option = $jinput->get('option');
+		$option = $jinput->get('option', '', 'cmd');
 		$browser_cachable = $jinput->get('browser_cachable', null);
 		if ($option==$this->extension && $browser_cachable!==null)
 		{
@@ -1537,7 +1537,7 @@ class plgSystemFlexisystem extends JPlugin
 	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
 		$jinput = JFactory::getApplication()->input;
-		$option = $jinput->get('component');
+		$option = $jinput->get('component', '', 'cmd');
 		$user   = JFactory::getUser();
 		
 		if ( $context=='com_config.component' && ($option == 'com_content' || $option == 'com_flexicontent') )
@@ -1699,7 +1699,7 @@ class plgSystemFlexisystem extends JPlugin
 		if (
 			$jinput->get('option', '', 'CMD')!='com_content' ||
 			$jinput->get('view', '', 'CMD')!='article' ||
-			$jinput->get('isflexicontent')
+			$jinput->get('isflexicontent', false, 'CMD')
 		) return;
 		
 		

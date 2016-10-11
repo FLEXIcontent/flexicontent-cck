@@ -314,9 +314,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
 
 		// Do some compatibility steps, Set the view and option to 'article' and 'com_content'
-		JRequest::setVar('view', 'article');
-		JRequest::setVar('option', 'com_content');
-		JRequest::setVar('isflexicontent', 'yes');
 		$jinput->set('view', 'article');
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');

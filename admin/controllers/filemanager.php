@@ -786,7 +786,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if ($file_mode == 'folder_mode')
 		{
-			$filename = rawurldecode( $this->input->get('filename') );
+			$filename = rawurldecode( $this->input->get('filename', '', 'cmd') );
+			// Default 'CMD' filtering is maybe too aggressive, but allowing UTF8 will not work in all filesystems, so we do not allow
 			//$filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
 
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
