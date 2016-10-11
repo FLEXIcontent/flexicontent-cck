@@ -1,6 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-if ( JFactory::getApplication()->input->get('print') ) return;
+if ( JFactory::getApplication()->input->get('print', 0, 'int') ) return;
 
 // ***********************************************************************************************************
 // Form for Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)

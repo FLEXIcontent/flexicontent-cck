@@ -1662,11 +1662,15 @@ class ParentClassItem extends JModelAdmin
 		$db   = $this->_db;
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+
+		$jinput     = JFactory::getApplication()->input;
 		$dispatcher = JDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$nullDate   = $this->_db->getNullDate();
-		$view = JRequest::getVar('view', false);
-		JRequest::setVar("isflexicontent", "yes");
+
+		$view = $jinput->get('view', '', 'cmd');
+		$jinput->set('isflexicontent', 'yes');
+
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$print_logging_info = $cparams->get('print_logging_info');
 		
@@ -3787,8 +3791,11 @@ class ParentClassItem extends JModelAdmin
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+
+		$jinput     = JFactory::getApplication()->input;
 		$dispatcher = JDispatcher::getInstance();
-		JRequest::setVar("isflexicontent", "yes");
+
+		$jinput->set('isflexicontent', 'yes');
 		static $event_failed_notice_added = false;
 		
 		if ( $id )

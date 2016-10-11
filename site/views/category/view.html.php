@@ -476,8 +476,6 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->text = isset($item->fields['text']->display) ? $item->fields['text']->display : '';
 			
 			// Set the view and option to 'category' and 'com_content'  (actually view is already called category)
-			JRequest::setVar('option', 'com_content');
-			JRequest::setVar('isflexicontent', 'yes');
 			$jinput->set('option', 'com_content');
 			$jinput->set('isflexicontent', 'yes');
 			

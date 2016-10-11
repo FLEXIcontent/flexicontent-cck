@@ -310,10 +310,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		$this->_listall = $app->input->get('listall');
+		$this->_listall = $app->input->get('listall', 0, 'int');
 		
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
-		$this->_active_limit = strlen( $app->input->get('limit') );
+		$this->_active_limit = strlen( $app->input->get('limit', '', 'string') );
 		$limit = $this->_active_limit ? $app->input->get('limit', 0, 'int') : $this->_params->get('limit');
 		$this->setState('limit', $limit);
 
@@ -1170,7 +1170,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
 		
 		// Override text search auto-complete category ids with those of filter 13
-		$f13_val = $app->input->get('filter_13');
+		$f13_val = $app->input->get('filter_13', null, 'string');
 		if ( isset($filters[13]) && !empty($f13_val) )
 		{
 			$cparams->set('txt_ac_cid', 'NA');
@@ -1182,7 +1182,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			$filt_vals = $app->input->get('filter_'.$filter->id, '');
+			$filt_vals = $app->input->get('filter_'.$filter->id, '', 'string');
 			
 			// Skip filters without value
 			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
@@ -1192,7 +1192,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ( !$allow_filtering_empty && ($empty_filt_vals_array || $empty_filt_vals_string) ) continue;
 			if ( !$empty_filt_vals_array && !$empty_filt_vals_string) $this->_active_filts[ $filter->id ] = $filt_vals;  // Set _relevant _active_* FLAG
 			
-			//echo "category model found filters: "; print_r($filt_vals);
+			//echo "Category model active filters: [".$filter->id."] <pre>"; print_r($filt_vals); echo "</pre>";
 			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals, $return_sql);
 		}
 		

@@ -249,14 +249,17 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		
 		// Check if user is logged, if so then nothing to do
 		$user = JFactory::getUser();
-		if ($user->id) {
+		if ($user->id)
+		{
 			$post = array();
 			return;
 		}
 		
 		// Check if not inside form
 		$jinput = JFactory::getApplication()->input;
-		if ( $jinput->get('layout', false) != "form" && $jinput->get('task')!='add' && $jinput->get('task')!='edit' )  return; 
+		$layout = $jinput->get('layout', '', 'cmd');
+		$task   = $jinput->get('task', '', 'cmd');
+		if ( $layout != "form" && $task != 'add' && $task != 'edit' ) return;
 		
 		
 		// Server side validation
