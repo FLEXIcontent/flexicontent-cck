@@ -92,7 +92,7 @@ class modFlexigooglemapHelper
 				break;
 		}
 
-		$url="http://mt.google.com/vt/icon/name=icons/spotlight/";
+		$url="https://mts.googleapis.com/vt/icon/name=icons/spotlight/";
 		$icon = $markerimage ? "'$markerimage'" : "'$url$color$letter'";
 
 		return $icon;
