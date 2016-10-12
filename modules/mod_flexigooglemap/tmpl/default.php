@@ -133,7 +133,7 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 				if ($usedirection)
 				{
 					$adressdirection = $addr;
-					$linkdirection= '<div class="directions"><a href="http://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
+					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
 				}
 
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
@@ -179,7 +179,7 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 				if ($usedirection)
 				{
 					$adressdirection = $addr;
-					$linkdirection= '<div class="directions"><a href="http://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
+					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
 				}
 
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
