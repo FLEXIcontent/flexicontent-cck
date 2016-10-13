@@ -106,24 +106,27 @@
 
 				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSDISPLAY" level="level2" />
 
-				<field name="markerimage" type="media" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
-				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_DESC" preview="true" preview_width="80" preview_height="80" />
+
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSIMAGE" level="level3" />
 
 				<field
-					name="lettermarkermode" type="radio"
-					default="0" label="FLEXI_GOOGLEMAP_LETTERMARKERMODE"
-					description="FLEXI_GOOGLEMAP_LETTERMARKERMODE_DESC"
-					class="btn-group btn-group-yesno"
+					name="markermode" type="radio"
+					default="0" label="FLEXI_GOOGLEMAP_MARKERMODE"
+					description="FLEXI_GOOGLEMAP_MARKERMODE_DESC"
+					class="btn-group group-fcinfo"
 					>
-					<option value="0">FLEXI_GOOGLEMAP_NO</option>
-					<option value="1">FLEXI_GOOGLEMAP_YES</option>
+					<option value="0">FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC</option>
+					<option value="1">FLEXI_GOOGLEMAP_LETTERMARKERMODE</option>
 				</field>
+
+				<field name="markerimage" type="media" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC"
+				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC_DESC" preview="true" preview_width="80" preview_height="80" showon="markermode:0" />
 
 				<field
 					name="markercolor" type="list"
 					default="redpt" label="FLEXI_GOOGLEMAP_MARKERSCOLOR"
 					description="FLEXI_GOOGLEMAP_MARKERSCOLOR_DESC"
-					showon="lettermarkermode:1">
+					showon="markermode:1">
 					<option	value="red">FLEXI_GOOGLEMAP_MARKERSCOLOR_RED</option>
 					<option	value="green">FLEXI_GOOGLEMAP_MARKERSCOLOR_GREEN</option>
 				</field>
@@ -131,8 +134,10 @@
 					name="lettermarker" type="text"
 					default="A" label="FLEXI_GOOGLEMAP_LETTERMARKER"
 					description="FLEXI_GOOGLEMAP_LETTERMARKER_DESC"
-					showon="lettermarkermode:1"
+					showon="markermode:1"
 				/>
+
+				<field name="" type="separator" default="FLEXI_GOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
 				<field
 					name="animationmarker" type="radio"
 					default="1" label="FLEXI_GOOGLEMAP_ANIMATIONMARKER"
@@ -144,8 +149,6 @@
 				</field>
 
 				<field name="mapstyle" type="textarea" hint="[Your style code]" label="FLEXI_GOOGLEMAP_STYLE" description="FLEXI_GOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw"/>
-
-
 
 				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING" level="level2" />
 				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />

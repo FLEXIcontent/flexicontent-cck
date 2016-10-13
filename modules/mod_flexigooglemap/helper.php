@@ -75,31 +75,32 @@ class modFlexigooglemapHelper
 		$markercolor = $params->get('markercolor');
 		$lettermarker = $params->get('lettermarker');
 
-		$lettermarkermode = $params->get('lettermarkermode');
-		$letter = $lettermarkermode ? "&text=".$lettermarker."&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48" : "";
-
-		$color ="spotlight-waypoint-b.png";
-		switch ($markercolor)
+		$lettermarkermode = $params->get('lettermarkermode', 0);  // compatibility with old parameter
+		$markermode = $params->get('markermode', $lettermarkermode);
+		
+		if ($markermode==1)
 		{
-			case "red":
-				$color ="spotlight-waypoint-b.png";
-				break;
-			case "green":
-				$color ="spotlight-waypoint-a.png";
-				break;
-			default :
-				$color ="spotlight-waypoint-b.png";
-				break;
+			$letter = "&text=".$lettermarker."&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48";
+			switch ($markercolor)
+			{
+				case "red":
+					$color ="spotlight-waypoint-b.png";
+					break;
+				case "green":
+					$color ="spotlight-waypoint-a.png";
+					break;
+				default :
+					$color ="spotlight-waypoint-b.png";
+					break;
+			}
+
+			$icon = "'https://mts.googleapis.com/vt/icon/name=icons/spotlight/" . $color . $letter . "'";	
+		}
+		else
+		{
+			$icon = $markerimage ? "'" . JURI::base() . $markerimage . "'" : "''";
 		}
 
-		$url="https://mts.googleapis.com/vt/icon/name=icons/spotlight/";
-		$icon = $markerimage ? "'$markerimage'" : "'$url$color$letter'";
-
 		return $icon;
-	}
-
-
-	public static function remplaceField(&$params)
-	{
 	}
 }

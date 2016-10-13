@@ -54,8 +54,9 @@ if ($map_style)
 $clustermode = $params->get('clustermode', '' );
 $gridsize = $params->get('gridsize', '' );
 $maxzoom = $params->get('maxzoom', '' );
-$imgcluster = $params->get('imgcluster', 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png');
 
+$imgcluster = $params->get('imgcluster', '');
+$imgcluster =  $imgcluster ? JURI::base().$imgcluster : 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png';
 
 $uselink = $params->get('uselink', '' );
 $useadress = $params->get('useadress', '' );
