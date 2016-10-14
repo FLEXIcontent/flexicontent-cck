@@ -69,18 +69,18 @@ if ( $print_logging_info && $format=='html')
 // ********************************
 
 //include constants file
-require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 //include the needed classes and helpers
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.fields.php');
-require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.acl.php');
-require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'permission.php');
-require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'route.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.acl.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 // Add component's table directory to the include path
-JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
@@ -206,7 +206,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$start_microtime = microtime(true);
 	
 	// Files in frontend assets folder
-	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
+	$path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
 	$inc_path = $path.'less/include/';
 	
 	$less_files = array(

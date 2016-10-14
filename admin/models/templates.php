@@ -100,7 +100,7 @@ class FlexicontentModelTemplates extends JModelLegacy
 	{
 		jimport('joomla.filesystem.folder');
 
-		$path 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
+		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$dest	= $dest ? flexicontent_upload::sanitizedir($path, $dest) : '';
 		
 		if (!$source || !$dest) return false;
@@ -121,7 +121,7 @@ class FlexicontentModelTemplates extends JModelLegacy
 	{
 		jimport('joomla.filesystem.folder');
 
-		$path 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
+		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		
 		if (!$dir || ($dir == 'blog') || ($dir == 'default') || ($dir == 'faq') || ($dir == 'presentation')) return false;		
 		if (!JFolder::delete($path.$dir)) return false;

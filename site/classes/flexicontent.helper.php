@@ -184,7 +184,7 @@ class flexicontent_html
 				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDBO()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
 				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less/ :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
 				$_reps = array(
-					'JPATH_COMPONENT_SITE' => JPATH_COMPONENT_SITE, 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_COMPONENT_ADMINISTRATOR,
+					'JPATH_COMPONENT_SITE' => JPATH_SITE.DS.'components'.DS.'com_flexicontent', 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent',
 					'JPATH_SITE' => JPATH_SITE, 'JPATH_ADMINISTRATOR' => JPATH_ADMINISTRATOR,
 					'JTEMPLATE_SITE' => $JTEMPLATE_SITE
 				);
@@ -1160,7 +1160,7 @@ class flexicontent_html
 				
 				$ver = '3.5.4';
 				$framework_path = JURI::root(true).$lib_path.'/select2';
-				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
+				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
 				$document->addScriptVersion($framework_path.'/select2.min.js', $ver);
 				$document->addScriptVersion($framework_path.'/select2.sortable.js', $ver);
 				$document->addStyleSheetVersion($framework_path.'/select2.css', $ver);
@@ -1485,7 +1485,7 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/plupload';
-				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'plupload';
+				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'plupload';
 				$document->addScript($framework_path.'/js/plupload.full.min.js');
 				
 				if ($mode=='ui') {
@@ -7409,7 +7409,7 @@ function FLEXISubmenu($cando)
 			'</a>', '', false);
 		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, '<span class="fcsb-icon-comments disabled"></span><span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
 		
-		$reviews_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'reviews';
+		$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
 		if (file_exists($reviews_path))
 		{
 			if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
@@ -7432,7 +7432,7 @@ function FLEXISubmenu($cando)
 	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 	
 		call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
-		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
 		{
 			if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench"></span>'.JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');

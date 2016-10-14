@@ -143,7 +143,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$query = 'SELECT attribs FROM #__content WHERE id = '.$ext_id;
 			// Load language file of the template
 			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
-			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$path = JPATH::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$directory);
 			$groupname = 'attribs';  // name="..." of <fields> container
 		}
 		
@@ -152,7 +152,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$query = 'SELECT attribs FROM #__flexicontent_types WHERE id = '.$ext_id;
 			// Load language file of the template
 			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
-			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$path = JPATH::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$directory);
 			$groupname = 'attribs';  // name="..." of <fields> container
 		}
 		
@@ -161,7 +161,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$query = 'SELECT params FROM #__categories WHERE id = '.$ext_id;
 			// Load language file of the template
 			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
-			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$path = JPATH::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$directory);
 			$groupname = 'attribs';  // name="..." of <fields> container
 		}
 		
@@ -170,7 +170,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$query = 'SELECT author_catparams FROM #__flexicontent_authors_ext WHERE user_id = '.$ext_id;
 			// Load language file of the template
 			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
-			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$path = JPATH::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$directory);
 			$groupname = 'attribs';  // name="..." of <fields> container
 		}
 		

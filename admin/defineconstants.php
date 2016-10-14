@@ -86,8 +86,9 @@ if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		
 if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	JPath::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
 
 // Set the media manager paths definitions
-$view = JRequest::getCmd('view',null);
-$popup_upload = JRequest::getCmd('pop_up',null);
+$jinput = JFactory::getApplication()->input;
+$view = $jinput->get('view', null, 'cmd');
+$popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
 if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 JPath::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));

@@ -125,7 +125,7 @@ class FlexicontentViewGroups extends JViewLegacy
 			JToolBarHelper::divider();
 		}
 		
-		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
 		{
 			$btn_icon = 'icon-download';

@@ -91,7 +91,7 @@ defined('_JEXEC') or die('Restricted access');
 									<?php echo JText::_( 'FLEXI_USE_JF_FL_DATA' ); ?> *
 								</label>
 								
-							<?php if ( JFile::exists(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php') ) : /* if automatic translator installed ... */ ?>
+							<?php if ( JFile::exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php') ) : /* if automatic translator installed ... */ ?>
 							
 								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copymove();" />
 								<label for="method-autotranslation" class="btn">

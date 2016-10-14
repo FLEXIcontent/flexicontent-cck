@@ -2226,7 +2226,7 @@ class FlexicontentFields
 		$parser = new \Smalot\PdfParser\Parser();
 		
 		// Parse pdf file and build necessary objects.
-		//$pdf = $parser->parseFile(JPATH_COMPONENT_SITE.DS.'librairies'.DS.'pdfparser'.DS.'samples'.DS.'Document1_foxitreader.pdf');
+		//$pdf = $parser->parseFile(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'pdfparser'.DS.'samples'.DS.'Document1_foxitreader.pdf');
 		//$text = $pdf->getText();
 		//echo $text; exit;
 

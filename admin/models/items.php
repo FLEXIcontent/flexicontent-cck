@@ -1469,7 +1469,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		// If translation method import the translator class
 		if ($translate_method==3 || $translate_method==4) {
-			require_once(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php');
+			require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php');
 		}
 		
 		// If translation method load description field to allow some parsing according to parameters
