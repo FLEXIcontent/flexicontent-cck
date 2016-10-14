@@ -36,10 +36,10 @@ $ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
 
 <?php
 // BOF: Load echart libraries
-if (!file_exists(JPATH_COMPONENT_SITE.DS.'librairies'.DS.'echarts')) :
-	echo "echarts library not installed in ".JPATH_COMPONENT_SITE.DS.'librairies'.DS.'echarts';
-elseif (!file_exists(JPATH_COMPONENT_SITE.DS.'librairies'.DS.'zrender')) :
-	echo "zrender library not installed in ".JPATH_COMPONENT_SITE.DS.'librairies'.DS.'zrender';
+if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts')) :
+	echo "echarts library not installed in ".JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts';
+elseif (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender')) :
+	echo "zrender library not installed in ".JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender';
 else :
 ?>
 <script type="text/javascript">

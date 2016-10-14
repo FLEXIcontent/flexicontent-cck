@@ -707,7 +707,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function edit()
 	{	
-		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 
 		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
@@ -775,7 +775,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		//require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+		//require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDBO();
@@ -888,7 +888,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
@@ -1033,7 +1033,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		//require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
+		//require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();

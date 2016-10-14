@@ -315,7 +315,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		// ****************************************
 
 		$clayout = $data['templates']['clayout'];
-		$layoutpath = !$clayout ? '' : JPath::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$clayout.DS.'category.xml');
+		$layoutpath = !$clayout ? '' : JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout.DS.'category.xml');
 		if ($layoutpath && !file_exists($layoutpath))
 		{
 			$layoutpath = '';

@@ -69,7 +69,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$data  = $jinput->post->getArray();  // Default filtering will remove HTML
 		$data['id'] = (int) $data['id'];
 
-		if ( $model->store($post) )
+		if ( $model->store($data) )
 		{
 			switch ($task)
 			{

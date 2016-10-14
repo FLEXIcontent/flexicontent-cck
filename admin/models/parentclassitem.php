@@ -3946,7 +3946,7 @@ class ParentClassItem extends JModelAdmin
 			// *************************
 			// Verify layout file exists
 			// *************************
-			$layoutpath = !$new_ilayout ? '' : JPath::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$new_ilayout.DS.'item.xml');
+			$layoutpath = !$new_ilayout ? '' : JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$new_ilayout.DS.'item.xml');
 			if ($layoutpath && !file_exists($layoutpath))
 			{
 				$layoutpath = '';

@@ -308,7 +308,7 @@ class FlexicontentModelAppsman extends JModelList
 		// Get DB data
 		$template_names = array_keys($rows);
 		foreach($template_names as $template_name) {
-			$dir = JPATH_COMPONENT_SITE.DS.'templates'.DS.$template_name;
+			$dir = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$template_name;
 			if (file_exists($dir))
 			{
 				$zip->addDir($dir, 'templates/'.$template_name);
