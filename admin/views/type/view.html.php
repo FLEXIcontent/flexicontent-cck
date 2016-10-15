@@ -120,8 +120,67 @@ class FlexicontentViewType extends JViewLegacy
 		$this->assignRef('row'        , $row);
 		$this->assignRef('form'       , $form);
 		$this->assignRef('tmpls'      , $tmpls);
+		$this->assignRef('cparams'    , $cparams);
 		
 		parent::display($tpl);
+	}
+	
+	
+	
+	/**
+	 * Method to diplay field showing inherited value
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function getInheritedFieldDisplay($field, $params)
+	{
+		$_v = $params->get($field->fieldname);
+		
+		if ($_v==='' || $_v===null)
+			return $field->input;
+		else if ($field->getAttribute('type')=='radio' || $field->getAttribute('type')=='fcradio' || ($field->getAttribute('type')=='multilist' && $field->getAttribute('subtype')=='radio'))
+		{
+			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'value="'.$_v.'"',
+				'value="'.$_v.'" class="fc-inherited-value" ',
+				$field->input);
+		}
+		else if ($field->getAttribute('type')=='fccheckbox' && is_array($_v))
+		{
+			$_input = $field->input;
+			foreach ($_v as $v)
+			{
+				$v = htmlspecialchars( $v, ENT_COMPAT, 'UTF-8' );
+				$_input = str_replace(
+					'value="'.$v.'"',
+					'value="'.$v.'" class="fc-inherited-value" ',
+					$_input);
+			}
+			return $_input;
+		}
+		else if ($field->getAttribute('type')=='text')
+		{
+			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'<input ',
+				'<input placeholder="'.$_v.'" ',
+				$field->input);
+		}
+		else if ($field->getAttribute('type')=='textarea')
+		{
+			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
+			return str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
+		}
+		else if ( method_exists($field, 'setInherited') )
+		{
+			$field->setInherited($_v);
+			return $field->input;
+		}
+		else
+			return $field->input;
 	}
 }
 ?>

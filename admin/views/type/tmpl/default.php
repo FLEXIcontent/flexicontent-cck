@@ -117,13 +117,13 @@ $this->document->addScriptDeclaration($js);
 				
 				foreach ($this->form->getFieldset($fsname) as $field) :
 					$_depends = $field->getAttribute('depend_class');
-					echo '
-					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						'.($field->label ? '
-							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-							<div class="container_fcfield">'.$field->input.'</div>
-						' : $field->input).'
-					</fieldset>
+					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<div class="control-label">'.$field->label.'</div>
+						<div class="controls">
+							'.$this->getInheritedFieldDisplay($field, $this->cparams).'
+						</div>
+					</div>
 					';
 				endforeach;
 			endforeach;
@@ -153,13 +153,13 @@ $this->document->addScriptDeclaration($js);
 				if ( $field->getAttribute('box_type') )
 					echo $field->input;
 				else
-					echo '
-					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						'.($field->label ? '
-							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-							<div class="container_fcfield">'.$field->input.'</div>
-						' : $field->input).'
-					</fieldset>
+					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<div class="control-label">'.$field->label.'</div>
+						<div class="controls">
+							'.$this->getInheritedFieldDisplay($field, $this->cparams).'
+						</div>
+					</div>
 					';
 					
 			endforeach;
@@ -201,14 +201,12 @@ $this->document->addScriptDeclaration($js);
 				{
 					$_depends = $field->getAttribute('depend_class');
 					echo '
-					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						<span class="label-fcouter">
-							'.str_replace('class="', 'class="label label-fcinner ', $field->label).'
-						</span>
-						<div class="container_fcfield">
-							'.$field->input.'
+					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<div class="control-label">'.$field->label.'</div>
+						<div class="controls">
+							'.$this->getInheritedFieldDisplay($field, $this->cparams).'
 						</div>
-					</fieldset>
+					</div>
 					';
 				}
 			endforeach; ?>
@@ -226,6 +224,10 @@ $this->document->addScriptDeclaration($js);
 					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 					
 					if ($tmpl->name != $item_layout) continue;
+
+					// Display only current layout and only get globalb layout parameters for it
+					$layoutParams = flexicontent_tmpl::getLayoutparams('items', $tmpl->name, '');
+					$layoutParams = new JRegistry($layoutParams);
 					
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
@@ -257,7 +259,8 @@ $this->document->addScriptDeclaration($js);
 								
 								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-										$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+										$this->getInheritedFieldDisplay($field, $layoutParams)
+										//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 									)
 								).
 								
