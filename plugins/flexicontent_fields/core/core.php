@@ -550,7 +550,8 @@ class plgFlexicontent_fieldsCore extends FCField
 					foreach($cids as $_cid)
 					{
 						if ( !isset($globalcats[$_cid]) ) continue;
-						if ( count($cids)>1 || !empty($globalcats[$_cid]->childrenarray) )
+						// if ( count($cids)>1 || !empty($globalcats[$_cid]->childrenarray) )
+						if ( count($cids)>1 )  // Do not add root category of single category sub-tree to the filter
 						{
 							$cat_obj = new stdClass();
 							$cat_obj->id = $globalcats[$_cid]->id;
