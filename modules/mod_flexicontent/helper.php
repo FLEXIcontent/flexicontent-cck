@@ -1693,9 +1693,9 @@ class modFlexicontentHelper
 			$_weights = array();			
 			for ($i = 1; $i <= 9; $i++)
 			{
-				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
+				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
 			}
-			$select_rated   = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
+			$select_rated   .= ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
 		}
 		$join_rated_type  = in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
 		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
