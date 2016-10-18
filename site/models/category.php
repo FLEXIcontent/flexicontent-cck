@@ -1170,11 +1170,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
 		
 		// Override text search auto-complete category ids with those of filter 13
-		$f13_val = $app->input->get('filter_13', null, 'string');
+		$f13_val = $app->input->get('filter_13', null, 'array');
 		if ( isset($filters[13]) && !empty($f13_val) )
 		{
+			if ( !is_array($f13_val) ) {
+				$f13_val = preg_replace( '/[^0-9,]/i', '', (string) $f13_val );
+				$f13_val = explode(',', $f13_val);
+			}
+			// This is not used in DB query, it will be added as value of HTML tag parameter, but anyway filter it as integer to avoid broken HTML
+			$_cids = array();
+			foreach ($f13_val as $i => $_id)  if ((int)$_id) $_cids[] = (int)$_id;
+
 			$cparams->set('txt_ac_cid', 'NA');
-			$cparams->set('txt_ac_cids', is_array($f13_val) ? $f13_val : array((string) $f13_val) );
+			$cparams->set('txt_ac_cids', $_cids);
 		}
 		
 		// Get SQL clause for filtering via each field
@@ -1182,7 +1190,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			$filt_vals = $app->input->get('filter_'.$filter->id, '', 'string');
+			$filt_vals = $app->input->get('filter_'.$filter->id, '', 'array');
 			
 			// Skip filters without value
 			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
