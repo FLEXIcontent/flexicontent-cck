@@ -475,15 +475,19 @@ var JFormValidator = function()
 				// tinyMCE
 				if (hasClass(el, 'mce_editable') && typeof tinyMCE !== 'undefined' && tinyMCE && tinyMCE.get(el_id))
 				{
-					$el.val( tinyMCE.get(el_id).getContent().trim() );
-					if ($el.val() === null || $el.val().length==0)  tinyMCE.get(el_id).setContent('');
+					// Visible element means editor is currently OFF
+					var d = $el.is(":visible") ? $el.val() : tinyMCE.get(el_id).getContent().trim();
+					if ( !$el.is(":visible") ) $el.val(d);
+					if (d === null || d.length==0) tinyMCE.get(el_id).setContent('');
 					$el.data('use_fcfield_box', 1);
 				}
 				// CodeMirror
 				else if ($el.next('.CodeMirror').length)
 				{
-					$el.val( $el.next('.CodeMirror').get(0).CodeMirror.getValue().trim() );
-					if ($el.val() === null || $el.val().length==0)  $el.next('.CodeMirror').get(0).CodeMirror.setValue('');
+					// Visible element means editor is OFF
+					var d = $el.is(":visible") ? $el.val() : $el.next('.CodeMirror').get(0).CodeMirror.getValue().trim();
+					if ( !$el.is(":visible") ) $el.val(d);
+					if (d === null || d.length==0) $el.next('.CodeMirror').get(0).CodeMirror.setValue('');
 					$el.data('use_fcfield_box', 1);
 				}
 				else $el.data('use_fcfield_box', 0);
