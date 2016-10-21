@@ -499,6 +499,7 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-expand-view').remove();
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
