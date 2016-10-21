@@ -198,7 +198,7 @@ defined('_JEXEC') or die('Restricted access');
 					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_TYPE' ); ?></label></span>
 					<div class="container_fcfield">
 						<?php echo $this->lists['type_id']; ?>
-						<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none; width:50%;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+						<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none; float:left;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 					</div>
 				</fieldset>
 

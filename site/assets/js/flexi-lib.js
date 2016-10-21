@@ -169,12 +169,14 @@
 			container = jQuery('<div id="'+tagid+'"></div>').appendTo(document.body);
 		}
 		
-		// Get loading animation tag, creating it if it does not exist
+		// Get loading animation tag, creating it if it does not exist, (re)showing if it is exists
 		var loading = jQuery('#'+tagid+'_loading');
-		if (!loading.length) {
+		if (!loading.length)
+		{
 			loading = jQuery('<div id="'+tagid+'_loading" class="fc_loading_msg" style="position:absolute; background-color:transparent;">loading...</div>');
 			container.prepend(loading);
 		}
+		else loading.show();
 		
 		// Add the iframe
 		var iframe;
