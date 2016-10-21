@@ -316,9 +316,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$params = null;
 		$err_text = null;
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename
-		$upload_check = flexicontent_upload::check( $file, $err_text, $params );
-		$filename 	  = flexicontent_upload::sanitize($path, $file['name']);
-		$filepath 	  = JPath::clean($path.strtolower($filename));
+		$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
+		$filename     = flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
+		$filepath 	  = JPath::clean($path.$filename);
 		
 		// Check if uploaded file is valid
 		if (!$upload_check)
@@ -616,7 +616,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			for ($n=0; $n<count($filenames); $n++)
 			{
-				$ext = strtolower(flexicontent_upload::getExt($filesdir . $filenames[$n]));
+				$ext = strtolower(flexicontent_upload::getExt($filenames[$n]));
 				if ( !isset($allowed_exts[$ext]) )
 				{
 					$excluded[] = $filenames[$n];

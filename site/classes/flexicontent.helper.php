@@ -4939,7 +4939,7 @@ class flexicontent_upload
 		// ***************************************************************
 		
 		$language = $language ? $language : (!empty($file['language']) ? $file['language'] : '*');   // * would usually be interpretted as frontend site default language
-		$file['name'] = flexicontent_upload::makesafe($file['name'], $language);
+		$file['name'] = flexicontent_upload::makeSafe($file['name'], $language);
 
 
 		// ***************************************
@@ -5054,7 +5054,7 @@ class flexicontent_upload
 
 
 	/**
-	* Sanitize the file name and return an unique string
+	* Sanitize the file name allowing only filesystem-safe characters, and return an unique filename for the given folder
 	*
 	* @since 1.0
 	*

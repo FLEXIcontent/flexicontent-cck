@@ -439,6 +439,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-expand-view').remove();
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
@@ -826,7 +827,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if (isset($value['existingname']))
 				{
-					$ext = strtolower(pathinfo($image_subpath, PATHINFO_EXTENSION));
+					$ext = strtolower(flexicontent_upload::getExt($image_subpath));
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
 					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
@@ -2596,7 +2597,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$format = $jinput->get('format', 'html', 'cmd');
-		$err    = null;
+		$err_text = null;
 		
 		// Get the component configuration
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -2632,19 +2633,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$path = COM_FLEXICONTENT_FILEPATH.DS;
 
 			//sanitize filename further and make unique
-			$filename = flexicontent_upload::sanitize($path, $file['name']);
-			$filepath = JPath::clean(COM_FLEXICONTENT_FILEPATH.DS.strtolower($filename));
+			$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
+			$filename     = flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
+			$filepath     = JPath::clean($path.$filename);
 			
 			//perform security check according
-			if (!flexicontent_upload::check( $file, $err, $params )) {
+			if (!$upload_check)
+			{
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = JLog::getInstance('com_flexicontent.error.php');
-					$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err));
+					$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err_text));
 					header('HTTP/1.0 415 Unsupported Media Type');
 					die('Error. Unsupported Media Type!');
 				} else {
-					JError::raiseNotice(100, $field->label . ' : ' . JText::_($err));
+					JError::raiseNotice(100, $field->label . ' : ' . JText::_($err_text));
 					return false;
 				}
 			}
@@ -2681,6 +2684,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$obj->altname		= $file['name'];
 				$obj->url				= 0;
 				$obj->secure		= 1;
+				$obj->access		= 1;  // public
 				$obj->ext				= $ext;
 				$obj->hits			= 0;
 				$obj->uploaded		= $date->toSql();
@@ -2709,9 +2713,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					return true;
 				}
 			}
-		} else {
-			$err = 'File upload failed';
-			JError::raiseNotice(100, $field->label . ' : ' . JText::_($err));
+		}
+		else
+		{
+			$err_text = 'File upload failed';
+			JError::raiseNotice(100, $field->label . ' : ' . JText::_($err_text));
 			return false;
 		}
 	}
@@ -2823,7 +2829,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$phpThumb->setParameter('zc', 1);
 		}
 		
-		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+		$ext = strtolower(flexicontent_upload::getExt($filename));
 		if ( in_array( $ext, array('png', 'ico', 'gif') ) )
 		{
 			$phpThumb->setParameter('f', $ext);
