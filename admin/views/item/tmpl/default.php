@@ -540,7 +540,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<span style="display:inline-block;" <?php echo $label_tooltip; ?> >
 					<?php echo $infoimage; ?>
 				</span>
-				<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+				<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none; float:left;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 			</div>
 		
 		
