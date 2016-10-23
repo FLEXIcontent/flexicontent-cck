@@ -101,7 +101,8 @@ class modFlexicontentHelper
 		$mod_image_fallback_img = $params->get('mod_image_fallback_img');
 
 		// Retrieve default image for the image field and also create field parameters so that they can be used
-		if ($mod_image) {
+		if ($mod_image)
+		{
 			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $mod_image;
 			$db->setQuery($query);
 			$mod_image_dbdata = $db->loadObject();
@@ -732,12 +733,6 @@ class modFlexicontentHelper
 		$flexiparams 	= $app->getParams('com_flexicontent');
 		$show_noauth 	= $flexiparams->get('show_noauth', 0);
 		
-		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
-		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $app->get('requestTime');
-		$now			= JFactory::getDate()->toSql();
-		$nullDate	= $db->getNullDate();
-		
 		// $display_category_data
 		$apply_config_per_category = (int)$params->get('apply_config_per_category', 0);
 		
@@ -805,9 +800,30 @@ class modFlexicontentHelper
 		$behaviour_dates 	= $params->get('behaviour_dates', 0);
 		$date_compare 		= $params->get('date_compare', 0);
 		$datecomp_field		= (int)$params->get('datecomp_field', 0);
+
+		// Retrieve default image for the image field and also create field parameters so that they can be used
+		$use_local_time = false;
+		if ( $behaviour_dates && $date_type==3 && $date_compare==0 && $datecomp_field )
+		{
+			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $datecomp_field;
+			$db->setQuery($query);
+			$date_field_dbdata = $db->loadObject();
+			$date_field_params = new JRegistry($date_field_dbdata->attribs);
+			$use_local_time = $date_field_params->get('date_allowtime', 0) && $date_field_params->get('use_editor_tz', 0);
+		}
+
+		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+		//  thus the items are published globally at the time the author specified in his/her local clock
+		$nowDate  = JFactory::getDate('now')->toSql();
+		$nullDate	= $db->getNullDate();
+		if ($use_local_time)
+		{
+			$nowDate = JHTML::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
+		}
+
 		// Server date
-		$sdate 			= explode(' ', $now);
-		$cdate 			= $sdate[0] . ' 00:00:00';
+		$sdate = explode(' ', $nowDate);
+		$cdate = $sdate[0] . ' 00:00:00';
 		// Set date comparators
 		if ($date_type == 0) {        // created
 			$comp = 'i.created';
@@ -846,9 +862,9 @@ class modFlexicontentHelper
 		$ignore_up_down_dates = $params->get('ignore_up_down_dates', 0);  // 1: ignore publish_up, 2: ignore publish_donw, 3: ignore both
 		$ignoreState =  $params->get('use_list_items_in_any_state_acl', 0) && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		if (!$ignoreState && $ignore_up_down_dates != 3 && $ignore_up_down_dates != 1)
-			$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
+			$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($nowDate).' )';
 		if (!$ignoreState && $ignore_up_down_dates != 3 && $ignore_up_down_dates != 2)
-			$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
+			$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($nowDate).' )';
 		
 		
 		// *********************
