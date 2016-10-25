@@ -3275,16 +3275,19 @@ class flexicontent_html
 					<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>
 					'.$html_vote_links.'
 				</ul>
+
 				<div id="fcvote_message_'.$id.'_'.$xid.'" class="fcvote_message" ></div>
+
+				'.($add_review_form ? '
+				<input type="button" class="btn fcvote_toggle_review_form"
+					onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\', this)"
+					value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
+				<div id="fcvote_review_form_box_'.$id.'_loading" class="fcvote_review_form_box_loading"></div>
+				<span class="fcclear"></span>
+				<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;"></div>' : '').'
+
 				'.( $desc ? '<div class="fcvote-desc">'.$desc.'</div>' :'' ).'
 			</div>
-			'.($add_review_form ? '
-			<input type="button" class="btn fcvote_toggle_review_form" style="vertical-align:top;"
-				onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\', this)"
-				value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
-			<div id="fcvote_review_form_box_'.$id.'_loading" class="" style="display:none; vertical-align: top;"></div>
-			<span class="fcclear"></span>
-			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;"></div>' : '').'
 		</div>';
 	}
 	

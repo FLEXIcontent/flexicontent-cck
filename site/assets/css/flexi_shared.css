@@ -633,13 +633,13 @@ div fieldset.panelform {
 #flexicontent .ui-sortable > li {
 	background-color: white;
 }
+#flexicontent .btn,
 .btn {
-	-webkit-touch-callout: none;
 	-webkit-user-select: none;
-	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	outline-width: 0;
 }
 @media (min-width: 1020px) {
 	.btn.spaced-btn {
