@@ -5,16 +5,25 @@ div.voting-group {
 	padding: 0;
 }
 div.voting-row {
+	box-sizing: border-box;
 	display: inline-block;
 	float: left;
-	margin: 2px 1%;
 	padding: 0;
-	box-sizing: border-box;
-	max-width: 600px;
+	margin: 12px 0;
+	padding: 0 24px 0 0;
 }
 div.voting-row.voting-row_main {
 	box-sizing: border-box;
-	width: 98%;
+	clear: both;
+}
+div.voting-row:nth-child(2n) {
+	clear: both;
+}
+#flexicontent
+div.voting-row .ajax-loader,
+div.voting-row .ajax-loader {
+	vertical-align: top;
+	margin: 6px 6px 10px 12px;
 }
 div.fcvote {
 	display: inline-block;
@@ -137,11 +146,6 @@ div.fcvote .ajax-loader {
 	padding: 0 0 0 20px;
 }
 #flexicontent
-.fcvote_review_form_submit_btn {
-	width: 100%;
-	box-sizing: border-box;
-}
-#flexicontent
 .fcvote_toggle_review_form,
 .fcvote_toggle_review_form * {
 	vertical-align: top;
@@ -157,9 +161,30 @@ div.fcvote .ajax-loader {
 	font-size: 120%;
 }
 #flexicontent
-table.fc-form-tbl td.key,
-table.fc-form-tbl td.key {
-	max-width: 400px;
+.fcvote_review_form_box table tr td {
+	padding-left: 2px;
+	padding-right: 2px;
+}
+#flexicontent
+.fcvote_review_form_box table td input.fcvote_review_form_submit_btn {
+	min-width: 33%;
+	float: right;
+}
+#flexicontent
+.fcvote_review_form_box table.fc-form-tbl td.key,
+.fcvote_review_form_box table.fc-form-tbl td.key {
+	max-width: 300px;
+}
+#flexicontent
+.fcvote_review_form_box table.fc-form-tbl td input[type=text],
+.fcvote_review_form_box table.fc-form-tbl td input[type=text],
+#flexicontent
+.fcvote_review_form_box table.fc-form-tbl td textarea,
+.fcvote_review_form_box table.fc-form-tbl td textarea {
+	width: 100%;
+	box-sizing: border-box;
+	height: unset;
+	padding: 6px 12px;
 }
 div.fcvote > ul.fcvote_list {
 	height: 24px !important;

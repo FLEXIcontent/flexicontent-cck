@@ -3280,8 +3280,9 @@ class flexicontent_html
 			</div>
 			'.($add_review_form ? '
 			<input type="button" class="btn fcvote_toggle_review_form" style="vertical-align:top;"
-				onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\')"
+				onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\', this)"
 				value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
+			<div id="fcvote_review_form_box_'.$id.'_loading" class="" style="display:none; vertical-align: top;"></div>
 			<span class="fcclear"></span>
 			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;"></div>' : '').'
 		</div>';

@@ -4,28 +4,42 @@ jQuery(document).ready(function(){
 	
 	var currentURL = window.location;
 	var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+	var under_vote = false;
 	
 	if (jQuery('.fcvote').length)
 	{
-		jQuery('.fcvote a.fc_dovote').on('click', function(e){
+		jQuery('.fcvote a.fc_dovote').on('click', function(e)
+		{
+			if (under_vote) return;
+			under_vote = true;
+
+			var voting_group = jQuery(this).closest('.voting-group');
+			voting_group.css('opacity', '0.5');
 			
+			var vote_list = jQuery(this).closest('.fcvote_list');
 			var data_arr = jQuery(this).attr('data-rel').split("_");
+			
+			// ID for item being voted
 			var itemID = data_arr[0];
-			// Extra voting option
-			if (typeof(data_arr[1])!="undefined" && data_arr[1]) {
-				xid = data_arr[1];
-			} else {
-				var xid = "main";  // default to ... 'main' voting
-			}
+
+			// Voting characteristic, (defaults to the 'main' voting characteristic if not set)
+			var xid = typeof(data_arr[1])!='undefined' && data_arr[1] ? data_arr[1] : 'main';
 			
-			var main_cnt = jQuery('#fcvote_cnt_' + itemID + '_main');
+			var xid_msg  = jQuery(this).closest('.fcvote').find('.fcvote_message');
+			var main_msg = voting_group.find('.voting-row_main').find('.fcvote_message');
+
+			var xid_cnt  = jQuery(this).closest('.fcvote').find('.fcvote-count');
+			var main_cnt = voting_group.find('.voting-row_main').find('.fcvote-count');
+
+			var xid_rating  = jQuery(this).closest('.fcvote_list').find('.current-rating');
+			var main_rating = voting_group.find('.voting-row_main').find('.fcvote_list').find('.current-rating');			
+
 			var _htmlrating_main = main_cnt.length ? main_cnt.html() : '';
-			var _htmlrating = jQuery('#fcvote_cnt_' + itemID + '_' + xid).html();
-			jQuery('#fcvote_cnt_' + itemID + '_' + xid).empty().css('display', '').addClass('ajax-loader');
+			var _htmlrating = xid_cnt.html();
 			
-			jQuery('#fcvote_message_' + itemID + '_' + xid).empty().css('display', '').addClass('ajax-loader');
-			//jQuery('#fcvote_message_' + itemID + '_main').empty().css('display', '').addClass('ajax-loader');
-			
+			xid_cnt.empty().hide();//.addClass('ajax-loader');
+			xid_msg.empty().show().addClass('ajax-loader');
+
 			var rating = jQuery(this).text();
 			var voteurl = live_site + "/index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=" + rating + "&cid=" + itemID + "&xid=" + xid;
 
@@ -38,10 +52,10 @@ jQuery(document).ready(function(){
 				success: function( data )
 				{
 					if (typeof(data.percentage)!="undefined" && data.percentage) {
-						jQuery('#rating_' + itemID + '_' + xid).css('width', data.percentage + "%");
+						xid_rating.css('width', data.percentage + "%");
 					}
 					if (typeof(data.percentage_main)!="undefined" && data.percentage_main) {
-						jQuery('#rating_' + itemID + '_main').css('width', data.percentage_main + "%");
+						main_rating.css('width', data.percentage_main + "%");
 					}
 					
 					if (typeof(data.htmlrating)!="undefined" && data.htmlrating) {
@@ -51,19 +65,18 @@ jQuery(document).ready(function(){
 						_htmlrating_main = data.htmlrating_main;
 					}
 					
-					var cnt = jQuery('#fcvote_cnt_' + itemID + '_' + xid);
 					if (typeof(data.html) && data.html) {
-						cnt.html(data.html).removeClass('ajax-loader');
-						setTimeout(function() { cnt.animate({opacity: "0.5"}, 900);  }, 2000);
+						xid_cnt.html(data.html).show();//.removeClass('ajax-loader');
+						setTimeout(function() { xid_cnt.animate({opacity: "0.5"}, 900);  }, 2000);
 						setTimeout(function() {
-							cnt.css('opacity', 'unset');
+							xid_cnt.css('opacity', 'unset');
 							if(_htmlrating.trim())
-								cnt.css('opacity', 1).html(_htmlrating);
+								xid_cnt.css('opacity', 1).html(_htmlrating);
 							else
-								cnt.html('').hide();
+								xid_cnt.html('').hide();
 						}, 3000);
 					} else {
-						cnt.html(_htmlrating).removeClass('ajax-loader');
+						xid_cnt.html(_htmlrating).removeClass('ajax-loader');
 					}
 					
 					if (main_cnt.length) {
@@ -82,19 +95,22 @@ jQuery(document).ready(function(){
 						}
 					}
 					
-					jQuery('#fcvote_message_' + itemID + '_' + xid).removeClass('ajax-loader');
-					//jQuery('#fcvote_message_' + itemID + '_main').removeClass('ajax-loader');
+					xid_msg.removeClass('ajax-loader');
 					
 					if (typeof(data.message)!="undefined" && data.message) {
-						jQuery('#fcvote_message_' + itemID + '_' + xid).css('display', '').html(data.message);
+						xid_msg.css('display', '').html(data.message);
 					}
 					if (typeof(data.message_main)!="undefined" && data.message_main) {
-						jQuery('#fcvote_message_' + itemID + '_main').css('display', '').html(data.message_main);
+						main_msg.css('display', '').html(data.message_main);
 					}
 					
+					under_vote = false;
+					voting_group.css('opacity', '');
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+					under_vote = false;
+					voting_group.css('opacity', '');
 				}
 			});
 			
@@ -105,7 +121,14 @@ jQuery(document).ready(function(){
 	function fcvote_open_review_form(tagid, content_id, review_type)
 	{
 		var box = jQuery('#'+tagid);
-		box.empty().css('display', '').addClass('ajax-loader');
+		var box_loading = jQuery('#'+tagid+'_loading');
+		if (box.is(":visible"))
+		{
+			box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+			box.slideUp(400, function(){ box.empty(); });
+			return;
+		}
+		box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
 		
 		var currentURL = window.location;
 		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
@@ -119,12 +142,14 @@ jQuery(document).ready(function(){
 			},
 			success: function( data )
 			{
-				box.removeClass('ajax-loader');
-				if (typeof(data.html) && data.html) {
-					box.html(data.html).show();
+				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+				if (typeof(data.html) && data.html)
+				{
+					box.html(data.html).slideDown();
 				}
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
+				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
 				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
 		});
@@ -134,8 +159,20 @@ jQuery(document).ready(function(){
 	function fcvote_submit_review_form(tagid, form)
 	{
 		var box = jQuery('#'+tagid);
-		box.empty().css('display', '').addClass('ajax-loader');
+		var box_loading = jQuery('#'+tagid+'_loading');
 		
+		if (( typeof(form.checkValidity) == "function" ) )
+		{
+			if (!form.checkValidity())
+			{
+				box_loading.empty().removeClass('ajax-loader').css('display', '');
+				fcvote_submit_review_form_show_validation(jQuery(form), box_loading);
+				return;
+			}
+		}
+
+		box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
+
 		var currentURL = window.location;
 		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
 		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=storereviewform";
@@ -146,14 +183,47 @@ jQuery(document).ready(function(){
 			data: jQuery(form).serialize(),
 			success: function( data )
 			{
-				box.removeClass('ajax-loader');
-				if (typeof(data.html) && data.html) {
-					box.html(data.html).show();
+				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+				if (typeof(data.html) && data.html)
+				{
+					if (typeof(data.error) && data.error)
+					{
+						box_loading.html(data.html).css('display', 'block');
+					}
+					else
+					{
+						box.html(data.html).show();
+					}
 				}
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
+				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
 				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
 		});
 	}
 
+
+	function fcvote_submit_review_form_show_validation(form, errorBox)
+	{
+		var errorList = jQuery('<div></div>');
+		errorBox.empty().append(errorList);
+
+		//Find all invalid fields within the form.
+		form.find(':invalid').each(function(index, node)
+		{
+			//Find the field's corresponding label
+			var label = jQuery('label[for=' + node.id + ']');
+	
+			//Opera incorrectly does not fill the validationMessage property.
+			var message = node.validationMessage || 'Invalid value.';
+			errorList.append('<div class="fc-mssg fc-warning fc-nobgimage"><button type="button" class="close" data-dismiss="alert">&times;</button><b>' + label.html() + '</b>: ' + message + '</div>');
+			
+			var $node = jQuery(node);
+			if (!$node.hasClass('needs-validation'))
+			{
+				$node.addClass('needs-validation').on('blur', function() { jQuery(this).removeClass('invalid') });
+			}
+			$node.addClass('invalid');
+		});
+	};
