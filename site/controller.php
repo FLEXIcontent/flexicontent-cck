@@ -1474,13 +1474,18 @@ class FlexicontentController extends JControllerLegacy
 		
 		if (!$content_id)  $error = "Content_id is zero";
 		else if ($review_type!='item')  $error = "review_type <> item is not yet supported";
-		else {
+		else
+		{
 			// Check content item exists
 			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$item->getError();
+			if ( !$item->load( $content_id ) )
+			{
+				$error = 'ID: '.$pk. ': '.$item->getError();
+			}
 			
 			// Check voting is enabled
-			else {
+			else
+			{
 				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 				$field = $db->loadObject();
 				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
@@ -1489,7 +1494,8 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		if (!empty($error)) {
+		if (!empty($error))
+		{
 			$result	= new stdClass();
 			$error = '
 			<div class="fc-mssg fc-warning fc-nobgimage">
@@ -1520,32 +1526,35 @@ class FlexicontentController extends JControllerLegacy
 			<input type="hidden" name="review_id"  value="'. ($review ? $review->id : '').'"/>
 			<input type="hidden" name="content_id"  value="'.$content_id.'"/>
 			<input type="hidden" name="review_type" value="'.$review_type.'"/>
-			<table class="fc-form-tbl">
-				<tr class="fcvote_review_form_title">
-					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
+			<table class="fc-form-tbl fcinner">
+				<tr class="fcvote_review_form_title_row">
+					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_title">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
 					<td>
-						<input type="text" name="title" size="200" value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'" />
+						<input type="text" name="title" size="200" value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'" id="fcvote_review_form_'.$content_id.'_title" />
 					</td>
 				</tr>
-				<tr class="fcvote_review_form_email">
-					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
+				<tr class="fcvote_review_form_email_row">
+					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_email">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
 					<td>'.( !$user->id ? '
-						<input type="text" name="email" size="200" value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'" />
+						<input required type="text" name="email" size="200" value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'" id="fcvote_review_form_'.$content_id.'_email"/>
 						' : '<span class=badge>'.$user->email.'</span>' ).'
 					</td>
 				</tr>
-				<tr class="fcvote_review_form_text">
-					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
+				<tr class="fcvote_review_form_text_row">
+					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_text">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
 					<td class="top">
-						<textarea name="text" rows="4" cols="200">'.($review ? $review->text : '').'</textarea>
+						<textarea required name="text" rows="4" cols="200" id="fcvote_review_form_'.$content_id.'_text">'.($review ? $review->text : '').'</textarea>
 					</td>
 				</tr>
-				<tr class="fcvote_review_form_text">
-					<td></td>
-					<td><input type="button" class="btn btn-primary fcvote_review_form_submit_btn" onclick="fcvote_submit_review_form(\''.$html_tagid.'\', this.form)" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
+				<tr class="fcvote_review_form_submit_btn_row">
+					<td class="key"></td>
+					<td class="top">
+						<input type="button" class="btn btn-success fcvote_review_form_submit_btn" onclick="fcvote_submit_review_form(\''.$html_tagid.'\', this.form); return false;" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/>
+					</td>
 				</tr>
 			</table>
-		</form>';
+		</form>
+		';
 		
 		echo json_encode($result);
 		jexit();
@@ -1581,6 +1590,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		if (!$content_id)  $error = "Content_id is zero";
 		else if (!$email)  $error = "Email is invalid or empty";
+		else if (!$text)   $error = "Text is invalid or empty";
 		else if ($review_type!='item')  $error = "review_type <> item is not yet supported";
 		else {
 			// Check content item exists
@@ -1597,14 +1607,16 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		if (!empty($error)) {
+		if (!empty($error))
+		{
 			$result	= new stdClass();
 			$error = '
-			<div class="fc-mssg fc-warning fc-nobgimage">
+			<div class="fc-mssg fc-error fc-nobgimage">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
 				'.$error.'
 			</div>';
 			$result->html = $error;
+			$result->error = 1;
 			echo json_encode($result);
 			jexit();
 		}
@@ -1618,7 +1630,13 @@ class FlexicontentController extends JControllerLegacy
 			{
 				$result	= new stdClass();
 				$error = 'ID: '.$review_id. ': '.$review->getError();
+				$error = '
+				<div class="fc-mssg fc-error fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
 				$result->html = $error;
+				$result->error = 1;
 				echo json_encode($result);
 				jexit();
 			}
@@ -1629,7 +1647,13 @@ class FlexicontentController extends JControllerLegacy
 			if ( ! empty($error) )
 			{
 				$result	= new stdClass();
+				$error = '
+				<div class="fc-mssg fc-error fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
 				$result->html = $error;
+				$result->error = 1;
 				echo json_encode($result);
 				jexit();
 			}
@@ -1646,17 +1670,27 @@ class FlexicontentController extends JControllerLegacy
 		{
 			$result	= new stdClass();
 			$error = 'ID: '.$review_id. ': '.$review->getError();
+			$error = '
+			<div class="fc-mssg fc-error fc-nobgimage">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				'.$error.'
+			</div>';
 			$result->html = $error;
+			$result->error = 1;
 			echo json_encode($result);
 			jexit();
 		}
 		
 		$result	= new stdClass();
-		$result->html = $review_id ?
-			'Existing review updated' :
-			'New review saved' ;
+		$mssg = $review_id ? 'Existing review updated' : 'New review saved';
+		$mssg = '
+		<div class="fc-mssg fc-success fc-nobgimage">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			'.$mssg.'
+		</div>';
+		$result->html = mssg;
 		//$result->html .= '<pre>'.print_r($_REQUEST, true).'</pre>';
-		
+
 		echo json_encode($result);
 		jexit();
 	}
