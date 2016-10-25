@@ -556,6 +556,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 			$recipient = $adm_email_bcc ? array($data['mailfrom']) : $adm_emails;
 			$bcc = $adm_email_bcc ? $adm_emails : null;
 			
+			// Remove main recepient from BCC, to avoid email failing
+			if ($bcc)
+			{
+				$_bcc_ = array_flip($bcc);
+				if ( isset($_bcc_[$data['mailfrom']]) ) unset($bcc[$_bcc_[$data['mailfrom']]]);
+			}
+
 			$send_result = JFactory::getMailer()->sendMail(
 				$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname

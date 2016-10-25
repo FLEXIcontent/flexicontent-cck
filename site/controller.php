@@ -2845,9 +2845,7 @@ class FlexicontentController extends JControllerLegacy
 				$html_mode=false; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
-				$send_result = FLEXI_J16GE ?
-					JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-					JUtility::sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 			}
 			ob_end_clean();
 		}
