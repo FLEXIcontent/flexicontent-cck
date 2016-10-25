@@ -4415,6 +4415,13 @@ class ParentClassItem extends JModelAdmin
 		$replyto     = null;
 		$replytoname = null;
 		
+		// Remove main recepient from BCC, to avoid email failing
+		if ($bcc)
+		{
+			$_bcc_ = array_flip($bcc);
+			if ( isset($_bcc_[$from]) ) unset($bcc[$_bcc_[$from]]);
+		}
+
 		$send_result = JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		
 		$debug_str = ""
