@@ -111,8 +111,8 @@ div.fcvote-label.xid-main {
 div.fcvote_message,
 div.fcvote_message {
 	float: left;
-	margin: 0 0 0 2px;
-	padding: 0 2px 0 2px;
+	margin: 0;
+	padding: 0;
 	clear: both;
 }
 #flexicontent
@@ -146,8 +146,17 @@ div.fcvote .ajax-loader {
 	padding: 0 0 0 20px;
 }
 #flexicontent
-.fcvote_toggle_review_form,
-.fcvote_toggle_review_form * {
+.fcvote_toggle_review_form {
+	clear: both;
+	float: left;
+	margin: 2px 0 2px 0;
+	vertical-align: top;
+	width: 100%;
+}
+#flexicontent
+.fcvote_review_form_box_loading {
+	float: left;
+	display: inline-block;
 	vertical-align: top;
 }
 #flexicontent
