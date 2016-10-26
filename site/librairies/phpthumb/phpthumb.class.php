@@ -1681,16 +1681,20 @@ class phpthumb {
 					}
 				}
 
-
-				if (!is_null($this->dpi) && $this->ImageMagickSwitchAvailable('density')) {
-					// for vector source formats only (WMF, PDF, etc)
-					$commandline .= ' -flatten';
-					$commandline .= ' -density '.phpthumb_functions::escapeshellarg_replacement($this->dpi);
-				}
 				ob_start();
 				$getimagesize = getimagesize($this->sourceFilename);
 				$GetImageSizeError = ob_get_contents();
 				ob_end_clean();
+
+				if (!is_null($this->dpi) && $this->ImageMagickSwitchAvailable('density')) {
+					// for vector source formats only (WMF, PDF, etc)
+					if (!is_array($getimagesize) || $getimagesize[2] != IMAGETYPE_PNG)
+					{
+						$commandline .= ' -flatten';
+					}
+					$commandline .= ' -density '.phpthumb_functions::escapeshellarg_replacement($this->dpi);
+				}
+
 				if (is_array($getimagesize)) {
 					$this->DebugMessage('getimagesize('.$this->sourceFilename.') SUCCEEDED: '.print_r($getimagesize, true), __FILE__, __LINE__);
 				} else {
