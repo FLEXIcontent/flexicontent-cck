@@ -220,7 +220,7 @@ class phpthumb {
 	var $issafemode       = null;
 	var $php_memory_limit = null;
 
-	var $phpthumb_version = '1.7.15-201609131155';
+	var $phpthumb_version = '1.7.15-201610261701';
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -1681,24 +1681,25 @@ class phpthumb {
 					}
 				}
 
+
 				ob_start();
 				$getimagesize = getimagesize($this->sourceFilename);
 				$GetImageSizeError = ob_get_contents();
 				ob_end_clean();
-
-				if (!is_null($this->dpi) && $this->ImageMagickSwitchAvailable('density')) {
-					// for vector source formats only (WMF, PDF, etc)
-					if (!is_array($getimagesize) || $getimagesize[2] != IMAGETYPE_PNG)
-					{
-						$commandline .= ' -flatten';
-					}
-					$commandline .= ' -density '.phpthumb_functions::escapeshellarg_replacement($this->dpi);
-				}
-
 				if (is_array($getimagesize)) {
 					$this->DebugMessage('getimagesize('.$this->sourceFilename.') SUCCEEDED: '.print_r($getimagesize, true), __FILE__, __LINE__);
 				} else {
 					$this->DebugMessage('getimagesize('.$this->sourceFilename.') FAILED with error "'.$GetImageSizeError.'"', __FILE__, __LINE__);
+				}
+				if (!is_null($this->dpi) && $this->ImageMagickSwitchAvailable('density')) {
+					// for vector source formats only (WMF, PDF, etc)
+					if (is_array($getimagesize) && isset($getimagesize[2]) && ($getimagesize[2] == IMAGETYPE_PNG)) {
+						// explicitly exclude PNG from "-flatten" to make sure transparency is preserved
+						// https://github.com/JamesHeinrich/phpThumb/issues/65
+					} else {
+						$commandline .= ' -flatten';
+						$commandline .= ' -density '.phpthumb_functions::escapeshellarg_replacement($this->dpi);
+					}
 				}
 				if (is_array($getimagesize)) {
 					$this->DebugMessage('getimagesize('.$this->sourceFilename.') returned [w='.$getimagesize[0].';h='.$getimagesize[1].';f='.$getimagesize[2].']', __FILE__, __LINE__);
