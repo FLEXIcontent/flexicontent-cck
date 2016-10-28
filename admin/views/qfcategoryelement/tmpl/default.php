@@ -114,7 +114,7 @@ function delAllFilters() {
 
 
 
-	<table class="adminlist">
+	<table class="adminlist fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -150,7 +150,10 @@ function delAllFilters() {
    	?>
 		<tr class="<?php echo "row$k"; ?>">
 			
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td>
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
 			
 			<td align="left" class="col_title">
 				<?php if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>

@@ -217,6 +217,7 @@ function delAllFilters() {
 		foreach ($this->rows as $row): ?>
 		<tr class="<?php echo 'row', $o; ?>">
 			<td>
+				<div class="adminlist-table-row"></div>
 				<?php echo $this->pagination->getRowOffset( $n ); ?>
 			</td>
 			<td>

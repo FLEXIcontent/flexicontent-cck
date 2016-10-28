@@ -171,7 +171,10 @@ function delAllFilters() {
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td>
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
 			
 			<td align="left">
 				<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">

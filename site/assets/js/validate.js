@@ -23,7 +23,7 @@ var JFormValidator_fc = null;
 var JFormValidator = function()
 {
 	"use strict";
-	var handlers, inputEmail, custom, IEversion, isIE8,
+	var handlers, inputEmail, custom, IEversion, isIE8, isIE9,
 
 	initialize = function()
 	{
@@ -38,6 +38,7 @@ var JFormValidator = function()
 		custom = custom || {};
 		IEversion = isIE();
 		isIE8 = IEversion ? IEversion < 9 : false;
+		isIE9 = IEversion ? IEversion < 10 : false;
 
  	 	inputEmail = (function() {
  	 	 	var input = document.createElement("input");
@@ -768,7 +769,7 @@ var JFormValidator = function()
 	
 	hasClass = function(el, class_name)
 	{
-		return isIE8 ? jQuery(el).hasClass(class_name) : el.classList.contains(class_name);
+		return isIE8 || isIE9 ? jQuery(el).hasClass(class_name) : el.classList.contains(class_name);
 	}
 
 	

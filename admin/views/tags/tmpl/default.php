@@ -173,7 +173,10 @@ function delAllFilters() {
 			$canEditOwn = 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td class="center hidden-phone"><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td class="center hidden-phone">
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
 			<td class="center"><?php echo $checked; ?></td>
 			<td class="center hidden-phone">
 				<?php
