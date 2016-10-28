@@ -220,6 +220,13 @@ class JFormFieldMultiList extends JFormField
 			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
+
+		if ($inline_text = @$attributes['inline_text'])
+		{
+			$text_class = @$attributes['text_class'];
+			$text_class .= ($text_class ? ' ' : '') . 'fc_toggle_current';
+			$tip_text = '<span class="'.$text_class.'" style="display: inline-block;">'.JText::_($inline_text).'</span>';
+		}
 		
 		if ($inline_tip = @$attributes['inline_tip2'])
 		{
