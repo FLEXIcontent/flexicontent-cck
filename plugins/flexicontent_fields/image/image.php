@@ -1513,7 +1513,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							useratio:false,        //(boolean) windows size follows ratio. (iframe or Youtube) Default: false
 							ratio:'90'             //(number) window ratio Default: '90'
 						});
-					})";
+					});";
 					$document->addScriptDeclaration($js);
 					
 					$multiboxadded = true;

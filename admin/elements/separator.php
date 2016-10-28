@@ -200,7 +200,12 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			// Will be handled after switch
 			break;
 		}
-
+		
+		if ($box_type==-1)
+		{
+			$_bof = '<div class="control-group">';
+			$_eof = '</div>';
+		}
 		return $_bof . '<div style="'.$style.'" class="'.$classes.'" '.$tip.' >'.$title.'</div><div class="fcclear"></div>' . $_eof;
 	}
 }

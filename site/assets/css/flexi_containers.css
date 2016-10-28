@@ -64,6 +64,11 @@ body .fc-mssg.fc-info {
 	color: #31708f;
 	border-color: #9CD8F1;
 }
+body .fc-mssg.fc-small,
+body .fc-mssg-inline.fc-small {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
 body .alert.fc-error {
 	background: #F2DEDE url(../images/error.png) no-repeat 10px 50%;
 	padding-left: 36px;

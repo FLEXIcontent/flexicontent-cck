@@ -650,7 +650,7 @@
 			jQuery.each(dlist, function( i, val ) { if(val<=0) delete dlist[i]; if(val>=1) dlist[i]=1 ;});
 			c.data('fc_depend_list', dlist);
 			
-			var toggledBox = !toggleParent ? emptySet : (toggleParentSelector ? c.parents(toggleParentSelector) : c.parents().eq(toggleParent));
+			var toggledBox = !toggleParent || c.hasClass('fc_toggle_current') ? emptySet : (toggleParentSelector ? c.parents(toggleParentSelector) : c.parents().eq(toggleParent));
 			
 			if ( jQuery.isEmptyObject(dlist) || forced=='1' )
 			{
