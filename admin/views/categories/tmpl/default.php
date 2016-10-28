@@ -295,7 +295,10 @@ function delAllFilters() {
 			$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;filter_cats='. $row->id.'&amp;fcform=1&amp;filter_state=';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td>
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
 			<td><?php echo $checked; ?></td>
 			<td>
 				<?php

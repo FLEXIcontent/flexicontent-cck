@@ -339,6 +339,7 @@ function delAllFilters() {
 			?>
 			<tr class="<?php echo "row$k"; ?>">
 				<td class="center">
+					<div class="adminlist-table-row"></div>
 					<?php echo $i+1+$this->pagination->limitstart;?>
 				</td>
 				<td class="center">

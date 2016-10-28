@@ -307,7 +307,8 @@ div.sorter-full-width > ul.fcrecords > li.fcrecord .delfield_handle {
 	float: none;
 }
 table.adminlist {
-	background-color: #fff;
+	position: relative !important;
+	background: transparent !important;
 	border-spacing: 0px !important;
 	border-collapse: collapse !important;
 	color: #555;
@@ -359,12 +360,17 @@ table.adminlist input[type="text"] {
 	padding-left: 0px !important;
 	padding-right: 0px !important;
 }
-table.adminlist td.yellow,
-table.adminlist tbody tr td.yellow,
+table.adminlist tr td.yellow,
 table.adminlist tbody tr.row0 td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
-	background: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
-	background: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
+	background-color: #f0f0f0;
+	background-image: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
+	background-image: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
+}
+table.adminlist tr:hover td.yellow,
+table.adminlist tbody tr.row0:hover td.yellow,
+table.adminlist tbody tr.row1:hover td.yellow {
+	background: transparent !important;
 }
 table.adminlist tbody th {
 	font-weight: bold;
@@ -374,7 +380,7 @@ table.adminlist tbody tr:first-child {
 }
 table.adminlist tbody tr {
 	border-top: 1px solid #dadada !important;
-	background-color: #FFFFFF;
+	background: transparent !important;
 	text-align: left;
 }
 table.adminlist tbody tr.collapsed_row {
@@ -389,10 +395,16 @@ table.adminlist tbody tr td {
 table.adminlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #f7f7f7;
 }
-table.adminlist tbody tr.row0:hover,
-table.adminlist tbody tr.row1:hover {
-	background: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
-	background: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
+.adminlist-table-row {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	background-color: #f0f0f0;
+	background-image: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
+	background-image: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 }
 table.adminlist tbody tr.row0:hover td,
 table.adminlist tbody tr.row1:hover td {

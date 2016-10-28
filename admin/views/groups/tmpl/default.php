@@ -160,6 +160,7 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 	?>
 		<tr class="row<?php echo $i % 2; ?>">
 			<td class="center">
+				<div class="adminlist-table-row"></div>
 				<?php if ($canEdit) : ?>
 					<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 				<?php endif; ?>

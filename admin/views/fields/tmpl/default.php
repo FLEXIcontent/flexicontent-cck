@@ -387,7 +387,10 @@ function delAllFilters() {
 				</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td>
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
 			<td><?php echo $checked; ?></td>
 
 			<?php if ($this->permission->CanOrderFields) : ?>

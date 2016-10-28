@@ -95,7 +95,7 @@ $list_total_cols = 8;
 	</div>
 	-->
 	
-	<table class="adminlist" style="width: 100% !important;">
+	<table id="adminListTableFCtemplates" class="adminlist fcmanlist" style="width: 100% !important;">
 	
 	<thead>
 		<tr class="header">
@@ -173,7 +173,10 @@ $list_total_cols = 8;
 			$checked	= JHTML::_('grid.checkedout', $row, $i-1 );
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
-			<td><?php echo $i; ?></td>
+			<td>
+				<div class="adminlist-table-row"></div>
+				<?php echo $i; ?>
+			</td>
 			<td><?php echo $checked; ?></td>
 			<td class="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>

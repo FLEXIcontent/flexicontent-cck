@@ -78,7 +78,10 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td>
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pageNav->getRowOffset( $i ); ?>
+			</td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php

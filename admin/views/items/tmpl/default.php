@@ -794,7 +794,10 @@ jQuery(document).ready(function(){
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td class="sort_handle"><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td class="sort_handle">
+				<div class="adminlist-table-row"></div>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
 			<td><?php echo $cid_checkbox; ?></td>
 
 		<?php if ($this->CanOrder) : ?>

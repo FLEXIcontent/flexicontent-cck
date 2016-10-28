@@ -720,6 +720,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
 					<td class="center hidden-phone">
+						<div class="adminlist-table-row"></div>
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
