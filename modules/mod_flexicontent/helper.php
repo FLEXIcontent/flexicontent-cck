@@ -778,6 +778,7 @@ class modFlexicontentHelper
 		// items scope parameters
 		$method_items 		= (int)$params->get('method_items', 1);
 		$items	 					= trim($params->get('items'));
+		$items_use_order  = (int)$params->get('items_use_order', 0);
 		$behaviour_items 	= $params->get('behaviour_items', 0);
 		$excluded_tags		= $params->get('excluded_tags', array());
 		$excluded_tags		= (!is_array($excluded_tags)) ? array($excluded_tags) : $excluded_tags;
@@ -1848,7 +1849,7 @@ class modFlexicontentHelper
 				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
 				. $where_field_filters
 				. ' GROUP BY i.id'
-				. $orderby
+				. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby)
 				;
 			
 			// if using CATEGORY SCOPE INCLUDE ... then link though them ... otherwise via main category

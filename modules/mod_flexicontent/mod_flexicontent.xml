@@ -295,6 +295,8 @@
 					<option value="3" show_list="behaviour_items_dynamic" hide_list="">FLEXI_REVERSE_RELATED_RELATION_FIELD</option>
 				</group>
 			</field>
+			<field name="excluded_tags" type="tags" default="" multiple="true" size="6" label="FLEXI_EXCLUDED_TAGS" description="FLEXI_EXCLUDED_TAGS_DESC" showon="behaviour_items:1" />
+			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relation" label="FLEXI_SELECT_RELATION_FIELDS" description="FLEXI_SELECT_RELATION_FIELDS_DESC" showon="behaviour_items:2,3" />
 
 			<field name="method_items" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" showon="behaviour_items:0" class="btn-group group-fcmethod" inline_text="FLEXI_UMOD_STATIC_SET_METHOD_TO_ALL_TO_DISABLE" text_class="fc-mssg-inline fc-success fc-small method_items_ops">
 				<option value="1" show_list="" hide_list="method_items_ops">FLEXI_ALL</option>
@@ -302,8 +304,10 @@
 				<option value="3" show_list="method_items_ops" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			<field name="items" type="text" default="" size="50" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" showon="method_items:2,3[AND]behaviour_items:0" class="input-xxlarge" />
-			<field name="excluded_tags" type="tags" default="" multiple="true" size="6" label="FLEXI_EXCLUDED_TAGS" description="FLEXI_EXCLUDED_TAGS_DESC" showon="behaviour_items:1" />
-			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relation" label="FLEXI_SELECT_RELATION_FIELDS" description="FLEXI_SELECT_RELATION_FIELDS_DESC" showon="behaviour_items:2,3" />
+			<field name="items_use_order" type="radio" default="0" label="FLEXI_UMOD_USE_SELECT_ITEMS_ORDER" description="FLEXI_UMOD_USE_SELECT_ITEMS_ORDER_DESC" showon="method_items:3[AND]behaviour_items:0" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 
 			<field name="" type="separator" default="FLEXI_UMOD_EXPERT_FILTERING" level="level0" />
