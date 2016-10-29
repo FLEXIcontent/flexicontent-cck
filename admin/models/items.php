@@ -366,10 +366,18 @@ class FlexicontentModelItems extends JModelLegacy
 			foreach ($this->_data as $item)
 			{
 				// Parse item configuration for every row
-				$item->config = new JRegistry($item->config);
-	   		
+				try
+				{
+					$item->config = new JRegistry($item->config);
+				}
+				catch (Exception $e)
+				{
+					$item->config = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $item->id);
+				}
+
 				// Parse item's TYPE configuration if not already parsed
-				if ( isset($tconfig[$item->type_name]) ) {
+				if ( isset($tconfig[$item->type_name]) )
+				{
 		   		$item->tconfig = &$tconfig[$item->type_name];
 					continue;
 				}

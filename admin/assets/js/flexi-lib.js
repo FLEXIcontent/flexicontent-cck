@@ -37,6 +37,12 @@ jQuery(document).ready(function(){
 
 	var row_old_index;
 	var row_new_index;
+	
+	jQuery("#sortable_fcitems").find('input.fcitem_order_no').on('blur', function(e, data)
+	{
+		jQuery("#fcorder_notes_box").hide();
+		jQuery("#fcorder_save_warn_box").show();
+	});
 
 	jQuery("#sortable_fcitems").sortable({
 		handle: 'div.fc_drag_handle',

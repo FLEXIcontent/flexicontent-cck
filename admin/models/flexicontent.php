@@ -772,6 +772,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					'custom_add'=>'ADD PRIMARY KEY',
 					'cols'=>array('id'=>0,'itemid'=>0, 'userid'=>0, 'type'=>0)
 				)
+			),
+			'flexicontent_items_extravote'=>array(
+				'PRIMARY'=>array(
+					'custom_add'=>'ADD PRIMARY KEY',
+					'cols'=>array('content_id'=>0, 'field_id'=>0)
+				)
 			)
 		);
 		

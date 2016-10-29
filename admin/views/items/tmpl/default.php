@@ -99,7 +99,7 @@ if ( !$this->filter_order_type ) {
 
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 $fcfilter_attrs = ' class="input-prepend fc-xpended" ';
-$ordering_type_attrs = ' data-placement="bottom" class="add-on '.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
+$ordering_type_attrs = ' data-placement="bottom" class="add-on icon-info'.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
 $ord_grp = 1;
 
 $stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
