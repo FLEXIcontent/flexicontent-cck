@@ -982,36 +982,15 @@ class ParentClassItem extends JModelAdmin
 		
 		$this->_item->itemparams = new JRegistry();
 		
-		if ($this->_id) {
-			// Convert the images
-			$images = $this->_item->images;
-			$registry = new JRegistry;
-			$registry->loadString($images);
-			$this->_item->images = $registry->toArray();
-			$this->_item->itemparams->merge($registry);
-	
-			// Convert the urls
-			$urls = $this->_item->urls;
-			$registry = new JRegistry;
-			$registry->loadString($urls);
-			$this->_item->urls = $registry->toArray();
-			$this->_item->itemparams->merge($registry);
-	
-			// Convert the attribs
-			$attribs = $this->_item->attribs;
-			$registry = new JRegistry;
-			$registry->loadString($attribs);
-			$this->_item->attribs = $registry->toArray();
-			$this->_item->itemparams->merge($registry);
-	
-			// Convert the metadata
-			$metadata = $this->_item->metadata;
-			$registry = new JRegistry;
-			$registry->loadString($metadata);
-			$this->_item->metadata = $registry->toArray();
-			$this->_item->itemparams->merge($registry);
-		} else {
-			$images = $urls = $attribs = $metadata = '';
+		if ($this->_id)
+		{
+			$this->_prepareMergeJsonParams('images');
+			$this->_prepareMergeJsonParams('urls');
+			$this->_prepareMergeJsonParams('attribs');
+			$this->_prepareMergeJsonParams('metadata');
+		}
+		else
+		{
 			$this->_item->attribs = array();
 			$this->_item->metadata = array();
 			$this->_item->images = array();
@@ -1032,10 +1011,6 @@ class ParentClassItem extends JModelAdmin
 		$form->option = $this->option;
 		$form->context = $this->getName();
 		
-		$this->_item->images = $images;
-		$this->_item->urls   = $urls;
-		$this->_item->attribs  = $attribs;
-		$this->_item->metadata = $metadata;
 		unset($this->_item->cid);
 		
 		// Determine correct permissions to check.
@@ -4841,5 +4816,25 @@ class ParentClassItem extends JModelAdmin
 	public function useAssociations()
 	{
 		return flexicontent_db::useAssociations();
+	}
+
+
+	/**
+	 * Method to merge JSON (column) data to item parameters
+	 *
+	 */
+	private function _prepareMergeJsonParams($colname)
+	{
+		$registry = new JRegistry;
+		try
+		{
+			$registry->loadString($this->_item->$colname);
+		}
+		catch (Exception $e)
+		{
+			$registry = flexicontent_db::check_fix_JSON_column($colname, 'content', 'id', $this->_item->id, $this->_item->$colname);
+		}
+		$this->_item->$colname = $registry->toArray();
+		$this->_item->itemparams->merge($registry);
 	}
 }

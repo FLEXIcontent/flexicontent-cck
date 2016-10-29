@@ -422,9 +422,20 @@ class FlexicontentModelItem extends ParentClassItem
 		
 		// Create item parameters
 		if ( !is_object($this->_item->attribs) )
-			$itemParams = new JRegistry($this->_item->attribs);
+		{
+			try
+			{
+				$itemParams = new JRegistry($this->_item->attribs);
+			}
+			catch (Exception $e)
+			{
+				$itemParams = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $this->_item->id, $this->_item->attribs);
+			}
+		}
 		else
+		{
 			$itemParams = $this->_item->attribs;
+		}
 		
 		// Retrieve Layout's parameters, also deciding the layout
 		$this->decideLayout($compParams, $typeParams, $itemParams);
@@ -505,24 +516,27 @@ class FlexicontentModelItem extends ParentClassItem
 		  $params->set('show_page_heading', $show_default_heading);
 			$params->set('show_page_title',   $show_default_heading);
 		}
-		
+
 		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
 		if ( $params->get('show_title', 1) ) {
 			if ($params->get('page_heading') == $this->_item->title) $params->set('show_page_heading', 0);
 			if ($params->get('page_title')   == $this->_item->title) $params->set('show_page_title',   0);
 		}
-		
-		// Also convert metadata property string to parameters object
-		if ( !empty($this->_item->metadata) ) {
+
+		// Also convert metadata property string to registry object
+		try
+		{
 			$this->_item->metadata = new JRegistry($this->_item->metadata);
-		} else {
-			$this->_item->metadata = new JRegistry();
 		}
-		
+		catch (Exception $e)
+		{
+			$this->_item->metadata = flexicontent_db::check_fix_JSON_column('metadata', 'content', 'id', $this->_item->id);
+		}
+
 		// Manually apply metadata from type parameters ... currently only 'robots' makes sense to exist per type
 		if ( !$this->_item->metadata->get('robots') )   !$this->_item->metadata->set('robots', $typeParams->get('robots'));
-		
-		
+
+
 		// *********************************************
 		// Finally set 'parameters' property of the item
 		// *********************************************

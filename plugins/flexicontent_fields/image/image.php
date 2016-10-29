@@ -1186,7 +1186,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			{
 				if (!is_object($item->images))
 				{
-					$item->images = new JRegistry($item->images);
+					try
+					{
+						$item->images = new JRegistry($item->images);
+					}
+					catch (Exception $e)
+					{
+						$item->images = flexicontent_db::check_fix_JSON_column('images', 'content', 'id', $item->id);
+					}
 				}
 				
 				$_image_path = $item->images->get('image_'.$_image_name, '');

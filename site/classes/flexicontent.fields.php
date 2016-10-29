@@ -349,7 +349,17 @@ class FlexicontentFields
 			}
 			$item->fields	= $item->fields	? $item->fields	: array();
 			
-			if (!isset($item->parameters)) $item->parameters = new JRegistry($item->attribs);
+			if (!isset($item->parameters))
+			{
+				try
+				{
+					$item->parameters = new JRegistry($item->attribs);
+				}
+				catch (Exception $e)
+				{
+					$item->parameters = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $item->id, $item->attribs);
+				}
+			}
 			$item->params		= $item->parameters;
 			
 			$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;

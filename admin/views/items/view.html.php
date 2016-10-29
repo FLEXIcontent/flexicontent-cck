@@ -527,8 +527,8 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build the order type boolean list
 		$order_types = array();
-		$order_types[] = JHTML::_('select.option', '0', 'FLEXI_ORDER_JOOMLA' );
-		$order_types[] = JHTML::_('select.option', '1', 'FLEXI_ORDER_FLEXICONTENT' );
+		$order_types[] = JHTML::_('select.option', '0', JText::_('FLEXI_ORDER_JOOMLA').' ('.JText::_('FLEXI_ORDER_JOOMLA_ABOUT').')' );
+		$order_types[] = JHTML::_('select.option', '1', JText::_('FLEXI_ORDER_FLEXICONTENT').' ('.JText::_('FLEXI_ORDER_FLEXICONTENT_ABOUT').')' );
 		//$lists['filter_order_type'] = JHTML::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type );
 		$lists['filter_order_type'] = JHTML::_('select.genericlist', $order_types, 'filter_order_type', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type, 'filter_order_type', $translate=true );
 		

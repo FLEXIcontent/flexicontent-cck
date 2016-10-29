@@ -6459,7 +6459,41 @@ class flexicontent_db
 		$db->setQuery($query);
 		$db->execute();
 	}
+
 	
+	/**
+	 * Method to verify a record has valid JSON data for the given column
+	 * 
+	 * @return string
+	 * @since 3.1
+	 */
+	static function check_fix_JSON_column($colname, $tblname, $idname, $id, & $attribs=null)
+	{
+		$db = JFactory::getDBO();
+		
+		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
+		$db->setQuery('SELECT '.$colname.' FROM #__'.$tblname.' WHERE '.$idname.' = ' . $db->Quote($id));
+		$attribs = $db->loadResult();
+
+		try {
+			$json_data = new JRegistry($attribs);
+		}
+		catch (Exception $e)
+		{
+			$attribs = '{}';
+			$json_data = new JRegistry($attribs);
+			$db->setQuery('UPDATE #__'.$tblname.' SET '.$colname.' = '.$db->Quote($attribs).' WHERE '.$idname.' = ' .  $db->Quote($id));
+			$db->execute();
+			$app = JFactory::getApplication();
+			if ($app->isAdmin())
+			{
+				$app->enqueueMessage('Cleared bad JSON COLUMN: <b>'.$colname.'</b>, DB TABLE: <b>'.$tblname.'</b>, RECORD: <b>'.$id.'</b>', 'warning');
+			}
+		}
+
+		return $json_data;
+	}
+
 	
 	/**
 	 * Method to get the (language filtered) name of all access levels
