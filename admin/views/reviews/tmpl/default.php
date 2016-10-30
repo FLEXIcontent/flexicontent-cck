@@ -20,24 +20,47 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
-$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+$tip_class = ' hasTooltip';
+$btn_class = 'btn';  //'fc_button fcsimple';
+
+$ico_class   = 'fc-man-icon-s';
+$btn_s_class = 'btn btn-small';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCreviews', $start_text, $end_text);
 
-$edit_entry = JText::_('FLEXI_EDIT_REVIEW', true);
-
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
-$attribs_preview = ' class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
-
 $list_total_cols = 7;
+
+
+
+// *********************
+// COMMON repeated texts
+// *********************
+
+$edit_entry = JText::_('FLEXI_EDIT_REVIEW', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+
+
+// *****
+// ICONS
+// *****
+
+$attribs_preview    = ' class="preview '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_rsslist    = ' class="rsslist '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_editlayout = ' class="editlayout '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
+
+$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
+$image_rsslist = JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
+$image_editlayout = 0 ?
+	JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ' class="'.$ico_class.'"') :
+	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
+
+$fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
 ?>
 <script type="text/javascript">
 
@@ -178,7 +201,7 @@ function delAllFilters() {
 					$previewlink = $review_link . $autologin;
 				}
 				else $previewlink="javascript:;";
-				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+				echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
 			</td>
 			<td class="title">

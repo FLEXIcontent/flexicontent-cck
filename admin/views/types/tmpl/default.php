@@ -20,9 +20,11 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
-$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$ico_class = 'btn btn-small'; //'fc-man-icon-s';
+$tip_class = ' hasTooltip';
+$btn_class = 'btn';  //'fc_button fcsimple';
+
+$ico_class   = 'fc-man-icon-s';
+$btn_s_class = 'btn btn-small';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -38,13 +40,34 @@ $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 $list_total_cols = 12;
 
+
+// *********************
+// COMMON repeated texts
+// *********************
+
+$edit_entry  = JText::_('FLEXI_EDIT_TYPE', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+$view_fields = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_FIELDS', true);
+$view_items  = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_ITEMS', true);
+
+
+// *****
+// ICONS
+// *****
+
+$attribs_preview    = ' class="preview '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_rsslist    = ' class="rsslist '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_editlayout = ' class="editlayout '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
+
+$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
+$image_rsslist = JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
+$image_editlayout = 0 ?
+	JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ' class="'.$ico_class.'"') :
+	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
+
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 $article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_JOOMLA_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
 $default_template_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_TYPE_DEFAULT_TEMPLATE', true ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
-
-//$editlayout_attribs = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ';
-//$editLayout_icon = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'),  $editlayout_attribs);
-$editLayout_icon = '<span class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'"><span class="icon-edit"></span></span>';
 ?>
 <script type="text/javascript">
 
@@ -241,8 +264,8 @@ function delAllFilters() {
 			
 			<td class="hidden-phone col_edit_layout">
 				<?php if ($this->CanTemplates) : ?>
-				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
-					<?php echo $editLayout_icon;?>
+				<a <?php echo $attribs_editlayout; ?>" href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
+					<?php echo $image_editlayout;?>
 				</a>
 				<?php endif; ?>
 			</td>
