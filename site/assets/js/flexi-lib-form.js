@@ -1,6 +1,4 @@
 
-	window.sortable_fcfield_lists = '';
-	
 	function fcfield_add2list(list_tagid, selector)
 	{
 		var list = jQuery('#'+list_tagid);
@@ -60,8 +58,12 @@
 	}
 	
 	
-	jQuery(document).ready(function()
+	function fcfield_attach_sortable(sel)
 	{
+		sel = typeof sel !== 'undefined' ? sel : 'body';
+
+		var sortable_fcfield_lists = sel + ' ul.fcfields_list';
+
 		jQuery( sortable_fcfield_lists ).each(function(index, value)
 		{
 			fcfield_store_ordering(jQuery(this));
@@ -69,14 +71,14 @@
 		
 		jQuery( sortable_fcfield_lists ).sortable(
 		{
-			connectWith: sortable_fcfield_lists,
+			//connectWith: sortable_fcfield_lists,
 			update: function(event, ui) {
 				ui.sender ?
 					fcfield_store_ordering(jQuery(ui.sender)) :
 					fcfield_store_ordering(jQuery(ui.item).parent()) ;
 			}
 		});
-	});
+	}
 
 
 
@@ -414,7 +416,7 @@
 	{
 		sel = typeof sel !== 'undefined' ? sel : 'body';
 
-		jQuery(sel + ' ul.fcrecords').each(function(index, value)
+		jQuery(sel + ' ul.fcrecords_list').each(function(index, value)
 		{
 			var list = jQuery(this);
 
@@ -442,4 +444,5 @@
 	jQuery(document).ready(function()
 	{
 		fcrecord_attach_sortable('body');
+		fcfield_attach_sortable('body');
 	});

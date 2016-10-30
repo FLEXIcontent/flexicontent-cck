@@ -313,10 +313,8 @@ function fc_getLayout(el)
 			//tabberAutomatic(tabberOptions, panel_id);
 			fc_bindFormDependencies('#'+panel_id, 0, '');
 			fc_bootstrapAttach('#'+panel_id);
-			if (typeof(fcrecord_attach_sortable) == 'function')
-			{
-				fcrecord_attach_sortable('#'+panel_id);
-			}
+			if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#'+panel_id);
+			if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#'+panel_id);
 		}
 	});
 }

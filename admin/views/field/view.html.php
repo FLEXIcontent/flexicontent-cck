@@ -160,10 +160,8 @@ class FlexicontentViewField extends JViewLegacy
 								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
 								fc_bindFormDependencies('#fieldspecificproperties', 0, '');
 								fc_bootstrapAttach('#fieldspecificproperties');
-								if (typeof(fcrecord_attach_sortable) == 'function')
-								{
-									fcrecord_attach_sortable('#fieldspecificproperties');
-								}
+								if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#fieldspecificproperties');
+								if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#fieldspecificproperties');
 								jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
 							}
 						});

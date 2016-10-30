@@ -961,7 +961,7 @@ class com_flexicontentInstallerScript
 							`checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
 						  `attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
-						  UNIQUE (`content_id`, `user_id`, `type`),
+						  KEY (`content_id`, `user_id`, `type`),
 						  KEY (`content_id`, `type`),
 						  KEY `user_id` (`user_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";

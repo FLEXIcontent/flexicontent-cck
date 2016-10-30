@@ -214,10 +214,8 @@ function ilayout_loadPanel(element)
 				//tabberAutomatic(tabberOptions, panel_id);
 				fc_bindFormDependencies('#'+panel_id, 0, '');
 				fc_bootstrapAttach('#'+panel_id);
-				if (typeof(fcrecord_attach_sortable) == 'function')
-				{
-					fcrecord_attach_sortable('#'+panel_id);
-				}
+				if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#'+panel_id);
+				if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#'+panel_id);
 				panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
 			}
 		});

@@ -830,18 +830,18 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<div class="fcclear"></div>
 				
 				<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
-				<span class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
-					<span class="btn <?php echo $tip_class; ?>"
+				<div class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
+					<div class="btn <?php echo $tip_class; ?>"
 						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
-						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo JText::_( $code_btn_lbls[$_posname] ); ?></span>
-					<span class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
+						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo JText::_( $code_btn_lbls[$_posname] ); ?></div>
+					<div class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
 						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
 						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">
 							<?php echo $code_btn_tips[$_posname]; ?>
 						</div>
-					</span>
+					</div>
 					<textarea style="float:left; clear:both; display:none; width:100%;" rows="24" form="code_insertion_form"><?php echo htmlspecialchars($code_btn_rawcode[$_posname]); ?></textarea>
-				</span>
+				</div>
 				<?php endforeach; ?>
 				
 			</div>
