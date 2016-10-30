@@ -78,7 +78,7 @@ class FlexicontentHelperRoute
 		self::$menuitems[$language] = array();
 		if ($_menuitems) foreach ($_menuitems as $menuitem)
 		{
-			// We do not need to check and skip menu items of non-allowed access level, since in J2.5+,
+			// We do not need to check and skip menu items of non-allowed access level, since
 			// filtering by access levels of current user, is already done by JMenuSite::getItems()
 			
 			// Index by menu id
@@ -100,7 +100,7 @@ class FlexicontentHelperRoute
 		
 		// Default item not found (yet) ... set it to false to indicate that we tried
 		$_component_default_menuitem_id = false;
-		$curr_langtag = JFactory::getLanguage()->getTag();  // Current language tag for J2.5+ but not for J1.5
+		$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		
 		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
@@ -109,7 +109,8 @@ class FlexicontentHelperRoute
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$default_menuitem_preference = $params->get('default_menuitem_preference', 0);
 		
-		switch ($default_menuitem_preference) {
+		switch ($default_menuitem_preference)
+		{
 		case 1:
 			// Try to use ACTIVE (current) menu item if pointing to Flexicontent, (if so configure in global options)
 			$menu = $menus->getActive();
@@ -117,8 +118,8 @@ class FlexicontentHelperRoute
 			// Check that (a) it exists and is active (b) points to com_flexicontent
 			if ($menu && @ $menu->query['option']=='com_flexicontent' )
 			{
-				// For J2.5+ check language, for J2.5+ checking access is not needed as it was done already above, by the JMenu::getItem()
-				$item_matches = $curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled();
+				// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
+				$item_matches = $current_language == '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
 				
 				// If item matched then set it as default and return it
 				if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
@@ -128,34 +129,11 @@ class FlexicontentHelperRoute
 		case 2:
 			// Try to use (user defined) component's default menu item, (if so configure in global options)
 			$menuitem_id = $params->get('default_menu_itemid', false);
-			$menu = $menus->getItem($menuitem_id);
-			
-			// Check that (a) it exists and is active (b) points to com_flexicontent
-			if ($menu && @ $menu->query['option']=='com_flexicontent')
-			{
-				// For J2.5+ check language, for J2.5+ checking access is not needed as it was done already above, by the JMenu::getItem()
-				$item_matches = $curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled();
-				
-				// If matched set default and return it
-				if ($item_matches)  return  $_component_default_menuitem_id = $menuitem_id;
-				
-				// For J2.5+ we also need to try menu item associations and select the current language item
-				if ( $menu->language!='*' && $menu->language!='' && $menu->language!=$curr_langtag )
-				{
-					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'helpers'.DS.'menus.php');
-					$helper = new MenusHelper();
-					$associated = $helper->getAssociations($menuitem_id);
-					
-					// Use the associated menu item for current language
-					if ( isset($associated[$curr_langtag]) )
-					{
-						// Check the associated menu item too
-						$menu = $menus->getItem($associated[$curr_langtag]);
-						if ($menu && @ $menu->query['option']=='com_flexicontent')  $_component_default_menuitem_id = $associated[$curr_langtag];
-					}
-				}
-			}
-			
+
+			// Verify the menu item, clearing it if invalid, or setting to its language associated menu item if needed
+			FlexicontentHelperRoute::verifyMenuItem($menuitem_id);
+			$_component_default_menuitem_id = $menuitem_id;
+
 			return $_component_default_menuitem_id;
 		}
 	}
@@ -169,61 +147,31 @@ class FlexicontentHelperRoute
 		// Cache the result on multiple calls
 		static $_layouts_default_menuitem_id = null;
 		if ( $_layouts_default_menuitem_id!==null ) return $_layouts_default_menuitem_id[$layout];
-		
+
 		// Default item not found (yet) ... set it to empty array to indicate that we tried
 		$_layouts_default_menuitem_id = array();
-		$curr_langtag = JFactory::getLanguage()->getTag();  // Current language tag for J2.5+ but not for J1.5
-		
+		$current_language = JFactory::getLanguage()->getTag();  // Current language tag
+
 		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-		
+
 		// Get preference for default menu item
 		$params = JComponentHelper::getParams('com_flexicontent');
-		
+
 		$_layouts_default_menuitem_id = array();
 		$_layouts_default_menuitem_id['tags'] = $params->get('cat_tags_default_menu_itemid', 0);
 		$_layouts_default_menuitem_id['favs'] = $params->get('cat_favs_default_menu_itemid', 0);
 		$_layouts_default_menuitem_id['author']  = $params->get('cat_author_default_menu_itemid',  0);
 		$_layouts_default_menuitem_id['myitems'] = $params->get('cat_myitems_default_menu_itemid', 0);
 		$_layouts_default_menuitem_id['mcats']   = $params->get('cat_mcats_default_menu_itemid', 0);
-		
+
 		foreach ($_layouts_default_menuitem_id as $layout => $menuitem_id)
 		{
-			$menu = $menus->getItem($menuitem_id);
-			
-			// Check that (a) it exists and is active (b) points to com_flexicontent (c) is category view and of correct layout
-			if ($menu && @ $menu->query['option']=='com_flexicontent' && @ $menu->query['view']=='category' && @ $menu->query['layout']==$layout)
-			{
-				// For J2.5+ check language, for J2.5+ checking access is not needed as it was done already above, by the JMenu::getItem()
-				$item_matches = $curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled();
-				
-				// If item matched then selected menu item is good, continue with next layout type
-				if ($item_matches) continue;
-				
-				// For J2.5+ we also need to try menu item associations and select the current language item
-				if ( $menu->language!='*' && $menu->language!='' && $menu->language!=$curr_langtag )
-				{
-					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'helpers'.DS.'menus.php');
-					$helper = new MenusHelper();
-					$associated = $helper->getAssociations($menuitem_id);
-					
-					// Assign the associated menu item as default, continue with next layout type
-					if ( isset($associated[$curr_langtag]) ) {
-						// Check the associated menu item too
-						$menu = $menus->getItem($associated[$curr_langtag]);
-						if ($menu && @ $menu->query['option']=='com_flexicontent' && @ $menu->query['view']=='category' && @ $menu->query['layout']==$layout)
-						{
-							$_layouts_default_menuitem_id[$layout] = $associated[$curr_langtag];
-							continue;
-						}
-					}
-				}
-			}
-			
-			// Default menu item for the layout, did not match, clear it
-			$_layouts_default_menuitem_id[$layout] = 0;
+			// Verify the menu item, clearing it if invalid, or setting to its language associated menu item if needed
+			FlexicontentHelperRoute::verifyMenuItem($menuitem_id);
+			$_layouts_default_menuitem_id[$layout] = $menuitem_id;
 		}
-		
+
 		return $_layouts_default_menuitem_id;
 	}
 	
@@ -357,7 +305,7 @@ class FlexicontentHelperRoute
 		
 		static $current_language = null;
 		if ($current_language === null) {
-			$current_language = JFactory::getLanguage()->getTag();  // Current language tag for J2.5+ but not for J1.5
+			$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		}
 		
 		static $use_language = null;
@@ -402,14 +350,14 @@ class FlexicontentHelperRoute
 		// DONE ONCE (per encountered type): Get content type's default menu
 		// *****************************************************************
 		
-		if ( $type ) {
+		if ( $type )
+		{
 			$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);  // ZERO: do not use, 1: before item's category, 2: after item's category
 			$type_menu_itemid       = $type->params->get('type_menu_itemid', 0);
-			if ($type_menu_itemid_usage && $type_menu_itemid) {
-				if ( !isset($type->typeMenuItem) ) {
-					$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-					$type->typeMenuItem = $menus->getItem( $type_menu_itemid );
-				}
+			if ($type_menu_itemid_usage && $type_menu_itemid && !isset($type->typeMenuItem))
+			{
+				// Verify the menu item, clearing it if invalid, or setting to its language associated menu item if needed
+				$type->typeMenuItem = FlexicontentHelperRoute::verifyMenuItem($type_menu_itemid);
 			}
 		}
 		
@@ -520,7 +468,7 @@ class FlexicontentHelperRoute
 		
 		static $current_language = null;
 		if ($current_language === null) {
-			$current_language = JFactory::getLanguage()->getTag();  // Current language tag for J2.5+ but not for J1.5
+			$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		}
 		
 		static $use_language = null;
@@ -759,7 +707,7 @@ class FlexicontentHelperRoute
 		
 		static $current_language = null;
 		if ($current_language === null) {
-			$current_language = JFactory::getLanguage()->getTag();  // Current language tag for J2.5+ but not for J1.5
+			$current_language = JFactory::getLanguage()->getTag();  // Current language tag
 		}
 		
 		static $use_language = null;
@@ -1137,6 +1085,58 @@ class FlexicontentHelperRoute
 		}
 		//echo "<pre>";  print_r(self::$lookup);  echo "</pre>"; exit;
 	}
-		
+
+
+
+	static function verifyMenuItem(& $menuitem_id)
+	{
+		$current_language = JFactory::getLanguage()->getTag();  // Current language tag
+
+		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item		
+
+		// Check that (a) it exists and is active (b) points to com_flexicontent
+		if ($menu && @ $menu->query['option']=='com_flexicontent')
+		{
+			// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
+			$item_matches = $current_language == '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
+
+			// If matched set default and return it
+			if ($item_matches) ;
+
+			// We also need to try menu item associations and select the current language item
+			else if ( $menu->language!='*' && $menu->language!='' && $menu->language!=$current_language )
+			{
+				// Clear menu item and and menu item id
+				$menuitem_id = 0;
+				$menu = false;
+
+				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'helpers'.DS.'menus.php');
+				$helper = new MenusHelper();
+				$associated = $helper->getAssociations($menuitem_id);
+
+				// Use the associated menu item for current language
+				if ( isset($associated[$current_language]) )
+				{
+					// Check the associated menu item too
+					$menuitem_id = $associated[$current_language];
+					$menu = $menus->getItem($menuitem_id);
+					if (!$menu || @ $menu->query['option']!='com_flexicontent')
+					{
+						// Clear menu item and and menu item id
+						$menuitem_id = 0;
+						$menu = false;
+					}
+				}
+			}
+		}
+		else
+		{
+			// Clear menu item and and menu item id
+			$menuitem_id = 0;
+			$menu = false;
+		}
+
+		return $menu;
+	}
 }
-?>

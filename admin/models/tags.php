@@ -265,6 +265,7 @@ class FlexicontentModelTags extends JModelLegacy
 			// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
 			// the more tags are listed (query LIMIT) the bigger the performance difference ...
 			. ($filter_order=='nrassigned' ? ', (SELECT COUNT(rel.tid) FROM #__flexicontent_tags_item_relations AS rel WHERE rel.tid=t.id GROUP BY t.id) AS nrassigned' : '')
+			. ', CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 			. ' FROM #__flexicontent_tags AS t'
 			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
 			. ($filter_assigned || $filter_order=='nrassigned' ? ' LEFT JOIN #__flexicontent_tags_item_relations AS rel ON rel.tid=t.id' : '')
