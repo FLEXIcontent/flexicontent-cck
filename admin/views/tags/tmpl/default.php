@@ -179,7 +179,8 @@ function delAllFilters() {
 		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		$edit_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&amp;task=';
 		$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;fcform=1&amp;filter_tag=';
-		
+		$use_catlinks = $cparams->get('tags_using_catview', 0);
+
 		$k = 0;
 		
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
@@ -201,7 +202,10 @@ function delAllFilters() {
 			<td class="center"><?php echo $checked; ?></td>
 			<td class="center hidden-phone">
 				<?php
-				$tag_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getTagRoute($row->id));
+				$tag_link = $use_catlinks ?
+					FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$row->slug)) :
+					FlexicontentHelperRoute::getTagRoute($row->slug) ;
+				$tag_link    = str_replace('&', '&amp;', $tag_link);
 				$tag_link    = JRoute::_(JURI::root().$tag_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 				$previewlink = $tag_link . $autologin;
 				echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';

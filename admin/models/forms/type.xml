@@ -324,10 +324,10 @@
 		
 		<fieldset name="seo" label="FLEXI_SEO" icon_class="icon-search">
 		
-			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level1" />
 			<field name="microdata_itemtype" type="microdatatype" first_option="FLEXI_DISABLE" label="FLEXI_MICRODATA_ITEMTYPE" description="FLEXI_MICRODATA_ITEMTYPE_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" />
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level1" />
 			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -338,7 +338,7 @@
 				<option value="2">FLEXI_ON_RIGHT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2" />
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level1" />
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -351,7 +351,15 @@
 				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
 				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
 			</field>
-		
+
+			<field name="" type="separator" default="Menu Item" level="level1" />
+			<field name="type_menu_itemid" type="fcmenuitem" component="com_flexicontent" default="" disable="separator" state="1" published="1" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" />
+			<field name="type_menu_itemid_usage" type="radio" default="0" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_NONE</option>
+				<option value="1">FLEXI_TYPE_MENU_ITEM_BEFORE_CAT</option>
+				<option value="2">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
+			</field>
+
 		</fieldset>
 			
 		<fieldset name="viewing" label="FLEXI_ITEM_VIEW" icon_class="icon-eye-open">
@@ -369,14 +377,6 @@
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_BEFORE_CONTENT</option>
 				<option value="2">FLEXI_AFTER_CONTENT</option>
-			</field>
-			
-			<field name="" type="separator" default="Menu Item" level="level1" />
-			<field name="type_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" />
-			<field name="type_menu_itemid_usage" type="radio" default="0" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NONE</option>
-				<option value="1">FLEXI_TYPE_MENU_ITEM_BEFORE_CAT</option>
-				<option value="2">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level1" />		
