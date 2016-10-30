@@ -28,11 +28,13 @@ foreach($this->extra_fields as $_field):
 	FlexicontentFields::renderField($this->rows, $field->name, $values, $field->methodname);
 endforeach;
 
-$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$ico_class = 'btn btn-small'; //'fc-man-icon-s';
+$tip_class = ' hasTooltip';
+$btn_class = 'btn';  //'fc_button fcsimple';
 
-$featimg = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="fc-man-icon-s" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
+$ico_class   = 'fc-man-icon-s';
+$btn_s_class = 'btn btn-small';
+
+$featimg = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; ';
 $end_text = '<div class="icon-arrow-up-2 btn" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -61,29 +63,49 @@ if ( $useAssocs ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);
 
+
+// *********************
+// COMMON repeated texts
+// *********************
+
+$edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
+$edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+$rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
+$rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+$scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
+$publication_expired = JText::_( 'FLEXI_PUBLICATION_EXPIRED', true );
+
+
+// *****
+// ICONS
+// *****
+
 $image_flag_path = "../media/mod_languages/images/";
-$attribs_preview = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_preview = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), $attribs_preview);
 
-$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+$attribs_preview    = ' class="preview '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_editlayout = ' class="editlayout '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
-//$editlayout_attribs = ' class="fc-man-icon-s '.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ';
-//$editLayout_icon = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'),  $editlayout_attribs);
-$editLayout_icon = '<span class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'"><span class="icon-edit"></span></span>';
+$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
+$image_editlayout = 0 ?
+	JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ' class="'.$ico_class.'"') :
+	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
 	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
 	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
 $_img_title = JText::_('MAIN category shown in bold', true);
-$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-man-icon-s '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
+$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="'.$ico_class.' '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
 
 if ( !$this->filter_order_type ) {
 	$_img_title = JText::_('FLEXI_ORDER_JOOMLA');
@@ -116,14 +138,6 @@ $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_N
 $date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
 //$date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
-// COMMON repeated texts
-$edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
-$edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
-$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
-$rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
-$rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
-$scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
-$publication_expired = JText::_( 'FLEXI_PUBLICATION_EXPIRED', true );
 ?>
 <script type="text/javascript">
 
@@ -854,7 +868,7 @@ jQuery(document).ready(function(){
 				);
 				$item_url = JRoute::_(JURI::root().$item_url, $xhtml=false); // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 				$previewlink = $item_url .'&amp;preview=1' .$autologin;
-				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+				echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
 			</td>
 
@@ -964,8 +978,8 @@ jQuery(document).ready(function(){
 			
 			<td class="col_edit_layout">
 				<?php if ($this->CanTemplates && $row_ilayout) : ?>
-				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
-					<?php echo $editLayout_icon;?>
+				<a <?php echo $attribs_editlayout; ?>" href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
+					<?php echo $image_editlayout;?>
 				</a>
 				<?php endif; ?>
 			</td>
