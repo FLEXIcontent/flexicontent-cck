@@ -1688,7 +1688,7 @@ class FlexicontentController extends JControllerLegacy
 			<button type="button" class="close" data-dismiss="alert">&times;</button>
 			'.$mssg.'
 		</div>';
-		$result->html = mssg;
+		$result->html = $mssg;
 		//$result->html .= '<pre>'.print_r($_REQUEST, true).'</pre>';
 
 		echo json_encode($result);

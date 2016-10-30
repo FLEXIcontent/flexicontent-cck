@@ -322,7 +322,7 @@ class JFormFieldFields extends JFormField
 			$sorter_html  = '
 			<div class="fcclear"></div>
 			<div class="'.$classes.'">
-				<ul id="'.$sortable_id.'" class="fcrecords">';
+				<ul id="'.$sortable_id.'" class="fcrecords fcfields_list">';
 			foreach($values as $val)
 			{
 				if( !isset($v2f[$val]) ) continue;

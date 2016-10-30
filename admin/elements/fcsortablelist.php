@@ -269,7 +269,7 @@ class JFormFieldFcSortableList extends JFormField
 					<div class="fcclear"></div>
 					<div class="fcrec_cascaded_msg alert alert-info" style="display: none;"></div>
 					'.($props_header ? '<span class="fcrecord_header"> '.implode('', $props_header).'</span>' : '').'
-					<ul id="'.$sortable_id.'" class="fcrecords" '.$list_attrs.'>';
+					<ul id="'.$sortable_id.'" class="fcrecords fcrecords_list" '.$list_attrs.'>';
 
 			$_unused_col = ' readonly="readonly" placeholder="'.JText::_('FLEXI_NA').'" ';
 			
