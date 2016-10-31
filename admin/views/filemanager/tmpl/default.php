@@ -1306,7 +1306,7 @@ flexicontent_html::loadFramework('flexi-lib');
 								</label>
 							</td>
 							<td id="file-url-size-container">
-								<input type="text" id="file-url-size" size="44" class="required input-xxlarge" name="file-url-size" />
+								<input type="text" id="file-url-size" size="44" class="input-xxlarge" name="file-url-size" />
 								<select id="size_unit" name="size_unit" class="use_select2_lib">
 									<option value="KBs" selected="selected">KBs</option>
 									<option value="MBs">MBs</option>
