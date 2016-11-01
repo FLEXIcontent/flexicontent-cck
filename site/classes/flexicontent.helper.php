@@ -1817,14 +1817,15 @@ class flexicontent_html
 	 */
 	static function setitemstate( $controller_obj )
 	{
-		$id = JRequest::getInt( 'id', 0 );
-		JRequest::setVar( 'cid', $id );
-
 		$app = JFactory::getApplication();
-		$modelname = $app->isAdmin() ? 'item' : FLEXI_ITEMVIEW;
-		$model = $controller_obj->getModel( $modelname );
+		$jinput = $app->input;
+
+		$id = $jinput->get('id', 0, 'int');
+		$jinput->set('cid', $id);
+
+		$model = $controller_obj->getModel('item');
 		$user = JFactory::getUser();
-		$state = JRequest::getVar( 'state', 0 );
+		$state = $jinput->get('state', 0, 'int');
 
 		// Get owner and other item data
 		$db = JFactory::getDBO();
@@ -2010,7 +2011,7 @@ class flexicontent_html
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
-		//$Itemid = JRequest::getInt('Itemid', 0);  // Maintain menu item ? e.g. current category view, 
+		//$Itemid = JFactory::getApplication()->input('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view, 
 		$Itemid = 0;
 		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 		$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=remove';
@@ -2619,7 +2620,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		if ( $params->get('show_editbutton', 1) == '1') {
-			//$Itemid = JRequest::getInt('Itemid', 0);  // Maintain menu item ? e.g. current category view, 
+			//$Itemid = JFactory::getApplication()->input('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view, 
 			$Itemid = 0;
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
@@ -6076,23 +6077,6 @@ class FLEXIUtilities
 		$versionscount = $db->loadResult();
 
 		return $versionscount;
-	}
-
-
-	static function doPlgAct()
-	{
-		$plg = JRequest::getVar('plg');
-		$act = JRequest::getVar('act');
-		if($plg && $act) {
-			$plgfolder = DS.strtolower($plg);
-			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($plg).'.php';
-			if(file_exists($path)) require_once($path);
-			$class = "plgFlexicontent_fields{$plg}";
-			if(class_exists($class) && in_array($act, get_class_methods($class))) {
-				//call_user_func("$class::$act");
-				call_user_func(array($class, $act));
-			}
-		}
 	}
 
 
