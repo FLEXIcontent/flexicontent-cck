@@ -67,7 +67,8 @@ class FlexicontentController extends JControllerLegacy
 		if ($view=='category' && $cid)
 		{
 			$query = 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-				.' FROM #__categories AS c WHERE c.id = '.$cid;
+				.' FROM #__categories AS c'
+				.' WHERE c.id = '.$cid;
 			$db->setQuery( $query );
 			$categoryslug = $db->loadResult();
 			echo JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
@@ -246,10 +247,12 @@ class FlexicontentController extends JControllerLegacy
 		// Create responce and JSON encode it
 		$options['Matches'] = array();
 		$n = 0;
-		foreach ($words_found as $_w => $i) {
-			if (!$search_prefix) {
+		foreach ($words_found as $_w => $i)
+		{
+			if (!$search_prefix)
+			{
 				if ( StringHelper::strlen($_w) < $min_word_len ) continue;  // word too short
-				if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
+				if ( $this->_isStopWord($_w, $tbl) ) continue;  // stopword or too common
 			}
 			
 			$options['Matches'][] = array(
@@ -262,21 +265,6 @@ class FlexicontentController extends JControllerLegacy
 		echo json_encode($options);
 		jexit();
 	}
-	
-	
-	function isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
-	{
-		$db = JFactory::getDBO();
-		$quoted_word = $db->escape($word, true);
-		$query = 'SELECT '.$col
-			.' FROM #__'.$tbl
-			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
-			.' LIMIT 1';
-		$db->setQuery($query);
-		$result = $db->loadAssocList();
-		return !empty($return) ? true : false;
-	}
-	
 	
 	
 	/**
@@ -1040,7 +1028,11 @@ class FlexicontentController extends JControllerLegacy
 			// Important pass referer back to avoid making the form itself the referer
 			// but also check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise set referer to HOME page
 			$referer = $jinput->get('referer', JURI::base(), 'string');
-			if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base();
+			if ( ! flexicontent_html::is_safe_url($referer) )
+			{
+				if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$referer, 'notice' );
+				$referer = JURI::base();
+			}
 			$return = '&return='.base64_encode( $referer );
 			$link .= $return;
 		}
@@ -1064,7 +1056,8 @@ class FlexicontentController extends JControllerLegacy
 				
 				// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
 				$link = $jinput->get('referer', JURI::base(), 'string');
-				if ( ! flexicontent_html::is_safe_url($link) ) {
+				if ( ! flexicontent_html::is_safe_url($link) )
+				{
 					if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$link, 'notice' );
 					$link = JURI::base();
 				}
@@ -1102,14 +1095,15 @@ class FlexicontentController extends JControllerLegacy
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 			
+			// Call model to handle approval, method will also perform access/validity checks
 			$model = $this->getModel( FLEXI_ITEMVIEW );
 			$msg = $model->approval( array($cid) );
 		}
 
 		$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base(), $msg );
 	}
-	
-	
+
+
 	/**
 	 * Display the view
 	 */
@@ -1348,7 +1342,8 @@ class FlexicontentController extends JControllerLegacy
 		$referer = $jinput->get('referer', JURI::base(), 'string');
 		
 		// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
-		if ( ! flexicontent_html::is_safe_url($referer) ) {
+		if ( ! flexicontent_html::is_safe_url($referer) )
+		{
 			if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$referer, 'notice' );
 			$referer = JURI::base();
 		}
@@ -1376,7 +1371,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check that the given URL variable is 'safe' (allowed), e.g. not an offsite URL
 		if ( ! $url || ! flexicontent_html::is_safe_url($url) )
 		{
-			if (! $url)
+			if ($url)
 			{
 				$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
 				if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
@@ -1424,7 +1419,8 @@ class FlexicontentController extends JControllerLegacy
 		else
 		{
 			$isfav = $model->getFavoured();
-			
+
+			// About security, model use current user, for adding / removing which is enough proper
 			if ($isfav)
 			{
 				$model->removefav();
@@ -1694,8 +1690,8 @@ class FlexicontentController extends JControllerLegacy
 		echo json_encode($result);
 		jexit();
 	}
-	
-	
+
+
 	/**
 	 *  Method for voting (ajax)
 	 *
@@ -2127,83 +2123,6 @@ class FlexicontentController extends JControllerLegacy
 
 
 	/**
-	 * Get the new tags and outputs html (ajax)
-	 *
-	 * @TODO cleanup this mess
-	 * @access public
-	 * @since 1.0
-	 */
-	function getajaxtags()
-	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$jinput  = $app->input;
-
-		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
-		if (!$authorized) return;
-		
-		$id    = $jinput->get('id', 0, 'int');
-		$model = $this->getModel(FLEXI_ITEMVIEW);
-		$tags  = $model->getAlltags();
-
-		$used  = null;
-		if ($id)
-		{
-			$used = $model->getUsedtagsIds($id);
-		}
-		if (!is_array($used))
-		{
-			$used = array();
-		}
-
-		$rsp = '';
-		$n = count($tags);
-		for( $i = 0, $n; $i < $n; $i++ ){
-			$tag = $tags[$i];
-
-			if ( ($i % 5) == 0 )
-			{
-				if ($i != 0)
-				{
-					$rsp .= '</div>';
-				}
-				$rsp .=  '<div class="qf_tagline">';
-			}
-			$rsp .=  '<span class="qf_tag"><span class="fc_tagidbox"><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $used) ? 'checked="checked"' : '') . ' /></span>'.$tag->name.'</span>';
-		}
-		$rsp .= '</div>';
-		$rsp .= '<div class="fcclear"></div>';
-		$rsp .= '<div class="fc_addtag">';
-		$rsp .= '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';
-		$rsp .= '  <input type="text" id="tagname" class="inputbox" size="30" />';
-		$rsp .=	'  <input type="button" class="button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
-		$rsp .= '</div>';
-
-		echo $rsp;
-	}
-
-	/**
-	 *  Add new Tag from item screen
-	 *
-	 * @access public
-	 * @since 1.0
-	 */
-	function addtagx()
-	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$jinput  = $app->input;
-
-		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
-		if (!$authorized) return;
-
-		$name  = $jinput->get('name', '', 'string');
-		$model = $this->getModel(FLEXI_ITEMVIEW);
-		$model->addtag($name);
-	}
-	
-	
-	/**
 	 *  Add new Tag from item screen
 	 *
 	 */
@@ -2259,77 +2178,6 @@ class FlexicontentController extends JControllerLegacy
 
 
 	/**
-	 * Add favourite
-	 * deprecated to ajax favs 
-	 *
-	 * @access public
-	 * @since 1.0
-	 */
-	function addfavourite()
-	{
-		$app  = JFactory::getApplication();
-		$jinput = $app->input;
-
-		$id  = $jinput->get('id', 0, 'int');
-		$cid = $jinput->get('cid', 0, 'int');
-
-		$model = $this->getModel(FLEXI_ITEMVIEW);
-		if ($model->addfav())
-		{
-			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_ADDED'), 'message');
-		}
-		else
-		{
-			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_NOT_ADDED').': '.$model->getError(), 'error');
-		}
-
-		global $globalcats;
-		$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
-		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, @ $globalcats[$cid]->slug, $Itemid));
-
-		$this->setRedirect($item_url);
-	}
-
-
-	/**
-	 * Remove favourite
-	 * deprecated to ajax favs
-	 *
-	 * @access public
-	 * @since 1.0
-	 */
-	function removefavourite()
-	{
-		$app  = JFactory::getApplication();
-		$jinput = $app->input;
-
-		$id  = $jinput->get('id', 0, 'int');
-		$cid = $jinput->get('cid', 0, 'int');
-
-		$model = $this->getModel(FLEXI_ITEMVIEW);
-		if ($model->removefav())
-		{
-			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_REMOVED'), 'message');
-		}
-		else
-		{
-			$app->enqueueMessage(JText::_('FLEXI_FAVOURITE_NOT_REMOVED').': '.$model->getError(), 'error');
-		}
-
-		if ($id)
-		{
-			global $globalcats;
-			$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, @ $globalcats[$cid]->slug, $Itemid));
-			$this->setRedirect($item_url);
-		}
-		else
-		{
-			$this->setRedirect(JRoute::_('index.php?view=favourites'));
-		}
-	}
-
-	/**
 	 * Logic to change the state of an item
 	 *
 	 * @access public
@@ -2338,55 +2186,14 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function setitemstate()
 	{
+		// Helper method also checks access, according to user ACL
 		flexicontent_html::setitemstate($this);
 	}
-	
-	
-	/**
-	 * Traverse Tree to create folder structure and get/prepare file objects
-	 *
-	 * @access public
-	 * @since 1.0
-	 */
-	function _traverseFileTree($nodes, $targetpath)
-	{
-		jimport('joomla.filesystem.file');
-		$all_files = array();
-		
-		foreach ($nodes as $node)
-		{
-			// Folder (Parent node)
-			if ( $node->isParent ) {
-				$targetpath_node = JPath::clean($targetpath.DS.$node->name);
-				JFolder::create($targetpath_node, 0755);
-				
-				// Folder has sub-contents
-				if ( !empty($node->children) ) {
-					$node_files = $this->_traverseFileTree($node->children, $targetpath_node);
-					foreach ($node_files as $nodeID => $file)  $all_files[$nodeID] = $file;
-				}
-			}
-			
-			// File (Leaf node)
-			else {
-				$file = new stdClass();
-				$nodeID = $node->id;
-				$file->fieldid    = (int) $node->fieldid;  // sql security ...
-				$file->contentid  = (int) $node->contentid; // sql security ...
-				$file->fileid     = (int) $node->fileid; // sql security ...
-				$file->filename   = $node->name;
-				// (of course) for each file the target path includes the filename,
-				// which can be different than original filename (user may have renamed it)
-				$file->targetpath = $targetpath.DS.$file->filename;
-				$all_files[$nodeID] = $file;
-			}
-		}
-		return $all_files;
-	}
-	
-	
+
+
 	function call_extfunc()
 	{
+		// Helper method also checks access, since each plugin needs to explicitely declare URL callable methods, which methods also implement access checks
 		flexicontent_ajax::call_extfunc();
 	}
 	
@@ -3026,8 +2833,8 @@ class FlexicontentController extends JControllerLegacy
 		// Done ... terminate execution
 		$app->close();
 	}
-	
-	
+
+
 	/**
 	 * External link logic
 	 *
@@ -3160,46 +2967,8 @@ class FlexicontentController extends JControllerLegacy
 	}
 
 
-	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
-	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
-	{
-		$user  = JFactory::getUser();
-		$select_access = $joinacc = $andacc = '';
-		
-		// Access Flags for: content item and field
-		if ( $get_select_access ) {
-			$select_access = '';
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-			$aid_list = implode(",", $aid_arr);
-			if ($include_file) $select_access .= ', CASE WHEN'.
-				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
-			$select_access .= ', CASE WHEN'.
-				'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
-			$select_access .= ', CASE WHEN'.
-				'  ty.access IN (0,'.$aid_list.') AND '.
-				'   c.access IN (0,'.$aid_list.') AND '.
-				'   i.access IN (0,'.$aid_list.')'.
-				' THEN 1 ELSE 0 END AS has_content_access';
-		}
-		
-		else {
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-			$aid_list = implode(",", $aid_arr);
-			if ($include_file)
-				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
-			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
-			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
-		}
-		
-		$clauses['select'] = $select_access;
-		$clauses['join']   = $joinacc;
-		$clauses['and']    = $andacc;
-		return $clauses;
-	}
-	
-	
 	/**
-	 * Method to fetch the tags form
+	 * Method to fetch the tags for selecting in item form
 	 * 
 	 * @since 1.5
 	 */
@@ -3208,9 +2977,9 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
-		$perms = FlexicontentHelperPerm::getPerm();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
+		$perms  = FlexicontentHelperPerm::getPerm();
 
 		@ob_end_clean();
 		//header("Content-type:text/json");
@@ -3226,7 +2995,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		else
 		{
-			$model = $this->getModel(FLEXI_ITEMVIEW);
+			$model = $this->getModel('item');
 			$tagobjs = $model->gettags($jinput->get('q', '', 'string'));
 
 			$array = array();
@@ -3284,10 +3053,115 @@ class FlexicontentController extends JControllerLegacy
 		$jinput->set('view', 'search');
 		$this->display();
 	}
-	
-	
-	function doPlgAct()
+
+
+
+	// **************
+	// Helper methods
+	// **************
+
+	/**
+	 * Method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
+	 *
+	 * @access private
+	 * @since 1.0
+	 */
+	protected function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
-		FLEXIUtilities::doPlgAct();
+		if ($this->input->get('task', '', 'cmd') == '__FUNCTION__') die(__FUNCTION__ . ' : direct call not allowed');
+
+		$user  = JFactory::getUser();
+		$select_access = $joinacc = $andacc = '';
+		
+		// Access Flags for: content item and field
+		if ( $get_select_access ) {
+			$select_access = '';
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			if ($include_file) $select_access .= ', CASE WHEN'.
+				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
+			$select_access .= ', CASE WHEN'.
+				'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+			$select_access .= ', CASE WHEN'.
+				'  ty.access IN (0,'.$aid_list.') AND '.
+				'   c.access IN (0,'.$aid_list.') AND '.
+				'   i.access IN (0,'.$aid_list.')'.
+				' THEN 1 ELSE 0 END AS has_content_access';
+		}
+		
+		else {
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			if ($include_file)
+				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
+		}
+		
+		$clauses['select'] = $select_access;
+		$clauses['join']   = $joinacc;
+		$clauses['and']    = $andacc;
+		return $clauses;
+	}
+
+
+	/**
+	 * Traverse Tree to create folder structure and get/prepare file objects
+	 *
+	 * @access private
+	 * @since 1.0
+	 */
+	protected function _traverseFileTree($nodes, $targetpath)
+	{
+		if ($this->input->get('task', '', 'cmd') == '__FUNCTION__') die(__FUNCTION__ . ' : direct call not allowed');
+
+		jimport('joomla.filesystem.file');
+		$all_files = array();
+		
+		foreach ($nodes as $node)
+		{
+			// Folder (Parent node)
+			if ( $node->isParent ) {
+				$targetpath_node = JPath::clean($targetpath.DS.$node->name);
+				JFolder::create($targetpath_node, 0755);
+				
+				// Folder has sub-contents
+				if ( !empty($node->children) ) {
+					$node_files = $this->_traverseFileTree($node->children, $targetpath_node);
+					foreach ($node_files as $nodeID => $file)  $all_files[$nodeID] = $file;
+				}
+			}
+			
+			// File (Leaf node)
+			else {
+				$file = new stdClass();
+				$nodeID = $node->id;
+				$file->fieldid    = (int) $node->fieldid;  // sql security ...
+				$file->contentid  = (int) $node->contentid; // sql security ...
+				$file->fileid     = (int) $node->fileid; // sql security ...
+				$file->filename   = $node->name;
+				// (of course) for each file the target path includes the filename,
+				// which can be different than original filename (user may have renamed it)
+				$file->targetpath = $targetpath.DS.$file->filename;
+				$all_files[$nodeID] = $file;
+			}
+		}
+		return $all_files;
+	}
+
+
+	protected function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
+	{
+		if ($this->input->get('task', '', 'cmd') == '__FUNCTION__') die(__FUNCTION__ . ' : direct call not allowed');
+
+		$db = JFactory::getDBO();
+		$quoted_word = $db->escape($word, true);
+		$query = 'SELECT '.$col
+			.' FROM #__'.$tbl
+			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
+			.' LIMIT 1';
+		$db->setQuery($query);
+		$result = $db->loadAssocList();
+		return !empty($return) ? true : false;
 	}
 }
