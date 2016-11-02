@@ -877,6 +877,8 @@ class FlexicontentController extends JControllerLegacy
 			foreach($missing_indexes as $tblname => $indexnames)
 			{
 				$index_cmds = array();
+				$index_cmds['indexdrop'] = array();   // !! important add 'indexdrop' to 'index_cmds', before 'indexadd' !!
+				$index_cmds['indexadd'] = array();
 				if ( isset($indexnames['__indexing_started__']) ) continue;
 				foreach($indexnames as $indexname => $iconf)
 				{
