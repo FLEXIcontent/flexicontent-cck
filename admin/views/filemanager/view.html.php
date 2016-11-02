@@ -449,6 +449,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 
+		$contrl = "filemanager.";
+		JToolbarHelper::checkin($contrl.'checkin');
 		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
 
 		$js = "jQuery(document).ready(function(){";

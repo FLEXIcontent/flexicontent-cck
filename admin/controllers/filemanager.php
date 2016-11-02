@@ -425,13 +425,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	}
 
 
-	function ftpValidate()
-	{
-		// Set FTP credentials, if given
-		jimport('joomla.client.helper');
-		JClientHelper::setCredentialsFromRequest('ftp');
-	}
-
 	/**
 	 * Upload a file by url
 	 *
@@ -474,12 +467,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return $this->terminate($file_id, $exitMessages);
 		}
 
-		$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
-		$size_unit = (int) @ $arr_sizes[$size_unit];
-		if ( $size_unit )
-			$filesize = ((int)$filesize) * $size_unit;
+		if (empty($filesize))
+		{
+			$filesize = $this->curl_get_file_size($filename);
+			if ($filesize < 0) $filesize = 0;
+		}
+
 		else
-			$filesize = 0;
+		{
+			$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
+			$size_unit = (int) @ $arr_sizes[$size_unit];
+			if ( $size_unit )
+				$filesize = ((int)$filesize) * $size_unit;
+			else
+				$filesize = 0;
+		}
 		
 		// we verifiy the url prefix and add http if any
 		if (!preg_match("#^http|^https|^ftp#i", $filename)) { $filename	= 'http://'.$filename; }
@@ -732,8 +734,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$view->document = $document;
 
 		// calculate access
-		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
+		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
 		$is_authorised = $canedit || $caneditown;
 		
 		// check access
@@ -814,7 +816,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$is_authorised = $candelete || $candeleteown;
 		
 		// check access
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 			$this->setRedirect( $this->returnURL, '');
 			return;
@@ -875,7 +878,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$this->setRedirect( $this->returnURL, $msg );
 	}
-	
+
+
 	/**
 	 * Logic for saving altered file data
 	 *
@@ -899,12 +903,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$data['hits'] = (int) $data['hits'];
 
 		// calculate access
-		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
+		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
 		$is_authorised = $canedit || $caneditown;
 
 		// check access
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
@@ -913,23 +918,37 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$data['secure'] = $data['secure'] ? 1 : 0;   // only allow 1 or 0
 		$data['url'] = $data['url'] ? 1 : 0;   // only allow 1 or 0
 
-		$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-		$file_path = JPath::clean($path . $data['filename']);
-
+		// CASE local file
 		if (!$data['url'])
 		{
+			$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+			$file_path = JPath::clean($path . $data['filename']);
+
 			// Get file size from filesystem (local file)
 			$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
 		}
+
+		// CASE file URL
 		else
 		{
-			// Get file size from submitted field (file URL), set to zero if no size unit specified
-			$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
-			$size_unit = (int) @ $arr_sizes[$data['size_unit']];
-			$data['size'] = ((int)$data['size']) * $size_unit;
-
 		  // Validate file URL
 			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
+
+			if ( empty($data['size']) )
+			{
+				$data['size'] = $this->curl_get_file_size($data['filename_original']);
+				if ($data['size'] < 0 || empty($data['size']))
+				{
+					$data['size'] = 0;
+				}
+			}
+			else
+			{
+				// Get file size from submitted field (file URL), set to zero if no size unit specified
+				$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
+				$size_unit = (int) @ $arr_sizes[$data['size_unit']];
+				$data['size'] = ((int)$data['size']) * $size_unit;
+			}
 		}
 
 		// Validate access level exists (set to public otherwise)
@@ -958,7 +977,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' ).' : '.$model->getError();
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
-		
+
 		$this->setRedirect($link, $msg);
 	}
 
@@ -975,9 +994,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		//$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data (no need for filtering)
-		$data  = $this->input->get->post->get('id', 0, 'int');
-		$this->input->set('cid', (int) $data['id']);
+		// DO not check access for checkin the item, method checkin() will do it
+		$id = $this->input->get->post->get('id', 0, 'int');
+		$this->input->set('cid', $id);
 
 		$this->checkin();
 	}
@@ -990,14 +1009,35 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function checkin()
 	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		// Get/Create the model
+		$model	= $this->getModel('file');
+		$file		= $model->getFile();
+		$user   = JFactory::getUser();
+
+		// calculate access
+		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
+		$is_authorised = $canedit || $caneditown;
+
+		// check access
+		if ( !$is_authorised )
+		{
+			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
+			$this->setRedirect( $this->returnURL, '');
+			return;
+		}
+
 		$tbl = 'flexicontent_files';
 		$redirect_url = 'index.php?option=com_flexicontent&view=filemanager';
 		flexicontent_db::checkin($tbl, $redirect_url, $this);
 	}
-	
-	
+
+
 	/**
-	 * Logic to publish a file
+	 * Logic to publish a file, this WRAPPER for changeState method
 	 *
 	 * @access public
 	 * @return void
@@ -1005,11 +1045,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function publish()
 	{
-		$this->changeState(1);
+		$this->changeState(1);   // Security checks are done by the called method
 	}
-	
+
+
 	/**
-	 * Logic to unpublish a file
+	 * Logic to unpublish a file, this WRAPPER for changeState method
 	 *
 	 * @access public
 	 * @return void
@@ -1017,10 +1058,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function unpublish()
 	{
-		$this->changeState(0);
+		$this->changeState(0);   // Security checks are done by the called method
 	}
-	
-	
+
+
 	/**
 	 * Logic to change publication state of files
 	 *
@@ -1044,7 +1085,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$is_authorised = $canpublish || $canpublishown;
 		
 		// check access
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 			$this->setRedirect( $this->returnURL, '');
 			return;
@@ -1121,7 +1163,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$is_authorised = $perms->CanFiles && ($perms->CanViewAllFiles || $user->id == $row->uploaded_by);
 		
 		// check access
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 			$this->setRedirect( $this->returnURL, '');
 			return;
@@ -1155,6 +1198,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function refactorFilesArray(&$f)
 	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
 		if ( empty($f['name']) || !is_array($f['name']) )  return $f; // nothing more to do
 		
 		$level0_keys = array_keys($f);
@@ -1198,6 +1243,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function terminate($exitData = null, & $exitMessages = null)
 	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
 		// CASE 1: interactive mode
 		if ($this->runMode=='interactive')
 		{
@@ -1271,5 +1318,61 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$app->redirect($this->returnURL . ($httpStatus == '403 Forbidden' ? '' : '&'. JSession::getFormToken() . '=1'));
 		else
 			return ! $this->exitSuccess ? false : null;
+	}
+
+
+	/**
+	 * Returns the size of a file without downloading it, or -1 if the file
+	 * size could not be determined.
+	 *
+	 * @param $url - The location of the remote file to download. Cannot
+	 * be null or empty.
+	 *
+	 * @return The size of the file referenced by $url,
+	 * or false if CURL is not available
+	 * or -1 if the size could not be determined
+	 * or -999 if there was an error
+	 */
+	function curl_get_file_size($url)
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		if (!function_exists('curl_version')) return -1;
+		$size = -999;
+
+		// Issue a HEAD request and follow any redirects.
+		$curl = curl_init( $url );
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($curl, CURLOPT_NOBODY, true);
+		curl_setopt($curl, CURLOPT_HEADER, true);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2450.0 Iron/46.0.2450.0');
+
+		$data = curl_exec( $curl );
+		if ($data)
+		{
+			$content_length = curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+			if ($content_length) $size = (int) $content_length;
+			//else die('Curl error: ' . curl_error($curl));
+		}
+		//else die('Curl error: ' . curl_error($curl));
+
+		curl_close( $curl );
+		return $size;
+	}
+
+
+	/**
+	 * Set credentials for using FTP layer for file handling
+	 */
+	function ftpValidate()
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		// Set FTP credentials, if given
+		jimport('joomla.client.helper');
+		JClientHelper::setCredentialsFromRequest('ftp');
 	}
 }

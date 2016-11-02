@@ -3068,7 +3068,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	protected function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
-		if ($this->input->get('task', '', 'cmd') == '__FUNCTION__') die(__FUNCTION__ . ' : direct call not allowed');
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		$user  = JFactory::getUser();
 		$select_access = $joinacc = $andacc = '';
@@ -3113,7 +3113,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	protected function _traverseFileTree($nodes, $targetpath)
 	{
-		if ($this->input->get('task', '', 'cmd') == '__FUNCTION__') die(__FUNCTION__ . ' : direct call not allowed');
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		jimport('joomla.filesystem.file');
 		$all_files = array();
@@ -3152,7 +3152,7 @@ class FlexicontentController extends JControllerLegacy
 
 	protected function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
 	{
-		if ($this->input->get('task', '', 'cmd') == '__FUNCTION__') die(__FUNCTION__ . ' : direct call not allowed');
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		$db = JFactory::getDBO();
 		$quoted_word = $db->escape($word, true);

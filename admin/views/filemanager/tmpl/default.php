@@ -644,6 +644,8 @@ flexicontent_html::loadFramework('flexi-lib');
 		
 			<tbody>
 				<?php
+				$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
 				$index = JRequest::getInt('index', 0);
 				$k = 0;
@@ -733,6 +735,30 @@ flexicontent_html::loadFramework('flexi-lib');
 					</td>
 					
 					<td class="left">
+						<?php
+						// Display an icon with checkin link, if current user has checked out current item
+						if ($row->checked_out) {
+							// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
+							$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
+							if ($canCheckin) {
+								//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
+								$task_str = 'types.checkin';
+								if ($row->checked_out == $user->id) {
+									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->checked_out, $row->checked_out_time);
+								} else {
+									echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
+									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->checked_out, $row->checked_out_time);
+								}
+								?>
+								<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
+									<span class="icon-checkedout"></span>
+								</a>
+								<?php
+							} else {
+								echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
+							}
+						}
+						?>
 						<?php
 							if (StringHelper::strlen($row->filename_displayed) > 100) {
 								$filename_cut = StringHelper::substr( htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8'), 0 , 100).'...';
