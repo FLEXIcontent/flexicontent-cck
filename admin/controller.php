@@ -1371,7 +1371,8 @@ class FlexicontentController extends JControllerLegacy
 	}
 	
 	
-	function fversioncompare() {
+	function fversioncompare()
+	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		@ob_end_clean();
@@ -1379,11 +1380,8 @@ class FlexicontentController extends JControllerLegacy
 		parent::display();
 		exit;
 	}
-	
-	function doPlgAct() {
-		FLEXIUtilities::doPlgAct();
-	}
-	
+
+
 	function call_extfunc()
 	{
 		flexicontent_ajax::call_extfunc();

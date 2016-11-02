@@ -146,7 +146,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 	
 	/**
-	 * Method to fetch the tags form
+	 * Method to fetch the tags for selecting in item form
 	 * 
 	 * @since 1.5
 	 */
@@ -154,7 +154,11 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
+
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$perms  = FlexicontentHelperPerm::getPerm();
+
 		@ob_end_clean();
 		//header("Content-type:text/json");
 		//header('Content-type: application/json');
@@ -162,20 +166,28 @@ class FlexicontentControllerItems extends FlexicontentController
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
-		
-		$perms = FlexicontentHelperPerm::getPerm();
-		if ( !$perms->CanUseTags ) {
+
+		if ( !$perms->CanUseTags )
+		{
 			$array =  array("{\"id\":\"0\",\"name\":\"You have no access\"}");
-		} else {
-			$model   = $this->getModel(FLEXI_ITEMVIEW);
-			$tagobjs = $model->gettags(JRequest::getVar('q'));
-			$array   = array();
-			if ($tagobjs) foreach($tagobjs as $tag) {
+		}
+		else
+		{
+			$model = $this->getModel('item');
+			$tagobjs = $model->gettags($jinput->get('q', '', 'string'));
+
+			$array = array();
+			if ($tagobjs) foreach($tagobjs as $tag)
+			{
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
-			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"".($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found')."\"}");
+
+			if (empty($array))
+			{
+				$array[] = "{\"id\":\"0\",\"name\":\"" . ($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found') . "\"}";
+			}
 		}
-		
+
 		echo "[\n" . implode(",\n", $array) . "\n]";
 		exit;
 	}
