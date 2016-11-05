@@ -304,6 +304,10 @@ if ( $format == 'html' )
 	// Load bootstrap CSS
 	if ( $cparams->get('loadfw_bootstrap_css', 2)==1 )
 		JHtml::_('bootstrap.loadCss', true);
+
+	// Load icomoon CSS
+	if ( $cparams->get('loadfw_icomoon_css', 2)==1 )
+		JFactory::getDocument()->addStyleSheet(JURI::root(true).'/media/jui/css/icomoon.css');
 }
 
 
