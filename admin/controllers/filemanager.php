@@ -469,7 +469,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (empty($filesize))
 		{
-			$filesize = $this->curl_get_file_size($filename);
+			$filesize = $this->get_file_size_from_url($filename);
 			if ($filesize < 0) $filesize = 0;
 		}
 
@@ -936,7 +936,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			if ( empty($data['size']) )
 			{
-				$data['size'] = $this->curl_get_file_size($data['filename_original']);
+				$data['size'] = $this->get_file_size_from_url($data['filename_original']);
 				if ($data['size'] < 0 || empty($data['size']))
 				{
 					$data['size'] = 0;
@@ -1322,45 +1322,35 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 
 	/**
-	 * Returns the size of a file without downloading it, or -1 if the file
-	 * size could not be determined.
+	 * Returns the size of a file without downloading it, or -1 if the file size could not be determined.
 	 *
-	 * @param $url - The location of the remote file to download. Cannot
-	 * be null or empty.
+	 * @param $url - The location of the remote file to download. Cannot be null or empty.
 	 *
 	 * @return The size of the file referenced by $url,
-	 * or false if CURL is not available
 	 * or -1 if the size could not be determined
 	 * or -999 if there was an error
 	 */
-	function curl_get_file_size($url)
+	function get_file_size_from_url($url)
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (!function_exists('curl_version')) return -1;
-		$size = -999;
+		try {
+			$headers = get_headers($url, 1);
 
-		// Issue a HEAD request and follow any redirects.
-		$curl = curl_init( $url );
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($curl, CURLOPT_NOBODY, true);
-		curl_setopt($curl, CURLOPT_HEADER, true);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2450.0 Iron/46.0.2450.0');
-
-		$data = curl_exec( $curl );
-		if ($data)
-		{
-			$content_length = curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-			if ($content_length) $size = (int) $content_length;
-			//else die('Curl error: ' . curl_error($curl));
+			// Follow the Location headers until the actual file URL is known
+			while (isset($headers['Location']))
+			{
+				$url = $headers['Location'];
+				$headers = get_headers($url, 1);
+			}
 		}
-		//else die('Curl error: ' . curl_error($curl));
+		catch (RuntimeException $e) {
+			return -999;  // indicate a fatal error
+		}
 
-		curl_close( $curl );
-		return $size;
+		// Get file size
+		$filesize = isset($headers["Content-Length"]) ? $headers["Content-Length"] : -1;  // indicate that the size could not be determined
+		return $filesize;
 	}
 
 
