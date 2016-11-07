@@ -30,6 +30,8 @@ if ( !JComponentHelper::isEnabled( 'com_flexicontent', true) )
 require_once dirname(__FILE__).'/helper.php';
 
 $itemsLoc = modFlexigooglemapHelper::getLoc($params);
+$tMapTips = modFlexigooglemapHelper::fixeCatmode($params, $itemsLoc);
+$catidmode = $params->get('catidmode');
 $catid = $params->get('catid');
 
 $fieldaddressid = $params->get('fieldaddressid');
