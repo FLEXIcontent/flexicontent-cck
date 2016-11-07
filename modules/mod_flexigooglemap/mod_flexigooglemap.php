@@ -26,25 +26,13 @@ if ( !JComponentHelper::isEnabled( 'com_flexicontent', true) )
 	return;
 }
 
+$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx'));
+
 // Include helper file
 require_once dirname(__FILE__).'/helper.php';
 
-$itemsLoc = modFlexigooglemapHelper::getLoc($params);
-$tMapTips = modFlexigooglemapHelper::fixeCatmode($params, $itemsLoc);
-$catidmode = $params->get('catidmode');
-$catid = $params->get('catid');
-
-$fieldaddressid = $params->get('fieldaddressid');
-$count = $params->get('count');
-
-$markercolor = $params->get('markercolor');
-$lettermarker = $params->get('lettermarker');
-$lettermarkermode = $params->get('lettermarkermode');
-
-$markerdisplay = modFlexigooglemapHelper::getMarkercolor($params);
-$relitem_html  = $params->get('relitem_html', '__display_text__' ) ;
-
-$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx'));
+$tMapTips = modFlexigooglemapHelper::renderMapLocations($params);
+$markerdisplay = modFlexigooglemapHelper::getMarkerURL($params);
 
 // Get Joomla Layout
 require JModuleHelper::getLayoutPath('mod_flexigooglemap', $params->get('layout', 'default'));

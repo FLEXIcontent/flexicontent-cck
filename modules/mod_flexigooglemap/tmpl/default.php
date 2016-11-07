@@ -51,13 +51,16 @@ if ($map_style)
 	}
 }
 
-$clustermode = $params->get('clustermode', '' );
 $gridsize = $params->get('gridsize', '' );
 $maxzoom = $params->get('maxzoom', '' );
+$ratiomap = $params->get('ratiomap','');
+
+$clustermode = $params->get('clustermode', '' );
 $imgcluster = $params->get('imgcluster', '');
 $imgcluster =  $imgcluster ? JURI::base().$imgcluster : 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png';
+
 $animationmarker = $params->get('animationmarker', '' );
-$ratiomap = $params->get('ratiomap','');
+
 
 // Add google maps API
 flexicontent_html::loadFramework('google-maps', '', $params);
@@ -69,13 +72,8 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script type="text/javascript">
 
-		<?php
-		$tabMapTipsJS = implode(",",  $tMapTips);
-		?>
-
-		// nouveau script
 		// Define your locations: HTML content for the info window, latitude, longitude
-		var locations = [ <?php echo $tabMapTipsJS; ?>  ];
+		var locations = [ <?php echo implode(",",  $tMapTips); ?>  ];
 
 		var icons = [<?php echo $markerdisplay; ?>]
 		var iconsLength = icons.length;
