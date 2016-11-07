@@ -54,36 +54,10 @@ if ($map_style)
 $clustermode = $params->get('clustermode', '' );
 $gridsize = $params->get('gridsize', '' );
 $maxzoom = $params->get('maxzoom', '' );
-
 $imgcluster = $params->get('imgcluster', '');
 $imgcluster =  $imgcluster ? JURI::base().$imgcluster : 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png';
-
-$uselink = $params->get('uselink', '' );
-$useadress = $params->get('useadress', '' );
-
 $animationmarker = $params->get('animationmarker', '' );
-$linkmode = $params->get('linkmode', '' );
-
-$readmore = $params->get('readmore', '' );
-
-$usedirection = $params->get('usedirection','');
-$directionname = $params->get('directionname','');
-
-$catidmode = $params->get('catidmode');
-$fieldaddressid = $params->get('fieldaddressid');
-$forced_itemid = $params->get('forced_itemid','');
-
-$infotextmode = $params->get('infotextmode','');
-$relitem_html = $params->get('relitem_html','');
-
 $ratiomap = $params->get('ratiomap','');
-
-// Get items of current view
-global $fc_list_items;
-if ( empty($fc_list_items) )
-{
-	$fc_list_items = array();
-}
 
 // Add google maps API
 flexicontent_html::loadFramework('google-maps', '', $params);
@@ -96,100 +70,6 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 	<script type="text/javascript">
 
 		<?php
-		$tMapTips = array();
-
-		// Fixed category mode
-		if ($catidmode ==0)
-		{
-			foreach ($itemsLoc as $itemLoc)
-			{
-				if ( empty($itemLoc->value) ) continue;   // skip empty value
-
-				$coord = unserialize ($itemLoc->value);
-				$lat = $coord['lat'];
-				$lon = $coord['lon'];
-
-				if ( empty($lat) && empty($lon) ) continue;    // skip empty value
-
-				$title = rtrim( addslashes($itemLoc->title) );
-
-				$link = '';
-				if ($uselink)
-				{
-					$link = $itemLoc->link;
-					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">'.JText::_($readmore).'</a></p>';
-					$link = addslashes($link);
-				}
-
-				$addr = '';
-				if ($useadress)
-				{
-					if ( !isset($coord['addr_display']) ) $coord['addr_display'] = '';
-					$addr = '<p>'.$coord['addr_display'].'</p>';
-					$addr = addslashes($addr);
-					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
-				}
-
-				$linkdirection = '';
-				if ($usedirection)
-				{
-					$adressdirection = $addr;
-					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
-				}
-
-				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
-
-				$coordinates = $lat .','. $lon;
-				$tMapTips[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
-			}
-		}
-
-		// Current category mode
-		else
-		{
-			foreach ($fc_list_items as $address)
-			{
-				if ( ! isset( $address->fieldvalues[$fieldaddressid][0]) ) continue;   // skip empty value
-
-				$coord = unserialize ($address->fieldvalues[$fieldaddressid][0]);
-				$lat = $coord['lat'];
-				$lon = $coord['lon'];
-
-				if ( empty($lat) && empty($lon) ) continue;    // skip empty value
-
-				$title = addslashes($address->title);
-
-				$link = '';
-				if ($uselink)
-				{
-					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->id, $address->catid, $forced_itemid, $address));
-					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">'.JText::_($readmore).'</a></p>';
-					$link = addslashes($link);
-				}
-
-				$addr = '';
-				if ($useadress)
-				{
-					if ( !isset($coord['addr_display']) ) $coord['addr_display'] = '';
-					$addr = '<p>'.$coord['addr_display'].'</p>';
-					$addr = addslashes($addr);
-					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
-				}
-
-				$linkdirection = '';
-				if ($usedirection)
-				{
-					$adressdirection = $addr;
-					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
-				}
-
-				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
-
-				$coordinates = $lat .','. $lon;
-				$tMapTips[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
-			}
-		}
-
 		$tabMapTipsJS = implode(",",  $tMapTips);
 		?>
 

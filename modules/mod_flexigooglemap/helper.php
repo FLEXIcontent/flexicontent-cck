@@ -67,6 +67,119 @@ class modFlexigooglemapHelper
 
 		return $itemsLoc;
 	}
+    
+    public static function fixeCatmode ($params , $itemsLoc)
+	{
+        $catidmode = $params->get('catidmode');
+        $uselink = $params->get('uselink', '' );
+        $useadress = $params->get('useadress', '' );
+        $linkmode = $params->get('linkmode', '' );
+        $readmore = $params->get('readmore', '' );
+        $usedirection = $params->get('usedirection','');
+        $infotextmode = $params->get('infotextmode','');
+        $relitem_html = $params->get('relitem_html','');
+        $fieldaddressid = $params->get('fieldaddressid');
+        $directionname = $params->get('directionname','');
+        $forced_itemid = $params->get('forced_itemid','');
+     // Fixed category mode
+		if ($catidmode ==0)
+		{
+			foreach ($itemsLoc as $itemLoc)
+			{
+				if ( empty($itemLoc->value) ) continue;   // skip empty value
+
+				$coord = unserialize ($itemLoc->value);
+				$lat = $coord['lat'];
+				$lon = $coord['lon'];
+
+				if ( empty($lat) && empty($lon) ) continue;    // skip empty value
+
+				$title = rtrim( addslashes($itemLoc->title) );
+
+				$link = '';
+				if ($uselink)
+				{
+					$link = $itemLoc->link;
+					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">'.JText::_($readmore).'</a></p>';
+					$link = addslashes($link);
+				}
+
+				$addr = '';
+				if ($useadress)
+				{
+					if ( !isset($coord['addr_display']) ) $coord['addr_display'] = '';
+					$addr = '<p>'.$coord['addr_display'].'</p>';
+					$addr = addslashes($addr);
+					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
+				}
+
+				$linkdirection = '';
+				if ($usedirection)
+				{
+					$adressdirection = $addr;
+					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
+				}
+
+				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
+
+				$coordinates = $lat .','. $lon;
+				$tMapTips[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+			}
+		}
+
+		// Current category mode
+		else
+		{
+            // Get items of current view
+                global $fc_list_items;
+                if ( empty($fc_list_items) )
+                    {
+	                   $fc_list_items = array();
+                    }
+			foreach ($fc_list_items as $address)
+			{
+				if ( ! isset( $address->fieldvalues[$fieldaddressid][0]) ) continue;   // skip empty value
+
+				$coord = unserialize ($address->fieldvalues[$fieldaddressid][0]);
+				$lat = $coord['lat'];
+				$lon = $coord['lon'];
+
+				if ( empty($lat) && empty($lon) ) continue;    // skip empty value
+
+				$title = addslashes($address->title);
+
+				$link = '';
+				if ($uselink)
+				{
+					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->id, $address->catid, $forced_itemid, $address));
+					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">'.JText::_($readmore).'</a></p>';
+					$link = addslashes($link);
+				}
+
+				$addr = '';
+				if ($useadress)
+				{
+					if ( !isset($coord['addr_display']) ) $coord['addr_display'] = '';
+					$addr = '<p>'.$coord['addr_display'].'</p>';
+					$addr = addslashes($addr);
+					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
+				}
+
+				$linkdirection = '';
+				if ($usedirection)
+				{
+					$adressdirection = $addr;
+					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
+				}
+
+				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
+
+				$coordinates = $lat .','. $lon;
+				$tMapTips[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+			}
+		}
+        return $tMapTips;
+    }
 
 
 	public static function getMarkercolor(&$params)
