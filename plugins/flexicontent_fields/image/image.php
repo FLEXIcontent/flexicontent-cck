@@ -60,6 +60,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+
+		// Execute once
+		static $initialized = null;
+		if ( !$initialized )
+		{
+			$initialized = 1;
+			jimport('joomla.filesystem.file');
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.path');
+		}
 		
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -2245,7 +2255,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		
 		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
-		if ( !$is_importcsv && empty($unique_tmp_itemid) ) {
+		if ( !$is_importcsv && empty($unique_tmp_itemid) )
+		{
 			$app = JFactory::getApplication();
 			$app->enqueueMessage( 'WARNING, field: '.$field->label.' requires variable -unique_tmp_itemid- please update your '.($app->isSite() ? 'form.php':'default.php'), 'warning');
 		}
@@ -2253,12 +2264,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
-		if ( !$initialized ) {
+		if ( !$initialized )
+		{
 			$initialized = 1;
 			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
-			if ( $is_importcsv ) {
+			if ( $is_importcsv )
+			{
 				$srcpath_original = JPath::clean( JPATH_SITE .DS. $import_media_folder .DS );
 			}
 		}
@@ -2276,7 +2289,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			//if ( $image_source > 1 ) ; // TODO
 			
 			// Create original images folder if doing CSV import and folder does not exist
-			if ( $is_importcsv ) {
+			if ( $is_importcsv )
+			{
 				$destpath_original = $destpath. 'original' .DS;
 				if ( !JFolder::exists($destpath_original) && !JFolder::create($destpath_original) ) {
 					JError::raiseWarning(100, $field->label .': Error. Unable to create folder: '. $destpath_original );
@@ -2738,7 +2752,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Execute once
 		static $initialized = null;
-		if ( !$initialized ) {
+		if ( !$initialized )
+		{
 			$initialized = 1;
 			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
@@ -2937,8 +2952,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Execute once
 		static $initialized = null;
-		if ( !$initialized ) {
+		if ( !$initialized )
+		{
 			$initialized = 1;
+			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
 		}
