@@ -33,7 +33,7 @@ require_once (JPATH_SITE.DS."components".DS."com_flexicontent".DS."models".DS.FL
 
 class modFlexigooglemapHelper
 {
-	public static function getLoc(&$params)
+	public static function getItemsLocations(&$params)
 	{
 		$fieldaddressid = $params->get('fieldaddressid');
 		if ( empty($fieldaddressid) )
@@ -47,7 +47,7 @@ class modFlexigooglemapHelper
 		$catlist = !empty($globalcats[$catid]->descendants) ? $globalcats[$catid]->descendants : $catid;
 
 		$count = $params->get('count');
-		$forced_itemid = $params->get('forced_itemid','');
+		$forced_itemid = $params->get('forced_itemid', 0);
 
 		$db = JFactory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
@@ -67,24 +67,32 @@ class modFlexigooglemapHelper
 
 		return $itemsLoc;
 	}
-    
-    public static function fixeCatmode ($params , $itemsLoc)
+
+
+	public static function renderMapLocations($params)
 	{
-        $catidmode = $params->get('catidmode');
-        $uselink = $params->get('uselink', '' );
-        $useadress = $params->get('useadress', '' );
-        $linkmode = $params->get('linkmode', '' );
-        $readmore = $params->get('readmore', '' );
-        $usedirection = $params->get('usedirection','');
-        $infotextmode = $params->get('infotextmode','');
-        $relitem_html = $params->get('relitem_html','');
-        $fieldaddressid = $params->get('fieldaddressid');
-        $directionname = $params->get('directionname','');
-        $forced_itemid = $params->get('forced_itemid','');
-     // Fixed category mode
-		if ($catidmode ==0)
+		$uselink = $params->get('uselink', '');
+		$useadress = $params->get('useadress', '');
+
+		$linkmode = $params->get('linkmode', '');
+		$readmore = $params->get('readmore', '');
+
+		$usedirection = $params->get('usedirection', '');
+		$directionname = $params->get('directionname', '');
+
+		$infotextmode = $params->get('infotextmode', '');
+		$relitem_html = $params->get('relitem_html','');
+
+		$fieldaddressid = $params->get('fieldaddressid');
+		$forced_itemid = $params->get('forced_itemid', 0);
+
+		$mapLocations = array();
+
+		// Fixed category mode
+		if ($params->get('catidmode') == 0)
 		{
-			foreach ($itemsLoc as $itemLoc)
+			$itemsLocations = modFlexigooglemapHelper::getItemsLocations($params);
+			foreach ($itemsLocations as $itemLoc)
 			{
 				if ( empty($itemLoc->value) ) continue;   // skip empty value
 
@@ -123,19 +131,19 @@ class modFlexigooglemapHelper
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
 
 				$coordinates = $lat .','. $lon;
-				$tMapTips[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
 			}
 		}
 
 		// Current category mode
 		else
 		{
-            // Get items of current view
-                global $fc_list_items;
-                if ( empty($fc_list_items) )
-                    {
-	                   $fc_list_items = array();
-                    }
+			// Get items of current view
+			global $fc_list_items;
+			if ( empty($fc_list_items) )
+			{
+				$fc_list_items = array();
+			}
 			foreach ($fc_list_items as $address)
 			{
 				if ( ! isset( $address->fieldvalues[$fieldaddressid][0]) ) continue;   // skip empty value
@@ -175,14 +183,15 @@ class modFlexigooglemapHelper
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
 
 				$coordinates = $lat .','. $lon;
-				$tMapTips[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
+				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
 			}
 		}
-        return $tMapTips;
-    }
+
+		return $mapLocations;
+	}
 
 
-	public static function getMarkercolor(&$params)
+	public static function getMarkerURL(&$params)
 	{
 		$markerimage = $params->get('markerimage');
 		$markercolor = $params->get('markercolor');
