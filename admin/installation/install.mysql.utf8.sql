@@ -149,6 +149,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `lastip` varchar(50) NOT NULL,
   `rating_sum` int(11) NOT NULL,
   `rating_count` int(11) NOT NULL,
+  PRIMARY KEY  (`content_id`, `field_id`),
   KEY `extravote_idx` (`content_id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
