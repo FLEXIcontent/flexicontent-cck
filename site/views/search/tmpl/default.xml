@@ -136,7 +136,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" />
 			
 			<field name="fcr_use_image" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_img">FLEXI_NO</option>

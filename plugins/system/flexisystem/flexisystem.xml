@@ -26,12 +26,12 @@
 				<option value="1">Set Request Variables (Recommeneded)</option>
 			</field-->
 
-			<field name="" type="separator" default="URL redirections" hr="false" level="level2" />
+			<field name="" type="separator" default="URL redirections" level="level2" />
 			<field name="exclude_redirect_cats" type="flexiusergroup" default="" multiple="true" size="6" label="Allow Joomla category manager to" description="All non-selected usergroups will be redirected to FLEXIcontent category manager" />
 			<field name="exclude_redirect_articles" type="flexiusergroup" default="" multiple="true" size="6" label="Allow Joomla article manager to" description="All non-selected usergroups will be redirected to FLEXIcontent item manager" />
 			<field name="excluded_redirect_urls" type="textarea" rows="6" cols="36" label="Exclude urls from redirection (enter a part) (BACKEND Only)" description="if you have trouble with some URLs unwantingly redirecting to FLEXIcontent URLs, you can enter here a sub-string of them, in order to exclude them from redirection. Seperate urls with %% DO NOT add new line characters" />
 
-			<field name="" type="separator" default="Auto-Checkins" hr="false" level="level2" />
+			<field name="" type="separator" default="Auto-Checkins" level="level2" />
 			<field name="checkin_on_session_end" type="radio" default="1" label="Check-in on user logout / session expiration" description="Check-out records (items,categories,etc) will be checked-in on user logout or session expiration" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -42,8 +42,8 @@
 			</field>
 			<field name="max_checkout_hours" type="text" label="Max checked out hours" description="Maximum allowed time an record (item,category,etc) should be checked out before automatically checking it in" default="24" />
 
-			<field name="" type="separator" default="Auto-Archive, Auto-Unpublish" hr="false" level="level2" />
-			<!--field name="" type="separator" default="NOTE: There powerful Joomla extensions that allow more options and flexibility than this basic Feature" hr="false" level="level3" /-->
+			<field name="" type="separator" default="Auto-Archive, Auto-Unpublish" level="level2" />
+			<!--field name="" type="separator" default="NOTE: There powerful Joomla extensions that allow more options and flexibility than this basic Feature" level="level3" /-->
 			<field name="archive_on_publish_down" type="radio" default="0" label="Items with expired dates" description="Enable this to automatically archive or unpublish items that their publish_down date is reached" class="btn-group btn-group-yesno">
 				<option value="0">No action</option>
 				<option value="1">Archive</option>

@@ -61,7 +61,7 @@
 				<option value="">FLEXI_SELECT</option>
 			</field>
 						
-			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level0" hr="false" />
+			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level0" />
 			
 			<field name="ff_placement" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" class="btn-group group-fcsuccess">
 				<option value="0" show_list="" hide_list="using_slider">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
@@ -78,7 +78,7 @@
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_BUTTONS" level="level2" hr="false" />
+			<field name="" type="separator" default="FLEXI_BUTTONS" level="level2" />
 			<field name="show_search_go" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group group-fcsuccess">
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -111,7 +111,7 @@
 			</field>
 			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level1" hr="false" />
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level1" />
 			<field name="use_search" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="usesearch">FLEXI_NO</option>
 				<option value="1" show_list="usesearch" hide_list="">FLEXI_YES</option>
@@ -138,7 +138,7 @@
 				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" hr="false" />
+			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" />
 			<field name="use_filters" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="usefilters">FLEXI_NO</option>
 				<option value="1" show_list="usefilters" hide_list="">FLEXI_YES</option>
