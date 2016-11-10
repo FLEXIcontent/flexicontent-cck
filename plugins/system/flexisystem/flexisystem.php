@@ -157,7 +157,7 @@ class plgSystemFlexisystem extends JPlugin
 		$this->checkinRecords();
 		
 		// (a.2) (Auto) Change item state, e.g. archive expired items (publish_down date exceeded)
-		$this->changeItemState();
+		$this->handleExpiredItems();
 		
 		if ($print_logging_info) $fc_run_times['auto_checkin_auto_state'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
@@ -1051,37 +1051,51 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function checkinRecords()
 	{
-		
-		$db  = JFactory::getDBO();
-		$app = JFactory::getApplication();
-		
 		$limit_checkout_hours   = $this->params->get('limit_checkout_hours', 1);
 		$checkin_on_session_end = $this->params->get('checkin_on_session_end', 1);
+		if (!$limit_checkout_hours && !$checkin_on_session_end) return true;
+
+		// Get last execution time from cache
+		$cache = JFactory::getCache('plg_'.$this->_name.'_'.__FUNCTION__);
+		$cache->setCaching(1);      // Force cache ON
+		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
+		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+
+		// Execute every 15 minutes
+		$elapsed_time = time() - $last_check_time;  //JFactory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
+		if ($elapsed_time < 15*60) return;  //JFactory::getApplication()->enqueueMessage('EXECUTING: '.'plg_'.$this->_name.'::'.__FUNCTION__.'()<br/>');
+
+		// Clear cache and call method again to restart the counter
+		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
+		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+
+		$db  = JFactory::getDBO();
+		$app = JFactory::getApplication();
+
 		$max_checkout_hours = $this->params->get('max_checkout_hours', 24);
 		$max_checkout_secs  = $max_checkout_hours * 3600;
-		
-		if (!$limit_checkout_hours && !$checkin_on_session_end) return true;
-		
+
 		// Get current seconds
 		$date = JFactory::getDate('now');
 		$tz	= new DateTimeZone($app->getCfg('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
-		
-		if ($checkin_on_session_end) {
+
+		if ($checkin_on_session_end)
+		{
 			$query = 'SELECT DISTINCT userid FROM #__session WHERE guest=0';
 			$db->setQuery($query);
 			$logged = $db->loadColumn();
 			$logged = array_flip($logged);
 		}
 		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";
-		
+
 		$tablenames = array('content', 'categories', 'modules', 'menu');
 		foreach ( $tablenames as $tablename )
 		{
 			//echo $tablename.":<br>";
-			
+
 			// Get checked out records
 			$query = 'SELECT id, checked_out, checked_out_time FROM #__'.$tablename.' WHERE checked_out > 0';
 			$db->setQuery($query);
@@ -1101,7 +1115,7 @@ class plgSystemFlexisystem extends JPlugin
 					$checkin_records[] = $record->id;
 					continue;
 				}
-				
+
 				// Check maximum checkout time
 				if ( $limit_checkout_hours)
 				{
@@ -1119,7 +1133,7 @@ class plgSystemFlexisystem extends JPlugin
 				}
 			}
 			$checkin_records = array_unique($checkin_records);
-			
+
 			// Check-in the records
 			if ( count($checkin_records) )
 			{
@@ -1129,8 +1143,8 @@ class plgSystemFlexisystem extends JPlugin
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Utility function:
 	 * Changes state of items, e.g archives content items when some conditions (e.g. time) are applicable
@@ -1138,16 +1152,27 @@ class plgSystemFlexisystem extends JPlugin
 	 * @return 	void
 	 * @since 1.5
 	 */
-	function changeItemState()
+	function handleExpiredItems()
 	{
+		$archive_on_publish_down = $this->params->get('archive_on_publish_down', 0);
+		if (!$archive_on_publish_down) return true;
+
+		// Get last execution time from cache
+		$cache = JFactory::getCache('plg_'.$this->_name.'_'.__FUNCTION__);
+		$cache->setCaching(1);      // Force cache ON
+		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
+		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+
+		// Execute every 15 minutes
+		$elapsed_time = time() - $last_check_time;  //JFactory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
+		if ($elapsed_time < 15*60) return;  //JFactory::getApplication()->enqueueMessage('EXECUTING: '.'plg_'.$this->_name.'::'.__FUNCTION__.'()<br/>');
+
+		// Clear cache and call method again to restart the counter
+		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
+		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
-		
-		$archive_on_publish_down = $this->params->get('archive_on_publish_down', 0);
-		$clear_publish_down_date = $this->params->get('clear_publish_down_date', 1);
-		$auto_archive_minute_interval = $this->params->get('auto_archive_minute_interval', 1);
-		
-		if (!$archive_on_publish_down) return true;
 		
 		// Get current seconds
 		$date = JFactory::getDate('now');
@@ -1155,16 +1180,10 @@ class plgSystemFlexisystem extends JPlugin
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
-		
-		// Check if auto archive interval passed
-		$session = JFactory::getSession();
-		$last_autoarchive_secs = $session->get('last_autoarchive_secs', $current_time_secs, 'flexicontent');
-		
-		if ($current_time_secs - $last_autoarchive_secs < $auto_archive_minute_interval*60) return;
-		
-		$session->set('last_autoarchive_secs', $current_time_secs, 'flexicontent');
-		
+
+		$clear_publish_down_date = $this->params->get('clear_publish_down_date', 1);
 		$new_state = $archive_on_publish_down==1 ? 2 : 0;
+
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
 		
@@ -1806,5 +1825,11 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$jcookie = JFactory::getApplication()->input->cookie;
 		$jcookie->set( 'fc_uid', 'p', 0);
+	}
+
+
+	public function _getLastCheckTime($workname = '')
+	{
+		return time();
 	}
 }
