@@ -214,8 +214,8 @@
 		<plugin name="flexiadvsearch"     folder="plugins/search/flexiadvsearch"    instfolder="search">Search - Flexiadvsearch, for FLEXIcontent search view</plugin>
 		
 		<!-- Plugins: system -->
-		<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core functions</plugin>
-		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, advanced routing functions</plugin>
+		<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core tasks</plugin>
+		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, routing tasks</plugin>
 		
 		<!-- Modules -->
 		<module name="mod_flexicategories" folder="modules/mod_flexicategories">FLEXIcontent - Categories</module>

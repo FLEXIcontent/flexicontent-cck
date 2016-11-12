@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="system" method="upgrade">
-	<name>System - Flexiadvroute, advanced routing functions</name>
+	<name>System - Flexiadvroute, routing tasks</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>July 2010</creationDate>
 	<copyright>Copyright (C) 2010 Emmanuel Danan</copyright>
