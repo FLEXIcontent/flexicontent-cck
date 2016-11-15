@@ -644,7 +644,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		
 			<tbody>
 				<?php
-				$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+				$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
 				$index = JRequest::getInt('index', 0);
