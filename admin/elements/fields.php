@@ -237,7 +237,7 @@ class JFormFieldFields extends JFormField
 			$values = array();
 		}
 		if ( !is_array($values) ) {
-			$values = preg_split("/[\|,]/", $values);
+			$values = preg_split("/[\s]*[\|,][\s]*/", $values);
 		}
 		//print_r($values);
 		
