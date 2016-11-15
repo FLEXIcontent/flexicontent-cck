@@ -170,7 +170,7 @@ function delAllFilters() {
 
 	<tbody>
 		<?php
-		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 		$edit_task = FLEXI_J16GE ? 'task=reviews.' : 'controller=reviews&amp;task=';
 		$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;fcform=1&amp;filter_id=';
 		

@@ -752,7 +752,7 @@ jQuery(document).ready(function(){
 
 	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
-		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 		
 		$k = 0;
 		$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;

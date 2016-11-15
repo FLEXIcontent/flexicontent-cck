@@ -282,7 +282,7 @@ function delAllFilters() {
 
 	<tbody <?php echo $ordering_draggable && $this->permission->CanOrderFields && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
-		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 		$_desc_label = JText::_('FLEXI_FIELD_DESCRIPTION', true);
 		
 		$k = 0;

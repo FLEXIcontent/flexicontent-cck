@@ -7087,7 +7087,7 @@ class flexicontent_db
 
 		static $canCheckinRecords = null;
 		if ($canCheckinRecords === null) {
-			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+			$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 		}
 
 		// Only attempt to check the row in if it exists.

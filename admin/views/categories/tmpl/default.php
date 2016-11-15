@@ -241,7 +241,7 @@ function delAllFilters() {
 
 	<tbody>
 		<?php
-		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 		
 		$originalOrders = array();
 		$extension	= 'com_content';
