@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
 
-require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -30,20 +30,21 @@ require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-
 /**
- * FLEXIcontent Advanced Search plugin
+ * Content Search plugin
  *
- * @package		Joomla.Plugin
- * @subpackage	Search.contacts
+ * @package		FLEXIcontent.Plugin
+ * @subpackage	Search.flexiadvsearch
  * @since		1.6
  */
 class plgSearchFlexiadvsearch extends JPlugin
 {
+	var $autoloadLanguage = false;
+
 	/**
 	 * Constructor
 	 *
-	 * @access      protected
+	 * @access      public
 	 * @param       object  $subject The object to observe
 	 * @param       array   $config  An array that holds the plugin configuration
 	 * @since       1.5
@@ -51,23 +52,22 @@ class plgSearchFlexiadvsearch extends JPlugin
 	public function __construct(& $subject, $config)
 	{
 		parent::__construct($subject, $config);
-		$extension_name = 'plg_search_flexiadvsearch';
-		//$this->loadLanguage();
-		//$this->loadLanguage( '$extension_name, JPATH_ADMINISTRATOR);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB'	, true);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null		, true);
+
+		static $language_loaded = null;
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_search_flexiadvsearch', JPATH_ADMINISTRATOR);
 	}
 	
 	
 	// Also add J1.5 function signatures
-	function onSearchAreas() { return $this->onContentSearchAreas(); }
-	function onSearch( $text, $phrase='', $ordering='', $areas=null )  {  return $this->onContentSearch( $text, $phrase, $ordering, $areas );  }
+	//function onSearchAreas() { return $this->onContentSearchAreas(); }
+	//function onSearch( $text, $phrase='', $ordering='', $areas=null )  {  return $this->onContentSearch( $text, $phrase, $ordering, $areas );  }
 	
 	
 	/**
 	* @return array An array of search areas
 	*/
-	function onContentSearchAreas() {
+	function onContentSearchAreas()
+	{
 		static $areas = array(
 		'flexicontent' => 'FLEXICONTENT'
 		);
@@ -844,13 +844,13 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 
 // Following code is when not having exactly named CLASS function.
+// !!! Code commented out but not removed to serve as example.
 // NOTE: in J1.5 (only) the triggerEvent() checks if functions being registered as Event Listener methods also exists outside the class, so we 
 // must define wrapper classes outside the class, these can be used by triggerEvent and will only contain a call to the respective class method
 
 // A different approach is to create wrapper class methods, that have the name of the event, we did this above
 
 /*
-
 // Wrapper class for J1.5 to RETURN SEARCH AREAS supported by this search plugin
 if (!function_exists('onContentSearchAreas')) {
 	function onContentSearchAreas() {
@@ -866,7 +866,8 @@ if (!function_exists('onContentSearch')) {
 }
 
 $app = JFactory::getApplication();
-if (!FLEXI_J16GE) {
+if (!FLEXI_J16GE)
+{
 	$app->registerEvent( 'onSearchAreas', 'onContentSearchAreas' );
 	$app->registerEvent( 'onSearch', 'onContentSearch');
 }

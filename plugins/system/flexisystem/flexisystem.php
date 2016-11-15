@@ -32,6 +32,7 @@ class plgSystemFlexisystem extends JPlugin
 {
 	var $extension;  // Component name
 	var $cparams;    // Component parameters
+	var $autoloadLanguage = false;
 	
 	/**
 	 * Constructor
@@ -39,8 +40,12 @@ class plgSystemFlexisystem extends JPlugin
 	function __construct( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
+
+		static $language_loaded = null;
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_system_flexisystem', JPATH_ADMINISTRATOR);
+
 		$this->extension = 'com_flexicontent';
-		$this->cparams  = JComponentHelper::getParams($this->extension);
+		$this->cparams = JComponentHelper::getParams($this->extension);
 	}
 	
 	

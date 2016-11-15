@@ -30,65 +30,80 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  */
 class plgSystemFlexiadvroute extends JPlugin
 {
+	var $extension;  // Component name
+	var $autoloadLanguage = false;
+
 	/**
 	 * Constructor
 	 */
 	function plgSystemFlexisystem( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
-		$extension_name = 'com_flexicontent';
-		//JPlugin::loadLanguage($extension_name, JPATH_SITE);
-		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB'	, true);
-		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null		, true);
+
+		static $language_loaded = null;
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_system_flexiadvroute', JPATH_ADMINISTRATOR);
+
+		$this->extension = 'com_flexicontent';
 	}
-	
+
+
 	/**
-	 * Do load rules and start checking function
+	 * Joomla initialized, but component has not been decided yet, this is good place to some actions regardless of component
+	 * OR to make early redirections OR to alter variables used to do routing (deciding the component that will be executed)
 	 */
 	function onAfterInitialise()
 	{
 		global $globalnopath, $globalnoroute;
+		$app = JFactory::getApplication();
 
-		$mainframe = JFactory::getApplication();
-		
-		if ($mainframe->isAdmin()) {
-			return; // Dont run in admin
+		// Dont run in admin
+		if ($app->isAdmin())
+		{
+			return;
 		}
-		
-		// Hide category names from pathway/url
-		$route_to_type 		= $this->params->get('route_to_type', 0);
-		$type_to_route 		= $this->params->get('type_to_route', '');
+
+		// **********************************************************
+		// Create global objects of non routable categories and types
+		// **********************************************************
+
+		// Hide Categories from Pathway/URLs for given Types
+		// - These are types that contain content not being a part of structure but rather general information content like site usage instructions or license agreement, etc
+		$route_to_type  = $this->params->get('route_to_type', 0);
+		$type_to_route  = $this->params->get('type_to_route', '');
 		if ($route_to_type)
 		{
 			$globalnopath = $type_to_route;
 			if ( empty($type_to_route) )							$globalnopath = array();
 			else if ( ! is_array($type_to_route) )		$globalnopath = explode("|", $type_to_route);
-		} else {
+		}
+		else
+		{
 			$globalnopath = array();
 		}
-		
-		// Hide category links
-		$cats_to_exclude 	= $this->params->get('cats_to_exclude', '');
-		$globalnoroute = $cats_to_exclude;
+
+		// Hide categories in Content / Content Listings by NOT displaying
+		//  a. Direct category links 
+		//  b. Category title as a content/content list markup 
+		// - These categories are for special purposes, e.g. contain items displayed in frontpage or in a module Slideshow
+		$cats_to_exclude = $this->params->get('cats_to_exclude', '');
+		$globalnoroute   = $cats_to_exclude;
 		if ( empty($cats_to_exclude) )							$globalnoroute = array();
 		else if ( ! is_array($cats_to_exclude) )		$globalnoroute = explode("|", $cats_to_exclude);
 	}
-	
-	
-	function onAfterRoute( $args=null )
+
+
+	/*function detectHomepage()
 	{
-	}
-	
-	
-	function detectHomepage()
-	{
-		$app = JFactory::getApplication();
-		$menu = $app->getMenu();
-		$isHomePage = false;
-		if ($menu) {
+		$menu = JFactory::getApplication()->getMenu();
+		if ($menu)
+		{
 			$lang = JFactory::getLanguage();
 			$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
 		}
+		else
+		{
+			$isHomePage = false;
+		}
 		return $isHomePage;
-	}
+	}*/
 }
