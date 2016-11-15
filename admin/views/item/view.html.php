@@ -241,9 +241,9 @@ class FlexicontentViewItem extends JViewLegacy
 		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
 		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel('items.cancel');
-		
-		
-		
+
+
+
 		// ***********************
 		// Add a preview button(s)
 		// ***********************
@@ -310,9 +310,9 @@ class FlexicontentViewItem extends JViewLegacy
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
 		}
-		
-		
-		
+
+
+
 		// ************************
 		// Add modal layout editing
 		// ************************
@@ -322,14 +322,47 @@ class FlexicontentViewItem extends JViewLegacy
 			$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
 			JToolBarHelper::divider();
 			if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
-				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='apply_ajax', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;", $msg_alert='', $msg_confirm='',
-				$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
+				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='edit_layout', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
+				$msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
 				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='.$item->itemparams->get('ilayout', $tparams->get('ilayout', 'default')).
 				'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"'
 			);
 		}
-		
-		
+
+
+		// ************************
+		// Add collaboration button
+		// ************************
+
+		$do_collaboration = JPluginHelper::isEnabled('system', 'flexisyspro');
+		if ($do_collaboration)
+		{
+			$com_mailto_found = file_exists(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+			if ($com_mailto_found)
+			{
+				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+				$status = 'width=700,height=360,menubar=yes,resizable=yes';
+				$btn_title = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM');
+				$btn_info  = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM_INFO');
+				$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
+				$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
+					.'&task=call_extfunc&exttype=plugins&extfolder=system&extname=flexisyspro&extfunc=collaborate_form'
+					.'&content_id='.$item->id;
+
+				flexicontent_html::addToolBarButton(
+					$btn_title, $btn_name='collaborate', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title:'".JText::_($btn_title)."'}); return false;",
+					$msg_alert='', $msg_confirm='',
+					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+					$btn_class="btn-info".$tip_class, $btn_icon="icon-mail",
+					'data-placement="bottom" data-href="'.$send_form_url.'" title="Send email to other reviewers"'
+				);
+			}
+		}
+
+
+
 		// **************************************************************************
 		// Load any previous form, NOTE: Because of fieldgroup rendering other fields
 		// this step must be done in seperate loop, placed before FIELD HTML creation

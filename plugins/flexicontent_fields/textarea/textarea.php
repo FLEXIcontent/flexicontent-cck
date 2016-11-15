@@ -222,8 +222,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				")."
 
 				// Prepare the new textarea for attaching the HTML editor
-				theArea = newField.find('.fc_'+boxClass).find('textarea');
+				var theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
+
+				//var xtd_btns = newField.find('#editor-xtd-buttons');
+				//var id_replace_pattern = new RegExp(theArea.attr('id'), 'g');
+				//if (xtd_btns.length) xtd_btns.html(xtd_btns.html().replace(id_replace_pattern, '".$elementid."_'+uniqueRowNum".$field->id."));
+
 				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
