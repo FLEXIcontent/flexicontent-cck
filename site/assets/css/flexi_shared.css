@@ -1102,9 +1102,15 @@ input.invalid + .fccheckradio_lbl {
 #flexicontent {
 	margin: 0px;
 }
+body.contentpane.component,
+body.contentpane.modal {
+	margin: 0px;
+	padding: 0px 8px 0px 8px;
+}
+body.contentpane.component #mailto-window,
 body.contentpane.component #flexicontent,
 body.contentpane.modal #flexicontent {
-	margin: 8px 4px 4px 4px;
+	padding: 8px 8px 4px 8px;
 }
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess,
