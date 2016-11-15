@@ -6100,41 +6100,35 @@ class FLEXIUtilities
 	static function call_FC_Field_Func( $fieldtype, $func, $args=null )
 	{
 		static $fc_plgs;
+		$className = 'plgFlexicontent_fields'.$fieldtype;
 
 		if ( !isset( $fc_plgs[$fieldtype] ) )
 		{
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
 			$plgfolder = DS.strtolower($fieldtype);
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
-			if (file_exists($path))
-				require_once($path);
-			else {
-				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"),'error');
+			if (!file_exists($path))
+			{
+				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"), 'error');
+				return;
+			}
+			require_once($path);
+
+			if (!class_exists($className))
+			{
+				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"), 'error');
 				return;
 			}
 
-			// 2. Create plugin instance
-			$class = "plgFlexicontent_fields{$fieldtype}";
-			if (class_exists($class))
-			{
-				// Create class name of the plugin
-				$className = 'plg'.'flexicontent_fields'.$fieldtype;
-				// Create a plugin instance
-				$dispatcher = JDispatcher::getInstance();
-				$fc_plgs[$fieldtype] =  new $className($dispatcher, array());
-				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
-				$plugin_db_data = JPluginHelper::getPlugin('flexicontent_fields',$fieldtype);
-				$fc_plgs[$fieldtype]->params = new JRegistry( @$plugin_db_data->params );
-			} else {
-				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
-				return;
-			}
+			// 2. Create a plugin instance, also pass the parameters so that $this->params are created too
+			$dispatcher  = JDispatcher::getInstance();
+			$plg_db_data = JPluginHelper::getPlugin('flexicontent_fields', $fieldtype);
+			$fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_fields', 'name'=>$fieldtype, 'params'=>$plg_db_data->params));
 		}
 
 		// 3. Execute only if it exists
-		if (!$func) return;
-		$class = "plgFlexicontent_fields{$fieldtype}";
-		if(in_array($func, get_class_methods($class))) {
+		if(in_array($func, get_class_methods($className)))
+		{
 			return call_user_func_array(array($fc_plgs[$fieldtype], $func), $args);
 		}
 	}
@@ -6144,37 +6138,36 @@ class FLEXIUtilities
 	static function call_Content_Plg_Func( $plgname, $func, $args=null )
 	{
 		static $content_plgs;
+		$className = 'plgContent'.$plgname;
 
-		if ( !isset( $content_plgs[$plgname] ) ) {
+		if ( !isset( $content_plgs[$plgname] ) )
+		{
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
 			$plgfolder = DS.strtolower($plgname);
 			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($plgname).'.php';
-			if(file_exists($path)) require_once($path);
-			else {
-				JFactory::getApplication()->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"),'error');
+			if (!file_exists($path))
+			{
+				JFactory::getApplication()->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"), 'error');
 				return;
 			}
 
-			// 2. Create plugin instance
-			$class = "plgContent{$plgname}";
-			if( class_exists($class) ) {
-				// Create class name of the plugin
-				$className = 'plg'.'content'.$plgname;
-				// Create a plugin instance
-				$dispatcher = JDispatcher::getInstance();
-				$content_plgs[$plgname] =  new $className($dispatcher, array());
-				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
-				$plugin_db_data = JPluginHelper::getPlugin('content',$plgname);
-				$content_plgs[$plgname]->params = new JRegistry( @$plugin_db_data->params );
-			} else {
-				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
+			require_once($path);
+
+			if(!class_exists($className))
+			{
+				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct plugin name"), 'error');
 				return;
 			}
+
+			// 2. Create a plugin instance, also pass the parameters so that $this->params are created too
+			$dispatcher  = JDispatcher::getInstance();
+			$plg_db_data = JPluginHelper::getPlugin('content', $plgname);
+			$content_plgs[$plgname] = new $className($dispatcher, array('type'=>'content', 'name'=>$plgname, 'params'=>$plg_db_data->params));
 		}
 
-		// 3. Execute only if it exists
-		$class = "plgContent{$plgname}";
-		if(in_array($func, get_class_methods($class))) {
+		// 3. Execute function only if it exists
+		if(in_array($func, get_class_methods($className)))
+		{
 			return call_user_func_array(array($content_plgs[$plgname], $func), $args);
 		}
 	}
@@ -7532,47 +7525,62 @@ class flexicontent_ajax
 		if ($exttype!='modules' && $exttype!='plugins') { echo 'only modules and plugins are supported'; jexit(); }  // currently supporting only module and plugins
 		if (!$extname || !$extfunc) { echo 'function or extension name not set'; jexit(); }  // require variable not set
 		if ($exttype=='plugins' && $extfolder=='') { echo 'plugin folder is not set'; jexit(); }  // currently supporting only module and plugins		
-		
+
 		if ($exttype=='modules')
 		{
 			// Import module helper file
 			$helper_path = JPath::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
-			if ( !file_exists($helper_path) ) { echo "no helper file found at expected path, filepath is ".$helper_path; jexit(); }
+			if ( !file_exists($helper_path) )
+			{
+				jexit("no helper file found at expected path, filepath is ".$helper_path);
+			}
 			require_once ($helper_path);
-			
+
 			// Create object
-			$classname = 'mod'.ucwords($extname).'Helper';
-			if ( !class_exists($classname) ) { echo "no correctly named class inside helper file"; jexit(); }
-			$obj = new $classname();
+			$className = 'mod'.ucwords($extname).'Helper';
+			if ( !class_exists($className) )
+			{
+				jexit("no correctly named class inside helper file");
+			}
+			$obj = new $className();
 		}
-		
+
 		else  // exttype is 'plugins'
 		{
 			// Load Flexicontent Field (the Plugin file) if not already loaded
 			$plgfolder = DS.strtolower($extname);
 			$path = JPATH_ROOT.DS.'plugins'.DS.$extfolder.$plgfolder.DS.strtolower($extname).'.php';
-			if ( !file_exists($path) ) { echo "no plugin file found at expected path, filepath is ".$path; jexit(); }
+			if ( !file_exists($path) )
+			{
+				jexit("no plugin file found at expected path, filepath is ".$path);
+			}
 			require_once ($path);
-			
+
 			// Create class name of the plugin
-			$classname = 'plg'. ucfirst($extfolder).$extname;
-			if ( !class_exists($classname) ) { echo "no correctly named class inside plugin file"; jexit(); }
-			
-			// Create a plugin instance
+			$className = 'plg'. ucfirst($extfolder).$extname;
+			if (!class_exists($className))
+			{
+				jexit("no correctly named class inside plugin file");
+			}
+
+			// Create a plugin instance, also pass the parameters so that $this->params are created too
 			$dispatcher = JDispatcher::getInstance();
-			$obj = new $classname($dispatcher, array());
-			
-			// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
-			$plugin_db_data = JPluginHelper::getPlugin($extfolder,$extname);
-			$obj->params = new JRegistry( @ $plugin_db_data->params );
+			$plg_db_data = JPluginHelper::getPlugin($extfolder, $extname);
+			$obj = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 		}
-		
+
 		// Security concern, only 'confirmed' methods will be callable
-		if ( !in_array($extfunc, $obj->task_callable) ) { echo "non-allowed method called"; jexit(); }
-		
+		if ( !in_array($extfunc, $obj->task_callable) )
+		{
+			jexit("non-allowed method called");
+		}
+
 		// Method actually exists
-		if ( !method_exists($obj, $extfunc) ) { echo "non-existing method called "; jexit(); }
-		
+		if ( !method_exists($obj, $extfunc) )
+		{
+			jexit("non-existing method called ");
+		}
+
 		// Load extension's english language file then override with current language file
 		if ($exttype=='modules')
 			$extension_name = 'mod_'.strtolower($extname);

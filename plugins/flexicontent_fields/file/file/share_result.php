@@ -9,11 +9,12 @@ defined('_JEXEC') or die;
 			<?php echo JText::_('FLEXI_FIELD_FILE_CLOSE_WINDOW'); ?> <?php echo JHtml::_('image', 'mailto/close-x.png', NULL, NULL, true); ?></a>
 	</div>
 
-	<span class="fc-mssg fc-success">
+	<div class="alert alert-success">
 		<?php echo JText::_('FLEXI_FIELD_FILE_EMAIL_SENT'); ?>
-	</span>
+	</div>
+	<div class="fcclear"></div>
 
-	<label class="flexi label" for="subject_field">
+	<label class="label" for="subject_field">
 		<?php echo JText::_('FLEXI_FIELD_FILE_EMAIL_SUBJECT'); ?>
 	</label>
 	<div class="fcclear"></div>
@@ -21,7 +22,7 @@ defined('_JEXEC') or die;
 	<div class="fcclear"></div>
 	<br/>
 	
-	<label class="flexi label" for="subject_field">
+	<label class="label" for="subject_field">
 		<?php echo JText::_('FLEXI_FIELD_FILE_EMAIL_DESCRIPTION'); ?>
 	</label>
 	<div class="fcclear"></div>

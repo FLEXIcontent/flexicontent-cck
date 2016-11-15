@@ -55,8 +55,8 @@ class plgFlexicontent_fieldsJProfile extends JPlugin
 		{
 			$users = array();
 			jimport('joomla.user.helper');
-			JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', true);
-			JFactory::getLanguage()->load('com_users', JPATH_SITE, null, true);
+			JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
+			JFactory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}
 		
 		$displayed_user = $field->parameters->get('displayed_user', 1);

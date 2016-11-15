@@ -31,6 +31,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
+		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -685,14 +686,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		
 		// Downloads manager feature
-		if ($allowshare) {
-			if (file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )) {
-				$com_mailto_found = true;
+		if ($allowshare)
+		{
+			$com_mailto_found = file_exists(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+			if ($com_mailto_found)
+			{
 				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
-				
 				$status = 'width=700,height=360,menubar=yes,resizable=yes';
-			} else {
-				$com_mailto_found = false;
 			}
 		}
 		
@@ -1282,24 +1282,23 @@ class plgFlexicontent_fieldsFile extends FCField
 		$content_id = $jinput->get('content_id', 0, 'int');
 		$field_id   = $jinput->get('field_id', 0, 'int');
 		$tpl = $jinput->get('tpl', 'default', 'cmd');
-		
+
 		// Check for missing file id
-		if (!$file_id) {
+		if (!$file_id)
+		{
 			jexit( JText::_('file id is missing') );
 		}
-		
+
 		// Check file exists
 		$query = ' SELECT * FROM #__flexicontent_files WHERE id='. $file_id;
 		$db->setQuery( $query );
 		$file = $db->loadObject();
-		
-		if ($db->getErrorNum())  {
-			jexit( __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) );
-		}
-		if (!$file) {
+
+		if (!$file)
+		{
 			jexit( JText::_('file id no '.$file_id.', was not found') );
 		}
-		
+
 		$data = new stdClass();
 		$data->file_id    = $file_id;
 		$data->content_id = $content_id;
@@ -1312,7 +1311,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$subject	= $jinput->get('subject', '', 'string');
 		$desc     = $jinput->get('desc', '', 'string');
 
-		if ($user->get('id') > 0) {
+		if ($user->get('id') > 0)
+		{
 			$data->sender	= $user->get('name');
 			$data->from		= $user->get('email');
 		}
@@ -1325,7 +1325,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->subject = $subject;
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
-		
+
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
@@ -1342,7 +1342,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
+
 		$user = JFactory::getUser();
 		$db   = JFactory::getDbo();
 		$app  = JFactory::getApplication();
@@ -1350,40 +1350,37 @@ class plgFlexicontent_fieldsFile extends FCField
 		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
-		
+
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
 			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
 			return $this->share_file_form();
 		}
-		
+
 		$SiteName	= $app->getCfg('sitename');
 		$MailFrom	= $app->getCfg('mailfrom');
 		$FromName	= $app->getCfg('fromname');
-		
-		
+
 		$file_id    = $jinput->get('file_id', 0, 'int');
 		$content_id = $jinput->get('content_id', 0, 'int');
 		$field_id   = $jinput->get('field_id', 0, 'int');
 		$tpl = $jinput->get('tpl', 'default', 'cmd');
-		
+
 		// Check for missing file id
-		if (!$file_id) {
+		if (!$file_id)
+		{
 			jexit( JText::_('file id is missing') );
 		}
-		
+
 		// Check file exists
 		$query = ' SELECT * FROM #__flexicontent_files WHERE id='. $file_id;
 		$db->setQuery( $query );
 		$file = $db->loadObject();
-		
-		if ($db->getErrorNum())  {
-			jexit( __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) );
-		}
-		if (!$file) {
+
+		if (!$file)
+		{
 			jexit( JText::_('file id no '.$file_id.', was not found') );
 		}
-		
 
 
 		// Create SELECT OR JOIN / AND clauses for checking Access
@@ -1423,12 +1420,15 @@ class plgFlexicontent_fieldsFile extends FCField
 				. $access_clauses['and']
 				;
 		$db->setQuery($query);
-		$file = $db->loadObject();
-		
-		if ($db->getErrorNum())  {
-			jexit( __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) );
+		try {
+			$file = $db->loadObject();
 		}
-		if ( empty($file) ) {
+		catch (Exception $e) {
+			jexit( __FUNCTION__.'() -- SQL ERROR: '. (JDEBUG ? '<br/>'.nl2br($db->getErrorMsg()) : 'Enabled DEBUG to see the error') );
+		}
+
+		if ( empty($file) )
+		{
 			// this is normally not reachable because the share link should not have been displayed for the user, but it is reachable if e.g. user session has expired
 			jexit( JText::_( 'FLEXI_ALERTNOTAUTH' ). "File data not found OR no access for file #: ". $file_id ." of content #: ". $content_id ." in field #: ".$field_id );
 		}
@@ -1458,14 +1458,15 @@ class plgFlexicontent_fieldsFile extends FCField
 		$link = $base . JRoute::_( 'index.php?option=com_flexicontent&task=download'.$vars, false );
 		
 		// Verify that this is a local link
-		if (!$link || !JURI::isInternal($link)) {
+		if (!$link || !JURI::isInternal($link))
+		{
 			//Non-local url...
 			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
 			return $this->share_file_form();
 		}
 
 		// An array of email headers we do not want to allow as input
-		$headers = array (	'Content-Type:',
+		$headers = array ('Content-Type:',
 							'MIME-Version:',
 							'Content-Transfer-Encoding:',
 							'bcc:',
@@ -1500,12 +1501,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		 */
 		unset ($headers, $fields);
 
-		$email		= $jinput->get('mailto', '', 'string'); echo "<br>";
-		$sender		= $jinput->get('sender', '', 'string'); echo "<br>";
-		$from			= $jinput->get('from', '', 'string'); echo "<br>";
-		$_subject = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender); echo "<br>";
-		$subject  = $jinput->get('subject', $_subject, 'string'); echo "<br>";
-		$desc     = $jinput->get('desc', '', 'string'); echo "<br>";
+		$email		= $jinput->get('mailto', '', 'string');
+		$sender		= $jinput->get('sender', '', 'string');
+		$from			= $jinput->get('from', '', 'string');
+		$_subject = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender);
+		$subject  = $jinput->get('subject', $_subject, 'string');
+		$desc     = $jinput->get('desc', '', 'string');
 		
 		// Check for a valid to address
 		$error	= false;
@@ -1562,7 +1563,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$aid_list = implode(",", $aid_arr);
 		
 		// Access Flags for: content item and field
-		if ( $get_select_access ) {
+		if ( $get_select_access )
+		{
 			$select_access = '';
 			if ($include_file) $select_access .= ', CASE WHEN'.
 				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
@@ -1574,12 +1576,16 @@ class plgFlexicontent_fieldsFile extends FCField
 				'   i.access IN (0,'.$aid_list.')'.
 				' THEN 1 ELSE 0 END AS has_content_access';
 		}
-		
-		else {
+
+		else
+		{
 			if ($include_file)
 				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
 			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
-			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
+			$andacc .= ''  // AND content access
+				.' AND ty.access IN (0,'.$aid_list.')'
+				.' AND  c.access IN (0,'.$aid_list.')'
+				.' AND  i.access IN (0,'.$aid_list.')';
 		}
 		
 		$clauses['select'] = $select_access;

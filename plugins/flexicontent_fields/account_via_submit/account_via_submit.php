@@ -28,9 +28,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		
 		JPlugin::loadLanguage('plg_flexicontent_fields_account_via_submit', JPATH_ADMINISTRATOR);
-		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	}
 	
 	
@@ -408,7 +406,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		jimport('joomla.user.user');
 		jimport('joomla.user.helper');
 		jimport('cms.component.helper');
-		JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', true);
+		JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
 		JFactory::getLanguage()->load('com_users', JPATH_SITE, null, true);
 		
 		$app = JFactory::getApplication();

@@ -39,14 +39,22 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
  */
 class plgSearchFlexisearch extends JPlugin
 {
+	var $autoloadLanguage = false;
+
+	/**
+	 * Constructor
+	 *
+	 * @access      public
+	 * @param       object  $subject The object to observe
+	 * @param       array   $config  An array that holds the plugin configuration
+	 * @since       1.5
+	 */
 	public function __construct(& $subject, $config)
 	{
 		parent::__construct($subject, $config);
-		$extension_name = 'plg_search_flexisearch';
-		//$this->loadLanguage();
-		//$this->loadLanguage( '$extension_name, JPATH_ADMINISTRATOR);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB'	, true);
-		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null		, true);
+
+		static $language_loaded = null;
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_search_flexisearch', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -119,7 +127,10 @@ class plgSearchFlexisearch extends JPlugin
 	}
 	
 	// Also add J1.5 function signature
-	function onSearchAreas() { return $this->onContentSearchAreas(); }
+	/*function onSearchAreas()
+	{
+		return $this->onContentSearchAreas();
+	}*/
 	
 
 	/**
@@ -364,8 +375,8 @@ class plgSearchFlexisearch extends JPlugin
 	
 	
 	// Also add J1.5 function signature
-	function onSearch( $text, $phrase='', $ordering='', $areas=null )
+	/*function onSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
 		return $this->onContentSearch( $text, $phrase, $ordering, $areas );
-	}
+	}*/
 }
