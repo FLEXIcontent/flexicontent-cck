@@ -488,7 +488,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build the include non-published cats boolean list
 		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) ) {
-			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />';
+			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />';
 			$lists['filter_subcats'] = $ordering_tip;
 		} else {
 			//$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_subcats );

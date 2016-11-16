@@ -7425,7 +7425,7 @@ function FLEXISubmenu($cando)
 		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, '<span class="fcsb-icon-comments disabled"></span><span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
 		
 		$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
-		if (file_exists($reviews_path))
+		if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.1.99', '>'))
 		{
 			if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 		}
