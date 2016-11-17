@@ -823,12 +823,18 @@
 		<field name="" type="separator" default="FLEXI_ITEMS_ITEM_SELECTION_N_PAGINATION" icon_class="icon-signup" level="tab_open" box_type="1" remove_boxes="2" />
  
 			<field name="" type="separator" default="FLEXI_ITEMS_ITEM_SELECTION_N_PAGINATION" description="" level="level1" />
-			<field name="show_noauth" type="multilist" subtype="radio" default="0" label="FLEXI_UNAUTHORIZED_ITEMS" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+
+			<field name="" type="separator" default="FLEXI_SELECT_ITEMS" description="" level="level3" class="alert alert-info fcpadded" />
+			<field name="show_noauth" type="fcradio" default="0" label="FLEXI_UNAUTHORIZED_ITEMS" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_owned" type="fcradio" default="1" label="FLEXI_OWNED_ITEMS" description="FLEXI_OWNED_ITEMS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="display_subcategories_items" type="fcradio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC" class="btn-group btn-group-yesno"> 
-				<option value="0">FLEXI_NO</option> 
+				<option value="0">FLEXI_HIDE</option> 
 				<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
 				<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
 			</field>
