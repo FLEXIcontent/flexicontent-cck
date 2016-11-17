@@ -318,13 +318,13 @@ foreach($values as $file_id)
 			$actions_arr[] =
 				' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
 		} else if ($is_public && $allowshare) {
-			$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
 			$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 				.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
-				'<input type="button" class="'.$file_classes.' fcfile_shareFile" onclick="'
-					.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'" value="'.$sharetext.'" />';
+				'<input type="button" class="'.$file_classes.' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'" value="'.$sharetext.'" '.
+					' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;" '.
+				'/>';
 		}
 	}
 	
@@ -384,12 +384,12 @@ foreach($values as $file_id)
 			// skip share popup form button if com_mailto is missing
 			$str .= ' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
 		} else if ($is_public && $allowshare) {
-			$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
 			$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 				.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
-				'<a href="javascript:;" class="fcfile_shareFile" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'">'
+				'<a href="'.$send_form_url.'" class="fcfile_shareFile" title="'.$shareinfo.'" '.
+				'  onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
 				.$sharetext
 				.'</a>';
 		}

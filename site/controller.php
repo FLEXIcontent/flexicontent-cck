@@ -117,7 +117,8 @@ class FlexicontentController extends JControllerLegacy
 		// CASE 2: Multi category view
 		else if ( !empty($cids) )
 		{
-			if ( !is_array($cids) ) {
+			if ( !is_array($cids) )
+			{
 				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $cids );
 				$_cids = explode(',', $_cids);
 			} else $_cids = $cids;
@@ -136,7 +137,8 @@ class FlexicontentController extends JControllerLegacy
 		{
 			// Find descendants of the categories
 			$subcats = array();
-			foreach ($cids as $_id) {
+			foreach ($cids as $_id)
+			{
 				if ( !isset($globalcats[$_id]) ) continue;
 				$subcats = array_merge($subcats, $globalcats[$_id]->descendantsarray);
 			}
@@ -153,7 +155,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		
 		// All starting words are exact words but last word is a ... word prefix
-		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$words = preg_split('/\s\s*/u', $text);
 		
 		$_words = array();
@@ -226,11 +228,14 @@ class FlexicontentController extends JControllerLegacy
 		$words_found = array();
 		$regex = '/(\b)('.$search_prefix.$word_prefix.'\w*)(\b)/iu';
 		
-		foreach ($data as $_d) {
+		foreach ($data as $_d)
+		{
 			//echo $_d['item_id'] . ' ';
-			if (preg_match_all($regex, $_d['search_index'], $matches) ) {
+			if (preg_match_all($regex, $_d['search_index'], $matches) )
+			{
 				//print_r($matches[2]); exit;
-				foreach ($matches[2] as $_m) {
+				foreach ($matches[2] as $_m)
+				{
 					if ($search_prefix)
 						$_m = preg_replace('/\b'.$search_prefix.'/u', '', $_m);
 					$_m_low = StringHelper::strtolower($_m, 'UTF-8');

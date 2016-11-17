@@ -21,13 +21,15 @@ JHtml::_('behavior.keepalive');
 ?>
 
 <div id="mailto-window">
-	<span class="fc-mssg fc-success">
+	<!--div style="text-align:right">
+		<a href="javascript: void window.close()">
+			<?php echo JText::_('FLEXI_FIELD_FILE_CLOSE_WINDOW'); ?> <?php echo JHtml::_('image', 'mailto/close-x.png', NULL, NULL, true); ?>
+		</a>
+	</div-->
+	<!--div class="fc-mssg fc-nobgimg fc-info">
 		<?php echo JText::_('FLEXI_FIELD_FILE_EMAIL_TO_A_FRIEND'); ?>
-	</span>
-	<div class="mailto-close">
-		<a href="javascript: void window.close()" title="<?php echo JText::_('FLEXI_FIELD_FILE_CLOSE_WINDOW'); ?>">
-		 <span><?php echo JText::_('FLEXI_FIELD_FILE_CLOSE_WINDOW'); ?> </span></a>
-	</div>
+	</div-->
+	<div class="fcclear"></div>
 
 	<form action="<?php echo JURI::base() ?>index.php?tmpl=component" id="mailtoForm" method="post">
 		<div class="formelm">
@@ -55,12 +57,12 @@ JHtml::_('behavior.keepalive');
 			<textarea id="desc_field" name="desc" class="inputbox" cols="40" rows="5" /><?php echo $data->desc; ?></textarea>
 		</div>
 		<p>
-			<button class="button" onclick="return Joomla.submitbutton('send');">
+			<button class="btn" onclick="return Joomla.submitbutton('send');">
 				<?php echo JText::_('FLEXI_FIELD_FILE_SEND'); ?>
 			</button>
-			<button class="button" onclick="window.close();return false;">
+			<!--button class="btn" onclick="window.close();return false;">
 				<?php echo JText::_('FLEXI_FIELD_FILE_CANCEL'); ?>
-			</button>
+			</button-->
 		</p>
 		<?php /*<input type="hidden" name="layout" value="<?php echo $this->getLayout();?>" />  */ ?>
 		<input type="hidden" name="option" value="com_flexicontent" />
@@ -76,4 +78,3 @@ JHtml::_('behavior.keepalive');
 
 	</form>
 </div>
-
