@@ -436,11 +436,11 @@ class ParentClassItem extends JModelAdmin
 		if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
 			$unapproved_version_notice = 1;
 			if (!$app->isAdmin()) {
-				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
+				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')));
 			} else {
 				JError::raiseNotice(10,
-					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
-					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')) . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE'.($app->isAdmin() ? '_ADMIN' : ''), $version, $current_version)
 				);
 			}
 		}
@@ -2237,9 +2237,9 @@ class ParentClassItem extends JModelAdmin
 			{
 				// Warn editor that his/her changes will need approval to before becoming active / visible
 				if ( $canEditState )
-					JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
+					JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')));
 				else
-					JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
+					JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')));
 			}
 			// Set modifier and modification time (as if item has been saved), so that we can use this information for updating the versioning tables
 			$datenow = JFactory::getDate();
