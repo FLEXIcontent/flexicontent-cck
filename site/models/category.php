@@ -911,6 +911,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$catlang = $cparams->get('language', '');         // Category language parameter, currently UNUSED
 		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
 		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
+		$show_owned = $cparams->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$use_tmp = $counting == true;
 		
 		// First thing we need to do is to select only the requested items
@@ -930,7 +931,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_layout=='tags')
 			$where .= ' AND tag.tid = ' . $db->Quote($this->_tagid);
 		
-		if ($this->_id || count($this->_ids)) {
+		if ($this->_id || count($this->_ids))
+		{
 			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
 			// Get sub categories used to create items list, according to configuration and user access
 			$this->_getDataCats($id_arr);
@@ -942,8 +944,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
-		if (!$ignoreState && $this->_layout!='myitems') {
-			$OR_isOwner = $user->id ? ' OR i.created_by = '.$user->id : '';
+		if (!$ignoreState)
+		{
+			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = '.$user->id : '';
 			//$OR_isModifier = $user->id ? ' OR i.modified_by = '.$user->id : '';
 			
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
