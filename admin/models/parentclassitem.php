@@ -4032,27 +4032,29 @@ class ParentClassItem extends JModelAdmin
 	{
 		static $nConf = null;
 		if ($nConf !== null) return $nConf;
-		
+
 		// (a) Check if notifications are not enabled
-		if ( !$params->get('enable_notifications', 0) ) {
+		if ( !$params->get('enable_notifications', 0) )
+		{
 			$nConf = false;
 			return $nConf;
 		}
-		
+
 		$db = JFactory::getDBO();
 		$nConf = new stdClass();
-		
+
 		// (b) Get Content Type specific notifications (that override global)
-		$nConf->userlist_notify_new            = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_new            = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
-		$nConf->userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
-		
-		$nConf->userlist_notify_existing             = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_existing             = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
-		$nConf->userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
-		$nConf->usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
-		
+		$only_cat_conf = $params->get('nf_allow_cat_specific') && $params->get('cats_enable_notifications') == '2';
+		$nConf->userlist_notify_new            = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_new            = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
+		$nConf->userlist_notify_new_pending    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_new_pending    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
+
+		$nConf->userlist_notify_existing             = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_existing             = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
+		$nConf->userlist_notify_existing_reviewal    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->usergrps_notify_existing_reviewal    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
+
 		// (c) Get category specific notifications
 		if ( $params->get('nf_allow_cat_specific') ) 
 		{
@@ -4061,7 +4063,8 @@ class ParentClassItem extends JModelAdmin
 			$db->setQuery( $query );
 			$mcats_params = $db->loadColumn();
 			
-			foreach ($mcats_params as $cat_params) {
+			foreach ($mcats_params as $cat_params)
+			{
 				$cat_params = new JRegistry($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 				
