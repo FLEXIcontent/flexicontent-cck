@@ -19,17 +19,15 @@
 defined('_JEXEC') or die('Restricted access');
 
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
-$close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
-?>
-<script type="text/javascript">
 
+$js = "
 jQuery(document).ready(function() {
 	var adminForm = jQuery('#adminForm');
 	adminForm.submit(function( event ) {
 		var log_bind = jQuery('#log-bind');
-		log_bind.html('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		log_bind.html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 		jQuery.ajax({
-			type: "POST",
+			type: 'POST',
 			data: adminForm.serialize(),
 			url:  adminForm.prop('action'),
 			success: function(str) {
@@ -39,7 +37,10 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 	});	
 });
-</script>
+";
+
+JFactory::getDocument()->addScriptDeclaration($js);
+?>
 
 <form action="index.php?option=com_flexicontent&<?php echo $ctrl_task; ?>duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
 
@@ -58,7 +59,7 @@ jQuery(document).ready(function() {
 		<tr>
 			<td>
 			<input id="import" type="submit" class="btn" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
-			<input type="button" class="btn" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="btn" onclick="window.parent.fc_tmpls_modal.dialog('destroy'); window.parent.document.adminForm.submit();" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
@@ -66,15 +67,7 @@ jQuery(document).ready(function() {
 
 	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
-
-<?php if (FLEXI_J16GE) : ?>
 	<input type="hidden" name="task" value="templates.duplicate" />
 	<input type="hidden" name="layout" value="templates.duplicate" />
 	<input type="hidden" name="format" value="raw" />
-<?php else : ?>
-	<input type="hidden" name="task" value="duplicate" />
-	<input type="hidden" name="controller" value="templates" />
-	<input type="hidden" name="view" value="templates" />
-	<input type="hidden" name="tmpl" value="component" />
-<?php endif; ?>
 </form>

@@ -26,6 +26,8 @@ $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation')
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 $form_token = JSession::getFormToken();
 $js = "
+var fc_tmpls_modal;
+
 jQuery(document).ready(function() {
 	jQuery('a.deletable-template').click(function( event ) {
 		var answer = confirm('".JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true )."')
@@ -185,7 +187,7 @@ $list_total_cols = 8;
 					</a>
 			 	<?php endif; ?>
 				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
-				<a onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300); return false;" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>
+				<a onclick="var url = jQuery(this).attr('href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300); return false;" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>
 			</td>
 			<td>
 				<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
