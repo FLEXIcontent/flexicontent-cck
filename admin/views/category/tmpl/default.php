@@ -206,10 +206,8 @@ $this->document->addScriptDeclaration($js);
 				<div class="tabbertab" id="tabset_cat_props_content_notifications_tab" data-icon-class="icon-mail" >
 					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_NOTIFICATIONS_CONF'); ?> </h3>
 
-				<?php if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) ) : ?>
-
 					<?php
-					$fieldSet = $this->form->getFieldset('cat_notifications_conf');
+					$fieldSet = $this->form->getFieldset('notifications_conf');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
@@ -227,12 +225,34 @@ $this->document->addScriptDeclaration($js);
 						';
 					endforeach; ?>
 
-				<?php else :
+				<?php if ( $this->cparams->get('nf_allow_cat_specific', 0) ) : ?>
+					
+						<?php
+						$fieldSet = $this->form->getFieldset('cat_notifications_conf');
 
-					$_comp_state = JText::_( $this->cparams->get('enable_notifications', 0) ? 'FLEXI_ENABLED' : 'FLEXI_DISABLED' );
-				 echo '<div class="alert alert-info">'.JText::sprintf('FLEXI_ABOUT_INACTIVE_CONTENT_NOTIFICATIONS', '<b>'.JText::_('FLEXI_DISABLED').'</b>', '<b>'.$_comp_state.'</b>').'</div>';
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+						endif;
+						?>
 
-				endif; ?>
+						<?php foreach ($fieldSet as $field) :
+							echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+							<div class="control-group">
+								<div class="control-label">'.$field->label.'</div>
+								<div class="controls">
+									'.$this->getInheritedFieldDisplay($field, $this->iparams).'
+								</div>
+							</div>
+							';
+						endforeach; ?>
+
+					<?php else : ?>
+					
+						<div class="fcsep_level0"><?php echo JText::_( 'FLEXI_NOTIFY_EMAIL_RECEPIENTS' ); ?></div>
+						<div class="fcclear"></div>
+						<div class="alert alert-info"><?php echo JText::_('FLEXI_INACTIVE_PER_CONTENT_CAT_NOTIFICATIONS_INFO'); ?></div>
+
+					<?php endif; ?>
 
 				</div><!-- tabbertab FLEXI_ASSOCIATIONS -->
 
