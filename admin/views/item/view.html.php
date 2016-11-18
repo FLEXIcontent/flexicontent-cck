@@ -346,7 +346,6 @@ class FlexicontentViewItem extends JViewLegacy
 				$status = 'width=700,height=360,menubar=yes,resizable=yes';
 				$btn_title = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM');
 				$btn_info  = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM_INFO');
-				$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
 				$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 					.'&task=call_extfunc&exttype=plugins&extfolder=system&extname=flexisyspro&extfunc=collaborate_form'
 					.'&content_id='.$item->id;
