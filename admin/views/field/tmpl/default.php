@@ -424,6 +424,7 @@ $this->document->addScriptDeclaration($js);
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
+<?php echo $this->form->getInput('id'); ?>
 <?php if ($form->getValue('iscore') == 1) : ?>
 <input type="hidden" name="jform[iscore]" value="<?php echo $form->getValue("iscore"); ?>" />
 <input type="hidden" name="jform[name]" value="<?php echo $form->getValue("name"); ?>" />

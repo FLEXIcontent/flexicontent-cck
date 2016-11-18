@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<field name="id" type="text" default="0" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" labelclass="label" />
-	<field name="asset_id" type="hidden" filter="unset" labelclass="label" />
+	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
+	<field name="asset_id" type="hidden" filter="unset" />
 	<field name="field_type" type="fieldtypes" default="text" label="FLEXI_FIELD_TYPE" description="FLEXI_FIELD_FIELDTYPE_DESC" class="inputbox" labelclass="label label-warning" />
 	<field name="name" type="text" default="" label="FLEXI_FIELD_NAME" description="FLEXI_FIELD_FIELDNAME_DESC" class="inputbox required" labelclass="label" />
 	<field name="label" type="text" default="" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_FIELDLABEL_DESC" class="inputbox required" labelclass="label" />
