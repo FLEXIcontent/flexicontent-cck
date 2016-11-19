@@ -5,71 +5,73 @@
 		<action name="core.admin" title="JAction_Admin" description="JACTION_ADMIN_COMPONENT_DESC" />
 		<action name="core.options" title="JACTION_OPTIONS" description="JACTION_OPTIONS_COMPONENT_DESC" />
 		<action name="core.manage" title="JAction_Manage" description="JACTION_MANAGE_COMPONENT_DESC" />
-		
-		<!-- Items/Categories: category-inherited permissions -->
-		<action name="core.create" title="Items/Categories (inherited): create" description="Allow users in the group to CREATE new Items/Categories in any category. NOTE: You can explicitely deny per category/item. but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="core.delete" title="Items/Categories (inherited): delete" description="Allow users in the group to DELETE Items/Categories (any item) in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="core.delete.own" title="Items/Categories (inherited): delete own" description="Allow users in the group to DELETE OWNED Items/Categories in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="core.edit" title="Items/Categories (inherited): edit" description="Allow users in the group to EDIT (all) Items/Categories in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="core.edit.own" title="Items/Categories (inherited): edit own" description="Allow users in the group to EDIT OWNED Items/Categories in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="core.edit.state" title="Items/Categories (inherited): edit state" description="Allow users in the group to EDIT the PUBLICATION STATE of Items/Categories in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="core.edit.state.own" title="Items/Categories (inherited): edit state own" description="Allow users in the group to EDIT the PUBLICATION STATE of OWNED Items/Categories in any category. NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="flexicontent.change.cat" title="Items (Item edit Form): change category assignment" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="flexicontent.change.cat.sec" title="Items (Item edit Form): change secondary category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="flexicontent.change.cat.feat" title="Items (Item edit Form): change featured category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		
-		<!-- ITEMs: component controlled permissions -->
-		<action name="flexicontent.copyitems" title="Items (Backend): Copy Task" description="Allow users in the group to use the Item Copy Task (in items management)" />
-		<action name="flexicontent.orderitems" title="Items (Backend): Reorder" description="Allow users in the group to change the ordering of items (in items management)" />
-		<action name="flexicontent.accesslevel" title="Items/Categories (Global Only): Edit Access Level" description="Allow users in the group to set the Access Level of items / categories that they can edit" />
-		<action name="flexicontent.editcreationdate" title="Items (Item edit Form): Edit creation date" description="Allow users in the group to edit creation date of an item. NOTE that is usually reserved for administrator since creation date might be important for subscription sites and other site behavior" />
-		<action name="flexicontent.versioning" title="Items (Item edit Form): use versions" description="Allow users in the group to use multiple Versions per Item" />
-		<action name="flexicontent.assocanytrans" title="Items (Item edit Form): associate any translation" description="Allow users in the group to associate translations (items) authored by any user" />
+
+		<!-- CATEGORY-INHERITED PERMISSIONS -->
+		<action name="core.create" title="create (*)" description="Allow users in the group to CREATE new Items/Categories in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item. but if set to deny here, you cann't expicitely allow per category/item. &lt;br/&gt; &lt;br/&gt; NOTE: * This combines with 'create items' per item type (both 'create' and 'create items' are required to add new items)" />
+		<action name="core.delete" title="delete" description="Allow users in the group to DELETE Items/Categories (any item) in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="core.delete.own" title="delete own" description="Allow users in the group to DELETE OWNED Items/Categories in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="core.edit" title="edit" description="Allow users in the group to EDIT (all) Items/Categories in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="core.edit.own" title="edit own" description="Allow users in the group to EDIT OWNED Items/Categories in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="core.edit.state" title="edit state" description="Allow users in the group to EDIT the PUBLICATION STATE of Items/Categories in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="core.edit.state.own" title="edit state own" description="Allow users in the group to EDIT the PUBLICATION STATE of OWNED Items/Categories in any category. &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+
+		<!-- ITEM EDIT FORM (Global only) -->
+		<!-- Category / Tag usage -->
+		<action name="flexicontent.multicat" title="Assign multiple categories to items" description="Allow users in the group to assign multiple categories to items. If lacking this privelege, the secondary category selector will be disabled. &lt;br/&gt; &lt;br/&gt; NOTE: user will still need to have 'create' privilege in these categories" />
+		<action name="flexicontent.usercats" title="View unauthorized categories" description="Allow users in the group to view the categories which they cannot assign to items" />
+		<action name="flexicontent.usetags" title="Edit tags assignments" description="Allow users in the group to edit the tags assigned to items" />
+		<action name="flexicontent.createtags" title="Create new tags (also in tags manager)" description="Allow users in the group to create new tags" />
+		<!-- Category assignments (existing items)-->
+		<action name="flexicontent.change.cat" title="Change main category" description="Allow users in the group to change the categories assigned to an item (after the item has been created). &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat.sec" title="Change secondary categories" description="Allow users in the group to change the categories assigned to an item (after the item has been created). &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat.feat" title="Change featured categories" description="Allow users in the group to change the categories assigned to an item (after the item has been created). &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />		
+		<!-- Various -->
+		<action name="flexicontent.accesslevel" title="Edit Access Level (also in items / cats managers)" description="Allow users in the group to set the Access Level of items / categories that they can edit" />
+		<action name="flexicontent.editcreationdate" title="Edit creation date" description="Allow users in the group to edit creation date of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for administrator since creation date might be important for subscription sites and other site behavior" />
+		<action name="flexicontent.versioning" title="Use versions" description="Allow users in the group to use multiple Versions per Item" />
+		<action name="flexicontent.assocanytrans" title="Associate items authored by other users" description="Allow users in the group to associate translations (items) authored by any user" />
+
 		<!-- ITEMs: WORKFLOW abilities -->
-		<action name="flexicontent.displayallitems" title="Items (WorkFlow in Backend): list all items" description="Allow users in the group to list all Items (in items management) regardless of access level or edit privilege, otherwise the user will only see the items that he/she ACCESS Level to view or (exclusive or) are in editable categories. &lt;br/&lt;br/ NOTE: view-based or edit-based item listing depends on component parameter for items manager). &lt;br/ &lt;br/ NOTE: this setting maybe used in other cases, like in quick access listings of FLEXIcontent Dashboard (revised items, pending approval items, etc)." />
-		<action name="flexicontent.ignoreviewstate" title="Items (WorkFlow in Frontend): list items in any state" description="Allow users in the group to view unpublished, archived, trashed, scheduled, expired items in frontend content lists e.g. category view. &lt;br/&lt;br/ NOTE normally only item owners and super admins can list such items. &lt;br/&lt;br/ WARNING: this does not override VIEW access level and EDIT privileges of the user on each item, e.g. the user will still need proper view level privelege for listing it and proper edit ACL privelege for editing it" />
-		<action name="flexicontent.requestapproval" title="Items (WorkFlow): send item approval requests for ANY draft-state item" description="Allow users in the group to send approval requests not only for their own items (default behaviour) but ALSO FOR ALL items that are draft state. &lt;br/&lt;br/ NOTE: the items are changed to pending approval state and a approval request email is sent to configured reviewers)" />
-		<action name="flexicontent.autoapprovechanges" title="Items (WorkFlow): can publish document changes regardless of edit state" description="Allow users in the group to auto-publish changes (approve new document version) regardless if having edit state / edit state own privileges. &lt;br/&lt;br/ NOTE: this will not allow the user to use and change the state selector (publish/unpublish the item)" />
+		<action name="flexicontent.displayallitems" title="List all items (Backend)" description="Allow users in the group to list all Items (in items manager) &lt;br/&gt; regardless of access level or edit privilege, &lt;br/&gt; &lt;br/&gt; Otherwise the user will only see the items that &lt;br/&gt; - user has ACCESS Level to view &lt;br/&gt; - (and / or) are in editable categories. &lt;br/&gt;&lt;br/&gt; NOTE: view-based or edit-based item listing depends on component parameters inside items manager TAB. &lt;br/&gt; &lt;br/&gt; NOTE: this setting maybe used in other cases, like in quick access listings of FLEXIcontent Dashboard (revised items, pending approval items, etc)" />
+		<action name="flexicontent.ignoreviewstate" title="List items in any state (Frontend)" description="Allow users in the group to view unpublished, archived, trashed, scheduled, expired items in frontend content lists e.g. category view. &lt;br/&gt; &lt;br/&gt; NOTE: normally only item owners and super admins can list such items. &lt;br/&gt; &lt;br/&gt; WARNING: this does not override VIEW access level and EDIT privileges of the user on each item, e.g. the user will still need proper view level privelege for listing it and proper edit ACL privelege for editing it" />
+		<action name="flexicontent.requestapproval" title="Send approval requests for draft items owned by others" description="Allow users in the group to send approval requests not only for their own items (default behaviour) but ALSO FOR ALL items that are draft state. &lt;br/&gt; &lt;br/&gt; NOTE: the items are changed to pending approval state and a approval request email is sent to configured reviewers)" />
+		<action name="flexicontent.autoapprovechanges" title="Can publish document changes in existing items" description="Allow users in the group to publish changes (approve new document version) regardless if having edit state / edit state own privileges. &lt;br/&gt; &lt;br/&gt; NOTE: this will not allow the user to use and change the state selector (publish/unpublish the item)" />
 		
-		<!-- CATEGORIES: management tab and usage -->
-		<action name="flexicontent.managecats" title="Categories: -- manage --" description="Allow users in the group to have access to the Category Management. NOTE: the inherited privileges of each category are in effect. Thus the user can only perform specific actions on specific categories" />		
-		<action name="flexicontent.usercats" title="Categories (Item edit Form): View unauthorized categories" description="Allow users in the group to view the categories which they cannot assign to items" />
-		<action name="flexicontent.multicat" title="Categories (Item edit Form): Assign multiple categories to items" description="Allow users in the group to assign multiple categories to items. If lacking this privelege, the secondary category selector will be disabled. NOTE: user will still need to have 'create' privilege in these categories" />
-		
-		<!-- TAGs: management tab and usage -->
-		<action name="flexicontent.managetags" title="Tags: -- manage --" description="Allow users in the group to have FULL access to the Tags Management" />
-		<action name="flexicontent.usetags" title="Tags (Item edit Form): edit tags assignments" description="Allow users in the group to edit the tags assigned to items" />
-		<action name="flexicontent.createtags" title="Tags (Item edit Form): create new tags (also in tags manager)" description="Allow users in the group to create new tags" />
-		
+		<!-- Items manager -->
+		<action name="flexicontent.copyitems" title="Copy items" description="Allow users in the group to use the Item Copy Task (in items management)" />
+		<action name="flexicontent.orderitems" title="Reorder items" description="Allow users in the group to change the ordering of items (in items management)" />
+
 		<!-- VARIOUS management tabs -->
-		<action name="flexicontent.manageimport" title="Import: -- manage --" description="Allow users in the group to have access to the (Content) Import Management." />
-		<action name="flexicontent.managetypes" title="Types: -- manage --" description="Allow users in the group to have access to the Types Management. NOTE: There are more permissions that control what the user can do with types." />
-		<action name="flexicontent.managearchives" title="Archives: -- manage --" description="Allow users in the group to have FULL access to the Archives Management" />
-		<action name="flexicontent.managetemplates" title="Templates: -- manage --" description="Allow users in the group to have FULL access to the Templates Management" />
-		<action name="flexicontent.managestats" title="Statistics: -- manage --" description="Allow users in the group to have FULL access to the Statistics Management" />
+		<action name="flexicontent.managecats" title="Categories" description="Allow users in the group to have access to the Category Management. NOTE: the inherited privileges of each category are in effect. Thus the user can only perform specific actions on specific categories" />		
+		<action name="flexicontent.managetypes" title="Types" description="Allow users in the group to have access to the Types Management. NOTE: There are more permissions that control what the user can do with types." />
+		<action name="flexicontent.managetags" title="Tags" description="Allow users in the group to have FULL access to the Tags Management" />
+		<action name="flexicontent.manageimport" title="Import" description="Allow users in the group to have access to the (Content) Import Management." />
+		<action name="flexicontent.managearchives" title="Archives" description="Allow users in the group to have FULL access to the Archives Management" />
+		<action name="flexicontent.managetemplates" title="Templates" description="Allow users in the group to have FULL access to the Templates Management" />
+		<action name="flexicontent.managestats" title="Statistics" description="Allow users in the group to have FULL access to the Statistics Management" />
 		
 		<!-- FIELDs: management tab -->
-		<action name="flexicontent.managefields" title="Fields: -- manage --" description="Allow users in the group to have FULL access to the Fields Management" />
-		<action name="flexicontent.copyfields" title="Fields (Backend Tab): Copy Task" description="Allow users in the group to use the Field Copy Task (in fields management)" />
-		<action name="flexicontent.orderfields" title="Fields (Backend Tab): Reorder" description="Allow users in the group to change the ordering of fields (in fields management)" />
-		<action name="flexicontent.createfield" title="Fields: create" description="Allow users in the group to create fields" />
-		<action name="flexicontent.editfieldvalues" title="Fields: edit values" description="Allow users in the group to edit field values" />
-		<action name="flexicontent.editfield" title="Fields: edit configuration" description="Allow users in the group to edit fields" />
-		<action name="flexicontent.publishfield" title="Fields: publish" description="Allow users in the group to publish fields" />
-		<action name="flexicontent.deletefield" title="Fields: delete" description="Allow users in the group to delete fields" />
+		<action name="flexicontent.managefields" title="Access Fields Manager" description="Allow users in the group to have FULL access to the Fields Management" />
+		<action name="flexicontent.copyfields" title="Copy fields" description="Allow users in the group to use the Field Copy Task (in fields management)" />
+		<action name="flexicontent.orderfields" title="Reorder fields" description="Allow users in the group to change the ordering of fields (in fields management)" />
+		<action name="flexicontent.createfield" title="Create fields" description="Allow users in the group to create fields" />
+		<action name="flexicontent.editfieldvalues" title="Edit values in item form (*)" description="Allow users in the group to edit field values. &lt;br/&gt;&lt;br/&gt; NOTE: * this is ignored by default !! enable usage of this in the configuration of every field" />
+		<action name="flexicontent.editfield" title="Edit field configuration" description="Allow users in the group to edit the configuration of fields" />
+		<action name="flexicontent.publishfield" title="Publish field" description="Allow users in the group to publish fields" />
+		<action name="flexicontent.deletefield" title="Delete field" description="Allow users in the group to delete fields" />
 		
 		<!-- FILEs: management tab -->
-		<action name="flexicontent.managefiles" title="Files: -- manage --" description="-- manage -- files" />
-		<action name="flexicontent.uploadfiles" title="Files (Upload Box): Upload New files" description="Allow users in the group to upload New Files" />
-		<action name="flexicontent.viewallfiles" title="Files (File List): View All files" description="Allow users in the group to view all existing files" />
+		<action name="flexicontent.managefiles" title="Access Files Manager" description="Allow users in the group to have FULL access to the Files Management" />
+		<action name="flexicontent.uploadfiles" title="Upload new files" description="Allow users in the group to upload New Files (note some fields (e.g. image field in folder modes) have their own configuration for uploding, and do not use this setting)" />
+		<action name="flexicontent.viewallfiles" title="View All files (uploaded by any user)" description="Allow users in the group to view files uploaded by any user" />
 		
-		<action name="flexicontent.editfile" title="Files: (Global Only): edit" description="Allow users in the group to edit files" />
-		<action name="flexicontent.publishfile" title="Files: (Global Only): publish" description="Allow users in the group to publish files" />
-		<action name="flexicontent.deletefile" title="Files: (Global Only): delete" description="Allow users in the group to delete files" />
+		<action name="flexicontent.editfile" title="Edit files" description="Allow users in the group to edit files" />
+		<action name="flexicontent.publishfile" title="Publish files" description="Allow users in the group to publish files" />
+		<action name="flexicontent.deletefile" title="Delete files" description="Allow users in the group to delete files" />
 		
-		<action name="flexicontent.editownfile" title="Files: (Global Only): edit own" description="Allow users in the group to edit OWNED files (uploaded by them)" />
-		<action name="flexicontent.publishownfile" title="Files: (Global Only): publish own" description="Allow users in the group to publish OWNED files (uploaded by them)" />
-		<action name="flexicontent.deleteownfile" title="Files: (Global Only): delete own" description="Allow users in the group to delete OWNED files (uploaded by them)" />
+		<action name="flexicontent.editownfile" title="Edit owned files" description="Allow users in the group to edit OWNED files (uploaded by them)" />
+		<action name="flexicontent.publishownfile" title="Publish owned files" description="Allow users in the group to publish OWNED files (uploaded by them)" />
+		<action name="flexicontent.deleteownfile" title="Delete owned files" description="Allow users in the group to delete OWNED files (uploaded by them)" />
 		
 	</section>
 
@@ -93,10 +95,10 @@
 	</section>
 	
 	<section name="field">
-		<action name="flexicontent.editfieldvalues" title="edit values" description="This field's -values- (item form) can be edited by members of this user group" />
-		<action name="flexicontent.editfield" title="edit configuration" description="This field can be edited by members of this user group" />
-		<action name="flexicontent.deletefield" title="delete field" description="This field can be deleted by members of this user group" />
-		<action name="flexicontent.publishfield" title="publish field" description="This field can be publiished by members of this user group" />
+		<action name="flexicontent.editfieldvalues" title="Edit values in item form (*)" description="Field's values (item form) can be edited by members of this user group" />
+		<action name="flexicontent.editfield" title="Edit field configuration" description="This field can be edited by members of this user group" />
+		<action name="flexicontent.deletefield" title="Delete field" description="This field can be deleted by members of this user group" />
+		<action name="flexicontent.publishfield" title="Publish field" description="This field can be publiished by members of this user group" />
 	</section>
 	
 	<section name="type">
@@ -106,9 +108,9 @@
 		<!--action name="core.edit.state.own" title="edit state of owned items" description="Allow users in the group to edit state of owned items of this type." /-->
 		<!--action name="core.delete" title="delete items" description="Allow users in the group to delete items of this type." /-->
 		<!--action name="core.delete.own" title="delete owned items" description="Allow users in the group to delete owned items of this type." /-->
-		<action name="flexicontent.change.cat" title="Items (Item edit Form): change category assignment" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="flexicontent.change.cat.sec" title="Items (Item edit Form): change secondary category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
-		<action name="flexicontent.change.cat.feat" title="Items (Item edit Form): change featured category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat" title="Item edit Form: change category assignment" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat.sec" title="Item edit Form: change secondary category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat.feat" title="Item edit Form: change featured category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
 	</section>
 	
 </access>

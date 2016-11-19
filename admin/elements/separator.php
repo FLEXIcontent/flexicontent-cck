@@ -54,6 +54,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$document = JFactory::getDocument();
 		$jinput = JFactory::getApplication()->input;
 		$option = $jinput->get('option', '', 'cmd');
+		$view = $jinput->get('view', '', 'cmd');
+		$component = $jinput->get('component', '', 'cmd');
 
 		// NOTE: this is imported by main Frontend/Backend CSS file, so import these only if it is not a flexicontent view
 		if ($option!='com_flexicontent')
@@ -77,6 +79,11 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+
+		if ($option=='com_config' && $view=='component' && $component=='com_flexicontent')
+		{
+			$this->add_comp_acl_headers();
+		}
 	}
 
 
@@ -89,6 +96,41 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 		$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+	}
+
+
+	function add_comp_acl_headers()
+	{
+		JFactory::getDocument()->addScriptDeclaration('
+			jQuery(document).ready(function(){
+				var tr1  = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(1)");
+				var tr4  = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(4)");
+				var tr11 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(11)");
+				var tr15 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(15)");
+				var tr18 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(18)");
+				var tr22 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(22)");
+				var tr26 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(26)");
+				var tr28 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(28)");
+				var tr35 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(35)");
+				var tr39 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(39)");
+				var tr43 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(43)");
+				var tr44 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(44)");
+
+				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Component access</td></tr>");
+				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items / Categories (inherited via category-tree)</td></tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Item form</td></tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Category / Tags usage</td></tr>");
+				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>Existing items</b>:  (Overridable in type\'s permissions)</td></tr>");
+				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Various</td></tr>");
+				tr22.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Workflow</td></tr>");
+				tr26.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items manager</td></tr>");
+				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)</td></tr>");
+				tr35.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Fields manager</td></tr>");
+				tr39.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Overridable in field\'s permissions</td></tr>");
+				tr43.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Files manager</td></tr>");
+				tr44.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Also used in <b>item form</b> e.g. <b>file</b> field</td></tr>");
+			});
+		');
 	}
 
 
