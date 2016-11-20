@@ -299,9 +299,8 @@ div .flexi_buttons button:not(.btn) {
 	text-decoration: none;
 	text-transform: none;
 	display: inline-block;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.3);
 	font-weight: bold;
-	color: #FFFFFF;
+	color: black;
 	background-color: #eeeeee;
 	background-image: -webkit-linear-gradient(top,#eeeeee,#dddddd);
 	background-image: linear-gradient(to bottom,#eeeeee,#dddddd);
@@ -3522,7 +3521,7 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 	width: auto;
 	background: none repeat scroll 0 0 #f5f5f5;
 }
-#flexicontent legend[class^="fc-board-header"] {
+#flexicontent .fc-board-header {
 	float: left;
 	border-radius: 3px;
 	font-size: 12px;
@@ -3545,6 +3544,7 @@ div#fc-dash-boardbtns .fc-board-button_sep {
 	width: 0px;
 	height: 80px;
 	border-left: 1px dashed #d0d0d0;
+	float: left;
 }
 div#fc-dash-boardbtns .fc-board-button {
 	margin: 0px 12px 12px 0;
@@ -3562,6 +3562,7 @@ div#fc-dash-boardbtns .fc-board-button {
 	text-shadow: 1px 1px 1px #fff;
 	border-radius: 3px;
 	box-shadow: 1px 2px 3px 0 rgba(0,0,0,0.32);
+	float: left;
 }
 div#fc-dash-boardbtns .fc-board-button:hover {
 	background-color: #FffFfF;
@@ -3723,18 +3724,21 @@ ul.fcimport_field_value_list li {
 	background-image: none;
 	padding-left: 0em;
 }
-.button-add a {
+table.postinstall-tbl td .install-task {
 	display: inline-block;
-	padding: 1px 8px;
-	border: 1px solid #ccc;
-	background: #efefef;
+	min-height: 24px;
 }
-.button-add a,
-.button-add a:visited,
-.button-add a:link,
-.button-add a:hover {
-	color: black;
-	text-decoration: none;
+table.postinstall-tbl td .fc_button.fc_simple {
+	margin: 0 16px;
+	padding: 0 24px;
+}
+table.postinstall-tbl td .ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll center center transparent;
+	width: 16px;
+	height: 24px;
+	display: inline-block;
+	vertical-align: middle;
+	padding: 0px;
 }
 .copyok {
 	background: url(../images/accept.png) 0% 50% no-repeat transparent;
@@ -3753,11 +3757,21 @@ ul.fcimport_field_value_list li {
 }
 .install-ok {
 	background: url(../images/accept.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
+	padding: 0;
+	margin: 0;
+	width: 20px;
+	height: 24px;
+	display: inline-block;
+	vertical-align: middle;
 }
 .install-notok {
 	background: url(../images/delete.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
+	padding: 0;
+	margin: 0;
+	width: 20px;
+	height: 24px;
+	display: inline-block;
+	vertical-align: middle;
 }
 #import-log {
 	margin: 10px 10px 15px 10px;

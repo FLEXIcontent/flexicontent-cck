@@ -1085,25 +1085,38 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		$fvs = $db->loadObjectList();
-		
-		for ($i=0; $i<count($cvs); $i++) {
-			foreach ($fvs as $fv) {
-				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '2') $cvs[$i]->created = $fv->value;
-				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '3') $cvs[$i]->created_by = $fv->value;
-				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '4') $cvs[$i]->modified = $fv->value;
-				if ($fv->item_id == $cvs[$i]->item_id && $fv->version == $cvs[$i]->version && $fv->field_id == '5') $cvs[$i]->modified_by = $fv->value;
+
+		$_fvs = array();
+		foreach ($fvs as $fv)
+		{
+			$_fvs[$fv->item_id][$fv->version][$fv->field_id] = $fv;
+		}
+		$fvs = $_fvs;
+
+		$versioned_fids = array(2=>'created', 3=>'created_by', 4=>'modified', 5=>'modified_by');
+		for ($i=0; $i<count($cvs); $i++)
+		{
+			foreach($versioned_fids as $fid => $fname)
+			{
+				if (isset($fvs[$cvs[$i]->item_id][$cvs[$i]->version][$fid]))
+				{
+					$cvs[$i]->$fname = $fvs[$cvs[$i]->item_id][$cvs[$i]->version][$fid]->value;
+				}
+				else $cvs[$i]->$fname = 0;
 			}
 		}
-		
+
 		$versions = new stdClass();
 		$n = 0;
-		foreach ($cvs as $cv) {
-			$versions->$n->item_id 		= $cv->item_id;
-			$versions->$n->version_id 	= $cv->version;
-			$versions->$n->comment	 	= '';
-			$versions->$n->created 		= (isset($cv->modified) && ($cv->modified != $nullDate)) ? $cv->modified : $cv->created;
-			$versions->$n->created_by 	= (isset($cv->modified_by) && $cv->modified_by) ? $cv->modified_by : $cv->created_by;
-			$versions->$n->state	 	= 1;
+		foreach ($cvs as $cv)
+		{
+			$versions->$n = new stdClass();
+			$versions->$n->item_id    = $cv->item_id;
+			$versions->$n->version_id = $cv->version;
+			$versions->$n->comment    = '';
+			$versions->$n->created    = (isset($cv->modified) && ($cv->modified != $nullDate)) ? $cv->modified : $cv->created;
+			$versions->$n->created_by = (isset($cv->modified_by) && $cv->modified_by) ? $cv->modified_by : $cv->created_by;
+			$versions->$n->state      = 1;
 			$db->insertObject('#__flexicontent_versions', $versions->$n);
 			$n++;
 		}

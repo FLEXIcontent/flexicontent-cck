@@ -1,0 +1,5 @@
+#flexicontent div legend[class^="fc-board-header"],
+div div#fc-dash-boardbtns .fc-board-button_sep,
+div div#fc-dash-boardbtns .fc-board-button {
+	float: right;
+}
