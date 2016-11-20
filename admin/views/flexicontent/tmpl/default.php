@@ -33,10 +33,30 @@ $dashboard_buttons_hide = FLEXIUtilities::paramToArray($dashboard_buttons_hide);
 
 $sbtns = array_flip($dashboard_buttons_hide);
 $skip_content_fieldset = isset($sbtns['items']) && isset($sbtns['additem']) && isset($sbtns['cats']) && isset($sbtns['addcat']) && isset($sbtns['comments']);
-$skip_types_fieldset = isset($sbtns['types']) && isset($sbtns['addtype']) && isset($sbtns['fields']) && isset($sbtns['addfield']) && isset($sbtns['tags']) && isset($sbtns['addtag']) && isset($sbtns['files']);
-$skip_contentviewing_fieldset = isset($sbtns['templates']) && isset($sbtns['index']) && isset($sbtns['stats']);
-$skip_users_fieldset = isset($sbtns['users']) && isset($sbtns['adduser']) && isset($sbtns['groups']) && isset($sbtns['addgroup']);
-$skip_expert_fieldset = isset($sbtns['import']) && isset($sbtns['plgfields']) && isset($sbtns['plgsystem']) && isset($sbtns['plgflexicontent']);
+$skip_types_fieldset   = isset($sbtns['types']) && isset($sbtns['addtype']) && isset($sbtns['fields']) && isset($sbtns['addfield']) && isset($sbtns['tags']) && isset($sbtns['addtag']) && isset($sbtns['files']);
+$skip_viewing_fieldset = isset($sbtns['templates']) && isset($sbtns['index']) && isset($sbtns['stats']);
+$skip_users_fieldset   = isset($sbtns['users']) && isset($sbtns['adduser']) && isset($sbtns['groups']) && isset($sbtns['addgroup']);
+$skip_expert_fieldset  = isset($sbtns['import']) && isset($sbtns['plgfields']) && isset($sbtns['plgsystem']) && isset($sbtns['plgflexicontent']);
+
+$sectionTypes   = $this->perms->CanTypes || $this->perms->CanFields || $this->perms->CanTags || $this->perms->CanFiles;
+$sectionViewing = $this->perms->CanTemplates || $this->perms->CanIndex || $this->perms->CanStats;
+$sectionUsers   = $this->perms->CanAuthors || $this->perms->CanGroups;
+$sectionExpert  = $this->perms->CanPlugins || $this->perms->CanImport;
+
+$skip_types_fieldset   = $skip_types_fieldset   || !$sectionTypes;
+$skip_viewing_fieldset = $skip_viewing_fieldset || !$sectionViewing;
+$skip_users_fieldset   = $skip_users_fieldset   || !$sectionUsers;
+$skip_expert_fieldset  = $skip_users_fieldset   || !$sectionExpert;
+
+if (isset($sbtns['comments'])) $commentsShown = false;
+else if (
+	($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
+	(!$this->params->get('comments') && $this->params->get('comments', 'comments_admin_link'))  // Custom comments extension
+) $commentsShown = true;
+else $commentsShown = false;
+
+// Special case fieldset, do not consider 'items' ...
+$skip_content_fieldset = $skip_content_fieldset || (!$this->perms->CanCats && !$commentsShown);
 
 // disable dashboard sliders
 $dashboard_sliders_disable = $this->params->get('dashboard_sliders_disable', array());
@@ -146,9 +166,19 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 			echo '</div>';
 		}
+		?>
 
-		if ($this->dopostinstall && $config_saved) {
-			?><?php if (empty($skip_content_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3><div class="fc-board-set-inner"><?php
+
+		<?php
+		// BOF -- SHOW DASHBOARD BUTTONS -- (POST installation is DONE)
+		if ($this->dopostinstall && $config_saved) :
+		?>
+
+		<?php if (empty($skip_content_fieldset)): ?>
+		<fieldset class="fc-board-set">
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
+
+			<div class="fc-board-set-inner"><?php
 			$link = 'index.php?option='.$option.'&amp;view=items';
 			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
 			if (!isset($sbtns['additem']))
@@ -196,7 +226,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$link = '';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_types_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3><div class="fc-board-set-inner"><?php
+			?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
+
+
+		<?php if (empty($skip_types_fieldset)): ?>
+		<fieldset class="fc-board-set">
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3>
+
+			<div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanTypes)
 			{
@@ -244,7 +284,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$link = 'index.php?option='.$option.'&amp;view=filemanager';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_contentviewing_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3><div class="fc-board-set-inner"><?php
+			?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
+
+
+		<?php if (empty($skip_viewing_fieldset)): ?>
+		<fieldset class="fc-board-set">
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3>
+
+			<div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
 			{
@@ -266,7 +316,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$link = 'index.php?option='.$option.'&amp;view=stats';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_users_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3><div class="fc-board-set-inner"><?php
+			?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
+
+
+		<?php if (empty($skip_users_fieldset)): ?>
+		<fieldset class="fc-board-set">
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3>
+
+			<div class="fc-board-set-inner"><?php
 			if ($this->perms->CanAuthors)
 			{
 				if (!isset($sbtns['users'])) {
@@ -289,7 +349,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups-add.png', JText::_( 'FLEXI_ADD_GROUP' ) );
 				}
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_expert_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3><div class="fc-board-set-inner"><?php
+			?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
+
+
+		<?php if (empty($skip_expert_fieldset)): ?>
+		<fieldset class="fc-board-set">
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3>
+
+			<div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanImport && !isset($sbtns['import']))
 			{
@@ -320,19 +390,34 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				//$link = 'index.php?option=com_content&amp;view=featured';
 				//if (!isset($sbtns['featured'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', JText::_( 'FLEXI_FEATURED' ), 1 );
 			}
-			?></div></fieldset><?php endif; ?><?php if ($this->params->get('support_url')): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></h3><div class="fc-board-set-inner"><?php
+			?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
+
+
+		<?php if ($this->params->get('support_url')): ?>
+		<fieldset class="fc-board-set">
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></h3>
+
+			<div class="fc-board-set-inner"><?php
 			if ($this->params->get('support_url'))
 			{
 				$link = $this->params->get('support_url');
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
 			}
-			?></div></fieldset><?php endif; ?><?php
-		}
-		?>
-		
+			?>
+			</div>
+		</fieldset>
+		<?php endif; ?>
 
 		<?php
-		if ( $this->params->get('show_updatecheck', 1) && $user->authorise('core.admin', 'com_flexicontent') )
+		// EOF -- SHOW DASHBOARD BUTTONS
+		endif; ?>
+
+
+		<?php
+		if ( $this->params->get('show_updatecheck', 1) && $this->perms->CanConfig )
 		{
 			$this->document->addScriptDeclaration("
 			jQuery(document).ready(function () {
@@ -657,7 +742,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['version'])): ?>
 			<?php
-			if ( ! $this->params->get('show_updatecheck', 1) || !$user->authorise('core.admin', 'com_flexicontent') )
+			if ( !$this->params->get('show_updatecheck', 1) || !$this->perms->CanConfig )
 			{
 				$this->document->addScriptDeclaration("
 				jQuery(document).ready(function () {
@@ -736,7 +821,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php
 			// Place PHP/DB requirements at bottom if no warning found
-			if ( !isset($php_lims['warning']) ) :
+			if ( !isset($php_lims['warning']) && $this->perms->CanConfig ) :
 				echo $fc_requirements;
 			endif;
 			?>
