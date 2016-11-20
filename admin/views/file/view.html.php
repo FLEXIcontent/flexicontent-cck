@@ -40,6 +40,10 @@ class FlexicontentViewFile extends JViewLegacy {
 		//add css/js to document
 		flexicontent_html::loadFramework('select2');
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		if (JFactory::getLanguage()->isRtl())
+		{
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+		}
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		//create the toolbar

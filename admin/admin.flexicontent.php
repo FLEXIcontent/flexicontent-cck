@@ -270,6 +270,9 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$less_files = array('less/j3x.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	
+	$less_files = array('less/flexicontentbackend_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
