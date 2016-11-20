@@ -7390,7 +7390,7 @@ class flexicontent_db
 }
 
 
-function FLEXISubmenu($cando)
+function FLEXISubmenu($cando = null)
 {
 	$perms   = FlexicontentHelperPerm::getPerm();
 	$app     = JFactory::getApplication();
@@ -7399,10 +7399,10 @@ function FLEXISubmenu($cando)
 	$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 	
 	// Check access to current management tab
-	$not_authorized = isset($perms->$cando) && !$perms->$cando;
-	if ( $not_authorized )
+	$is_authorized = $cando === null || $perms->$cando;
+	if ( !$is_authorized )
 	{
-		$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ), 'warning');
 	}
 	
 	// Get post-installation FLAG (session variable), and current view (HTTP request variable)
