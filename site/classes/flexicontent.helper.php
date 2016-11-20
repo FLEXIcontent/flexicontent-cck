@@ -3544,11 +3544,12 @@ class flexicontent_html
 		if ($check_perms)
 			$user = JFactory::getUser();
 		
+		$selected_arr = is_array($selected) ? $selected : ($selected ? array($selected) : array());
 		foreach ($types as $type)
 		{
 			$allowed = true;
 			if ($check_perms)
-				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+				$allowed = in_array($type->id, $selected_arr) || !$type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 			
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 			
