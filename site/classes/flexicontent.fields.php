@@ -1134,8 +1134,55 @@ class FlexicontentFields
 		unset($iv);
 		return $fieldvalues;
 	}
-	
-	
+
+
+	/**
+	 * Method to get the custom field values for multiple items at once
+	 * 
+	 * @access public
+	 * @return array indexed by item IDs, and then index by field names
+	 * @since 3.1.2
+	 */
+	static function getCustomFieldValues(&$items, $view = FLEXI_ITEMVIEW)
+	{
+		$custom = FlexicontentFields::_getCustomValues($items, $view);
+
+		$db = JFactory::getDBO();
+		$query = 'SELECT *'
+			.' FROM #__flexicontent_fields';
+		$db->setQuery($query);
+		$fields = $db->loadObjectList('id');
+
+		$data = array();
+		foreach($custom as $item_id => $fdata)
+		{
+			foreach($fdata as $fid => $fvalues)
+			{
+				if ( !isset($fields[$fid]) ) continue;
+
+				// Make sure field values is an array
+				if ( !is_array($fvalues) )
+				{
+					$fvalues = strlen($fvalues) ? array($fvalues) : array();
+				}
+
+				// Unserialize values already serialized values
+				foreach ($fvalues as $i => $val)
+				{
+					if ( @unserialize($val)!== false || $val === 'b:0;' )
+					{
+						$fvalues[$i] = unserialize($val);
+					}
+				}
+
+				$data[$item_id][$fields[$fid]->name] = $fvalues;
+			}
+		}
+
+		return $data;
+	}
+
+
 	/**
 	 * Method to get the tags
 	 *
