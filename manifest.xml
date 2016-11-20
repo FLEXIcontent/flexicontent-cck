@@ -78,6 +78,7 @@
 			<menu link="option=com_flexicontent&amp;view=tags">FLEXI_TAGS</menu>
 			<menu link="option=com_flexicontent&amp;view=templates">FLEXI_TEMPLATES</menu>
 			<menu link="option=com_flexicontent&amp;view=users">FLEXI_USERS</menu>
+			<menu link="option=com_flexicontent&amp;view=groups">FLEXI_GROUPS</menu>
 			<menu link="option=com_flexicontent&amp;view=filemanager">FLEXI_FILEMANAGER</menu>
 			<menu link="option=com_flexicontent&amp;view=import">FLEXI_IMPORT</menu>
 			<menu link="option=com_flexicontent&amp;view=search">FLEXI_SEARCH_INDEXES</menu>
