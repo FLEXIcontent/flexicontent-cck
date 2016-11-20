@@ -148,7 +148,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		}
 
 		if ($this->dopostinstall && $config_saved) {
-			?><?php if (empty($skip_content_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header-content-editing"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></legend><div class="fc-board-set-inner"><?php
+			?><?php if (empty($skip_content_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3><div class="fc-board-set-inner"><?php
 			$link = 'index.php?option='.$option.'&amp;view=items';
 			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
 			if (!isset($sbtns['additem']))
@@ -184,7 +184,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
 				(!$this->params->get('comments') && $this->params->get('comments', 'comments_admin_link'))  // Custom comments extension
 			) {
-				echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
+				echo '<span class="fc-board-button_sep"></span>';
 				$link = ($this->params->get('comments')==1 && $this->perms->CanComments) ?
 					'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent' :
 					$this->params->get('comments', 'comments_admin_link');
@@ -192,11 +192,11 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			}
 			else if ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
 			{
-				echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
+				echo '<span class="fc-board-button_sep"></span>';
 				$link = '';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_types_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></legend><div class="fc-board-set-inner"><?php
+			?></div></fieldset><?php endif; ?><?php if (empty($skip_types_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3><div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanTypes)
 			{
@@ -226,7 +226,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$addTagsBtns  = $this->perms->CanTags && (!isset($sbtns['tags']) || !isset($sbtns['addtag']));
 				$addFilesBtns = $this->perms->CanFiles && !isset($sbtns['files']);
 				if ($add_sep && ($addTagsBtns || $addFilesBtns))
-					echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
+					echo '<span class="fc-board-button_sep"></span>';
 			}
 			if ($this->perms->CanTags)
 			{
@@ -244,7 +244,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$link = 'index.php?option='.$option.'&amp;view=filemanager';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_contentviewing_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></legend><div class="fc-board-set-inner"><?php
+			?></div></fieldset><?php endif; ?><?php if (empty($skip_contentviewing_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3><div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
 			{
@@ -261,12 +261,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanStats && !isset($sbtns['stats']))
 			{
 				if ($add_sep)
-					echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
+					echo '<span class="fc-board-button_sep"></span>';
 				
 				$link = 'index.php?option='.$option.'&amp;view=stats';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_users_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></legend><div class="fc-board-set-inner"><?php
+			?></div></fieldset><?php endif; ?><?php if (empty($skip_users_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3><div class="fc-board-set-inner"><?php
 			if ($this->perms->CanAuthors)
 			{
 				if (!isset($sbtns['users'])) {
@@ -289,7 +289,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups-add.png', JText::_( 'FLEXI_ADD_GROUP' ) );
 				}
 			}
-			?></div></fieldset><?php endif; ?><?php if (empty($skip_expert_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></legend><div class="fc-board-set-inner"><?php
+			?></div></fieldset><?php endif; ?><?php if (empty($skip_expert_fieldset)): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3><div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanImport && !isset($sbtns['import']))
 			{
@@ -300,7 +300,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanPlugins)
 			{
 				if ($add_sep && (!isset($sbtns['plgfields']) || !isset($sbtns['plgsystem']) || !isset($sbtns['plgflexicontent'])))
-					echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
+					echo '<span class="fc-board-button_sep"></span>';
 				
 				if (!isset($sbtns['plgfields'])) {
 					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent_fields';
@@ -320,7 +320,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				//$link = 'index.php?option=com_content&amp;view=featured';
 				//if (!isset($sbtns['featured'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', JText::_( 'FLEXI_FEATURED' ), 1 );
 			}
-			?></div></fieldset><?php endif; ?><?php if ($this->params->get('support_url')): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></legend><div class="fc-board-set-inner"><?php
+			?></div></fieldset><?php endif; ?><?php if ($this->params->get('support_url')): ?><fieldset class="fc-board-set"><h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></h3><div class="fc-board-set-inner"><?php
 			if ($this->params->get('support_url'))
 			{
 				$link = $this->params->get('support_url');
@@ -350,7 +350,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			");
 			echo '
 			<fieldset class="fc-board-set">
-				<legend class="fc-board-header-content-editing">'.JText::_( 'FLEXI_UPDATE_CHECK' ).'</legend>
+				<h3 class="fc-board-header">'.JText::_( 'FLEXI_UPDATE_CHECK' ).'</h3>
 				<div class="fc-board-set-inner">
 					<div id="displayfversion" style="float: left;"></div>
 				</div>
@@ -684,7 +684,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php ob_start(); ?>
 			<div id="fc-dash-credits">
-			<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><legend class="fc-board-header-content-editing">'.JText::_( 'About FLEXIcontent' ).'</legend>' : ''; ?>
+			<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><h3 class="fc-board-header">'.JText::_( 'About FLEXIcontent' ).'</h3>' : ''; ?>
 				<div class="fc-board-set-inner">
 				<?php
 					$logo_style = ';';

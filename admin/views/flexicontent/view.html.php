@@ -189,13 +189,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		}
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
-		
-		$css =	'.install-ok { background: url(components/com_flexicontent/assets/images/accept.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; }
-				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
-		$document->addStyleDeclaration($css);
-		
-		
-		
+
+
+
 		// *****************************
 		// Get user's global permissions
 		// *****************************
@@ -356,7 +352,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$link_attribs = $modal ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.'); return false;"' : '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>
-		<span class="fc-board-button" style="float:<?php echo ($lang->isRTL()) ? 'right' : 'left'; ?>;">
+		<span class="fc-board-button">
 			<span class="fc-board-button-inner">
 				
 				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
