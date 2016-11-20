@@ -145,6 +145,10 @@ class FlexicontentViewItems extends JViewLegacy
 		JHTML::_('behavior.calendar');
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		if (JFactory::getLanguage()->isRtl())
+		{
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+		}
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		$js = "jQuery(document).ready(function(){";
@@ -730,6 +734,10 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// Add css to document
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		if (JFactory::getLanguage()->isRtl())
+		{
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+		}
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 
 		// Add js to document

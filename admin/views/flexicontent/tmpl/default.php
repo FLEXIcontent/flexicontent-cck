@@ -184,7 +184,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
 				(!$this->params->get('comments') && $this->params->get('comments', 'comments_admin_link'))  // Custom comments extension
 			) {
-				echo '<span class="fc-board-button_sep" style="float:'.($lang->isRTL() ? 'right' : 'left').'"></span>';
+				echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
 				$link = ($this->params->get('comments')==1 && $this->perms->CanComments) ?
 					'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent' :
 					$this->params->get('comments', 'comments_admin_link');
@@ -192,7 +192,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			}
 			else if ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
 			{
-				echo '<span class="fc-board-button_sep" style="float:'.($lang->isRTL() ? 'right' : 'left').'"></span>';
+				echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
 				$link = '';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
 			}
@@ -226,7 +226,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				$addTagsBtns  = $this->perms->CanTags && (!isset($sbtns['tags']) || !isset($sbtns['addtag']));
 				$addFilesBtns = $this->perms->CanFiles && !isset($sbtns['files']);
 				if ($add_sep && ($addTagsBtns || $addFilesBtns))
-					echo '<span class="fc-board-button_sep" style="float:'.($lang->isRTL() ? 'right' : 'left').'"></span>';
+					echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
 			}
 			if ($this->perms->CanTags)
 			{
@@ -261,7 +261,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanStats && !isset($sbtns['stats']))
 			{
 				if ($add_sep)
-					echo '<span class="fc-board-button_sep" style="float:'.($lang->isRTL() ? 'right' : 'left').'"></span>';
+					echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
 				
 				$link = 'index.php?option='.$option.'&amp;view=stats';
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
@@ -300,7 +300,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if ($this->perms->CanPlugins)
 			{
 				if ($add_sep && (!isset($sbtns['plgfields']) || !isset($sbtns['plgsystem']) || !isset($sbtns['plgflexicontent'])))
-					echo '<span class="fc-board-button_sep" style="float:'.($lang->isRTL() ? 'right' : 'left').'"></span>';
+					echo '<span class="fc-board-button_sep '.($lang->isRTL() ? 'isRTL': '').'"></span>';
 				
 				if (!isset($sbtns['plgfields'])) {
 					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent_fields';

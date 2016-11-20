@@ -92,6 +92,10 @@ class FlexicontentViewCategories extends JViewLegacy
 		//JHTML::_('behavior.tooltip');
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		if (JFactory::getLanguage()->isRtl())
+		{
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+		}
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		

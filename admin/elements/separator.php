@@ -51,8 +51,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	{
 		self::$css_js_added = true;
 
+		$app = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$jinput = JFactory::getApplication()->input;
+		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
 		$component = $jinput->get('component', '', 'cmd');
@@ -60,12 +61,16 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		// NOTE: this is imported by main Frontend/Backend CSS file, so import these only if it is not a flexicontent view
 		if ($option!='com_flexicontent')
 		{
-			$css = "";
-			if ($css) $document->addStyleDeclaration($css);
+			$isAdmin = $app->isAdmin();
 
-			JFactory::getApplication()->isSite() ?
+			!$isAdmin ?
 				$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
 				$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+
+			if ($isAdmin && JFactory::getLanguage()->isRtl())
+			{
+				$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			}
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 
 			// Add flexicontent specific TABBing to non-flexicontent views
