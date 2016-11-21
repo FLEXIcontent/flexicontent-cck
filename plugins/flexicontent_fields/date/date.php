@@ -208,8 +208,9 @@ class plgFlexicontent_fieldsDate extends FCField
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				
 				// Update date picker
+				var newCalendar = typeof JoomlaCalendar === 'function';
 				var thePicker = theInput.next();
-				thePicker.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
+				thePicker.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." + (newCalendar ? '_btn' : '_img'));
 				";
 				
 			if ($date_source==3) $js .= "
@@ -232,14 +233,26 @@ class plgFlexicontent_fieldsDate extends FCField
 				";
 			
 			if ($date_source!=3) $js .= "
+				// Add a tag id to the date field outer container to be able to select it
+				var df_tag_id = 'field-calendar-fc_".$field->id."_' + (uniqueRowNum".$field->id." + 1);
+				theInput.closest('.field-calendar').attr('id', df_tag_id);
+
 				// This needs to be after field is added to DOM (unlike e.g. select2 / inputmask JS scripts)
-				Calendar.setup({
-					inputField:	theInput.attr('id'),
-					ifFormat:		'%Y-%m-%d".$_time_format."',
-					button:			thePicker.attr('id'),
-					align:			'Tl',
-					singleClick:	true
-				});
+				if (newCalendar)
+				{
+					theInput.parent().next().remove();
+					JoomlaCalendar.init('#' + df_tag_id);
+				}
+				else
+				{
+					Calendar.setup({
+						inputField:	theInput.attr('id'),
+						ifFormat:		'%Y-%m-%d".$_time_format."',
+						button:			thePicker.attr('id'),
+						align:			'Tl',
+						singleClick:	true
+					});
+				}
 				";
 			
 			// Add new element to sortable objects (if field not in group)
