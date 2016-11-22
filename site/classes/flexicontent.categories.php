@@ -466,7 +466,8 @@ class flexicontent_cats
 		$show_noauth = $fparams->get('show_noauth', 0);
 		
 		$all_cats = array();
-		foreach ($cids as $cid) {
+		if ($treeinclude!=5) foreach ($cids as $cid)
+		{
 			if ($cid) $all_cats[] = $cid;
 		}
 		
@@ -478,6 +479,10 @@ class flexicontent_cats
 				// current category only
 				case 0: default: 
 					$cats = array($cid);
+				break;
+				case 5: // children only
+					$cats = $globalcats[$cid]->descendantsarray;
+					array_shift($cats);  // First category is the category itself
 				break;
 				case 1: // current category + children
 					$cats = $globalcats[$cid]->descendantsarray;
@@ -495,7 +500,7 @@ class flexicontent_cats
 			$all_cats = array_merge($all_cats, $cats);
 		}
 		if ( empty($all_cats) ) return array();
-		
+
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';

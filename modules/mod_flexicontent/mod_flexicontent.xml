@@ -244,8 +244,9 @@
 			<field name="treeinclude" type="list" default="0" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC" showon="method_cat:2,3[OR]behaviour_cat:1,2,3,4" >
 				<option value="0">FLEXI_NONE</option>
 				<option value="1">FLEXI_CHILDREN</option>
-				<option value="2">FLEXI_PARENTS</option>
-				<option value="3">FLEXI_CHILDREN_PARENTS</option>
+				<option value="5">FLEXI_CHILDREN_EXCLUDE_SELECTED_CATS</option>
+				<option value="2">FLEXI_ANCESTORS</option>
+				<option value="3">FLEXI_CHILDREN_ANCESTORS</option>
 				<option value="4">FLEXI_OTHER_CATS_OF_ITEM</option>
 			</field>
 
