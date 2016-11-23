@@ -185,7 +185,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$field->html = '';
 		
 		// Initialise property with default value
-		if ( !$field->value ) {
+		if ( !$field->value )
+		{
 			$field->value = array();
 			$field->value[0]['originalname'] = '';
 			$field->value[0] = serialize($field->value[0]);
@@ -199,7 +200,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$elementid = 'custom_'.$field->name;
 		
 		// Intro / Full mode
-		if ( $image_source == -1 ) {
+		if ( $image_source == -1 )
+		{
 			$field->html = $use_ingroup ?
 				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use intro/full images, please disable use in group</div>') :
 				'_INTRO_FULL_IMAGES_HTML_';
@@ -207,8 +209,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Media manager mode
-		else if ( $image_source == -2 ) {
-			
+		else if ( $image_source == -2 )
+		{
 			//$start_microtime = microtime(true);
 			
 			/*$xml_field = '<field name="'.$field->name.'" type="media" width="500" />';
@@ -706,14 +708,35 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$image_added = false;
 		$skipped_vals = array();
 		$uploadLimitsTxt = $this->getUploadLimitsTxt($field);
-		foreach ($field->value as $value)
+
+		// Handle file-ids as values
+		$v = reset($field->value);
+		if ((string)(int)$v == $v)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			$files_data = $this->getFileData( $field->value, $published=false );
+		}
+		foreach ($field->value as $index => $value)
+		{
+			// Compatibility for unserialized values, e.g. Reload user input after form validation error
+			// or for NULL values in a field group or file ids as values (minigallery legacy field)
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('originalname' => $value);
+				if ((string)(int)$value == $value)
+				{
+					if (isset($files_data[$value]))
+					{
+						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
+						$value = array('originalname' => $_filename);
+					}
+					else $value = array('originalname' => null);
+				}
+				else
+				{
+					$v = !empty($value) ? @unserialize($value) : false;
+					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+						array('originalname' => $value);
+				}
+				$field->value[$index] = $value;
 			}
 			$i++;
 			
@@ -775,7 +798,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				';
 			}
 			
-			else if ( $image_source == -2 ) {
+			else if ( $image_source == -2 )
+			{
 				$mm_id = $elementid_n.'_existingname';
 				$img_path = $value['originalname'];
 				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  '';
@@ -822,11 +846,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// Calculate image preview link
-			if ( $image_source == -2 || $image_source == -1 ) {
+			if ( $image_source == -2 || $image_source == -1 )
+			{
 				//$img_link  = JURI::root(true).'/'.$image_subpath;
 				$img_link = false;  // Joomla Media Manager / and Intro/Full use a popup preview
 			}
-			
 			else if ( $image_subpath )
 			{
 				// $image_source >= 0
@@ -842,7 +866,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$img_link = str_replace('\\', '/', $img_link);
 					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 				}
-			} else {
+			}
+			else
+			{
 				$img_link = '';
 			}
 			
@@ -1236,11 +1262,35 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Check for deleted image files or image files that cannot be thumbnailed,
 		// rebuilding thumbnails as needed, and then assigning checked values to a new array
 		$usable_values = array();
-		if ($values) foreach ($values as $index => $value)
+		if ($values)
 		{
-			$value	= unserialize($value);
-			if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item) )  $usable_values[] = $values[$index];
-			else if ($is_ingroup) $usable_values[] = $values[$index]; // ADD empty value if in fieldgroup
+			// Handle file-ids as values
+			$v = reset($values);
+			if ((string)(int)$v == $v)
+			{
+				$files_data = $this->getFileData( $values, $published=false );
+			}
+			foreach ($values as $index => $value)
+			{
+				// Compatibility for unserialized values, e.g file ids as values (minigallery legacy field)
+				if ((string)(int)$value == $value)
+				{
+					if (isset($files_data[$value]))
+					{
+						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
+						$value = array('originalname' => $_filename);
+					}
+					else $value = array('originalname' => null);
+					$values[$index] = serialize($value);
+				}
+				else
+				{
+					$value = unserialize($value);
+				}
+				
+				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item) )  $usable_values[] = $values[$index];
+				else if ($is_ingroup) $usable_values[] = $values[$index]; // ADD empty value if in fieldgroup
+			}
 		}
 		$values = & $usable_values;
 
@@ -1406,10 +1456,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$ogpinview  = $field->parameters->get('ogpinview', array());
 		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
 		$ogpthumbsize= $field->parameters->get('ogpthumbsize', 2);
-		
-		
-
-
 
 
 		// *************************************
@@ -2583,6 +2629,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
+
+		/*if ($post !== null)
+		{
+			$v = reset($post);
+			if ((string)(int)$v == $v)
+			{
+				$files_data = $this->getFileData( $post, $published=false );
+			}
+			foreach ($post as $index => $value)
+			{
+				// Compatibility for unserialized values, e.g file ids as values (minigallery legacy field)
+				if ((string)(int)$value == $value)
+				{
+					if (isset($files_data[$value]))
+					{
+						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
+						$value = array('originalname' => $_filename);
+					}
+					else $value = array('originalname' => null);
+					$post[$index] = serialize($value);
+				}
+				else
+				{
+					$value = unserialize($value);
+				}
+				$post[$index] = $value;
+			}
+		}*/
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -2600,6 +2674,33 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
+		/*if ($post !== null)
+		{
+			$v = reset($post);
+			if ((string)(int)$v == $v)
+			{
+				$files_data = $this->getFileData( $post, $published=false );
+			}
+			foreach ($post as $index => $value)
+			{
+				// Compatibility for unserialized values, e.g file ids as values (minigallery legacy field)
+				if ((string)(int)$value == $value)
+				{
+					if (isset($files_data[$value]))
+					{
+						$_filename = $files_data[$value]->filename_original ? $files_data[$value]->filename_original : $files_data[$value]->filename;
+						$value = array('originalname' => $_filename);
+					}
+					else $value = array('originalname' => null);
+					$post[$index] = serialize($value);
+				}
+				else
+				{
+					$value = unserialize($value);
+				}
+				$post[$index] = $value;
+			}
+		}*/
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -2747,7 +2848,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// ***********************************************************************************************
 	// Decide parameters for calling phpThumb library to create a thumbnail according to configuration
 	// ***********************************************************************************************
-	function create_thumb( &$field, $filename, $size, $origpath='', $destpath='', $copy_original=0, $extra_prefix='' ) {
+	function create_thumb( &$field, $filename, $size, $origpath='', $destpath='', $copy_original=0, $extra_prefix='' )
+	{
 		static $destpaths_arr = array();
 		
 		// Execute once
@@ -3376,5 +3478,49 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$fc_folder_mode_err[$field->id] = 1;
 		return 1;
 	}
-	
+
+
+	function getFileData( $fid, $published=1, $extra_select='' )
+	{
+		// Find which file data are already cached, and if no new file ids to query, then return cached only data
+		static $cached_data = array();
+		$return_data = array();
+		$new_ids = array();
+		$file_ids = is_array($fid) ? $fid : array($fid);
+		foreach ($file_ids as $file_id)
+		{
+			$f = (int)$file_id;
+			if ( !isset($cached_data[$f]) && $f)
+				$new_ids[] = $f;
+		}
+		
+		// Get file data not retrieved already
+		if ( count($new_ids) )
+		{
+			// Only query files that are not already cached
+			$db = JFactory::getDBO();
+			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
+					. ' FROM #__flexicontent_files'
+					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+					. ($published ? '  AND published = 1' : '')
+					;
+			$db->setQuery($query);
+			$new_data = $db->loadObjectList('id');
+
+			if ($new_data) foreach($new_data as $file_id => $file_data)
+			{
+				$cached_data[$file_id] = $file_data;
+			}
+		}
+		
+		// Finally get file data in correct order
+		foreach($file_ids as $file_id)
+		{
+			$f = (int)$file_id;
+			if ( isset($cached_data[$f]) && $f)
+				$return_data[$file_id] = $cached_data[$f];
+		}
+
+		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
+	}
 }
