@@ -1,7 +1,8 @@
 .rg-image-wrapper{
 	position:relative;
-	padding:20px 30px;
-	background:transparent url(../images/black.png) repeat top left;
+	padding:20px 0px;
+	/*background:transparent url(../images/black.png) repeat top left;*/
+	background: white;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	border-radius: 10px;
@@ -15,12 +16,13 @@
 .rg-image img{
 	max-height:100%;
 	max-width:100%;
+	width:100%;
 }
 .rg-image-nav a{
 	position:absolute;
 	top:0px;
 	left:0px;
-	background:#000 url(../images/nav.png) no-repeat -20% 50%;
+	background:rgba(0, 0, 0, 0.3) url(../images/nav.png) no-repeat -20% 50%;
 	width:28px;
 	height:100%;
 	text-indent:-9000px;
@@ -30,6 +32,7 @@
 	-moz-border-radius: 10px 0px 0px 10px;
 	-webkit-border-radius: 10px 0px 0px 10px;
 	border-radius: 10px 0px 0px 10px;
+	z-index: 2;
 }
 .rg-image-nav a.rg-image-nav-next{
 	right:0px;

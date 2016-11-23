@@ -1013,14 +1013,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	// VARIOUS HELPER METHODS
 	// **********************
 	
-	function getFileData( $value, $published=1, $extra_select='' )
+	function getFileData( $fid, $published=1, $extra_select='' )
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
 		$return_data = array();
 		$new_ids = array();
-		$values = is_array($value) ? $value : array($value);
-		foreach ($values as $file_id)
+		$file_ids = is_array($fid) ? $fid : array($fid);
+		foreach ($file_ids as $file_id)
 		{
 			$f = (int)$file_id;
 			if ( !isset($cached_data[$f]) && $f)
@@ -1047,14 +1047,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		}
 		
 		// Finally get file data in correct order
-		foreach($values as $file_id)
+		foreach($file_ids as $file_id)
 		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
 				$return_data[$file_id] = $cached_data[$f];
 		}
 
-		return !is_array($value) ? @$return_data[(int)$value] : $return_data;
+		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
 	}
 
 
