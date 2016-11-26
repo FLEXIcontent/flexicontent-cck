@@ -126,16 +126,17 @@ class plgSystemFlexisystem extends JPlugin
 			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
 		}
 		
-		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
+		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION)
+		{
 			global $globalcats;
 			$start_microtime = microtime(true);
 			if (FLEXI_CACHE) 
 			{
-				// add the category tree to categories cache
+				// Add the category tree to categories cache
 				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->setCaching(1);                  // Force cache ON
 				$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
-				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+				$globalcats = $catscache->call(array($this, 'getCategoriesTree'));
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}

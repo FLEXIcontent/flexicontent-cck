@@ -326,7 +326,7 @@ jQuery(document).ready(function() {
 					var el_cids = el.attr('data-txt_ac_cids') ? el.attr('data-txt_ac_cids') : _FC_GET['cids'];
 					var el_usesubs = parseInt(el.attr('data-txt_ac_usesubs')) || 0;
 					jQuery.ajax({
-						url: (jbase_url_fc + "index.php?option=com_flexicontent&format=raw"),
+						url: (jbase_url_fc + "components/com_flexicontent/tasks/core.php"),
 						dataType: "json",
 						data: {
 							type: (el.hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
@@ -395,7 +395,7 @@ jQuery(document).ready(function() {
 		
 			ajax: {
 				quietMillis: 200,
-				url: (jbase_url_fc + "index.php?option=com_flexicontent&format=raw"),
+				url: (jbase_url_fc + "components/com_flexicontent/tasks/core.php"),
 				dataType: 'json',
 				//Our search term and what page we are on
 				data: function (term, page) {
