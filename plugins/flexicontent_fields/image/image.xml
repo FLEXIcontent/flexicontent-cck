@@ -89,6 +89,12 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level1" depend_class="img-db-mode" />
+			<field name="target_dir" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo"
+				inline_tip="Chaging this, will render previous values not useable" tip_class="about-target-dir-mode" tip_img="warning.png"
+				>
+				<option value="0" show_list="about-target-dir-mode" hide_list="">FLEXI_MEDIA</option>
+				<option value="1" show_list="about-target-dir-mode" hide_list="">FLEXI_SECURE</option>
+			</field>
 			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_AUTOUPLOAD_DESC" depend_class="img-db-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
