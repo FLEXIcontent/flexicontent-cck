@@ -93,7 +93,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
-		$image_source = $field->parameters->get('image_source', 0);
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		$existing_imgs= $field->parameters->get('existing_imgs', 1);
@@ -143,7 +144,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($js) $document->addScriptDeclaration($js);
 			$db_mode_common_js_added = true;
 		}
-		
+
+		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
 		static $mm_mode_common_js_added = false;
 		if ( $image_source == -2 && !$mm_mode_common_js_added )
 		{
@@ -151,7 +153,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$pathSourceFolder = JPath::clean(JPATH_ROOT.'/plugins/flexicontent_fields/image/media/tmpl/');
 			
 			// 1. Check DESTINATION folder
-			if ( !JFolder::exists($pathDestFolder) && !JFolder::create($pathDestFolder) ) {
+			if ( !JFolder::exists($pathDestFolder) && !JFolder::create($pathDestFolder) )
+			{
 			 echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
 			}
 			
@@ -1078,7 +1081,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$app  = JFactory::getApplication();
 		$jinput = $app->input;
 		
-		$image_source = $field->parameters->get('image_source', 0);
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		
@@ -2296,7 +2300,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 		
-		$image_source = $field->parameters->get('image_source', 0);
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		
@@ -2563,7 +2568,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function onBeforeDeleteField(&$field, &$item)
 	{
 		$dir = $field->parameters->get('dir');
-		$image_source = $field->parameters->get('image_source', 0);
+
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		if ( $image_source >= 1 ) {
@@ -2741,8 +2748,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
-		
-		$image_source = $field->parameters->get('image_source', 0);  // This should be always ZERO inside this function
+
+		// IMAGE SOURCE, should be always ZERO (DB-mode) inside this function
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
@@ -2752,7 +2761,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( isset($file['name']) && $file['name'] != '' )
 		{
 			// only handle the secure folder
-			$path = COM_FLEXICONTENT_FILEPATH.DS;
+			$path = ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS;
 
 			//sanitize filename further and make unique
 			$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
@@ -2862,13 +2871,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			jimport('joomla.filesystem.path');
 		}
 		
-		// (DB/Folder) Mode of image field
-		$image_source = $field->parameters->get('image_source', 0);
+		// (DB/Folder/Other) Mode of image field
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		// Image file paths
 		$dir = $field->parameters->get('dir');
-		$origpath = $origpath ? $origpath : JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		$origpath = $origpath ? $origpath : JPath::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
 		$destpath = $destpath ? $destpath : JPath::clean( JPATH_SITE .DS. $dir .DS );
 		$prefix		= $size . '_' . $extra_prefix;
 		$filepath = $destpath.$prefix.$filename;
@@ -2980,11 +2990,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// ************************************************
 	function removeOriginalFile( $field, $filename )
 	{
+		$db = JFactory::getDBO();
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.path');
-		
-		$db = JFactory::getDBO();
-		$image_source = $field->parameters->get('image_source', 0);
+
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		if ( $image_source >= 1 ) {  // Folder-mode 1
@@ -2995,7 +3006,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		else if ( $image_source == 0 ) { // DB-mode
 			$thumbfolder = JPath::clean( JPATH_SITE .DS. $field->parameters->get('dir') );
-			$origfolder  = JPath::clean( COM_FLEXICONTENT_FILEPATH );
+			$origfolder  = JPath::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) );
 		}
 		else { // negative, intro-full mode, this should be unreachable, because
 			echo "image field id: ".$field->id." is in intro-full mode, removeOriginalFile() should not have been called";
@@ -3043,7 +3054,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		static $images_processed = array();
 		
-		$image_source = $field->parameters->get('image_source', 0);
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		$filename = $image_source == -2 ? basename( @$value['originalname']) : @$value['originalname'];
@@ -3116,7 +3128,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		else {
 			// DB-mode
-			$origpath  = JPath::clean( COM_FLEXICONTENT_FILEPATH .DS );
+			$origpath  = JPath::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS );
 		}
 		if ($dirname) $origpath = JPath::clean( $origpath . $dirname .DS );
 		
@@ -3304,7 +3316,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$filenames = array_unique($filenames);
 		
 		// Eliminate records that have no original files
-		$securepath = JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
+		$securepath = JPath::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
 		$existing_files = array();
 		foreach($filenames as $filename) {
 			if (!$filename) continue;  // Skip empty values
