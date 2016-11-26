@@ -79,18 +79,15 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 /***************/
 
 /* the container */
-.fc_filter_text_search {}
+.fc_text_search {}
 
 /* the label */
-.fc_filter.fc_filter_text_search .fc_filter_label,
-.fc_filter_line.fc_filter_text_search .fc_filter_label {}
+.fc_filter.fc_text_search .fc_filter_label,
+.fc_filter_line.fc_text_search .fc_filter_label {}
 
-/* text-search autocomplete */
-.ui-autocomplete {
-	z-index:1000 !important;  /* FORCED autocomplete list it to be over elements */
-}
-.ui-autocomplete-loading {
-	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+/* text-search autocomplete loading */
+.fc_text_search .ui-autocomplete-loading {
+	/*background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;*/
 }
 
 

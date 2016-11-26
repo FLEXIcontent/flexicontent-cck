@@ -50,6 +50,7 @@
 		<folder>assets</folder>
 		<folder>classes</folder>
 		<folder>controllers</folder>
+		<folder>tasks</folder>
 		<folder>helpers</folder>
 		<folder>librairies</folder>
 		<folder>models</folder>
