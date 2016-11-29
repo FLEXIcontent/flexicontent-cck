@@ -55,7 +55,10 @@ site/templates/default-1/
 site/templates/faq-1/
 site/templates/items-tabbed-1/
 site/templates/presentation-1/
+
 site/librairies/pdfparser/
 site/librairies/php-stemmer/
+site/librairies/TCPDF/
+
 site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
 site/tasks/includes/defines.php

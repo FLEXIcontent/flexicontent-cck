@@ -498,8 +498,75 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		return $return;
 	}
-	
-	
+
+
+	function checkJCEplugins()
+	{
+		jimport('joomla.filesystem.path' );
+		jimport('joomla.filesystem.folder');
+		jimport('joomla.filesystem.file');
+
+		$pathSourceName = JPath::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
+		$pathDestName   = JPath::clean(JPATH_ROOT.'/components/com_jce/editor/extensions/links');
+
+		// 1. Check if copying is needed
+		if ( !JFolder::exists($pathDestName) )
+		{
+			return true; // Nothing to do, JCE not installed
+		}
+		if (JFile::exists($pathDestName.'/flexicontentlinks.php') && filemtime(__FILE__) < filemtime($pathDestName.'/flexicontentlinks.php'))
+		{
+			return true; // Nothing to do, already up-to-date
+		}
+
+		// 2. Copy all files
+		$files = glob($pathSourceName."/*.*");
+		foreach ($files as $file)
+		{
+			$file_dest = basename($file);
+			copy($file, $pathDestName.'/'.$file_dest);
+		}
+
+		// Check DESTINATION folder
+		$pathSourceName = JPath::clean($pathSourceName.'/flexicontentlinks');
+		$pathDestName   = JPath::clean($pathDestName.'/flexicontentlinks');
+		if ( !JFolder::exists($pathDestName) && !JFolder::create($pathDestName) )
+		{
+			JFactory::getApplication()->enqueueMessage(JText::_('Unable to create folder') . ': ' . $pathDestName, 'warning');
+		}
+
+		// Copy all files
+		$files = glob($pathSourceName."/*.*");
+		foreach ($files as $file)
+		{
+			$file_dest = basename($file);
+			copy($file, $pathDestName.'/'.$file_dest);
+		}
+		
+		$folders = array('css', 'images');
+		foreach ($folders as $folder)
+		{
+			// Check DESTINATION folder
+			$sub_pathSourceName = JPath::clean($pathSourceName.'/'.$folder);
+			$sub_pathDestName   = JPath::clean($pathDestName.'/'.$folder);
+			if ( !JFolder::exists($sub_pathDestName) && !JFolder::create($sub_pathDestName) )
+			{
+				JFactory::getApplication()->enqueueMessage(JText::_('Unable to create folder') . ': ' . $sub_pathDestName, 'warning');
+			}
+
+			// Copy all files
+			$files = glob($sub_pathSourceName."/*.*");
+			foreach ($files as $file)
+			{
+				$file_dest = basename($file);
+				copy($file, $sub_pathDestName.'/'.$file_dest);
+			}
+		}
+
+		JFactory::getApplication()->enqueueMessage(JText::_('Copied FLEXIcontent Links plugin for JCE'));
+	}
+
+
 	/**
 	 * Method to fix collations
 	 * 

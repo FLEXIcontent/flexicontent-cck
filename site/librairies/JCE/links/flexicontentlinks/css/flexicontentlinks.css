@@ -1,0 +1,25 @@
+/* flexicontent advlink CSS */
+
+div.tree ul li div.tree-row span.folder.flexicontent  {background: url(../images/folder_page_white.png) no-repeat 0 2px;}
+
+div.tree ul li div.tree-row span.folder.fcauthors   {background: url(../images/folder_page_white.png) no-repeat 0 2px;}
+div.tree ul li div.tree-row span.folder.fccats      {background: url(../images/folder_page_white.png) no-repeat 0 2px;}
+div.tree ul li div.tree-row span.folder.fctags      {background: url(../images/folder_tags.png) no-repeat 0 2px;}
+div.tree ul li div.tree-row span.folder.fctagged    {background: url(../images/folder_tags.png) no-repeat 0 2px;}
+
+div.tree ul li div.tree-row span.file.flexiauthor  {background: url(../images/user.png) no-repeat 0 2px;}
+div.tree ul li div.tree-row span.file.flexitag     {background: url(../images/tag_green.png) no-repeat 0 2px;}
+div.tree ul li div.tree-row span.file.flexitagged  {background: url(../images/tag_green.png) no-repeat 0 2px;}
+div.tree ul li div.tree-row span.file.flexiitem    {background: url(../images/page_white.png) no-repeat 2px 2px;}
+
+li.folder.fcauthors.nolink .uk-icon-folder:before {content: "\f0c0";}
+li.folder.fccats.nolink    .uk-icon-folder:before {content: "\f0e8";}
+li.folder.fctags.nolink    .uk-icon-folder:before {content:"\f02c";}
+li.folder.fctagged.nolink  .uk-icon-folder:before {content:"\f02c";}
+
+li.folder.fccats.nolink  li.folder.flexicat .uk-icon-folder:before {content: "\f07b";}
+
+li.file.flexiauthor .uk-icon-file-text-o:before {content: "\f007";}
+li.file.flexiitem   .uk-icon-file-text-o:before {content: "\f1ea";}
+li.file.flexitag    .uk-icon-file-text-o:before {content:"\f02b";}
+li.file.flexitagged .uk-icon-file-text-o:before {content:"\f02b";}
