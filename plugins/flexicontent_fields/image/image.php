@@ -3271,7 +3271,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$existing_imgs    = $field->parameters->get('existing_imgs', 1);
 		$imagepickerlimit = $field->parameters->get('imagepickerlimit', 200);
-		
+
+		$image_source = (int) $field->parameters->get('image_source', 0);
+		$target_dir   = (int) $field->parameters->get('target_dir', 1);
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
+
 		$all_media         = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
@@ -3318,10 +3322,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Eliminate records that have no original files
 		$securepath = JPath::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
 		$existing_files = array();
-		foreach($filenames as $filename) {
+		foreach($filenames as $filename)
+		{
 			if (!$filename) continue;  // Skip empty values
 			$filepath = $securepath . $filename;
-			if (file_exists($filepath)) {
+			if (file_exists($filepath))
+			{
 				$existing_files[] = $filename;
 			}
 		}

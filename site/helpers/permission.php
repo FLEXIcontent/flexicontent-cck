@@ -47,23 +47,28 @@ class FlexicontentHelperPerm
 	static function getUserPerms($user_id = null)
 	{
 		// handle jcomments integration
-		if (JPluginHelper::isEnabled('system', 'jcomments')) {
+		if (JPluginHelper::isEnabled('system', 'jcomments'))
+		{
 			$JComments_Installed 	= 1;
 			$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
 			$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
 			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
 			
+			jimport('joomla.filesystem.path' );
+			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.file');
-			if (!JFile::exists($dest)) {
+
+			if (!JFile::exists($dest) || filemtime(__FILE__) > filemtime($source))
+			{
 				if (!JFolder::exists($destpath)) { 
 					if (!JFolder::create($destpath)) { 
-						JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to create jComments plugin folder'));
+						JFactory::getApplication()->enqueueMessage(JText::_('FLEXIcontent: Unable to create jComments plugin folder'), 'warning');
 					}
 				}
 				if (!JFile::copy($source, $dest)) {
-					JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to copy jComments plugin'));
+					JFactory::getApplication()->enqueueMessage(JText::_('FLEXIcontent: Unable to copy jComments plugin'), 'warning');
 				} else {
-					$mainframe->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
+					JFactory::getApplication()->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
 				}
 			}
 		} else {
