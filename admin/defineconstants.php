@@ -115,14 +115,7 @@ if (!FLEXI_J16GE) {
 if (!defined('FLEXI_ACCESS'))  define('FLEXI_ACCESS'	, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
 if (!defined('FLEXI_CACHE'))   define('FLEXI_CACHE'		, $params->get('advcache', 1));
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
-if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', FLEXI_J16GE ? 'falangdriver' : 'jfdatabase' ))) ? 1 : 0);
-if ( FLEXI_FISH ) {
-	$db  = JFactory::getDBO();
-	$app = JFactory::getApplication();
-	$dbprefix = $app->getCfg('dbprefix');
-	$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
-	define('FLEXI_FISH_22GE', (boolean) count($db->loadObjectList()) );
-}
+if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'falangdriver' ))) ? 1 : 0);
 if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'	, 1 );
 if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' : 'items' );
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/system/images/' : 'images/M_images/' );

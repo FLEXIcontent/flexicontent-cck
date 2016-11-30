@@ -196,7 +196,7 @@ class FlexicontentController extends JControllerLegacy
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$model  = $this->getModel('flexicontent');
 		$model->checkCollations();
-		$model->checkJCEplugins();
+		$model->install_3rdParty_plugins();
 		
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);

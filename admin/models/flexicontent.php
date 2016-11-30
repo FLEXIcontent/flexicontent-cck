@@ -500,21 +500,82 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	}
 
 
-	function checkJCEplugins()
+	function install_3rdParty_plugins()
 	{
 		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.file');
 
-		$pathSourceName = JPath::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
-		$pathDestName   = JPath::clean(JPATH_ROOT.'/components/com_jce/editor/extensions/links');
+		// ****************************
+		// Handle jcomments integration
+		// ****************************
 
-		// 1. Check if copying is needed
-		if ( !JFolder::exists($pathDestName) )
+		$destpath = JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
+
+		// Check if JComments installed and active
+		if (JFolder::exists($destpath) && JPluginHelper::isEnabled('system', 'jcomments'))
+		{
+			$dest   = $destpath.DS.'com_flexicontent.plugin.php';
+			$source = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
+			$plg_exists = JFile::exists($dest);
+
+			if (!$plg_exists || filemtime(__FILE__) > filemtime($dest))
+			{
+				if (!JFolder::exists($destpath)) { 
+					if (!JFolder::create($destpath)) { 
+						JFactory::getApplication()->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'jComments plugin for FLEXIcontent', $destpath), 'warning');
+					}
+				}
+				if (!JFile::copy($source, $dest)) {
+					JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_FAILED_TO') . JText::_(!$plg_exists ? 'JLIB_INSTALLER_INSTALL' : 'JLIB_INSTALLER_UPDATE') . ' jComments plugin for FLEXIcontent', 'warning');
+				} else {
+					JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> jComments plugin for FLEXIcontent', 'message');
+				}
+			}
+		}
+
+
+		// *************************
+		// Handle falang integration
+		// *************************
+
+		$destpath = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_falang'.DS.'contentelements';
+
+		if (JFolder::exists($destpath) && JPluginHelper::isEnabled('system', 'falangdriver'))
+		{
+			$sourcepath = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish';
+			$files = glob($sourcepath."/*.xml");
+			$elements_count[0] = $elements_count[1] = 0;
+			foreach ($files as $file)
+			{
+				$file_dest = $destpath.DS.basename($file);
+				$plg_exists = JFile::exists($file_dest);
+				if (!$plg_exists || filemtime($file) > filemtime($file_dest))
+				{
+					JFile::copy($file, $file_dest);
+					$elements_count[$plg_exists ? 1 : 0]++;
+				}
+			}
+			if ($elements_count[0]) JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_('FLEXI_INSTALLED') . '</span> ' . $elements_count[0] . ' Falang elements for FLEXIcontent', 'message');
+			if ($elements_count[1]) JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_('FLEXI_UPDATED')   . '</span> ' . $elements_count[1] . ' Falang elements for FLEXIcontent', 'message');
+		}
+
+
+		// **********************
+		// Handle JCE integration
+		// **********************
+
+		$pathDestName   = JPath::clean(JPATH_ROOT.'/components/com_jce/editor/extensions/links');
+		$pathSourceName = JPath::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
+
+		// Check if JCE installed and active
+		if (!JFolder::exists($pathDestName) || !JPluginHelper::isEnabled('editors', 'jce'))
 		{
 			return true; // Nothing to do, JCE not installed
 		}
-		if (JFile::exists($pathDestName.'/flexicontentlinks.php') && filemtime(__FILE__) < filemtime($pathDestName.'/flexicontentlinks.php'))
+
+		$plg_exists = JFile::exists($pathDestName.'/flexicontentlinks.php');
+		if ($plg_exists && filemtime(__FILE__) < filemtime($pathDestName.'/flexicontentlinks.php'))
 		{
 			return true; // Nothing to do, already up-to-date
 		}
@@ -523,8 +584,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$files = glob($pathSourceName."/*.*");
 		foreach ($files as $file)
 		{
-			$file_dest = basename($file);
-			copy($file, $pathDestName.'/'.$file_dest);
+			$file_dest = $pathDestName .DS. basename($file);
+			JFile::copy($file, $file_dest);
 		}
 
 		// Check DESTINATION folder
@@ -532,17 +593,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$pathDestName   = JPath::clean($pathDestName.'/flexicontentlinks');
 		if ( !JFolder::exists($pathDestName) && !JFolder::create($pathDestName) )
 		{
-			JFactory::getApplication()->enqueueMessage(JText::_('Unable to create folder') . ': ' . $pathDestName, 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $pathDestName), 'warning');
 		}
 
 		// Copy all files
 		$files = glob($pathSourceName."/*.*");
 		foreach ($files as $file)
 		{
-			$file_dest = basename($file);
-			copy($file, $pathDestName.'/'.$file_dest);
+			$file_dest = $pathDestName .DS. basename($file);
+			JFile::copy($file, $file_dest);
 		}
-		
+
 		$folders = array('css', 'images');
 		foreach ($folders as $folder)
 		{
@@ -551,19 +612,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$sub_pathDestName   = JPath::clean($pathDestName.'/'.$folder);
 			if ( !JFolder::exists($sub_pathDestName) && !JFolder::create($sub_pathDestName) )
 			{
-				JFactory::getApplication()->enqueueMessage(JText::_('Unable to create folder') . ': ' . $sub_pathDestName, 'warning');
+				JFactory::getApplication()->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $sub_pathDestName), 'warning');
 			}
 
 			// Copy all files
 			$files = glob($sub_pathSourceName."/*.*");
 			foreach ($files as $file)
 			{
-				$file_dest = basename($file);
-				copy($file, $sub_pathDestName.'/'.$file_dest);
+				$file_dest = $sub_pathDestName .DS. basename($file);
+				JFile::copy($file, $file_dest);
 			}
 		}
 
-		JFactory::getApplication()->enqueueMessage(JText::_('Copied FLEXIcontent Links plugin for JCE'));
+		JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> JCE Links plugin for FLEXIcontent', 'message');
 	}
 
 
