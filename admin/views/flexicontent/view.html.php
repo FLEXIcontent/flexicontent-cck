@@ -59,49 +59,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		
 		// activate the tooltips
 		//JHTML::_('behavior.tooltip');
-
-		// handle jcomments integration
-		if (JPluginHelper::isEnabled('system', 'jcomments')) {
-			$JComments_Installed 	= 1;
-			$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
-			$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
-			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
-			
-			if (!JFile::exists($dest)) {
-				if (!JFolder::exists($destpath)) { 
-					if (!JFolder::create($destpath)) { 
-						JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to create jComments plugin folder'));
-					}
-				}
-				if (!JFile::copy($source, $dest)) {
-					JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to copy jComments plugin'));
-				} else {
-					$app->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
-				}
-			}
-		} else {
-			$JComments_Installed 	= 0;
-		}
-
-		// handle joomfish integration
-		if (JPluginHelper::isEnabled('system', 'jfdatabase')) {
-			$files = new stdClass;
-			$files->fields = new stdClass;
-			$files->files  = new stdClass;
-			$files->tags   = new stdClass;
-			$files->fields->dest   = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_fields.xml';
-			$files->fields->source = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_fields.xml';
-			$files->files->dest    = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_files.xml';
-			$files->files->source  = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_files.xml';
-			$files->tags->dest     = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_joomfish'.DS.'contentelements'.DS.'flexicontent_tags.xml';
-			$files->tags->source   = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish'.DS.'flexicontent_tags.xml';
-
-			foreach ($files as $file) {
-				if (!JFile::exists($file->dest)) {
-					JFile::copy($file->source, $file->dest);
-				}
-			}
-		}
 		
 		// Get model
 		$model = $this->getModel('flexicontent');

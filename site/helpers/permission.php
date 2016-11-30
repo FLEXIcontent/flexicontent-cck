@@ -46,35 +46,9 @@ class FlexicontentHelperPerm
 	
 	static function getUserPerms($user_id = null)
 	{
-		// handle jcomments integration
-		if (JPluginHelper::isEnabled('system', 'jcomments'))
-		{
-			$JComments_Installed 	= 1;
-			$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
-			$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
-			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
-			
-			jimport('joomla.filesystem.path' );
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.file');
+		// Handle jcomments integration
+		$JComments_Installed = JPluginHelper::isEnabled('system', 'jcomments');
 
-			if (!JFile::exists($dest) || filemtime(__FILE__) > filemtime($source))
-			{
-				if (!JFolder::exists($destpath)) { 
-					if (!JFolder::create($destpath)) { 
-						JFactory::getApplication()->enqueueMessage(JText::_('FLEXIcontent: Unable to create jComments plugin folder'), 'warning');
-					}
-				}
-				if (!JFile::copy($source, $dest)) {
-					JFactory::getApplication()->enqueueMessage(JText::_('FLEXIcontent: Unable to copy jComments plugin'), 'warning');
-				} else {
-					JFactory::getApplication()->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
-				}
-			}
-		} else {
-			$JComments_Installed 	= 0;
-		}
-		
 		// Find permissions for given user id
 		$user = $user_id ? JFactory::getUser($user_id) : JFactory::getUser();  // no user id given, use current user)
 		$user_id = $user->id;
