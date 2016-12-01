@@ -404,13 +404,6 @@ class FlexicontentController extends JControllerLegacy
 		// Validate Form data for core fields and for parameters
 		$validated_data = $model->validate($form, $data);
 
-		// Validate jfdata using same JForm
-		$jfdata_v = array();
-		foreach ($jfdata as $lang_index => $lang_data)
-		{
-			$jfdata_v[$lang_index] = $model->validate($form, $lang_data);
-		}
-
 		// Check for validation error
 		if (!$validated_data)
 		{
@@ -435,11 +428,21 @@ class FlexicontentController extends JControllerLegacy
 			else
 				return false;
 		}
-		
+
+		// Validate jfdata
+		$validated_jf = array();
+		foreach ($jfdata as $lang_index => $lang_data)
+		{
+			foreach($lang_data as $i => $v)
+			{
+				$validated_jf[$lang_index][$i] = flexicontent_html::dataFilter($v, ($i!='text' ? 4000 : 0), 2, 0);
+			}
+		}
+
 		// Some values need to be assigned after validation
 		$validated_data['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 		$validated_data['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform (validation will follow at each field)
-		$validated_data['jfdata']  = & $jfdata_v;        // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform (validated above)
+		$validated_data['jfdata']  = & $validated_jf;    // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform (validated above)
 		
 		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
 		// Always be set in backend, but usually not in frontend, if frontend template editing is not shown

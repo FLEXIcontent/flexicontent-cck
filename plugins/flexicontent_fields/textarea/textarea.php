@@ -123,12 +123,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']';
-		$elementid = 'custom_'.$field->name;
-
-		// Override element id and field name if rendering the main description text
-		if ($field->field_type == 'maintext')
+		if ($field->field_type != 'maintext')
 		{
+			$fieldname = 'custom['.$field->name.']';
+			$elementid = 'custom_'.$field->name;
+		}
+		else
+		{
+			// Override element id and field name if rendering the main description text
 			if ( !is_array($field->name) ) {
 				$fieldname = 'jform['.$field->name.']';
 				$elementid = 'jform_'.$field->name;
@@ -608,8 +610,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			
-			
 			// **************************************************************
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************
