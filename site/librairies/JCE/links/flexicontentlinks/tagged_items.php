@@ -55,7 +55,7 @@ class FlexicontentlinksTagged_items extends JObject {
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
-			return '<li id="index.php?option=com_flexicontent_tagged_items&view=category&layout=tags" class="folder fctagged nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . WFText::_('Items by tag') . '</span></a></div></li>';
+			return '<li id="index.php?option=com_flexicontent_tagged_items&view=category&layout=tags" class="folder fctagged nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG') . '</span></a></div></li>';
 		}
 	}
 
