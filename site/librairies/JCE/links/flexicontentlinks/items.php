@@ -55,7 +55,7 @@ class FlexicontentlinksItems extends JObject {
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
-			return '<li id="index.php?option=com_flexicontent_items&view=category" class="folder fccats nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . WFText::_('Items by category / Single Items') . '</span></a></div></li>';
+			return '<li id="index.php?option=com_flexicontent_items&view=category" class="folder fccats nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_CAT_N_SINGLE_ITEMS') . '</span></a></div></li>';
 		}
 	}
 

@@ -55,7 +55,7 @@ class FlexicontentlinksAuthored_items extends JObject {
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
-			return '<li id="index.php?option=com_flexicontent_authored_items&view=category&layout=author" class="folder fcauthors nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . WFText::_('Items by author') . '</span></a></div></li>';
+			return '<li id="index.php?option=com_flexicontent_authored_items&view=category&layout=author" class="folder fcauthors nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_AUTHOR') . '</span></a></div></li>';
 		}
 	}
 
