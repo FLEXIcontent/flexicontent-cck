@@ -41,13 +41,21 @@
 				<field
 					name="catidmode" type="radio" default="0"
 					label="FLEXI_GOOGLEMAP_CATIDMODE" description="FLEXI_GOOGLEMAP_CATIDMODE_DESC"
-					class="btn-group btn-group-yesno"
+					class="btn-group group-fcinfo"
 					>
-					<option value="0">FLEXI_GOOGLEMAP_CATID_MANUAL</option>
+					<option value="0">FLEXI_GOOGLEMAP_CATID_FIXED_CATS</option>
 					<option value="1">FLEXI_GOOGLEMAP_CATID_CURRENT</option>
 				</field>
 
-				<field name="catid" type="flexicategories" multiple="false" label="FLEXI_GOOGLEMAP_CAT" description="FLEXI_GOOGLEMAP_DESC" showon="catidmode:0"/>
+				<field name="catid" type="flexicategories" multiple="true" label="FLEXI_GOOGLEMAP_CAT" description="FLEXI_GOOGLEMAP_DESC" showon="catidmode:0"/>
+				<field name="treeinclude" type="list" default="1" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC" showon="catidmode:0" >
+					<option value="0">FLEXI_NONE</option>
+					<option value="1">FLEXI_CHILDREN</option>
+					<option value="5">FLEXI_CHILDREN_EXCLUDE_SELECTED_CATS</option>
+					<option value="2">FLEXI_ANCESTORS</option>
+					<option value="3">FLEXI_CHILDREN_ANCESTORS</option>
+					<!--option value="4">FLEXI_OTHER_CATS_OF_ITEM</option-->
+				</field>
 
 				<field name="fieldaddressid" type="sql" default="10" label="FLEXI_GOOGLEMAP_ADDRESSFIELD" query="SELECT id AS value, concat( name, ' (', id, ')') AS title FROM #__flexicontent_fields WHERE field_type='addressint'" description="FLEXI_GOOGLEMAP_ADDRESSFIELD_DESC" value_field="title"/>
 				<field
