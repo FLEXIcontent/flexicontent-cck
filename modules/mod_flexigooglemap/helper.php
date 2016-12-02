@@ -42,9 +42,21 @@ class modFlexigooglemapHelper
 			return null;
 		}
 
+		$treeinclude = $params->get('treeinclude', 1);  // by default include children categories
 		global $globalcats;
-		$catid = $params->get('catid');
-		$catlist = !empty($globalcats[$catid]->descendants) ? $globalcats[$catid]->descendants : $catid;
+		$catids = $params->get('catid');
+
+		// Make sure categories is an array
+		$catids = is_array($catids) ? $catids : array($catids);
+
+		// Retrieve extra categories, such children or parent categories
+		$catids_arr = flexicontent_cats::getExtraCats($catids, $treeinclude, array());
+
+		// Check if zero allowed categories
+		if (empty($catids_arr))
+		{
+			return array();
+		}
 
 		$count = $params->get('count');
 		$forced_itemid = $params->get('forced_itemid', 0);
@@ -54,7 +66,7 @@ class modFlexigooglemapHelper
 			.' FROM #__content  AS a'
 			.' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
 			.' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
-			.' WHERE b.field_id = '.$fieldaddressid.' AND rel.catid IN ('.$catlist.') AND state = 1'
+			.' WHERE b.field_id = '.$fieldaddressid.' AND rel.catid IN (' . implode(',', $catids_arr) . ') AND state = 1'
 			.' ORDER BY title '.$count
 			;
 		$db->setQuery( $queryLoc );
