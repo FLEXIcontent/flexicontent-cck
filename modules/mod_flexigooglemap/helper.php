@@ -205,36 +205,25 @@ class modFlexigooglemapHelper
 
 	public static function getMarkerURL(&$params)
 	{
-		$markerimage = $params->get('markerimage');
-		$markercolor = $params->get('markercolor');
-		$lettermarker = $params->get('lettermarker');
+		// Get marker mode, 'lettermarkermode' was old parameter name, (in future wew may more more modes, so the old parameter name was renamed)
+		$markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
 
-		$lettermarkermode = $params->get('lettermarkermode', 0);  // compatibility with old parameter
-		$markermode = $params->get('markermode', $lettermarkermode);
-		
-		if ($markermode==1)
+		switch ($markermode)
 		{
-			$letter = "&text=".$lettermarker."&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48";
-			switch ($markercolor)
-			{
-				case "red":
-					$color ="spotlight-waypoint-b.png";
-					break;
-				case "green":
-					$color ="spotlight-waypoint-a.png";
-					break;
-				default :
-					$color ="spotlight-waypoint-b.png";
-					break;
-			}
+			case 1:   // 'Letter' mode
+				$color_to_file = array(
+					'red'=>'spotlight-waypoint-b.png', 'green'=>'spotlight-waypoint-a.png', ''=>'spotlight-waypoint-b.png' /* '' is for not set*/
+				);
+				return "'https://mts.googleapis.com/vt/icon/name=icons/spotlight/"
+					. $color_to_file[$params->get('markercolor', '')]
+					. "?text=" . $params->get('lettermarker')
+					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48"
+					. "'";	
 
-			$icon = "'https://mts.googleapis.com/vt/icon/name=icons/spotlight/" . $color . $letter . "'";	
+			default:  // 'Local image file' mode
+				$markerimage = $params->get('markerimage');
+				return $markerimage ? ("'" . JURI::base() . $markerimage . "'") : 'null';
 		}
-		else
-		{
-			$icon = $markerimage ? "'" . JURI::base() . $markerimage . "'" : "''";
-		}
-
-		return $icon;
 	}
+
 }

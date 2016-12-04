@@ -51,16 +51,36 @@ if ($map_style)
 	}
 }
 
-$gridsize = $params->get('gridsize', '' );
-$maxzoom = $params->get('maxzoom', '' );
+$gridsize = $params->get('gridsize', '');
+$maxzoom = $params->get('maxzoom', '');
 $ratiomap = $params->get('ratiomap','');
 
 $clustermode = $params->get('clustermode', '' );
-$imgcluster = $params->get('imgcluster', '');
-$imgcluster =  $imgcluster ? JURI::base().$imgcluster : 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png';
+if ($clustermode)
+{
+	$imgcluster = $params->get('imgcluster', '');
+	if ($imgcluster && $img_info = getimagesize(JPATH::clean(JPATH_ROOT.DS.$imgcluster)))
+	{
+		$imgcluster_w = $img_info[0];
+		$imgcluster_h = $img_info[1];
+		$imgcluster_url  = JURI::base().$imgcluster;
+	}
+	else
+	{
+		$imgcluster_w = 53;
+		$imgcluster_h = 52;
+		$imgcluster_url =  'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m1.png';
+	}
+}
 
-$animationmarker = $params->get('animationmarker', '' );
-
+// Get image size of local marker
+$scaledSize = 'null';
+/*$markermode = $params->get('markermode', $params->get('lettermarkermode', 0));
+$markerimage = $params->get('markerimage');
+if ($markermode==0 && $markerimage && $img_info = getimagesize(JPATH::clean(JPATH_ROOT.DS.$markerimage)))
+{
+	$scaledSize = 'scaledSize: new google.maps.Size('. $img_info[0] . ', ' . $img_info[1] . ')';
+}*/
 
 // Add google maps API
 flexicontent_html::loadFramework('google-maps', '', $params);
@@ -75,7 +95,14 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 		// Define your locations: HTML content for the info window, latitude, longitude
 		var locations = [ <?php echo implode(",",  $tMapTips); ?>  ];
 
-		var icons = [<?php echo $markerdisplay; ?>]
+		var icons = [
+			{
+				url: <?php echo $markerdisplay; ?>,
+				scaledSize: <?php echo $scaledSize; ?>, // scaled size
+				origin: new google.maps.Point(0, 0), // origin
+				anchor: new google.maps.Point(0, 0) // anchor
+			}
+		];
 		var iconsLength = icons.length;
 
 		var map = new google.maps.Map(document.getElementById('map'), {
@@ -105,7 +132,7 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 			var marker = new google.maps.Marker({
 				position: new google.maps.LatLng(locations[i][1], locations[i][2]),
 				map: map,
-				<?php echo ($animationmarker ? 'animation: google.maps.Animation.DROP,' : ''); ?>
+				<?php	echo ($params->get('animationmarker', 1) ? 'animation: google.maps.Animation.DROP,' : '')."\n"; ?>
 				icon: icons[iconCounter]
 			});
 
@@ -141,7 +168,16 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 		<?php if ($clustermode)
 		{
 			echo "
-			var mcOptions = {gridSize:$gridsize, maxZoom:$maxzoom, imagePath: '$imgcluster'};
+			var mcOptions = {
+				zoomOnClick: true,
+				gridSize:$gridsize,
+				maxZoom:$maxzoom,
+				styles: [{
+					url: '$imgcluster_url',
+					width: $imgcluster_w,
+					height: $imgcluster_h
+				}]
+			};
 			var marker = new MarkerClusterer(map, markers, mcOptions);
 			";
 		}
