@@ -414,7 +414,7 @@ flexicontent_html::loadFramework('flexi-lib');
 
 <div id="flexicontent" class="flexicontent">
 
-
+<div class="alert alert-info" style="display: none; width: 300px;"><?php echo JText::_('FLEXI_ASSIGNING') . ' ... ' . JText::_('FLEXI_PLEASE_WAIT'); ?></div>
 
 <?php /* echo JHtml::_('tabs.start'); */ ?>
 <div class="fctabber" id="fileman_tabset">
@@ -539,7 +539,9 @@ flexicontent_html::loadFramework('flexi-lib');
 			<div class="fcclear"></div>
 			<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 			<div class="fcclear"></div>
-			
+
+			<span class="btn btn-success" onclick="fc_fileselement_assign_files(jQuery(this));">Use images</span>
+
 			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist fcmanlist">
 			<thead>
     		<tr class="header">
@@ -550,6 +552,8 @@ flexicontent_html::loadFramework('flexi-lib');
 				<?php else : ?>
 					<th>&nbsp;</th>
 				<?php endif; ?>
+
+					<th>&nbsp;</th>
 					
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
@@ -695,9 +699,9 @@ flexicontent_html::loadFramework('flexi-lib');
 					}
 
 					if ($this->folder_mode) {
-						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."', 0, '".$filename_original."');document.getElementById('file{$i}').className='striketext';";
+						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', 0, '".$filename_original."');document.getElementById('file{$i}').className='striketext';";
 					} else {
-						$img_assign_link = "var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', '".$this->targetid."', file_data);";
+						$img_assign_link = "var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  fc_fileselement_assign_file(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', fc_fileselement_targetid, file_data);";
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
@@ -707,14 +711,16 @@ flexicontent_html::loadFramework('flexi-lib');
 					</td>
 					
 					<td>
-						<?php echo '<span style="display: none;">'.$checked.'</span>'; ?>
-						<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+						<?php echo $checked; ?>
+					</td>
+					<td>
+						<a class="btn btn-micro" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
 						<?php echo JHTML::image('components/com_flexicontent/assets/images/trash.png', JText::_('FLEXI_REMOVE') ); ?>
 						</a>
 					</td>
 					
 					<td class="center">
-						<a style="cursor:pointer; font-family:Georgia;" class="<?php echo $tip_class; ?>" onclick="<?php echo $img_assign_link; ?>" title="<?php echo $select_entry; ?>">
+						<a style="cursor:pointer; font-family:Georgia;" class="fc_assign_file_btn <?php echo $tip_class; ?>" onclick="<?php echo $img_assign_link; ?>" title="<?php echo $select_entry; ?>">
 							<?php echo $thumb_or_icon; ?>
 						</a>
 					</td>
