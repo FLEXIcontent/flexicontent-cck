@@ -378,12 +378,46 @@ class FlexicontentViewFileselement extends JViewLegacy
 			var newfile_data = ".json_encode($_newfile).";
 			" : "")."
 			
-			function qffileselementadd(obj, id, file, targetid, file_data) {
-				var result = window.parent.qfSelectFile".$fieldid."(obj, id, file, targetid, file_data);
+			var fc_fileselement_close_modal = 1;
+			var fc_fileselement_targetid = '".$targetid."';
+
+			function fc_fileselement_assign_files(el)
+			{
+				jQuery('#fileman_tabset').hide();
+				jQuery('#fileman_tabset').prev().show();
+				
+				window.setTimeout(function()
+				{
+					fc_fileselement_close_modal = 0;
+					var rows = jQuery('input[name=\"cid[]\"]:checked');
+					var row_count = 0;
+					rows.each(function(index, value)
+					{
+						var row = jQuery(this).closest('tr');
+						var assign_file_btn = row.find('.fc_assign_file_btn');
+						if (row_count > 0 || fc_fileselement_targetid == '')
+						{
+							// Add after given element or at end if element was not provided
+							fc_fileselement_targetid = fc_fileselement_targetid ? 
+								window.parent.addField".$fieldid."(null, null, jQuery('#'+fc_fileselement_targetid, parent.document).closest('li'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
+								window.parent.addField".$fieldid."(null);
+						}
+						if (fc_fileselement_targetid == 'cancel')  return false;  // Stop .each() loop
+						row_count++;
+						assign_file_btn.trigger('click');
+					});
+					window.parent.fc_field_dialog_handle_".$field->id.".dialog('close');
+				}, 50);
+			}
+
+			function fc_fileselement_assign_file(obj, id, file, targetid, file_data)
+			{
+				var result = window.parent.qfSelectFile".$fieldid."(obj, id, file, targetid, file_data, fc_fileselement_close_modal);
 				if ((typeof result) != 'undefined' && result == 'cancel') return;
 				obj.className = 'striketext';
 				document.adminForm.file.value=id;
 			}
+
 			jQuery(document).ready(function()
 			{
 				// Find and mark file usage by filename search
@@ -408,7 +442,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				}
 				
 				"
-				.(($autoselect && $newfileid) ? "newfile_data.displayname = '".$newfilename."'; newfile_data.preview = '".$file_preview."';  qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."', '".$targetid."', newfile_data);" : "")
+				.(($autoselect && $newfileid) ? "newfile_data.displayname = '".$newfilename."'; newfile_data.preview = '".$file_preview."';  fc_fileselement_assign_file( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."', '".$targetid."', newfile_data);" : "")
 				."
 			});
 			";

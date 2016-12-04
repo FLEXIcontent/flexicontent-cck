@@ -199,7 +199,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				return false;
 			}
 			
-			function qfSelectFile".$field->id."(obj, id, file, targetid, file_data)
+			function qfSelectFile".$field->id."(obj, id, file, targetid, file_data, close_modal)
 			{
 				var result = 1;
 				var preview = typeof file_data.preview !== 'undefined' ? file_data.preview : '';
@@ -239,7 +239,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					//if (window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
 				
-				if (targetid) fc_field_dialog_handle_".$field->id.".dialog('close');
+				close_modal = typeof close_modal !== 'undefined' ? close_modal : targetid;
+				if (close_modal) fc_field_dialog_handle_".$field->id.".dialog('close');
 				
 				var remove_obj = container.find('.inlinefile-del');
 				remove_obj.removeAttr('checked').trigger('change');
@@ -412,6 +413,9 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
+
+				// return HTML Tag ID of field containing the file ID, needed when creating file rows to assign multi-fields at once
+				return '".$elementid."_' + (uniqueRowNum".$field->id." - 1) + '_file-id';
 			}
 			
 			function expandFields".$field->id."(el, groupval_box, fieldval_box)
