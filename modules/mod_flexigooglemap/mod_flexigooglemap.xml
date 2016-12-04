@@ -127,7 +127,7 @@
 					<option value="1">FLEXI_GOOGLEMAP_LETTERMARKERMODE</option>
 				</field>
 
-				<field name="markerimage" type="media" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC"
+				<field name="markerimage" type="fcmedia" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC"
 				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC_DESC" preview="true" preview_width="80" preview_height="80" showon="markermode:0" />
 
 				<field
@@ -171,7 +171,7 @@
 					<option value="1">FLEXI_GOOGLEMAP_YES</option>
 				</field>
 
-				<field name="imgcluster" type="media" directory="mod_flexigooglemap/cluster" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
+				<field name="imgcluster" type="fcmedia" directory="mod_flexigooglemap/cluster" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
 				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_DESC" preview="true" preview_width="80" preview_height="80" showon="clustermode:1"/>
 				<field
 					name="gridsize" type="text"
