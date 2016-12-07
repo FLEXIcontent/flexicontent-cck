@@ -37,6 +37,11 @@
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
 				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
+
+			<field name="fields_box_placing" type="radio" default="0" label="Fields Container" description="You can save space by floating the form fields container" depend_class="fieldgroupoff" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_CLEARED</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
 			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">

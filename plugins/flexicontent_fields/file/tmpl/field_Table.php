@@ -2,8 +2,6 @@
 $FT = 'FILE';
 $PRV_TYPE='-2';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-$fields_box_placing = $field->parameters->get('fields_box_placing', '0');
-$form_file_preview = $field->parameters->get('form_file_preview', '2');
 
 $n = 0;
 foreach($field->value as $file_id)

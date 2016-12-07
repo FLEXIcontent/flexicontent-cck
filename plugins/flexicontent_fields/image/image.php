@@ -103,7 +103,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$dir          = $field->parameters->get('dir');
 		$dir_url      = str_replace('\\', '/', $dir);
 		
-		
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
+
+
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
 		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
@@ -197,6 +199,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -249,6 +252,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
+					".($field->parameters->get('fields_box_placing', 0) ? "
+					,start: function(e) {
+						jQuery(e.target).children().css('float', 'left');
+						fc_setEqualHeights(jQuery(e.target), 0);
+					}
+					,stop: function(e) {
+						jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
+					}
+					" : '')."
 				});
 			});
 			";
@@ -390,7 +402,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Set tooltip data placeholders
 				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;Selected image.&lt;/strong&gt;&lt;br /&gt;&lt;div id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview_empty&quot; style=&quot;display:none&quot;&gt;No image selected.&lt;/div&gt;&lt;div id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;Selected image.&quot; id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/div&gt;\"><i class=\"icon-eye\"></i></span>');

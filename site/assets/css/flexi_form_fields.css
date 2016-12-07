@@ -10,28 +10,29 @@
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox,
 #flexicontent div.fcfieldval_container.valuebox {
-	clear: both;
-	height: auto;
 	position: relative;
 	background: transparent;
 	border: 0px solid lightgray;
 	margin: 0 0 4px 0;
 	padding: 2px 4px 4px 4px;
 	box-sizing: border-box;
+	height: auto;
 	width: 100%;
 	display: inline-block;
-	float: left;
+	clear: both;
+	float: none;
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox {
 	list-style: none !important;
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
+	display: inline-block;
 	clear: none;
-	display: block;
-	float: left;
-	max-width: 100% !important;
+	float: none;
+	max-width: 100%;
 	width: auto;
 	box-sizing: border-box;
+	vertical-align: top;
 }
 .toggle_all_values_buttons_box {
 	display: block;
