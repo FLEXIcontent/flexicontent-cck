@@ -589,6 +589,40 @@
 		document.formvalidator.attachToForm(null, sel);
 	}
 
+	
+	/* Set children to have same minimum height e.g. floated elements that need to wrap properly */
+	function fc_setEqualHeights(box, property)
+	{
+		property = !!property ? property : 0;  // 0: both height + min-height, 1: height, 2: min-height
+		var elements = box.children();
+		elements.css({'height': '', 'min-height': ''});
+		var max_h  = Number.NEGATIVE_INFINITY;
+		var max_mh = Number.NEGATIVE_INFINITY;
+
+		jQuery.each(elements, function(index, item) {
+			if (property==1 || property==0)
+			{
+				if (jQuery(item).height() > max_h) max_h = jQuery(item).height();
+			}
+			if (property==2 || property==0)
+			{
+				if (jQuery(item).outerHeight() > max_mh) max_mh = jQuery(item).outerHeight();
+			}
+		})
+
+		var val_h  = '' + max_h + 'px';
+		var val_mh = '' + max_mh + 'px';
+		elements.each(function(i, v) {
+			if (property==1 || property==0)
+			{
+				if (v.style.height != val_h) v.style.height = val_h;
+			}
+			if (property==2 || property==0)
+			{
+				if (v.style.minHeight != val_mh) v.style.minHeight = val_mh;
+			}
+		});
+	}
 
 	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
 	function fc_bootstrapAttach(sel)

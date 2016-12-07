@@ -105,7 +105,6 @@ input[type="radio"].fc_checkradio,
 }
 label input[type="checkbox"].fc_checkradio,
 label input[type="radio"].fc_checkradio,
-[name="adminForm"] input[type="checkbox"][name^="cid"],
 [name="adminForm"] input[type="checkbox"]:only-child,
 [name="adminForm"] label input[type="checkbox"]:not(.skip_fccr),
 [name="adminForm"] label input[type="radio"]:not(.skip_fccr),
@@ -126,7 +125,7 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
 	display: inline-block !important;
-	margin: 1px 12px 1px 0px !important;
+	margin: 1px 12px 1px 0px;
 	padding: 0px 0px 0px 24px !important;
 	line-height: 22px !important;
 	height: 22px !important;
@@ -154,15 +153,25 @@ input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.bt
 	opacity: 0.6 !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
-input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
+input[type="checkbox"].fc_checkradio + label,
 [name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks2.png) no-repeat 0 0 !important;
 }
-input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
+input[type="radio"].fc_checkradio + label,
 [name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks2.png) no-repeat 0 -72px !important;
+}
+input[type="checkbox"].fc_checkradio + label.green,
+[name="adminForm"] input[type="checkbox"] + label.green:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"] + label.green:not(.plupload_button):not(.btn) {
+	background: url(../images/checks3.png) no-repeat 0 0 !important;
+}
+input[type="radio"].fc_checkradio + label.green,
+[name="adminForm"] input[type="radio"] + label.green:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"] + label.green:not(.plupload_button):not(.btn) {
+	background: url(../images/checks3.png) no-repeat 0 -72px !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
@@ -2463,6 +2472,34 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 .fc-fileman-upload-icon:before {
 	color: darkorange !important;
+}
+.fc-fileman-thumb-box {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	width: 150px;
+	height: 150px;
+	border-radius: 4px;
+	border: 3px solid #ddd;
+	margin: 4px;
+	padding: 4px;
+}
+.fc-fileman-thumb-box.selected {
+	border: 3px solid green;
+}
+label.fc-fileman-checkbox-lbl {
+	position: absolute !important;
+	top: -9px !important;
+	right: -14px !important;
+	margin: 0 !important;
+}
+img.fc-fileman-thumb {
+	width: 150px;
+	height: 150px;
+}
+.adminlist.fcmanlist img.fc-fileman-thumb {
+	width: 60px;
+	height: 60px;
 }
 #multiple_uploader {
 	padding: 0px;

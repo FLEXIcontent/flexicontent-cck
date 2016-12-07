@@ -264,6 +264,10 @@ div.current dd .pane-sliders .panel {
 table.adminlist.fcmanlist {
 	margin-top: 12px;
 }
+div.adminthumbs.fcmanthumbs {
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
 .column_toggle_lbl {
 	display: none;
 }

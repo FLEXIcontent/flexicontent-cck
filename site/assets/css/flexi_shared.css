@@ -1415,6 +1415,34 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 .fc-fileman-upload-icon:before {
 	color: darkorange !important;
 }
+.fc-fileman-thumb-box {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	width: 150px;
+	height: 150px;
+	border-radius: 4px;
+	border: 3px solid #ddd;
+	margin: 4px;
+	padding: 4px;
+}
+.fc-fileman-thumb-box.selected {
+	border: 3px solid green;
+}
+label.fc-fileman-checkbox-lbl {
+	position: absolute !important;
+	top: -9px !important;
+	right: -14px !important;
+	margin: 0 !important;
+}
+img.fc-fileman-thumb {
+	width: 150px;
+	height: 150px;
+}
+.adminlist.fcmanlist img.fc-fileman-thumb {
+	width: 60px;
+	height: 60px;
+}
 #multiple_uploader {
 	padding: 0px;
 	margin: 6px 0 0 0;

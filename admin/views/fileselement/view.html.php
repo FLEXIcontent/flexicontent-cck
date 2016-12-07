@@ -383,13 +383,19 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 			function fc_fileselement_assign_files(el)
 			{
+				var rows = jQuery('input[name=\"cid[]\"]:checked');
+				if (!rows.length)
+				{
+					alert('Please select some files');
+					return;
+				}
+				
 				jQuery('#fileman_tabset').hide();
 				jQuery('#fileman_tabset').prev().show();
 				
 				window.setTimeout(function()
 				{
 					fc_fileselement_close_modal = 0;
-					var rows = jQuery('input[name=\"cid[]\"]:checked');
 					var row_count = 0;
 					rows.each(function(index, value)
 					{
