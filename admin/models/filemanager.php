@@ -313,24 +313,21 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$option = $jinput->get('option', '', 'cmd');
 		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$where = $this->_buildContentWhere();
-		if (!$ids_only) {
-			$orderby = $this->_buildContentOrderBy();
-		}
-		//$having = $this->_buildContentHaving();
+		$join    = $this->_buildContentJoin();
+		$where   = $this->_buildContentWhere();
+		$orderby = !$ids_only ? $this->_buildContentOrderBy() : '';
+		$having  = ''; //$this->_buildContentHaving();
 		
 		$filter_item = $item_id  ?  $item_id  :  $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.item_id',   'item_id',   '',   'int' );
-		
-		$extra_join = '';
-		$extra_where = '';
-		
-		if ($filter_item) {
-			$extra_join	.= ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = '. $filter_item .' AND f.id = rel.value ';
-			$extra_join	.= ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote('file');
+		if ($filter_item)
+		{
+			$join	.= ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = '. $filter_item .' AND f.id = rel.value ';
+			$join	.= ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote('file');
 		}
 		
-		if ( !$ids_only ) {
-			$extra_join .= ' LEFT JOIN #__viewlevels AS level ON level.id=f.access';
+		if ( !$ids_only )
+		{
+			$join .= ' LEFT JOIN #__viewlevels AS level ON level.id=f.access';
 		}
 		
 		if ( $ids_only ) {
@@ -338,8 +335,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		} else {
 			$columns[] = 'SQL_CALC_FOUND_ROWS f.*, u.name AS uploader,'
 				.' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END AS filename_displayed ';
-			if ( $assigned_fields && count($assigned_fields) ) {
-				foreach ($assigned_fields as $field_type) {
+			if ( !empty($assigned_fields) )
+			{
+				foreach ($assigned_fields as $field_type)
+				{
 					// Field relation sub query for counting file assignment to this field type
 					$assigned_query	= 'SELECT COUNT(value)'
 						. ' FROM #__flexicontent_fields_item_relations AS rel'
@@ -355,10 +354,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		$query = 'SELECT '. implode(', ', $columns)
 			. ' FROM #__flexicontent_files AS f'
-			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
-			. $extra_join
+			. $join
 			. $where
-			. $extra_where
 			//. ' GROUP BY f.id'
 			//. $having
 			. (!$ids_only ? $orderby : '')
@@ -403,8 +400,15 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		return $orderby;
 	}
-	
-	
+
+
+	function _buildContentJoin()
+	{
+		$join = ' JOIN #__users AS u ON u.id = f.uploaded_by';
+		return $join;
+	}
+
+
 	/**
 	 * Method to build the where clause of the query for the files
 	 *
@@ -418,6 +422,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$user   = JFactory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
+
+		$where = array();
 		
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
@@ -429,12 +435,13 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$filter_secure    = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_secure',    'filter_secure',    '',          'word' );
 		$filter_ext       = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		
-		$where = array();
 		
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanViewAllFiles = $permission->CanViewAllFiles;
 		
-		if ( !$CanViewAllFiles ) {
+		if (0) {  // limit via parameter
+			$where[] = ' uploaded_by = ' . $user->id;
+		} else if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;
 		} else if ( $filter_uploader ) {
 			$where[] = ' uploaded_by = ' . $filter_uploader;

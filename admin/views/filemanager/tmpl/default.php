@@ -136,6 +136,67 @@ function delAllFilters()
 	delFilter('filter_order'); delFilter('filter_order_Dir');
 }
 
+
+// Switch between details / thumbnails views
+function fman_toggle_view_mode(new_btn)
+{
+	var btns = new_btn.parent().children();
+
+	btns.removeClass('active');
+	new_btn.addClass('active');
+
+	btns.each(function(index, value)
+	{
+		var btn = jQuery(value);
+		jQuery('#'+btn.data('toggle_id')).hide();
+	});
+	jQuery('#'+new_btn.data('toggle_id')).show();
+}
+
+
+// Toggle file selection (thumbs view) when click on parent container
+function fman_toggle_thumb_selection(box, oval)
+{
+	var i = box.find('input.fc-fileman-checkbox');
+
+	oval = (typeof oval !== 'undefined') ? oval : i.prop('checked');
+	oval ? box.removeClass('selected') : box.addClass('selected');
+	i.prop('checked', !oval);
+}
+
+
+// Sync a file selection between the details/thumb views
+function fman_sync_cid(box, reverse)
+{
+	var el = jQuery(box).find('input[type=\"checkbox\"]').get(0);
+	var c  = jQuery(el).prop('checked');
+	c = reverse ? !c : c;
+	var id = jQuery(el).attr('id');
+	if (id.indexOf('_cb') >= 0)
+	{
+		id = id.replace('_cb', '');
+		jQuery('#cb'+id).prop('checked', c);
+	}
+	else
+	{
+		id = id.replace('cb', '');
+		//jQuery('#_cb'+id).prop('checked', c);
+		fman_toggle_thumb_selection(jQuery('#_cb'+id).closest('.fc-fileman-thumb-box'), !c);
+	}
+}
+
+
+// Select ALL files in thumbnails view
+function fman_set_cids(val)
+{
+	jQuery('input[name=\"_cid[]\"]').each(function(index, value)
+	{
+		//jQuery(value).prop('checked', val);
+		fman_toggle_thumb_selection(jQuery(value).closest('.fc-fileman-thumb-box'), !val);
+	});
+}
+
+
 var _file_data = new Array();
 ";
 
@@ -547,14 +608,24 @@ flexicontent_html::loadFramework('flexi-lib');
 			<div class="fcclear"></div>
 			<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 			<div class="fcclear"></div>
-			
+
+			<span class="btn btn-info btn-small" style="height: 24px; line-height: 24px; padding-left: 6px; padding-right: 0;">
+				<input type="checkbox" name="toggle" value="" id="checkall_btn" onclick="Joomla.checkAll(this); fman_set_cids(jQuery(this).prop('checked'));" />
+				<label for="checkall_btn" class="green" style="margin: 0 !important; padding-right: 12px !important; color: white">Select all</label>
+			</span>
+
+			<div class="btn-group" style="margin: 0 12px;">
+				<button type="button" class="btn list-view hasTooltip active" id="btn-list-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" style="width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_DETAILS'); ?>"><i class="icon-list-view"></i></button>
+				<button type="button" class="btn grid-view hasTooltip" id="btn-grid-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" style="width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_THUMBS'); ?>"><i class="icon-grid-view"></i></button>
+			</div>
+
 			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist fcmanlist">
 			<thead>
     		<tr class="header">
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 					
 				<?php if (!$this->folder_mode) : ?>
-					<th class="center"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+					<th>&nbsp;</th>
 				<?php else : ?>
 					<th>&nbsp;</th>
 				<?php endif; ?>
@@ -615,11 +686,6 @@ flexicontent_html::loadFramework('flexi-lib');
 		
 		<?php if (!$this->folder_mode) : ?>
 			<tfoot>
-				<tr>
-					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-						<?php echo $pagination_footer; ?>
-					</td>
-				</tr>
 
 				<?php
 				$field_legend = array();
@@ -645,6 +711,8 @@ flexicontent_html::loadFramework('flexi-lib');
 			<tbody>
 				<?php
 				$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
+				$thumbs_arr = array();
+				$items_link_arr = array();
 
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
 				$index = JRequest::getInt('index', 0);
@@ -685,13 +753,15 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					$file_url = rawurlencode(str_replace('\\', '/', $file_path));
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					if ( empty($thumb_or_icon) ) {
+					if ( empty($thumb_or_icon) )
+					{
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=60&amp;h=60&amp;zc=1&amp;ar=x" alt="'.$filename_original.'" />';
+							$thumb_or_icon = '<img class="fc-fileman-thumb" src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=600&amp;h=600&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-box badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
 					}
+					$thumbs_arr[] = $thumb_or_icon;
 					
 					if (!$this->folder_mode)
 					{
@@ -717,8 +787,9 @@ flexicontent_html::loadFramework('flexi-lib');
 						}
 					}
 
-					// link to items using the field
+					// Link to items using the field
 					$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_fileid='. $row->id.'&amp;fcform=1&amp;filter_state=ALL';
+					$items_link_arr[$i] = $items_link;
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
 					<td class="center hidden-phone">
@@ -726,12 +797,15 @@ flexicontent_html::loadFramework('flexi-lib');
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
-					<td>
+					<td class="center">
 						<?php echo $checked; ?>
+						<label for="cb<?php echo $i; ?>" class="green" onclick="fman_sync_cid(jQuery(this).closest('td'), 1);"></label>
 					</td>
 					
 					<td class="center">
-						<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid='.$row->id.'" title="'.$edit_entry.'">'.$thumb_or_icon.'</a>'; ?>
+						<a href="index.php?option=com_flexicontent<?php echo '&amp;'.$ctrl_task.'edit&amp;cid='.$row->id.'" title="'.$edit_entry; ?>">
+							<?php echo $thumb_or_icon; ?>
+						</a>
 					</td>
 					
 					<td class="left">
@@ -740,8 +814,9 @@ flexicontent_html::loadFramework('flexi-lib');
 						if ($row->checked_out) {
 							// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 							$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
-							if ($canCheckin) {
-								//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
+							if ($canCheckin)
+							{
+								//if ($row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
 								$task_str = 'types.checkin';
 								if ($row->checked_out == $user->id) {
 									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->checked_out, $row->checked_out_time);
@@ -754,7 +829,9 @@ flexicontent_html::loadFramework('flexi-lib');
 									<span class="icon-checkedout"></span>
 								</a>
 								<?php
-							} else {
+							}
+							else
+							{
 								echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
 							}
 						}
@@ -882,6 +959,86 @@ flexicontent_html::loadFramework('flexi-lib');
 			</tbody>
 			
 			</table>
+
+			<div id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminthumbs fcmanthumbs" style="display: none;">
+				<?php
+				$imageexts = array('jpg','gif','png','bmp','jpeg');
+				$index = JRequest::getInt('index', 0);
+				$k = 0;
+				$i = 0;
+				$n = count($this->rows);
+				foreach ($this->rows as $row)
+				{
+					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+
+					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
+					$filename_original = str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
+					$filename_original = $filename_original ? $filename_original : $filename;
+					
+					$fileid = $this->folder_mode ? '' : $row->id;
+					
+					$ext = strtolower($row->ext);
+					
+					// Check if file is NOT an known / allowed image, and skip it if LAYOUT is 'image' otherwise display a 'type' icon
+					if ( !in_array($ext, $imageexts)) {
+						if ( $this->layout == 'image' )
+							continue;
+					}
+					
+					$thumb_or_icon = $thumbs_arr[$i];
+					
+					if (!$this->folder_mode)
+					{
+						$row->count_assigned = 0;
+						foreach($this->assigned_fields_labels as $field_type => $ignore) {
+							$row->count_assigned += $row->{'assigned_'.$field_type};
+						}
+						if ($row->count_assigned)
+						{
+							$row->assigned = array();
+							foreach($this->assigned_fields_labels as $field_type => $field_label) {
+								if ( $row->{'assigned_'.$field_type} )
+								{
+									$icon_name = $this->assigned_fields_icons[$field_type];
+									$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
+									$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+									$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
+								}
+							}
+							$row->assigned = implode('&nbsp;&nbsp;| ', $row->assigned);
+						} else {
+							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
+						}
+					}
+					$items_link = $items_link_arr[$i];
+		   		?>
+
+				<div class="fc-fileman-thumb-box" onclick="fman_toggle_thumb_selection(jQuery(this)); fman_sync_cid(this, 0);">
+					<!--a class="btn btn-micro" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+					<?php echo JHTML::image('components/com_flexicontent/assets/images/trash.png', JText::_('FLEXI_REMOVE') ); ?>
+					</a-->
+					<?php
+					$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
+					echo $thumb_or_icon;
+					?>
+					<br/>
+					<a style="cursor:pointer; font-family:Georgia; border-radius:4px; margin:8px; border:1px solid #555; display:none" class="btn fc_assign_file_btn <?php echo $tip_class; ?>" onclick="<?php echo $file_assign_link; ?>" title="<?php echo $_filename_original; ?>">
+						Insert
+					</a>
+					<input type="checkbox" value="1" id="_cb<?php echo $i; ?>" name="_cid[]" class="fc-fileman-checkbox" />
+					<label for="_cb'<?php echo $i; ?>'" class="green fc-fileman-checkbox-lbl"></label>
+				</div>
+				<?php 
+					$k = 1 - $k;
+					$i++;
+				} 
+				?>
+
+			</div>
+
+			<?php if (!$this->folder_mode) : ?>
+				<?php echo $pagination_footer; ?>
+			<?php endif; ?>
 			
 			<input type="hidden" name="boxchecked" value="0" />
 			<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
