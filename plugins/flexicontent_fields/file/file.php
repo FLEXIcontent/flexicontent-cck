@@ -81,8 +81,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$top_notice = '';//$use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
 		
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
-		$fields_box_placing = $field->parameters->get('fields_box_placing', '0');
-		$form_file_preview = $field->parameters->get('form_file_preview', '2');
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
+		$form_file_preview  = (int) $field->parameters->get('form_file_preview', 2);
 		
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
@@ -167,7 +167,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $field->parameters->get('fields_box_placing', '0')==1 ? ' floated' : '';
+		$value_classes .= $field->parameters->get('fields_box_placing', '0')=='1' ? ' floated' : '';
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -265,6 +265,15 @@ class plgFlexicontent_fieldsFile extends FCField
 					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
+					".($field->parameters->get('fields_box_placing', 0) ? "
+					,start: function(e) {
+						jQuery(e.target).children().css('float', 'left');
+						fc_setEqualHeights(jQuery(e.target), 0);
+					}
+					,stop: function(e) {
+						jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
+					}
+					" : '')."
 				});
 			});
 			";
@@ -401,7 +410,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});

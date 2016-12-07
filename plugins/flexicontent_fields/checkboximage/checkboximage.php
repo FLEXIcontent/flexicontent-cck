@@ -331,6 +331,15 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
+					".($field->parameters->get('fields_box_placing', 0) ? "
+					,start: function(e) {
+						jQuery(e.target).children().css('float', 'left');
+						fc_setEqualHeights(jQuery(e.target), 0);
+					}
+					,stop: function(e) {
+						jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
+					}
+					" : '')."
 				});
 			});
 			";
@@ -469,7 +478,7 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});

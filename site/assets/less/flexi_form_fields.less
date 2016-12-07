@@ -21,17 +21,19 @@
 /* 1. multiple-value (sortable) container, 2. single-value container */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox,
 #flexicontent div.fcfieldval_container.valuebox {
-	clear: both;
-	height: auto;
 	position: relative;
 	background: transparent;
 	border: 0px solid lightgray;  /* better drag-n-drop ordering */
 	margin: 0 0 4px 0;
 	padding: 2px 4px 4px 4px;
 	box-sizing: border-box;
+
+	height: auto;
 	width: 100%;
+
 	display: inline-block;
-	float: left;
+	clear: both;
+	float: none;
 }
 
 /* FIELD: multiple-value (sortable) container */
@@ -40,12 +42,18 @@
 }
 /* FIELD: multiple-value (sortable) container (not cleared) */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
+	/* Allow proper ROW wrapping of different height, at sort 'start' even this need to become left / right */
+	display: inline-block;
 	clear: none;
-	display: block;
-	float: left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
+	float: none;
+	
+	/* Allow responsive width*/
+	max-width: 100%;
 	width: auto;
 	box-sizing: border-box;
+
+	/* Need when using overflow: hidden to animate height changes */
+	vertical-align: top;
 }
 /* FIELD: single-value container */
 #flexicontent div.fcfieldval_container.valuebox {

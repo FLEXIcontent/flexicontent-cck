@@ -50,7 +50,7 @@
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/minigallery/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			
-			<field name="fields_box_placing" type="radio" default="0" label="Fields Container" description="You can save space by floating the form fields container" class="btn-group group-fcinfo">
+			<field name="fields_box_placing" type="radio" default="0" label="Fields Container" description="You can save space by floating the form fields container" depend_class="fieldgroupoff" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 			</field>
