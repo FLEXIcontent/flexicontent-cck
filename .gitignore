@@ -59,6 +59,7 @@ site/templates/presentation-1/
 site/librairies/pdfparser/
 site/librairies/php-stemmer/
 site/librairies/TCPDF/
+site/librairies/cropper/
 
 site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
 site/tasks/includes/defines.php

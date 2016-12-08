@@ -264,7 +264,6 @@ body .fc-mssg-inline.fc-nomargin {
 .fc-sliderTooltip.fc-left.fc-bottom {
 	right: 33px;
 	left: unset;
-	top: 0px;
 }
 .fc-sliderTooltip.fc-right {
 	right: unset;
@@ -273,7 +272,10 @@ body .fc-mssg-inline.fc-nomargin {
 .fc-sliderTooltip.fc-right.fc-bottom {
 	right: unset;
 	left: 33px;
-	top: 0px;
+}
+.fc-sliderTooltip.fc-bottom {
+	top: 10px;
+	left: 34px;
 }
 .fc-sliderTooltip {
 	display: block;

@@ -1421,13 +1421,33 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	clear: none;
 	vertical-align: top;
 	position: relative;
-	width: 150px;
-	height: 150px;
 	border-radius: 4px;
 	border: 3px solid #ddd;
 	margin: 4px 6px;
 	padding: 4px;
 	cursor: pointer;
+	-webkit-transition: width 0.6s ease-in, height 0.6s ease-in;
+	transition: width 0.6s ease-in, height 0.6s ease-in;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_90 {
+	width: 90px;
+	height: 90px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_120 {
+	width: 120px;
+	height: 120px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_150 {
+	width: 150px;
+	height: 150px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_200 {
+	width: 200px;
+	height: 200px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_250 {
+	width: 250px;
+	height: 250px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-thumb-box.selected {
 	border: 3px solid green;
@@ -1510,6 +1530,26 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	-webkit-transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
 	transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
 }
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_90 img.fc-fileman-thumb {
+	max-width: 90px;
+	max-height: 90px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_120 img.fc-fileman-thumb {
+	max-width: 120px;
+	max-height: 120px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_150 img.fc-fileman-thumb {
+	max-width: 150px;
+	max-height: 150px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_200 img.fc-fileman-thumb {
+	max-width: 200px;
+	max-height: 200px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.thumb_250 img.fc-fileman-thumb {
+	max-width: 250px;
+	max-height: 250px;
+}
 .adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming {
 	position: fixed;
 	top: 50%;
@@ -1534,11 +1574,31 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	z-index: 1000;
 	color: white;
 }
-.adminlist.fcmanlist img.fc-fileman-thumb {
-	width: 60px;
-	height: 60px;
+.adminlist.fcmanlist .fc-fileman-list-thumb-box img.fc-fileman-thumb {
 	border: 1px solid #d0d0d0;
 	border-radius: 2px;
+	-webkit-transition: width 0.6s ease-in, height 0.6s ease-in;
+	transition: width 0.6s ease-in, height 0.6s ease-in;
+}
+.adminlist.fcmanlist .fc-fileman-list-thumb-box.thumb_40 img.fc-fileman-thumb {
+	width: 40px;
+	height: 40px;
+}
+.adminlist.fcmanlist .fc-fileman-list-thumb-box.thumb_60 img.fc-fileman-thumb {
+	width: 60px;
+	height: 60px;
+}
+.adminlist.fcmanlist .fc-fileman-list-thumb-box.thumb_90 img.fc-fileman-thumb {
+	width: 90px;
+	height: 90px;
+}
+.adminlist.fcmanlist .fc-fileman-list-thumb-box.thumb_120 img.fc-fileman-thumb {
+	width: 120px;
+	height: 120px;
+}
+.adminlist.fcmanlist .fc-fileman-list-thumb-box.thumb_150 img.fc-fileman-thumb {
+	width: 150px;
+	height: 150px;
 }
 #multiple_uploader {
 	padding: 0px;
