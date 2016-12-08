@@ -645,43 +645,6 @@ class FlexicontentModelFileselement extends JModelLegacy
 		return $where;
 	}
 	
-
-
-	// ********************************************************************************
-	// Builds a seletion of images stored in the DB, according to field's configuration
-	// ********************************************************************************
-	function buildImageList( $field )
-	{
-		$db    = JFactory::getDBO();
-		$user  = JFactory::getUser();
-		$params= $this->getFieldParams();
-		
-		// Get configuration parameters
-		$target_dir  = (int) $params->get('target_dir', 1);
-		$all_media         = $params->get('list_all_media_files', 0);
-		$limit_by_uploader = $params->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
-
-		// Retrieve available (and appropriate) images from the DB
-		if ($all_media) {
-			$query = 'SELECT filename'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE secure=1 AND ext IN ("jpg","gif","png","jpeg") '
-				.( $limit_by_uploader ? " AND uploaded_by = ". $user->id : "")
-				;
-		} else {
-			$query = 'SELECT value'
-				. ' FROM #__flexicontent_fields_item_relations'
-				. ' WHERE field_id = '. (int) $field->id .' AND value<>"" '
-				;
-		}
-		$db->setQuery($query);
-		$values = $db->loadColumn();
-		
-		return $values;
-	}
-	
-
-
 	
 	/**
 	 * Method to build the having clause of the query for the files

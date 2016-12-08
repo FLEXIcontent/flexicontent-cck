@@ -1415,33 +1415,130 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 .fc-fileman-upload-icon:before {
 	color: darkorange !important;
 }
-.fc-fileman-thumb-box {
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box {
 	display: inline-block;
+	float: none;
+	clear: none;
 	vertical-align: top;
 	position: relative;
 	width: 150px;
 	height: 150px;
 	border-radius: 4px;
 	border: 3px solid #ddd;
-	margin: 4px;
+	margin: 4px 6px;
 	padding: 4px;
+	cursor: pointer;
 }
-.fc-fileman-thumb-box.selected {
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box.selected {
 	border: 3px solid green;
 }
-label.fc-fileman-checkbox-lbl {
+.adminthumbs.fcmanthumbs .fc-fileman-delete-btn,
+.adminthumbs.fcmanthumbs .fc-fileman-preview-btn,
+.adminthumbs.fcmanthumbs .fc-fileman-selection-mark {
 	position: absolute !important;
-	top: -9px !important;
-	right: -14px !important;
 	margin: 0 !important;
+	padding: 0px;
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+	border-radius: 4px;
 }
-img.fc-fileman-thumb {
-	width: 150px;
-	height: 150px;
+.adminthumbs.fcmanthumbs .fc-fileman-delete-btn {
+	top: -3px !important;
+	left: -3px !important;
+	background: none;
+	border: 0;
+	box-shadow: unset;
+	-webkit-transition: all 0.2s ease-in;
+	transition: all 0.2s ease-in;
+	overflow: hidden;
+	transform: scale(0.5);
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+.adminthumbs.fcmanthumbs .fc-fileman-delete-btn:before {
+	font-size: 24px;
+	padding: 4px;
+	background: red;
+	color: white;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-delete-btn:hover {
+	text-shadow: 3px 3px 3px rgba(0,0,0,0.2);
+}
+.adminthumbs.fcmanthumbs .fc-fileman-thumb-box:hover .fc-fileman-delete-btn {
+	text-shadow: 3px 3px 3px rgba(0,0,0,0.2);
+	transform: scale(1);
+	opacity: 1;
+	filter: alpha(opacity=100);
+}
+.adminthumbs.fcmanthumbs .fc-fileman-preview-btn {
+	bottom: -3px !important;
+	left: -3px !important;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-preview-btn:before {
+	font-size: 24px;
+	padding: 4px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-preview-btn:hover {
+	text-shadow: 3px 3px 3px rgba(0,0,0,0.2);
+}
+.adminthumbs.fcmanthumbs .fc-fileman-selection-mark {
+	top: -2px;
+	right: -2px;
+	background: none;
+	border: 0;
+	box-shadow: unset;
+	-webkit-transition: all 0.3s ease-in;
+	transition: all 0.3s ease-in;
+	overflow: hidden;
+	width: 0;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-selection-mark:before {
+	background: green;
+	color: white;
+	margin: 0px;
+	padding: 4px;
+	font-size: 24px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-selection-mark.selected {
+	width: 32px;
+}
+.adminthumbs.fcmanthumbs img.fc-fileman-thumb {
+	position: relative;
+	max-width: 150px;
+	max-height: 150px;
+	-webkit-transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
+	transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
+}
+.adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	max-width: unset;
+	box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
+	z-index: 2050 !important;
+}
+.adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming.zoomed {
+	max-height: 100% !important;
+	max-width: 100% !important;
+}
+#fileman-overlay {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.4);
+	z-index: 1000;
+	color: white;
 }
 .adminlist.fcmanlist img.fc-fileman-thumb {
 	width: 60px;
 	height: 60px;
+	border: 1px solid #d0d0d0;
+	border-radius: 2px;
 }
 #multiple_uploader {
 	padding: 0px;
@@ -1544,6 +1641,7 @@ img.fc-fileman-thumb {
 	position: relative;
 	max-height: 64px;
 	max-width: 140px;
+	-webkit-transition: all 0.5s ease-in-out;
 	transition: all 0.5s ease-in-out;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.fc_uploader_zooming span.plupload_img_preview {
