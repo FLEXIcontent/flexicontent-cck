@@ -136,6 +136,43 @@ function delAllFilters()
 	delFilter('filter_order'); delFilter('filter_order_Dir');
 }
 
+function disabledEventPropagation(event)
+{
+	if (event.stopPropagation){
+		event.stopPropagation();
+	}
+	else if(window.event){
+		window.event.cancelBubble=true;
+	}
+}
+
+// Thumbnail zoom
+function fman_zoom_thumb(e, obj)
+{
+	disabledEventPropagation(e);
+
+	var box = jQuery(obj).closest('.fc-fileman-thumb-box');
+	var img = box.find('img.fc-fileman-thumb');
+	var btn = box.find('.fc-fileman-preview-btn');
+
+	if (img.length==0) return;
+
+	if (img.hasClass('zoomed'))
+	{
+		btn.removeClass('active btn-info');
+		img.removeClass('zoomed');
+		setTimeout(function(){ img.removeClass('zooming'); jQuery('#fileman-overlay').hide(); }, 550);
+	}
+	else
+	{
+		if (img.hasClass('zooming')) return;
+		jQuery('#fileman-overlay').show(); 
+		img.addClass('zooming zoomed');
+		btn.addClass('active btn-info');
+	}
+}
+
+
 
 // Switch between details / thumbnails views
 function fman_toggle_view_mode(new_btn)
@@ -143,56 +180,48 @@ function fman_toggle_view_mode(new_btn)
 	var btns = new_btn.parent().children();
 
 	btns.removeClass('active');
-	new_btn.addClass('active');
-
 	btns.each(function(index, value)
 	{
 		var btn = jQuery(value);
 		jQuery('#'+btn.data('toggle_id')).hide();
 	});
+
+	new_btn.addClass('active');
 	jQuery('#'+new_btn.data('toggle_id')).show();
 }
 
 
 // Toggle file selection (thumbs view) when click on parent container
-function fman_toggle_thumb_selection(box, oval)
+function fman_toggle_thumb_selection(box, new_value)
 {
-	var i = box.find('input.fc-fileman-checkbox');
-
-	oval = (typeof oval !== 'undefined') ? oval : i.prop('checked');
-	oval ? box.removeClass('selected') : box.addClass('selected');
-	i.prop('checked', !oval);
+	var i = box.find('.fc-fileman-selection-mark');
+	new_value ? box.addClass('selected') : box.removeClass('selected');
+	new_value ? i.addClass('selected') : i.removeClass('selected') ;
 }
 
 
 // Sync a file selection between the details/thumb views
-function fman_sync_cid(box, reverse)
+function fman_sync_cid(id, is_cb)
 {
-	var el = jQuery(box).find('input[type=\"checkbox\"]').get(0);
-	var c  = jQuery(el).prop('checked');
-	c = reverse ? !c : c;
-	var id = jQuery(el).attr('id');
-	if (id.indexOf('_cb') >= 0)
+	is_cb = !!is_cb;
+	var el  = jQuery('input#cb' + id);
+	var el2 = jQuery('span#_cb' + id);
+
+	var c = el.prop('checked');
+	if (!is_cb)
 	{
-		id = id.replace('_cb', '');
-		jQuery('#cb'+id).prop('checked', c);
+		el.prop('checked', !c);
 	}
-	else
-	{
-		id = id.replace('cb', '');
-		//jQuery('#_cb'+id).prop('checked', c);
-		fman_toggle_thumb_selection(jQuery('#_cb'+id).closest('.fc-fileman-thumb-box'), !c);
-	}
+	fman_toggle_thumb_selection(el2.closest('.fc-fileman-thumb-box'), !c);
 }
 
 
 // Select ALL files in thumbnails view
 function fman_set_cids(val)
 {
-	jQuery('input[name=\"_cid[]\"]').each(function(index, value)
+	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-thumb-box').each(function(index, value)
 	{
-		//jQuery(value).prop('checked', val);
-		fman_toggle_thumb_selection(jQuery(value).closest('.fc-fileman-thumb-box'), !val);
+		fman_toggle_thumb_selection(jQuery(value), val);
 	});
 }
 
@@ -473,9 +502,13 @@ flexicontent_html::loadFramework('flexi-lib');
 </script>*/
 ?>
 
+<div id="fileman-overlay" onclick="jQuery('img.fc-fileman-thumb.zoomed').trigger('click');"></div>
+
 <div id="flexicontent" class="flexicontent">
 
-<div class="alert alert-info" style="display: none; width: 300px;"><?php echo JText::_('FLEXI_ASSIGNING') . ' ... ' . JText::_('FLEXI_PLEASE_WAIT'); ?></div>
+<div class="alert alert-info" style="display: none; width: 300px;">
+	<?php echo JText::_('FLEXI_ASSIGNING') . ' ... ' . JText::_('FLEXI_PLEASE_WAIT'); ?>
+</div>
 
 <?php /* echo JHtml::_('tabs.start'); */ ?>
 <div class="fctabber" id="fileman_tabset">
@@ -619,9 +652,7 @@ flexicontent_html::loadFramework('flexi-lib');
     		<tr class="header">
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 					
-				<?php if (!$this->folder_mode) : ?>
-					<th>&nbsp;</th>
-				<?php else : ?>
+				<?php if ($this->view!='filemanager') : ?>
 					<th>&nbsp;</th>
 				<?php endif; ?>
 
@@ -683,7 +714,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		
 			<tbody>
 				<?php
-				$thumbs_arr = array();
+				$thumbs_icons_arr = array();
 				$file_assign_arr = array();
 
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
@@ -705,7 +736,9 @@ flexicontent_html::loadFramework('flexi-lib');
 					$ext = strtolower($row->ext);
 					
 					// Check if file is NOT an known / allowed image, and skip it if LAYOUT is 'image' otherwise display a 'type' icon
-					if ( !in_array($ext, $imageexts)) {
+					$is_img = in_array($ext, $imageexts);
+					if (!$is_img)
+					{
 						if ( $this->layout == 'image' )
 							continue;
 						else
@@ -728,12 +761,12 @@ flexicontent_html::loadFramework('flexi-lib');
 					if ( empty($thumb_or_icon) )
 					{
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img class="fc-fileman-thumb" src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=600&amp;h=600&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
+							$thumb_or_icon = '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-box badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
 					}
-					$thumbs_arr[] = $thumb_or_icon;
+					$thumbs_icons_arr[] = $thumb_or_icon;
 					
 					if (!$this->folder_mode)
 					{
@@ -776,7 +809,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					<td class="center">
 						<?php echo $checked; ?>
-						<label for="cb<?php echo $i; ?>" class="green" onclick="fman_sync_cid(jQuery(this).closest('td'), 1);"></label>
+						<label for="cb<?php echo $i; ?>" class="green" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
 					<td>
 						<a class="btn btn-micro" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
@@ -785,9 +818,9 @@ flexicontent_html::loadFramework('flexi-lib');
 					</td>
 					
 					<td class="center">
-						<a style="cursor:pointer; font-family:Georgia;" class="fc_assign_file_btn <?php echo $tip_class; ?>" onclick="<?php echo $file_assign_link; ?>" title="<?php echo $select_entry; ?>">
+						<span onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 							<?php echo $thumb_or_icon; ?>
-						</a>
+						</span>
 					</td>
 					
 					<td class="left">
@@ -923,23 +956,25 @@ flexicontent_html::loadFramework('flexi-lib');
 					$ext = strtolower($row->ext);
 					
 					// Check if file is NOT an known / allowed image, and skip it if LAYOUT is 'image' otherwise display a 'type' icon
-					if ( !in_array($ext, $imageexts)) {
-						if ( $this->layout == 'image' )
-							continue;
+					$is_img = in_array($ext, $imageexts);
+					if (!$is_img)
+					{
+						if ( $this->layout == 'image' )  continue;
 					}
-					
-					$thumb_or_icon = $thumbs_arr[$i];
-					
+					$thumb_or_icon = $thumbs_icons_arr[$i];
+
 					if (!$this->folder_mode)
 					{
 						$row->count_assigned = 0;
-						foreach($this->assigned_fields_labels as $field_type => $ignore) {
+						foreach($this->assigned_fields_labels as $field_type => $ignore)
+						{
 							$row->count_assigned += $row->{'assigned_'.$field_type};
 						}
 						if ($row->count_assigned)
 						{
 							$row->assigned = array();
-							foreach($this->assigned_fields_labels as $field_type => $field_label) {
+							foreach($this->assigned_fields_labels as $field_type => $field_label)
+							{
 								if ( $row->{'assigned_'.$field_type} )
 								{
 									$icon_name = $this->assigned_fields_icons[$field_type];
@@ -949,17 +984,15 @@ flexicontent_html::loadFramework('flexi-lib');
 								}
 							}
 							$row->assigned = implode('&nbsp;&nbsp;| ', $row->assigned);
-						} else {
+						}
+						else {
 							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 						}
 					}
 					$file_assign_link = $file_assign_arr[$i];
 		   		?>
 
-				<div class="fc-fileman-thumb-box" onclick="fman_toggle_thumb_selection(jQuery(this)); fman_sync_cid(this, 0);">
-					<!--a class="btn btn-micro" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
-					<?php echo JHTML::image('components/com_flexicontent/assets/images/trash.png', JText::_('FLEXI_REMOVE') ); ?>
-					</a-->
+				<div class="fc-fileman-thumb-box" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 					<?php
 					$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
 					echo $thumb_or_icon;
@@ -968,8 +1001,12 @@ flexicontent_html::loadFramework('flexi-lib');
 					<a style="cursor:pointer; font-family:Georgia; border-radius:4px; margin:8px; border:1px solid #555; display:none" class="btn fc_assign_file_btn <?php echo $tip_class; ?>" onclick="<?php echo $file_assign_link; ?>" title="<?php echo $_filename_original; ?>">
 						Insert
 					</a>
-					<input type="checkbox" value="1" id="_cb<?php echo $i; ?>" name="_cid[]" class="fc-fileman-checkbox" />
-					<label for="_cb'<?php echo $i; ?>'" class="green fc-fileman-checkbox-lbl"></label>
+
+					<?php echo !$is_img ? '' : '
+					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
+					'; ?>
+					<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
+					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
 				</div>
 				<?php 
 					$k = 1 - $k;
