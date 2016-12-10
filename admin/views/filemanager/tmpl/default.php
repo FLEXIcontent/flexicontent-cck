@@ -70,7 +70,7 @@ if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0)
 // Currently multi-uploading is supported / finished only for LAYOUT 'image'
 $_forced_secure_val = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
 $_forced_secure_int = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? '0' : '1');
-$_tmpl = $this->view=='fileselement' ? 'component' : '';
+$_tmpl = $this->view == 'fileselement' ? 'component' : '';
 
 $uconf = new JRegistry();
 $uconf->merge( $this->params );
@@ -80,7 +80,8 @@ if (!empty($this->field))
 }
 
 $is_inline_input = strlen($uconf->get('inputmode')) && $uconf->get('inputmode', 0) == 0;
-$enable_multi_uploader = 1; //$this->view=='filemanager' || $is_inline_input;
+$enable_multi_uploader = 1;
+$nonimg_message = $this->layout == 'image' ? '' : '-1';
 
 $js = "
 jQuery(document).ready(function() {
@@ -276,9 +277,9 @@ $perms = FlexicontentHelperPerm::getPerm();  // get global perms
 flexicontent_html::loadFramework('nouislider');
 $js = "
 	jQuery(document).ready(function(){
-		var slider = document.getElementById('fc-fileman-thumb-size_nouislider');
+		var slider = document.getElementById('fc-fileman-grid-thumb-size_nouislider');
 		
-		var input1 = document.getElementById('fc-fileman-thumb-size-val');
+		var inputSL = document.getElementById('fc-fileman-grid-thumb-size-val');
 		var isSingle = 1;
 		
 		var step_values = [90, 120, 150, 200, 250];
@@ -312,7 +313,7 @@ $js = "
 			if ( handle ) {
 				alert('This slider does not have a right handler');
 			} else {
-				input1.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
+				inputSL.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
 			}
 			var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
 			var max_len = 36;
@@ -334,14 +335,14 @@ $js = "
 		
 		// Handle form autosubmit
 		slider.noUiSlider.on('change', function() {
-			var slider = jQuery('#fc-fileman-thumb-size_nouislider');
-			var slider_input = jQuery('#fc-fileman-thumb-size-val').get(0);
+			var slider = jQuery('#fc-fileman-grid-thumb-size_nouislider');
+			var slider_input = jQuery('#fc-fileman-grid-thumb-size-val').get(0);
 			var jform  = slider.closest('form');
 			var form   = jform.get(0);
 			jQuery('div.fc-fileman-thumb-box').removeClass('thumb_90').removeClass('thumb_120').removeClass('thumb_150').removeClass('thumb_200').removeClass('thumb_250').addClass('thumb_' + slider_input.value);
 		});
 		
-		input1.addEventListener('change', function(){
+		inputSL.addEventListener('change', function(){
 			var value = 0;  // default is first value = empty
 			for(var i=1; i<step_values.length-1; i++) {
 				if (step_values[i] == this.value) { value=i; break; }
@@ -353,14 +354,14 @@ $js = "
 	jQuery(document).ready(function(){
 		var slider = document.getElementById('fc-fileman-list-thumb-size_nouislider');
 		
-		var input1 = document.getElementById('fc-fileman-list-thumb-size-val');
+		var inputSL = document.getElementById('fc-fileman-list-thumb-size-val');
 		var isSingle = 1;
 		
 		var step_values = [40, 60, 90, 120, 150];
 		var step_labels = [\"40x40\", \"60x60\", \"90x90\", \"120x120\", \"150x150\"];
 		
 		noUiSlider.create(slider, {
-			start: 1,
+			start: 0,
 			connect: false,
 			step: 1,
 			range: {'min': 0, 'max': 4},
@@ -387,7 +388,7 @@ $js = "
 			if ( handle ) {
 				alert('This slider does not have a right handler');
 			} else {
-				input1.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
+				inputSL.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
 			}
 			var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
 			var max_len = 36;
@@ -416,7 +417,7 @@ $js = "
 			jQuery('div.fc-fileman-list-thumb-box').removeClass('thumb_40').removeClass('thumb_60').removeClass('thumb_90').removeClass('thumb_120').removeClass('thumb_150').addClass('thumb_' + slider_input.value);
 		});
 		
-		input1.addEventListener('change', function(){
+		inputSL.addEventListener('change', function(){
 			var value = 0;  // default is first value = empty
 			for(var i=1; i<step_values.length-1; i++) {
 				if (step_values[i] == this.value) { value=i; break; }
@@ -488,11 +489,11 @@ if ($enable_multi_uploader)
 				runtimes : runtimes,
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
 				prevent_duplicates : true,
-				
+
 				// Set maximum file size and chunking to 1 MB
 				max_file_size : "'.$upload_maxsize.'",
 				chunk_size: "1mb",
-				
+
 				// Resize images on clientside if we can
 				'.($resize_on_upload ? '
 				resize : {
@@ -501,20 +502,27 @@ if ($enable_multi_uploader)
 					quality : '.$upload_quality.',
 					crop: '.($upload_method ? 'true' : 'false').'},
 				' : '').'
-				
+
 				// Specify what files to browse for
+				// Also it is possible to prevent picking file over the upload limit, but since we have resize do not use it
 				filters : {
-					max_file_size : "'.$upload_maxsize.'"
+					//max_file_size : "'.$upload_maxsize.'",
+					'.($this->layout == 'image' ? '
+					mime_types: [
+						{title : "Image files", extensions : "jpg,jpeg,gif,png"},
+						{title : "Zip files", extensions : "zip,avi"}
+					]
+					' : '').'
 				},
 
 				// Rename files by clicking on their titles
 				rename: true,
 
-				// Sort files
-				sortable: true,
-
 				// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
 				dragdrop: true,
+
+				// Sort files
+				sortable: true,
 
 				// Views to activate
 				views: {
@@ -528,7 +536,7 @@ if ($enable_multi_uploader)
 
 				// Silverlight settings
 				silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
-				
+
 				init: {
 					BeforeUpload: function (up, file) {
 						// Called right before the upload for a given file starts, can be used to cancel it if required
@@ -565,11 +573,11 @@ if ($enable_multi_uploader)
 				runtimes : runtimes,
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
 				prevent_duplicates : true,
-				
+
 				// Set maximum file size and chunking to 1 MB
 				max_file_size : "'.$upload_maxsize.'",
 				chunk_size: "1mb",
-				
+
 				// Resize images on clientside if we can
 				'.($resize_on_upload ? '
 				resize : {
@@ -580,26 +588,21 @@ if ($enable_multi_uploader)
 				' : '').'
 
 				// Specify what files to browse for
-				filters : {
-					max_file_size : "'.$upload_maxsize.'"
-				},
-				
+				filters : [
+					'.($this->layout == 'image' ? '
+					{title : "Image files", extensions : "jpg,jpeg,gif,png"},
+					{title : "Zip files", extensions : "zip,avi"}
+					' : '').'
+				],
+
 				// Rename files by clicking on their titles
 				rename: true,
-				 
-				// Sort files
-				sortable: true,
-				
+
 				// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
 				dragdrop: true,
 				
-				// Views to activate
-				views: {
-					list: true,
-					thumbs: true, // Show thumbs
-					active: "thumbs"
-				},
-				
+				// "sortable", and "views" are not natively supported by "*Queue" , but we will add them and also enhance them ...
+
 				// Flash settings
 				flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
 
@@ -742,7 +745,7 @@ flexicontent_html::loadFramework('flexi-lib');
 				</div>
 				<?php endif; ?>
 
-				<?php if ($this->layout!='image') : /* if layout==image then this URL filter is not applicable */ ?>
+				<?php if ($this->layout != 'image') : /* if layout == image then this URL filter is not applicable */ ?>
 				<div class="fc-filter nowrap_box">
 					<div <?php echo $fcfilter_attrs_row; ?> >
 						<?php echo $this->lists['url']; ?>
@@ -802,8 +805,8 @@ flexicontent_html::loadFramework('flexi-lib');
 			</span>
 
 			<div class="btn-group" style="margin: 0 12px;">
-				<button type="button" class="btn list-view hasTooltip active" id="btn-list-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_list_element" style="width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_DETAILS'); ?>"><i class="icon-list-view"></i></button>
-				<button type="button" class="btn grid-view hasTooltip" id="btn-grid-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_grid_element" style="width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_THUMBS'); ?>"><i class="icon-grid-view"></i></button>
+				<button type="button" class="btn list-view hasTooltip active" id="btn-list-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_list_element" style="min-width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_DETAILS'); ?>"><i class="icon-list-view"></i></button>
+				<button type="button" class="btn grid-view hasTooltip" id="btn-grid-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_grid_element" style="min-width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_GRID'); ?>"><i class="icon-grid-view"></i></button>
 			</div>
 
 			<div id="fc-fileman-list-thumb-size_nouislider" class="fman_list_element" style="width: 260px; margin: 0 0 -7px 16px; display: inline-block;"></div>
@@ -811,22 +814,22 @@ flexicontent_html::loadFramework('flexi-lib');
 				<input id="fc-fileman-list-thumb-size-val" name="fc-fileman-list-thumb-size-val" type="text" size="12" value="140" />
 			</div>
 
-			<div id="fc-fileman-thumb-size_nouislider" class="fman_grid_element" style="visibility: hidden; width: 260px; margin: 0 0 -7px 16px; display: inline-block;"></div>
+			<div id="fc-fileman-grid-thumb-size_nouislider" class="fman_grid_element" style="visibility: hidden; width: 260px; margin: 0 0 -7px 16px; display: inline-block;"></div>
 			<div class="fc_slider_input_box">
-				<input id="fc-fileman-thumb-size-val" name="fc-fileman-thumb-size-val" type="text" size="12" value="140" />
+				<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />
 			</div>
 
 			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist fcmanlist fman_list_element">
 			<thead>
     		<tr class="header">
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-					
-				<?php if ($this->view!='filemanager') : ?>
+
+					<th>&nbsp;</th>
+
+				<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
 					<th>&nbsp;</th>
 				<?php endif; ?>
 
-					<th>&nbsp;</th>
-					
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
 						<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -918,7 +921,7 @@ flexicontent_html::loadFramework('flexi-lib');
 				$n = count($this->rows);
 				foreach ($this->rows as $row)
 				{
-					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+					$checked = @ JHTML::_('grid.checkedout', $row, $i );
 					
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
@@ -998,11 +1001,11 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					<td class="center">
 						<?php echo $checked; ?>
-						<label for="cb<?php echo $i; ?>" class="green" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
+						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
 					
 					<td class="center">
-						<div class="fc-fileman-list-thumb-box thumb_60" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
+						<div class="fc-fileman-list-thumb-box thumb_40" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 							<?php echo $thumb_or_icon; ?>
 						</div>
 					</td>
@@ -1121,7 +1124,7 @@ flexicontent_html::loadFramework('flexi-lib');
 				
 				<?php if ($this->CanViewAllFiles && !empty($this->cols['uploader'])) : ?>
 					<td class="center hidden-phone">
-					<?php if (FlexicontentHelperPerm::getPerm()->CanAuthors) :?>
+					<?php if ($this->view == 'filemanager' && FlexicontentHelperPerm::getPerm()->CanAuthors) :?>
 						<a target="_blank" href="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task_authors; ?>edit&amp;hidemainmenu=1&amp;cid=<?php echo $row->uploaded_by; ?>">
 						<?php echo $row->uploader; ?>
 						</a>
@@ -1223,7 +1226,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
 					'; ?>
 					<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
 				</div>
 				<?php 
 					$k = 1 - $k;
@@ -1251,6 +1254,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 			<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 			<?php echo strlen($_forced_secure_int) ? '<input type="hidden" name="secure" value="'.$_forced_secure_int.'" />' : ''; ?>
+			<input type="hidden" name="filename" value="" />
 		</form>
 		
 	</div>
@@ -1262,7 +1266,7 @@ flexicontent_html::loadFramework('flexi-lib');
 	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload fc-fileman-upload-icon">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 		
-		<?php if (!$this->CanUpload && ($this->layout!='image' || $this->view!='fileselement')) : /* image layout of fileselement view is not subject to upload check */ ?>
+		<?php if (!$this->CanUpload && ($this->layout != 'image' || $this->view != 'fileselement')) : /* image layout of fileselement view is not subject to upload check */ ?>
 			<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
 		<?php else : ?>
 
@@ -1499,7 +1503,7 @@ flexicontent_html::loadFramework('flexi-lib');
 							<td id="file-upload-container">
 								<div id="img_preview_msg" style="float:left;"></div>
 								<img id="img_preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image placeholder" style="float:left; display:none;" />
-								<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 100, 0, '-1');" />
+								<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 100, 0, <?php echo $nonimg_message; ?>);" />
 							</td>
 						</tr>
 						
