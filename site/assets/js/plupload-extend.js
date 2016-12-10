@@ -14,10 +14,17 @@
 
 		if (uploader_container.find('.fc_plupload_toggleThumbs_btn').length==0)
 		{
-			uploader_container.find('.plupload_header_content').prepend('\
+			uploader_container.find('.plupload_header_content')
+			.prepend('\
 				<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
 					<span class="icon-image"></span> Thumbnails\
 				</span>\
+			')
+			.prepend('\
+			<div class="btn-group" style="margin: 12px; float: right;">\
+				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').removeClass(\'fc_uploader_thumbs_view\');" style="width: 60px;" title="Details"><i class="icon-list-view"></i></button>\
+				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').addClass(\'fc_uploader_thumbs_view\');" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
+			</div>\
 			');
 		}
 	}
@@ -67,6 +74,9 @@
 		var file_name_box = file_row.find('.plupload_file_name');
 		var is_img = is_IE8_IE9 && !fc_has_flash_addon() ? 0 : file.name.match(/\.(jpg|jpeg|png|gif)$/i);
 
+		// Add extra CSS classes to the delete buttons
+		file_row.find('.plupload_file_action > a').addClass('icon-remove fc_uploader_row_remove');
+		file_row.addClass('thumb_90');
 
 		/*
 		 * Add properties editing button
@@ -118,7 +128,7 @@
 		 */
 		if ( is_img )
 		{
-			var imgpreview_handle = jQuery("<span class=\"btn fc_img_preview_btn icon-eye\"></span>").appendTo( btn_box );
+			var imgpreview_handle = jQuery("<span class=\"btn fc_img_preview_btn icon-search\"></span>").appendTo( btn_box );
 			var box = jQuery("<span class=\"plupload_img_preview\"></span>").insertAfter( btn_box );
 
 			// Try to use already loaded image, otherwise we will load it later
@@ -141,17 +151,19 @@
 				file_row = jQuery(this).closest("li");
 				btn = file_row.find('.fc_img_preview_btn');
 				img_box = file_row.find('.plupload_img_preview');
+				var is_img = this.tagName=='IMG';
 
 				file_row.closest("ul").find("li:not('#" + btn.closest('li').attr('id') + "') .btn.fc_img_preview_btn.active").trigger("click");
 				if (file_row.hasClass("fc_uploader_zoomed"))
 				{
 					btn.removeClass("active btn-info");
 					file_row.removeClass("fc_uploader_zoomed");
-					setTimeout(function(){ file_row.removeClass("fc_uploader_zooming"); }, 400);
+					setTimeout(function(){ file_row.removeClass("fc_uploader_zooming"); }, 620);
 				}
 				else
 				{
-					if (file_row.hasClass("fc_uploader_zooming")) return;
+					if (file_row.hasClass("fc_uploader_zooming")) return;  // Zooming already started
+					if (is_img && file_row.closest('.plupload_container').hasClass("fc_uploader_thumbs_view")) return;    // Avoid zooming when clicking thumbnails in grid view
 					file_row.addClass("fc_uploader_zooming fc_uploader_zoomed");
 					btn.addClass("active btn-info");
 				}
@@ -171,7 +183,7 @@
 			{
 				// This will scale the image (in memory) before it tries to render it. This just reduces the amount of Base64 data that needs to be rendered.
 				// Use higher resultion to allow zooming and also for better thumbnail
-				this.downsize( 800, 600 );
+				this.downsize( 1000, 1000 );
 
 				// Now that the image is preloaded, grab the Base64 encoded data URL. This will show the image without making an Network request using the client-side file binary.
 				fc_plupload_loaded_imgs[file_row_id].prop( "src", this.getAsDataURL() );
