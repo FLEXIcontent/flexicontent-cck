@@ -1072,6 +1072,17 @@ class flexicontent_html
 		$lib_path = '/components/com_flexicontent/librairies';
 		$js = "";
 		$css = "";
+
+		static $specific_browser_support = null;
+		if ( $specific_browser_support === null )
+		{
+			if ( method_exists($document, 'addCustomTag') ) $document->addCustomTag('
+				<!--[if IE 8]>
+				<link href="'.JURI::root(true).'/components/com_flexicontent/assets/css/ie8.css?' . FLEXI_VHASH . '" rel="stylesheet" />
+				<![endif]-->
+			');
+		}
+
 		switch ( $framework )
 		{
 			case 'jQuery':
@@ -1554,6 +1565,8 @@ class flexicontent_html
 				";
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
+				JText::script('FLEXI_LOADING_IMAGES',true);
+				JText::script('FLEXI_THUMBNAILS',true);
 				break;
 			
 			// Used only by content / configuration forms, that have form elements needing this

@@ -1,5 +1,6 @@
 
 	var fc_file_props_handle = null;
+	var fc_file_count = 0;
 	var fc_plupload_loaded_imgs = {};
 	
 	// Handle the PostInit event. At this point, we will know which runtime
@@ -14,10 +15,25 @@
 
 		if (uploader_container.find('.fc_plupload_toggleThumbs_btn').length==0)
 		{
+			uploader_container.find('.plupload_filelist').sortable({
+				containment: 'parent',
+				tolerance: 'pointer'
+			});
 			uploader_container.find('.plupload_header_content')
 			.prepend('\
-				<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
-					<span class="icon-image"></span> Thumbnails\
+				<div id="fc-uploader-loading" class="fc-mssg-inline fc-success  fc-small fc-iblock fc-nobgimage" style="display: none;">\
+					<img src="components/com_flexicontent/assets/images/ajax-loader.gif" /> ' + Joomla.JText._('FLEXI_LOADING_IMAGES') + ' ...\
+				</div>\
+			')
+			.prepend('\
+				<div id="fc-uploader-grid-thumb-size_nouislider" class="fman_grid_element"></div>\
+				<div class="fc_slider_input_box">\
+					<input id="fc-uploader-grid-thumb-size-val" name="fc-uploader-grid-thumb-size-val" type="text" size="12" value="140" />\
+				</div>\
+			')
+			.prepend('\
+				<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px 8px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
+					<span class="icon-image"></span> <span class="fc_hidden_960">' + Joomla.JText._('FLEXI_THUMBNAILS') + '</span>\
 				</span>\
 			')
 			.prepend('\
@@ -26,6 +42,8 @@
 				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').addClass(\'fc_uploader_thumbs_view\');" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
 			</div>\
 			');
+
+			fc_attachSingleSlider(fc_uploader_slider_cfg);
 		}
 	}
 
@@ -76,7 +94,7 @@
 
 		// Add extra CSS classes to the delete buttons
 		file_row.find('.plupload_file_action > a').addClass('icon-remove fc_uploader_row_remove');
-		file_row.addClass('thumb_90');
+		file_row.addClass('thumb_' + jQuery('#fc-uploader-grid-thumb-size-val').val());
 
 		/*
 		 * Add properties editing button
@@ -135,7 +153,9 @@
 			var image_already_loaded = !! fc_plupload_loaded_imgs[file_row_id];
 			if (!image_already_loaded)
 			{
-				fc_plupload_loaded_imgs[file_row_id] = jQuery( "<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" />" );
+				fc_file_count++;
+				jQuery('#fc-uploader-loading').show();
+				fc_plupload_loaded_imgs[file_row_id] = jQuery( "<img class=\"plupload_loading_img\" src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" />" );
 			}
 
 
@@ -186,7 +206,9 @@
 				this.downsize( 1000, 1000 );
 
 				// Now that the image is preloaded, grab the Base64 encoded data URL. This will show the image without making an Network request using the client-side file binary.
-				fc_plupload_loaded_imgs[file_row_id].prop( "src", this.getAsDataURL() );
+				fc_plupload_loaded_imgs[file_row_id].prop( "src", this.getAsDataURL() ).removeClass('plupload_loading_img');
+				fc_file_count--;
+				if (fc_file_count==0) jQuery('#fc-uploader-loading').hide();
 			};
 
 			// Calling the .getSource() on the file will return an instance of mOxie.File, which is a unified file wrapper that can be used across the various runtimes.

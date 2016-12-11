@@ -257,28 +257,28 @@ body .fc-mssg-inline.fc-nomargin {
 .fc_slider_input_box {
 	display: none;
 }
-.fc-sliderTooltip.fc-left {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-left {
 	right: 18px;
 	left: unset;
 }
-.fc-sliderTooltip.fc-left.fc-bottom {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-left.fc-bottom {
 	right: 33px;
 	left: unset;
 }
-.fc-sliderTooltip.fc-right {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right {
 	right: unset;
 	left: 18px;
 }
-.fc-sliderTooltip.fc-right.fc-bottom {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-right.fc-bottom {
 	right: unset;
 	left: 33px;
 }
-.fc-sliderTooltip.fc-bottom {
+.noUi-base .noUi-handle .fc-sliderTooltip.fc-bottom {
 	top: 10px;
 	left: 34px;
 }
-.fc-sliderTooltip {
-	display: block;
+.noUi-base .noUi-handle .fc-sliderTooltip {
+	display: inline-block;
 	position: absolute;
 	border: 1px solid #D9D9D9;
 	font: 400 12px/12px Arial;
@@ -291,8 +291,10 @@ body .fc-mssg-inline.fc-nomargin {
 	min-width: 90px;
 	min-height: 24px;
 	background: lightgoldenrodyellow;
+	box-sizing: border-box;
+	color: black;
 }
-.fc-sliderTooltip strong {
+.noUi-base .noUi-handle .fc-sliderTooltip strong {
 	display: block;
 	padding: 2px;
 }

@@ -340,73 +340,77 @@ class plgSystemFlexisystem extends JPlugin
 			if(preg_match("#$quoted#", $uri)) return false;
 		}
 		
-		if (!empty($option)) {
-			// if try to access com_content you get redirected to Flexicontent items
-			if ( $option == 'com_content' ) {
-				
-				// Check if a user group is groups, that are excluded from article redirection
-				if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
-				
-				// Default (target) redirection url
-				$redirectURL = 'index.php?option='.$this->extension;
-				
-				// Get request variables used to determine whether to apply redirection
-				$layout   = $jinput->get('layout', '', 'cmd');
-				$function = $jinput->get('function', '', 'cmd');
-				
-				// *** Specific Redirect Exclusions ***
-				
-				//--. (J2.5 only) Selecting Joomla article for menu item
-				if ( $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
-				
-				//--. JA jatypo (editor-xtd plugin button for text style selecting)
-				if ($jinput->get('jatypo', '', 'cmd')!="" && $layout=="edit") return false;
+		if (empty($option)) return;
 
-				//--. Allow listing featured backend management
-				if ($view=="featured") return false;
-				//return false;  // for testing
-				
+		// if try to access com_content you get redirected to Flexicontent items
+		if ( $option == 'com_content' )
+		{
+			// Check if a user group is groups, that are excluded from article redirection
+			if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
+
+			// Default (target) redirection url
+			$redirectURL = 'index.php?option='.$this->extension;
+
+			// Get request variables used to determine whether to apply redirection
+			$layout   = $jinput->get('layout', '', 'cmd');
+			$function = $jinput->get('function', '', 'cmd');
+
+			// *** Specific Redirect Exclusions ***
+
+			//--. (J2.5 only) Selecting Joomla article for menu item
+			if ( $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
+
+			//--. JA jatypo (editor-xtd plugin button for text style selecting)
+			if ($jinput->get('jatypo', '', 'cmd')!="" && $layout=="edit") return false;
+
+			//--. Allow listing featured backend management
+			if ($view=="featured") return false;
+			//return false;  // for testing
+
+			if ($task)
+			{
 				if ($task == 'add') {
 					$redirectURL .= '&task=items.add';
 				} else if ($task == 'edit') {
-					$cid = JRequest::getVar('id');
-					$cid = $cid ? $cid : JRequest::getVar('cid');
+					$cid = $jinput->get('id', $jinput->get('cid', 0));
 					$redirectURL .= '&task=items.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
 				} else if ($task == 'element') {
 					$redirectURL .= '&view=itemelement&tmpl=component&object='.JRequest::getVar('object','');
 				} else {
-					$redirectURL .= '&view=items';
+					return;
 				}
-				
-				// Apply redirection
-				$app->redirect($redirectURL,'');
-				return false;
-
-			} elseif ( $option == 'com_categories' ) {
-				
-				// Check if a user group is groups, that are excluded from category redirection
-				if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
-				
-				// Get request variables used to determine whether to apply redirection
-				$category_scope = JRequest::getVar( 'extension' );
-				
-				// Apply redirection if in com_categories is in content scope
-				if ( $category_scope == 'com_content' )
-				{
-					if ($task == 'add') {
-						$redirectURL .= 'index.php?option='.$this->extension.'&task=category.add&extension='.$this->extension;
-					} else if ($task == 'edit') {
-						$cid = JRequest::getVar('id');
-						$cid = $cid ? $cid : JRequest::getVar('cid');
-						$redirectURL .= 'index.php?option='.$this->extension.'&task=category.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
-					} else {
-						$redirectURL = 'index.php?option='.$this->extension.'&view=categories';
-					}
-					$app->redirect($redirectURL,'');
-				}
-				return false;
-				
 			}
+
+			$redirectURL .= '&view=items';
+
+			// Apply redirection
+			$app->redirect($redirectURL,'');
+			return false;
+		}
+
+		elseif ( $option == 'com_categories' )
+		{
+			// Check if a user group is groups, that are excluded from category redirection
+			if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
+
+			// Get request variables used to determine whether to apply redirection
+			$category_scope = JRequest::getVar( 'extension' );
+
+			// Apply redirection if in com_categories is in content scope
+			if ( $category_scope == 'com_content' )
+			{
+				if ($task == 'add') {
+					$redirectURL .= 'index.php?option='.$this->extension.'&task=category.add&extension='.$this->extension;
+				} else if ($task == 'edit') {
+					$cid = JRequest::getVar('id');
+					$cid = $cid ? $cid : JRequest::getVar('cid');
+					$redirectURL .= 'index.php?option='.$this->extension.'&task=category.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
+				} else {
+					$redirectURL = 'index.php?option='.$this->extension.'&view=categories';
+				}
+				$app->redirect($redirectURL,'');
+			}
+			return false;
 		}
 	}
 	
