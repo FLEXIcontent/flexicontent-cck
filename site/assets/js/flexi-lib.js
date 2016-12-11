@@ -1622,3 +1622,83 @@
 		}
 		return result;
 	}
+
+
+	function fc_attachSingleSlider(cfg)
+	{
+		var slider = document.getElementById(cfg.name + '_nouislider');
+
+		var inputSL = document.getElementById(cfg.name + '-val');
+		var isSingle = 1;
+
+		var step_values = cfg.step_values;
+		var step_labels = cfg.step_labels;
+
+		noUiSlider.create(slider, {
+			start: cfg.initial_pos,
+			connect: false,
+			step: 1,
+			range: {'min': 0, 'max': (cfg.step_values.length - 1)},
+		});
+
+		var tipHandles = slider.getElementsByClassName('noUi-handle'),
+		tooltips = [];
+
+		// Add divs to the slider handles.
+		for ( var i = 0; i < tipHandles.length; i++ ){
+			tooltips[i] = document.createElement('span');
+			tipHandles[i].appendChild(tooltips[i]);
+
+			tooltips[i].className += 'fc-sliderTooltip fc-bottom'; // Add a class for styling
+			tooltips[i].innerHTML = '<span></span>'; // Add additional markup
+			tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
+		}
+
+		// When the slider changes, display the value in the tooltips and set it into the input form elements
+		slider.noUiSlider.on('update', function( values, handle ) {
+			var value = parseInt(values[handle]);
+			var i = value;
+
+			if ( handle ) {
+				alert('This slider does not have a right handler');
+			} else {
+				inputSL.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
+			}
+			var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
+			var max_len = 36;
+			tooltips[handle].innerHTML = '<span class=\"icon-image\"></span> ' + 
+				(tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
+			var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
+			var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
+
+			//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
+			if (isSingle) {
+				left<(50/100)*width ?
+					jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
+					jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
+			}
+			else {
+				alert('This slider only has 1 handle');
+			}
+		});
+
+		// Handle form autosubmit
+		slider.noUiSlider.on('change', function() {
+			var slider = jQuery('#' + cfg.name + '_nouislider');
+			var slider_input = jQuery('#' + cfg.name + '-val').get(0);
+			var jform  = slider.closest('form');
+			var form   = jform.get(0);
+			jQuery(cfg.element_selector)
+				.removeClass(cfg.element_class_list)
+				.addClass(cfg.element_class_prefix + slider_input.value);
+		});
+
+		inputSL.addEventListener('change', function(){
+			var value = 0;  // default is first value = empty
+			for(var i=1; i<step_values.length-1; i++)
+			{
+				if (step_values[i] == this.value) { value=i; break; }
+			}
+			slider.noUiSlider.set([value, null]);
+		});
+	}

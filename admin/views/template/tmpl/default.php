@@ -864,5 +864,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 <form id="layout_file_editor_form" name="layout_file_editor_form" action="index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw" method="POST"></form>
 <form id="code_insertion_form" name="code_insertion_form" action="#" method="POST"></form>
+<!--[if IE 8]>
+<script>
+	alert('Internet Explorer 8 is not supported by this view. Please use a more modern browser');
+
+	// Disable HTML5fallback, it will cause problems due form="..." attribute used to place elements outside of form TAG
+	jQuery.fn.h5f = function(options){}
+</script>
+<![endif]-->
 
 </div>

@@ -152,24 +152,33 @@ function fman_zoom_thumb(e, obj)
 {
 	disabledEventPropagation(e);
 
-	var box = jQuery(obj).closest('.fc-fileman-thumb-box');
+	var box = jQuery(obj).closest('.fc-fileman-grid-thumb-box');
 	var img = box.find('img.fc-fileman-thumb');
 	var btn = box.find('.fc-fileman-preview-btn');
 
 	if (img.length==0) return;
+	var IEversion = isIE();
 
 	if (img.hasClass('zoomed'))
 	{
 		btn.removeClass('active btn-info');
 		img.removeClass('zoomed');
-		setTimeout(function(){ img.removeClass('zooming'); jQuery('#fileman-overlay').hide(); }, 550);
+		setTimeout(function(){
+			img.removeClass('zooming'); jQuery('#fc-fileman-overlay').hide();
+			if (IEversion && IEversion == 8) img.css('left', '');
+		}, 10);
 	}
 	else
 	{
 		if (img.hasClass('zooming')) return;
-		jQuery('#fileman-overlay').show(); 
+		jQuery('#fc-fileman-overlay').show();
 		img.addClass('zooming zoomed');
 		btn.addClass('active btn-info');
+		if (IEversion && IEversion == 8)
+		{
+			//setTimeout(function(){ img.css('left', jQuery(window).width()/2-(img.width()/2)); }, 10);
+			img.css('left', jQuery(window).width()/2-(img.width()/2));
+		}
 	}
 }
 
@@ -213,14 +222,14 @@ function fman_sync_cid(id, is_cb)
 	{
 		el.prop('checked', !c);
 	}
-	fman_toggle_thumb_selection(el2.closest('.fc-fileman-thumb-box'), !c);
+	fman_toggle_thumb_selection(el2.closest('.fc-fileman-grid-thumb-box'), !c);
 }
 
 
 // Select ALL files in thumbnails view
 function fman_set_cids(val)
 {
-	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-thumb-box').each(function(index, value)
+	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box').each(function(index, value)
 	{
 		fman_toggle_thumb_selection(jQuery(value), val);
 	});
@@ -275,156 +284,105 @@ $perms = FlexicontentHelperPerm::getPerm();  // get global perms
 
 
 flexicontent_html::loadFramework('nouislider');
-$js = "
-	jQuery(document).ready(function(){
-		var slider = document.getElementById('fc-fileman-grid-thumb-size_nouislider');
-		
-		var inputSL = document.getElementById('fc-fileman-grid-thumb-size-val');
-		var isSingle = 1;
-		
-		var step_values = [90, 120, 150, 200, 250];
-		var step_labels = [\"90x90\", \"120x120\", \"150x150\", \"200x200\", \"250x250\"];
-		
-		noUiSlider.create(slider, {
-			start: 2,
-			connect: false,
-			step: 1,
-			range: {'min': 0, 'max': 4},
-		});
-		
-		var tipHandles = slider.getElementsByClassName('noUi-handle'),
-		tooltips = [];
-		
-		// Add divs to the slider handles.
-		for ( var i = 0; i < tipHandles.length; i++ ){
-			tooltips[i] = document.createElement('span');
-			tipHandles[i].appendChild(tooltips[i]);
-			
-			tooltips[i].className += 'fc-sliderTooltip fc-bottom'; // Add a class for styling
-			tooltips[i].innerHTML = '<span></span>'; // Add additional markup
-			tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
-		}
-		
-		// When the slider changes, display the value in the tooltips and set it into the input form elements
-		slider.noUiSlider.on('update', function( values, handle ) {
-			var value = parseInt(values[handle]);
-			var i = value;
-			
-			if ( handle ) {
-				alert('This slider does not have a right handler');
-			} else {
-				inputSL.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
-			}
-			var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
-			var max_len = 36;
-			tooltips[handle].innerHTML = '<span class=\"icon-image\"></span> ' + 
-				(tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
-			var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-			var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
-			
-			//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-			if (isSingle) {
-				left<(50/100)*width ?
-					jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-					jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-			}
-			else {
-				alert('This slider only has 1 handle');
-			}
-		});
-		
-		// Handle form autosubmit
-		slider.noUiSlider.on('change', function() {
-			var slider = jQuery('#fc-fileman-grid-thumb-size_nouislider');
-			var slider_input = jQuery('#fc-fileman-grid-thumb-size-val').get(0);
-			var jform  = slider.closest('form');
-			var form   = jform.get(0);
-			jQuery('div.fc-fileman-thumb-box').removeClass('thumb_90').removeClass('thumb_120').removeClass('thumb_150').removeClass('thumb_200').removeClass('thumb_250').addClass('thumb_' + slider_input.value);
-		});
-		
-		inputSL.addEventListener('change', function(){
-			var value = 0;  // default is first value = empty
-			for(var i=1; i<step_values.length-1; i++) {
-				if (step_values[i] == this.value) { value=i; break; }
-			}
-			slider.noUiSlider.set([value, null]);
-		});
-	});
 
-	jQuery(document).ready(function(){
-		var slider = document.getElementById('fc-fileman-list-thumb-size_nouislider');
-		
-		var inputSL = document.getElementById('fc-fileman-list-thumb-size-val');
-		var isSingle = 1;
-		
-		var step_values = [40, 60, 90, 120, 150];
-		var step_labels = [\"40x40\", \"60x60\", \"90x90\", \"120x120\", \"150x150\"];
-		
-		noUiSlider.create(slider, {
-			start: 0,
-			connect: false,
-			step: 1,
-			range: {'min': 0, 'max': 4},
-		});
-		
-		var tipHandles = slider.getElementsByClassName('noUi-handle'),
-		tooltips = [];
-		
-		// Add divs to the slider handles.
-		for ( var i = 0; i < tipHandles.length; i++ ){
-			tooltips[i] = document.createElement('span');
-			tipHandles[i].appendChild(tooltips[i]);
-			
-			tooltips[i].className += 'fc-sliderTooltip fc-bottom'; // Add a class for styling
-			tooltips[i].innerHTML = '<span></span>'; // Add additional markup
-			tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
-		}
-		
-		// When the slider changes, display the value in the tooltips and set it into the input form elements
-		slider.noUiSlider.on('update', function( values, handle ) {
-			var value = parseInt(values[handle]);
-			var i = value;
-			
-			if ( handle ) {
-				alert('This slider does not have a right handler');
-			} else {
-				inputSL.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
-			}
-			var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
-			var max_len = 36;
-			tooltips[handle].innerHTML = '<span class=\"icon-image\"></span> ' + 
-				(tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
-			var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-			var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
-			
-			//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-			if (isSingle) {
-				left<(50/100)*width ?
-					jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-					jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-			}
-			else {
-				alert('This slider only has 1 handle');
-			}
-		});
-		
-		// Handle form autosubmit
-		slider.noUiSlider.on('change', function() {
-			var slider = jQuery('#fc-fileman-list-thumb-size_nouislider');
-			var slider_input = jQuery('#fc-fileman-list-thumb-size-val').get(0);
-			var jform  = slider.closest('form');
-			var form   = jform.get(0);
-			jQuery('div.fc-fileman-list-thumb-box').removeClass('thumb_40').removeClass('thumb_60').removeClass('thumb_90').removeClass('thumb_120').removeClass('thumb_150').addClass('thumb_' + slider_input.value);
-		});
-		
-		inputSL.addEventListener('change', function(){
-			var value = 0;  // default is first value = empty
-			for(var i=1; i<step_values.length-1; i++) {
-				if (step_values[i] == this.value) { value=i; break; }
-			}
-			slider.noUiSlider.set([value, null]);
-		});
+
+$slider_conf = new stdClass();
+$slider_conf->slider_name = $name = "fc-fileman-list-thumb-size";
+$slider_conf->element_selector = "div.fc-fileman-list-thumb-box";
+$slider_conf->element_class_prefix = "thumb_";
+$slider_conf->initial_pos = 0;
+$slider_conf->values = array(40, 60, 90, 120, 150);
+$slider_conf->labels = array();
+foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
+//include(dirname(__FILE__). '/../../filemanager/tmpl/layouts/single_slider.php');
+
+$cfg = $slider_conf;
+$element_classes = array();
+foreach($cfg->values as $value) $element_classes[] = $cfg->element_class_prefix . $value;
+
+$element_class_list = implode(' ', $element_classes);
+$step_values = '[' . implode(', ', $cfg->values) . ']';
+$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
+
+$js = "
+jQuery(document).ready(function()
+{
+	fc_attachSingleSlider({
+		'name': '".$name."',
+		'step_values': ".$step_values.",
+		'step_labels': ".$step_labels.",
+		'initial_pos': ".$cfg->initial_pos.",
+		'element_selector': '".$cfg->element_selector."',
+		'element_class_list': '".$element_class_list."',
+		'element_class_prefix': '".$cfg->element_class_prefix."'
 	});
+});
+";
+JFactory::getDocument()->addScriptDeclaration($js);
+
+
+$slider_conf = new stdClass();
+$slider_conf->slider_name = $name = "fc-fileman-grid-thumb-size";
+$slider_conf->element_selector = "div.fc-fileman-grid-thumb-box";
+$slider_conf->element_class_prefix = "thumb_";
+$slider_conf->initial_pos = 2;
+$slider_conf->values = array(90, 120, 150, 200, 250);
+$slider_conf->labels = array();
+foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
+//include(dirname(__FILE__). '/../../filemanager/tmpl/layouts/single_slider.php');
+
+$cfg = $slider_conf;
+$element_classes = array();
+foreach($cfg->values as $value) $element_classes[] = $cfg->element_class_prefix . $value;
+
+$element_class_list = implode(' ', $element_classes);
+$step_values = '[' . implode(', ', $cfg->values) . ']';
+$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
+
+$js = "
+jQuery(document).ready(function()
+{
+	fc_attachSingleSlider({
+		'name': '".$name."',
+		'step_values': ".$step_values.",
+		'step_labels': ".$step_labels.",
+		'initial_pos': ".$cfg->initial_pos.",
+		'element_selector': '".$cfg->element_selector."',
+		'element_class_list': '".$element_class_list."',
+		'element_class_prefix': '".$cfg->element_class_prefix."'
+	});
+});
+";
+JFactory::getDocument()->addScriptDeclaration($js);
+
+
+$slider_conf = new stdClass();
+$slider_conf->slider_name = $name = "fc-uploader-grid-thumb-size";
+$slider_conf->element_selector = "#multiple_uploader li.plupload_delete";
+$slider_conf->element_class_prefix = "thumb_";
+$slider_conf->initial_pos = 2;
+$slider_conf->values = array(90, 120, 150, 200, 250);
+$slider_conf->labels = array();
+foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
+
+$cfg = $slider_conf;
+$element_classes = array();
+foreach($cfg->values as $value) $element_classes[] = $cfg->element_class_prefix . $value;
+
+$element_class_list = implode(' ', $element_classes);
+$step_values = '[' . implode(', ', $cfg->values) . ']';
+$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
+
+$js = "
+var fc_uploader_slider_cfg = {
+	'name': '".$name."',
+	'step_values': ".$step_values.",
+	'step_labels': ".$step_labels.",
+	'initial_pos': ".$cfg->initial_pos.",
+	'element_selector': '".$cfg->element_selector."',
+	'element_class_list': '".$element_class_list."',
+	'element_class_prefix': '".$cfg->element_class_prefix."'
+}
 ";
 JFactory::getDocument()->addScriptDeclaration($js);
 
@@ -661,7 +619,7 @@ flexicontent_html::loadFramework('flexi-lib');
 </script>*/
 ?>
 
-<div id="fileman-overlay" onclick="jQuery('img.fc-fileman-thumb.zoomed').trigger('click');"></div>
+<div id="fc-fileman-overlay" onclick="jQuery('img.fc-fileman-thumb.zoomed').trigger('click');"></div>
 
 <div id="flexicontent" class="flexicontent">
 
@@ -1003,7 +961,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						<?php echo $checked; ?>
 						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
-					
+
 					<td class="center">
 						<div class="fc-fileman-list-thumb-box thumb_40" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 							<?php echo $thumb_or_icon; ?>
@@ -1218,7 +1176,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					$items_link = $items_link_arr[$i];
 		   		?>
 
-				<div class="fc-fileman-thumb-box thumb_150" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
+				<div class="fc-fileman-grid-thumb-box thumb_150" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 					<?php
 					$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
 					echo $thumb_or_icon;

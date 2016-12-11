@@ -1,0 +1,11 @@
+body #flexicontent .adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming {
+	top: 10%;
+	left: 10%;
+}
+body #flexicontent .adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming.zoomed {
+	max-height: 80%;
+	max-width: 80%;
+}
+body #flexicontent label {
+	display: inline-block;
+}
