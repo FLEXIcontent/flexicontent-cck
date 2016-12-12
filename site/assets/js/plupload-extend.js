@@ -43,7 +43,7 @@
 			</div>\
 			');
 
-			fc_attachSingleSlider(fc_uploader_slider_cfg);
+			setTimeout(function(){ fc_attachSingleSlider(fc_uploader_slider_cfg); }, 40);
 		}
 	}
 
