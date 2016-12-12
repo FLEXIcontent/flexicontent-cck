@@ -1691,6 +1691,7 @@
 			jQuery(cfg.element_selector)
 				.removeClass(cfg.element_class_list)
 				.addClass(cfg.element_class_prefix + slider_input.value);
+			fclib_setCookie(slider_input.name, slider_input.value, 0);
 		});
 
 		inputSL.addEventListener('change', function(){

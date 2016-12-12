@@ -37,6 +37,8 @@ $action_url_js = str_replace('&amp;', '&', $action_url);
 $session = JFactory::getSession();
 $document = JFactory::getDocument();
 $cparams = JComponentHelper::getComponent('com_flexicontent')->params;
+$app  = JFactory::getApplication();
+$jinput = $app->input;
 
 $secure_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
 
@@ -290,8 +292,17 @@ $slider_conf = new stdClass();
 $slider_conf->slider_name = $name = "fc-fileman-list-thumb-size";
 $slider_conf->element_selector = "div.fc-fileman-list-thumb-box";
 $slider_conf->element_class_prefix = "thumb_";
-$slider_conf->initial_pos = 0;
 $slider_conf->values = array(40, 60, 90, 120, 150);
+
+$thumb_size['fm-list'] = $jinput->cookie->get($name . '-val', 40, 'int');
+$slider_conf->initial_pos = (int) array_search($thumb_size['fm-list'], $slider_conf->values);
+if ($slider_conf->initial_pos === false)
+{
+	$slider_conf->initial_pos = 0;
+}
+$thumb_size['fm-list'] = $slider_conf->values[$slider_conf->initial_pos];
+$jinput->cookie->set($name . '-val', $thumb_size['fm-list']);
+
 $slider_conf->labels = array();
 foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
 //include(dirname(__FILE__). '/../../filemanager/tmpl/layouts/single_slider.php');
@@ -325,9 +336,18 @@ $slider_conf = new stdClass();
 $slider_conf->slider_name = $name = "fc-fileman-grid-thumb-size";
 $slider_conf->element_selector = "div.fc-fileman-grid-thumb-box";
 $slider_conf->element_class_prefix = "thumb_";
-$slider_conf->initial_pos = 2;
 $slider_conf->values = array(90, 120, 150, 200, 250);
 $slider_conf->labels = array();
+
+$thumb_size['fm-grid'] = $jinput->cookie->get($name . '-val', 150, 'int');
+$slider_conf->initial_pos = (int) array_search($thumb_size['fm-grid'], $slider_conf->values);
+if ($slider_conf->initial_pos === false)
+{
+	$slider_conf->initial_pos = 0;
+}
+$thumb_size['fm-grid'] = $slider_conf->values[$slider_conf->initial_pos];
+$jinput->cookie->set($name . '-val', $thumb_size['fm-grid']);
+
 foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
 //include(dirname(__FILE__). '/../../filemanager/tmpl/layouts/single_slider.php');
 
@@ -360,9 +380,18 @@ $slider_conf = new stdClass();
 $slider_conf->slider_name = $name = "fc-uploader-grid-thumb-size";
 $slider_conf->element_selector = "#multiple_uploader li.plupload_delete";
 $slider_conf->element_class_prefix = "thumb_";
-$slider_conf->initial_pos = 2;
 $slider_conf->values = array(90, 120, 150, 200, 250);
 $slider_conf->labels = array();
+
+$thumb_size['up-grid'] = $jinput->cookie->get($name . '-val', 150, 'int');
+$slider_conf->initial_pos = (int) array_search($thumb_size['up-grid'], $slider_conf->values);
+if ($slider_conf->initial_pos === false)
+{
+	$slider_conf->initial_pos = 0;
+}
+$thumb_size['up-grid'] = $slider_conf->values[$slider_conf->initial_pos];
+$jinput->cookie->set($name . '-val', $thumb_size['up-grid']);
+
 foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
 
 $cfg = $slider_conf;
@@ -963,7 +992,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					</td>
 
 					<td class="center">
-						<div class="fc-fileman-list-thumb-box thumb_40" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
+						<div class="fc-fileman-list-thumb-box thumb_<?php echo $thumb_size['fm-list'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 							<?php echo $thumb_or_icon; ?>
 						</div>
 					</td>
@@ -1176,7 +1205,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					$items_link = $items_link_arr[$i];
 		   		?>
 
-				<div class="fc-fileman-grid-thumb-box thumb_150" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
+				<div class="fc-fileman-grid-thumb-box thumb_<?php echo $thumb_size['fm-grid'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 					<?php
 					$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
 					echo $thumb_or_icon;
