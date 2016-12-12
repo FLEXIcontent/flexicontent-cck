@@ -45,7 +45,7 @@ $secure_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s
 // Common language strings
 $edit_entry = JText::_('FLEXI_EDIT_FILE', true);
 $view_entry = JText::_('FLEXI_VIEW', true);
-$select_entry = JText::_('FLEXI_SELECT', true);
+$insert_entry = JText::_('FLEXI_INSERT', true);
 $usage_in_str = JText::_('FLEXI_USAGE_IN', true);
 $fields_str = JText::_('FLEXI_FIELDS', true);
 
@@ -813,10 +813,6 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					<th>&nbsp;</th>
 
-				<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
-					<th>&nbsp;</th>
-				<?php endif; ?>
-
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
 						<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -867,7 +863,11 @@ flexicontent_html::loadFramework('flexi-lib');
 				<?php if (!$this->folder_mode && !empty($this->cols['file_id'])) : ?>
 					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
-				
+
+				<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
+					<th>&nbsp;</th>
+				<?php endif; ?>
+
 				</tr>
 			</thead>
 		
@@ -899,6 +899,7 @@ flexicontent_html::loadFramework('flexi-lib');
 				<?php
 				$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
 				$thumbs_icons_arr = array();
+				$filenames_cut = array();
 				$items_link_arr = array();
 
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
@@ -1031,6 +1032,7 @@ flexicontent_html::loadFramework('flexi-lib');
 							} else {
 								$filename_cut = htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8');
 							}
+							$filenames_cut[$i] = $filename_cut;
 						?>
 						<?php echo '
 						<a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid='.$row->id.'" title="'.$edit_entry.'">
@@ -1139,6 +1141,14 @@ flexicontent_html::loadFramework('flexi-lib');
 				
 			<?php endif; ?>
 				
+					<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
+					<td>
+						<a class="btn btn-mini" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }" style="padding: 4px;">
+							<span class="icon-remove" title="<?php echo JText::_('FLEXI_REMOVE'); ?>"></span>
+						</a>
+					</td>
+					<?php endif; ?>
+
 				</tr>
 				<?php 
 					$k = 1 - $k;
@@ -1214,6 +1224,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					'; ?>
 					<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
 					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+					<span class="fc-fileman-filename-box"><?php echo $filenames_cut[$i]; ?></span>
 				</div>
 				<?php 
 					$k = 1 - $k;
