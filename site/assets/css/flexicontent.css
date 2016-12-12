@@ -173,8 +173,11 @@ input[type="radio"].fc_checkradio + label.green,
 .flexicontent input[type="radio"] + label.green:not(.plupload_button):not(.btn) {
 	background: url(../images/checks3.png) no-repeat 0 -72px !important;
 }
+.flexicontent input[type="radio"] + label.green.single,
+.flexicontent input[type="checkbox"] + label.green.single,
 .fc_checkradio + label.green.single {
 	padding-left: 18px !important;
+	margin: 0px !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
@@ -1510,11 +1513,6 @@ body div .badge-info-2 {
 body div .badge-box {
 	border-radius: 3px;
 }
-body div a.striketext {
-	text-decoration: line-through;
-	color: red;
-	font-style: italic;
-}
 ul#ultagbox {
 	margin: 0;
 	padding: 0;
@@ -2500,6 +2498,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	float: right;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box {
+	overflow: hidden;
 	display: inline-block;
 	float: none;
 	clear: none;
@@ -2515,27 +2514,28 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_90 {
 	width: 90px;
-	height: 90px;
+	height: 110px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_120 {
 	width: 120px;
-	height: 120px;
+	height: 140px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_150 {
 	width: 150px;
-	height: 150px;
+	height: 170px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_200 {
 	width: 200px;
-	height: 200px;
+	height: 220px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_250 {
 	width: 250px;
-	height: 250px;
+	height: 270px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.selected {
 	border: 3px solid green;
 }
+.adminthumbs.fcmanthumbs .fc-fileman-filename-box,
 .adminthumbs.fcmanthumbs .fc-fileman-delete-btn,
 .adminthumbs.fcmanthumbs .fc-fileman-preview-btn,
 .adminthumbs.fcmanthumbs .fc-fileman-selection-mark {
@@ -2546,6 +2546,33 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	height: 32px;
 	line-height: 32px;
 	border-radius: 4px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-filename-box {
+	bottom: -3px !important;
+	left: 36px !important;
+	font-size: 12px;
+	overflow: hidden;
+	border-radius: 4px 0 0 0;
+	padding: 0px 4px;
+	background-color: black;
+	color: white;
+	line-height: 21px;
+	height: 24px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_90 .fc-fileman-filename-box {
+	width: 53px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_120 .fc-fileman-filename-box {
+	width: 83px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_150 .fc-fileman-filename-box {
+	width: 113px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_200 .fc-fileman-filename-box {
+	width: 163px;
+}
+.adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_250 .fc-fileman-filename-box {
+	width: 213px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-delete-btn {
 	top: -3px !important;
@@ -2645,11 +2672,12 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
 	-webkit-transition: all 0s;
 	transition: all 0s;
-	z-index: 1001;
+	z-index: 2001;
 }
 .adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming.zoomed {
-	max-height: 100%;
-	max-width: 100%;
+	max-height: 96%;
+	max-width: 96%;
+	border-radius: 2px;
 }
 #fc-uploader-loading {
 	color: black;
@@ -2667,15 +2695,16 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	right: 0;
 	bottom: 0;
 	background-color: #707070;
-	background-image: -webkit-repeating-linear-gradient(135deg,#707070,#707070 6px,#606060 6px,#606060 12px);
-	background-image: repeating-linear-gradient(135deg,#707070,#707070 6px,#606060 6px,#606060 12px);
-	opacity: 0.5;
-	filter: alpha(opacity=50);
-	z-index: 1000;
+	background-image: -webkit-repeating-linear-gradient(135deg,#707070,#707070 6px,#676767 6px,#676767 12px);
+	background-image: repeating-linear-gradient(135deg,#707070,#707070 6px,#676767 6px,#676767 12px);
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+	z-index: 2000;
 }
 .adminlist.fcmanlist .fc-fileman-list-thumb-box img.fc-fileman-thumb {
 	border: 1px solid #d0d0d0;
 	border-radius: 2px;
+	cursor: pointer;
 	-webkit-transition: width 0.6s ease-in, height 0.6s ease-in;
 	transition: width 0.6s ease-in, height 0.6s ease-in;
 }
@@ -2755,6 +2784,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	max-height: 250px;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete {
+	cursor: move;
 	display: inline-block;
 	background: white;
 	border: 1px solid #dfdfdf;
@@ -2885,9 +2915,10 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .plupload_file_name > span:first-of-type {
 	display: inline-block;
-	width: 200px;
-	white-space: normal;
-	word-wrap: break-word;
+	width: auto;
+	white-space: nowrap;
+	word-wrap: normal;
+	overflow: hidden;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn-group.fc_uploader_row_btns {
 	margin: 0px 6px 0px 0px;
@@ -2977,9 +3008,24 @@ table.fc_uploader_header_tbl td {
 table.fc_uploader_header_tbl td:last-child {
 	padding: 1px 0px 1px 0px;
 }
-.fc_set_file_assignment {
-	max-width: 240px;
+.flexicontent a.fc_set_file_assignment {
+	width: 240px;
+	word-break: break-all;
 	word-wrap: break-word;
+	color: black;
+	text-align: initial;
+}
+.flexicontent a.fc_set_file_assignment.striketext {
+	color: gray;
+	font-style: italic;
+}
+.flexicontent a.fc_set_file_assignment.striketext > .icon-new,
+.flexicontent a.fc_set_file_assignment > .icon-checkbox {
+	display: none;
+}
+.flexicontent a.fc_set_file_assignment > .icon-new,
+.flexicontent a.fc_set_file_assignment.striketext > .icon-checkbox {
+	display: inline-block;
 }
 @media (max-width: 1200px) {
 	#multiple_uploader.fc_file_uploading .plupload_header_content {
@@ -3116,7 +3162,7 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #fc_filter_form_blocker {
 	display: none;
-	z-index: 1000;
+	z-index: 2000;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -3125,7 +3171,7 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #fc_filter_form_blocker .fc_blocker_opacity {
 	display: block;
-	z-index: 1000;
+	z-index: 2000;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -3137,7 +3183,7 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #fc_filter_form_blocker .fc_blocker_content {
 	display: block;
-	z-index: 1001;
+	z-index: 2001;
 	position: fixed;
 	top: 35%;
 	left: 50%;
