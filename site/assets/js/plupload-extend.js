@@ -26,9 +26,10 @@
 				</div>\
 			')
 			.prepend('\
-				<div id="fc-uploader-grid-thumb-size_nouislider" class="fman_grid_element"></div>\
+				<select id="fc-uploader-grid-thumb-size-sel" name="fc-uploader-grid-thumb-size-sel" type="text" style="display: none;"></select>\
+				<div id="fc-uploader-grid-thumb-size_nouislider" class="fc_uploader_grid_element" style="visibility: hidden; display: none;"></div>\
 				<div class="fc_slider_input_box">\
-					<input id="fc-uploader-grid-thumb-size-val" name="fc-uploader-grid-thumb-size-val" type="text" size="12" value="140" />\
+					<input id="fc-uploader-grid-thumb-size-val" name="fc-uploader-grid-thumb-size-val" type="text" size="12" value="150" />\
 				</div>\
 			')
 			.prepend('\
@@ -38,8 +39,8 @@
 			')
 			.prepend('\
 			<div class="btn-group" style="margin: 12px; float: right;">\
-				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').removeClass(\'fc_uploader_thumbs_view\');" style="width: 60px;" title="Details"><i class="icon-list-view"></i></button>\
-				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').addClass(\'fc_uploader_thumbs_view\');" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
+				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="width: 60px;" title="Details"><i class="icon-list-view"></i></button>\
+				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
 			</div>\
 			');
 
@@ -72,6 +73,9 @@
 				jQuery("#"+file_row_id).find('.fc_props_edit_btn').addClass("btn-success") :
 				jQuery("#"+file_row_id).find('.fc_props_edit_btn').removeClass("btn-success") ;
 		}
+		
+		jQuery('#fc-uploader-grid-thumb-size-sel').trigger('change');
+		jQuery('#fc-uploader-grid-thumb-size_nouislider').trigger('change');
 	}
 
 
@@ -203,7 +207,9 @@
 			{
 				// This will scale the image (in memory) before it tries to render it. This just reduces the amount of Base64 data that needs to be rendered.
 				// Use higher resultion to allow zooming and also for better thumbnail
-				this.downsize( 1000, 1000 );
+				var min_dimension = this.width > this.height ? this.height : this.width;
+				min_dimension = min_dimension > 1000 ? 1000 : min_dimension;
+				this.downsize({width: min_dimension, height: min_dimension, crop: 'cc'});
 
 				// Now that the image is preloaded, grab the Base64 encoded data URL. This will show the image without making an Network request using the client-side file binary.
 				fc_plupload_loaded_imgs[file_row_id].prop( "src", this.getAsDataURL() ).removeClass('plupload_loading_img');

@@ -1628,8 +1628,40 @@
 	{
 		var slider = document.getElementById(cfg.name + '_nouislider');
 
+		var selectSL = jQuery('#' + cfg.name + '-sel');
 		var inputSL = document.getElementById(cfg.name + '-val');
 		var isSingle = 1;
+
+		var IEversion = isIE();
+		var is_IE8 = IEversion && IEversion < 9;
+		if (is_IE8)
+		{
+			if (selectSL.length)
+			{
+				var selected;
+				jQuery.each(cfg.step_values, function(key, value)
+				{
+					selectSL.append(
+						jQuery('<option></option>')
+							.attr('value', cfg.step_values[key])
+							.text(cfg.step_labels[key])
+					);
+				});
+
+				selectSL
+					.val(cfg.step_values[cfg.initial_pos])
+					.on('change', function(e, data) {
+						var slider_input = jQuery('#' + cfg.name + '-val').get(0);
+						jQuery(cfg.element_selector)
+							.removeClass(cfg.element_class_list)
+							.addClass(cfg.element_class_prefix + selectSL.val());
+						fclib_setCookie(slider_input.name, selectSL.val(), 0);
+					})
+					.css('display', '');  // avoid show() it adds display: block
+			}
+			return;
+		}
+		slider.style.display = '';
 
 		var step_values = cfg.step_values;
 		var step_labels = cfg.step_labels;
@@ -1686,8 +1718,6 @@
 		slider.noUiSlider.on('change', function() {
 			var slider = jQuery('#' + cfg.name + '_nouislider');
 			var slider_input = jQuery('#' + cfg.name + '-val').get(0);
-			var jform  = slider.closest('form');
-			var form   = jform.get(0);
 			jQuery(cfg.element_selector)
 				.removeClass(cfg.element_class_list)
 				.addClass(cfg.element_class_prefix + slider_input.value);
@@ -1702,4 +1732,20 @@
 			}
 			slider.noUiSlider.set([value, null]);
 		});
+	}
+
+	// Toggle elements of all other views when switching between views (e.g. details / thumbnails views)
+	function fc_toggle_view_mode(new_btn)
+	{
+		var btns = new_btn.parent().children();
+	
+		btns.removeClass('active');
+		btns.each(function(index, value)
+		{
+			var btn = jQuery(value);
+			jQuery(btn.data('toggle_selector')).hide();
+		});
+	
+		new_btn.addClass('active');
+		jQuery(new_btn.data('toggle_selector')).show().css('display', '').css('visibility', '');
 	}

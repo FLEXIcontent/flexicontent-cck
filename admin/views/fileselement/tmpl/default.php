@@ -167,7 +167,7 @@ function fman_zoom_thumb(e, obj)
 		img.removeClass('zoomed');
 		setTimeout(function(){
 			img.removeClass('zooming'); jQuery('#fc-fileman-overlay').hide();
-			if (IEversion && IEversion == 8) img.css('left', '');
+			if (IEversion && IEversion < 9) img.css('left', '');
 		}, 10);
 	}
 	else
@@ -176,30 +176,12 @@ function fman_zoom_thumb(e, obj)
 		jQuery('#fc-fileman-overlay').show();
 		img.addClass('zooming zoomed');
 		btn.addClass('active btn-info');
-		if (IEversion && IEversion == 8)
+		if (IEversion && IEversion < 9)
 		{
 			//setTimeout(function(){ img.css('left', jQuery(window).width()/2-(img.width()/2)); }, 10);
 			img.css('left', jQuery(window).width()/2-(img.width()/2));
 		}
 	}
-}
-
-
-
-// Switch between details / thumbnails views
-function fman_toggle_view_mode(new_btn)
-{
-	var btns = new_btn.parent().children();
-
-	btns.removeClass('active');
-	btns.each(function(index, value)
-	{
-		var btn = jQuery(value);
-		jQuery(btn.data('toggle_selector')).hide();
-	});
-
-	new_btn.addClass('active');
-	jQuery(new_btn.data('toggle_selector')).show().css('visibility', '');
 }
 
 
@@ -286,7 +268,6 @@ $perms = FlexicontentHelperPerm::getPerm();  // get global perms
 
 
 flexicontent_html::loadFramework('nouislider');
-
 
 $slider_conf = new stdClass();
 $slider_conf->slider_name = $name = "fc-fileman-list-thumb-size";
@@ -387,7 +368,7 @@ $thumb_size['up-grid'] = $jinput->cookie->get($name . '-val', 150, 'int');
 $slider_conf->initial_pos = (int) array_search($thumb_size['up-grid'], $slider_conf->values);
 if ($slider_conf->initial_pos === false)
 {
-	$slider_conf->initial_pos = 0;
+	$slider_conf->initial_pos = 1;
 }
 $thumb_size['up-grid'] = $slider_conf->values[$slider_conf->initial_pos];
 $jinput->cookie->set($name . '-val', $thumb_size['up-grid']);
@@ -789,16 +770,18 @@ flexicontent_html::loadFramework('flexi-lib');
 			</span>
 
 			<div class="btn-group" style="margin: 0 12px;">
-				<button type="button" class="btn list-view hasTooltip active" id="btn-list-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_list_element" style="min-width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_DETAILS'); ?>"><i class="icon-list-view"></i></button>
-				<button type="button" class="btn grid-view hasTooltip" id="btn-grid-view" onclick="fman_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_grid_element" style="min-width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_GRID'); ?>"><i class="icon-grid-view"></i></button>
+				<button type="button" class="btn list-view hasTooltip active" id="btn-fman-list-view" onclick="fc_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_list_element" style="min-width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_DETAILS'); ?>"><i class="icon-list-view"></i></button>
+				<button type="button" class="btn grid-view hasTooltip" id="btn-fman-grid-view" onclick="fc_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_grid_element" style="min-width: 60px;" title="<?php echo JText::_('FLEXI_FILEMAN_GRID'); ?>"><i class="icon-grid-view"></i></button>
 			</div>
 
-			<div id="fc-fileman-list-thumb-size_nouislider" class="fman_list_element" style="width: 260px; margin: 0 0 -7px 16px; display: inline-block;"></div>
+			<select id="fc-fileman-grid-thumb-size-sel" name="fc-fileman-grid-thumb-size-sel" type="text" style="display: none;"></select>
+			<div id="fc-fileman-list-thumb-size_nouislider" class="fman_list_element" style="display: none;"></div>
 			<div class="fc_slider_input_box">
 				<input id="fc-fileman-list-thumb-size-val" name="fc-fileman-list-thumb-size-val" type="text" size="12" value="140" />
 			</div>
 
-			<div id="fc-fileman-grid-thumb-size_nouislider" class="fman_grid_element" style="visibility: hidden; width: 260px; margin: 0 0 -7px 16px; display: inline-block;"></div>
+			<select id="fc-fileman-grid-thumb-size-sel" name="fc-fileman-grid-thumb-size-sel" type="text" style="display: none;"></select>
+			<div id="fc-fileman-grid-thumb-size_nouislider" class="fman_grid_element" style="visibility: hidden; display: none;"></div>
 			<div class="fc_slider_input_box">
 				<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />
 			</div>
@@ -986,7 +969,7 @@ flexicontent_html::loadFramework('flexi-lib');
 							$filenames_cut[$i] = $filename_cut;
 						?>
 						<?php echo '
-						<a style="btn btn-min" style="padding: 4px;" id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$file_assign_link.'" title="'.$insert_entry.'">
+						<a id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$file_assign_link.'" title="'.$insert_entry.'">
 							<span class="icon-checkbox"></span> <span class="icon-new"></span> '.$filename_cut.'
 						</a>
 						'; ?>

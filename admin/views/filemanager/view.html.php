@@ -366,8 +366,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// BOF *** REMOVED files *** fileselement VIEW
 		if ($view=='fileselement')
 		{
-			$filelist = JRequest::getString('files');
-			$file = JRequest::getInt('file');
+			$filelist = $jinput->get('files', '', 'string');
+			$file = $jinput->get('file', 0, 'int');
 
 			$filelist = explode(',', $filelist);
 			$files = array();

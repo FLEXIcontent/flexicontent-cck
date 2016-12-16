@@ -198,9 +198,13 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_item      = $filter_item ? $filter_item : '';
 		
 		// *** BOF FILESELEMENT view specific ***
-		$newfileid		= JRequest::getInt('newfileid');
-		$newfilename	= base64_decode(JRequest::getVar('newfilename', ''));
-		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
+		$newfileid		= $jinput->get('newfileid', 0, 'int');
+
+		$newfilename = $app->getUserState('newfilename', null);
+		$app->setUserState('newfilename', null);
+
+		$delfilename = $app->getUserState('delfilename', null);
+		$app->setUserState('delfilename', null);
 		// *** BOF FILESELEMENT view specific ***
 		
 		
@@ -565,8 +569,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// BOF *** REMOVED files *** fileselement VIEW
 		if ($view=='fileselement')
 		{
-			$filelist = JRequest::getString('files');
-			$file = JRequest::getInt('file');
+			$filelist = $jinput->get('files', '', 'string');
+			$file = $jinput->get('file', 0, 'int');
 
 			$filelist = explode(',', $filelist);
 			$files = array();
