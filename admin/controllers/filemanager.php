@@ -97,6 +97,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
+		$session = JFactory::getSession();
 
 		// Force interactive run mode, if given parameters
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
@@ -127,7 +128,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$file = $this->input->files->get('file', '', 'array');
 			$file_row_id = $this->input->get('file_row_id', '', 'string');
 
-			$session = JFactory::getSession();
 			$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 
 			$data_from_sess = @ $uploader_file_data[$file_row_id];
@@ -334,7 +334,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Get the extension to record it in the DB
 		$ext = strtolower(flexicontent_upload::getExt($filename));
 
-		// Upload Failed
 		//echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
 		$move_success = $chunks ?
 			rename($file['tmp_name'], $filepath) :
@@ -344,6 +343,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				array('null_byte'=>true, 'forbidden_extensions'=>array('_fake_ext_'), 'php_tag_in_content'=>true, 'shorttag_in_content'=>true, 'shorttag_extensions'=>array(), 'fobidden_ext_in_content'=>false, 'php_ext_content_extensions'=>array() )
 			);
 
+		// Check of upload failed
 		if (!$move_success)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '409 Conflict') );
@@ -392,20 +392,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			// Get id of new file record
 			$file_id = (int) $db->insertid();
-
-			$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
-			if ($filter_item)
-			{
-				$session = JFactory::getSession();
-				$files = $session->get('fileselement.'.$filter_item, null);
-
-				if (!$files)
-				{
-					$files = array();
-				}
-				$files[] = $file_id;
-				$session->set('fileselement.'.$filter_item, $files);
-			}
 		}
 
 		// b. Custom Folder mode
@@ -414,6 +400,22 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$file_id = 0;
 		}
 
+		// Add information about uploaded file data into the session
+		$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
+		if ($filter_item)
+		{
+			$context = 'fileselement.item_'.$filter_item.'.uploaded_files.';
+
+			$_file_ids = $session->get($context.'ids', array());
+			$_file_ids[] = $file_id;
+			$session->set($context.'ids', $_file_ids);
+
+			$_file_names = $session->get($context.'names', array());
+			$_file_names[] = $filename;
+			$session->set($context.'names', $_file_names);
+		}
+		// TODO remove this and use the above ...
+		$app->setUserState('newfilename', $filename);
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
@@ -436,6 +438,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app = JFactory::getApplication();
+		$session = JFactory::getSession();
 
 		// Force interactive run mode, if given parameters
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
@@ -513,17 +516,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
 
+		// Add information about added (URL) file data into the session
 		if ($filter_item)
 		{
-			$session = JFactory::getSession();
-			$files = $session->get('fileselement.'.$filter_item, null);
+			$context = 'fileselement.item_'.$filter_item.'.added_urls.';
 
-			if(!$files) {
-				$files = array();
-			}
-			$files[] = $file_id;
-			$session->set('fileselement.'.$filter_item, $files);
+			$_file_ids = $session->get($context.'ids', array());
+			$_file_ids[] = $file_id;
+			$session->set($context.'ids', $_file_ids);
+
+			$_file_names = $session->get($context.'names', array());
+			$_file_names[] = $filename;
+			$session->set($context.'names', $_file_names);
 		}
+		// TODO remove this and use the above ...
+		$app->setUserState('newfilename', $filename);
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
@@ -805,8 +812,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			} else {
 				$msg = JText::_( 'FLEXI_FILES_DELETED' );
 			}
-			$vc_start = StringHelper::strrpos('?', $_SERVER['HTTP_REFERER']) ? '&' : '?'; 
-			$this->setRedirect( $_SERVER['HTTP_REFERER'].$vc_start.'delfilename='.base64_encode($filename), $msg );
+
+			// TODO revise, this after implementing multi-file deletion for fileselement 'folder' mode
+			$app->setUserState('delfilename', $filename);
+			$this->setRedirect( $_SERVER['HTTP_REFERER'], $msg );
 			return;
 		}
 		
