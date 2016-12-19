@@ -1082,8 +1082,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getDeprecatedFiles(&$deprecated=null)
 	{
+		// Store JPATH_BASE variable (needed in case of hard linking to flexicontent files outside of Joomla folder)
+		if (JPATH_BASE != realpath(__DIR__.'/../..') || !file_exists(__DIR__.'/tasks/defines.php') || filemtime(__FILE__) >= filemtime(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tasks'.DS.'defines.php'))
+		{
+			file_put_contents(__DIR__.'/tasks/defines.php', '<?php'."\n".'define(\'JPATH_BASE\', \''.JPATH_BASE.'\');'."\n");
+		}
+
 		$deprecated = array();
-		return true;  // Do not execute
+		return true;  // Do not execute, TODO revise this task and remove some used files
 		
 		static $return;
 		if ($return===true) return $return;
@@ -1107,7 +1113,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
 		$cattmpl 	= JFolder::files($catdir);		
 		$ctmpl 		= array_diff($cattmpl,$files);
-		foreach ($ctmpl as $c) {
+		foreach ($ctmpl as $c)
+		{
 			$deprecated[$catdir][] = $c;
 		}
 		
@@ -1121,7 +1128,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
 		$itemtmpl	= JFolder::files($itemdir);		
 		$itmpl 		= array_diff($itemtmpl,$files);
-		foreach ($itmpl as $c) {
+		foreach ($itmpl as $c)
+		{
 			$deprecated[$itemdir][] = $c;
 		}
 		

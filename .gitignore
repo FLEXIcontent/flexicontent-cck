@@ -62,4 +62,4 @@ site/librairies/TCPDF/
 site/librairies/cropper/
 
 site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
-site/tasks/includes/defines.php
+site/tasks/defines.php
