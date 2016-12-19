@@ -16,8 +16,10 @@
 		if (uploader_container.find('.fc_plupload_toggleThumbs_btn').length==0)
 		{
 			uploader_container.find('.plupload_filelist').sortable({
+				cancel: '.fc_zooming',
 				containment: 'parent',
-				tolerance: 'pointer'
+				tolerance: 'pointer',
+				distance: 12
 			});
 			uploader_container.find('.plupload_header_content')
 			.prepend('\
@@ -171,25 +173,36 @@
 			imgpreview_handle.add(fc_plupload_loaded_imgs[file_row_id]).on( "click", function()
 			{
 				// Close any open previews
-				var file_row, btn, img_box;
+				var IEversion = isIE();
+				var file_row, btn, img_box, img;
 				file_row = jQuery(this).closest("li");
 				btn = file_row.find('.fc_img_preview_btn');
 				img_box = file_row.find('.plupload_img_preview');
+				img = img_box.find('img');
 				var is_img = this.tagName=='IMG';
 
 				file_row.closest("ul").find("li:not('#" + btn.closest('li').attr('id') + "') .btn.fc_img_preview_btn.active").trigger("click");
-				if (file_row.hasClass("fc_uploader_zoomed"))
+				if (file_row.hasClass("fc_zoomed"))
 				{
 					btn.removeClass("active btn-info");
-					file_row.removeClass("fc_uploader_zoomed");
-					setTimeout(function(){ file_row.removeClass("fc_uploader_zooming"); }, 620);
+					file_row.removeClass("fc_zoomed");
+					setTimeout(function(){
+						file_row.removeClass("fc_zooming");
+						jQuery('#fc-fileman-overlay').hide();
+						if (IEversion && IEversion < 9) img.css('left', '');
+					}, (!IEversion || IEversion > 9 ? 320 : 20));
 				}
 				else
 				{
-					if (file_row.hasClass("fc_uploader_zooming")) return;  // Zooming already started
-					if (is_img && file_row.closest('.plupload_container').hasClass("fc_uploader_thumbs_view")) return;    // Avoid zooming when clicking thumbnails in grid view
-					file_row.addClass("fc_uploader_zooming fc_uploader_zoomed");
-					btn.addClass("active btn-info");
+					if (file_row.hasClass("fc_zooming")) return;  // Zooming already started
+					if (is_img /*&& file_row.closest('.plupload_container').hasClass("fc_uploader_thumbs_view")*/) return;    // Avoid zooming when clicking thumbnails in grid view and for consistency in list view too ...
+					jQuery('#fc-fileman-overlay').show();
+					file_row.addClass("fc_zooming");
+					setTimeout(function(){
+						file_row.addClass("fc_zoomed");
+						btn.addClass("active btn-info");
+						if (IEversion && IEversion < 9) img.css('left', jQuery(window).width()/2-(img.width()/2));
+					}, 20);
 				}
 			});
 

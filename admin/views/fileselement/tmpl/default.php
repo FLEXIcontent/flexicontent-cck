@@ -161,26 +161,26 @@ function fman_zoom_thumb(e, obj)
 	if (img.length==0) return;
 	var IEversion = isIE();
 
-	if (img.hasClass('zoomed'))
+	if (img.hasClass('fc_zoomed'))
 	{
 		btn.removeClass('active btn-info');
-		img.removeClass('zoomed');
+		img.removeClass('fc_zoomed');
 		setTimeout(function(){
-			img.removeClass('zooming'); jQuery('#fc-fileman-overlay').hide();
+			img.removeClass('fc_zooming');
+			jQuery('#fc-fileman-overlay').hide();
 			if (IEversion && IEversion < 9) img.css('left', '');
-		}, 10);
+		}, (!IEversion || IEversion > 9 ? 320 : 20));
 	}
 	else
 	{
-		if (img.hasClass('zooming')) return;
+		if (img.hasClass('fc_zooming')) return;
 		jQuery('#fc-fileman-overlay').show();
-		img.addClass('zooming zoomed');
-		btn.addClass('active btn-info');
-		if (IEversion && IEversion < 9)
-		{
-			//setTimeout(function(){ img.css('left', jQuery(window).width()/2-(img.width()/2)); }, 10);
-			img.css('left', jQuery(window).width()/2-(img.width()/2));
-		}
+		img.addClass('fc_zooming');
+		setTimeout(function(){
+			img.addClass('fc_zoomed');
+			btn.addClass('active btn-info');
+			if (IEversion && IEversion < 9) img.css('left', jQuery(window).width()/2-(img.width()/2));
+		}, 20);
 	}
 }
 
@@ -629,7 +629,7 @@ flexicontent_html::loadFramework('flexi-lib');
 </script>*/
 ?>
 
-<div id="fc-fileman-overlay" onclick="jQuery('img.fc-fileman-thumb.zoomed').trigger('click');"></div>
+<div id="fc-fileman-overlay" onclick="jQuery('img.fc_zoomed, li.fc_zoomed .plupload_img_preview img').trigger('click');"></div>
 
 <div id="flexicontent" class="flexicontent">
 
@@ -795,9 +795,13 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
-						<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-						/
-						<?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+						<?php if (!$this->folder_mode) : ?>
+							<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							&nbsp; -- &nbsp;
+							<?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+						<?php else: ?>
+							<?php echo JText::_('FLEXI_FILENAME'); ?>
+						<?php endif; ?>
 					</th>
 					
 			<?php if (!$this->folder_mode) : ?>
@@ -864,8 +868,6 @@ flexicontent_html::loadFramework('flexi-lib');
 				$n = count($this->rows);
 				foreach ($this->rows as $row)
 				{
-					$checked = @ JHTML::_('grid.checkedout', $row, $i );
-					
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
@@ -901,7 +903,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					if ( empty($thumb_or_icon) )
 					{
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
+							$thumb_or_icon = '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-box badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
@@ -948,7 +950,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					</td>
 					
 					<td class="center">
-						<?php echo $checked; ?>
+						<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
 
@@ -960,11 +962,11 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					<td class="left">
 						<?php
-							$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
-							if (StringHelper::strlen($row->filename_original) > 100) {
-								$filename_cut = htmlspecialchars(flexicontent_html::striptagsandcut($_filename_original, 100) . '...', ENT_QUOTES, 'UTF-8');
+							$row->filename_displayed = $row->filename_original ? $row->filename_original : $row->filename;
+							if (StringHelper::strlen($row->filename_displayed) > 100) {
+								$filename_cut = htmlspecialchars(StringHelper::substr($row->filename_displayed, 100), ENT_QUOTES, 'UTF-8') . '...';
 							} else {
-								$filename_cut = htmlspecialchars($_filename_original, ENT_QUOTES, 'UTF-8');
+								$filename_cut = htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8');
 							}
 							$filenames_cut[$i] = $filename_cut;
 						?>
@@ -975,11 +977,11 @@ flexicontent_html::loadFramework('flexi-lib');
 						'; ?>
 						
 						<?php
-						if (!$this->folder_mode && $row->filename != $row->filename_displayed)
+						if (!$this->folder_mode && $row->altname != $row->filename_displayed)
 						{
-							echo StringHelper::strlen($row->filename) > 100 ?
-								'<br/><small>'.StringHelper::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 100).'... </small>' :
-								'<br/><small>'.htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8').'</small>' ;
+							echo StringHelper::strlen($row->altname) > 100 ?
+								'<br/><small>'.StringHelper::substr( htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8'), 0 , 100).'... </small>' :
+								'<br/><small>'.htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8').'</small>' ;
 						}
 						?>
 					</td>
@@ -1144,7 +1146,6 @@ flexicontent_html::loadFramework('flexi-lib');
 
 				<div class="fc-fileman-grid-thumb-box thumb_<?php echo $thumb_size['fm-grid'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 					<?php
-					$_filename_original = $row->filename_original ? $row->filename_original : $row->filename;
 					echo $thumb_or_icon;
 					echo !$is_img ? '' : '
 					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>

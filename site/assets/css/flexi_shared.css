@@ -321,7 +321,7 @@ table.adminlist thead th {
 	border-width: 0px !important;
 	color: #555;
 	text-align: unset;
-	padding: 6px 8px;
+	padding: 6px 4px;
 }
 table.adminlist thead th.center,
 table.adminlist td.center {
@@ -350,7 +350,13 @@ table.adminlist thead th .filterdel img {
 	vertical-align: bottom;
 }
 table.adminlist td {
-	padding: 6px 8px;
+	padding: 4px;
+}
+table tr td:first-child::after {
+	content: "";
+	display: inline-block;
+	vertical-align: middle;
+	min-height: 30px;
 }
 table.adminlist input[type="text"] {
 	width: auto !important;
@@ -1435,7 +1441,6 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	float: right;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box {
-	overflow: hidden;
 	display: inline-block;
 	float: none;
 	clear: none;
@@ -1444,30 +1449,30 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	border-radius: 4px;
 	border: 3px solid #ddd;
 	margin: 4px 6px;
-	padding: 4px;
+	padding: 0;
 	cursor: pointer;
-	-webkit-transition: width 0.6s ease-in, height 0.6s ease-in;
-	transition: width 0.6s ease-in, height 0.6s ease-in;
+	-webkit-transition: width 0.3s ease-in, height 0.3s ease-in;
+	transition: width 0.3s ease-in, height 0.3s ease-in;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_90 {
 	width: 90px;
-	height: 110px;
+	height: 118px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_120 {
 	width: 120px;
-	height: 140px;
+	height: 148px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_150 {
 	width: 150px;
-	height: 170px;
+	height: 178px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_200 {
 	width: 200px;
-	height: 220px;
+	height: 228px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_250 {
 	width: 250px;
-	height: 270px;
+	height: 278px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.selected {
 	border: 3px solid green;
@@ -1485,31 +1490,34 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	border-radius: 4px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-filename-box {
-	bottom: -3px !important;
-	left: 36px !important;
+	bottom: 0;
+	left: 36px;
 	font-size: 12px;
 	overflow: hidden;
-	border-radius: 4px 0 0 0;
+	border-radius: 4px 0 4px 0;
 	padding: 0px 4px;
 	background-color: black;
 	color: white;
 	line-height: 21px;
 	height: 24px;
+	-webkit-transition: all 0.3s ease-in;
+	transition: all 0.3s ease-in;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_90 .fc-fileman-filename-box {
-	width: 53px;
+	width: 50px;
+	left: 32px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_120 .fc-fileman-filename-box {
-	width: 83px;
+	width: 76px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_150 .fc-fileman-filename-box {
-	width: 113px;
+	width: 106px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_200 .fc-fileman-filename-box {
-	width: 163px;
+	width: 156px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_250 .fc-fileman-filename-box {
-	width: 213px;
+	width: 206px;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-delete-btn {
 	top: -3px !important;
@@ -1575,10 +1583,9 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 .adminthumbs.fcmanthumbs img.fc-fileman-thumb {
 	position: relative;
-	max-width: 150px;
-	max-height: 150px;
-	-webkit-transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
-	transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
+	border-radius: 4px;
+	-webkit-transition: max-width 0.3s ease-in, max-height 0.3s ease-in;
+	transition: max-width 0.3s ease-in, max-height 0.3s ease-in;
 }
 .adminthumbs.fcmanthumbs .fc-fileman-grid-thumb-box.thumb_90 img.fc-fileman-thumb {
 	max-width: 90px;
@@ -1600,21 +1607,19 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	max-width: 250px;
 	max-height: 250px;
 }
-.adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming {
+.adminthumbs.fcmanthumbs img.fc-fileman-thumb.fc_zooming {
 	position: fixed;
 	top: 50%;
 	left: 50%;
 	-webkit-transform: translate(-50%,-50%);
 	transform: translate(-50%,-50%);
 	box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
-	-webkit-transition: all 0s;
-	transition: all 0s;
+	cursor: pointer;
 	z-index: 2001;
 }
-.adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming.zoomed {
+.adminthumbs.fcmanthumbs img.fc-fileman-thumb.fc_zooming.fc_zoomed {
 	max-height: 96%;
 	max-width: 96%;
-	border-radius: 2px;
 }
 #fc-uploader-loading {
 	color: black;
@@ -1648,8 +1653,8 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	border: 1px solid #d0d0d0;
 	border-radius: 2px;
 	cursor: pointer;
-	-webkit-transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
-	transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
+	-webkit-transition: max-width 0.3s ease-in, max-height 0.3s ease-in;
+	transition: max-width 0.3s ease-in, max-height 0.3s ease-in;
 }
 .adminlist.fcmanlist .fc-fileman-list-thumb-box.thumb_40 img.fc-fileman-thumb {
 	max-width: 40px;
@@ -1716,10 +1721,6 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	max-width: 250px;
 	max-height: 250px;
 }
-#multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete span.plupload_img_preview > img {
-	width: auto;
-	height: auto;
-}
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete.thumb_90 .plupload_file_status,
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete.thumb_120 .plupload_file_status,
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete.thumb_150 .plupload_file_status,
@@ -1759,16 +1760,15 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	right: 24px;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete {
-	cursor: move;
 	display: inline-block;
+	cursor: move;
 	background: white;
 	border: 1px solid #dfdfdf;
 	margin: 6px 8px;
 	padding: 32px 0 0 0;
 	border-radius: 4px;
-	overflow: hidden;
-	-webkit-transition: width 0.6s ease-in, height 0.6s ease-in;
-	transition: width 0.6s ease-in, height 0.6s ease-in;
+	-webkit-transition: width 0.3s ease-in, height 0.3s ease-in;
+	transition: width 0.3s ease-in, height 0.3s ease-in;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete > * {
 	float: left;
@@ -1804,15 +1804,15 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete .plupload_file_status {
 	width: unset;
-	-webkit-transition: right 0.6s ease-in;
-	transition: right 0.6s ease-in;
+	-webkit-transition: right 0.3s ease-in;
+	transition: right 0.3s ease-in;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete .plupload_file_size {
 	clear: none;
 	width: unset;
 	margin: 0 0 0 12px;
-	-webkit-transition: right 0.6s ease-in;
-	transition: right 0.6s ease-in;
+	-webkit-transition: right 0.3s ease-in;
+	transition: right 0.3s ease-in;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete .plupload_file_action {
 	margin: 0px;
@@ -1917,6 +1917,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn-group.fc_uploader_row_btns {
 	margin: 0px 6px 0px 0px;
+	z-index: 1;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_props_edit_btn,
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist .btn.fc_img_preview_btn {
@@ -1936,10 +1937,10 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	position: relative;
 	height: auto;
 	width: auto;
-	width: 64px;
-	height: 64px;
-	-webkit-transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
-	transition: max-width 0.6s ease-in, max-height 0.6s ease-in;
+	max-width: 64px;
+	max-height: 64px;
+	-webkit-transition: max-width 0.3s ease-in, max-height 0.3s ease-in;
+	transition: max-width 0.3s ease-in, max-height 0.3s ease-in;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist span.plupload_img_preview > img.plupload_loading_img {
 	margin: 8px;
@@ -1948,23 +1949,24 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	min-height: auto !important;
 	height: auto !important;
 }
-#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.fc_uploader_zooming span.plupload_img_preview {
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete.fc_zooming span.plupload_img_preview {
 	display: inline-block !important;
 }
-#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.fc_uploader_zooming span.plupload_img_preview > img {
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete.fc_zooming span.plupload_img_preview > img {
+	position: fixed;
 	top: 50%;
 	left: 50%;
 	-webkit-transform: translate(-50%,-50%);
 	transform: translate(-50%,-50%);
-	position: fixed !important;
-	box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75) !important;
-	z-index: 2050 !important;
+	box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75);
+	cursor: pointer;
+	z-index: 2050;
 }
-#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.fc_uploader_zooming.fc_uploader_zoomed span.plupload_img_preview > img {
+#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete.fc_zooming.fc_zoomed span.plupload_img_preview > img {
 	width: auto;
 	height: auto;
-	max-height: 100% !important;
-	max-width: 100% !important;
+	max-height: 100%;
+	max-width: 100%;
 }
 #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete .plupload_file_action {
 	position: relative;
@@ -2015,10 +2017,13 @@ table.fc_uploader_header_tbl td:last-child {
 	text-align: initial;
 }
 .flexicontent a.fc_set_file_assignment.isedit_link {
-	color: black;
+	color: #3071a9;
+}
+.flexicontent a.fc_set_file_assignment.isedit_link > span {
+	margin-right: 4px;
 }
 .flexicontent a.fc_set_file_assignment.isedit_link > .icon-pencil:before {
-	color: blue;
+	color: #555;
 	margin-top: -2px;
 }
 .flexicontent a.fc_set_file_assignment.striketext {
@@ -2121,9 +2126,9 @@ table.fc_uploader_header_tbl td:last-child {
 	#multiple_uploader.fc_file_uploading .plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist > li.fc_uploader_is_image {
 		height: 32px;
 	}
-	#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li:not(.fc_uploader_zooming) span.plupload_img_preview > img {
-		height: 32px;
-		width: 32px;
+	#multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li:not(.fc_zooming) span.plupload_img_preview > img {
+		max-height: 32px;
+		max-width: 32px;
 	}
 	#multiple_uploader.fc_file_uploading .fileprops_message .fc-mssg,
 	#multiple_uploader.fc_file_uploading .fileprops_message .alert {

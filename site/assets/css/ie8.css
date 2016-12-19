@@ -1,8 +1,10 @@
-body #flexicontent .adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming {
+body #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete.fc_zooming span.plupload_img_preview > img,
+body .adminthumbs.fcmanthumbs img.fc-fileman-thumb.fc_zooming {
 	top: 10%;
 	left: 10%;
 }
-body #flexicontent .adminthumbs.fcmanthumbs img.fc-fileman-thumb.zooming.zoomed {
+body #multiple_uploader.fc_file_uploading .plupload_scroll ul.plupload_filelist > li.plupload_delete.fc_zooming.fc_uploader_zoomed span.plupload_img_preview > img,
+body .adminthumbs.fcmanthumbs img.fc-fileman-thumb.fc_zooming.fc_zoomed {
 	max-height: 80%;
 	max-width: 80%;
 }
