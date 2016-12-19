@@ -38,7 +38,7 @@ JHtml::_('behavior.multiselect');
 $user    = JFactory::getUser();
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
-$list_total_cols = 5;
+$list_total_cols = 6;
 
 JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 ?>
@@ -125,8 +125,10 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 	<table id="adminListTableFCgroups" class="adminlist fcmanlist" style="min-width: 400px;">
 	<thead>
 		<tr>
+			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th>
-				<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
 			</th>
 			<th class="hideOnDemandClass left">
 				<?php echo JText::_('COM_USERS_HEADING_GROUP_TITLE'); ?>
@@ -159,11 +161,13 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 		$canChange	= $user->authorise('core.edit.state',	'com_users');
 	?>
 		<tr class="row<?php echo $i % 2; ?>">
-			<td class="center">
+			<td>
 				<div class="adminlist-table-row"></div>
-				<?php if ($canEdit) : ?>
-					<?php echo JHtml::_('grid.id', $i, $item->id); ?>
-				<?php endif; ?>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
+			</td>
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $item->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
 			<td>
 				<?php echo str_repeat('<span class="gi">|&mdash;</span>', $item->level) ?>
@@ -202,8 +206,8 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="group" />
-	<input type="hidden" name="view" value="group" />
+	<input type="hidden" name="controller" value="groups" />
+	<input type="hidden" name="view" value="groups" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $listOrder; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />

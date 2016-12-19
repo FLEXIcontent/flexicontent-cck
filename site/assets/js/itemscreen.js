@@ -1,114 +1,84 @@
 var itemscreen = new Class(
 {
 	options:  {
-		id: "",
-		script_url: "index.php?option=com_flexicontent&controller=items&tmpl=component",
-		task: ""
+		id: '',
+		script_url: 'index.php?option=com_flexicontent&controller=items&tmpl=component',
+		task: ''
 	},
 
-	initialize: function( name, options ) {
+	initialize: function( name, options )
+	{
 		this.setOptions( options );
 		this.name = name;
 	},  
 
-	fetchscreen: function( name, options )  
+	fetchscreen: function( name )  
 	{
-		var doname = this.name;
-		if(typeof name!="undefined") {
-			doname = name;
+		var doname = typeof name != 'undefined' ? name : this.name;
+
+		if (this.options.id <= 0)
+		{
+			jQuery('#'+doname).html('0');
+			return;
 		}
-		var dooptions = {
-			method: 'get',
-			update: doname,
-			evalScripts: false
-		};
-		if(typeof options!="undefined") {
-			dooptions = options;
-		}
-		
-		var loader_html = '<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>';
-		var url_to_load = this.options.script_url + "&task=" + this.options.task + "&id=" + this.options.id;
-		
-		if (MooTools.version>='1.2.4') {
-			$(doname).set('html', loader_html);
-			if(this.options.id>0) {
-				new Request.HTML({
-					url: url_to_load,
-					method: 'get',
-					update: $(this.name),
-					evalScripts: false
-				}).send();
-			} else {
-				$(this.name).set('html', '0');
+
+		jQuery('#'+doname).html('<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		jQuery.ajax({
+			url: this.options.script_url + "&task=" + this.options.task + "&id=" + this.options.id,
+			type: 'get',
+			data: {},
+			success: function (data)
+			{
+				jQuery('#'+doname).html(data);
+			},
+			error: function (xhr, ajaxOptions, thrownError)
+			{
+				jQuery('#'+doname).html('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
-		} else {
-			$(doname).setHTML(loader_html);
-			var ajax = new Ajax(url_to_load, dooptions);
-			ajax.request.delay(300, ajax);
-		}
-		
+		});
 	},
 
 	addtag: function( cid, tagname, url )
 	{
-		var url = url+'&cid='+cid;
-		if (MooTools.version>='1.2.4') {
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				data : {'name' : tagname },
-				evalScripts: false,
-		    onSuccess: function(responseText){
-					myvar = responseText[0].wholeText.split("|");
-					if( ((typeof myvar[0])!="undefined") && (typeof myvar[1]!="undefined") ) {
-						if (myvar[0]!='0')
-							addToList(myvar[0], myvar[1]);
-						else
-							alert(myvar[1]);
-					}
-		    },
-		    onFailure: function(){
-		    	alert('Failed to add tag');
-				}
-			}).send();
-		} else {
-			var tagajax = new Ajax(url, {
-				method: 'get',
-				data : Object.toQueryString({'name' : tagname }),
-				evalScripts: false,
-				onComplete:function (html) {
-					myvar = html.split("|");
-					if( ((typeof myvar[0])!="undefined") && (typeof myvar[1]!="undefined") ) {
+		jQuery.ajax({
+			url: url+'&cid='+cid,
+			type: 'get',
+			data : {'name' : tagname },
+			success: function (data)
+	    {
+				myvar = data.split("|");
+				if( ((typeof myvar[0])!="undefined") && (typeof myvar[1]!="undefined") )
+				{
+					if (myvar[0]!='0')
 						addToList(myvar[0], myvar[1]);
-					}
+					else
+						alert(myvar[1]);
 				}
-			});
-			tagajax.request();
-		}
+	    },
+	    error: function (xhr, ajaxOptions, thrownError)
+	    {
+	    	alert('Failed to add tag'); //alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
 	},
 
-	reseter: function( task, id, div, url )
+	reseter: function( task, id, name, url )
 	{
-		var doname = div;
-		var loader_html = '<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>';
-	  var url = url+'&format=raw&task='+task+'&id='+id;
-		if (MooTools.version>='1.2.4') {
-			$(doname).set('html', loader_html);
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				update: $(div),
-				evalScripts: false
-			}).send();
-		} else {
-			$(doname).setHTML(loader_html);
-			var resetajax = new Ajax(url, {
-				method: 'get',
-				update: $(div),
-				evalScripts: false
-			});
-			resetajax.request();
-		}
+		var doname = typeof name != 'undefined' ? name : this.name;
+
+		jQuery('#'+doname).html('<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		jQuery.ajax({
+			url: url+'&format=raw&task='+task+'&id='+id,
+			type: 'get',
+			success: function (data)
+			{
+				jQuery('#'+doname).html(data);
+			},
+			error: function (xhr, ajaxOptions, thrownError)
+			{
+				jQuery('#'+doname).html('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
 	}
 });
 

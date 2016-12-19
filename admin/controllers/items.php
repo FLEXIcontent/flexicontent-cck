@@ -1541,37 +1541,28 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function getvotes()
 	{
-		$id   = JRequest::getInt('id', 0);
-		$html = 1;
-		
-		$model = $this->getModel('item');
-		$votes = $model->getRatingDisplay($id);
-		
+		$id = JFactory::getApplication()->input->get('id', 0, 'int');
+
 		@ob_end_clean();
-		echo $html;
-		exit;
+		$votes = $this->getModel('item')->getRatingDisplay($id);
+
+		jexit($votes ?: '0');
 	}
 
 
 	/**
 	 * Method to get hits
 	 * 
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function gethits()
 	{
-		$id 	= JRequest::getInt('id', 0);
-		$model 	= $this->getModel('item');
+		$id = JFactory::getApplication()->input->get('id', 0, 'int');
 
 		@ob_end_clean();
-		$hits 	= $model->gethits($id);
+		$hits = $this->getModel('item')->gethits($id);
 
-		if ($hits) {
-			echo $hits;
-		} else {
-			echo 0;
-		}
-		exit;
+		jexit($hits ?: '0');
 	}
 	
 }

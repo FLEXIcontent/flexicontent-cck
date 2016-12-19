@@ -128,6 +128,7 @@ class FlexicontentHelperPerm
 		$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates',	'com_flexicontent'); // (backend) Allow management of Templates
 		$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent'); // (backend) Allow management of Statistics
 		$permission->CanImport		= $user->authorise('flexicontent.manageimport',			'com_flexicontent'); // (backend) Allow management of (Content) Import
+		$permission->CanAppsman		= $permission->CanConfig;
 		
 		// FIELDS: management tab
 		$permission->CanFields			= $user->authorise('flexicontent.managefields', 'com_flexicontent'); // (backend) Allow management of Fields

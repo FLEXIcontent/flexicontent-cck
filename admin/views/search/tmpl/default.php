@@ -171,7 +171,11 @@ function delAllFilters() {
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<!--th class="left">
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
+			</th-->
+
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left title"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_TITLE'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			
@@ -213,16 +217,17 @@ function delAllFilters() {
 		<?php endif; ?>
 
 		<?php
-		$n = 0; $o = 0;
+		$i = 0; $o = 0;
 		foreach ($this->rows as $row): ?>
 		<tr class="<?php echo 'row', $o; ?>">
 			<td>
 				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $n ); ?>
+				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
-			<td>
-				<?php echo JHTML::_('grid.id', $n, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
-			</td>
+			<!--td>
+				<?php echo JHTML::_('grid.id', $i, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td-->
 			<td>
 				<?php echo $row->item_id; ?>
 			</td>
@@ -262,7 +267,7 @@ function delAllFilters() {
 			</td>*/ ?>
 		</tr>
 
-		<?php $n++; $o = ++$o % 2; ?>
+		<?php $i++; $o = ++$o % 2; ?>
 		<?php endforeach; ?>
 	</tbody>
 	</table>

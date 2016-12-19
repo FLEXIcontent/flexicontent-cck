@@ -67,6 +67,16 @@ class FlexicontentControllerTags extends FlexicontentController
 		$data  = $jinput->post->getArray();  // Default filtering will remove HTML
 		$data['id'] = (int) $data['id'];
 
+		// calculate access
+		$is_authorised = !$data['id'] ? FlexicontentHelperPerm::getPerm()->CanCreateTags : FlexicontentHelperPerm::getPerm()->CanTags;
+
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
+		}
+
 		if ( $model->store($data) )
 		{
 			switch ($task)
@@ -126,7 +136,16 @@ class FlexicontentControllerTags extends FlexicontentController
 	 */
 	function publish()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		// check access
+		if (!FlexicontentHelperPerm::getPerm()->CanTags)
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
+		}
+
+		$jinput = JFactory::getApplication()->input;
+		$cid   = $jinput->get('cid', array(0), 'array');
 		$model = $this->getModel('tags');
 		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -158,18 +177,28 @@ class FlexicontentControllerTags extends FlexicontentController
 	 */
 	function unpublish()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		// check access
+		if (!FlexicontentHelperPerm::getPerm()->CanTags)
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
+		}
+
+		$jinput = JFactory::getApplication()->input;
+		$cid   = $jinput->get('cid', array(0), 'array');
 		$model = $this->getModel('tags');
 		
-		if (!is_array( $cid ) || count( $cid ) < 1) {
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
 			return;
 		}
-		
-		
+
 		$msg = '';
-		if (!$model->publish($cid, 0)) {
+		if (!$model->publish($cid, 0))
+		{
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
@@ -191,7 +220,16 @@ class FlexicontentControllerTags extends FlexicontentController
 	 */
 	function remove()
 	{
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		// check access
+		if (!FlexicontentHelperPerm::getPerm()->CanTags)
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
+		}
+
+		$jinput = JFactory::getApplication()->input;
+		$cid   = $jinput->get('cid', array(0), 'array');
 		$model = $this->getModel('tags');
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -243,14 +281,13 @@ class FlexicontentControllerTags extends FlexicontentController
 	 */
 	function edit()
 	{
-		JRequest::setVar( 'view', 'tag' );
-		JRequest::setVar( 'hidemainmenu', 1 );
-		
+		$jinput = JFactory::getApplication()->input;
+		$jinput->set('view', 'tag');
+		$jinput->set('hidemainmenu', 1);
+
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
-		
-
 
 		// Get/Create the view
 		$viewType   = $document->getType();
@@ -265,19 +302,12 @@ class FlexicontentControllerTags extends FlexicontentController
 		$view->setModel($model, true);
 		$view->document = $document;
 		
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$tag_id = (int)$cid[0];
-		
-		
+		$cid   = $jinput->get('cid', array(0), 'array');
+		$tag_id = (int) $cid[0];
+
 		// calculate access
-		if (!$tag_id) {
-			$is_authorised = $user->authorise('flexicontent.createtags', 'com_flexicontent');
-		} else {
-			//$asset = 'com_flexicontent.tag.' . $tag_id;
-			//$is_authorised = $user->authorise('flexicontent.edittag', $asset);
-			$is_authorised = $user->authorise('flexicontent.managetags', 'com_flexicontent');
-		}
-		
+		$is_authorised = !$tag_id ? FlexicontentHelperPerm::getPerm()->CanCreateTags : FlexicontentHelperPerm::getPerm()->CanTags;
+
 		// check access
 		if ( !$is_authorised ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
@@ -301,5 +331,4 @@ class FlexicontentControllerTags extends FlexicontentController
 		
 		parent::display();
 	}
-	
 }

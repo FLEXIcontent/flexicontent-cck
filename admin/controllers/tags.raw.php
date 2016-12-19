@@ -55,21 +55,33 @@ class FlexicontentControllerTags extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$list  = JRequest::getVar( 'taglist', null, 'post', 'string' );
+
+		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
+		{
+			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_AUTH_CREATE_NEW_TAGS' ).'</div>';
+			return;
+		}
+
+		$jinput = JFactory::getApplication()->input;
+		$list  = $jinput->get('taglist', null, 'string');
 		$list  = preg_replace("/[\"'\\\]/u", "", $list);
-		
+
 		$model = $this->getModel('tags');		
 		$logs  = $model->importList($list);
 		
-		if ($logs) {
-			if ($logs['success']) {
+		if ($logs)
+		{
+			if ($logs['success'])
+			{
 				echo '<div class="copyok">'.JText::sprintf( 'FLEXI_TAG_IMPORT_SUCCESS', $logs['success'] ).'</div>';
 			}
-			if ($logs['error']) {
+			if ($logs['error'])
+			{
 				echo '<div class="copywarn>'.JText::sprintf( 'FLEXI_TAG_IMPORT_FAILED', $logs['error'] ).'</div>';
 			}
-		} else {
+		}
+		else
+		{
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TAG_TO_IMPORT' ).'</div>';
 		}
 	}
@@ -83,15 +95,15 @@ class FlexicontentControllerTags extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$name 	= JRequest::getString('name', '');
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		$cid   = (int)$array[0];
-		
+
+		$jinput = JFactory::getApplication()->input;
+		$name  = $jinput->get('name', '', 'string');
+		$array = $jinput->get('cid',  0, 'array');
+		$cid   = (int) $array[0];
+
 		// Check if tag exists (id exists or name exists)
 		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
-		$model 	= new FlexicontentModelTag();
-		//$model 	= $this->getModel('tag');
+		$model = new FlexicontentModelTag();
 		$model->setId($cid);
 		$tag = $model->getTag($name);
 		
