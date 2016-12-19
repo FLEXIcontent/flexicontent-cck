@@ -490,17 +490,3 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$fc_performance_msg .= $msg . '<div class="fcclear"></div>';
 }
 unset ($is_fc_component);
-
-
-// Store JPATH_BASE variable (needed in case of hard linking to flexicontent files outside of Joomla folder)
-if (JPATH_BASE != realpath(__DIR__.'/../..'))
-{
-	if (!file_exists(__DIR__.'/tasks/includes/defines.php') || filemtime(__FILE__) > filemtime(__DIR__.'/tasks/includes/defines.php'))
-	{
-		file_put_contents(__DIR__.'/tasks/includes/defines.php', '<?php'."\n".'define(\'JPATH_BASE\', \''.JPATH_BASE.'\');'."\n");
-	}
-}
-else if (file_exists(__DIR__.'/tasks/includes/defines.php'))
-{
-	unlink(__DIR__.'/tasks/includes/defines.php');
-}

@@ -19,7 +19,8 @@ class FlexicontentTasksCore
 
 		define('_JEXEC', 1);
 		define('DS', DIRECTORY_SEPARATOR);
-		file_exists('includes/defines.php')  ?  require_once 'includes/defines.php'  :   define('JPATH_BASE', trim(str_replace(basename(__DIR__), '', __DIR__), '/\\'));
+
+		file_exists('defines.php')  ?  require_once 'defines.php'  :   define('JPATH_BASE', realpath(__DIR__.'/../../..'));
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
 
