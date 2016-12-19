@@ -156,7 +156,10 @@ function delAllFilters() {
 	<thead>
 		<tr class="header">
 			<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="center"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th class="center">
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
+			</th>
 			<th class="center hidden-phone"></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass alias hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -189,8 +192,7 @@ function delAllFilters() {
 			$row  = & $this->rows[$i];
 			$link = 'index.php?option=com_flexicontent&amp;'.$edit_task.'edit&amp;cid='. $row->id;
 			$published	= JHTML::_('jgrid.published', $row->published, $i, 'tags.' );
-			
-			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+
 			$canEdit    = 1;
 			$canEditOwn = 1;
    		?>
@@ -199,7 +201,10 @@ function delAllFilters() {
 				<div class="adminlist-table-row"></div>
 				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
-			<td class="center"><?php echo $checked; ?></td>
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td>
 			<td class="center hidden-phone">
 				<?php
 				$tag_link = $use_catlinks ?
@@ -219,7 +224,7 @@ function delAllFilters() {
 					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
-						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'tags.', $canCheckin);
+						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'tags.', $canCheckin);
 						$task_str = 'tags.checkin';
 						if ($row->checked_out == $user->id) {
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);

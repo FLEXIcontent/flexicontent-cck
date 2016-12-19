@@ -102,7 +102,10 @@ $list_total_cols = 8;
 	<thead>
 		<tr class="header">
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo 'Joomla.checkAll(this);'; ?>" /></th>
+			<th class="left">
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
+			</th>
 			<th></th>
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th colspan="2" style="text-align: left">
@@ -156,7 +159,7 @@ $list_total_cols = 8;
 	<tbody>
 		<?php
 		$k = 0;
-		$i = 1;
+		$i = 0;
 		// Get cached texts to avoid reloading all language files
 		$item_texts = flexicontent_tmpl::getLayoutTexts('items');
 		$cats_texts = flexicontent_tmpl::getLayoutTexts('category');
@@ -172,14 +175,17 @@ $list_total_cols = 8;
 			$description_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->description : '';
 			
 			$row->id = $row->name;
-			$checked	= JHTML::_('grid.checkedout', $row, $i-1 );
+			$checked	= JHTML::_('grid.checkedout', $row, $i );
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td>
 				<div class="adminlist-table-row"></div>
-				<?php echo $i; ?>
+				<?php echo $i+1; ?>
 			</td>
-			<td><?php echo $checked; ?></td>
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td>
 			<td class="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
 					<a style="margin-right: 5px" id="<?php echo 'del-' . $row->name ?>" class="deletable-template" href="javascript:;">

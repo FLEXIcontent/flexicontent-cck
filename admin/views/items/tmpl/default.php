@@ -559,10 +559,11 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th class="left">
-				<input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" />
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
-			<th class="left nowrap hideOnDemandClass" style="padding-right: 0px;">
+			<th class="left nowrap hideOnDemandClass" style="padding-left: 0px; padding-right: 0px;">
 				<?php
 				if (!$this->filter_order_type) {
 					echo $this->CanOrder ? $image_ordering_tip : '';
@@ -785,8 +786,6 @@ jQuery(document).ready(function(){
 				$access = $this->escape($row->access_level);
 			}
 
-			$cid_checkbox = @ JHTML::_('grid.checkedout', $row, $i );
-
 			// Check publication START/FINISH dates (publication Scheduled / Expired)
 			$is_published = in_array( $row->state, array(1, -5, (FLEXI_J16GE ? 2:-1) ) );
 			$extra_img = $extra_alt = '';
@@ -812,7 +811,10 @@ jQuery(document).ready(function(){
 				<div class="adminlist-table-row"></div>
 				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
-			<td><?php echo $cid_checkbox; ?></td>
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td>
 
 		<?php if ($this->CanOrder) : ?>
 			<td class="order">
@@ -880,7 +882,7 @@ jQuery(document).ready(function(){
 					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
-						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $canCheckin);
+						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $canCheckin);
 						$task_str = 'items.checkin';
 						if ($row->checked_out == $user->id) {
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);

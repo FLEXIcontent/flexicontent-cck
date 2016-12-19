@@ -164,7 +164,11 @@ function delAllFilters() {
 	<thead>
 		<tr class="header">
 			<th class="hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th class="left">
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
+			</th>
+
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
@@ -199,8 +203,7 @@ function delAllFilters() {
 			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;view=type&amp;id='. $row->id;
 			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
 			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
-			
-			$checked	= @ JHTML::_('grid.checkedout', $row, $i );
+
 			$fields_url = 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
 			$items_url  = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
 			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row->config->get("ilayout");
@@ -212,7 +215,10 @@ function delAllFilters() {
 				<div class="adminlist-table-row"></div>
 				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
-			<td><?php echo $checked; ?></td>
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td>
 			<td class="left">
 				<?php
 				
@@ -221,7 +227,7 @@ function delAllFilters() {
 					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
-						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
+						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
 						$task_str = 'types.checkin';
 						if ($row->checked_out == $user->id) {
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);

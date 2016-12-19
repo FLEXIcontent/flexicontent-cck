@@ -75,6 +75,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
+		$jinput   = $app->input;
 		
 		// Get/Create the model
 		$model = $this->getModel('appsman');
@@ -85,7 +86,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// ************************
 		
 		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			return;
@@ -96,8 +98,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Security Concern: check for allowed tables
 		// ******************************************
 		
-		$table = strtolower(JRequest::getCmd('table', 'flexicontent_fields'));
-		if ( !in_array($table, self::$allowed_tables) ) {
+		$table = strtolower($jinput->get('table', 'flexicontent_fields', 'cmd'));
+		if ( !in_array($table, self::$allowed_tables) )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' . ' Table: ' .$table. ' not in allowed tables' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			return;
@@ -109,14 +112,15 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Get rows ids
 		// ************
 		
-		$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
+		$cid = $jinput->get('cid', array(), 'array');
 		if ($ids_are_integers) JArrayHelper::toInteger($cid, array());
 		
 		$conf = $session->get('appsman_export', array(), 'flexicontent');	
 		
 		$count_new = 0;
 		$count_old = 0;
-		foreach ($cid as $_id) {
+		foreach ($cid as $_id)
+		{
 			if (!isset($conf[$table][$_id]))
 				$count_new++;
 			else
@@ -134,7 +138,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		if ( is_callable(array($model, $customHandler)) )
 		{
 			$related_ids = $model->$customHandler($cid);
-			foreach ($related_ids as $_table => $_cid) {
+			foreach ($related_ids as $_table => $_cid)
+			{
 				$customHandler_msg[] = '- added related '.count($_cid).' records from <strong>'.$_table.'</strong>';
 				foreach ($_cid as $_id)  $conf[$_table][$_id] = 1;
 			}
@@ -163,7 +168,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		// calculate / check access
 		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			return;
@@ -209,7 +215,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// ************************
 		
 		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			return;
@@ -226,9 +233,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Execute according to task
 		// *************************
 		
-		switch ($task) {
-		
-		
+		switch ($task)
+		{
+
 		// ***********************************************************************************************
 		// RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
 		// ***********************************************************************************************
@@ -256,7 +263,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			$conf   = $session->get('appsman_config', "", 'flexicontent');
 			$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
 			
-			if ( empty($conf) ) {
+			if ( empty($conf) )
+			{
 				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished' , 'error');
 				$this->setRedirect( $link );
 				return;
@@ -338,7 +346,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 			// Retrieve the temporary path of the uploaded file
 			$xmlfile = @$_FILES["xmlfile"]["tmp_name"];
-			if( !is_file($xmlfile) ) {
+			if( !is_file($xmlfile) )
+			{
 				$app->enqueueMessage('Upload file error!', 'error');
 				$app->redirect( $link );
 			}
@@ -391,6 +400,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
+		$jinput   = $app->input;
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
@@ -407,7 +417,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		// calculate / check access
 		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
-		if ( !$is_authorised ) {
+		if ( !$is_authorised )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			return;
@@ -419,15 +430,17 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$export_type = str_replace('export', '', $task);
 		
 		// Get optional filename of export file
-		$filename = JRequest::getCmd('export_filename');
+		$filename = $jinput->get('export_filename', '', 'cmd');
 		
 		// When export type is given, we require that specific table and specific IDs are given too
 		if ( $export_type )
 		{
-			$table = strtolower(JRequest::getCmd('table', ''));
-			$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
-			JArrayHelper::toInteger($cid, array());
-			
+			$table = strtolower($jinput->get('table', '', 'cmd'));
+			$ids_are_integers = $table!='flexicontent_templates';
+
+			$cid = $jinput->get('cid', array(), 'array');
+			if ($ids_are_integers) JArrayHelper::toInteger($cid, array());
+
 			if ( !$table )
 				$error[500] = JText::_( 'No table name given. Export aborted' );
 			else if ( !in_array($table, self::$allowed_tables) )
@@ -435,7 +448,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			else if ( !count($cid) )
 				$error[500] = JText::_( 'No records IDs were specified. Export aborted' );
 			
-			if ( !empty($error) ) {
+			if ( !empty($error) )
+			{
 				foreach ($error as $error_code => $error_text)  JError::raiseWarning( $error_code, $error_text );
 				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 				return;
@@ -456,7 +470,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				return;
 			}
 
-			switch($export_type) {
+			switch($export_type)
+			{
 				case "xml":
 					$customHandler = 'getExtraData_'.$table;
 					$content = '<?xml version="1.0"?>'
@@ -499,7 +514,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 					$content .= $model->$customHandler($rows);
 				}
 			}
-			if ($content) {
+			if ($content)
+			{
 				$content = '<?xml version="1.0"?>'
 					."\n<conf>\n"
 					.$content
@@ -518,7 +534,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$filename = $filename ? $filename : 'dbdata';//str_replace('#__', '', $table);
 		$filename .= '.'.($export_type ? $export_type : 'xml');
 		
-		if ( $export_type ) {
+		if ( $export_type )
+		{
 			// Simple export from a string
 			$downloadname = $filename;
 			$downloadsize = strlen($content);
@@ -586,11 +603,13 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Output the file
 		// ***************
 		
-		if ( $export_type ) {
+		if ( $export_type )
+		{
 			// Simple export from a string
 			echo $content;
 		}
-		else {
+		else
+		{
 			// Read archive file from the server disk
 			$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
 			if (1 || $filesize > $chunksize)

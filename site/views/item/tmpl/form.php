@@ -238,7 +238,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 			}
 			
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
+			tag.addtag( id, tagname, '".JURI::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
 		}
 		
 		function deleteTag(obj)

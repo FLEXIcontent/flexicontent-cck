@@ -196,7 +196,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 			}
 			
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
+			tag.addtag( id, tagname, '".JURI::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
 		}
 		
 		function deleteTag(obj)
@@ -208,7 +208,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 		
 		
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&". JSession::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
+			jQuery.ajax({ url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&". JSession::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
 				jQuery(this).html(\"\\
 				<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
 				\"+str+\"\\
@@ -269,7 +269,7 @@ $this->document->addScriptDeclaration("
 	function reseter(task, id, div){
 		var res = new itemscreen();
 		task = '".$ctrl_items."' + task;
-		res.reseter( task, id, div, 'index.php?option=com_flexicontent&controller=items' );
+		res.reseter( task, id, div, '".JURI::base(true)."/index.php?option=com_flexicontent&controller=items' );
 	}
 	
 	function clickRestore(link) {
@@ -1663,7 +1663,7 @@ if ( count($FC_jfields_html) ) : ?>
 					<td class="versions"><a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $commentimage;?></a>
 					<?php
 					if((int)$version->nr==(int)$this->row->current_version) { ?>
-						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;cid=<?php echo $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+						<a onclick="javascript:return clickRestore('<?php echo JURI::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;cid=<?php echo $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 					<?php }else{
 					?>
 						<a class="modal-versions"
@@ -1672,7 +1672,7 @@ if ( count($FC_jfields_html) ) : ?>
 						>
 							<?php echo $viewimage; ?>
 						</a>
-						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
+						<a onclick="javascript:return clickRestore('<?php echo JURI::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
 							href="javascript:;"
 							title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
 						>

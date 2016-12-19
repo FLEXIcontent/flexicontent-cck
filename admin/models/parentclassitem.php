@@ -2096,7 +2096,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Some compatibility steps
 		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );  $db->execute(); }
-	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+		JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
@@ -2208,7 +2208,7 @@ class ParentClassItem extends JModelAdmin
 			if ( $print_logging_info ) $start_microtime = microtime(true);
 			
 			// Some compatibility steps
-		  JRequest::setVar('view', 'article');
+			JRequest::setVar('view', 'article');
 			JRequest::setVar('option', 'com_content');
 		  
 			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
@@ -3321,53 +3321,49 @@ class ParentClassItem extends JModelAdmin
 	 * @return object
 	 * @since 1.0
 	 */
-	function getvotes($id=0)
+	function getvotes($id = 0)
 	{
-		$id = $id ? $id : $this->_id;
-		
-		$query = 'SELECT rating_sum, rating_count FROM #__content_rating WHERE content_id = '.(int)$id;
-		$this->_db->setQuery($query);
-		$votes = $this->_db->loadObjectlist();
-		
-		return $votes;
+		$id = $id ?: $this->_id;
+
+		$this->_db->setQuery('SELECT rating_sum, rating_count FROM #__content_rating WHERE content_id = ' . (int) $id);
+		return $this->_db->loadObjectlist();
 	}
 	
 	
-	function getRatingDisplay($id=0)
+	function getRatingDisplay($id = 0)
 	{
-		$id = $id ? $id : $this->_id;
-		
+		$id = $id ?: $this->_id;
+
 		$votes = $this->getvotes($id);
-		$rating_resolution = $this->getVotingResolution($id);
-		
-		if ($votes) {
+		if ($votes)
+		{
+			$rating_resolution = $this->getVotingResolution($id);
 			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * (100 / $rating_resolution)), 2);
 			$vote	= ((int)$votes[0]->rating_count > 1) ? (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTES' ) : (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTE' );
-			$html = $score.'% | '.$vote;
-		} else {
-			$html = JText::_( 'FLEXI_NOT_RATED_YET' );
+			return $score.'% | '.$vote;
 		}
-		
-		return $html;
+
+		return JText::_( 'FLEXI_NOT_RATED_YET' );
 	}
 	
 	
-	function getVotingResolution($id=0)
+	function getVotingResolution($id = 0)
 	{
 		static $rating_resolution = array();
-		$id = $id ? $id : $this->_id;
-		if ( empty($rating_resolution[$id]) ) {
-			$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-			$field = $this->_db->loadObject();
-			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			$item->load( $id );
-			FlexicontentFields::loadFieldConfig($field, $item);
-			
-			$_rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
-			$_rating_resolution = $_rating_resolution >= 5   ?  $_rating_resolution  :  5;
-			$_rating_resolution = $_rating_resolution <= 100 ?  $_rating_resolution  :  100;
-			$rating_resolution[$id] = $_rating_resolution;
-		}
+		$id = $id ?: $this->_id;
+		if (isset($rating_resolution[$id])) return $rating_resolution[$id];
+
+		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+		$field = $this->_db->loadObject();
+		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$item->load( $id );
+		FlexicontentFields::loadFieldConfig($field, $item);
+
+		$_rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
+		$_rating_resolution = $_rating_resolution >= 5   ?  $_rating_resolution  :  5;
+		$_rating_resolution = $_rating_resolution <= 100 ?  $_rating_resolution  :  100;
+		$rating_resolution[$id] = $_rating_resolution;
+
 		return $rating_resolution[$id];
 	}
 	
@@ -3379,13 +3375,12 @@ class ParentClassItem extends JModelAdmin
 	 * @return int
 	 * @since 1.0
 	 */
-	function gethits($id)
+	function gethits($id = 0)
 	{
-		$query = 'SELECT hits FROM #__content WHERE id = '.(int)$id;
-		$this->_db->setQuery($query);
-		$hits = $this->_db->loadResult();
-		
-		return $hits;
+		$id = $id ?: $this->_id;
+
+		$this->_db->setQuery('SELECT hits FROM #__content WHERE id = ' . (int) $id);
+		return $this->_db->loadResult();
 	}
 	
 	
@@ -3397,21 +3392,22 @@ class ParentClassItem extends JModelAdmin
 	 * @return object
 	 * @since 1.5
 	 */
-	function getSubscribersCount()
+	function getSubscribersCount($id = 0)
 	{
 		static $subscribers = array();
-		if ( isset($subscribers[$this->_id]) ) return $subscribers[$this->_id];
+		$id = $id ?: $this->_id;
+		if ( isset($subscribers[$id]) ) return $subscribers[$id];
 		
 		$query	= 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_favourites AS f'
 				.' LEFT JOIN #__users AS u'
 				.' ON u.id = f.userid'
-				.' WHERE f.itemid = ' . (int)$this->_id
+				.' WHERE f.itemid = ' . (int) $id
 				.'  AND u.block=0 ' //.' AND f.notify = 1'
 				;
 		$this->_db->setQuery($query);
-		$subscribers[$this->_id] = $this->_db->loadResult();
-		return $subscribers[$this->_id];
+		$subscribers[$id] = $this->_db->loadResult();
+		return $subscribers[$id];
 	}
 	
 	
@@ -3426,7 +3422,8 @@ class ParentClassItem extends JModelAdmin
 	{
 		static $typedata = array();
 		
-		if ( !$this->_id && !$this->_typeid) {
+		if ( !$this->_id && !$this->_typeid)
+		{
 			$_typedata = new stdClass();
 			$_typedata->id = 0;
 			$_typedata->name = null;
@@ -3826,7 +3823,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Compatibility steps (including Joomla compatible state),
 		// so that 3rd party plugins using the change state event work properly
-	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+		JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
 		$item->state = $jm_state;
 		
 		$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
