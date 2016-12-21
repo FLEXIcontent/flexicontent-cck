@@ -138,6 +138,7 @@ $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_N
 $date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
 //$date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
+$isCatsOrder = $this->filter_order=='i.ordering' || $this->filter_order=='catsordering';
 ?>
 <script type="text/javascript">
 
@@ -1037,64 +1038,71 @@ jQuery(document).ready(function(){
 				$nr = count($row->catids);
 				$ix = 0;
 				$nn = 0;
-				for ($nn=0; $nn < $nr; $nn++) :
+				$row_cats = array();
+				$sec_cats = array();
+				$_maincat = '';
+				for ($nn=0; $nn < $nr; $nn++)
+				{
 					$_item_cat = $row->catids[$nn];
 					if ( !isset($this->itemCats[$_item_cat]) ) continue;
+
 					$category = & $this->itemCats[$_item_cat];
-					
 					$isMainCat = ((int)$category->id == (int)$row->catid);
-					//if (!$this->filter_order_type && !$isMainCat) continue;
+
+					$catClass = ($isMainCat ? 'maincat' : 'secondarycat').
+						(($ix==0 && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')) ? ' orderingcat' : '');
 					
-					$typeofcats = $isMainCat ? 'maincat' : 'secondarycat';
-					if ( $ix==0 && ($this->filter_order=='catsordering' || $this->filter_order=='i.ordering') )
-						$typeofcats .= ' orderingcat';
-					
-					$catlink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid='. $category->id;
+					$catLink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
-					if ($this->CanCats) :
-				?>
-					<span class="<?php echo $typeofcats; ?>" title="<?php echo $edit_cat_title; ?>">
-					<a href="<?php echo $catlink; ?>">
-						<?php
-						if (StringHelper::strlen($title) > 40) {
-							echo StringHelper::substr( $title , 0 , 40).'...';
-						} else {
-							echo $title;
-						}
-						?></a></span>
-					<?php
-					else :
-						if (StringHelper::strlen($title) > 40) {
-							echo ($category->id != $row->catid) ? '' : '<strong>';
-							echo StringHelper::substr( $title , 0 , 40).'...';
-							echo ($category->id != $row->catid) ? '' : '</strong>';
-						} else {
-							echo ($category->id != $row->catid) ? '' : '<strong>';
-							echo $title;
-							echo ($category->id != $row->catid) ? '' : '</strong>';
-						}
-					endif;
+					
+					$short_name = StringHelper::strlen($title) > 40  ? StringHelper::substr( $title , 0 , 40) . '...' : $title;
+					if (!$isMainCat)
+					{
+						$row_cats[] = !$this->CanCats ? $short_name : '
+							<span class="'.$catClass.'" title="'.$edit_cat_title.'">
+								<a href="'.$catLink.'">'.$short_name.'</a>
+							</span>';
+						$sec_cats[] = $short_name;
+					}
+					else
+					{
+						$_maincat = !$this->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
+						<span class="'.$catClass.'" title="'.$edit_cat_title.'">
+							<a href="'.$catLink.'">'.$short_name.'</a>
+						</span>';
+					}
 					$ix++;
-					if ($ix != $nr) :
-						echo ', ';
-					endif;
-				endfor;
+				}
+				echo $_maincat;
+				echo count($row->catids) > 3 ? '
+					<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SECONDARY_CATEGORIES'), ' - '.implode('<br/> - ', $sec_cats), 0, 1).'">
+						'.count($row->catids).' <i class="icon-tree-2"></i>
+					</span>
+					<div style="display: none;">' : (count($row_cats) ?  '<br/>' : '');
+				echo count($row_cats) ? ' - ' . implode('<br/> - ', $row_cats) : '';
+				echo count($row->catids) > 3 ? '</div>' : '';
 				?>
 			</td>
 			
 			<td class="col_tag">
 				<?php
-					$row_tags = array();
+					$row_tags  = array();
+					$tag_names = array();
 					foreach ($row->tagids as $key => $_itag)
 					{
 						if ( isset($this->itemTags[$_itag]) )
 						{
-							$row_tags[] = ' <span class="badge">'.$this->itemTags[$_itag]->name.'</span> ';
+							$row_tags[] = ' <span class="itemtag">'.$this->itemTags[$_itag]->name.'</span> ';
+							$tag_names[] = $this->itemTags[$_itag]->name;
 						}
 					}
-					echo count($row->tagids) > 2 ?
-						' <span class="hasTooltip" title="'.flexicontent_html::getToolTip('', implode(' ', $row_tags), 0, 1).'">' . count($row->tagids) .' <i class="icon-tags"></i></span>' :
-						implode(' ', $row_tags) ;
+					echo count($row->tagids) > 3 ? '
+						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_TAGS'), ' - '.implode('<br/> - ', $tag_names), 0, 1).'">
+							'.count($row->tagids).' <i class="icon-tags"></i>
+						</span>
+						<div style="display: none;">' : (count($row_tags) ?  '<br/>' : '');
+					echo count($row_tags) ? ' - ' . implode('<br/> - ', $row_tags) : '';
+					echo count($row->tagids) > 3 ? '</div>' : '';
 				?>
 			</td>
 			
