@@ -1148,27 +1148,44 @@ option[disabled],
 option[readonly] {
 	color: #bbb;
 }
-span.orderingcat {
+body span.orderingcat {
 	display: inline-block;
 	border-radius: 6px;
 	border: 1px dashed gray;
 	padding: 2px 4px;
 	background: white;
 }
-span.maincat a:hover {
+body span.maincat a:hover {
 	text-decoration: none !important;
 }
-span.maincat a {
+body span.maincat a {
 	color: black;
 	font-weight: bold;
 	font-size: 12px;
 	font-family: tahoma, arial;
 }
-span.itemtag,
-span.secondarycat a {
+body span.itemtype,
+body span.itemtag,
+body span.secondarycat a {
 	color: gray;
 	font-size: 12px;
 	font-family: tahoma, arial;
+}
+body ul.fc_plain {
+	display: block;
+	list-style-type: disc;
+	margin-top: 2px;
+	margin-bottom: 0px;
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 16px;
+}
+body ul.fc_plain > li {
+	display: list-item;
+	line-height: 1.2em;
+}
+.fc_assignments_box {
+	display: none;
 }
 h3.themes-title {
 	font-size: 12px;

@@ -398,6 +398,8 @@ jQuery(document).ready(function(){
 		<span class="btn-group input-append fc-filter">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+			<span id="fc-toggle-cats_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></span>
+			<span id="fc-toggle-tags_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></span>
 			<span id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" ><span class="icon-help"></span></span>
 		</span>
 		
@@ -1074,13 +1076,15 @@ jQuery(document).ready(function(){
 					$ix++;
 				}
 				echo $_maincat;
-				echo count($row->catids) > 3 ? '
-					<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SECONDARY_CATEGORIES'), ' - '.implode('<br/> - ', $sec_cats), 0, 1).'">
+				echo count($row->catids) > 1 ? '
+					<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SECONDARY_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $sec_cats).'</li></ul>', 0, 1).'">
 						'.count($row->catids).' <i class="icon-tree-2"></i>
 					</span>
-					<div style="display: none;">' : (count($row_cats) ?  '<br/>' : '');
-				echo count($row_cats) ? ' - ' . implode('<br/> - ', $row_cats) : '';
-				echo count($row->catids) > 3 ? '</div>' : '';
+					<div class="fc_assignments_box fc_cats">' : '';
+				echo count($row_cats) > 8
+					? implode(', ', $row_cats)
+					: (count($row_cats) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_cats) . '</li></ul>' : '');
+				echo count($row->catids) > 1 ? '</div>' : '';
 				?>
 			</td>
 			
@@ -1096,13 +1100,15 @@ jQuery(document).ready(function(){
 							$tag_names[] = $this->itemTags[$_itag]->name;
 						}
 					}
-					echo count($row->tagids) > 3 ? '
-						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_TAGS'), ' - '.implode('<br/> - ', $tag_names), 0, 1).'">
+					echo count($row->tagids) > 1 ? '
+						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
 							'.count($row->tagids).' <i class="icon-tags"></i>
 						</span>
-						<div style="display: none;">' : (count($row_tags) ?  '<br/>' : '');
-					echo count($row_tags) ? ' - ' . implode('<br/> - ', $row_tags) : '';
-					echo count($row->tagids) > 3 ? '</div>' : '';
+						<div class="fc_assignments_box fc_tags">' : '';
+					echo count($row_tags) > 8
+						? implode(', ', $row_tags)
+						: (count($row_tags) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_tags) . '</li></ul>' : '');
+					echo count($row->tagids) > 1 ? '</div>' : '';
 				?>
 			</td>
 			
