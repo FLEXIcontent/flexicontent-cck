@@ -120,28 +120,25 @@ class FlexicontentViewCategories extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolBarHelper::title( $doc_title, 'fc_categories' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		$js = "jQuery(document).ready(function(){";
-		
+
 		$contrl = "categories.";
 		$contrl_singular = "category.";
 		$toolbar = JToolBar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		
 		// Copy Parameters
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-params a.toolbar, #toolbar-params button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '". $popup_load_url ."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 600, y: 440}, onClose: function() {}}');
-			";
-			JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
-			JHtml::_('behavior.modal', '#toolbar-params a.toolbar, #toolbar-params button');
-		} else {
-			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
-		}
+		//$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
+		$js .= "
+			jQuery('#toolbar-params a.toolbar, #toolbar-params button').attr('href', '".$popup_load_url."')
+				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 600, 440, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+					.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_COPY_PARAMS'), 2)."\'}); return false;');
+		";
+		JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
+
 		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 		JToolBarHelper::divider();
 		
@@ -176,7 +173,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		if ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) {
 			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
-			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 			$btn_task    = $contrl.'remove';
 			$extra_js    = "";
@@ -204,7 +201,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'categories'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Export now',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Export now as XML',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 			
 			$btn_icon = 'icon-box-add';
@@ -213,7 +210,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'categories'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Add to export list',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
 		

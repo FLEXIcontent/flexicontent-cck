@@ -272,51 +272,44 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	 */
 	function setToolbar()
 	{
-		$document = JFactory::getDocument();
 		$js = "jQuery(document).ready(function(){";
+
+		$document = JFactory::getDocument();
 		$toolbar = JToolBar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
-					.attr('href', '".$popup_load_url."');
-			";
-			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_REINDEX_BASIC_CONTENT_LISTS', false );
-		} else {
-			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-		}
-		
+		//$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 350);
+		$js .= "
+			jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
+				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+					.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'), 2)."\'}); return false;');
+		";
+		JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_REINDEX_BASIC_CONTENT_LISTS', false );
+
 		JToolBarHelper::divider();  JToolBarHelper::spacer();
-		
+
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
-					.attr('href', '".$popup_load_url."');
-			";
-			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
-		} else {
-			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-		}
-		
+		//$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 350);
+		$js .= "
+			jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
+				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+					.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'), 2)."\'}); return false;');
+		";
+		JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
+
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
-					.attr('href', '".$popup_load_url."');
-			";
-			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
-		} else {
-			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-		}
-		
+		//$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 350);
+		$js .= "
+			jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button').attr('href', '".$popup_load_url."')
+				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+					.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'), 2)."\'}); return false;');
+		";
+		JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
+
 		//$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', 'search.purge', false);
 		$btn_icon = 'icon-trash';
 		$btn_name = 'purge';
@@ -324,7 +317,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_INDEX_ADVANCED_PURGE',
-			$btn_name, $full_js='', $msg_alert='', $msg_confirm='FLEXI_DELETE_INDEX_CONFIRM',
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_PURGE_INDEX_CONFIRM'),
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
 
 		//$toolbar->appendButton('Confirm', 'Update ?', 'shuffle', 'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES', 'search.custom_order', false);
@@ -334,7 +327,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES',
-			$btn_name, $full_js='', $msg_alert='', $msg_confirm='Update',
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_UPDATE_CUSTOM_ORDER_INDEXES'),
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 
 		// Configuration button

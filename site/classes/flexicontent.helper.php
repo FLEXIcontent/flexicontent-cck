@@ -1601,24 +1601,38 @@ class flexicontent_html
 	
 	
 	/**
-	 * Escape a string so that it can be used directly by JS source code
+	 * Escape an HTML string so that it can be used directly by JS source code
 	 *
 	 * @param 	string 		$text
 	 * @param 	int 		$nb
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function escapeJsText($string, $skipquote='')
+	static function encodeHTML($string, $no_quote='s')
 	{
-		$string = (string)$string;
-		$string = str_replace("\r", '', $string);
-		$string = addcslashes($string, "\0..\37'\\");
-		// Whether to skip single or double quotes
-		if ( $skipquote!='d' )  $string = str_replace('"', '\"', $string);
-		if ( $skipquote!='s' )  $string = str_replace("'", "\'", $string);
-		$string = str_replace("\n", ' ', $string);
+		$string = trim(json_encode($string, FLEXI_PHP_54GE ? JSON_UNESCAPED_UNICODE : 0), '"');
+		if ($no_quote === 1)
+		{
+		}
+		else if ($no_quote === 2)
+		{
+			$string = str_replace("\\'", "\\\\\\'", addslashes($string));
+		}
+		else if ($no_quote === 'd')
+		{
+			$string = str_replace('\\"', '"', $string);
+			$string = str_replace("'", "\\'", $string);
+		}
+
 		return $string;
 	}
+	
+	// DEPRECATED, instead use: encodeHTML()
+	static function escapeJsText($string, $no_quote='s')
+	{
+		return flexicontent_html::encodeHTML($string, $no_quote);
+	}
+
 
 	/**
 	 * Trims whitespace from an array of strings
@@ -1652,7 +1666,7 @@ class flexicontent_html
 			}			
 			elseif (function_exists($validation))
 			{
-				return call_user_func($validation, $v);  // A callback function
+				return $validation($v);
 			}
 		}
 
@@ -1738,59 +1752,72 @@ class flexicontent_html
 		$v = trim($v);
 		return $v;
 	}
-	
-	
+
+
 	/**
-	 * Strip html tags and cut after x characters
+	 * Strip html tags and cut after x characters, optionally adding a toggler button to show the trimmed text
 	 *
 	 * @param 	string 		$text
 	 * @param 	int 		$nb
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function striptagsandcut( $text, $chars=null, &$uncut_length=0 )
+	static function striptagsandcut( $text, $chars=null, &$uncut_length=0, $ops = array('cut_at_word' => false, 'more_txt' => '...', 'more_toggler' => false))
 	{
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
 		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
-		
+
 		// Strip SCRIPT tags AND their containing code
 		$text = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $text );
-		
+
 		// Add whitespaces at start/end of tags so that words will not be joined,
 		//$text = preg_replace('/(<\/[^>]+>((?!\P{L})|(?=[0-9])))|(<[^>\/][^>]*>)/u', ' $1', $text);
 		$text = preg_replace('/(<\/[^>]+>(?![\:|\.|,|:|"|\']))|(<[^>\/][^>]*>)/u', ' $1', $text);
-		
+
 		// Strip html tags
 		$cleantext = strip_tags($text);
 
-		// clean additionnal plugin tags
+		// Clean additionnal plugin tags
 		$patterns = array();
 		$patterns[] = '#\[(.*?)\]#';
 		$patterns[] = '#{(.*?)}#';
 		$patterns[] = '#&(.*?);#';
-		
-		foreach ($patterns as $pattern) {
+
+		foreach ($patterns as $pattern)
+		{
 			$cleantext = preg_replace( $pattern, '', $cleantext );
 		}
-		
+
 		// Replace multiple spaces, tabs, newlines, etc with a SINGLE whitespace so that text length will be calculated correctly
 		$cleantext = preg_replace('/[\p{Z}\s]{2,}/u', ' ', $cleantext);  // Unicode safe whitespace replacing
-		
+
 		// Calculate length according to UTF-8 encoding
 		$uncut_length = StringHelper::strlen($cleantext);
-		
+
 		// Cut off the text if required
-		if ($chars) {
-			if ($uncut_length > $chars) {
-				$cleantext = StringHelper::substr( $cleantext, 0, $chars ).'...';
-			}
+		if ($chars && $uncut_length > $chars)
+		{
+			// If not cutting at middle of word, then find closest whitespace, that is previous to the word
+			if ($ops['cut_at_word'])
+			{
+				$chars = StringHelper::strrpos(StringHelper::substr($cleantext, 0, $chars), ' ');
+	    }
+
+			$text1 = StringHelper::substr($cleantext, 0, $chars);
+			$text2 = $ops['more_toggler'] ? StringHelper::substr($cleantext, $chars) : false;
 		}
-		
+		else $text1 = $cleantext;
+
 		// Reencode HTML special characters, (but do not encode UTF8 characters)
-		$cleantext = htmlspecialchars($cleantext, ENT_QUOTES, 'UTF-8');
-		
-		return $cleantext;
+		// and RETURN cutted text, optionally adding a show all text button		
+		return htmlspecialchars($text1, ENT_QUOTES, 'UTF-8') . (empty($text2) ? JText::_($ops['more_txt']) : '
+			<span class="btn btn-mini btn-info" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\';">'.JText::_($ops['more_txt']).'</span>
+			<span class="fc_cutted_text" style="display: none;">
+				' . htmlspecialchars($text2, ENT_QUOTES, 'UTF-8') . '
+			</span>
+		');
 	}
+
 
 	/**
 	 * Make image tag from field or extract image from introtext
@@ -4449,15 +4476,15 @@ class flexicontent_html
 	static function addToolBarButton($text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='')
 	{
 		$toolbar = JToolBar::getInstance('toolbar');
-		$text  = JText::_( $text );
+		$text  = JText::_($text);
 		$class = $btn_icon ? $btn_icon : 'icon-32-'.$btn_name;
 
 		if ( !$full_js )
 		{
-			$err_msg = $err_msg ? $err_msg : JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', $btn_name );
-			$err_msg = addslashes($err_msg);
+			$err_msg = $err_msg ? $err_msg : JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', $btn_name);
+			$err_msg = flexicontent_html::escapeJsText(strip_tags($err_msg), "d");
 			$confirm_msg = $confirm_msg ? $confirm_msg : JText::_('FLEXI_ARE_YOU_SURE');
-			$confirm_msg = addslashes($confirm_msg);
+			$confirm_msg = flexicontent_html::escapeJsText(strip_tags($confirm_msg), "d");
 
 			$full_js = $extra_js ."; submitbutton('$task');";
 			if ($confirm) {
@@ -4472,12 +4499,12 @@ class flexicontent_html
 		}
 		$full_js = "javascript: $full_js";
 
-		$button_html	= "<a href=\"#\" onclick=\"$full_js\" class=\"toolbar btn btn-small $btn_class\" ".$attrs.">\n";
-		$button_html .= "<span class=\"$class\" title=\"$text\">\n";
-		$button_html .= "</span>\n";
-		$button_html	.= "$text\n";
-		$button_html	.= "</a>\n";
-
+		$button_html	= '
+		<a href="#" onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'" class="toolbar btn btn-small '.$btn_class.'" '.$attrs.'>
+			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
+			'.$text.'
+		</a>
+		';
 		$toolbar->appendButton('Custom', $button_html, $btn_name);
 	}
 	

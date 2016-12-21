@@ -149,7 +149,7 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
-		$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+		$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
 		$btn_task    = $contrl.'remove';
 		$extra_js    = "";

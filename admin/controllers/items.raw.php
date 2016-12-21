@@ -240,12 +240,13 @@ class FlexicontentControllerItems extends FlexicontentController
 			if ($auth_delete) {
 				$state['T'] = array( 'name' =>'FLEXI_TRASHED', 'desc' =>'FLEXI_TRASHED_TO_BE_DELETED', 'icon' => 'trash.png', 'btn_class' => 'btn-danger' );
 			}
-			echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b><br /><br />";
+			//echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b>";
+			echo "<br /><br />";
 		?>
 			
 		<?php
 			foreach($state as $shortname => $statedata) {
-				$css = "width:216px; margin:0px 24px 12px 0px;";
+				$css = "width:216px; margin:0px 12px 12px 0px;";
 				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&". JSession::getFormToken() ."=1";
 				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
 		?>

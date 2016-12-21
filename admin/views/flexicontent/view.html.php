@@ -170,54 +170,50 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'flexicontent' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
+		$js = "jQuery(document).ready(function(){";
+
 		// Create the toolbar
-		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			$js = "jQuery(document).ready(function(){";
-			
-			if($perms->CanConfig)  {
-				$toolbar = JToolBar::getInstance('toolbar');
-				
+		$toolbar = JToolBar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		if($perms->CanConfig)
+		{
+
+			if (1) // FLEXI_J37GE
+			{
 				$btn_task = '';
 				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=import&tmpl=component';
-				if (!FLEXI_J16GE) {
-					$js .= "
-						jQuery('#toolbar-download a.toolbar, #toolbar-download button')
-							.attr('onclick', 'javascript:;')
-							.attr('href', '".$popup_load_url."')
-							.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
-					";
-					JToolBarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
-					JHtml::_('behavior.modal', '#toolbar-download a.toolbar, #toolbar-download button');
-				} else {
-					//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 400, 300);
-				}
-				
-				/*$btn_task = '';
-				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
-				if (FLEXI_J16GE) {
-					$js .= "
-						jQuery('#toolbar-language a.toolbar, #toolbar-language button')
-							.attr('onclick', 'javascript:;')
-							.attr('href', '".$popup_load_url."')
-							.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
-					";
-					JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
-					JHtml::_('behavior.modal', '#toolbar-language a.toolbar, #toolbar-language button');
-				} else {
-					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 800, 500);
-				}*/
-				
-				$session = JFactory::getSession();
-				$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-				$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-				$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-				$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-				JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
+				$js .= "
+					jQuery('#toolbar-download a.toolbar, #toolbar-download button').attr('href', '".$popup_load_url."')
+						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 500, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+							.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
+				";
+				JToolBarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
 			}
-			
-			$js .= "});";
-			$document->addScriptDeclaration($js);
+
+			if (1) // TODO evaluate for e.g. submiting a template
+			{
+				$btn_task = '';
+				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
+				//$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
+				$js .= "
+					jQuery('#toolbar-language a.toolbar, #toolbar-language button').attr('href', '".$popup_load_url."')
+						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 540, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_SEND_LANGUAGE'), 2)."\'}); return false;');
+				";
+				JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
+			}
+
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
+
+		$js .= "});";
+		$document->addScriptDeclaration($js);
 		
 		// Lists
 		jimport('joomla.filesystem.folder');

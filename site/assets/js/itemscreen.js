@@ -1,18 +1,16 @@
-var itemscreen = new Class(
+var itemscreen = function(name, options)
 {
-	options:  {
-		id: '',
-		script_url: 'index.php?option=com_flexicontent&controller=items&tmpl=component',
-		task: ''
-	},
-
-	initialize: function( name, options )
+	options = options || {};
+	this.initialize = function(name, options)
 	{
-		this.setOptions( options );
 		this.name = name;
-	},  
+		this.options = {};
+		this.options.id = options.id || '';
+		this.options.script_url = options.script_url || 'index.php?option=com_flexicontent&controller=items&tmpl=component';
+		this.options.task = options.task || '';
+	};
 
-	fetchscreen: function( name )  
+	this.fetchscreen = function(name)  
 	{
 		var doname = typeof name != 'undefined' ? name : this.name;
 
@@ -36,9 +34,9 @@ var itemscreen = new Class(
 				jQuery('#'+doname).html('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
 		});
-	},
+	};
 
-	addtag: function( cid, tagname, url )
+	this.addtag = function(cid, tagname, url)
 	{
 		jQuery.ajax({
 			url: url+'&cid='+cid,
@@ -60,9 +58,9 @@ var itemscreen = new Class(
 	    	alert('Failed to add tag'); //alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
 		});
-	},
+	};
 
-	reseter: function( task, id, name, url )
+	this.reseter = function(task, id, name, url)
 	{
 		var doname = typeof name != 'undefined' ? name : this.name;
 
@@ -79,7 +77,7 @@ var itemscreen = new Class(
 				jQuery('#'+doname).html('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
 		});
-	}
-});
+	};
 
-itemscreen.implement( new Options, new Events );
+	this.initialize(name, options);
+};

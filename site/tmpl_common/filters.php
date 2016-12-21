@@ -112,7 +112,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				$text_search_class = 'fc_text_filter';
 				$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
 				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete '.$_label_internal) : ' '.$_label_internal;
-				$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
+				$text_search_prompt = htmlspecialchars(JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST'), ENT_QUOTES, 'UTF-8');
 				?>
 				
 				<?php if ($show_search_label==1) : ?>
@@ -124,7 +124,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						<?php echo 'data-txt_ac_cid="'.$txt_ac_cid.'"'; ?>
 						<?php echo 'data-txt_ac_cids="'. implode(',', $txt_ac_cids) .'"'; ?>
 						<?php echo 'data-txt_ac_usesubs="'. $txt_ac_usesubs .'"'; ?>
-						placeholder="<?php echo $text_search_label; ?>" name="filter"
+						placeholder="<?php echo $text_search_prompt; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
 					

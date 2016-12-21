@@ -183,7 +183,7 @@ class FlexicontentViewFields extends JViewLegacy
 		if ($perms->CanDeleteField) {
 			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
-			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
 			$btn_task    = $contrl.'remove';
 			$extra_js    = "";
@@ -192,39 +192,7 @@ class FlexicontentViewFields extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
 		JToolbarHelper::checkin($contrl.'checkin');
-		
-		
-		/*
-		JToolBarHelper::divider(); JToolBarHelper::spacer();
-		$btn_name = 'basicindex';
-		$btn_task    = 'fields.toggleprop';
-		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='issearch';";
-		flexicontent_html::addToolBarButton(
-			'FLEXI_TOGGLE_TEXT_SEARCHABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
-		
-		$btn_name = 'basicfilter';
-		$btn_task    = 'fields.toggleprop';
-		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isfilter';";
-		flexicontent_html::addToolBarButton(
-			'FLEXI_TOGGLE_FILTERABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
-		
-		$btn_name = 'advindex';
-		$btn_task    = 'fields.toggleprop';
-		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvsearch';";
-		flexicontent_html::addToolBarButton(
-			'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
-		
-		$btn_name = 'advfilter';
-		$btn_task    = 'fields.toggleprop';
-		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvfilter';";
-		flexicontent_html::addToolBarButton(
-			'FLEXI_TOGGLE_ADV_FILTERABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
-		*/
-		
+
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
 		{
@@ -234,7 +202,7 @@ class FlexicontentViewFields extends JViewLegacy
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Export now',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Export now as XML',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 			
 			$btn_icon = 'icon-box-add';
@@ -243,7 +211,7 @@ class FlexicontentViewFields extends JViewLegacy
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Add to export list',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
 		

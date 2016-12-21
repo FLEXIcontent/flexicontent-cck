@@ -206,8 +206,8 @@ class FlexicontentViewItems extends JViewLegacy
 		// *****************************
 		
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-				
+
+
 		// ************************
 		// Create Submenu & Toolbar
 		// ************************
@@ -222,35 +222,31 @@ class FlexicontentViewItems extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		$toolbar = JToolBar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		
 		// Implementation of multiple-item state selector
 		$add_divider = false;
-		if ( $hasPublish ) {
+		if ( $hasPublish )
+		{
 			$btn_task = '';
-			$ctrl_task = '&task=items.selectstate';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&format=raw';
-			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-				$js .= "
-					jQuery('#toolbar-publish a.toolbar, #toolbar-publish button')
-						.attr('onclick', 'javascript:;')
-						.attr('href', '".$popup_load_url."')
-						.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
-				";
-				//JToolBarHelper::publishList( $btn_task );
-				JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
-				JHtml::_('behavior.modal', '#toolbar-publish a.toolbar, #toolbar-publish button');
-			} else {
-				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 240);
-			}
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolBarHelper::publishList( $btn_task );
+			$js .= "
+				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\'}); return false;');
+			";
+			JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
 			$add_divider = true;
 		}
 		
-		if ($hasDelete) {
+		if ($hasDelete)
+		{
 			if ( $filter_state && in_array('T',$filter_state) ) {
 				//$btn_msg = JText::_('FLEXI_ARE_YOU_SURE');
 				//$btn_task = 'items.remove';
 				//JToolBarHelper::deleteList($btn_msg, $btn_task);
-				$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 				$btn_task    = 'items.remove';
 				$extra_js    = "";
@@ -258,7 +254,7 @@ class FlexicontentViewItems extends JViewLegacy
 					'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning");
 			} else {
-				$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH') );
+				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH'));
 				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM').' '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
 				$btn_task    = 'items.changestate';
 				$extra_js    = "document.adminForm.newstate.value='T';";
@@ -270,7 +266,7 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		
 		if ($CanArchives && (!$filter_state || !in_array('A',$filter_state))) {
-			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE')  );
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE'));
 			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
 			$btn_task    = 'items.changestate';
 			$extra_js    = "document.adminForm.newstate.value='A';";
@@ -284,7 +280,7 @@ class FlexicontentViewItems extends JViewLegacy
 			($CanArchives && $filter_state && in_array('A',$filter_state)) ||
 			($hasDelete   && $filter_state && in_array('T',$filter_state))
 		) {
-			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE') );
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE'));
 			$msg_confirm = JText::_('FLEXI_RESTORE_CONFIRM');
 			$btn_task    = 'items.changestate';
 			$extra_js    = "document.adminForm.newstate.value='P';";
@@ -295,25 +291,20 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($add_divider) { JToolBarHelper::divider(); }
 		
 		$add_divider = false;
-		if ($CanAddAny) {
+		if ($CanAddAny)
+		{
 			$btn_task = '';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
-			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-				$js .= "
-					jQuery('#toolbar-new a.toolbar, #toolbar-new button')
-						.attr('onclick', 'javascript:;')
-						.attr('href', '".$popup_load_url."')
-						.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
-				";
-				//JToolBarHelper::addNew( $btn_task );
-				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
-				JHtml::_('behavior.modal', '#toolbar-new a.toolbar, #toolbar-new button');
-			} else {
-				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 800, 240);
-			}
+			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolBarHelper::addNew( $btn_task );
+			$js .= "
+				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 240, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
+			";
+			JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
 			$add_divider = true;
 		}
-		if ($hasEdit) {
+		if ($hasEdit)
+		{
 			$btn_task = 'items.edit';
 			JToolBarHelper::editList($btn_task);
 			$add_divider = true;
@@ -321,7 +312,8 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($add_divider) { JToolBarHelper::divider(); }
 		
 		$add_divider = false;
-		if ($CanAddAny && $CanCopy) {
+		if ($CanAddAny && $CanCopy)
+		{
 			$btn_task = 'items.copy';
 			JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
 			if ($useAssocs) {

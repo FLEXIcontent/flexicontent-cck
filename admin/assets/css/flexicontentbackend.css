@@ -3570,6 +3570,9 @@ icon-typeadd:before,
 .icon-advindexdirty:before {
 	content: "\e001";
 }
+.icon-language:before {
+	content: "\35";
+}
 @media (min-width: 1020px) {
 	#toolbar-purge,
 	#toolbar-custom_order,

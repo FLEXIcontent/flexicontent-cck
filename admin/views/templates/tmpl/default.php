@@ -49,7 +49,7 @@ jQuery(document).ready(function() {
 ";
 JFactory::getDocument()->addScriptDeclaration($js);
 
-$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+$edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 $editSingle_icon   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ' );
 $editMultiple_icon = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
 $editLayout_icon   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', $edit_layout, ' style="min-width:16px;"  class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
