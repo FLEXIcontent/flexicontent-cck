@@ -1161,9 +1161,14 @@ span.maincat a:hover {
 span.maincat a {
 	color: black;
 	font-weight: bold;
+	font-size: 12px;
+	font-family: tahoma, arial;
 }
+span.itemtag,
 span.secondarycat a {
 	color: gray;
+	font-size: 12px;
+	font-family: tahoma, arial;
 }
 h3.themes-title {
 	font-size: 12px;
