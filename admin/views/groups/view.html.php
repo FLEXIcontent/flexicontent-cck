@@ -87,7 +87,7 @@ class FlexicontentViewGroups extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanGroups');
+		FLEXIUtilities::ManagerSideMenu('CanGroups');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_GROUPS' );

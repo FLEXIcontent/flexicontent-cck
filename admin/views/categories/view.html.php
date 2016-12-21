@@ -113,7 +113,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanCats');
+		FLEXIUtilities::ManagerSideMenu('CanCats');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_CATEGORIES' );

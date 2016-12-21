@@ -110,7 +110,7 @@ class FlexicontentViewReviews extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanReviews');
+		FLEXIUtilities::ManagerSideMenu('CanReviews');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_REVIEWS' );

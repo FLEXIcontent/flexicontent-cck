@@ -98,7 +98,7 @@ class FlexicontentViewStats extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanStats');
+		FLEXIUtilities::ManagerSideMenu('CanStats');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_STATISTICS' );

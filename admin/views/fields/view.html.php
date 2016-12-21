@@ -136,7 +136,7 @@ class FlexicontentViewFields extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanFields');
+		FLEXIUtilities::ManagerSideMenu('CanFields');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FIELDS' );

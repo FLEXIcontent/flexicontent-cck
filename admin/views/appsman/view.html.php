@@ -98,7 +98,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanAppsman');
+		FLEXIUtilities::ManagerSideMenu('CanAppsman');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' );

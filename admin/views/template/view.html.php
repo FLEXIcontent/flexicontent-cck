@@ -212,7 +212,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanTemplates');
+		FLEXIUtilities::ManagerSideMenu('CanTemplates');
 
 		//create the toolbar
 		$bar = JToolBar::getInstance('toolbar');

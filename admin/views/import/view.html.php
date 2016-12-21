@@ -98,7 +98,7 @@ class FlexicontentViewImport extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanImport');
+		FLEXIUtilities::ManagerSideMenu('CanImport');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_IMPORT' );

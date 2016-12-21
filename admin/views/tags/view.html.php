@@ -109,7 +109,7 @@ class FlexicontentViewTags extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanTags');
+		FLEXIUtilities::ManagerSideMenu('CanTags');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TAGS' );

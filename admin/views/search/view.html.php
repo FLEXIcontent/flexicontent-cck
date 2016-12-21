@@ -136,7 +136,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanIndex');
+		FLEXIUtilities::ManagerSideMenu('CanIndex');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );

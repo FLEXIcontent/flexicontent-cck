@@ -114,7 +114,7 @@ class FlexicontentViewTypes extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanTypes');
+		FLEXIUtilities::ManagerSideMenu('CanTypes');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TYPES' );

@@ -77,7 +77,7 @@ class FlexicontentViewArchive extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanArchives');
+		FLEXIUtilities::ManagerSideMenu('CanArchives');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
