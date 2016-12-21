@@ -178,7 +178,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanAuthors');
+		FLEXIUtilities::ManagerSideMenu('CanAuthors');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_AUTHORS' );

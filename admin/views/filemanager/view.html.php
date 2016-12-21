@@ -208,7 +208,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Create Submenu (and also check access to current view)
 		if ($view!='fileselement')
 		{
-			FLEXISubmenu('CanFiles');
+			FLEXIUtilities::ManagerSideMenu('CanFiles');
 		}
 		
 		// Create document/toolbar titles

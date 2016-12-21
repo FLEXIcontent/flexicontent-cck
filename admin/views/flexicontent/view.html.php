@@ -162,7 +162,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		FLEXISubmenu(null);
+		FLEXIUtilities::ManagerSideMenu(null);
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
