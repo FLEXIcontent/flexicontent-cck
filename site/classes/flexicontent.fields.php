@@ -3157,10 +3157,10 @@ class FlexicontentFields
 				{
 					$options[] = JHTML::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 				}
-				$extra_param  = ' data-placeholder="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
-				
+				$extra_param = ' data-placeholder="'.htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8').'"';
+
 				// Add type to filter PROMPT (via js)
-				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
+				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
 			}
 			
 			// SINGLE-select does not has an internal label a drop-down list option
@@ -3211,13 +3211,16 @@ class FlexicontentFields
 			break;
 		case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
 			
-			if ( !$isSlider ) {
+			if ( !$isSlider )
+			{
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
-				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
+				$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
 				
 				$attribs_str = ' class="fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'" placeholder="'.$_inner_lb.'"';
 				$attribs_arr = array('class'=>'fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'', 'placeholder' => $_inner_lb );
-			} else {
+			}
+			else
+			{
 				$attribs_str = "";
 				
 				$value1 = $display_filter_as==8 ? @$value[1] : $value;

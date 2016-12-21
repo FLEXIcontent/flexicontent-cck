@@ -76,7 +76,8 @@ if ( !class_exists('JViewLegacy') )        jimport('legacy.view.legacy');
 
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code
-if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>')) {
+if (ini_get('date.timezone') == '')
+{
 	date_default_timezone_set('UTC');
 }
 
@@ -112,7 +113,7 @@ if (!FLEXI_J16GE) {
 }
 
 // Define configuration constants
-if (!defined('FLEXI_ACCESS'))  define('FLEXI_ACCESS'	, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
+if (!defined('FLEXI_ACCESS'))  define('FLEXI_ACCESS'	, 0);  // TO BE REMOVED
 if (!defined('FLEXI_CACHE'))   define('FLEXI_CACHE'		, $params->get('advcache', 1));
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
 if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'falangdriver' ))) ? 1 : 0);
@@ -126,3 +127,4 @@ define('FLEXI_PHP_RECOMMENDED',	'5.4.0');
 define('FLEXI_VERSION', '3.2.0-dev');
 define('FLEXI_RELEASE',	'');
 define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
+define('FLEXI_PHP_54GE', version_compare(PHP_VERSION, '5.4.0', '>='));

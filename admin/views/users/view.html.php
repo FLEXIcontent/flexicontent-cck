@@ -310,7 +310,9 @@ class FlexicontentViewUsers extends JViewLegacy
 		$tip_class = ' hasTooltip';
 		JToolBarHelper::divider();
 		flexicontent_html::addToolBarButton(
-			'FLEXI_NEW', $btn_name='add_juser', $full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;", $msg_alert='', $msg_confirm='',
+			'FLEXI_NEW', $btn_name='add_juser',
+			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
+			$msg_alert='', $msg_confirm='',
 			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn btn-small btn-success".$tip_class, $btn_icon="icon-new icon-white",
 			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id=0" title="Add new Joomla user"'
 		);
@@ -319,7 +321,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
-		$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+		$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
 		$btn_task    = $contrl.'remove';
 		$extra_js    = "";

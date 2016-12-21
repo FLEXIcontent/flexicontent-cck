@@ -154,32 +154,31 @@ foreach($values as $file_id)
 	
 	
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
-	$_filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
-	if ($lowercase_filename) $_filetitle = StringHelper::strtolower( $_filetitle );
-	
+	$filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
+	$filetitle_escaped = htmlspecialchars($filetitle, ENT_COMPAT, 'UTF-8');
+
+	if ($lowercase_filename) $filetitle = StringHelper::strtolower( $filetitle );
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
-	$$filename_original = str_replace( array("'", "\""), array("\\'", ""), $filename_original );
-	$filename_original = htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8');
-	
-	$name_str   = $display_filename==2 ? $filename_original : $_filetitle;
+
+	$name_str = $display_filename==2 ? $filename_original : $filetitle;
+	$name_escaped = htmlspecialchars($name_str, ENT_COMPAT, 'UTF-8');
+
 	$name_classes = $file_classes.($file_classes ? ' ' : '').'fcfile_title';
-	$name_html  = '<h3 class="'.$name_classes.'">'. $name_str . '</h3>';
-	
-	
+	$name_html = '<h3 class="'.$name_classes.'">'. $name_str . '</h3>';
+
+
 	// f. DESCRIPTION: either as tooltip or as inline text
 	$descr_tip = $descr_inline = $descr_icon = '';
 	if (!empty($file_data->description))
 	{
 		if ( !$authorized ) {
 			if ($noaccess_display != 2 ) {
-				$name_escaped = flexicontent_html::escapeJsText($name_str, 's');
 				$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 				$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 				$descr_inline  = '';
 			}
 		}
 		else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
-				$name_escaped = flexicontent_html::escapeJsText($name_str, 's');
 			$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 			$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
@@ -290,7 +289,7 @@ foreach($values as $file_id)
 			$actions_arr[] = '
 				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" ' .($viewinside==2 ? 'target="_blank"' : '')
 					.' class="'.($viewinside==0 ? 'fancybox ' : '').$file_classes.' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-fancybox-type="iframe" ' : '')
-					.($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. flexicontent_html::escapeJsText($_filetitle,'s') .'\'}); return false;" ' : '').' title="'.$viewinfo.'" style="line-height:1.3em;" >
+					.($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '').' title="'.$viewinfo.'" style="line-height:1.3em;" >
 					'. $viewtext.'
 				</a>';
 			$fancybox_needed = 1;
@@ -303,7 +302,7 @@ foreach($values as $file_id)
 			
 			$attribs  = ' class="'. $addtocart_classes .'"';
 			$attribs .= ' title="'. $addtocartinfo .'"';
-			$attribs .= ' data-filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
+			$attribs .= ' data-filename="'. $filetitle_escaped .'"';
 			$attribs .= ' data-fieldid="'. $field->id .'"';
 			$attribs .= ' data-contentid="'. $item->id .'"';
 			$attribs .= ' data-fileid="'. $file_data->id .'"';
@@ -369,7 +368,7 @@ foreach($values as $file_id)
 			
 			$attribs  = ' class="'. $addtocart_classes .'"';
 			$attribs .= ' title="'. $addtocartinfo .'"';
-			$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
+			$attribs .= ' filename="'. $filetitle_escaped .'"';
 			$attribs .= ' fieldid="'. $field->id .'"';
 			$attribs .= ' contentid="'. $item->id .'"';
 			$attribs .= ' fileid="'. $file_data->id .'"';

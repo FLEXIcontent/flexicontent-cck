@@ -115,7 +115,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$btn_task    = 'appsman.initxml';
 		$extra_js    = "";
 		flexicontent_html::addToolBarButton(
-			'Import', $btn_name, $full_js='', $msg_alert='', $msg_confirm='',
+			'Import', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn", $btn_icon);
 		*/
 		

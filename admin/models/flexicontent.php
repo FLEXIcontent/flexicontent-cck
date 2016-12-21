@@ -1085,7 +1085,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Store JPATH_BASE variable (needed in case of hard linking to flexicontent files outside of Joomla folder)
 		if (JPATH_BASE != realpath(__DIR__.'/../..') || !file_exists(__DIR__.'/tasks/defines.php') || filemtime(__FILE__) >= filemtime(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tasks'.DS.'defines.php'))
 		{
-			file_put_contents(__DIR__.'/tasks/defines.php', '<?php'."\n".'define(\'JPATH_BASE\', \''.JPATH_BASE.'\');'."\n");
+			file_put_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tasks'.DS.'defines.php', '<?php'."\n".'define(\'JPATH_BASE\', \''.JPATH_BASE.'\');'."\n");
 		}
 
 		$deprecated = array();
