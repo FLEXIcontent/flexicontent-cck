@@ -75,6 +75,10 @@ foreach ($this->rows as $row)
 	}
 	$rows_byid[$row->id] = $row;
 }
+foreach($this->types as $type)
+{
+	$type->jname = JText::_($type->name);
+}
 
 // Iterate thtrough all fields and create information needed by field
 $allrows_byid = array();
@@ -155,6 +159,7 @@ function delAllFilters() {
 		<span class="btn-group input-append fc-filter">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+			<span id="fc-toggle-types_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_ASSIGNED_TYPES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_types').show() : jQuery('.fc_assignments_box.fc_types').hide();" ><span class="icon-tree"></span><?php echo JText::_('FLEXI_TYPES'); ?></php></span>
 			<span id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');"><span class="icon-help"></span></span>
 		</span>
 		
@@ -526,9 +531,10 @@ function delAllFilters() {
 					'.$row->type."</span><br/>";
 					echo '<span class="alert alert-info" style="display: inline-block; margin: 0px 0px 1px; border-radius: 3px; width: 98%; padding: 4px 1%;">';
 					$_lbls = array();
-					foreach($grouped_fields[$row->id] as $_r) {
+					foreach($grouped_fields[$row->id] as $_r)
+					{
 						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;view=field&amp;id='. $_r->id;
-						$_lbls[] = '<a class="badge" style="border-radius:3px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
+						$_lbls[] = '<a class="label" style="border-radius:3px; padding: 2px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
 					}
 					echo implode(' ', $_lbls);
 					echo '</span>';
@@ -605,10 +611,32 @@ function delAllFilters() {
 			</td>
 			<td>
 				<?php
-				if (count($row->content_types))
-					foreach($row->content_types as $type_id) echo '<span class="badge">'.JText::_($this->types[$type_id]->name).'</span>';
-				else
+				if (!count($row->content_types))
+				{
 					echo '<span class="badge badge-warning">'.JText::_('FLEXI_NONE').'</span>';
+				}
+				else
+				{
+					$row_types  = array();
+					$type_names = array();
+					foreach($row->content_types as $type_id)
+					{
+						$row_types[] = '
+						<span class="itemtype">
+							'.$this->types[$type_id]->jname.'
+						</span>';
+						$type_names[] = $this->types[$type_id]->jname;
+					}
+					echo count($row_types) > 3 ? '
+						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_ASSIGNED_TYPES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $type_names).'</li></ul>', 0, 1).'">
+							'.count($row_types).' <i class="icon-tree"></i>
+						</span>
+						<div class="fc_assignments_box fc_types">' : '';
+					echo count($row_types) > 8
+						? implode(', ', $row_types)
+						: (count($row_types) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_types) . '</li></ul>' : '');
+					echo count($row_types) > 3 ? '</div>' : '';
+				}
 				?>
 			</td>
 			<td>

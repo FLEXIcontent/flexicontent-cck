@@ -179,7 +179,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		if($perms->CanConfig)
 		{
 
-			if (1) // FLEXI_J37GE
+			if (0) // FLEXI_J37GE
 			{
 				$btn_task = '';
 				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=import&tmpl=component';
@@ -192,7 +192,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				JToolBarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
 			}
 
-			if (1) // TODO evaluate for e.g. submiting a template
+			if (0) // TODO evaluate for e.g. submiting a template
 			{
 				$btn_task = '';
 				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
