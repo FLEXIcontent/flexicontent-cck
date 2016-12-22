@@ -939,7 +939,7 @@ flexicontent_html::loadFramework('flexi-lib');
 
 					// Link to assign file value into the content form
 					$file_assign_link = $this->folder_mode ?
-						"window.parent.qmAssignFile".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', 0, '".$filename_original."');document.getElementById('file{$i}').className='striketext';" :
+						"window.parent.qmAssignFile".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', !fc_fileselement_close_modal, '".$filename_original."'); document.getElementById('file".$row->id."').className='striketext';" :
 						"var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  fc_fileselement_assign_file(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', fc_fileselement_targetid, file_data);";
 					$file_assign_arr[$i] = $file_assign_link;
 		   		?>
