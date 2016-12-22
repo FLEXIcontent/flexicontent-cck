@@ -1040,8 +1040,8 @@ jQuery(document).ready(function(){
 				$nr = count($row->catids);
 				$ix = 0;
 				$nn = 0;
-				$row_cats = array();
-				$sec_cats = array();
+				$row_cats  = array();
+				$cat_names = array();
 				$_maincat = '';
 				for ($nn=0; $nn < $nr; $nn++)
 				{
@@ -1064,7 +1064,7 @@ jQuery(document).ready(function(){
 							<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 								<a href="'.$catLink.'">'.$short_name.'</a>
 							</span>';
-						$sec_cats[] = $short_name;
+						$cat_names[] = $short_name;
 					}
 					else
 					{
@@ -1076,15 +1076,15 @@ jQuery(document).ready(function(){
 					$ix++;
 				}
 				echo $_maincat;
-				echo count($row->catids) > 1 ? '
-					<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SECONDARY_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $sec_cats).'</li></ul>', 0, 1).'">
-						'.count($row->catids).' <i class="icon-tree-2"></i>
+				echo count($row_cats) ? '
+					<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SECONDARY_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
+						'.count($row_cats).' <i class="icon-tree-2"></i>
 					</span>
 					<div class="fc_assignments_box fc_cats">' : '';
 				echo count($row_cats) > 8
 					? implode(', ', $row_cats)
 					: (count($row_cats) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_cats) . '</li></ul>' : '');
-				echo count($row->catids) > 1 ? '</div>' : '';
+				echo count($row_cats) ? '</div>' : '';
 				?>
 			</td>
 			
@@ -1100,15 +1100,15 @@ jQuery(document).ready(function(){
 							$tag_names[] = $this->itemTags[$_itag]->name;
 						}
 					}
-					echo count($row->tagids) > 1 ? '
+					echo count($row_tags) ? '
 						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle(400);" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
-							'.count($row->tagids).' <i class="icon-tags"></i>
+							'.count($row_tags).' <i class="icon-tags"></i>
 						</span>
 						<div class="fc_assignments_box fc_tags">' : '';
 					echo count($row_tags) > 8
 						? implode(', ', $row_tags)
 						: (count($row_tags) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_tags) . '</li></ul>' : '');
-					echo count($row->tagids) > 1 ? '</div>' : '';
+					echo count($row_tags) ? '</div>' : '';
 				?>
 			</td>
 			

@@ -327,8 +327,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (has_select2)  newField.find('select.use_select2_lib').show().select2();
 				" : "").
 			"
-				newField.find('a.addfile_".$field->id."').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-				newField.find('a.addfile_".$field->id."').attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JSession::getFormToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$preview_thumb_w.'&thumb_h='.$preview_thumb_h.'&autoassign='.$autoassign."');
+				// Update button for modal file selection
+				var theBTN = newField.find('a.addfile_".$field->id."');
+				theBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
+				theBTN.attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JSession::getFormToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$preview_thumb_w.'&thumb_h='.$preview_thumb_h.'&autoassign='.$autoassign."');
+				theBTN.each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT_IMAGE', true)."'});
+						return false;
+					});
+				});
 				
 				// COPY an preview box
 				var img_preview = newField.find('img.preview_image');
@@ -382,15 +391,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
-				
-				// Add jQuery modal window to the select image file button
-				newField.find('a.addfile_".$field->id."').each(function(index, value) {
-					jQuery(this).on('click', function() {
-						var url = jQuery(this).attr('href');
-						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_SELECT_IMAGE', true)."'});
-						return false;
-					});
-				});
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -429,6 +429,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
+
+				// return HTML Tag ID of field containing the file ID, needed when creating file rows to assign multi-fields at once
+				return '".$elementid."_' + (uniqueRowNum".$field->id." - 1) + '_existingname';
 			}
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
@@ -619,8 +622,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (prv_obj) {
 					if (file || (fileUrlGiven && existingAllowed && !existing_obj.hasClass('no_value_selected')) ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+preview_url+'\" alt=\"Preview image\" />';
-					} else if (action!='0') {
-						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />';
 					} else {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />';
 					}

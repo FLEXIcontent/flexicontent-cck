@@ -383,7 +383,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					newField.find('div.select2-container').remove();
 					newField.find('select.use_select2_lib').select2('destroy').show().select2();
 				}
-				
+
+				// Update button for modal file selection
 				var theBTN = newField.find('a.addfile_".$field->id."');
 				theBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
 				theBTN.attr('data-rowno',uniqueRowNum".$field->id.");
