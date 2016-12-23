@@ -80,12 +80,34 @@ class FlexicontentViewFileselement extends JViewLegacy
 		
 		// Get field id and folder mode
 		$fieldid = $view=='fileselement' ? $jinput->get('field', 0, 'int') : null;   // Force no field id for filemanager
+		$folder_mode = 0;
+		$assign_mode = 0;
+		if ($fieldid)
+		{
+			$_fields = FlexicontentFields::getFieldsByIds(array($fieldid), false);
+			if ( !empty($_fields[$fieldid]) )
+			{
+				$field = $_fields[$fieldid];
+				$field->parameters = new JRegistry($field->attribs);
+
+				if ( in_array($field->field_type, array('image')) )
+				{
+				 $folder_mode = $field->parameters->get('image_source')==0 ? 0 : 1;
+				 $assign_mode = 1;
+				}
+			}
+			else
+			{
+				$fieldid = null;
+			}
+		}
+
+		if (!$fieldid && $view=='fileselement') die('no valid field ID');
 		$_view = $view.$fieldid;
-		$folder_mode = !$fieldid ? 0 :
-			$app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode', 'folder_mode', 0, 'int' );
-		
-		
-		
+		//$folder_mode = !$fieldid ? 0 : $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode', 'folder_mode', 0, 'int' );
+
+
+
 		// ***********
 		// Get filters
 		// ***********
@@ -104,17 +126,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage');
 		$cols = array();
 
-		if ($fieldid)
-		{
-			$_fields = FlexicontentFields::getFieldsByIds(array($fieldid), false);
-			if ( !empty($_fields[$fieldid]) )
-			{
-				$field = $_fields[$fieldid];
-				$field->parameters = new JRegistry($field->attribs);
-			}
-			else
-				$fieldid = null;
-		}
 
 		// Column disabling only applicable for FILESELEMENT view, with field in DB mode (folder_mode==0)
 		if (!$folder_mode && $fieldid)
@@ -607,6 +618,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->langs  = $langs;
 
 		$this->folder_mode = $folder_mode;
+		$this->assign_mode = $assign_mode;
 		$this->pagination = $pagination;
 
 		$this->CanFiles   = $perms->CanFiles;

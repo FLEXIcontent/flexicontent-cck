@@ -75,15 +75,15 @@
 			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC">
 				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode,client-resize">Joomla media manager</option>
 				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode,client-resize">Joomla article images: (intro + full)</option>
-				<option value="0"  show_list="img-db-mode"  hide_list="img-fld-mode,client-resize">FLEXI_FIELD_REUSABLE_DB_MODE</option>
-				<option value="1"  show_list="img-fld-mode,client-resize" hide_list="img-db-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
+				<option value="0"  show_list="img-db-mode,img-common-conf"  hide_list="img-fld-mode,client-resize">FLEXI_FIELD_REUSABLE_DB_MODE</option>
+				<option value="1"  show_list="img-fld-mode,img-common-conf,client-resize" hide_list="img-db-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
-
-			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level1" depend_class="img-fld-mode" />
-			<field name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE" description="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE_DESC" depend_class="img-fld-mode" class="btn-group btn-group-yesno">
+			<field name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE" description="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE_DESC" depend_class="img-common-conf" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level1" depend_class="img-fld-mode" />
 			<field name="of_usage" type="radio" default="0" label="FLEXI_IMAGE_FOLDER_LOCATION" description="FLEXI_IMAGE_FOLDER_LOCATION_DESC" depend_class="img-fld-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_ONE_PER_ITEM</option>
 				<option value="1">FLEXI_USE_ORIGINAL_FOLDER</option>
@@ -100,38 +100,33 @@
 				<option value="0" show_list="about-target-dir-mode" hide_list="">FLEXI_MEDIA</option>
 				<option value="1" show_list="about-target-dir-mode" hide_list="">FLEXI_SECURE</option>
 			</field>
-			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_AUTOUPLOAD_DESC" depend_class="img-db-mode" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="select_in_modal" type="multilist" subtype="radio" default="1" toggle_related="1" label="Selection method" description="Show image selection in modal popup that maximizes available usable space" depend_class="img-db-mode" class="btn-group group-fcinfo">
+				<option value="1" show_list=""  hide_list="db-imgpicker">Filemanager (AJAX uploader)</option>
+				<option value="0" show_list="db-imgpicker"  hide_list="">Image picker (inline)</option>
+				<option value="2" show_list="db-imgpicker"  hide_list="">Image picker (popup)</option>
 			</field>
 			<field name="auto_delete_unused" type="radio" default="1" label="FLEXI_AUTO_DELETE_UNUSED" description="FLEXI_AUTO_DELETE_UNUSED_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_AUTO</option>
-				<option value="1">FLEXI_ALWAYS</option>
-			</field>
-			<field name="select_in_modal" type="radio" default="1" label="Select in modal" description="Show image selection in modal popup that maximizes available usable space" depend_class="img-db-mode" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
 			<field name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" depend_class="img-db-mode" />
-			<field name="existing_imgs" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ENABLE" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode" class="btn-group btn-group-yesno">
-				<option value="0" show_list=""  hide_list="db-existing-imgsel,db-existing-imgpicker">FLEXI_HIDE</option>
-				<option value="2" show_list="db-existing-imgsel" hide_list="db-existing-imgpicker">Select drop-down</option>
-				<option value="1" show_list="db-existing-imgsel,db-existing-imgpicker" hide_list="">Select + Image picker</option>
+			<field name="list_all_media_files" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD" description="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="limit-by-uploader">FLEXI_FIELD_THIS_FIELD</option>
+				<option value="1" show_list="limit-by-uploader" hide_list="">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
 			</field>
-			<field name="imagepickerlimit" type="text" default="200" label="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode db-existing-imgpicker" />
-			<field name="list_all_media_files" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD" description="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD_DESC" depend_class="img-db-mode db-existing-imgsel" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_FIELD_THIS_FIELD</option>
-				<option value="1">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_FIELD_ANY_FIELD_OR_FM" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level4" class="alert alert-info" depend_class="img-db-mode" />
-			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
+			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC" depend_class="img-db-mode limit-by-uploader" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_FIELD_CURRENT_USER</option>
 				<option value="0">FLEXI_FIELD_ANY_USER</option>
 			</field>
-			<field name="unique_thumb_method" type="radio" default="0" label="FLEXI_FIELD_UNIQUE_THUMB_METHOD" description="FLEXI_FIELD_UNIQUE_THUMB_METHOD_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_FIELD_UNIQUE_THUMB_FIELD_ID</option>
-				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER_IN_THUMBS_TAB</option>
+
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_PICKER" description="FLEXI_FIELD_IMAGE_PICKER_DESC" level="level4" class="alert alert-info fcpadded" depend_class="img-db-mode db-imgpicker" />
+			<field name="existing_imgs" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_SHOW" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode db-imgpicker" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="db-existing-imgpicker">FLEXI_HIDE</option>
+				<option value="2" show_list="" hide_list="db-existing-imgpicker">Select drop-down</option>
+				<option value="1" show_list="db-existing-imgpicker" hide_list="">Select + Image picker</option>
 			</field>
+			<field name="imagepickerlimit" type="text" default="200" label="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode db-imgpicker db-existing-imgpicker" />
 
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level2" depend_class="client-resize"  />
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" depend_class="client-resize"  class="alert alert-info fcpadded"/>
@@ -344,9 +339,13 @@
 			<field name="" type="separator" default="FLEXI_THUMBNAILS" icon_class="icon-image" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
-			
+
 			<field name="default_image" type="media" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
 			<field name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_FOLDER" description="FLEXI_FIELD_IMAGE_FOLDER_DESC" />
+			<field name="unique_thumb_method" type="radio" default="0" label="FLEXI_FIELD_UNIQUE_THUMB_METHOD" description="FLEXI_FIELD_UNIQUE_THUMB_METHOD_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_UNIQUE_THUMB_FIELD_ID</option>
+				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER_SET_ABOVE</option>
+			</field>
 			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
 			<field name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
 			<field name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
