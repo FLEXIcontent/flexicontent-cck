@@ -1898,7 +1898,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to replace item properties for the SQL value mode for various fields
-	static function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, $canCache=null)
+	static function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, &$canCache=null)
 	{
 		// replace item properties
 		preg_match_all("/{item->[^}]+}/", $query, $matches);

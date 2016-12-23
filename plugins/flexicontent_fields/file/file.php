@@ -167,7 +167,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $field->parameters->get('fields_box_placing', '0')=='1' ? ' floated' : '';
+		$value_classes .= $fields_box_placing ? ' floated' : '';
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -175,7 +175,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
-			
+
 			function file_fcfield_del_existing_value".$field->id."(el)
 			{
 				var el  = jQuery(el);
@@ -188,18 +188,19 @@ class plgFlexicontent_fieldsFile extends FCField
 					box.find('.fc_filedata_txt').css('text-decoration', '');
 				}
 			}
-			
-			function fc_openFileSelection_".$field->id."(event) {
+
+			function fc_openFileSelection_".$field->id."(event)
+			{
 				var obj = jQuery(event.data.obj);
 				var url = obj.attr('href');
-				
+
 				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
 				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
-				
+
 				fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".JText::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."'});
 				return false;
 			}
-			
+
 			function qfSelectFile".$field->id."(obj, id, file, targetid, file_data, close_modal)
 			{
 				var result = 1;
@@ -207,47 +208,47 @@ class plgFlexicontent_fieldsFile extends FCField
 				var altname     = typeof file_data.altname     !== 'undefined' ? file_data.altname     : '';
 				var description = typeof file_data.description !== 'undefined' ? file_data.description : '';
 				var language    = typeof file_data.language    !== 'undefined' ? file_data.language    : '';
-				
+
 				var strorage_name = typeof file_data.filename !== 'undefined' ? file_data.filename : file;
 				var altname = typeof file_data.altname !== 'undefined' ? file_data.altname : '';
 				var displaytitle = altname && (altname!=file) ? altname : '-';
 				var hidden_text  = altname && (altname!=file) ? file+'<br/>'+altname : '';
-				
+
 				var container = jQuery('#'+targetid).closest('.fcfieldval_container');
 				container.find('.fc_fileid').val(id);
 				container.find('.fc_filedata_storage_name').html(strorage_name);
-				
+
 				container.find('.fc_filedata_txt_nowrap').html(hidden_text).show();
 				container.find('.fc_filedata_txt').removeClass('file_unpublished').val(file).blur();
 				container.find('.fc_filedata_title').html(displaytitle);
-				
+
 				container.find('.fc_preview_thumb').attr('src', preview ? preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 				if (preview) container.find('.fc_preview_thumb').show();
 				else container.find('.fc_preview_thumb').hide();
-				
+
 				".($form_file_preview == 2 ? "
 				preview ? container.find('.fc_preview_thumb').show() : container.find('.fc_preview_thumb').hide();
 				" : "")."
-				
+
 				container.find('.fc_filetitle').val(altname).blur();
 				container.find('.fc_filelang').val(language).trigger('change');
 				container.find('.fc_filedesc').val(description);
-				
+
 				// Increment value counter (which is optionally used as 'required' form element)
 				var valcounter = document.getElementById('".$elementid."');
 				if (valcounter) {
 					valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
 					//if (window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
-				
+
 				close_modal = typeof close_modal !== 'undefined' ? close_modal : targetid;
 				if (close_modal) fc_field_dialog_handle_".$field->id.".dialog('close');
-				
+
 				var remove_obj = container.find('.inlinefile-del');
 				remove_obj.removeAttr('checked').trigger('change');
 				return result;
 			}
-						
+
 			jQuery(document).ready(function() {
 				jQuery('a.addfile_".$field->id."').each(function(index, value) {
 					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
@@ -265,7 +266,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 0) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						jQuery(e.target).children().css('float', 'left');
 						fc_setEqualHeights(jQuery(e.target), 0);
@@ -1138,21 +1139,21 @@ class plgFlexicontent_fieldsFile extends FCField
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
-	
-	
-	
+
+
+
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
 	
-	function getFileData( $value, $published=1, $extra_select='' )
+	function getFileData($fid, $published=1, $extra_select='')
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
 		$return_data = array();
 		$new_ids = array();
-		$values = is_array($value) ? $value : array($value);
-		foreach ($values as $file_id)
+		$file_ids = (array)$fid;
+		foreach ($file_ids as $file_id)
 		{
 			$f = (int)$file_id;
 			if ( !isset($cached_data[$f]) && $f)
@@ -1179,14 +1180,14 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 		
 		// Finally get file data in correct order
-		foreach($values as $file_id)
+		foreach($file_ids as $file_id)
 		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
 				$return_data[$file_id] = $cached_data[$f];
 		}
 
-		return !is_array($value) ? @$return_data[(int)$value] : $return_data;
+		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
 	}
 
 

@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
+jimport('joomla.filesystem.file');
 use Joomla\String\StringHelper;
 
 /**
@@ -83,7 +84,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option.'.'.$view.'.';
 		
-		$this->fieldid = '';
+		$this->fieldid = 0;  // $jinput->get('field', null, 'int');  // not yet used for filemanager view, only for fileselement views
 		$this->viewid  = $view.$this->fieldid;
 		
 		
@@ -162,32 +163,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
-	
-	
-	/**
-	 * Method to load the configuration parameters of specific field
-	 *
-	 * @access public
-	 * @return	string
-	 * @since	1.6
-	 */
-	function & getFieldParams($fieldid)
-	{
-		static $field_params = array();
-		
-		if (isset($field_params[$fieldid])) return $field_params[$fieldid];
-		
-		$db = JFactory::getDBO();
-		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE id='".$fieldid."'";
-		$db->setQuery($query);
-		$data = $db->loadObject();
-		if ($db->getErrorNum())  echo $query."<br /><br />".$db->getErrorMsg()."<br />";
-		
-		$field_params[$fieldid] = new JRegistry($data->attribs);
-		return $field_params[$fieldid];
-	}
-	
-	
+
+
 	/**
 	 * Method to get files data
 	 *
@@ -214,8 +191,6 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$query = $s_assigned_via_main  ?  $this->_buildQuery($s_assigned_fields)  :  $this->_buildQuery();
 			
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-			
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $this->_db->loadResult();
 			
@@ -296,6 +271,75 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		}
 
 		return $this->_pagination;
+}
+
+
+	
+	/**
+	 * Method to load the configuration parameters of specific field
+	 *
+	 * @access	public
+	 * @param	int file identifier
+	 * @since	3.0
+	 */
+	function & getFieldParams($fieldid=0)
+	{
+		static $field_params = array();
+		$fieldid = (int) $fieldid ?: $this->fieldid;
+		if (isset($field_params[$fieldid])) return $field_params[$fieldid];
+
+		if (!$fieldid)
+		{
+			$field_params[0] = new JRegistry();
+			return $field_params[0];
+		}
+
+		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE id='".$fieldid."'";
+		$this->_db->setQuery($query);
+		$data = $this->_db->loadObject();
+
+		$field_params[$fieldid] = new JRegistry($data->attribs);
+		return $field_params[$fieldid];
+	}
+	
+	
+	/**
+	 * Method to get the field name when given fieldid
+	 *
+	 * @access	public
+	 * @param	int file identifier
+	 */
+	function getFieldName($fieldid)
+	{
+		$query = "SELECT name FROM #__flexicontent_fields WHERE id='{$fieldid}';";
+		$this->_db->setQuery($query);
+		return $this->_db->loadResult();
+	}
+
+
+	/**
+	 * Method to get the field data when given fieldid
+	 *
+	 * @access	public
+	 * @param	int file identifier
+	 */
+	function getFieldData($fieldid=0)
+	{
+		static $field_data = array();
+		$fieldid = (int) $fieldid ?: $this->fieldid;
+		if (isset($field_data[$fieldid])) return $field_data[$fieldid];
+
+		if (!$fieldid)
+		{
+			$field_data[0] = false;
+			return $field_data[0];
+		}
+
+		$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}';";
+		$this->_db->setQuery($query);
+
+		$field_data[$fieldid] = $this->_db->loadObject();
+		return $field_data[$fieldid];
 	}
 	
 	
@@ -374,11 +418,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getItemFiles($item_id=0)
 	{
-		$db = JFactory::getDBO();
 		$query = $this->_buildQuery( $assigned_fields=array(), $ids_only=true, $item_id );
-		$db->setQuery($query);
-		$items = $db->loadColumn();
-		$items = $items?$items:array();
+		$this->_db->setQuery($query);
+
+		$items = $this->_db->loadColumn();
+		$items = $items ?: array();
 		return $items;
 	}
 	
@@ -424,7 +468,32 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$option = $jinput->get('option', '', 'cmd');
 
 		$where = array();
+
+		$params = $this->getFieldParams();
+		$field  = $this->getFieldData();
+
+		// Limit listed files to specific uploader,  1: current user, 0: any user, and respect 'filter_uploader' URL variable
+		$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
+
+		// Calculate a default value for limiting to 'media' or 'secure' folder,  0: media folder, 1: secure folder, 2: no folder limitation AND respect 'filter_secure' URL variable
+		$default_dir = 2;
+		if ($field)
+		{
+			if (in_array($field->field_type, array('file', 'image')))
+				$default_dir = 1;  // 'secure' folder
+			else if (in_array($field->field_type, array('minigallery')))
+				$default_dir = 0;  // 'media' folder
+		}
+		$target_dir = $params->get('target_dir', $default_dir);
 		
+		// Handles special cases of fields, that have special rules for listing specific files only
+		if ($field && $field->field_type =='image')
+		{
+			$where[] = $params->get('list_all_media_files', 0)
+				? ' f.ext IN ("jpg","gif","png","jpeg") '
+				: ' f.id IN ('.implode(', ', $this->getFilesUsedByImageField($field, $params)).')';
+		}
+
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
 		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
@@ -438,8 +507,15 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanViewAllFiles = $permission->CanViewAllFiles;
-		
-		if (0) {  // limit via parameter
+
+		// Limit via parameter, 2: List any file and respect 'filter_secure' URL variable, 1: limit to secure, 0: limit to media
+		if ( strlen($target_dir) && $target_dir!=2 )
+		{
+			$filter_secure = $target_dir ? 'S' : 'M';   // force secure / media
+		}
+
+		// Limit via parameter, 1: limit to current user as uploader, 0: list files from any uploader, and respect 'filter_uploader' URL variable
+		if ($limit_by_uploader) {
 			$where[] = ' uploaded_by = ' . $user->id;
 		} else if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;
@@ -576,13 +652,12 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getFieldsUsingDBmode($field_type)
 	{
-		$db = JFactory::getDBO();
 		// Some fields may not be using DB, create a limitation for them
 		switch($field_type) {
 			case 'image':
 				$query = "SELECT id FROM #__flexicontent_fields WHERE field_type='image' AND attribs NOT LIKE '%image_source=1%'";
 				$this->_db->setQuery($query);
-				$field_ids = $db->loadColumn();
+				$field_ids = $this->_db->loadColumn();
 				break;
 			
 			default:
@@ -648,10 +723,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		//echo nl2br( "\n".$query."\n");
 		$this->_db->setQuery( $query );
 		$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
+
 		$items = array();
-		if ($_item_data) foreach ($_item_data as $item) {
+		if ($_item_data) foreach ($_item_data as $item)
+		{
 			if ($count_items) {
 				$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
 			} else {
@@ -733,9 +808,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			//echo nl2br( "\n".$query."\n");
 			$this->_db->setQuery( $query );
 			$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-			
-			if ($_item_data) foreach ($_item_data as $item) {
+
+			if ($_item_data) foreach ($_item_data as $item)
+			{
 				if ($count_items) {
 					$items[$item->file_id] = ((int) @ $items[$item->file_id]) + $item->item_count;
 				} else {
@@ -875,11 +950,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 		$assigned_data = $this->_db->loadObjectList('id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
-		//echo "<pre>"; print_r($assigned_data); exit;
-		
-		foreach($rows as $row) {
+
+		foreach($rows as $row)
+		{
 			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
 			if (@ $assigned_data[$row->id]->item_list)
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
@@ -910,11 +983,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 				. ' GROUP BY f.id'
 				;
 		$this->_db->setQuery($query);
-		
 		$assigned_data = $this->_db->loadObjectList('file_id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
-		foreach ($rows as $row) {
+
+		foreach ($rows as $row)
+		{
 			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
 			if (@ $assigned_data[$row->id]->item_list)
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
@@ -998,4 +1070,3 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		return $file_ids;
 	}
 }
-?>
