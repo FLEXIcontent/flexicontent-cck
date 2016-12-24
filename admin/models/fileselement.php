@@ -550,7 +550,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$field  = $this->getFieldData();
 
 		// Limit listed files to specific uploader,  1: current user, 0: any user, and respect 'filter_uploader' URL variable
-		$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
+		$limit_by_uploader = 0;
 
 		// Calculate a default value for limiting to 'media' or 'secure' folder,  0: media folder, 1: secure folder, 2: no folder limitation AND respect 'filter_secure' URL variable
 		$default_dir = 2;
@@ -564,11 +564,12 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$target_dir = $params->get('target_dir', $default_dir);
 		
 		// Handles special cases of fields, that have special rules for listing specific files only
-		if ($field && $field->field_type =='image')
+		if ($field && $field->field_type =='image' && $params->get('image_source', 0) == 0)
 		{
+			$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
 			$where[] = $params->get('list_all_media_files', 0)
 				? ' f.ext IN ("jpg","gif","png","jpeg") '
-				: ' f.id IN ('.implode(', ', $this->getFilesUsedByImageField($field, $params)).')';
+				: $this->getFilesUsedByImageField($field, $params);
 		}
 
 		$scope  = $this->getState( 'scope' );
@@ -744,13 +745,17 @@ class FlexicontentModelFileselement extends JModelLegacy
 		}
 		$filenames = $existing_files;
 
+		if (!$filenames) return '';  // No files found
+
 		$query = 'SELECT id'
 			.' FROM #__flexicontent_files'
 			.' WHERE '
 			.'  filename IN ('.implode(',', array_keys($filenames)).')'
 			.($target_dir != 2 ? '  AND secure = '. (int)$target_dir : '');
 		$this->_db->setQuery($query);
-		return $this->_db->loadColumn() ?: array('');
+		$file_ids = $this->_db->loadColumn();
+
+		return !$file_ids ? '' : ' f.id IN ('.implode(', ', $file_ids).')';
 	}
 
 
