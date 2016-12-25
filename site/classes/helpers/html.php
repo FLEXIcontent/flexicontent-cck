@@ -364,31 +364,21 @@ class flexicontent_html
 		";
 
 		$columnchoose_post   = $jinput->post->get('columnchoose_'.$data_tbl_id, null, 'array');
-		$columnchoose_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, null, 'string');		
+		$columnchoose_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, '', 'string');		
 
-		if ( $columnchoose_post !== null )
+		$columnchoose = $columnchoose_post !== null
+			? array_keys($columnchoose_post)
+			: preg_split("/[\s]*,[\s]*/", $columnchoose_cookie);
+
+		foreach ($columnchoose as $colnum)
 		{
-			foreach ($columnchoose_post as $colnum => $ignore)
-			{
-				$colnum = (int) $colnum;
-				$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
-			}
+			$colnum = (int) $colnum;
+			$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
 		}
 
-		else if ( $columnchoose_cookie !== null )
-		{
-			$colnums = preg_split("/[\s]*,[\s]*/", $columnchoose_cookie);
-			foreach ($colnums as $colnum)
-			{
-				$colnum = (int) $colnum;
-				$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
-			}
-		}
-		
 		$firstload = isset($_POST["columnchoose_${data_tbl_id}"]) || isset($_COOKIE["columnchoose_${data_tbl_id}"]) ? "false" : "true";
-		$js .= "create_column_choosers('$container_div_id', '$data_tbl_id', $firstload, '".$start_html."', '".$end_html."'); \n";
-		
 		$js .= "
+			create_column_choosers('$container_div_id', '$data_tbl_id', $firstload, '".$start_html."', '".$end_html."');
 		});
 		";
 		$document->addScriptDeclaration($js);
@@ -2292,45 +2282,54 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, &$params=null, $addToggler=true, $tooltip_place = null )
+	static function statebutton( $item, $params=null, $addToggler=true, $tooltip_place = null, $class=null )
 	{
-		// Check for empty params too
-		if ( $params && !$params->get('show_state_icon', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
-		
-		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
-		$document = JFactory::getDocument();
-		$nullDate = $db->getNullDate();
-		$app = JFactory::getApplication();
+		// Some static variables
+		static $user;
+		static $nullDate;
+		static $isAdmin;
+		static $isPrint;
 
-		// Determine general archive privilege
 		static $has_archive = null;
-		if ($has_archive === null) {
-			$permission  = FlexicontentHelperPerm::getPerm();
-			$has_archive = $permission->CanArchives;
+		static $has_checkin = null;
+
+		if ($has_archive === null)
+		{
+			$user = JFactory::getUser();
+			$nullDate = JFactory::getDBO()->getNullDate();
+			$isAdmin  = JFactory::getApplication()->isAdmin();
+			$isPrint  = JFactory::getApplication()->input->get('print', 0, 'INT');
+
+			$has_archive = FlexicontentHelperPerm::getPerm()->CanArchives;
+			$has_checkin = $user->authorise('core.admin', 'com_checkin');
 		}
-		
-		// Determine edit state, delete privileges of the current user on the given item
+
+		// Check if state icon should not be shown (note: parameters are usually NULL in backend)
+		if ( $params && !$params->get('show_state_icon', 1) || $isPrint ) return;
+
+		// Determine edit state, delete privileges of the current user on the given item, NOTE: currently we ignore canCheckin in frontend
 		$asset = 'com_content.article.' . $item->id;
-		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-		$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
-		
+		$item->canCheckin   = isset($item->canCheckin)   ? $item->canCheckin   : $has_checkin || $item->checked_out == 0 || $item->checked_out == $user->id;
+		$item->canEditState = isset($item->canEditState) ? $item->canEditState : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.edit.state', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset)));
+		$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.delete', $asset)     || ($item->created_by == $user->get('id') && $user->authorise('core.delete.own', $asset)));
+
 		// Display state toggler if it can do any of state change
-		$canChangeState = $has_edit_state || $has_delete || $has_archive;
+		$canChangeState = $item->canEditState || $item->canDelete || $has_archive;
 
 		static $js_and_css_added = false;
 
 		if (!$js_and_css_added && $canChangeState && $addToggler )
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
-			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
+			$doc = JFactory::getDocument();
+			$doc->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js ='				
 				function fc_setitemstate(state, id)
 				{
-					var handler = new fc_statehandler({task: "'. ($app->isAdmin() ? 'items.setitemstate' : 'setitemstate') .'"});
+					var handler = new fc_statehandler({task: "'. ($isAdmin ? 'items.setitemstate' : 'setitemstate') .'"});
 					handler.setstate( state, id );
 				}';
-			$document->addScriptDeclaration($js);
+			$doc->addScriptDeclaration($js);
 			$js_and_css_added = true;
 		}
 		
@@ -2340,7 +2339,7 @@ class flexicontent_html
 		static $tooltip_class = null;
 		static $state_tips = null;
 		static $button_classes = null;
-		static $icon_sep = null;
+		static $jtext = array();
 		
 		if ( !$state_names )
 		{
@@ -2356,12 +2355,19 @@ class flexicontent_html
 			}
 			
 			$button_classes = 'fc_statebutton';
-			if ( !$params || !$params->get('btn_grp_dropdown', 0) )
+			if ($class)
+				$button_classes .= ' '.$class;
+			else if ( !$params || !$params->get('btn_grp_dropdown', 0) )
 				$button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			else
 				$button_classes .= ' btn';
-			$button_classes .= ' hasTooltip';
-			$icon_sep = JText::_( 'FLEXI_ICON_SEP' );
+
+			$jtext['icon_sep'] = JText::_( 'FLEXI_ICON_SEP' );
+			$jtext['start_always'] = JText::_( 'FLEXI_START_ALWAYS' );
+			$jtext['start'] = JText::_( 'FLEXI_START' );
+			$jtext['finish_no_expiry'] = JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
+			$jtext['finish'] = JText::_( 'FLEXI_FINISH' );
+			$jtext['change_state'] = JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 		}
 		
 		// Create state icon
@@ -2386,35 +2392,29 @@ class flexicontent_html
 
 
 		// Create publish information
-		$publish_info = '';
-		if (isset($item->publish_up)) {
-			if ($item->publish_up == $nullDate) {
-				$publish_info .= JText::_( 'FLEXI_START_ALWAYS' );
-			} else {
-				$publish_info .= JText::_( 'FLEXI_START' ) .": ". JHTML::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
-			}
+		$publish_info = array();
+		if (isset($item->publish_up))
+		{
+			$publish_info[] = $item->publish_up == $nullDate
+				? $jtext['start_always']
+				: $jtext['start'] .": ". JHTML::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 		}
-		if (isset($item->publish_down)) {
-			if ($item->publish_down == $nullDate) {
-				$publish_info .= ($publish_info ? '<br/>' : ''). JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
-			} else {
-				$publish_info .= ($publish_info ? '<br/>' : ''). JText::_( 'FLEXI_FINISH' ) .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
-			}
+		if (isset($item->publish_down))
+		{
+			$publish_info[] = $item->publish_down == $nullDate
+				? $jtext['finish_no_expiry']
+				: $jtext['finish'] .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
 		}
-		$publish_info = $state_text.'<br/>'.$publish_info;
 
 
 		// Create the state selector button and return it
 		if ( $canChangeState && $addToggler )
 		{
 			// Only add user's permitted states on the current item
-			if ($has_edit_state) $state_ids   = array(1, -5, 0, -3, -4);
+			if ($item->canEditState) $state_ids   = array(1, -5, 0, -3, -4);
 			if ($has_archive)    $state_ids[] = 2;
-			if ($has_delete)     $state_ids[] = -2;
+			if ($item->canDelete)     $state_ids[] = -2;
 
-			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
-			$publish_info .= '<br/><br/>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
-			
 			if ( $tooltip_place ) ;
 			else if ( !$params || !$params->get('show_icons', 2) )
 				$tooltip_place = 'bottom';
@@ -2430,35 +2430,38 @@ class flexicontent_html
 							</a>
 						</li>';
 			}
-			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
+			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
 			$output = '
-			<ul class="statetoggler">
-				<li class="topLevel">
-					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">
+			<div class="statetoggler '.$button_classes.'">
+				<div class="topLevel">
+					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$tooltip_class.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</a>
-					<div class="options" style="'.$box_css.'" onclick="fc_toggleStateSelector(this)">
+					<div class="options">
 						<ul>
 						<li style="text-align:center;"><b>'.JText::_( 'FLEXI_ACTION' ).'</b></li>
 						'.implode('', $allowed_states).'
 						</ul>
 					</div>
-				</li>
-			</ul>';
+				</div>
+			</div>';
 		}
 		
-		else if ($app->isAdmin())  // Backend, possibly with state selector disabled
+		else if ($isAdmin)  // Backend, possibly with state selector disabled
 		{
-			if ($canChangeState) $publish_info .= '<br/><br/>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
-			
-			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
+			if ($canChangeState)
+			{
+				$publish_info[] = '<br/>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
+			}
+
+			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), implode("\n<br/>\n", $publish_info), 0);
 			$output = '
-				<div id="row'.$item->id.'">
+				<div id="row'.$item->id.'" class="statetoggler_disabled '.$class.'">
 					<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</span>
 				</div>';
-			$output	= $icon_sep .$output. $icon_sep;
+			$output	= $jtext['icon_sep'] .$output. $jtext['icon_sep'];
 		}
 		
 		else
@@ -2771,35 +2774,49 @@ class flexicontent_html
 	 */
 	static function stateicon( $state, &$params, &$state_text=null )
 	{
+		static $jtext_state = null;
+		static $tooltip_class = ' hasTooltip';
+
 		static $state_names = null;
 		static $state_imgs = null;
+
 		static $state_basictips = null;
 		static $state_fulltips = null;
-		if ( !$state_names ) {
+
+		static $state_icons = array();
+
+		if ( !$state_names )
+		{
+			$jtext_state = JText::_( 'FLEXI_STATE' );
 			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
 			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
-		}
-		
-		if ( !$state_fulltips ) {
-			$title = JText::_( 'FLEXI_STATE' );
-			foreach($state_names as $state_id => $state_name) {
+
+			foreach($state_names as $state_id => $state_name)
+			{
 				$content = str_replace('::', '-', $state_name);
-				$state_fulltips[$state_id] = flexicontent_html::getToolTip($title, $content, 0);
+				$state_fulltips[$state_id] = flexicontent_html::getToolTip($jtext_state, $content, 0);
+			}
+
+			foreach($state_names as $state_id => $state_name)
+			{
+				$content = str_replace('::', '-', $state_name);
+				$state_basictips[$state_id] = $jtext_state.' : '.$content;
 			}
 		}
-		
-		if ( !$state_basictips ) {
-			foreach($state_names as $state_id => $state_name) {
-				$content = !FLEXI_J30GE ? str_replace('::', '-', $state_name) : $state_name;
-				$state_basictips[$state_id] = $title.' : '.$content;
-			}
-		}
-		
+
 		// Check for invalid state
 		if ( !isset($state_names[$state]) ) $state = '';
-		
+		$state_text = $state_names[$state];
+
+		// Return state name if not showing icons
+		if (!$params->get('show_icons', 1)) return $state_names[$state];
+
+		// Return cached icon if already calculated
+		$popup_type = $params->get('stateicon_popup', 'full');
+		if ( isset($state_icons[$state][$popup_type]) ) return $state_icons[$state][$popup_type];
+
 		// Create popup text
-		switch ( $params->get('stateicon_popup', 'full') )
+		switch ( $popup_type )
 		{
 			case 'basic':
 				$attribs = 'title="'.$state_basictips[$state].'"';
@@ -2808,25 +2825,16 @@ class flexicontent_html
 				$attribs = '';
 				break;
 			case 'full': default:
-				$tooltip_class = ' hasTooltip';
 				$attribs = 'class="fc_stateicon '.$tooltip_class.'" title="'.$state_fulltips[$state].'"';
 				break;
 		}
-		
-		// Create state icon image
-		$app = JFactory::getApplication();
-		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';
-		if ( $params->get('show_icons', 1) ) {
-			$img = $state_imgs[$state];
-			$icon = JHTML::image($path.$img, $state_names[$state], $attribs);
-		} else {
-			$icon = $state_names[$state];
-		}
-		
-		return $icon;
+
+		// Create state icon image and return it
+		$state_icons[$state][$popup_type] = JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $attribs);
+		return $state_icons[$state][$popup_type];
 	}
-	
-	
+
+
 	/**
 	 * Creates the ratingbar
 	 *
