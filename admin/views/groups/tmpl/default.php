@@ -41,6 +41,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 $list_total_cols = 6;
 
 JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
+$tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)
@@ -87,9 +88,10 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<span class="btn-group input-append fc-filter">
-			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+			<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);"><?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?></span>
 			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
 		</span>
+		<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
 		
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box">
@@ -112,7 +114,7 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 	</div>
 	
 	
-	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
+	<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 		
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
