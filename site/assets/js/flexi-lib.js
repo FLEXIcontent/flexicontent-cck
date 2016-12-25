@@ -1134,7 +1134,7 @@
 
 
 	/* Toggle box via a button and set CSS class to indicate that it is open  */
-	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode)
+	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode, useCookie)
 	{
 		var box = typeof theBox=='string' ? jQuery('#'+theBox) : theBox;
 
@@ -1143,16 +1143,19 @@
 			btnNew.show();
 			jQuery(btn).hide();
 		}
+		var el = !!useCookie ? jQuery('#' + theBox + '-disp') : false;
 
 		if (
 			(typeof mode!=='undefined' && parseInt(mode)) ||  // use the mode provided
 			(typeof mode==='undefined' && box.is(':hidden'))  // if any of the elements collection 'box' is hidden then open them all
 		) {
+			if (el) fclib_setCookie(el.get(0).name, 1, 0);
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.show() :
 				box.slideDown(400) ;
 			jQuery(btn).addClass(btnClass).data('fc_noeffect', null).removeClass('fc_noeffect');
 		} else {
+			if (el) fclib_setCookie(el.get(0).name, 0, 0);
 			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
 				box.hide() :
 				box.slideUp(400) ;

@@ -722,30 +722,27 @@ body .fc-mssg.fc-noborder {
 body .fc-mssg-inline.fc-nomargin {
 	margin: 1px 0 2px 0px;
 }
-#flexicontent ul.statetoggler {
+#flexicontent div.statetoggler {
 	float: none;
+	padding: 0;
 	margin: 0;
 	vertical-align: top;
 	display: inline-block;
 	list-style: none;
-	padding: 0;
 	width: auto;
 }
-#flexicontent ul.statetoggler > li.topLevel > .options {
+#flexicontent div.statetoggler > div.topLevel > .options {
 	padding: 0px;
 	margin: 0;
 	background: white;
 	position: absolute;
 	font-size: 14px;
+	line-height: 21px;
 	width: auto;
 	height: 0;
 	z-index: 1;
 }
-#flexicontent ul.statetoggler > li.topLevel > .options > div {
-	display: inline-block;
-	padding: 0px;
-}
-#flexicontent ul.statetoggler > li.topLevel > .options ul {
+#flexicontent div.statetoggler > div.topLevel > .options ul {
 	display: none;
 	float: left;
 	background: white;
@@ -757,47 +754,51 @@ body .fc-mssg-inline.fc-nomargin {
 	margin: 2px 0px;
 	width: 100%;
 }
-#flexicontent ul.statetoggler > li.topLevel,
-#flexicontent ul.statetoggler > li.topLevel ul > li {
+#flexicontent div.statetoggler > div.topLevel,
+#flexicontent div.statetoggler > div.topLevel > .options > ul > li {
+	position: relative;
 	background: none repeat scroll 0 0 transparent;
 	overflow: visible;
-	min-height: 20px;
-	vertical-align: top;
 	display: inline-block;
 	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
 	width: 100%;
+	height: auto;
+	min-height: auto;
+	min-width: auto;
 }
-#flexicontent ul.statetoggler > li.topLevel span.btn,
-#flexicontent ul.statetoggler > li.topLevel span.fcbutton {
-	padding-left: 4px;
-	padding-right: 4px;
-}
-#flexicontent ul.statetoggler > li.topLevel ul > li a {
+#flexicontent div.statetoggler > div.topLevel a {
 	white-space: nowrap;
 	display: inline-block;
 	box-sizing: border-box;
 	margin: 0px;
-	padding: 2px 8px;
+	padding: 2px 8px 3px;
 	width: 100%;
+	text-align: left;
+	line-height: 16px;
+	vertical-align: middle;
 }
-#flexicontent ul.statetoggler > li.topLevel ul > li a:hover {
+#flexicontent div.statetoggler > div.topLevel > .options > ul > li > a {
+	padding: 2px 8px;
+	line-height: 16px;
+}
+#flexicontent div.statetoggler > div.topLevel > .options > ul > li a:hover {
 	background-image: linear-gradient(to bottom,#f0f0f0,#d7d7d7);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d7d7d7);
 }
-#flexicontent ul.statetoggler > li.topLevel ul > li img {
+#flexicontent div.statetoggler > div.topLevel > .options > ul > li img {
 	padding: 4px 6px;
 	margin: 0;
 	border: none;
 	display: unset;
 	box-sizing: unset;
 }
-#flexicontent ul.statetoggler > li.topLevel > a.stateopener {
+#flexicontent div.statetoggler > div.topLevel > .options > ul > li > a.stateopener {
 	outline: none;
 	text-decoration: none;
 }
-#flexicontent ul.statetoggler > li.topLevel > a.stateopener img {
+#flexicontent div.statetoggler > div.topLevel > .options > ul > li > a.stateopener img {
 	padding: 0;
 	margin: 0;
 	border: none;
@@ -806,7 +807,7 @@ body .fc-mssg-inline.fc-nomargin {
 	box-sizing: unset;
 	min-width: 16px;
 }
-#flexicontent ul.statetoggler .ajax-loader {
+#flexicontent div.statetoggler .ajax-loader {
 	background: url("../images/ajax-loader.gif") no-repeat scroll center center transparent;
 	height: 20px;
 	width: 16px;
@@ -1065,6 +1066,17 @@ body .fc-nowrap-box,
 	line-height: 64px !important;
 	height: 64px !important;
 	width: 64px !important;
+}
+body .btn-group.fc_btn_group > .btn.btn-micro,
+#flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
+#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.topLevel > a {
+	padding: 4px 4px;
+	line-height: 18px;
+}
+body .btn-group.fc_btn_group > .preview.btn.btn-micro,
+#flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
+#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.topLevel > a {
+	padding: 4px 8px;
 }
 input.fc-inherited-value + label {
 	font-weight: bold !important;
