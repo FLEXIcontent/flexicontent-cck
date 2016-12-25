@@ -817,7 +817,8 @@
 	//******************************************
 	
 	// *** Hide a column of a table
-	function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
+	function toggle_column(container_div_id, data_tbl_id, col_no, firstrun)
+	{
 		// 1. Get column-status array for the table with id: data_tbl_id
 		var show_col = eval('show_col_'+data_tbl_id);
 	
@@ -902,8 +903,10 @@
 					var colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
 	
 					jQuery(tcells[cell]).removeClass('initiallyHidden');
-					if ( colspan ) {
-						if ( action_func == 'hide' ) {
+					if ( colspan )
+					{
+						if ( action_func == 'hide' )
+						{
 							if ( colspan > colspan_remaining ) {
 								jQuery(tcells[cell]).attr('colspan', colspan - colspan_remaining);
 							} else {
@@ -912,7 +915,9 @@
 								eval('jQuery(tcells[cell]).'+action_func+'("slow")');
 								jQuery(tcells[cell]).addClass('isHidden');
 							}
-						} else if (!firstrun) {
+						}
+						else if (!firstrun)
+						{
 							if ( !jQuery(tcells[cell]).hasClass('isHidden') ) {
 								jQuery(tcells[cell]).attr('colspan', colspan + colspan_remaining);
 							} else {
@@ -921,7 +926,9 @@
 							}
 						}
 						colspan_remaining = colspan_remaining - colspan;
-					} else {
+					}
+					else if (action_func == 'hide' || !firstrun)
+					{
 						firstrun ?
 						eval('jQuery(tcells[cell]).'+action_func+'()') :
 						eval('jQuery(tcells[cell]).'+action_func+'("slow")');
@@ -931,20 +938,34 @@
 				if (colspan_remaining<1) break; // no more colspan to toggle columns
 			}
 		}
-	
-		if (container_div_id) {
-			var col_selectors = jQuery('#'+container_div_id+' input');
-			var col_selected = new Array();
-			var i = 0;
-			for (var cnt=0; cnt<col_selectors.length; cnt++) {
-				if ( jQuery(col_selectors[cnt]).attr("checked") ) {
-					col_selected[i++] = jQuery(col_selectors[cnt]).attr("data-colno");
-				}
+
+		// Update cookie data and display data
+		if (!firstrun && container_div_id) column_toggles_update_data(container_div_id, data_tbl_id);
+	}
+
+
+	// *** Update cookie data and display data
+	function column_toggles_update_data(container_div_id, data_tbl_id)
+	{
+		var col_selectors = jQuery('#'+container_div_id+'_cols input');
+		var col_selected = new Array();
+		var i = 0;
+		for (var cnt=0; cnt<col_selectors.length; cnt++)
+		{
+			if ( jQuery(col_selectors[cnt]).attr("checked") )
+			{
+				col_selected[i++] = jQuery(col_selectors[cnt]).attr("data-colno");
 			}
-			var cookieValue = col_selected.join(',');
-			var cookieName = 'columnchoose_' + data_tbl_id;
-			var nDays = 30;
-			fclib_setCookie(cookieName, cookieValue, nDays);
+		}
+		var cookieValue = col_selected.join(',');
+		var cookieName = 'columnchoose_' + data_tbl_id;
+		var nDays = 30;
+		fclib_setCookie(cookieName, cookieValue, nDays);
+
+		var totals_tag = jQuery('#columnchoose_totals');
+		if (totals_tag.length)
+		{
+			totals_tag.html(col_selectors.length == col_selected.length ? '' : ' '+(col_selected.length - col_selectors.length));
 		}
 	}
 
@@ -995,8 +1016,11 @@
 		}
 	
 		// 8. Fill in 'column choose box'
-		str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true">' + str + end_text;
+		str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true" /><span id="'+container_div_id+'_cols">' + str + '</span>' + end_text;
 		document.getElementById(container_div_id).innerHTML=str;
+
+		// 9. Update cookie data and display data
+		column_toggles_update_data(container_div_id, data_tbl_id);
 	}
 
 
