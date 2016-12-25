@@ -1049,8 +1049,19 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		echo $msg;
 	}
-	
-	
+
+
+	function publish()
+	{
+		JFactory::getApplication()->input->set('newstate', 'P');
+		$this->changestate();
+	}
+	function unpublish()
+	{
+		JFactory::getApplication()->input->set('newstate', 'U');
+		$this->changestate();
+	}
+
 
 	/**
 	 * Logic to change state of multiple items
