@@ -7,29 +7,29 @@
 	<field name="label" type="text" default="" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_FIELDLABEL_DESC" class="inputbox required" labelclass="label" />
 	<field name="ordering" type="fieldordering" default="999" label="Ordering" description="FLEXI_FIELD_ORDER_DESC" class="inputbox" labelclass="label" />
 	<field name="description" type="textarea" filter="JComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" class="inputbox" labelclass="label" />
-	<field name="isfilter" type="radio" default="1" label="FLEXI_FIELD_CONTENT_LIST_FILTERABLE" description="FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="isfilter" type="fcradio" default="1" label="FLEXI_FIELD_CONTENT_LIST_FILTERABLE" description="FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>
-	<field name="isadvfilter" type="radio" default="1" label="FLEXI_FIELD_ADVANCED_FILTERABLE" description="FLEXI_FIELD_ADVANCED_FILTERABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="isadvfilter" type="fcradio" default="1" label="FLEXI_FIELD_ADVANCED_FILTERABLE" description="FLEXI_FIELD_ADVANCED_FILTERABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>
 	<field name="iscore" type="hidden" default="0" label="iscore" description="" class="inputbox" labelclass="label" />
-	<field name="issearch" type="radio" default="1" label="FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE" description="FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="issearch" type="fcradio" default="1" label="FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE" description="FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>
-	<field name="isadvsearch" type="radio" default="1" label="FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE" description="FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="isadvsearch" type="fcradio" default="1" label="FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE" description="FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>
 	
-	<field name="untranslatable" type="radio" default="0" label="FLEXI_FIELD_NON_TRANSLATABLE" description="FLEXI_FIELD_NON_TRANSLATABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="untranslatable" type="fcradio" default="0" label="FLEXI_FIELD_NON_TRANSLATABLE" description="FLEXI_FIELD_NON_TRANSLATABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>
-	<field name="formhidden" type="radio" default="0" label="FLEXI_FORM_HIDDEN" description="FLEXI_FORM_HIDDEN_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="formhidden" type="fcradio" default="0" label="FLEXI_FORM_HIDDEN" description="FLEXI_FORM_HIDDEN_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_FRONTEND</option>
 		<option value="2">FLEXI_BACKEND</option>
@@ -50,7 +50,7 @@
 		<option value="3">FLEXI_EDIT_HELP_INLINE</option>
 	</field>
 
-	<field name="published" type="radio" default="1" label="FLEXI_PUBLISHED" description="FLEXI_FIELD_PUBLISHED_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="published" type="fcradio" default="1" label="FLEXI_PUBLISHED" description="FLEXI_FIELD_PUBLISHED_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>

@@ -780,13 +780,13 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				<button type="button" class="btn grid-view hasTooltip" id="btn-fman-grid-view" onclick="fc_toggle_view_mode(jQuery(this));" data-toggle_selector=".fman_grid_element" style="min-width: 60px;"><i class="icon-grid-view"></i> <?php echo JText::_('FLEXI_FILEMAN_GRID'); ?></button>
 			</div>
 
-			<select id="fc-fileman-grid-thumb-size-sel" name="fc-fileman-grid-thumb-size-sel" type="text" style="display: none;"></select>
+			<select id="fc-fileman-list-thumb-size-sel" name="fc-fileman-list-thumb-size-sel" style="display: none;"></select>
 			<div id="fc-fileman-list-thumb-size_nouislider" class="fman_list_element" style="display: none;"></div>
 			<div class="fc_slider_input_box">
 				<input id="fc-fileman-list-thumb-size-val" name="fc-fileman-list-thumb-size-val" type="text" size="12" value="140" />
 			</div>
 
-			<select id="fc-fileman-grid-thumb-size-sel" name="fc-fileman-grid-thumb-size-sel" type="text" style="display: none;"></select>
+			<select id="fc-fileman-grid-thumb-size-sel" name="fc-fileman-grid-thumb-size-sel" style="display: none;"></select>
 			<div id="fc-fileman-grid-thumb-size_nouislider" class="fman_grid_element" style="visibility: hidden; display: none;"></div>
 			<div class="fc_slider_input_box">
 				<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />

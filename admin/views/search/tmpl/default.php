@@ -31,7 +31,7 @@ $edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
 
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 
-$list_total_cols = $this->isADV ? 10 : 5;
+$list_total_cols = $this->isADV ? 9 : 4;
 $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 

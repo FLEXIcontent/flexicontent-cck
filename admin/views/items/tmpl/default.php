@@ -61,7 +61,7 @@ $isAdmin = $app->isAdmin();
 $useAssocs = flexicontent_db::useAssociations();
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$list_total_cols = 18;
+$list_total_cols = 17;
 if ( $useAssocs ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);

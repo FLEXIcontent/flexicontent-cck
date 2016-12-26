@@ -401,11 +401,16 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
-			if ($this->params->get('support_url'))
+			$link = $this->params->get('support_url');
+			FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
+
+			// Read installation file
+			/*$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
+			$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+			if (!empty($com_xml['authorUrl']))
 			{
-				$link = $this->params->get('support_url');
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
-			}
+				FlexicontentViewFlexicontent::quickiconButton( $com_xml['authorUrl'], 'icon-48-dashboard.png', JText::_( 'FLEXI_ABOUT' ), 1 );
+			}*/
 			?>
 			</div>
 		</fieldset>

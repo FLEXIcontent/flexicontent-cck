@@ -178,7 +178,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 
 		if($perms->CanConfig)
 		{
-
 			if (0) // FLEXI_J37GE
 			{
 				$btn_task = '';
@@ -302,19 +301,18 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	{
 		//initialise variables
 		$lang = JFactory::getLanguage();
-		$link_attribs = $modal ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.'); return false;"' : '';
+		$link_attribs = empty($_SERVER['HTTPS']) && $modal
+			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($text), 2).'\'}); return false;"' : '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>
 		<span class="fc-board-button">
 			<span class="fc-board-button-inner">
-				
+
 				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
-					<?php echo FLEXI_J16GE ?
-						JHTML::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs) :
-						JHTML::_('image.site', $image, '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, $text, $attribs); ?>
+					<?php echo JHTML::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs); ?>
 					<span class="fc-board-btn-text <?php echo $link ? '' : ' fcdisabled'; ?>"><?php echo $text; ?></span>
 				<?php if ($link) : ?></a><?php endif; ?>
-				
+
 			</span>
 		</span>
 		<?php

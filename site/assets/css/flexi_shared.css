@@ -374,7 +374,7 @@ table.adminlist thead th .filterdel img {
 table.adminlist td {
 	padding: 4px;
 }
-table tr td:first-child::after {
+table.adminlist tr td:first-child::after {
 	content: "";
 	display: inline-block;
 	vertical-align: middle;
