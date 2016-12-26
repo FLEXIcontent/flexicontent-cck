@@ -64,15 +64,24 @@ class FlexicontentViewField extends JViewLegacy
 		$form   = $this->get('Form');
 		$types				= $this->get( 'Typeslist' );
 		$typesselected= $this->get( 'Typesselected' );
-		
-		//create the toolbar
-		$isnew  = !$row->id;
-		if ( !$isnew ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
+		$js = '';
+
+
+
+		// *** Fail if checked non-new record is checked out not by 'me'
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
 		}
-		
+
+
+
+		// *** Create the toolbar
+		$isnew  = !$row->id;
+		!$isnew
+			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' )
+			: JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
 		$ctrl = 'fields.';
 
 		JToolBarHelper::apply( $ctrl.'apply', 'FLEXI_APPLY' );
@@ -83,17 +92,33 @@ class FlexicontentViewField extends JViewLegacy
 		JToolBarHelper::save( $ctrl.'save' );
 		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
+
+		if (!empty($model->helpURL))
+		{
+			$onclick_js = empty($_SERVER['HTTPS']) && $model->helpModal
+				? 'var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($model->helpTitle), 2).'\'}); return false;'
+				: 'var url = jQuery(this).attr(\'data-href\'); window.open(url);';
+			$js .= "
+				jQuery('#toolbar-help a.toolbar, #toolbar-help button').attr('data-href', '".$model->helpURL."').attr('onclick', \"".$onclick_js."\");
+			";
+			JToolBarHelper::custom( $btn_task='', 'help.png', 'help_f2.png', $model->helpTitle, false );
+		}
+
+
+
+		// *** Display appropritate messages: import and check current field
 		
-		// Import Joomla plugin that implements the type of current flexi field
+		// Import Joomla plugin that implements the type of current field
 		$extfolder = 'flexicontent_fields';
 		$extname = $row->iscore ? 'core' : $row->field_type;
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
-		
+
 		// Create class name of the plugin and then create a plugin instance
 		$classname = 'plg'. ucfirst($extfolder).$extname;
-		
+
 		// Check max allowed version
-		if ( property_exists ($classname, 'prior_to_version') ) {
+		if ( property_exists ($classname, 'prior_to_version') )
+		{
 			// Set a system message with warning of failed PHP limits
 			$prior_to_version = $app->getUserStateFromRequest( $option.'.flexicontent.prior_to_version_'.$row->field_type,	'prior_to_version_'.$row->field_type,	0, 'int' );
 			$app->setUserState( $option.'.flexicontent.prior_to_version_'.$row->field_type, $prior_to_version+1 );
@@ -104,26 +129,29 @@ class FlexicontentViewField extends JViewLegacy
 				$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
 				$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
 				$ver_exceeded = version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=');
-				if ($ver_exceeded) echo '
+				echo $ver_exceeded ? '
 					<span class="fc-note fc-mssg-inline">
 						'.$close_btn.'
 						Warning: installed version of Field: \'<b>'.$extname.'</b>\' was given to be free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.' <br/> It may or may not work properly in later versions
-					</span>';
-				else echo '
+					</span>' : '
 					<span class="fc-info fc-mssg-inline">
 						'.$close_btn.'
 						Note: installed version of Field: \'<b>'.$extname.'</b>\' is given free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
 					</span>';
 			}
 		}
-		
+
+
+
 		// Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
 		// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
 		$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
 		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
 		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 
-		//check which properties are supported by current field
+
+
+		// *** Check which properties are supported by current field
 		$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 		
 		$supportsearch          = $ft_support->supportsearch;
@@ -134,47 +162,52 @@ class FlexicontentViewField extends JViewLegacy
 		$supportvalueseditable  = $ft_support->supportvalueseditable;
 		$supportformhidden      = $ft_support->supportformhidden;
 		$supportedithelp        = $ft_support->supportedithelp;
-		
-		
-		//build selectlists, (for J1.6+ most of these are defined via XML file and custom form field classes)
-		$lists = array();
-		
-		//build field_type list
-		if (!$row->field_type) $row->field_type = 'text';
-		
-		$_attribs = ' class="use_select2_lib fc_skip_highlight" ';
-		if ($row->iscore == 1) {
-			$_attribs .= ' disabled="disabled" ';
+
+
+
+		// *** Check access level exists
+		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
 		}
-		else {
+
+
+
+		// *** Add JS for AJAX reloading field parameters after field type change
+		if (!$row->iscore)
+		{
 			$_field_id = 'jform_field_type';
 			$_row_id = $form->getValue("id");
 			$_ctrl_task = 'task=fields.getfieldspecificproperties';
-			$document->addScriptDeclaration("
-				jQuery(document).ready(function() {
-					jQuery('#".$_field_id."').on('change', function() {
-						jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
-						jQuery.ajax({
-							type: \"GET\",
-							url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
-							success: function(str) {
-								jQuery('#fieldspecificproperties').html(str);
-								jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
+			$js .= "
+				jQuery('#".$_field_id."').on('change', function() {
+					jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+					jQuery.ajax({
+						type: \"GET\",
+						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
+						success: function(str) {
+							jQuery('#fieldspecificproperties').html(str);
+							jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
 
-								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
-								fc_bindFormDependencies('#fieldspecificproperties', 0, '');
-								fc_bootstrapAttach('#fieldspecificproperties');
-								if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#fieldspecificproperties');
-								if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#fieldspecificproperties');
-								jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
-							}
-						});
+							tabberAutomatic(tabberOptions, 'fieldspecificproperties');
+							fc_bindFormDependencies('#fieldspecificproperties', 0, '');
+							fc_bootstrapAttach('#fieldspecificproperties');
+							if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#fieldspecificproperties');
+							if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#fieldspecificproperties');
+							jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
+						}
 					});
 				});
-			");
+			";
 		}
-		
-		//build field select list
+
+
+		// *** Build selectlists, (some of these are defined via XML file, but some are not, possibly we may add more re-usable form elements later)
+		$lists = array();
+
+		// Build field_type select list
 		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=true, $_usage=false, $_published=true);
 		$fftypes = array();
 		foreach ($fieldtypes as $field_group => $ft_types) {
@@ -184,72 +217,45 @@ class FlexicontentViewField extends JViewLegacy
 			}
 			$fftypes[] = '';
 		}
+		$_attribs = ' class="use_select2_lib fc_skip_highlight" ' . ($row->iscore ? ' disabled="disabled" ' : '');
 		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fftypes, 'jform[field_type]', $row->field_type, ($_grouped ? 1 : 0), $_attribs);
-		
-		//build type select list
+
+		// Build (content) type select list
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';
 		$attribs .= $row->iscore ? ' disabled="disabled"' : '';
 		$types_fieldname = 'jform[tid][]';
 		$lists['tid'] = flexicontent_html::buildtypesselect($types, $types_fieldname, $typesselected, false, $attribs);
-		
-		// check access level exists
-		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
-		if (empty($level_name))
-		{
-			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
-		}
-		
-		
-		
-		// **************************************************************************
-		// Create fields for J1.5 (J2.5+ uses JForm XML file for most of form fields)
-		// **************************************************************************
-		if (!FLEXI_J16GE)
-		{
-			// Create the parameter 's form object parsing the file XML
-			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$row->field_type.'.xml';
-			if (JFile::exists( $pluginpath )) {
-				$form = new JParameter('', $pluginpath);
-			} else {
-				$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
-			}
-			// Special and Core Groups
-			$form->loadINI($row->attribs);
-		}
-		
 
-		// fail if checked out not by 'me'
-		if ($row->id) {
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
-			}
-		}
-		
-		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+
+		// *** Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );    // we use JForm to output fields so this is redundant
-		
-		// assign permissions for J2.5
-		$permission = FlexicontentHelperPerm::getPerm();
-		$this->assignRef('permission' , $permission);
-		
-		//assign data to template
-		$this->assignRef('document'   , $document);
-		$this->assignRef('row'        , $row);
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('form'       , $form);
-		$this->assignRef('typesselected'	, $typesselected);
-		$this->assignRef('supportsearch'           , $supportsearch);
-		$this->assignRef('supportadvsearch'        , $supportadvsearch);
-		$this->assignRef('supportfilter'           , $supportfilter);
-		$this->assignRef('supportadvfilter'        , $supportadvfilter);
-		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
-		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
-		$this->assignRef('supportformhidden'       , $supportformhidden);
-		$this->assignRef('supportedithelp'         , $supportedithelp);
+
+
+		// *** Add js to head
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
+		}
+
+
+		// *** Assign data to template
+		$this->permission = FlexicontentHelperPerm::getPerm();
+		$this->document    = $document;
+		$this->row         = $row;
+		$this->lists       = $lists;
+		$this->form        = $form;
+		$this->typesselected	 = $typesselected;
+		$this->supportsearch            = $supportsearch;
+		$this->supportadvsearch         = $supportadvsearch;
+		$this->supportfilter            = $supportfilter;
+		$this->supportadvfilter         = $supportadvfilter;
+		$this->supportuntranslatable    = $supportuntranslatable;
+		$this->supportvalueseditable    = $supportvalueseditable;
+		$this->supportformhidden        = $supportformhidden;
+		$this->supportedithelp          = $supportedithelp;
 		
 		parent::display($tpl);
 	}
 }
-?>

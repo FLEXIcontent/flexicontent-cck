@@ -623,26 +623,47 @@ class FlexicontentModelField extends JModelAdmin
 		||	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, $lang->getDefault(), false, false)
 		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, $lang->getDefault(), false, false);
 		*/
-		if (file_exists($pluginpath)) {
-			// Get the plugin form.
-			if (!$form->loadFile($pluginpath, false, '//config')) {
+
+		// Get the plugin form.
+		if (!file_exists($pluginpath))
+		{
+			die('Plugin path not found:' . $pluginpath);
+		}
+
+
+		// *** Load form's XML file
+		// We will load the form's XML file into a string to be able to manipulate it, before it is loaded by the JForm
+		if (1)
+		{
+			// Read XML file
+			$xml_string = str_replace(' type="radio"', ' type="fcradio"', file_get_contents($pluginpath));
+			$xml = simplexml_load_string($xml_string);  //simplexml_load_file($pluginpath);
+			if (!$xml)
+			{
 				throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
 			}
+
+			// Load XML file into the form
+			$form->load($xml, false, '//config');
+		}
+		else
+		{
+			if (!$form->loadFile($pluginpath, false, '//config'))
+			{
+				throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
+			}
+			$xml = $form->getXml();
 		}
 
-		// Attempt to load the xml file.
-		if (!$xml = simplexml_load_file($pluginpath)) {
-			throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-		}
 
-		// Get the help data from the XML file if present.
-		$help = $xml->xpath('/extension/help');
-		if (!empty($help)) {
-			$helpKey = trim((string) $help[0]['key']);
-			$helpURL = trim((string) $help[0]['url']);
 
-			$this->helpKey = $helpKey ? $helpKey : $this->helpKey;
-			$this->helpURL = $helpURL ? $helpURL : $this->helpURL;
+		// *** Get the help data from the XML file if present.
+		$docs = $xml->xpath('/extension/documentation');
+		if (!empty($docs))
+		{
+			$this->helpTitle = trim((string) $docs[0]['title']);
+			$this->helpURL   = trim((string) $docs[0]['url']);
+			$this->helpModal = (int) $docs[0]['modal'];
 		}
 
 		// Trigger the default form events.

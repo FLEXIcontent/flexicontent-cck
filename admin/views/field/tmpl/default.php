@@ -31,9 +31,25 @@ $form = & $this->form;
 $this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
 $this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+
+// Add FC dependencies JS
 $js = "
 	jQuery(document).ready(function(){
 		fc_bindFormDependencies('#flexicontent', 0, '');
+	});
+";
+
+// Handle some readonly (server-side ignored) properties of CORE fields
+$js .= "
+	jQuery( document ).ready(function() {".
+		($form->getValue("id") > 0 && $form->getValue("id") < 7 ? "
+		setTimeout(function(){ 
+			jQuery('#jform_published').css('pointer-events', 'none').off('click');
+			jQuery('#jform_published').find('.btn').addClass('disabled');
+			jQuery('#jform_name').attr('readonly', 'readonly');
+			jQuery('#jform_name').prop('readonly', true);
+		}, 1);
+		" : '')."
 	});
 ";
 $this->document->addScriptDeclaration($js);
@@ -89,7 +105,7 @@ $this->document->addScriptDeclaration($js);
 					<?php echo $form->getLabel('name'); ?>
 				</td>
 				<td>
-					<span class="badge badge-info"><?php echo $form->getValue("name"); ?></span>
+					<?php echo $form->getInput("name"); ?>
 					
 					<?php if ($form->getValue('field_type')=='maintext') :
 						$msg_txt = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1);
@@ -132,19 +148,6 @@ $this->document->addScriptDeclaration($js);
 						</td>
 						<td>
 							<?php echo $form->getInput('published'); ?>
-							<?php
-							$disabled = ($form->getValue("id") > 0 && $form->getValue("id") < 7);
-							if ($disabled) {
-								$this->document->addScriptDeclaration("
-									jQuery( document ).ready(function() {
-										setTimeout(function(){ 
-											jQuery('#jform_published').css('pointer-events', 'none').off('click');
-											jQuery('#jform_published').find('.btn').addClass('disabled');
-										}, 1);
-									});
-								");
-							}
-							?>
 						</td>
 					</tr>
 					
