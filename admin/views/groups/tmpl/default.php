@@ -41,7 +41,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 $list_total_cols = 6;
 
 JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
-$tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)

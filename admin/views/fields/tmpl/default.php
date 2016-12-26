@@ -110,7 +110,7 @@ foreach ($this->allrows as $row)
 		}
 	}
 }
-$tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 <script type="text/javascript">
 

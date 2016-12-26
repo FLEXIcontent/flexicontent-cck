@@ -61,7 +61,7 @@ $image_editlayout = 0 ?
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 
 $fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
-$tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 <script type="text/javascript">
 
