@@ -152,7 +152,7 @@ $isCatsOrder = $this->filter_order=='i.ordering' || $this->filter_order=='catsor
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 $fcfilter_attrs = ' class="input-prepend fc-xpended" ';
 $stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
-$tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 
 
