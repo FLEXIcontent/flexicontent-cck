@@ -442,75 +442,82 @@ body .fc-nowrap-box,
 	padding-right: 4px;
 }
 
-/* FIX select2 choosen value not showing when used inside an append/prepend group */
-#flexicontent [class^="fc-xpended"] > div.select2-container,
-#flexicontent [class*="fc-xpended"] > div.select2-container {
-	vertical-align: top;
-}
-#flexicontent [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
-#flexicontent [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen {
-	font-size: 12px;
-	line-height: 26px;
-	min-height: 26px;
-	font-weight: normal !important;
-}
-
-/* Force proper styling of selects inside an append/prepend group */
-#flexicontent [class^="fc-xpended"] > select,
-#flexicontent [class*="fc-xpended"] > select,
-#flexicontent [class^="fc-xpended"] > div.select2-container > ul.select2-choices,
-#flexicontent [class*="fc-xpended"] > div.select2-container > ul.select2-choices,
-#flexicontent [class^="fc-xpended"] > div.select2-container > a.select2-choice,
-#flexicontent [class*="fc-xpended"] > div.select2-container > a.select2-choice {
-	border-top-left-radius: 6px;
-	border-bottom-left-radius: 6px;
-	border-top-right-radius: 6px;
-	border-bottom-right-radius: 6px;	
-	margin-top: 0;
-	vertical-align: top;
-	font-size: 13px;
-}
-
-#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
-#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
-#flexicontent [class^="fc-xpended"] > select:not(:first-child),
-#flexicontent [class*="fc-xpended"] > select:not(:first-child),
-#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
-#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
-#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
-#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice {
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
-	margin-left: 0px !important;
-	margin-right: 0px !important;
-}
-#flexicontent [class^="fc-xpended"] > select:not(:last-child),
-#flexicontent [class*="fc-xpended"] > select:not(:last-child),
-#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
-#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
-#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
-#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice {
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
-	margin-right: 0px !important;
-}
-#flexicontent [class*="fc-xpended"] > div.select2-container .select2-input {
-	border-radius: 4px;
-}
-#flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted,
-#flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
-	background: #555 none repeat scroll 0 0;
-	color: white;
-	font-family: monospace;
-	text-shadow: unset;
-	border: 1px solid gray;
-	font-size: 12px;
-}
-#flexicontent [class^="fc-xpended"] > .btn-group,
-#flexicontent [class*="fc-xpended"] > .btn-group,
-#flexicontent [class^="fc-xpended"] > *:not(.btn-group):not(:first-child),
-#flexicontent [class*="fc-xpended"] > *:not(.btn-group):not(:first-child) {
-	margin: 0px;
+#flexicontent [class^="fc-xpended"],
+#flexicontent [class*="fc-xpended"] {
+	/* FIX select2 choosen value not showing when used inside an append/prepend group */
+	> div.select2-container,
+	> div.select2-container {
+		vertical-align: top;
+	}
+	> div.select2-container .select2-choice > .select2-chosen,
+	> div.select2-container .select2-choice > .select2-chosen {
+		font-size: 12px;
+		line-height: 26px;
+		min-height: 26px;
+		font-weight: normal !important;
+	}
+	
+	/* Force proper styling of selects inside an append/prepend group */
+	> select,
+	> select,
+	> div.select2-container > ul.select2-choices,
+	> div.select2-container > ul.select2-choices,
+	> div.select2-container > a.select2-choice,
+	> div.select2-container > a.select2-choice {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;	
+		margin-top: 0;
+		vertical-align: top;
+		font-size: 13px;
+	}
+	
+	> fieldset > label.btn:first-of-type,
+	> fieldset > label.btn:first-of-type,
+	> select:not(:first-child),
+	> select:not(:first-child),
+	> div.select2-container:not(:first-child) > ul.select2-choices,
+	> div.select2-container:not(:first-child) > ul.select2-choices,
+	> div.select2-container:not(:first-child) > a.select2-choice,
+	> div.select2-container:not(:first-child) > a.select2-choice {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		margin-left: 0px !important;
+		margin-right: 0px !important;
+	}
+	> select:not(:last-child),
+	> select:not(:last-child),
+	> div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+	> div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+	> div.select2-container:nth-last-child(n+3) > a.select2-choice,
+	> div.select2-container:nth-last-child(n+3) > a.select2-choice {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+		margin-right: 0px !important;
+	}
+	> div.select2-container .select2-input {
+		border-radius: 4px;
+	}
+	.add-on.fc-lbl-inverted,
+	.add-on.fc-lbl-inverted {
+		background: #555 none repeat scroll 0 0;
+		color: white;
+		font-family: monospace;
+		text-shadow: unset;
+		border: 1px solid gray;
+		font-size: 12px;
+	}
+	.add-on.fc-lbl-inverted.fc-lbl-padded {
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+	> .btn-group,
+	> .btn-group,
+	> *:not(.btn-group):not(:first-child),
+	> *:not(.btn-group):not(:first-child) {
+		margin: 0px;
+	}
 }
 
 /* ICONs */

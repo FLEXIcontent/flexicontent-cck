@@ -138,7 +138,7 @@ else
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
-$ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted icon-info'.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
+$ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted fc-lbl-padded icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
 
 $ord_grp = 1;
 $isCatsOrder = $this->filter_order=='i.ordering' || $this->filter_order=='catsordering';
@@ -554,36 +554,43 @@ jQuery(document).ready(function(){
 	<?php echo @$this->minihelp; ?>
 	<div class="fcclear"></div>
 
-	<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-info" style="padding: 4px 8px 4px 36px; margin: 4px 0 0 0; line-height: 28px; display: none;">
-		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
-	</div>
+	<?php if ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering'): ?>
 
-	<?php
-	$order_msg = '';
-	
-	if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')):
-		$order_msg .= JText::_('Joomla order, GROUPING BY main category') .'. ';
-	elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')):
-		$order_msg .= JText::_('Grouping by first listed category') .'. ';
-	endif;
-	
-	if ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')):
-		$order_msg .= JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER');
-	endif;
-	?>
-	
-	<?php if ($order_msg): ?>
-		<div id="fcorder_notes_box" class="fc-mssg-inline fc-success" style="padding: 4px 8px 4px 36px; margin: 4px 0 0 0; line-height: 28px;">
-			<?php echo $order_msg;?>
-		</div>
+		<?php
+		$order_msg = '';
 
-		<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 9px 12px 0;">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<div <?php echo $ordering_type_attrs; ?> > <?php echo JText::_('FLEXI_ORDER_TYPE'); ?></div>
-				<?php echo $this->lists['filter_order_type']; ?>
+		if (!$this->filter_order_type):
+			$order_msg .= JText::_('Joomla order, GROUPING BY main category') .'. ';
+		elseif ($this->filter_order_type && !$this->filter_cats):
+			$order_msg .= JText::_('Grouping by first listed category') .'. ';
+		endif;
+
+		if ($this->filter_order_type && !$this->filter_cats):
+			$order_msg .= JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER');
+		endif;
+		?>
+
+		<?php if (!empty($order_msg)): ?>
+			<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 4px 0 0 0;">
+				<div <?php echo $fcfilter_attrs; ?> >
+					<div <?php echo $ordering_type_attrs; ?> > <?php echo JText::_('FLEXI_ORDER_TYPE'); ?></div>
+					<?php echo $this->lists['filter_order_type']; ?>
+				</div>
 			</div>
+
+			<div id="fcorder_notes_box" class="fc-mssg-inline fc-nobgimage fc-success" style="padding: 0px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
+				<span class="icon-checkbox"></span> <?php echo $order_msg;?>
+			</div>
+			<div class="fcclear"></div>
+
+		<?php endif; ?>
+
+		<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
+			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
 		</div>
+
 	<?php endif; ?>
+
 
 	<div class="fcclear"></div>
 
@@ -602,13 +609,10 @@ jQuery(document).ready(function(){
 
 			<th class="left nowrap hideOnDemandClass" style="padding-left: 0px; padding-right: 0px;">
 				<?php
-				if (!$this->filter_order_type) {
-					echo $this->CanOrder ? $image_ordering_tip : '';
-					echo str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] ));
-				} else {
-					echo $this->CanOrder ? $image_ordering_tip : '';
-					echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] )));
-				}
+				echo $this->CanOrder ? $image_ordering_tip : '';
+				echo !$this->filter_order_type
+					? str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] ))
+					: str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] )));
 
 				/*if ($this->CanOrder && $this->ordering) :
 					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
