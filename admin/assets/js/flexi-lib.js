@@ -1,13 +1,14 @@
 
-function updateDragImg( index ) {
-	var row = jQuery("#sortable_fcitems tr").get(index);
+function updateDragImg( index )
+{
+	var row = jQuery("#sortable_fcitems tr").get(index-1);
 	if (!row) return;
 	row = jQuery(row);
 
 	row_drag_handle = row.find("td div.fc_drag_handle");
-	row_ord_grp  = row.find("td input[name=ord_grp\\[\\]]");
-	prev_ord_grp = row.prev() ? row.prev().find("td input[name=ord_grp\\[\\]]") : false;
-	next_ord_grp = row.next() ? row.next().find("td input[name=ord_grp\\[\\]]") : false;
+	row_ord_grp  = row.find('td input[name="ord_grp\[\]"]');
+	prev_ord_grp = row.prev() ? row.prev().find('td input[name="ord_grp\[\]"]') : false;
+	next_ord_grp = row.next() ? row.next().find('td input[name="ord_grp\[\]"]') : false;
 
 	has_ordUp   = prev_ord_grp && prev_ord_grp.val() == row_ord_grp.val();
 	has_ordDown = next_ord_grp && next_ord_grp.val() == row_ord_grp.val();
@@ -30,8 +31,8 @@ function updateDragImg( index ) {
 	}
 }
 
-jQuery(document).ready(function(){
-	
+jQuery(document).ready(function()
+{
 	var moved_row_order;
 	var next_row_order;
 
@@ -48,7 +49,10 @@ jQuery(document).ready(function(){
 		handle: 'div.fc_drag_handle',
 		containment: 'parent',
 		tolerance: 'pointer',
-		helper: function(e, tr) {
+		revert: 100,
+
+		helper: function(e, tr)
+		{
 			var $originals = tr.children();
 			var $helper = tr.clone();
 			$helper.children().each(function(index) {
@@ -57,32 +61,38 @@ jQuery(document).ready(function(){
 			});
 			return $helper;
 		},
-		revert: 100,
-		start: function(event, ui) {
+
+		start: function(event, ui)
+		{
 			jQuery("#fcorder_notes_box").hide();
 			jQuery("#fcorder_save_warn_box").show();
-			moved_row_order = ui.item.find("td input[name=order\\[\\]]").val();
+			moved_row_order = ui.item.find('td input[name="order\[\]"]').val();
 			row_old_index  = ui.item.index();
 		},
-		stop: function(event, ui) {
 
+		stop: function(event, ui)
+		{
 			row_new_index = ui.item.index();
-			moved_row_ord_grp = ui.item.find("td input[name=ord_grp\\[\\]]").val();
+			moved_row_ord_grp = ui.item.find('td input[name="ord_grp\[\]"]').val();
 
-			if (row_new_index == row_old_index) {
-				return;
-			} else if (row_new_index < row_old_index) {
-				start_ord_grp = ui.item.next().find("td input[name=ord_grp\\[\\]]").val();
+			if (row_new_index == row_old_index) return;
+
+			if (row_new_index < row_old_index)
+			{
+				start_ord_grp = ui.item.next().find('td input[name="ord_grp\[\]"]').val();
 				if (start_ord_grp!=moved_row_ord_grp) {
 					alert(move_within_ordering_groups_limits);
 					jQuery(this).sortable('cancel');
 					return;
 				}
-			} else {
-				end_ord_grp = ui.item.prev().find("td input[name=ord_grp\\[\\]]").val();
-				if (end_ord_grp!=moved_row_ord_grp) {
-					alert(move_within_ordering_groups_limits);
+			}
+			else
+			{
+				end_ord_grp = ui.item.prev().find('td input[name="ord_grp\[\]"]').val();
+				if (end_ord_grp!=moved_row_ord_grp)
+				{
 					jQuery(this).sortable('cancel');
+					alert(move_within_ordering_groups_limits);
 					return;
 				}
 			}
@@ -92,28 +102,33 @@ jQuery(document).ready(function(){
 			if ( ui.item.prev() )  updateDragImg( ui.item.prev().index() );
 			if ( ui.item.next() )  updateDragImg( ui.item.next().index() );
 
-			var start_row_index = row_old_index < row_new_index ? row_old_index : row_new_index;
-			var end_row_index = row_new_index > row_old_index ? row_new_index: row_old_index;
+			var start_row_index = (row_old_index < row_new_index ? row_old_index : row_new_index) - 1;
+			var end_row_index   = (row_new_index > row_old_index ? row_new_index: row_old_index) - 1;
+			//window.console.log('' + start_row_index + ' ' +end_row_index);
 
 			var rows = jQuery("#sortable_fcitems tr").get();
-			for (i=start_row_index; i<=end_row_index; i++) {
+			for (i=start_row_index; i<=end_row_index; i++)
+			{
 				row = jQuery(rows[i]);
 
-				if (row_new_index < row_old_index) {
+				if (row_new_index < row_old_index)
+				{
 					if (i>=start_row_index && i<end_row_index) {
-						next_row_order = row.next().find("td input[name=order\\[\\]]").val();
-						row.find("td input[name=order\\[\\]]").val( next_row_order );
+						next_row_order = row.next().find('td input[name="order\[\]"]').val();
+						row.find('td input[name="order\[\]"]').val( next_row_order );
 					} else if (i==end_row_index) {
-						row.find("td input[name=order\\[\\]]").val( moved_row_order );
+						row.find('td input[name="order\[\]"]').val( moved_row_order );
 					}
-				} else {
+				}
+				else
+				{
 					if (i>start_row_index && i<=end_row_index) {
-						tmp_row_order = row.find("td input[name=order\\[\\]]").val();
-						row.find("td input[name=order\\[\\]]").val( next_row_order );
+						tmp_row_order = row.find('td input[name="order\[\]"]').val();
+						row.find('td input[name="order\[\]"]').val( next_row_order );
 						next_row_order = tmp_row_order;
 					} else if (i==start_row_index) {
-						next_row_order = row.find("td input[name=order\\[\\]]").val();
-						row.find("td input[name=order\\[\\]]").val( moved_row_order );
+						next_row_order = row.find('td input[name="order\[\]"]').val();
+						row.find('td input[name="order\[\]"]').val( moved_row_order );
 					}
 				}
 			}

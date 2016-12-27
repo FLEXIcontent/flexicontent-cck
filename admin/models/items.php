@@ -2008,7 +2008,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function move($direction, $ord_catid, $prev_order)
+	function move($direction, $ord_catid, $prev_order, $item_cb)
 	{
 		$app = JFactory::getApplication();
 		
@@ -2065,7 +2065,6 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 		else
 		{
-			$item_cb = JRequest::getVar( 'item_cb', array(0), 'post', 'array' );
 			$row_item_cb = array_search($this->_id, $item_cb);
 			$row_ord_catid  = $ord_catid [$row_item_cb];
 			$row_prev_order = $prev_order[$row_item_cb];

@@ -73,7 +73,7 @@ class flexicontent_html
 	{
 		//return str_replace('rel="tooltip"', '', JHTML::_('grid.order', $rows, $image, $task));
 		return '<a href="javascript:saveorder('
-			. (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn pull-right"><span class="icon-menu-2"></span> '.JText::_('JLIB_HTML_SAVE_ORDER') .'</a>';
+			. (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn btn-small btn-primary pull-right"><span class="icon-menu-2"></span> '.JText::_('JLIB_HTML_SAVE_ORDER') .'</a>';
 	}
 	
 	
