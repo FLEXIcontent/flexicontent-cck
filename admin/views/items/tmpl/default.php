@@ -138,7 +138,7 @@ else
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
-$ordering_type_attrs = ' data-placement="bottom" class="add-on icon-info'.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
+$ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted icon-info'.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
 
 $ord_grp = 1;
 $isCatsOrder = $this->filter_order=='i.ordering' || $this->filter_order=='catsordering';
@@ -550,13 +550,14 @@ jQuery(document).ready(function(){
 	</div>
 	
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
-	<?php echo @$this->minihelp; ?>
 
+	<?php echo @$this->minihelp; ?>
 	<div class="fcclear"></div>
-	<div id="fcorder_save_warn_box" class="fc-mssg fc-note" style="padding: 4px 8px 4px 36px; line-height: 32px; display: none;">
+
+	<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-info" style="padding: 4px 8px 4px 36px; margin: 4px 0 0 0; line-height: 28px; display: none;">
 		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
 	</div>
-	
+
 	<?php
 	$order_msg = '';
 	
@@ -572,12 +573,11 @@ jQuery(document).ready(function(){
 	?>
 	
 	<?php if ($order_msg): ?>
-		<div id="fcorder_notes_box" class="fc-mssg fc-success" style="padding: 4px 8px 4px 36px; line-height: 32px;">
+		<div id="fcorder_notes_box" class="fc-mssg-inline fc-success" style="padding: 4px 8px 4px 36px; margin: 4px 0 0 0; line-height: 28px;">
 			<?php echo $order_msg;?>
 		</div>
-		<div class="fcclear"></div>
 
-		<div class="fc-filter nowrap_box" id="order_type_selector">
+		<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 9px 12px 0;">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<div <?php echo $ordering_type_attrs; ?> > <?php echo JText::_('FLEXI_ORDER_TYPE'); ?></div>
 				<?php echo $this->lists['filter_order_type']; ?>
@@ -864,10 +864,10 @@ jQuery(document).ready(function(){
 				<?php if ($this->ordering): $disabled = ''; ?>
 				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
 
-				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
-				<input type="hidden" name="ord_catid[]" style="display:none;" value="<?php echo $row->$ord_catid; ?>" />
-				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
-				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
+				<input type="hidden" name="item_cb[]" value="<?php echo $row->id; ?>" />
+				<input type="hidden" name="ord_catid[]" value="<?php echo $row->$ord_catid; ?>" />
+				<input type="hidden" name="prev_order[]" value="<?php echo $row->$ord_col; ?>" />
+				<input type="hidden" name="ord_grp[]" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 				<?php endif; ?>
 			</td>
 		<?php else : ?>

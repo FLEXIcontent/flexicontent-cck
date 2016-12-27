@@ -651,28 +651,29 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
+
 		// Get variables: model, user, item id
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
-		
+
 		$cid = $this->input->get('cid', array(0), 'array');
 		JArrayHelper::toInteger($cid);
 
-		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
-		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
-		
-		JArrayHelper::toInteger($cid);
+		$ord_catid  = $this->input->get('ord_catid', array(0), 'array');
+		$prev_order = $this->input->get('prev_order', array(0), 'array');
+		$item_cb    = $this->input->get('item_cb', array(0), 'array');
+
 		JArrayHelper::toInteger($ord_catid);
 		JArrayHelper::toInteger($prev_order);
-		
+		JArrayHelper::toInteger($item_cb);
+
 		// calculate access
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 		
 		// check access
 		if ( !$canOrder ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-		} else if ( $model->move($dir, $ord_catid, $prev_order) ){
+		} else if ( $model->move($dir, $ord_catid, $prev_order, $item_cb) ){
 			// success
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
@@ -745,7 +746,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';
 		} else {
-			$msg = JText::_( 'FLEXI_NEW_ORDERING_SAVED' );
+			$msg = ''; //JText::_( 'FLEXI_NEW_ORDERING_SAVED' );
 		}
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );

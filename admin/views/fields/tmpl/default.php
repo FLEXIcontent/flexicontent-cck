@@ -45,7 +45,7 @@ $flexi_toggle    = JText::_( 'FLEXI_CLICK_TO_TOGGLE', true );
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/warning.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
@@ -225,9 +225,9 @@ function delAllFilters() {
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	<?php echo @$this->minihelp; ?>
 	
-	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
-		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '') ; ?>
-	</span>
+	<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-info" style="padding: 4px 8px 4px 36px; margin: 4px 0; line-height: 28px;">
+		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
+	</div>
 	
 	<table id="adminListTableFCfields" class="adminlist fcmanlist">
 	<thead>
@@ -238,22 +238,16 @@ function delAllFilters() {
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 			<th class="nowrap">
-				<?php echo $image_ordering_tip; ?>
-				<?php if ( !$this->filter_type ) : ?>
-					<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-					<?php
-					if ($this->permission->CanOrderFields) :
-						echo $this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '';
-					endif;
-					?>
-				<?php else : ?>
-					<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-					<?php
-					if ($this->permission->CanOrderFields) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
-					endif;
-					?>
-				<?php endif; ?>
+				<?php
+				echo $image_ordering_tip;
+				echo !$this->filter_type
+					? JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'])
+					: JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order']);
+
+				if ($this->permission->CanOrderFields && $this->ordering):
+					//echo str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder'));
+				endif;
+				?>
 			</th>
 			<?php /*<th style="padding:0px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
 			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -296,14 +290,12 @@ function delAllFilters() {
 		$_desc_label = JText::_('FLEXI_FIELD_DESCRIPTION', true);
 		
 		$k = 0;
-		$i = 0;
 		$padcount = 0;
 		
+		$total_rows = count($this->rows);
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
-		for ($i=0, $n=count($this->rows); $i < $n; $i++)
+		foreach($this->rows as $i => $row)
 		{
-			$row = & $this->rows[$i];
-			
 			$padspacer = '';
 			$row_css = '';
 			
@@ -408,7 +400,7 @@ function delAllFilters() {
 			<td class="order">
 				<?php
 					$show_orderUp   = $i > 0;
-					$show_orderDown = $i < $n-1;
+					$show_orderDown = $i < $total_rows-1;
 				?>
 				<?php if ($ordering_draggable) : ?>
 					<?php
@@ -420,15 +412,15 @@ function delAllFilters() {
 					?>
 				<?php else: ?>
 					<span><?php echo $this->pagination->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-					<span><?php echo $this->pagination->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
+					<span><?php echo $this->pagination->orderDownIcon( $i, $total_rows, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
 				
 				<?php $disabled = $this->ordering ?  '' : 'disabled="disabled"'; ?>
 				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
 				
-				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
-				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
-				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
+				<input type="hidden" name="item_cb[]" value="<?php echo $row->id; ?>" />
+				<input type="hidden" name="prev_order[]" value="<?php echo $row->$ord_col; ?>" />
+				<input type="hidden" name="ord_grp[]" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 			</td>
 			<?php else : ?>
 			<td>
