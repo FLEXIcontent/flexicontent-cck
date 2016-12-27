@@ -45,7 +45,7 @@ $flexi_toggle    = JText::_( 'FLEXI_CLICK_TO_TOGGLE', true );
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
@@ -224,11 +224,13 @@ function delAllFilters() {
 	
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	<?php echo @$this->minihelp; ?>
-	
-	<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-info" style="padding: 4px 8px 4px 36px; margin: 4px 0; line-height: 28px;">
-		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
+
+	<?php if ($this->ordering): ?>
+	<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0; line-height: 28px;">
+		<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder'); ?>
 	</div>
-	
+	<?php endif; ?>
+
 	<table id="adminListTableFCfields" class="adminlist fcmanlist">
 	<thead>
 		<tr>

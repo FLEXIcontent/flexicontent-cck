@@ -1,7 +1,7 @@
 
 function updateDragImg( index )
 {
-	var row = jQuery("#sortable_fcitems tr").get(index-1);
+	var row = jQuery("#sortable_fcitems tr").get(index);
 	if (!row) return;
 	row = jQuery(row);
 
@@ -102,8 +102,8 @@ jQuery(document).ready(function()
 			if ( ui.item.prev() )  updateDragImg( ui.item.prev().index() );
 			if ( ui.item.next() )  updateDragImg( ui.item.next().index() );
 
-			var start_row_index = (row_old_index < row_new_index ? row_old_index : row_new_index) - 1;
-			var end_row_index   = (row_new_index > row_old_index ? row_new_index: row_old_index) - 1;
+			var start_row_index = (row_old_index < row_new_index ? row_old_index : row_new_index);
+			var end_row_index   = (row_new_index > row_old_index ? row_new_index: row_old_index);
 			//window.console.log('' + start_row_index + ' ' +end_row_index);
 
 			var rows = jQuery("#sortable_fcitems tr").get();

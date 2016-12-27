@@ -357,10 +357,14 @@ body .fc-nowrap-box,
 	padding-right: 4px;
 }
 #flexicontent [class^="fc-xpended"] > div.select2-container,
+#flexicontent [class^="fc-xpended"] > div.select2-container,
+#flexicontent [class*="fc-xpended"] > div.select2-container,
 #flexicontent [class*="fc-xpended"] > div.select2-container {
 	vertical-align: top;
 }
 #flexicontent [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
+#flexicontent [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
+#flexicontent [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
 #flexicontent [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen {
 	font-size: 12px;
 	line-height: 26px;
@@ -368,10 +372,16 @@ body .fc-nowrap-box,
 	font-weight: normal !important;
 }
 #flexicontent [class^="fc-xpended"] > select,
-#flexicontent [class*="fc-xpended"] > select,
+#flexicontent [class^="fc-xpended"] > select,
 #flexicontent [class^="fc-xpended"] > div.select2-container > ul.select2-choices,
-#flexicontent [class*="fc-xpended"] > div.select2-container > ul.select2-choices,
+#flexicontent [class^="fc-xpended"] > div.select2-container > ul.select2-choices,
 #flexicontent [class^="fc-xpended"] > div.select2-container > a.select2-choice,
+#flexicontent [class^="fc-xpended"] > div.select2-container > a.select2-choice,
+#flexicontent [class*="fc-xpended"] > select,
+#flexicontent [class*="fc-xpended"] > select,
+#flexicontent [class*="fc-xpended"] > div.select2-container > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > div.select2-container > a.select2-choice {
 	border-top-left-radius: 6px;
 	border-bottom-left-radius: 6px;
@@ -381,13 +391,21 @@ body .fc-nowrap-box,
 	vertical-align: top;
 	font-size: 13px;
 }
-#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
-#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
+#flexicontent [class^="fc-xpended"] > fieldset > label.btn:first-of-type,
+#flexicontent [class^="fc-xpended"] > fieldset > label.btn:first-of-type,
 #flexicontent [class^="fc-xpended"] > select:not(:first-child),
-#flexicontent [class*="fc-xpended"] > select:not(:first-child),
+#flexicontent [class^="fc-xpended"] > select:not(:first-child),
 #flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
-#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
+#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
 #flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
+#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
+#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
+#flexicontent [class*="fc-xpended"] > fieldset > label.btn:first-of-type,
+#flexicontent [class*="fc-xpended"] > select:not(:first-child),
+#flexicontent [class*="fc-xpended"] > select:not(:first-child),
+#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
@@ -395,19 +413,28 @@ body .fc-nowrap-box,
 	margin-right: 0px !important;
 }
 #flexicontent [class^="fc-xpended"] > select:not(:last-child),
-#flexicontent [class*="fc-xpended"] > select:not(:last-child),
+#flexicontent [class^="fc-xpended"] > select:not(:last-child),
 #flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
-#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
 #flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
+#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
+#flexicontent [class*="fc-xpended"] > select:not(:last-child),
+#flexicontent [class*="fc-xpended"] > select:not(:last-child),
+#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > ul.select2-choices,
+#flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	margin-right: 0px !important;
 }
+#flexicontent [class^="fc-xpended"] > div.select2-container .select2-input,
 #flexicontent [class*="fc-xpended"] > div.select2-container .select2-input {
 	border-radius: 4px;
 }
 #flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted,
+#flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted,
+#flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted,
 #flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
 	background: #555 none repeat scroll 0 0;
 	color: white;
@@ -416,9 +443,18 @@ body .fc-nowrap-box,
 	border: 1px solid gray;
 	font-size: 12px;
 }
+#flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted.fc-lbl-padded,
+#flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted.fc-lbl-padded {
+	padding-left: 12px;
+	padding-right: 12px;
+}
 #flexicontent [class^="fc-xpended"] > .btn-group,
-#flexicontent [class*="fc-xpended"] > .btn-group,
+#flexicontent [class^="fc-xpended"] > .btn-group,
 #flexicontent [class^="fc-xpended"] > *:not(.btn-group):not(:first-child),
+#flexicontent [class^="fc-xpended"] > *:not(.btn-group):not(:first-child),
+#flexicontent [class*="fc-xpended"] > .btn-group,
+#flexicontent [class*="fc-xpended"] > .btn-group,
+#flexicontent [class*="fc-xpended"] > *:not(.btn-group):not(:first-child),
 #flexicontent [class*="fc-xpended"] > *:not(.btn-group):not(:first-child) {
 	margin: 0px;
 }
