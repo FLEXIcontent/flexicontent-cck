@@ -45,6 +45,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'apply',      'save' );
 		$this->registerTask( 'apply_ajax', 'save' );
 		$this->registerTask( 'saveandnew', 'save' );
+		$this->registerTask( 'unfeatured', 'featured' );
+
+		$this->redirect = 'index.php?option=com_flexicontent&view=items';
 	}
 	
 	
@@ -59,7 +62,6 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
@@ -71,7 +73,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$session = JFactory::getSession();
 
 		$ctrl_task = 'task=items.';
-		$task  = $jinput->get('task', '', 'cmd');
+		$task = $this->getTask();
 		
 		
 		// *********************
@@ -762,6 +764,9 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function copy()
 	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
@@ -837,7 +842,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db    = JFactory::getDBO();
-		$task  = JRequest::getVar('task');
+		$task  = $this->getTask();
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
 		
@@ -1052,15 +1057,70 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 
 
+	/* WRAPPER method for changestate TASK */
 	function publish()
 	{
 		JFactory::getApplication()->input->set('newstate', 'P');
 		$this->changestate();
 	}
+
+	/* WRAPPER method for changestate TASK */
 	function unpublish()
 	{
 		JFactory::getApplication()->input->set('newstate', 'U');
 		$this->changestate();
+	}
+
+
+	/**
+	 * Method to toggle the featured setting of a list of articles.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.2
+	 */
+	public function featured()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$user   = JFactory::getUser();
+		$ids    = $this->input->get('cid', array(), 'array');
+		$values = array('featured' => 1, 'unfeatured' => 0);
+		$task   = $this->getTask();
+		$value  = JArrayHelper::getValue($values, $task, 0, 'int');
+
+		// Access checks.
+		foreach ($ids as $i => $id)
+		{
+			if (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $id))
+			{
+				// Prune items that you can't change.
+				unset($ids[$i]);
+				JError::raiseNotice(403, JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+			}
+		}
+
+		if (empty($ids))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->redirect);
+		}
+
+		// Get the model.
+		$itemmodel = $this->getModel('item');
+
+		// Update featured flag (model will also handle cache cleaning)
+		if (!$itemmodel->featured($ids, $value))
+		{
+			$app->enqueueMessage($itemmodel->getError(), 'error');
+			$app->redirect($this->redirect);
+		}
+
+		$message = $value == 1
+			? JText::plural('COM_CONTENT_N_ITEMS_FEATURED', count($ids))
+			: JText::plural('COM_CONTENT_N_ITEMS_UNFEATURED', count($ids));
+		$this->setRedirect($this->redirect, $message);
 	}
 
 
@@ -1073,57 +1133,66 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function changestate()
 	{
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		
-		$model = $this->getModel('item');
+		$itemmodel = $this->getModel('item');
 		$msg = '';
-		
-		$cid   = JRequest::getVar( 'cid', array(), 'post', 'array' );
+
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
-		
-		$newstate = JRequest::getVar("newstate", '');
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->redirect);
+		}
+
+		$newstate = $this->input->get('newstate', '', 'string');
 		$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => (FLEXI_J16GE ? 2:-1), 'T' => -2 );
 		$statenames = array ( 'PE' => 'FLEXI_PENDING', 'OQ' => 'FLEXI_TO_WRITE', 'IP' => 'FLEXI_IN_PROGRESS', 'P' => 'FLEXI_PUBLISHED', 'U' => 'FLEXI_UNPUBLISHED', 'A' => 'FLEXI_ARCHIVED', 'T' => 'FLEXI_TRASHED' );
-		
-		// check valid state
-		if ( !isset($stateids[$newstate]) ) {
-			JError::raiseWarning(500, JText::_( 'Invalid State' ).": ".$newstate );
+
+		// *** Check for valid state
+		if (!isset($stateids[$newstate]))
+		{
+			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $newstate, 'error');
+			$app->redirect($this->redirect);
 		}
-		
-		// check at least one item was selected
-		if ( !count( $cid ) ) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_NO_ITEMS_SELECTED' ) );
-		} else {
-			// Remove unauthorized (undeletable) items
-			$auth_cid = array();
-			$non_auth_cid = array();
-			
-			// Get owner and other item data
-			$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
-			$db->setQuery($q);
-			$itemdata = $db->loadObjectList('id');
-			
-			// Check authorization for publish operation
-			foreach ($cid as $id) {
-				
-				// Determine priveleges of the current user on the given item
-				$asset = 'com_content.article.' . $itemdata[$id]->id;
-				$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
-				$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
-				// ...
-				$permission = FlexicontentHelperPerm::getPerm();
-				$has_archive    = $permission->CanArchives;
-				
-				$has_edit_state = $has_edit_state && in_array($stateids[$newstate], array(0,1,-3,-4,-5));
-				$has_delete     = $has_delete     && $stateids[$newstate] == -2;
-				$has_archive    = $has_archive    && $stateids[$newstate] == (FLEXI_J16GE ? 2:-1);
-				
-				if ( $has_edit_state || $has_delete || $has_archive ) {
-					$auth_cid[] = $id;
-				} else {
-					$non_auth_cid[] = $id;
-				}
+
+
+		// Remove unauthorized (undeletable) items
+		$auth_cid = array();
+		$non_auth_cid = array();
+
+		// Get owner and other item data
+		$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
+		$db->setQuery($q);
+		$itemdata = $db->loadObjectList('id');
+
+		// Check authorization for publish operation
+		foreach ($cid as $id)
+		{
+			// Determine priveleges of the current user on the given item
+			$asset = 'com_content.article.' . $itemdata[$id]->id;
+			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
+			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $itemdata[$id]->created_by == $user->get('id'));
+			// ...
+			$permission = FlexicontentHelperPerm::getPerm();
+			$has_archive    = $permission->CanArchives;
+
+			$has_edit_state = $has_edit_state && in_array($stateids[$newstate], array(0,1,-3,-4,-5));
+			$has_delete     = $has_delete     && $stateids[$newstate] == -2;
+			$has_archive    = $has_archive    && $stateids[$newstate] == (FLEXI_J16GE ? 2:-1);
+
+			if ( $has_edit_state || $has_delete || $has_archive ) {
+				$auth_cid[] = $id;
+			} else {
+				$non_auth_cid[] = $id;
 			}
 		}
 
@@ -1136,22 +1205,24 @@ class FlexicontentControllerItems extends FlexicontentController
 			JError::raiseNotice(500, $msg_noauth);
 		}
 		
-		// Set state
-		if ( count($auth_cid) ){
-			foreach ($auth_cid as $item_id) {
-				$model->setitemstate($item_id, $stateids[$newstate]);
+		// Set state, (model will also handle cache cleaning)
+		if (count($auth_cid))
+		{
+			foreach ($auth_cid as $item_id)
+			{
+				$itemmodel->setitemstate($item_id, $stateids[$newstate], $_cleanCache = false);
 			}
 			$msg = count($auth_cid) ." ". JText::_('FLEXI_ITEMS') ." : &nbsp; ". JText::_( 'FLEXI_ITEMS_STATE_CHANGED_TO')." -- ".JText::_( $statenames[$newstate] ) ." --";
 			if ($newstate=='T') $msg .= '<br/> '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
+
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		}
 
-		$cache = FLEXIUtilities::getCache($group='', 0);
-		$cache->clean('com_flexicontent_items');
-		$cache->clean('com_flexicontent_filters');
-		$cache = FLEXIUtilities::getCache($group='', 1);
-		$cache->clean('com_flexicontent_items');
-		$cache->clean('com_flexicontent_filters');
-		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
 
@@ -1165,21 +1236,26 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function approval()
 	{
-		$cid	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
-		
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_APPROVAL_SELECT_ITEM_SUBMIT' ) );
-		} else {
-			$itemmodel = $this->getModel('item');
-			$msg = $itemmodel->approval($cid);
+
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'error');
+			$app->redirect($this->redirect);
 		}
-		
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
+
+		// Approve item(s) (model will also handle cache cleaning)
+		$itemmodel = $this->getModel('item');
+		$msg = $itemmodel->approval($cid);
+
+		$this->setRedirect($this->redirect, $msg);
 	}
-	
-	
+
+
 	/**
 	 * Logic to delete items
 	 *
@@ -1199,61 +1275,67 @@ class FlexicontentControllerItems extends FlexicontentController
 		$itemmodel = $this->getModel('item');
 		$msg = '';
 
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
-		
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			JError::raiseNotice(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
-		} else {
-			// Remove unauthorized (undeletable) items
-			$auth_cid = array();
-			$non_auth_cid = array();
-			
-			// Get owner and other item data
-			$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
-			$db->setQuery($q);
-			$itemdata = $db->loadObjectList('id');
-			
-			// Check authorization for delete operation
-			foreach ($cid as $id) {
-			
-				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
-				$canDelete 		= in_array('delete', $rights);
-				$canDeleteOwn = in_array('delete.own', $rights) && $itemdata[$id]->created_by == $user->id;
-				
-				if ( $canDelete || $canDeleteOwn ) {
-					$auth_cid[] = $id;
-				} else {
-					$non_auth_cid[] = $id;
-				}
+
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEM_DELETE'), 'error');
+			$app->redirect($this->redirect);
+		}
+
+
+		// Remove unauthorized (undeletable) items
+		$auth_cid = array();
+		$non_auth_cid = array();
+
+		// Get owner and other item data
+		$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
+		$db->setQuery($q);
+		$itemdata = $db->loadObjectList('id');
+
+		// Check authorization for delete operation
+		foreach ($cid as $id)
+		{
+			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
+			$canDelete 		= in_array('delete', $rights);
+			$canDeleteOwn = in_array('delete.own', $rights) && $itemdata[$id]->created_by == $user->id;
+
+			if ( $canDelete || $canDeleteOwn ) {
+				$auth_cid[] = $id;
+			} else {
+				$non_auth_cid[] = $id;
 			}
 		}
 		//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 		
 		// Set warning for undeletable items
-		if (count($non_auth_cid)) {
-			if (count($non_auth_cid) < 2) {
-				$msg_noauth = JText::_( 'FLEXI_CANNOT_DELETE_ITEM' );
-			} else {
-				$msg_noauth = JText::_( 'FLEXI_CANNOT_DELETE_ITEMS' );
-			}
+		if (count($non_auth_cid))
+		{
+			$msg_noauth = count($non_auth_cid) < 2
+				? JText::_('FLEXI_CANNOT_DELETE_ITEM')
+				: JText::_('FLEXI_CANNOT_DELETE_ITEMS');
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_DELETE_PERMISSION' ) ." - ". JText::_( 'FLEXI_IDS_SKIPPED' );
-			JError::raiseNotice(500, $msg_noauth);
+
+			$app->enqueueMessage($msg_noauth, 'error');
+			$app->redirect($this->redirect);
 		}
-		
+
 		// Try to delete 
-		if ( count($auth_cid) && !$model->delete($auth_cid, $itemmodel) ) {
-			JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
-		} else {
-			$msg = count($auth_cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
+		if (count($auth_cid) && !$model->delete($auth_cid, $itemmodel))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED'), 'error');
+			$app->redirect($this->redirect);
 		}
-		
+
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+
+		$msg = count($auth_cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
 	
@@ -1265,51 +1347,62 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function access( )
+	function access()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$user	= JFactory::getUser();
-		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id   = (int)$cid[0];
-		$task = JRequest::getVar( 'task' );
-		
-		// Decide / Retrieve new access level
-		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-		$access = $accesses[$id];
-		
-		$model = $this->getModel('item');
-		
-		$canEdit = $model->getItemAccess()->get('access-edit');
-		
+
+		$cid = $this->input->get('cid', array(), 'array');
+		JArrayHelper::toInteger($cid);
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->redirect);
+		}
+		$id = reset($cid);
+
 		// Check if user can edit the item
-		if ( !$canEdit ) {
+		$itemmodel = $this->getModel('item');
+		$canEdit = $itemmodel->getItemAccess()->get('access-edit');
+		if (!$canEdit)
+		{
 			$msg_noauth = JText::_( 'FLEXI_CANNOT_CHANGE_ACCLEVEL_ASSETS' );
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_PUBLISH_PERMISSION' );
-		}
-		if ($msg_noauth) {
-			JError::raiseNotice(500, $msg_noauth);
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
-			return;
+
+			$app->enqueueMessage($msg_noauth, 'error');
+			$app->redirect($this->redirect);
 		}
 
-		$model = $this->getModel('items');
-		
-		if(!$model->saveaccess( $id, $access )) {
-			$msg = JText::_( 'FLEXI_ERROR_SETTING_ITEM_ACCESS_LEVEL' );
-			JError::raiseWarning( 500, $msg ." " . $model->getError() );
-			$msg = '';
-		} else {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
+		// Get and check new access level
+		$accesses	= $this->input->get('access', array(), 'array');
+
+		// *** Check at least one item was selected
+		if (!isset($accesses[$id]))
+		{
+			$app->enqueueMessage('No access level for item id: ' . $id, 'error');
+			$app->redirect($this->redirect);
 		}
-		
-		$this->setRedirect('index.php?option=com_flexicontent&view=items' );
+		$access = (int) $accesses[$id];
+
+		$model = $this->getModel('items');
+		if (!$model->saveaccess($id, $access))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SETTING_ITEM_ACCESS_LEVEL') . ' ' . $model->getError(), 'error');
+			$app->redirect($this->redirect);
+		}
+
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+
+		$this->setRedirect($this->redirect);
 	}
 
 
@@ -1346,7 +1439,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$id			= JRequest::getInt( 'id', 0 );
 		$version	= JRequest::getVar( 'version', '', 'request', 'int' );
-		$model		= $this->getModel('item');
+		$itemmodel = $this->getModel('item');
 
 		// First checkin the open item
 		$item = JTable::getInstance('flexicontent_items', '');
@@ -1354,7 +1447,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$item->checkin();
 		if ($version) {
 			$msg = JText::sprintf( 'FLEXI_VERSION_RESTORED', $version );
-			$model->restore($version, $id);
+			$itemmodel->restore($version, $id);
 		} else {
 			$msg = JText::_( 'FLEXI_NOTHING_TO_RESTORE' );
 		}
@@ -1480,69 +1573,72 @@ class FlexicontentControllerItems extends FlexicontentController
 		//parent::display();
 	}
 
+
 	/**
-	 * Method to fetch the tags form, this is currently NOT USED
+	 * Method to fetch the tags edit field for the edit form, this is currently NOT USED
 	 * 
 	 * @since 1.5
 	 */
 	function gettags()
 	{
-		$id    = JRequest::getInt('id', 0);
-		$model = $this->getModel('item');
-		$tags  = $model->gettags();
-		$user  = JFactory::getUser();
-		
-		$used = null;
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		if ($id) {
-			$used = $model->getUsedtagsIds($id);
-		}
-		if(!is_array($used)){
-			$used = array();
-		}
-		
+		$id    = JRequest::getInt('id', 0);
+		$itemmodel = $this->getModel('item');
+		$tags  = $itemmodel->gettags();
+		$user  = JFactory::getUser();
+
+		// Get tag ids if non-new item
+		$used = $id ? $itemmodel->getUsedtagsIds($id) : null;
+		$used = is_array($used) ? $used : array();
+
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanCreateTags = $permission->CanCreateTags;
 		$CanUseTags    = $permission->CanUseTags;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';
 		$n = count($tags);
-		$rsp = '';
-		if ($n>0) {
-			$rsp .= '<div class="fc_tagbox" id="fc_tagbox">';
-			$rsp .= '<ul id="ultagbox">';
+		$html = '';
+
+		// Create list of current item's already assigned tags
+		if ($n)
+		{
+			$html .= '<div class="fc_tagbox" id="fc_tagbox">';
+			$html .= '<ul id="ultagbox">';
 			for( $i = 0, $n; $i < $n; $i++ ){
 				$tag = $tags[$i];
 				if (!in_array($tag->id, $used)) continue; // tag not assigned to item
 				if ( $CanUseTags && in_array($tag->id, $used) ) {
-					$rsp .='
+					$html .='
 					<li class="tagitem">
 						<span>'.$tag->name.'</span>
 						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
 						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 					</li>';
 				} else {
-					$rsp .='
+					$html .='
 					<li class="tagitem plain">
 						<span>'.$tag->name.'</span>
 						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
 					</li>';
 				}
 			}
-			$rsp .= '</ul>';
-			$rsp .= '</div>';
-			$rsp .= '<div class="fcclear"></div>';
+			$html .= '</ul>';
+			$html .= '</div>';
+			$html .= '<div class="fcclear"></div>';
 		}
+
 		if ($CanCreateTags)
 		{
-			$rsp .= '
+			$html .= '
 			<div class="fc_addtag">
 				<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>
 				<input type="text" id="tagname" class="inputbox" size="30" />
 				<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />
 			</div>';
 		}
-		echo $rsp;
+		echo $html;
 	}
 
 

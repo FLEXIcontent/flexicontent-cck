@@ -3759,7 +3759,7 @@ class ParentClassItem extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function setitemstate($id, $state = 1)
+	function setitemstate($id, $state = 1, $cleanCache = true)
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -3833,12 +3833,18 @@ class ParentClassItem extends JModelAdmin
 		JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');
 		if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
 		
-		if (in_array(false, $result, true) && !$event_failed_notice_added) {
+		if (in_array(false, $result, true) && !$event_failed_notice_added)
+		{
 			JError::raiseNotice(10, JText::_('One of plugin event handler for onContentChangeState failed') );
 			$event_failed_notice_added = true;
 			return false;
 		}
-		
+
+		if ($cleanCache)
+		{
+			$this->cleanCache(null, 0);
+			$this->cleanCache(null, 1);
+		}
 		return true;
 	}
 	
@@ -4585,14 +4591,8 @@ class ParentClassItem extends JModelAdmin
 			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_PUBLISHABLE_EXCLUDED', $publishable_str).'</div>';
 		}
 		
-		// This may not be needed since the item was already in unpublished stated ??
-		$cache = FLEXIUtilities::getCache($group='', 0); // backend
-		$cache->clean('com_flexicontent_items');
-		$cache->clean('com_flexicontent_filters');
-		$cache = FLEXIUtilities::getCache($group='', 1); // frontend
-		$cache->clean('com_flexicontent_items');
-		$cache->clean('com_flexicontent_filters');
-		
+		$this->cleanCache(null, 0);
+		$this->cleanCache(null, 1);
 		return $msg;
 	}
 	
@@ -4715,9 +4715,8 @@ class ParentClassItem extends JModelAdmin
 		}
 
 		$table->reorder();
-
-		$this->cleanCache();
-
+		$this->cleanCache(null, 0);
+		$this->cleanCache(null, 1);
 		return true;
 	}
 	
@@ -4836,5 +4835,20 @@ class ParentClassItem extends JModelAdmin
 		}
 		$this->_item->$colname = $registry->toArray();
 		$this->_item->itemparams->merge($registry);
+	}
+	
+	
+	protected function cleanCache($group = null, $client_id = 0)
+	{
+		$cache = FLEXIUtilities::getCache($group, $client_id);
+		if ($group)
+		{
+			$cache->clean();
+		}
+		else
+		{
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+		}
 	}
 }

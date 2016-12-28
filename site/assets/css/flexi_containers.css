@@ -123,6 +123,7 @@ body .fc-mssg-inline.fc-nomargin {
 	margin: 1px 0 2px 0px;
 }
 #flexicontent div.statetoggler {
+	position: relative;
 	float: none;
 	padding: 0;
 	margin: 0;
@@ -131,31 +132,7 @@ body .fc-mssg-inline.fc-nomargin {
 	list-style: none;
 	width: auto;
 }
-#flexicontent div.statetoggler > div.topLevel > .options {
-	padding: 0px;
-	margin: 0;
-	background: white;
-	position: absolute;
-	font-size: 14px;
-	line-height: 21px;
-	width: auto;
-	height: 0;
-	z-index: 1;
-}
-#flexicontent div.statetoggler > div.topLevel > .options ul {
-	display: none;
-	float: left;
-	background: white;
-	border: 1px solid lightgray;
-	border-radius: 4px;
-	box-shadow: 2px 4px 4px gray;
-	box-sizing: border-box;
-	padding: 0px;
-	margin: 2px 0px;
-	width: 100%;
-}
-#flexicontent div.statetoggler > div.topLevel,
-#flexicontent div.statetoggler > div.topLevel > .options > ul > li {
+#flexicontent div.statetoggler > div.statetoggler_inner {
 	position: relative;
 	background: none repeat scroll 0 0 transparent;
 	overflow: visible;
@@ -168,37 +145,22 @@ body .fc-mssg-inline.fc-nomargin {
 	min-height: auto;
 	min-width: auto;
 }
-#flexicontent div.statetoggler > div.topLevel a {
-	white-space: nowrap;
+#flexicontent div.statetoggler > div.statetoggler_inner > div.stateopener {
+	line-height: 20px;
+	height: 26px;
+	width: 32px;
 	display: inline-block;
 	box-sizing: border-box;
 	margin: 0px;
-	padding: 2px 8px 3px;
-	width: 100%;
-	text-align: left;
-	line-height: 16px;
-	vertical-align: middle;
-}
-#flexicontent div.statetoggler > div.topLevel > .options > ul > li > a {
 	padding: 2px 8px;
-	line-height: 16px;
+	text-align: left;
+	vertical-align: middle;
+	cursor: pointer;
 }
-#flexicontent div.statetoggler > div.topLevel > .options > ul > li a:hover {
-	background-image: linear-gradient(to bottom,#f0f0f0,#d7d7d7);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d7d7d7);
+#flexicontent div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
+	background-position: center;
 }
-#flexicontent div.statetoggler > div.topLevel > .options > ul > li img {
-	padding: 4px 6px;
-	margin: 0;
-	border: none;
-	display: unset;
-	box-sizing: unset;
-}
-#flexicontent div.statetoggler > div.topLevel > .options > ul > li > a.stateopener {
-	outline: none;
-	text-decoration: none;
-}
-#flexicontent div.statetoggler > div.topLevel > .options > ul > li > a.stateopener img {
+#flexicontent div.statetoggler > div.statetoggler_inner > div.stateopener img {
 	padding: 0;
 	margin: 0;
 	border: none;
@@ -206,11 +168,60 @@ body .fc-mssg-inline.fc-nomargin {
 	display: unset;
 	box-sizing: unset;
 	min-width: 16px;
+	border-width: 0;
 }
-#flexicontent div.statetoggler .ajax-loader {
-	background: url("../images/ajax-loader.gif") no-repeat scroll center center transparent;
-	height: 20px;
-	width: 16px;
+#flexicontent div.statetoggler > div.statetoggler_inner > .options {
+	padding: 2px 16px 0 0;
+	margin: 2px 0px;
+	background: white;
+	position: absolute;
+	font-size: 14px;
+	line-height: 21px;
+	z-index: 1;
+	display: none;
+	border: 1px solid lightgray;
+	border-radius: 4px;
+	box-shadow: 2px 4px 4px gray;
+	box-sizing: border-box;
+}
+#flexicontent div.statetoggler > div.statetoggler_inner > .options > div,
+#flexicontent div.statetoggler > div.statetoggler_inner > .options > span {
+	position: relative;
+	float: left;
+	clear: both;
+	overflow: visible;
+	display: inline-block;
+	box-sizing: border-box;
+	line-height: 16px;
+	padding: 2px 8px;
+	margin: 0;
+	width: 100%;
+	height: auto;
+	min-height: auto;
+	min-width: auto;
+	background: none repeat scroll 0 0 transparent;
+	outline: none;
+	text-decoration: none;
+	white-space: nowrap;
+	text-align: left;
+	vertical-align: middle;
+	cursor: pointer;
+}
+#flexicontent div.statetoggler > div.statetoggler_inner > .options > div {
+	text-align: center;
+	font-weight: bold;
+}
+#flexicontent div.statetoggler > div.statetoggler_inner > .options > span:hover {
+	background-color: #e7e7e7;
+	background-image: linear-gradient(to bottom,#f0f0f0,#d7d7d7);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d7d7d7);
+}
+#flexicontent div.statetoggler > div.statetoggler_inner > .options > span > img {
+	padding: 4px 6px;
+	margin: 0;
+	border: none;
+	display: unset;
+	box-sizing: unset;
 }
 #flexicontent .qf_ratingbarcontainer {
 	border: 1px solid #999999;
@@ -505,12 +516,16 @@ body .fc-nowrap-box,
 }
 body .btn-group.fc_btn_group > .btn.btn-micro,
 #flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.topLevel > a {
+#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.statetoggler_inner > a {
 	padding: 4px 4px;
 	line-height: 18px;
 }
 body .btn-group.fc_btn_group > .preview.btn.btn-micro,
 #flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.topLevel > a {
+#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.statetoggler_inner > a {
 	padding: 4px 8px;
+}
+#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.statetoggler_inner > a.ajax-loader {
+	background-position: center;
+	padding: 13px 10px 13px 22px;
 }
