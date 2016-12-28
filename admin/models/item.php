@@ -29,8 +29,8 @@ require_once('parentclassitem.php');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelItem extends ParentClassItem {
-	
+class FlexicontentModelItem extends ParentClassItem
+{
 	/**
 	 * Constructor
 	 *

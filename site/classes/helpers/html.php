@@ -1821,26 +1821,20 @@ class flexicontent_html
 
 		// check if user can edit.state of the item
 		$access_msg = '';
-		if ( !$has_edit_state && !$has_delete && !$has_archive )
+		if (!$has_edit_state && !$has_delete && !$has_archive)
 		{
 			//echo JText::_( 'FLEXI_NO_ACCESS_CHANGE_STATE' );
 			echo JText::_( 'FLEXI_DENIED' );   // must a few words
 			return;
 		}
-		else if(!$model->setitemstate($id, $state))
+
+		// Set new item state (model will also handle cache cleaning) 
+		if (!$model->setitemstate($id, $state))
 		{
 			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
 			echo $msg . ": " .$model->getError();
 			return;
 		}
-
-		// Clean cache
-		$cache = FLEXIUtilities::getCache($group='', 0);
-		$cache->clean('com_flexicontent_items');
-		$cache->clean('com_flexicontent_filters');
-		$cache = FLEXIUtilities::getCache($group='', 1);
-		$cache->clean('com_flexicontent_items');
-		$cache->clean('com_flexicontent_filters');
 
 		// Output new state icon and terminate
 		$tmpparams = new JRegistry();
@@ -2289,6 +2283,7 @@ class flexicontent_html
 		static $nullDate;
 		static $isAdmin;
 		static $isPrint;
+		static $img_path;
 
 		static $has_archive = null;
 		static $has_checkin = null;
@@ -2299,6 +2294,7 @@ class flexicontent_html
 			$nullDate = JFactory::getDBO()->getNullDate();
 			$isAdmin  = JFactory::getApplication()->isAdmin();
 			$isPrint  = JFactory::getApplication()->input->get('print', 0, 'INT');
+			$img_path = JURI::root(true) . '/components/com_flexicontent/assets/images/';
 
 			$has_archive = FlexicontentHelperPerm::getPerm()->CanArchives;
 			$has_checkin = $user->authorise('core.admin', 'com_checkin');
@@ -2321,13 +2317,22 @@ class flexicontent_html
 		if (!$js_and_css_added && $canChangeState && $addToggler )
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
+			JText::script('FLEXI_ACTION', true);
+			JText::script('FLEXI_PUBLISH_THIS_ITEM', true);
+			JText::script('FLEXI_SET_STATE_AS_IN_PROGRESS', true);
+			JText::script('FLEXI_UNPUBLISH_THIS_ITEM', true);
+			JText::script('FLEXI_SET_STATE_AS_PENDING', true);
+			JText::script('FLEXI_SET_STATE_AS_TO_WRITE', true);
+			JText::script('FLEXI_ARCHIVE_THIS_ITEM', true);
+			JText::script('FLEXI_TRASH_THIS_ITEM', true);
 			$doc = JFactory::getDocument();
 			$doc->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
-			$js ='				
+			$js = '
+				var fc_statehandler_img_path = '.json_encode($img_path).';
 				function fc_setitemstate(state, id)
 				{
 					var handler = new fc_statehandler({task: "'. ($isAdmin ? 'items.setitemstate' : 'setitemstate') .'"});
-					handler.setstate( state, id );
+					handler.setstate(state, id);
 				}';
 			$doc->addScriptDeclaration($js);
 			$js_and_css_added = true;
@@ -2351,7 +2356,7 @@ class flexicontent_html
 			$state_tips = array();
 			$title_header = '';//JText::_( 'FLEXI_ACTION' );
 			foreach ($state_names as $state_id => $i) {
-				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0);
+				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0, 1);
 			}
 			
 			$button_classes = 'fc_statebutton';
@@ -2368,6 +2373,7 @@ class flexicontent_html
 			$jtext['finish_no_expiry'] = JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
 			$jtext['finish'] = JText::_( 'FLEXI_FINISH' );
 			$jtext['change_state'] = JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
+			$jtext['action'] = JText::_('FLEXI_ACTION');
 		}
 		
 		// Create state icon
@@ -2387,9 +2393,6 @@ class flexicontent_html
 		$publish_down = JFactory::getDate($item->publish_down);
 		$publish_up->setTimezone($tz);
 		$publish_down->setTimezone($tz);
-
-		$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
-
 
 		// Create publish information
 		$publish_info = array();
@@ -2415,38 +2418,36 @@ class flexicontent_html
 			if ($has_archive)    $state_ids[] = 2;
 			if ($item->canDelete)     $state_ids[] = -2;
 
-			if ( $tooltip_place ) ;
+			if ($tooltip_place === 'top') $tooltip_place = '';
+			else if ( $tooltip_place ) ;
 			else if ( !$params || !$params->get('show_icons', 2) )
 				$tooltip_place = 'bottom';
 			else
 				$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
-			
-			$allowed_states = array();
-			foreach ($state_ids as $i => $state_id) {
-				$allowed_states[] ='
-						<li style="display:inline-block; float:left; clear:both;">
-							<a href="javascript:void(0);" onclick="fc_setitemstate(\''.$state_id.'\', \''.$item->id.'\')" class="setstate_btn" style="text-decoration:none;">
-								<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="State" /> '.$state_tips[$state_id].'
-							</a>
-						</li>';
+
+			//$allowed_states = array('<div>'.$jtext['action'].'</div>');
+			foreach ($state_ids as $i => $state_id)
+			{
+				$state_data[] = array('i'=>$state_id);
+				/*$allowed_states[] ='
+					<span onclick="fc_setitemstate(\''.$state_id.'\', \''.$item->id.'\')">
+						<img src="'.$img_path.$state_imgs[$state_id].'" alt="s" /> '.$state_tips[$state_id].'
+					</span>';*/
 			}
 			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
 			$output = '
 			<div class="statetoggler '.$button_classes.'">
-				<div class="topLevel">
-					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$tooltip_class.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">
+				<div class="statetoggler_inner">
+					<div onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$tooltip_class.'" '.($tooltip_place ? ' data-placement="'.$tooltip_place.'"' : '').' title="'.$tooltip_title.'">
 						'.$stateicon.'
-					</a>
-					<div class="options">
-						<ul>
-						<li style="text-align:center;"><b>'.JText::_( 'FLEXI_ACTION' ).'</b></li>
-						'.implode('', $allowed_states).'
-						</ul>
+					</div>
+					<div class="options" data-id="'.$item->id.'" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">
+						'/*.implode('', $allowed_states)*/.'
 					</div>
 				</div>
 			</div>';
 		}
-		
+
 		else if ($isAdmin)  // Backend, possibly with state selector disabled
 		{
 			if ($canChangeState)
