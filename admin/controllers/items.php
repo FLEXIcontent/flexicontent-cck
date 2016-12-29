@@ -47,7 +47,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'saveandnew', 'save' );
 		$this->registerTask( 'unfeatured', 'featured' );
 
-		$this->redirect = 'index.php?option=com_flexicontent&view=items';
+		$this->returnURL = 'index.php?option=com_flexicontent&view=items';
 	}
 	
 	
@@ -1104,7 +1104,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (empty($ids))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		// Get the model.
@@ -1114,13 +1114,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!$itemmodel->featured($ids, $value))
 		{
 			$app->enqueueMessage($itemmodel->getError(), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		$message = $value == 1
 			? JText::plural('COM_CONTENT_N_ITEMS_FEATURED', count($ids))
 			: JText::plural('COM_CONTENT_N_ITEMS_UNFEATURED', count($ids));
-		$this->setRedirect($this->redirect, $message);
+		$this->setRedirect($this->returnURL, $message);
 	}
 
 
@@ -1150,7 +1150,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!count($cid))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		$newstate = $this->input->get('newstate', '', 'string');
@@ -1161,7 +1161,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!isset($stateids[$newstate]))
 		{
 			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $newstate, 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 
@@ -1245,14 +1245,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!count($cid))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		// Approve item(s) (model will also handle cache cleaning)
 		$itemmodel = $this->getModel('item');
 		$msg = $itemmodel->approval($cid);
 
-		$this->setRedirect($this->redirect, $msg);
+		$this->setRedirect($this->returnURL, $msg);
 	}
 
 
@@ -1281,7 +1281,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!count($cid))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEM_DELETE'), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 
@@ -1318,14 +1318,14 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_DELETE_PERMISSION' ) ." - ". JText::_( 'FLEXI_IDS_SKIPPED' );
 
 			$app->enqueueMessage($msg_noauth, 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		// Try to delete 
 		if (count($auth_cid) && !$model->delete($auth_cid, $itemmodel))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED'), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		$cache = FLEXIUtilities::getCache($group='', 0);
@@ -1361,7 +1361,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!count($cid))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 		$id = reset($cid);
 
@@ -1374,7 +1374,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_PUBLISH_PERMISSION' );
 
 			$app->enqueueMessage($msg_noauth, 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		// Get and check new access level
@@ -1384,7 +1384,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!isset($accesses[$id]))
 		{
 			$app->enqueueMessage('No access level for item id: ' . $id, 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 		$access = (int) $accesses[$id];
 
@@ -1392,7 +1392,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!$model->saveaccess($id, $access))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_ERROR_SETTING_ITEM_ACCESS_LEVEL') . ' ' . $model->getError(), 'error');
-			$app->redirect($this->redirect);
+			$app->redirect($this->returnURL);
 		}
 
 		$cache = FLEXIUtilities::getCache($group='', 0);
@@ -1402,7 +1402,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
 
-		$this->setRedirect($this->redirect);
+		$this->setRedirect($this->returnURL);
 	}
 
 

@@ -137,7 +137,7 @@ body .fc-mssg.fc-noborder {
 	border-width: 0;
 }
 body .fc-mssg-inline.fc-nomargin {
-	margin: 1px 0 2px 0px;
+	margin: 1px 0 2px 0;
 }
 
 
@@ -148,12 +148,20 @@ body .fc-mssg-inline.fc-nomargin {
 #flexicontent div.statetoggler {
 	position: relative;
 	float: none;
-	padding: 0;
-	margin: 0;
-	vertical-align: top;
+	padding: 4px 4px;
 	display: inline-block;
-	list-style: none;
 	width: auto;
+	line-height: 14px;
+	height: 14px;
+
+	.icon-publish:before,
+	.icon-checkmark-2:before {
+		color: green;
+	}
+
+	.icon-unpublish {
+		color: darkred;
+	}
 
 	> div.statetoggler_inner {
 		position: relative;
@@ -170,21 +178,23 @@ body .fc-mssg-inline.fc-nomargin {
 
 
 		> div.stateopener {
-			line-height: 20px;
-			height: 26px;
-			width: 32px;
+			line-height: auto;
+			height: auto;
+			width: auto;
 
 			display: inline-block;
 			box-sizing: border-box;
-			margin: 0px;
-			padding: 2px 8px;
+			padding: 0;
+			margin: 0;
 
 			text-align: left;
-			vertical-align: middle;
+			vertical-align: baseline;
 			cursor: pointer;
 		}
 		> div.stateopener.ajax-loader {
 			background-position: center;
+			padding: 8px;
+			margin: -1px -1px -1px -1px;
 		}
 
 		> div.stateopener img {
@@ -199,8 +209,8 @@ body .fc-mssg-inline.fc-nomargin {
 		}
 
 		> .options {
-			padding: 2px 16px 0 0;
-			margin: 2px 0px;
+			padding: 4px 0;
+			margin: 2px 0;
 			background: white;
 			position: absolute;
 			font-size: 14px;
@@ -223,12 +233,12 @@ body .fc-mssg-inline.fc-nomargin {
 				display: inline-block;
 				box-sizing: border-box;
 
-				line-height: 16px;
-				padding: 2px 8px;
+				line-height: 24px;
+				padding: 2px 16px 2px 8px;
 				margin: 0;
 				width: 100%;
 				height: auto;
-				min-height: auto;
+				min-height: 24px;
 				min-width: auto;
 
 				background: none repeat scroll 0 0 transparent;
@@ -245,16 +255,20 @@ body .fc-mssg-inline.fc-nomargin {
 			}
 			> span:hover {
 				background-color: #e7e7e7;
-				background-image: linear-gradient(to bottom,#f0f0f0,#d7d7d7);
-				filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d7d7d7);
+				background-image: linear-gradient(to bottom,#f0f0f0,#d0d0d0);
+				filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d0d0d0);
 			}
 
+			> span > span,
 			> span > img {
-				padding: 4px 6px;
-				margin: 0;
+				max-width: unset;
+				padding: 0;
+				margin: 0 .5em 0 0;
 				border: none;
-				display: unset;
 				box-sizing: unset;
+			}
+			> span > img {
+				display: unset;
 			}
 		}
 	}
@@ -497,8 +511,8 @@ body .fc-nowrap-box,
 	> div.select2-container:not(:first-child) > a.select2-choice {
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
-		margin-left: 0px !important;
-		margin-right: 0px !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
 	}
 	> select:not(:last-child),
 	> select:not(:last-child),
@@ -508,7 +522,7 @@ body .fc-nowrap-box,
 	> div.select2-container:nth-last-child(n+3) > a.select2-choice {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
-		margin-right: 0px !important;
+		margin-right: 0 !important;
 	}
 	> div.select2-container .select2-input {
 		border-radius: 4px;
@@ -530,7 +544,7 @@ body .fc-nowrap-box,
 	> .btn-group,
 	> *:not(.btn-group):not(:first-child),
 	> *:not(.btn-group):not(:first-child) {
-		margin: 0px;
+		margin: 0;
 	}
 }
 
@@ -585,20 +599,23 @@ body .fc-nowrap-box,
 	width: 64px !important;
 }
 
-body .btn-group.fc_btn_group > .btn.btn-micro,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.statetoggler_inner > a {
+body .btn-group.fc_btn_group > .btn.btn-small {
 	padding: 4px 4px;
-	line-height: 18px;
+	line-height: 14px;
+	height: 14px;
+	vertical-align: middle;
 }
 
-body .btn-group.fc_btn_group > .preview.btn.btn-micro,
+div.statetoggler [class^="icon-"], 
+div.statetoggler [class*=" icon-"], 
+body .btn-group.fc_btn_group > .btn.btn-small [class^="icon-"],
+body .btn-group.fc_btn_group > .btn.btn-small [class*=" icon-"] {
+	margin: 0;
+	font-size: 14px;
+}
+
+body .btn-group.fc_btn_group > .preview.btn.btn-small,
 #flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.statetoggler_inner > a {	
+#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-small {	
 	padding: 4px 8px;
-}
-
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-micro > div.statetoggler_inner > a.ajax-loader {
-	background-position: center;
-	padding: 13px 10px 13px 22px;
 }

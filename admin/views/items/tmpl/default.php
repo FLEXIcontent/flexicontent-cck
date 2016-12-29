@@ -83,13 +83,13 @@ $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::g
 // *****
 
 $image_flag_path = "../media/mod_languages/images/";
-$attribs_preview = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), $attribs_preview);
+//$attribs_preview = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+//$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), $attribs_preview);
+$image_preview = '<span class="icon-screen"></span>';
 
-$attribs_preview    = ' class="preview btn btn-micro '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_preview    = ' class="preview '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_editlayout = ' class="editlayout '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
-$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
 $image_editlayout = 0 ?
 	JHTML::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
@@ -890,8 +890,8 @@ jQuery(document).ready(function(){
 					$item_url = JRoute::_(JURI::root().$item_url, $xhtml=false); // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 					$previewlink = $item_url .'&amp;preview=1' .$autologin;
 
+					echo flexicontent_html::statebutton( $row, null, $addToggler = ($limit <= $this->inline_ss_max), 'top', 'btn btn-small' );
 					echo JHtml::_('fcitems.featured', $row->featured, $i, $row->canEditState);
-					echo flexicontent_html::statebutton( $row, null, $addToggler = ($limit <= $this->inline_ss_max), 'top', 'btn btn-micro' );
 					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 					?>
 				</div>

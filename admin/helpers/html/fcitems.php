@@ -44,12 +44,12 @@ abstract class JHtmlFcitems
 
 		return $canChange
 			? '
-			<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="btn btn-micro hasTooltip'
+			<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="featured btn btn-small hasTooltip'
 				. ($value == 1 ? ' active' : '') . '" title="' . $state[3] . '">
 				<span class="icon-' . $state[0] . '"></span>
 			</a>
 			' : '
-			<a class="btn btn-micro hasTooltip disabled' . ($value == 1 ? ' active' : '') . '" title="'
+			<a class="featured btn btn-small hasTooltip disabled' . ($value == 1 ? ' active' : '') . '" title="'
 				. $state[2] . '">
 				<span class="icon-' . $state[0] . '"></span>
 			</a>';
@@ -81,7 +81,7 @@ abstract class JHtmlFcitems
 
 		return 
 		($row->checked_out != $user->id ? '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">' : '') . '
-		<a class="btn btn-micro hasTooltip" title="'.$_tip_title.'" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'items.checkin\'; ccb.form.submit();">
+		<a class="btn btn-small hasTooltip" title="'.$_tip_title.'" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'items.checkin\'; ccb.form.submit();">
 			<span class="icon-checkedout"></span>
 		</a>
 		';
@@ -110,7 +110,7 @@ abstract class JHtmlFcitems
 			$html['scheduled'] = '<span class="btn btn-micro active" style="cursor:default"><img src="components/com_flexicontent/assets/images/pushished_scheduled.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span> ';
 
 			$tip_text = JText::_('FLEXI_PUBLICATION_EXPIRED', true);
-			$html['expired'] = '<span class="btn btn-micro active" style="cursor:default"><img src="components/com_flexicontent/assets/images/pushished_expired.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span> ' ;
+			$html['expired'] = '<span class="btn btn-small active" style="cursor:default"><img src="components/com_flexicontent/assets/images/pushished_expired.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span> ' ;
 		}
 
 		// Check publication START/FINISH dates (publication Scheduled / Expired)
