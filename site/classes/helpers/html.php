@@ -1839,9 +1839,8 @@ class flexicontent_html
 		// Output new state icon and terminate
 		$tmpparams = new JRegistry();
 		$tmpparams->set('stateicon_popup', 'basic');
-		$stateicon = flexicontent_html::stateicon( $state, $tmpparams );
-		echo $stateicon;
-		exit;
+		$stateicon = flexicontent_html::stateicon($state, $tmpparams);
+		jexit($stateicon);
 	}
 
 
@@ -2284,6 +2283,7 @@ class flexicontent_html
 		static $isAdmin;
 		static $isPrint;
 		static $img_path;
+		static $use_font_icons;
 
 		static $has_archive = null;
 		static $has_checkin = null;
@@ -2295,13 +2295,14 @@ class flexicontent_html
 			$isAdmin  = JFactory::getApplication()->isAdmin();
 			$isPrint  = JFactory::getApplication()->input->get('print', 0, 'INT');
 			$img_path = JURI::root(true) . '/components/com_flexicontent/assets/images/';
+			$use_font_icons = $isAdmin || ($params && $params->get('use_font_icons', 1));
 
 			$has_archive = FlexicontentHelperPerm::getPerm()->CanArchives;
 			$has_checkin = $user->authorise('core.admin', 'com_checkin');
 		}
 
 		// Check if state icon should not be shown (note: parameters are usually NULL in backend)
-		if ( $params && !$params->get('show_state_icon', 1) || $isPrint ) return;
+		if ( !$isAdmin && ($params && !$params->get('show_state_icon', 1) || $isPrint) ) return;
 
 		// Determine edit state, delete privileges of the current user on the given item, NOTE: currently we ignore canCheckin in frontend
 		$asset = 'com_content.article.' . $item->id;
@@ -2328,12 +2329,12 @@ class flexicontent_html
 			$doc = JFactory::getDocument();
 			$doc->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js = '
-				var fc_statehandler_img_path = '.json_encode($img_path).';
-				function fc_setitemstate(state, id)
-				{
-					var handler = new fc_statehandler({task: "'. ($isAdmin ? 'items.setitemstate' : 'setitemstate') .'"});
-					handler.setstate(state, id);
-				}';
+				var fc_statehandler_singleton = new fc_statehandler({
+					task: '. json_encode($isAdmin ? 'items.setitemstate' : 'setitemstate') .',
+					img_path: '.json_encode($img_path).',
+					font_icons: '.($use_font_icons ? 'true' : 'false').'
+				});
+			';
 			$doc->addScriptDeclaration($js);
 			$js_and_css_added = true;
 		}
@@ -2341,16 +2342,19 @@ class flexicontent_html
 		static $state_names = null;
 		static $state_descrs = null;
 		static $state_imgs = null;
+		static $font_icons = null;
 		static $tooltip_class = null;
 		static $state_tips = null;
 		static $button_classes = null;
 		static $jtext = array();
-		
+		static $icon_params = null;
+
 		if ( !$state_names )
 		{
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
-			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_names  = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), 'u'=>JText::_('FLEXI_UNKNOWN'));
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), 'u'=>'FLEXI_UNKNOWN');
+			$state_imgs   = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', 'u'=>'unknown.png');
+			$font_icons   = array(1=>'publish', -5=>'checkmark-2', 0=>'unpublish', -3=>'clock', -4=>'pencil-2', 2=>'archive', -2=>'trash', 'u'=>'question-2');
 			
 			$tooltip_class = ' hasTooltip';
 			$state_tips = array();
@@ -2374,14 +2378,17 @@ class flexicontent_html
 			$jtext['finish'] = JText::_( 'FLEXI_FINISH' );
 			$jtext['change_state'] = JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			$jtext['action'] = JText::_('FLEXI_ACTION');
+
+			$icon_params = new JRegistry();
+			$icon_params->set('stateicon_popup', 'none');
+			$icon_params->set('use_font_icons', $use_font_icons);
 		}
 		
 		// Create state icon
 		$state = $item->state;
+		if ( !isset($state_names[$state]) ) $state = 'u';
 		$state_text ='';
-		$tmpparams = new JRegistry();
-		$tmpparams->set('stateicon_popup', 'none');
-		$stateicon = flexicontent_html::stateicon( $state, $tmpparams, $state_text );
+		$stateicon = flexicontent_html::stateicon($state, $icon_params, $state_text);
 
 
 		$tz_string = JFactory::getApplication()->getCfg('offset');
@@ -2425,25 +2432,24 @@ class flexicontent_html
 			else
 				$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 
-			//$allowed_states = array('<div>'.$jtext['action'].'</div>');
+			//$allowed_states = array();
+			//$allowed_states[] = '<div>'.$jtext['action'].'</div>');
 			foreach ($state_ids as $i => $state_id)
 			{
 				$state_data[] = array('i'=>$state_id);
 				/*$allowed_states[] ='
-					<span onclick="fc_setitemstate(\''.$state_id.'\', \''.$item->id.'\')">
-						<img src="'.$img_path.$state_imgs[$state_id].'" alt="s" /> '.$state_tips[$state_id].'
+					<span onclick="fc_statehandler_singleton.setstate(\''.$state_id.'\', \''.$item->id.'\')">
+						'.($use_font_icons ? '<span class="icon-'.$font_icons[$state_id].'"></span>' : '<img src="'.$img_path.$state_imgs[$state_id].'" alt="s" /> ').$state_tips[$state_id].'
 					</span>';*/
 			}
 			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
 			$output = '
 			<div class="statetoggler '.$button_classes.'">
 				<div class="statetoggler_inner">
-					<div onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$tooltip_class.'" '.($tooltip_place ? ' data-placement="'.$tooltip_place.'"' : '').' title="'.$tooltip_title.'">
+					<div onclick="fc_statehandler_singleton.toggleSelector(this)" id="row'.$item->id.'" class="stateopener '.$tooltip_class.'" '.($tooltip_place ? ' data-placement="'.$tooltip_place.'"' : '').' title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</div>
-					<div class="options" data-id="'.$item->id.'" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">
-						'/*.implode('', $allowed_states)*/.'
-					</div>
+					<div class="options" data-id="'.$item->id.'" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">'/*.implode('', $allowed_states)*/.'</div>
 				</div>
 			</div>';
 		}
@@ -2773,7 +2779,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function stateicon( $state, &$params, &$state_text=null )
+	static function stateicon($state, $params, &$state_text=null)
 	{
 		static $jtext_state = null;
 		static $tooltip_class = ' hasTooltip';
@@ -2785,12 +2791,14 @@ class flexicontent_html
 		static $state_fulltips = null;
 
 		static $state_icons = array();
+		static $font_icons = null;
 
-		if ( !$state_names )
+		if ($state_names === null)
 		{
 			$jtext_state = JText::_( 'FLEXI_STATE' );
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>JText::_('FLEXI_UNKNOWN'));
-			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), 'u'=>JText::_('FLEXI_UNKNOWN'));
+			$state_imgs  = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', 'u'=>'unknown.png');
+			$font_icons  = array(1=>'publish', -5=>'checkmark-2', 0=>'unpublish', -3=>'clock', -4=>'pencil-2', 2=>'archive', -2=>'trash', 'u'=>'question-2');
 
 			foreach($state_names as $state_id => $state_name)
 			{
@@ -2806,7 +2814,7 @@ class flexicontent_html
 		}
 
 		// Check for invalid state
-		if ( !isset($state_names[$state]) ) $state = '';
+		if ( !isset($state_names[$state]) ) $state = 'u';
 		$state_text = $state_names[$state];
 
 		// Return state name if not showing icons
@@ -2817,21 +2825,28 @@ class flexicontent_html
 		if ( isset($state_icons[$state][$popup_type]) ) return $state_icons[$state][$popup_type];
 
 		// Create popup text
+		$use_font = $params->get('use_font_icons', 1);
+		$icon_class = $use_font ? 'icon-'.$font_icons[$state] : '';
 		switch ( $popup_type )
 		{
 			case 'basic':
-				$attribs = 'title="'.$state_basictips[$state].'"';
+				$attribs = ($icon_class ? ' class="'.$icon_class.'" ' : '') . ' title="'.$state_basictips[$state].'"';
 				break;
 			case 'none':
-				$attribs = '';
+				$attribs = $icon_class ? ' class="'.$icon_class.'" ' : '';
 				break;
 			case 'full': default:
-				$attribs = 'class="fc_stateicon '.$tooltip_class.'" title="'.$state_fulltips[$state].'"';
+				$attribs = ($use_font
+					? ' class="'.$icon_class . ' ' . $tooltip_class.'"'
+					: ' class="fc_stateicon ' . $tooltip_class.'"'
+				) . ' title="'.$state_fulltips[$state].'"';
 				break;
 		}
 
 		// Create state icon image and return it
-		$state_icons[$state][$popup_type] = JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $attribs);
+		$state_icons[$state][$popup_type] = $use_font
+			? '<span '.$attribs.'></span>'
+			: JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $attribs);
 		return $state_icons[$state][$popup_type];
 	}
 

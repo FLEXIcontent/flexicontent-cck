@@ -70,6 +70,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 $img_path = '../components/com_flexicontent/assets/images/';
 $state_names = array('ALL_P'=>JText::_('FLEXI_PUBLISHED'), 'ALL_U'=>JText::_('FLEXI_UNPUBLISHED'), 'A'=>JText::_('FLEXI_ARCHIVED'), 'T'=>JText::_('FLEXI_TRASHED'));
 $state_imgs = array('ALL_P'=>'tick.png', 'ALL_U'=>'publish_x.png', 'A'=>'archive.png', 'T'=>'trash.png');
+$state_icons = array('ALL_P'=>'publish', 'ALL_U'=>'unpublish', 'A'=>'archive', 'T'=>'trash');
 
 $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
@@ -206,21 +207,21 @@ function delAllFilters() {
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass">
+			<th class="hideOnDemandClass center">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['ALL_P'].'" alt="'.$state_names['ALL_P'].'" title="'.$state_names['ALL_P'].'">'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass">
+			<th class="hideOnDemandClass center">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['ALL_U'].'" alt="'.$state_names['ALL_U'].'" title="'.$state_names['ALL_U'].'">'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass">
+			<th class="hideOnDemandClass center">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['A'].'" alt="'.$state_names['A'].'" title="'.$state_names['A'].'">'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass">
+			<th class="hideOnDemandClass center">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['T'].'" alt="'.$state_names['T'].'" title="'.$state_names['T'].'">'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>

@@ -1,41 +1,3 @@
-var fc_statehandler = function( options )
-{
-	this.options = {
-		id: '',
-		script_url: 'index.php?option=com_flexicontent&format=raw',
-		task: '',
-		state: ''
-	};
-	
-	if( typeof options !== 'undefined') for (var key in options)
-	{
-		//console.log(key, options[key]);
-		this.options[key] = options[key];
-	};
-
-	this.setstate = function( state, id )
-	{
-		var row = jQuery('#row' + id);
-		row.next().hide();
-		row.empty().addClass('ajax-loader');
-		row.closest('.statetoggler').removeClass('active');
-
-		jQuery.ajax({
-			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state,
-			dataType: 'html',
-			data: {
-				lang: (typeof _FC_GET !='undefined' && 'lang' in _FC_GET ? _FC_GET['lang']: '')
-			},
-			success: function( data )
-			{
-				jQuery('#row' + id).removeClass('ajax-loader').html(data);
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
-	}
-};
 
 var fc_state_imgs = {
 	'1': 'accept.png',
@@ -46,6 +8,16 @@ var fc_state_imgs = {
 	'2': 'archive.png',
 	'-2': 'trash.png',
 	'u': 'unknown.png'
+};
+var fc_state_icons = {
+	'1': 'publish',
+	'-5': 'checkmark-2',
+	'0': 'unpublish',
+	'-3': 'clock',
+	'-4': 'pencil-2',
+	'2': 'archive',
+	'-2': 'trash',
+	'u': 'question-2'
 };
 var fc_state_descrs;
 
@@ -62,49 +34,111 @@ jQuery(document).ready(function() {
 	};
 });
 
-var fc_stateSelector_box;
 
-function fc_toggleStateSelector(el)
+
+var fc_statehandler_singleton = false;
+
+jQuery(document).mouseup(function(event)
 {
-	var ops = jQuery(el).parent().find('.options');
-	fc_stateSelector_box = jQuery(el).closest('.statetoggler');
-
-	if ( ops.is(':hidden') )
-	{
-		fc_stateSelector_box.addClass('active');
-
-		if (ops.children().length == 0)
-		{
-			var html = '<div>' + Joomla.JText._('FLEXI_ACTION') + '</div>';
-			var iid = ops.data('id');
-			var states = ops.data('st');
-			jQuery(states).each(function(index, item){
-				html += '<span onclick="fc_setitemstate(\'' + item.i + '\', \'' + iid + '\')"><img src="' + fc_statehandler_img_path + fc_state_imgs[item.i] + '">' + fc_state_descrs[item.i] + '</span>';
-			});
-			jQuery(html).appendTo(ops);
-		}
-	}
-
-	else
-	{
-		fc_stateSelector_box.removeClass('active');
-		fc_stateSelector_box = null;
-	}
-	ops.slideToggle(200);
-}
-
-
-function fc_closeStateSelector (e)
-{
-	if (!fc_stateSelector_box) return;  // no open container
-	if (fc_stateSelector_box.is(e.target)) return;  // if target of the click is the container
-	if (fc_stateSelector_box.has(e.target).length !== 0) return; // if target of click is a descendant of the container
-
-	fc_stateSelector_box.find('.stateopener').click();
-	fc_stateSelector_box = null;
-}
-
-jQuery(document).mouseup(function (e)
-{
-	fc_closeStateSelector(e);
+	if (fc_statehandler_singleton) fc_statehandler_singleton.closeSelector(event);
 });
+
+
+
+var fc_statehandler = function(options)
+{
+	this.options = {
+		id: '',
+		script_url: 'index.php?option=com_flexicontent&format=raw',
+		task: '',
+		state: '',
+		font_icons: true
+	};
+	
+	if( typeof options !== 'undefined') for (var key in options)
+	{
+		this.options[key] = options[key];  //window.console.log(key, options[key]);
+	};
+
+
+	this.setState = function(state, id)
+	{
+		var row = jQuery('#row' + id);
+		var toggler = row.closest('.statetoggler');
+
+		row.next().hide();
+		row.empty().addClass('ajax-loader');
+
+		toggler.removeClass('active');
+		toggler.css('z-index', '');
+		this.active_selector_box = null;
+
+		jQuery.ajax({
+			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state,
+			dataType: 'html',
+			data: {
+				lang: (typeof _FC_GET !='undefined' && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+			},
+			success: function( data )
+			{
+				jQuery('#row' + id).removeClass('ajax-loader').html(data);
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
+	};
+
+
+	this.toggleSelector = function(el)
+	{
+		if (!fc_statehandler_singleton) return;
+
+		var toggler = jQuery(el).closest('.statetoggler');
+		var ops = toggler.find('.options');
+
+		if ( ops.is(':hidden') )
+		{
+			this.active_selector_box = null;
+
+			toggler.addClass('active');
+			toggler.css('z-index', 100); // should 3 or more
+
+			if (ops.children().length == 0)
+			{
+				var html = '';//'<div>' + Joomla.JText._('FLEXI_ACTION') + '</div>';
+				var iid = ops.data('id');
+				var states = ops.data('st');
+				jQuery(states).each(function(index, item){
+					html += fc_statehandler_singleton.options.font_icons
+						? '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><span class="icon-' + fc_state_icons[item.i] + '"></span>' + fc_state_descrs[item.i] + '</span>'
+						: '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><img src="' + fc_statehandler_singleton.options.img_path + fc_state_imgs[item.i] + '"/>' + fc_state_descrs[item.i] + '</span>';
+				});
+				jQuery(html).appendTo(ops);
+			}
+			this.active_selector_box = toggler;
+		}
+		else
+		{
+			this.active_selector_box = null;
+
+			setTimeout(function(){
+				toggler.removeClass('active');
+				toggler.css('z-index', '');
+			}, 200);
+		}
+		ops.slideToggle(200);
+	};
+
+
+	this.closeSelector = function(event)
+	{
+		if (!this.active_selector_box) return;  // no open container
+		if (this.active_selector_box.is(event.target)) return;  // if target of the click is the container
+		if (this.active_selector_box.has(event.target).length !== 0) return; // if target of click is a descendant of the container
+	
+		this.active_selector_box.find('.stateopener').click();
+		this.active_selector_box = null;
+	};
+};
+

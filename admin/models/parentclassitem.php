@@ -4647,74 +4647,51 @@ class ParentClassItem extends JModelAdmin
 		$pks = (array) $pks;
 		JArrayHelper::toInteger($pks);
 
-		if (empty($pks)) {
-			$this->setError(JText::_('NO item selected'));
+		if (empty($pks))
+		{
+			$this->setError(JText::_('FLEXI_NO_ITEMS_SELECTED'));
 			return false;
 		}
-		
-		$table = $this->getTable('flexicontent_content_frontpage', '');
 
+		$db = $this->getDbo();
 		try {
-			$db = $this->getDbo();
+			$query = 'UPDATE #__%s SET featured = ' . (int)$value . ' WHERE id IN ('.implode(',', $pks).')';
+			$db->setQuery(sprintf($query, 'content'))->execute();
+			$db->setQuery(sprintf($query, 'flexicontent_items_tmp'))->execute();
 
-			$db->setQuery(
-				'UPDATE #__content' .
-				' SET featured = '.(int) $value.
-				' WHERE id IN ('.implode(',', $pks).')'
-			);
-			if (!$db->execute()) {
-				throw new Exception($db->getErrorMsg());
+			// Adjust the mapping table, clear the existing features settings
+			if ((int)$value == 0)
+			{
+				$db->setQuery('DELETE FROM #__content_frontpage WHERE content_id IN ('.implode(',', $pks).')')->execute();
 			}
-
-			if ((int)$value == 0) {
-				// Adjust the mapping table.
-				// Clear the existing features settings.
-				$db->setQuery(
-					'DELETE FROM #__content_frontpage' .
-					' WHERE content_id IN ('.implode(',', $pks).')'
-				);
-				if (!$db->execute()) {
-					throw new Exception($db->getErrorMsg());
-				}
-			} else {
+			else
+			{
 				// first, we find out which of our new featured articles are already featured.
-				$query = $db->getQuery(true);
-				$query->select('f.content_id');
-				$query->from('#__content_frontpage AS f');
-				$query->where('content_id IN ('.implode(',', $pks).')');
-				//echo $query;
-				$db->setQuery($query);
-
-				if (!is_array($old_featured = $db->loadColumn())) {
-					throw new Exception($db->getErrorMsg());
-				}
+				$db->setQuery('SELECT f.content_id FROM #__content_frontpage AS f WHERE content_id IN ('.implode(',', $pks).')');
 
 				// we diff the arrays to get a list of the articles that are newly featured
+				$old_featured = $db->loadColumn();
 				$new_featured = array_diff($pks, $old_featured);
 
 				// Featuring.
 				$tuples = array();
-				foreach ($new_featured as $pk) {
-					$tuples[] = '('.$pk.', 0)';
-				}
-				if (count($tuples)) {
+				foreach ($new_featured as $pk) $tuples[] = '('.$pk.', 0)';
+				if (count($tuples))
+				{
 					$db->setQuery(
-						'INSERT INTO #__content_frontpage ('.$db->quoteName('content_id').', '.$db->quoteName('ordering').')' .
-						' VALUES '.implode(',', $tuples)
-					);
-					if (!$db->execute()) {
-						$this->setError($db->getErrorMsg());
-						return false;
-					}
+						'INSERT INTO #__content_frontpage '
+						.'('.$db->quoteName('content_id').', '.$db->quoteName('ordering').')'
+						.' VALUES '.implode(',', $tuples)
+					)->execute();
 				}
 			}
-
-		} catch (Exception $e) {
+		}
+		catch (Exception $e) {
 			$this->setError($e->getMessage());
 			return false;
 		}
 
-		$table->reorder();
+		$this->getTable('flexicontent_content_frontpage', '')->reorder();
 		$this->cleanCache(null, 0);
 		$this->cleanCache(null, 1);
 		return true;

@@ -4,15 +4,6 @@
 	margin-bottom: 24px;   /* needed because of Joomla's bottom info bar overlaping the content */
 }
 
-.flexicontent [class^="icon-"]:before,
-.flexicontent [class*=" icon-"]:before {
-	font-size: 14px;
-	vertical-align: bottom;
-}
-.flexicontent [class^="icon-"],
-.flexicontent [class*=" icon-"] {
-	width: 16px;
-}
 
 
 /***********
@@ -1207,12 +1198,20 @@ img.btn.btn-small.fc-man-icon-s {
 }
 
 .adminlist.fcmanlist .btn.btn-small {
-	padding: 2px 3px 3px 4px;
-	border-radius: 3px;
+	padding: 2px 2px 1px 3px;
+	font-size: 14px;
+}
+.adminlist.fcmanlist .btn.btn-micro {
+	padding: 2px 1px 1px 2px;
+	font-size: 12px;
 }
 .adminlist.fcmanlist .btn.btn-small [class^="icon-"],
 .adminlist.fcmanlist .btn.btn-small [class*="icon-"] {
 	margin: 0;
+}
+.adminlist.fcmanlist th [class^="icon-"],
+.adminlist.fcmanlist th [class*="icon-"] {
+	font-size: 14px;
 }
 
 .adminlist.fcmanlist .btn.btn-small.fc-assignments-btn {
