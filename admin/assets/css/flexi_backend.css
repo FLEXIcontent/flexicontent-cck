@@ -971,30 +971,30 @@ img.btn.btn-small.fc-man-icon-s {
 }
 .btn.btn-micro.fc-man-icon-s {
 	border-radius: 3px;
-	padding: 3px;
-}
-.adminlist.fcmanlist .btn.btn-small.preview img.fc-man-icon-s {
-	margin-top: 1px;
-	margin-bottom: -1px;
+	padding: 2px;
 }
 .adminlist.fcmanlist .btn.btn-small img.fc-man-icon-s {
 	float: left;
 }
-.adminlist.fcmanlist .btn.btn-small {
+.adminlist.fcmanlist .btn.btn-small.fc-preview-btn img.fc-man-icon-s {
+	margin-top: 1px;
+	margin-bottom: -1px;
+}
+.adminlist.fcmanlist th :not(.btn-group) > [class^="icon-"],
+.adminlist.fcmanlist th :not(.btn-group) > [class*="icon-"] {
+	font-size: 14px;
+}
+.adminlist.fcmanlist :not(.btn-group) > .btn.btn-small {
 	padding: 2px 2px 1px 3px;
 	font-size: 14px;
 }
-.adminlist.fcmanlist .btn.btn-micro {
+.adminlist.fcmanlist :not(.btn-group) > .btn.btn-micro {
 	padding: 2px 1px 1px 2px;
 	font-size: 12px;
 }
-.adminlist.fcmanlist .btn.btn-small [class^="icon-"],
-.adminlist.fcmanlist .btn.btn-small [class*="icon-"] {
-	margin: 0;
-}
-.adminlist.fcmanlist th [class^="icon-"],
-.adminlist.fcmanlist th [class*="icon-"] {
-	font-size: 14px;
+.adminlist.fcmanlist :not(.btn-group) > .btn.btn-mini {
+	padding: 1px 1px 0px 2px;
+	font-size: 10px;
 }
 .adminlist.fcmanlist .btn.btn-small.fc-assignments-btn {
 	min-width: 50px;

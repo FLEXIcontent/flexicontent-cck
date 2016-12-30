@@ -1131,7 +1131,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				
 					<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
 					<td>
-						<a class="btn btn-mini" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }" style="padding: 4px;">
+						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
 							<span class="icon-remove" title="<?php echo JText::_('FLEXI_REMOVE'); ?>"></span>
 						</a>
 					</td>
@@ -1294,15 +1294,15 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 			<table class="fc_uploader_header_tbl">
 				<tr class="fc-about-size-limits">
 					<td>
-						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'" data-placement="top">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
 					</td>
 					<td>
 						<span class="fc-sys-upload-limit-box fc-about-conf-size-limit">
 							<span class="icon-database"></span>
-							<span class="'.$conf_limit_class.' '.$tip_class.'" style="margin-right: 4px; '.$conf_limit_style.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'">'.round($upload_maxsize / (1024*1024), 2).'</span> <span class="fc_hidden_580">MBytes</span>
+							<span class="'.$conf_limit_class.'" style="margin-right: 4px; '.$conf_limit_style.'">'.round($upload_maxsize / (1024*1024), 2).'</span> <span class="fc_hidden_580">MBytes</span>
 						</span>
 						'.($perms->SuperAdmin ?
-							'<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'"></span>
+							'<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'" data-placement="top"></span>
 						' : '').'
 						'.($server_limit_exceeded && ! $enable_multi_uploader ? /* plupload JS overcomes server limitations so we will not display it, if using plupload*/
 						'
@@ -1327,16 +1327,16 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				'.($resize_on_upload ? '
 				<tr class="fc-about-dim-limits">
 					<td>
-						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$tip_class.'" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
 							'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'
-							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
+							<span class="icon-image pull-right" style="margin:2px -4px 0px 8px"></span>
 						</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-contract-2"></span>
 							<span class="'.$sys_limit_class.'" style="margin-right: 4px;">'.$upload_max_w.'x'.$upload_max_h.'</span> <span class="fc_hidden_580">Pixels</span>
-							<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC', '', 1, 1).'"></span>
+							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.JText::_('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC').'" data-placement="top"></span>
 						</span>
 					</td>
 					<td>
@@ -1345,16 +1345,16 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 				<tr class="fc-about-crop-quality-limits">
 					<td>
-						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$tip_class.'" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
 							'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'
-							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
+							<span class="icon-image pull-right" style="margin:2px -4px 0px 8px"></span>
 						</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-scissors" style="margin-right: 4px;'.($upload_method ? '' : 'opacity: 0.3;').'"></span>
-							<span class="'.$tip_class.'" style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
-							<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FIT_METHOD_DESC', '', 1, 1).'"></span>
+							<span style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
+							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.JText::_('FLEXI_UPLOAD_FIT_METHOD_DESC').'" data-placement="top"></span>
 						</span>
 					</td>
 					<td>

@@ -145,7 +145,7 @@ body .fc-mssg-inline.fc-nomargin {
  * State Toggler
  ****************/
 
-#flexicontent div.statetoggler {
+div.statetoggler {
 	position: relative;
 	float: none;
 	padding: 4px 4px;
@@ -599,6 +599,11 @@ body .fc-nowrap-box,
 	width: 64px !important;
 }
 
+.ntxt [class^="icon-"],
+.ntxt [class*="icon-"] {
+	margin: 0;
+}
+
 body .btn-group.fc_btn_group > .btn.btn-small {
 	padding: 4px 4px;
 	line-height: 14px;
@@ -608,14 +613,15 @@ body .btn-group.fc_btn_group > .btn.btn-small {
 
 div.statetoggler [class^="icon-"], 
 div.statetoggler [class*=" icon-"], 
+div.statetoggler_disabled [class^="icon-"], 
+div.statetoggler_disabled [class*=" icon-"], 
 body .btn-group.fc_btn_group > .btn.btn-small [class^="icon-"],
 body .btn-group.fc_btn_group > .btn.btn-small [class*=" icon-"] {
-	margin: 0;
 	font-size: 14px;
 }
 
-body .btn-group.fc_btn_group > .preview.btn.btn-small,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-small {	
+body .btn-group.fc_btn_group > .fc-preview-btn.btn.btn-small,
+body .btn-group.fc_btn_group > div.statetoggler_disabled.btn.btn-small,
+body .btn-group.fc_btn_group > div.statetoggler.btn.btn-small {	
 	padding: 4px 8px;
 }

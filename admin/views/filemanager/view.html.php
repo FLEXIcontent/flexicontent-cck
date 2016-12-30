@@ -181,7 +181,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($filter_item) $count_filters++;
 		
 		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
-		//if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // DO NOT SET it prevents listing and selecting files !!
+
 
 		// Text search
 		$scope  = $model->getState( 'scope' );
@@ -191,9 +191,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
 		
-		
-		
-		
+
+
+
 		// **************************
 		// Add css and js to document
 		// **************************
@@ -252,13 +252,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		{
 			$exts = $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
 			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
-			
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
-			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
-			
-			$ext = strtolower(pathinfo($newfilename, PATHINFO_EXTENSION));
-			$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$thumb_url = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1&amp;ar=x';
 		}
 		$pagination = $this->get('Pagination');
 		//$users = $this->get('Users');
@@ -415,6 +409,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->langs  = $langs;
 
 		$this->folder_mode = $folder_mode;
+		$this->assign_mode = $assign_mode;
 		$this->pagination = $pagination;
 
 		$this->CanFiles   = $perms->CanFiles;
@@ -429,6 +424,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->field   = !empty($field) ? $field : null;
 		$this->fieldid = $fieldid;
 		$this->u_item_id  = $u_item_id;
+		$this->new_file_names = $new_file_names;
 
 		$this->option = $option;
 		$this->view   = $view;
@@ -468,7 +464,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$contrl = "filemanager.";
 		JToolBarHelper::editList($contrl.'edit');
 		JToolbarHelper::checkin($contrl.'checkin');
-		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
+		JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
 		$js = "jQuery(document).ready(function(){";
 		if ($perms->CanConfig)

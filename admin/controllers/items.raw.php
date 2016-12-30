@@ -344,7 +344,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function setitemstate()
 	{
-		flexicontent_html::setitemstate($this);
+		flexicontent_html::setitemstate($this, 'json');
 	}
 	
 }

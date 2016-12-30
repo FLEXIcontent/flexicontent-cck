@@ -184,7 +184,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		if ($filter_item) $count_filters++;
 		
 		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
-		//if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // DO NOT SET it prevents listing and selecting files !!
 
 		// *** BOF FILESELEMENT view specific ***
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
@@ -199,7 +198,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$thumb_w					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_w',    			 'thumb_w',     		 120, 				'int' );
 		$thumb_h					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_h',    			 'thumb_h',     		 90, 				  'int' );
 		// *** EOF FILESELEMENT view specific ***
-		
+
 		// Text search
 		$scope  = $model->getState( 'scope' );
 		$search = $model->getState( 'search' );
@@ -211,15 +210,25 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// *** BOF FILESELEMENT view specific ***
 		$newfileid		= $jinput->get('newfileid', 0, 'int');
 
-		$newfilename = $app->getUserState('newfilename', null);
-		$app->setUserState('newfilename', null);
-
 		$delfilename = $app->getUserState('delfilename', null);
 		$app->setUserState('delfilename', null);
+
+		$session = JFactory::getSession();
+		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
+
+		$new_file_ids = $session->get($context.'ids', array());
+		$new_file_names = $session->get($context.'names', array());
+		$new_file_names = array_flip($new_file_names);
+		if (count($new_file_names))
+		{
+			$app->enqueueMessage(JText::_( 'Recently uploaded files were selected. Please click "Insert selected" to add them' ), 'notice');
+		}
+		$session->set($context.'ids', null);
+		$session->set($context.'names', null);
 		// *** BOF FILESELEMENT view specific ***
-		
-		
-		
+
+
+
 		// **************************
 		// Add css and js to document
 		// **************************
@@ -278,13 +287,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		{
 			$exts = $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
 			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
-			
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
-			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
-			
-			$ext = strtolower(pathinfo($newfilename, PATHINFO_EXTENSION));
-			$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$thumb_url = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1&amp;ar=x';
 		}
 		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
@@ -359,9 +362,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 					var rows = jQuery.find('a[data-filename=\"'+ imgobjs[i] +'\"]');
 					jQuery(rows).addClass('striketext');
 				}
-				"
-				.($autoassign && $newfilename ? "window.parent.qmAssignFile".$fieldid."('".$targetid."', '".$newfilename."', '".$thumb_url."');" : "")
-				."
+
+				".($autoassign && count($new_file_names) ? "
+				jQuery('td.is-new-file input').next().trigger('click');
+				jQuery('#insert_selected_btn').trigger('click');
+				" : "")."
 			});
 			";
 		}
@@ -415,10 +420,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 					var rows = jQuery.find('a[data-fileid=\"'+ imgids[i] +'\"]');
 					jQuery(rows).addClass('striketext');
 				}
-				
-				"
-				.(($autoselect && $newfileid) ? "newfile_data.displayname = '".$newfilename."'; newfile_data.preview = '".$file_preview."';  fc_fileselement_assign_file( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."', '".$targetid."', newfile_data);" : "")
-				."
+
+				".($autoselect && count($new_file_names) ? "
+				jQuery('td.is-new-file input').next().trigger('click');
+				jQuery('#insert_selected_btn').trigger('click');
+				" : "")."
 			});
 			";
 		}
@@ -440,7 +446,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				jQuery('#fileman_tabset').hide();
 				jQuery('#fileman_tabset').prev().show();
 				
-				window.setTimeout(function()
+				setTimeout(function()
 				{
 					fc_fileselement_close_modal = 0;
 					var row_count = 0;
@@ -469,6 +475,18 @@ class FlexicontentViewFileselement extends JViewLegacy
 				if ((typeof result) != 'undefined' && result == 'cancel') return;
 				obj.className = 'striketext';
 				document.adminForm.file.value=id;
+			}
+
+			function fc_fileselement_delete_files()
+			{
+				if (document.adminForm.boxchecked.value==0)
+				{
+					alert('". flexicontent_html::encodeHTML(JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE')), 'd')."');
+				}
+				else
+				{
+					if (confirm('".flexicontent_html::encodeHTML('FLEXI_ARE_YOU_SURE', 's')."')) Joomla.submitbutton('filemanager.remove');
+				}
 			}
 		";
 
@@ -633,6 +651,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->field   = !empty($field) ? $field : null;
 		$this->fieldid = $fieldid;
 		$this->u_item_id  = $u_item_id;
+		$this->new_file_names = $new_file_names;
 
 		$this->option = $option;
 		$this->view   = $view;

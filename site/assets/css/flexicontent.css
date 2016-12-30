@@ -722,7 +722,7 @@ body .fc-mssg.fc-noborder {
 body .fc-mssg-inline.fc-nomargin {
 	margin: 1px 0 2px 0;
 }
-#flexicontent div.statetoggler {
+div.statetoggler {
 	position: relative;
 	float: none;
 	padding: 4px 4px;
@@ -731,14 +731,14 @@ body .fc-mssg-inline.fc-nomargin {
 	line-height: 14px;
 	height: 14px;
 }
-#flexicontent div.statetoggler .icon-publish:before,
-#flexicontent div.statetoggler .icon-checkmark-2:before {
+div.statetoggler .icon-publish:before,
+div.statetoggler .icon-checkmark-2:before {
 	color: green;
 }
-#flexicontent div.statetoggler .icon-unpublish {
+div.statetoggler .icon-unpublish {
 	color: darkred;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner {
+div.statetoggler > div.statetoggler_inner {
 	position: relative;
 	background: none repeat scroll 0 0 transparent;
 	overflow: visible;
@@ -751,7 +751,7 @@ body .fc-mssg-inline.fc-nomargin {
 	min-height: auto;
 	min-width: auto;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > div.stateopener {
+div.statetoggler > div.statetoggler_inner > div.stateopener {
 	line-height: auto;
 	height: auto;
 	width: auto;
@@ -763,12 +763,12 @@ body .fc-mssg-inline.fc-nomargin {
 	vertical-align: baseline;
 	cursor: pointer;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
+div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
 	background-position: center;
 	padding: 8px;
 	margin: -1px -1px -1px -1px;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > div.stateopener img {
+div.statetoggler > div.statetoggler_inner > div.stateopener img {
 	padding: 0;
 	margin: 0;
 	border: none;
@@ -778,7 +778,7 @@ body .fc-mssg-inline.fc-nomargin {
 	min-width: 16px;
 	border-width: 0;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > .options {
+div.statetoggler > div.statetoggler_inner > .options {
 	padding: 4px 0;
 	margin: 2px 0;
 	background: white;
@@ -792,8 +792,8 @@ body .fc-mssg-inline.fc-nomargin {
 	box-shadow: 2px 4px 4px gray;
 	box-sizing: border-box;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > div,
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > span {
+div.statetoggler > div.statetoggler_inner > .options > div,
+div.statetoggler > div.statetoggler_inner > .options > span {
 	position: relative;
 	float: left;
 	clear: both;
@@ -815,24 +815,24 @@ body .fc-mssg-inline.fc-nomargin {
 	vertical-align: middle;
 	cursor: pointer;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > div {
+div.statetoggler > div.statetoggler_inner > .options > div {
 	text-align: center;
 	font-weight: bold;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > span:hover {
+div.statetoggler > div.statetoggler_inner > .options > span:hover {
 	background-color: #e7e7e7;
 	background-image: linear-gradient(to bottom,#f0f0f0,#d0d0d0);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d0d0d0);
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > span > span,
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > span > span,
+div.statetoggler > div.statetoggler_inner > .options > span > img {
 	max-width: unset;
 	padding: 0;
 	margin: 0 .5em 0 0;
 	border: none;
 	box-sizing: unset;
 }
-#flexicontent div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > span > img {
 	display: unset;
 }
 #flexicontent .qf_ratingbarcontainer {
@@ -1126,6 +1126,10 @@ body .fc-nowrap-box,
 	height: 64px !important;
 	width: 64px !important;
 }
+.ntxt [class^="icon-"],
+.ntxt [class*="icon-"] {
+	margin: 0;
+}
 body .btn-group.fc_btn_group > .btn.btn-small {
 	padding: 4px 4px;
 	line-height: 14px;
@@ -1134,14 +1138,15 @@ body .btn-group.fc_btn_group > .btn.btn-small {
 }
 div.statetoggler [class^="icon-"],
 div.statetoggler [class*=" icon-"],
+div.statetoggler_disabled [class^="icon-"],
+div.statetoggler_disabled [class*=" icon-"],
 body .btn-group.fc_btn_group > .btn.btn-small [class^="icon-"],
 body .btn-group.fc_btn_group > .btn.btn-small [class*=" icon-"] {
-	margin: 0;
 	font-size: 14px;
 }
-body .btn-group.fc_btn_group > .preview.btn.btn-small,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler_disabled,
-#flexicontent .btn-group.fc_btn_group > div.statetoggler.btn.btn-small {
+body .btn-group.fc_btn_group > .fc-preview-btn.btn.btn-small,
+body .btn-group.fc_btn_group > div.statetoggler_disabled.btn.btn-small,
+body .btn-group.fc_btn_group > div.statetoggler.btn.btn-small {
 	padding: 4px 8px;
 }
 input.fc-inherited-value + label {
@@ -1160,6 +1165,12 @@ div.fc-inherited-value {
 	top: 40px;
 	left: 30px;
 	overflow: auto;
+}
+body > #system-message-container {
+	margin: 6px 0 0 0;
+}
+body > #system-message-container .alert {
+	margin: 0;
 }
 .flexicontent .calendar {
 	vertical-align: middle;
