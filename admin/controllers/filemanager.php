@@ -401,21 +401,15 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		// Add information about uploaded file data into the session
-		$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
-		if ($filter_item)
-		{
-			$context = 'fileselement.item_'.$filter_item.'.uploaded_files.';
+		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
 
-			$_file_ids = $session->get($context.'ids', array());
-			$_file_ids[] = $file_id;
-			$session->set($context.'ids', $_file_ids);
+		$_file_ids = $session->get($context.'ids', array());
+		$_file_ids[] = $file_id;
+		$session->set($context.'ids', $_file_ids);
 
-			$_file_names = $session->get($context.'names', array());
-			$_file_names[] = $filename;
-			$session->set($context.'names', $_file_names);
-		}
-		// TODO remove this and use the above ...
-		$app->setUserState('newfilename', $filename);
+		$_file_names = $session->get($context.'names', array());
+		$_file_names[] = $filename;
+		$session->set($context.'names', $_file_names);
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
@@ -514,23 +508,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Get id of new file record
 		$file_id = (int) $db->insertid();
 
-		$filter_item = $app->getUserStateFromRequest( $this->option . '.fileselement.item_id', 'item_id', '', 'int' );
-
 		// Add information about added (URL) file data into the session
-		if ($filter_item)
-		{
-			$context = 'fileselement.item_'.$filter_item.'.added_urls.';
+		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
 
-			$_file_ids = $session->get($context.'ids', array());
-			$_file_ids[] = $file_id;
-			$session->set($context.'ids', $_file_ids);
+		$_file_ids = $session->get($context.'ids', array());
+		$_file_ids[] = $file_id;
+		$session->set($context.'ids', $_file_ids);
 
-			$_file_names = $session->get($context.'names', array());
-			$_file_names[] = $filename;
-			$session->set($context.'names', $_file_names);
-		}
-		// TODO remove this and use the above ...
-		$app->setUserState('newfilename', $filename);
+		$_file_names = $session->get($context.'names', array());
+		$_file_names[] = $filename;
+		$session->set($context.'names', $_file_names);
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
@@ -793,99 +780,142 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
 		$file_mode  = $this->input->get('folder_mode', 0, 'int') ? 'folder_mode' : 'db_mode';
 
+		// Check for zero selected records
+		$cid = $this->input->get('cid', array(), 'array');
+		if ($file_mode != 'folder_mode')
+		{
+			JArrayHelper::toInteger($cid, array()); // These are file ids, for DB-mode
+		}
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
+			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_SELECT_ITEM_DELETE') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
+		}
+
+		// Different handling for folder_mode
 		if ($file_mode == 'folder_mode')
 		{
-			$filename = rawurldecode( $this->input->get('filename', '', 'cmd') );
-			// Default 'CMD' filtering is maybe too aggressive, but allowing UTF8 will not work in all filesystems, so we do not allow
-			//$filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
-
-			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
-			$field = $db->loadObject();
+			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id=' . $fieldid)->loadObject();
 			$field->parameters = new JRegistry($field->attribs);
 			$field->item_id = $u_item_id;
 			
-			$result = FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array( &$field, $filename ) );
-			
-			if ( !$result ) {
-				JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_CLEANUP_ORIGINAL_FILE' ) .": ". $path);
-				$msg = '';
-			} else {
-				$msg = JText::_( 'FLEXI_FILES_DELETED' );
+			$failed_files = array();
+			foreach($cid as $filename)
+			{
+				$filename = rawurldecode($filename);
+
+				// Default 'CMD' filtering is maybe too aggressive, but allowing UTF8 will not work in all filesystems, so we do not allow
+				//$filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
+
+				if (!FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array(&$field, $filename)))
+				{
+					$failed_files[] = $filename;
+				}
 			}
 
-			// TODO revise, this after implementing multi-file deletion for fileselement 'folder' mode
-			$app->setUserState('delfilename', $filename);
-			$this->setRedirect( $_SERVER['HTTP_REFERER'], $msg );
-			return;
+			$failed_msg = !count($failed_files) ? '' : JText::_('FLEXI_UNABLE_TO_CLEANUP_ORIGINAL_FILE') .': '. implode(', ', $failed_files);
+			$delete_count = count($cid) - count($failed_files);
+			if ($delete_count)
+			{
+				$this->exitHttpHead = array( 0 => array('status' => '200 OK') );
+				$this->exitMessages = array( 0 => array('message' => $delete_count .' '. JText::_('FLEXI_FILES_DELETED')) );
+				if (count($failed_files)) $app->enqueueMessage($failed_msg, 'warning');
+			}
+			else
+			{
+				$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
+				$this->exitMessages = array( 0 => array('error' => $failed_msg) );
+			}
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = count($failed_files) == 0;	
+
+			return $this->terminate($file_id, $exitMessages);
 		}
 		
-		// calculate access
+		// Calculate access
 		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
 		$candeleteown = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
 		$is_authorised = $candelete || $candeleteown;
 		
-		// check access
+		// Check access
 		if ( !$is_authorised )
 		{
-			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect( $this->returnURL, '');
-			return;
+			$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
 		}
 
-		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid, array());
+		$msg = '';
 
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
-		}
-		
-		else {
-			$msg = '';
-			
-			$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
-			$files = $db->loadObjectList('id');
-			$cid = array_keys($files);
-			
-			$model = $this->getModel('filemanager');
-			$deletable = $model->getDeletable($cid);
-			
-			if (count($cid) != count($deletable))
+		$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
+		$files = $db->loadObjectList('id');
+		$cid = array_keys($files);
+
+		$model = $this->getModel('filemanager');
+		$deletable = $model->getDeletable($cid);
+
+
+		// Find files that are currently in use
+		if (count($cid) != count($deletable))
+		{
+			$_del = array_flip($deletable);
+			$inuse_files = array();
+			foreach ($files as $_id => $file)
 			{
-				$_del = array_flip($deletable);
-				$inuse_files = array();
-				foreach ($files as $_id => $file) if ( !isset($_del[$_id]) )  $inuse_files[] = $file->filename_original ? $file->filename_original : $file->filename;
-				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_REMOVE_FILES_IN_USE' ) .': '. implode(', ', $inuse_files), 'warning');
-				$cid = $deletable;
+				if (isset($_del[$_id])) continue;
+				$inuse_files[] = $file->filename_original ? $file->filename_original : $file->filename;
 			}
-			
-			$allowed_files = array();
-			$denied_files = array();
-			foreach($cid as $_id) {
-				if ( !isset($files[$_id]) ) continue;
-				$filename = $files[$_id]->filename_original ? $files[$_id]->filename_original : $files[$_id]->filename;
-				if ($candelete || $files[$_id]->uploaded_by == $user->get('id'))
-					$allowed_files[$_id] = $filename;
-				else
-					$denied_files[$_id] = $filename;
-			}
-			if ( count($denied_files) ) {
-				$app->enqueueMessage( ' You are not allowed to delete files: '. implode(', ', $denied_files), 'warning');
-			}
-			$allowed_cid = array_keys($allowed_files);
-			
-			if (count($allowed_cid) && !$model->delete($allowed_cid)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-			
-			if (count($allowed_cid)) $msg .= count($allowed_cid).' '.JText::_( 'FLEXI_FILES_DELETED' );
-			
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
+			$app->enqueueMessage(JText::_('FLEXI_CANNOT_REMOVE_FILES_IN_USE') .': '. implode(', ', $inuse_files), 'warning');
+			$cid = $deletable;
 		}
-		
-		$this->setRedirect( $this->returnURL, $msg );
+
+
+		// Find files allowed to be deleted
+		$allowed_files = array();
+		$denied_files = array();
+		foreach($cid as $_id)
+		{
+			if ( !isset($files[$_id]) ) continue;
+			$filename = $files[$_id]->filename_original ? $files[$_id]->filename_original : $files[$_id]->filename;
+
+			// Note: component 'deleteownfile' was checked above
+			if ($candelete || $files[$_id]->uploaded_by == $user->get('id'))
+				$allowed_files[$_id] = $filename;
+			else
+				$denied_files[$_id] = $filename;
+		}
+		if (count($denied_files))
+		{
+			$app->enqueueMessage( ' You are not allowed to delete files: '. implode(', ', $denied_files), 'warning');
+		}
+		$allowed_cid = array_keys($allowed_files);
+
+
+		// Check for error during delete operation
+		if (count($allowed_cid) && !$model->delete($allowed_cid))
+		{
+			$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
+			$this->exitMessages = array( 0 => array('error' => JText::_('FLEXI_OPERATION_FAILED').' : '.$model->getError()) );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate($file_id, $exitMessages);
+		}
+		if (count($allowed_cid)) $msg .= count($allowed_cid).' '.JText::_( 'FLEXI_FILES_DELETED' );
+
+
+		// Clear cache and return
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+
+		$this->setRedirect($this->returnURL, $msg);
 	}
 
 

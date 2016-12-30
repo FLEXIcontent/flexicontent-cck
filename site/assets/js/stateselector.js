@@ -35,16 +35,6 @@ jQuery(document).ready(function() {
 });
 
 
-
-var fc_statehandler_singleton = false;
-
-jQuery(document).mouseup(function(event)
-{
-	if (fc_statehandler_singleton) fc_statehandler_singleton.closeSelector(event);
-});
-
-
-
 var fc_statehandler = function(options)
 {
 	this.options = {
@@ -61,27 +51,24 @@ var fc_statehandler = function(options)
 	};
 
 
+	// *** AJAX request to set new item state
 	this.setState = function(state, id)
 	{
 		var row = jQuery('#row' + id);
 		var toggler = row.closest('.statetoggler');
 
-		row.next().hide();
 		row.empty().addClass('ajax-loader');
-
-		toggler.removeClass('active');
-		toggler.css('z-index', '');
-		this.active_selector_box = null;
 
 		jQuery.ajax({
 			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state,
-			dataType: 'html',
+			dataType: 'json',
 			data: {
 				lang: (typeof _FC_GET !='undefined' && 'lang' in _FC_GET ? _FC_GET['lang']: '')
 			},
 			success: function( data )
 			{
-				jQuery('#row' + id).removeClass('ajax-loader').html(data);
+				row.removeClass('ajax-loader').html(data.html);
+				toggler.attr('data-original-title', data.title);
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
@@ -90,11 +77,12 @@ var fc_statehandler = function(options)
 	};
 
 
+	// *** Toggle drop down selector display, and populate available options if this is not already done
 	this.toggleSelector = function(el)
 	{
 		if (!fc_statehandler_singleton) return;
 
-		var toggler = jQuery(el).closest('.statetoggler');
+		var toggler = jQuery(el);
 		var ops = toggler.find('.options');
 
 		if ( ops.is(':hidden') )
@@ -131,14 +119,22 @@ var fc_statehandler = function(options)
 	};
 
 
+	// *** Detect click outside container and close any open selector
 	this.closeSelector = function(event)
 	{
 		if (!this.active_selector_box) return;  // no open container
 		if (this.active_selector_box.is(event.target)) return;  // if target of the click is the container
 		if (this.active_selector_box.has(event.target).length !== 0) return; // if target of click is a descendant of the container
-	
-		this.active_selector_box.find('.stateopener').click();
+
+		this.active_selector_box.click();
 		this.active_selector_box = null;
 	};
 };
 
+
+var fc_statehandler_singleton = false;
+
+jQuery(document).mouseup(function(event)
+{
+	if (fc_statehandler_singleton) fc_statehandler_singleton.closeSelector(event);
+});

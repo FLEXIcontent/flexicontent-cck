@@ -2003,7 +2003,7 @@ class FlexicontentController extends JControllerLegacy
 	function setitemstate()
 	{
 		// Helper method also checks access, according to user ACL
-		flexicontent_html::setitemstate($this);
+		flexicontent_html::setitemstate($this, 'json');
 	}
 
 

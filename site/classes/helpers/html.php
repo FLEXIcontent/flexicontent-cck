@@ -1789,7 +1789,7 @@ class flexicontent_html
 	 * @return void
 	 * @since 1.0
 	 */
-	static function setitemstate( $controller_obj )
+	static function setitemstate($controller_obj, $type = 'html')
 	{
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
@@ -1839,7 +1839,7 @@ class flexicontent_html
 		// Output new state icon and terminate
 		$tmpparams = new JRegistry();
 		$tmpparams->set('stateicon_popup', 'basic');
-		$stateicon = flexicontent_html::stateicon($state, $tmpparams);
+		$stateicon = flexicontent_html::stateicon($state, $tmpparams, $type);
 		jexit($stateicon);
 	}
 
@@ -2388,7 +2388,7 @@ class flexicontent_html
 		$state = $item->state;
 		if ( !isset($state_names[$state]) ) $state = 'u';
 		$state_text ='';
-		$stateicon = flexicontent_html::stateicon($state, $icon_params, $state_text);
+		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text);
 
 
 		$tz_string = JFactory::getApplication()->getCfg('offset');
@@ -2444,9 +2444,9 @@ class flexicontent_html
 			}
 			$tooltip_title = flexicontent_html::getToolTip($state_text ? $state_text : JText::_( 'FLEXI_PUBLISH_INFORMATION' ), ' &nbsp; '.implode("\n<br/> &nbsp; \n", $publish_info).'<br/>'.$jtext['change_state'], 0);
 			$output = '
-			<div class="statetoggler '.$button_classes.'">
+			<div class="statetoggler '.$button_classes.' '.$tooltip_class.'" '.($tooltip_place ? ' data-placement="'.$tooltip_place.'"' : '').' title="'.$tooltip_title.'" onclick="fc_statehandler_singleton.toggleSelector(this)">
 				<div class="statetoggler_inner">
-					<div onclick="fc_statehandler_singleton.toggleSelector(this)" id="row'.$item->id.'" class="stateopener '.$tooltip_class.'" '.($tooltip_place ? ' data-placement="'.$tooltip_place.'"' : '').' title="'.$tooltip_title.'">
+					<div id="row'.$item->id.'" class="stateopener ntxt">
 						'.$stateicon.'
 					</div>
 					<div class="options" data-id="'.$item->id.'" data-st="'.htmlspecialchars(json_encode($state_data), ENT_COMPAT, 'UTF-8').'">'/*.implode('', $allowed_states)*/.'</div>
@@ -2779,7 +2779,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function stateicon($state, $params, &$state_text=null)
+	static function stateicon($state, $params, $type = 'html', &$state_text=null)
 	{
 		static $jtext_state = null;
 		static $tooltip_class = ' hasTooltip';
@@ -2821,32 +2821,44 @@ class flexicontent_html
 		if (!$params->get('show_icons', 1)) return $state_names[$state];
 
 		// Return cached icon if already calculated
-		$popup_type = $params->get('stateicon_popup', 'full');
+		$popup_type = $type == 'json' ? 'basic' : $params->get('stateicon_popup', 'full');
 		if ( isset($state_icons[$state][$popup_type]) ) return $state_icons[$state][$popup_type];
 
-		// Create popup text
+		// If using font icons
 		$use_font = $params->get('use_font_icons', 1);
 		$icon_class = $use_font ? 'icon-'.$font_icons[$state] : '';
+
+		// Create output
+		$data = array();
 		switch ( $popup_type )
 		{
-			case 'basic':
-				$attribs = ($icon_class ? ' class="'.$icon_class.'" ' : '') . ' title="'.$state_basictips[$state].'"';
-				break;
 			case 'none':
-				$attribs = $icon_class ? ' class="'.$icon_class.'" ' : '';
+				$data['class'] = $icon_class;
 				break;
+			case 'basic':
 			case 'full': default:
-				$attribs = ($use_font
-					? ' class="'.$icon_class . ' ' . $tooltip_class.'"'
-					: ' class="fc_stateicon ' . $tooltip_class.'"'
-				) . ' title="'.$state_fulltips[$state].'"';
+				$data['class'] = $icon_class. ' ' . ($popup_type != 'basic' ? $tooltip_class : '');
+				$data['title'] = $state_basictips[$state];
 				break;
 		}
 
-		// Create state icon image and return it
+		// Special case return uncached JSON encoded data
+		if ($type == 'json')
+		{
+			$data['html'] = $use_font
+				? '<span class="'.$data['class'].'"></span>'
+				: JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '');
+			unset($data['class']);
+			return json_encode($data);
+		}
+
+		// Create state icon image, cache it and return it
+		$tag_attribs = '';
+		foreach($data as $key => $val) $tag_attribs .= ' ' . $key . '="' . $val . '" ';
 		$state_icons[$state][$popup_type] = $use_font
-			? '<span '.$attribs.'></span>'
-			: JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $attribs);
+			? '<span '.$tag_attribs.'></span>'
+			: JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs);
+
 		return $state_icons[$state][$popup_type];
 	}
 

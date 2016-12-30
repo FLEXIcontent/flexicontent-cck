@@ -125,7 +125,7 @@ class FlexicontentViewGroups extends JViewLegacy
 			JToolBarHelper::divider();
 		}
 		if ($canDo->get('core.delete')) {
-			JToolBarHelper::deleteList('', 'groups.delete');
+			JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'groups.delete');
 			JToolBarHelper::divider();
 		}
 		

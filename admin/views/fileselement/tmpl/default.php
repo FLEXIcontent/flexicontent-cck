@@ -768,8 +768,11 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				<input type="checkbox" name="toggle" value="" id="checkall_btn" onclick="Joomla.checkAll(this); fman_set_cids(jQuery(this).prop('checked'));" />
 				<label for="checkall_btn" class="green" style="margin: 0 !important; padding-right: 12px !important; color: white">Select all</label>
 			</span>
-			<span class="btn btn-success btn-small" onclick="fc_fileselement_assign_files(jQuery(this));" style="height: 24px; line-height: 24px;">
+			<span class="btn btn-success btn-small" id="insert_selected_btn" onclick="fc_fileselement_assign_files(jQuery(this));" style="height: 24px; line-height: 24px;">
 				<span class="icon-plus"></span> <?php echo JText::_('FLEXI_FILEMAN_INSERT_SELECTED'); ?>
+			</span>
+			<span class="btn btn-small" onclick="fc_fileselement_delete_files()" style="height: 24px; line-height: 24px;">
+				<span class="icon-cancel"></span> <?php echo JText::_('FLEXI_DELETE'); ?>
 			</span>
 
 			<div class="btn-group" style="margin: 0 12px;">
@@ -945,15 +948,18 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 						"window.parent.qmAssignFile".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', !fc_fileselement_close_modal, '".$filename_original."'); document.getElementById('file".$row->id."').className='striketext';" :
 						"var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  fc_fileselement_assign_file(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', fc_fileselement_targetid, file_data);";
 					$file_assign_arr[$i] = $file_assign_link;
+
+					$row->filename_displayed = $row->filename_original ? $row->filename_original : $row->filename;
+					$isselected = isset($this->new_file_names[$row->filename_displayed]);
 		   		?>
-				<tr class="<?php echo "row$k"; ?>">
+				<tr class="<?php echo 'row'.$k; ?>">
 					<td class="center hidden-phone">
 						<div class="adminlist-table-row"></div>
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
-					<td class="center">
-						<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+					<td class="center <?php echo ($isselected ? ' is-new-file' : ''); ?>">
+						<?php echo JHtml::_('grid.id', $i, !$this->folder_mode ? $row->id : rawurlencode($filename)); ?>
 						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
 
@@ -965,7 +971,6 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 					
 					<td class="left">
 						<?php
-							$row->filename_displayed = $row->filename_original ? $row->filename_original : $row->filename;
 							if (StringHelper::strlen($row->filename_displayed) > 100) {
 								$filename_cut = htmlspecialchars(StringHelper::substr($row->filename_displayed, 100), ENT_QUOTES, 'UTF-8') . '...';
 							} else {
@@ -1075,7 +1080,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				
 					<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
 					<td>
-						<a class="btn btn-mini" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }" style="padding: 4px;">
+						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
 							<span class="icon-remove" title="<?php echo JText::_('FLEXI_REMOVE'); ?>"></span>
 						</a>
 					</td>
@@ -1240,15 +1245,15 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 			<table class="fc_uploader_header_tbl">
 				<tr class="fc-about-size-limits">
 					<td>
-						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'" data-placement="top">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
 					</td>
 					<td>
 						<span class="fc-sys-upload-limit-box fc-about-conf-size-limit">
 							<span class="icon-database"></span>
-							<span class="'.$conf_limit_class.' '.$tip_class.'" style="margin-right: 4px; '.$conf_limit_style.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'">'.round($upload_maxsize / (1024*1024), 2).'</span> <span class="fc_hidden_580">MBytes</span>
+							<span class="'.$conf_limit_class.'" style="margin-right: 4px; '.$conf_limit_style.'">'.round($upload_maxsize / (1024*1024), 2).'</span> <span class="fc_hidden_580">MBytes</span>
 						</span>
 						'.($perms->SuperAdmin ?
-							'<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'"></span>
+							'<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'" data-placement="top"></span>
 						' : '').'
 						'.($server_limit_exceeded && ! $enable_multi_uploader ? /* plupload JS overcomes server limitations so we will not display it, if using plupload*/
 						'
@@ -1273,16 +1278,16 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				'.($resize_on_upload ? '
 				<tr class="fc-about-dim-limits">
 					<td>
-						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$tip_class.'" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
 							'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'
-							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
+							<span class="icon-image pull-right" style="margin:2px -4px 0px 8px"></span>
 						</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-contract-2"></span>
 							<span class="'.$sys_limit_class.'" style="margin-right: 4px;">'.$upload_max_w.'x'.$upload_max_h.'</span> <span class="fc_hidden_580">Pixels</span>
-							<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC', '', 1, 1).'"></span>
+							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.JText::_('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC').'" data-placement="top"></span>
 						</span>
 					</td>
 					<td>
@@ -1291,16 +1296,16 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 				<tr class="fc-about-crop-quality-limits">
 					<td>
-						<div class="fc-mssg fc-info fc-nobgimage fc-about-box">
+						<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$tip_class.'" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
 							'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'
-							<span class="icon-image '.$tip_class.' pull-right" style="margin:2px -4px 0px 8px" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'"></span>
+							<span class="icon-image pull-right" style="margin:2px -4px 0px 8px"></span>
 						</div>
 					</td>
 					<td>
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-scissors" style="margin-right: 4px;'.($upload_method ? '' : 'opacity: 0.3;').'"></span>
-							<span class="'.$tip_class.'" style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
-							<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FIT_METHOD_DESC', '', 1, 1).'"></span>
+							<span style="margin-right: 4px;">'.JText::_($upload_method ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upload_quality.'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
+							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.JText::_('FLEXI_UPLOAD_FIT_METHOD_DESC').'" data-placement="top"></span>
 						</span>
 					</td>
 					<td>

@@ -81,14 +81,11 @@ class FlexicontentViewArchive extends JViewLegacy
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
-		if (FLEXI_J16GE) {
-			//JToolBarHelper::unarchiveList('archive.unarchive');
-			//JToolBarHelper::deleteList('Are you sure?', 'archive.remove');
-		} else {
-			//JToolBarHelper::unarchiveList();
-			//JToolBarHelper::deleteList();
-		}
-		if ($perms->CanConfig) {
+		//JToolBarHelper::unarchiveList('archive.unarchive');
+		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'archive.remove');
+
+		if ($perms->CanConfig)
+		{
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
