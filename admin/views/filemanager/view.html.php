@@ -190,7 +190,26 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
-		
+
+
+		// *** Get recently uploaded files
+		$newfileid		= $jinput->get('newfileid', 0, 'int');
+
+		$delfilename = $app->getUserState('delfilename', null);
+		$app->setUserState('delfilename', null);
+
+		$session = JFactory::getSession();
+		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
+
+		$new_file_ids = $session->get($context.'ids', array());
+		$new_file_names = $session->get($context.'names', array());
+		$new_file_names = array_flip($new_file_names);
+		if (count($new_file_names))
+		{
+			$app->enqueueMessage(JText::_( 'Recently uploaded files were selected. Please click "Insert selected" to add them' ), 'notice');
+		}
+		$session->set($context.'ids', null);
+		$session->set($context.'names', null);
 
 
 
