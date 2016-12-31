@@ -69,10 +69,15 @@ if ($this->folder_mode) $list_total_cols -= 7;
 // Optional columns
 if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0) $list_total_cols -= (count($this->optional_cols) - count($this->cols));
 
-// Currently multi-uploading is supported / finished only for LAYOUT 'image'
+
+// Calculated configuration values
+$isFilesElement = $this->view == 'fileselement';
+$isAdmin = $app->isAdmin();
 $_forced_secure_val = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
 $_forced_secure_int = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? '0' : '1');
-$_tmpl = $this->view == 'fileselement' ? 'component' : '';
+$_tmpl = $isFilesElement ? 'component' : '';
+$uploader_height_pad = $isFilesElement ? 320 : 460;
+
 
 $uconf = new JRegistry();
 $uconf->merge( $this->params );
@@ -84,6 +89,7 @@ if (!empty($this->field))
 $is_inline_input = strlen($uconf->get('inputmode')) && $uconf->get('inputmode', 0) == 0;
 $enable_multi_uploader = 1;
 $nonimg_message = $this->layout == 'image' ? '' : '-1';
+$uploader_tag_id = 'fc_filesman_uploader';
 
 $js = "
 jQuery(document).ready(function() {
@@ -97,7 +103,7 @@ jQuery(document).ready(function() {
 	{
 		// Show uploader's outer container
 		jQuery('#filemanager-2').show();
-		jQuery('#multiple_uploader').css('min-height', 180);
+		jQuery('#".$uploader_tag_id."').css('min-height', 180);
 
 		// Init uploader
 		showUploader();
@@ -359,7 +365,7 @@ JFactory::getDocument()->addScriptDeclaration($js);
 
 $slider_conf = new stdClass();
 $slider_conf->slider_name = $name = "fc-uploader-grid-thumb-size";
-$slider_conf->element_selector = "#multiple_uploader li.plupload_delete";
+$slider_conf->element_selector = "#".$uploader_tag_id." li.plupload_delete";
 $slider_conf->element_class_prefix = "thumb_";
 $slider_conf->values = array(90, 120, 150, 200, 250);
 $slider_conf->labels = array();
@@ -417,7 +423,7 @@ if ($enable_multi_uploader)
 		
 		// Also set filelist height
 		var max_filelist_h = 568;
-		var plupload_filelist_h = max_filelist_h > (window_h - 320) ? (window_h - 320) : max_filelist_h;
+		var plupload_filelist_h = max_filelist_h > (window_h - '.$uploader_height_pad.') ? (window_h - '.$uploader_height_pad.') : max_filelist_h;
 		jQuery(".plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)").css({ "height": plupload_filelist_h+"px" });
 	}
 
@@ -438,7 +444,7 @@ if ($enable_multi_uploader)
 		var runtimes = !is_IE8_IE9  ?  "html5,flash,silverlight,html4"  : "flash,html4";  //,silverlight,html5
 		if (!fc_file_mul_uploader && is_IE8_IE9)
 		{
-			if (!fc_has_flash_addon()) jQuery("<div class=\"alert alert-warning fc-iblock\">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</div>").insertBefore("#multiple_uploader");
+			if (!fc_has_flash_addon()) jQuery("<div class=\"alert alert-warning fc-iblock\">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</div>").insertBefore("#'.$uploader_tag_id.'");
 		}
 
 		// Already initialized
@@ -452,7 +458,7 @@ if ($enable_multi_uploader)
 		
 		else if ("'.$plupload_mode.'"=="ui")
 		{
-	    fc_file_mul_uploader = jQuery("#multiple_uploader").plupload({
+	    fc_file_mul_uploader = jQuery("#'.$uploader_tag_id.'").plupload({
 				// General settings
 				runtimes : runtimes,
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
@@ -536,7 +542,7 @@ if ($enable_multi_uploader)
 		else
 		{
 			//window.console.log("creating");
-			jQuery("#multiple_uploader").pluploadQueue({
+			jQuery("#'.$uploader_tag_id.'").pluploadQueue({
 				// General settings
 				runtimes : runtimes,
 				url : "'.$action_url_js.'uploads'.(strlen($_forced_secure_int) ? '&secure='.$_forced_secure_int : '').'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'",
@@ -601,7 +607,7 @@ if ($enable_multi_uploader)
 			});
 			
 			// Need to make 2nd call to get the created uploader instance
-			fc_file_mul_uploader = jQuery("#multiple_uploader").pluploadQueue();
+			fc_file_mul_uploader = jQuery("#'.$uploader_tag_id.'").pluploadQueue();
 			
 			// It is also possible to bind events also after initialization
 			//fc_file_mul_uploader.bind(\'PostInit\', fc_plupload_handle_init);
@@ -854,18 +860,44 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
-				<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
+				<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 					<th>&nbsp;</th>
 				<?php endif; ?>
 
 				</tr>
 			</thead>
 		
+		<?php if (!$this->folder_mode) : ?>
+			<tfoot>
+
+				<?php
+				$field_legend = array();
+				$this->assigned_fields_labels;
+				foreach($this->assigned_fields_labels as $field_type => $field_label) {
+					$icon_name = $this->assigned_fields_icons[$field_type];
+					$tip = $field_label;
+					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
+					$field_legend[$field_type] = $image. " ".$field_label;
+				}
+				?>
+
+				<tr>
+					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
+						<span class="label fc_legend_box <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_ITEM_ASSIGNMENTS_LEGEND', 'FLEXI_FILE_ITEM_ASSIGNMENTS_LEGEND_TIP', 1, 1); ?> " ><?php echo JText::_('FLEXI_FILE_ITEM_ASSIGNMENTS_LEGEND'); ?></span> &nbsp; 
+						<?php echo implode(' &nbsp; &nbsp; | &nbsp; &nbsp; ', $field_legend); ?>
+					</td>
+				</tr>
+
+			</tfoot>
+		<?php endif; ?>
+		
 			<tbody>
 				<?php
+				$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
+				$file_is_selected = false;
 				$thumbs_icons_arr = array();
 				$filenames_cut = array();
-				$file_assign_arr = array();
+				$file_assign_arr = array();   // fileselement view only
 
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
 				$index = JRequest::getInt('index', 0);
@@ -915,7 +947,8 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 						}
 					}
 					$thumbs_icons_arr[] = $thumb_or_icon;
-					
+
+
 					if (!$this->folder_mode)
 					{
 						$row->count_assigned = 0;
@@ -939,18 +972,30 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 						}
 					}
+					else
+					{
+						// Displayed filename calculated for DB-mode only
+						$row->filename_displayed = $row->filename_original ? $row->filename_original : $row->filename;
+					}
 
-					// File preview icon for content form
-					$file_preview = !in_array($ext, $imageexts) ? '' : JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 
-					// Link to assign file value into the content form
-					$file_assign_link = $this->assign_mode ?
-						"window.parent.qmAssignFile".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', !fc_fileselement_close_modal, '".$filename_original."'); document.getElementById('file".$row->id."').className='striketext';" :
-						"var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  fc_fileselement_assign_file(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', fc_fileselement_targetid, file_data);";
-					$file_assign_arr[$i] = $file_assign_link;
+					if ($isFilesElement)
+					{
+						// File preview icon for content form
+						$file_is_selected = isset($this->new_file_names[$row->filename_displayed]);
+						$file_preview = !in_array($ext, $imageexts) ? '' : JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 
-					$row->filename_displayed = $row->filename_original ? $row->filename_original : $row->filename;
-					$isselected = isset($this->new_file_names[$row->filename_displayed]);
+						// Link to assign file value into the content form
+						$file_assign_link = $this->assign_mode ?
+							"window.parent.qmAssignFile".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', !fc_fileselement_close_modal, '".$filename_original."'); document.getElementById('file".$row->id."').className='striketext';" :
+							"var file_data = _file_data['".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  fc_fileselement_assign_file(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', fc_fileselement_targetid, file_data);";
+						$file_assign_arr[$i] = $file_assign_link;
+					}
+					else
+					{
+						// Link to items using the field
+						$item_link = !$isAdmin ? '' : 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_fileid='. $row->id.'&amp;fcform=1&amp;filter_state=ALL';
+					}
 		   		?>
 				<tr class="<?php echo 'row'.$k; ?>">
 					<td class="center hidden-phone">
@@ -958,7 +1003,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
-					<td class="center <?php echo ($isselected ? ' is-new-file' : ''); ?>">
+					<td class="center <?php echo ($file_is_selected ? ' is-new-file' : ''); ?>">
 						<?php echo JHtml::_('grid.id', $i, !$this->folder_mode ? $row->id : rawurlencode($filename)); ?>
 						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
@@ -971,14 +1016,38 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 					
 					<td class="left">
 						<?php
-							if (StringHelper::strlen($row->filename_displayed) > 100) {
-								$filename_cut = htmlspecialchars(StringHelper::substr($row->filename_displayed, 100), ENT_QUOTES, 'UTF-8') . '...';
-							} else {
-								$filename_cut = htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8');
+						// Display an icon with checkin link, if current user has checked out current item
+						if (!$isFilesElement && $row->checked_out)
+						{
+							// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
+							$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
+							if ($canCheckin)
+							{
+								//if ($row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
+								$task_str = 'types.checkin';
+								if ($row->checked_out == $user->id) {
+									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->checked_out, $row->checked_out_time);
+								} else {
+									echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
+									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->checked_out, $row->checked_out_time);
+								}
+								?>
+								<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
+									<span class="icon-checkedout"></span>
+								</a>
+								<?php
 							}
-							$filenames_cut[$i] = $filename_cut;
-						?>
-						<?php echo '
+							else
+							{
+								echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
+							}
+						}
+
+						$filename_cut = StringHelper::strlen($row->filename_displayed) > 100
+							? htmlspecialchars(StringHelper::substr($row->filename_displayed, 100), ENT_QUOTES, 'UTF-8') . '...'
+							: htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8');
+						$filenames_cut[$i] = $filename_cut;
+						echo '
 						<a id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$file_assign_link.'" title="'.$insert_entry.'">
 							<span class="icon-checkbox"></span> <span class="icon-new"></span> '.$filename_cut.'
 						</a>
@@ -1045,12 +1114,19 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				<?php if (!empty($this->cols['usage'])) : ?>
 					<td class="center hidden-phone">
 						<span class="nowrap_box"><?php echo $row->assigned; ?></span>
+						<?php if (!$isFilesElement && $row->count_assigned) : ?>
+							<br/><br/>
+							<span class="badge badge-info"><?php echo count($row->itemids); ?></span>
+							<a href="<?php echo $item_link; ?>">
+							[<?php echo $view_entry;?>]
+							</a>
+						<?php endif; ?>
 					</td>
 				<?php endif; ?>
 				
 				<?php if ($this->CanViewAllFiles && !empty($this->cols['uploader'])) : ?>
 					<td class="center hidden-phone">
-					<?php if ($this->view == 'filemanager' && FlexicontentHelperPerm::getPerm()->CanAuthors) :?>
+					<?php if (!$isFilesElement && $perms->CanAuthors) :?>
 						<a target="_blank" href="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task_authors; ?>edit&amp;hidemainmenu=1&amp;cid=<?php echo $row->uploaded_by; ?>">
 						<?php echo $row->uploader; ?>
 						</a>
@@ -1078,7 +1154,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				
 			<?php endif; ?>
 				
-					<?php if ($this->view == 'fileselement') : /* Direct delete button for fileselement view */ ?>
+					<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 					<td>
 						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
 							<span class="icon-remove" title="<?php echo JText::_('FLEXI_REMOVE'); ?>"></span>
@@ -1202,7 +1278,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload fc-fileman-upload-icon">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 		
-		<?php if (!$this->CanUpload && ($this->layout != 'image' || $this->view != 'fileselement')) : /* image layout of fileselement view is not subject to upload check */ ?>
+		<?php if (!$this->CanUpload && ($this->layout != 'image' || !$isFilesElement)) : /* image layout of fileselement view is not subject to upload check */ ?>
 			<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
 		<?php else : ?>
 
@@ -1266,7 +1342,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 					<td rowspan="3" style="text-align: center;" class="fc_hidden_960">
 					'.($enable_multi_uploader ? '
 						<div class="fc-mssg fc-info" style="margin: 0px 0 8px 0; padding-top: 4px; padding-bottom: 4px; width: 100%; box-sizing: border-box;">'.JText::_('Please edit file properties<br/>after you upload the files').'</div>
-						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); /*jQuery(\'#multiple_uploader\').css(\'min-height\', 180);*/ setTimeout(function(){showUploader(); fc_plupload_resize_now();}, 100);"
+						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); /*jQuery(\'#'.$uploader_tag_id.'\').css(\'min-height\', 180);*/ setTimeout(function(){showUploader(); fc_plupload_resize_now();}, 100);"
 							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'" style=""
 						>
 							'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
@@ -1404,7 +1480,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 						<tr>
 							<td style="text-align:right; padding: 12px 4px;">
-								<input type="button" id="file-props-apply" class="btn btn-success" onclick="fc_plupload_submit_props_form(this, jQuery('#multiple_uploader').pluploadQueue()); return false;" value="<?php echo JText::_( 'FLEXI_APPLY' ); ?>"/>
+								<input type="button" id="file-props-apply" class="btn btn-success" onclick="fc_plupload_submit_props_form(this, jQuery('#<?php echo $uploader_tag_id; ?>').pluploadQueue()); return false;" value="<?php echo JText::_( 'FLEXI_APPLY' ); ?>"/>
 							</td>
 							<td style="text-align:left; padding: 12px 4px;">
 								<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>"/>
@@ -1526,7 +1602,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 			</fieldset>
 			
 			<fieldset class="actions" id="filemanager-2" style="display:none;">
-				<div id="multiple_uploader" class="fc_file_uploading" style="height: 0px;">
+				<div id="<?php echo $uploader_tag_id; ?>" class="fc_file_uploader">
 					<div id="multiple_uploader_failed" class="alert alert-warning">
 						There was some JS error or JS issue, file uploader script failed to start
 					</div>

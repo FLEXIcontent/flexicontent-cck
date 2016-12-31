@@ -11,6 +11,7 @@
 	function fc_plupload_handle_init( uploader, params )
 	{
 		//if(window.console) window.console.log( "PostInit event" );
+		if (typeof fc_uploader_slider_cfg === 'undefined') return;
 		var uploader_container = jQuery(uploader.settings.container);
 
 		if (uploader_container.find('.fc_plupload_toggleThumbs_btn').length==0)
@@ -46,7 +47,7 @@
 			</div>\
 			');
 
-			setTimeout(function(){ fc_attachSingleSlider(fc_uploader_slider_cfg); }, 40);
+			if (typeof fc_uploader_slider_cfg !== 'undefined') setTimeout(function(){ fc_attachSingleSlider(fc_uploader_slider_cfg); }, 40);
 		}
 	}
 

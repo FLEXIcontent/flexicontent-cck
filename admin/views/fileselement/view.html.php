@@ -206,8 +206,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
-		
-		// *** BOF FILESELEMENT view specific ***
+
+
+		// *** Get recently uploaded files
 		$newfileid		= $jinput->get('newfileid', 0, 'int');
 
 		$delfilename = $app->getUserState('delfilename', null);
@@ -225,7 +226,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		}
 		$session->set($context.'ids', null);
 		$session->set($context.'names', null);
-		// *** BOF FILESELEMENT view specific ***
 
 
 
@@ -485,7 +485,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				}
 				else
 				{
-					if (confirm('".flexicontent_html::encodeHTML('FLEXI_ARE_YOU_SURE', 's')."')) Joomla.submitbutton('filemanager.remove');
+					if (confirm('".flexicontent_html::encodeHTML(JText::_('FLEXI_ARE_YOU_SURE'), 's')."')) Joomla.submitbutton('filemanager.remove');
 				}
 			}
 		";
