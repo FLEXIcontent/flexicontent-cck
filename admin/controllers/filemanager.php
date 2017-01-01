@@ -97,6 +97,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
+		$db     = JFactory::getDBO();
 		$session = JFactory::getSession();
 
 		// Force interactive run mode, if given parameters
@@ -181,17 +182,34 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		$model = $this->getModel('filemanager');
-		if ($file_mode != 'folder_mode' && $fieldid)
+		$field = false;
+		if ($fieldid)
 		{
-			// Check if FORCED secure/media mode parameter exists and if it is forced
-			$field_params = $model->getFieldParams($fieldid);
-			$target_dir = $field_params->get('target_dir', '');
-			
-			if ( strlen($target_dir) && $target_dir!=2 ) {
-				$secure = $target_dir ? 1 : 0; // force secure / media
-			} else {
-				// allow filter secure via form/URL variable
+			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id=' . $fieldid)->loadObject();
+			$field->parameters = new JRegistry($field->attribs);
+			$field->item_id = $u_item_id;
+		}
+
+		$default_dir = 2;
+		if ($field)
+		{
+			if (in_array($field->field_type, array('file', 'image')))
+				$default_dir = 1;  // 'secure' folder
+			else if (in_array($field->field_type, array('minigallery')))
+				$default_dir = 0;  // 'media' folder
+			$target_dir = $field->parameters->get('target_dir', $default_dir);
+
+			// Force secure / media DB folder according to field configuration
+			if ( strlen($target_dir) && $target_dir!=2 )
+			{
+				$secure = $target_dir ? 1 : 0;
 			}
+		}
+
+		$file_mode = 'db_mode';
+		if ($field && $field->field_type =='image' && $field->parameters->get('image_source', 0) == 1)
+		{
+			$file_mode = 'folder_mode';
 		}
 
 
@@ -362,9 +380,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// a. Database mode
 		if ($file_mode == 'db_mode')
 		{
-			$db 	= JFactory::getDBO();
-			$user	= JFactory::getUser();
-
 			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
 			$filepath = $path . $filename;
 			$filesize = file_exists($filepath) ? filesize($filepath) : 0;

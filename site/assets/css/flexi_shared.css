@@ -1709,6 +1709,14 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	margin: 6px 0 0 0;
 	width: auto;
 }
+#flexicontent .fc_file_uploader.fc_inline_uploader {
+	padding: 0px;
+	margin: 6px 0 0 0;
+	width: auto;
+}
+#flexicontent .fc_file_uploader.fc_inline_uploader li.plupload_droptext {
+	font-size: 40px;
+}
 #flexicontent .fc_file_uploader .plupload_scroll > .fc_uploader_thumbs_view ul.plupload_filelist > li.plupload_delete.thumb_90 {
 	width: 90px;
 	height: 118px;
@@ -2044,6 +2052,7 @@ table.fc_uploader_header_tbl td:last-child {
 	word-wrap: break-word;
 	color: black;
 	text-align: initial;
+	margin: 1px 4px 2px 4px;
 }
 .flexicontent a.fc_set_file_assignment.isedit_link {
 	color: #3071a9;
