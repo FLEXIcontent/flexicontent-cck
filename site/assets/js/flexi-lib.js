@@ -1228,11 +1228,11 @@
 
 
 	/* Debounced function execution by the given 'wait' time, forcing single function execution within the given 'wait' time */
-	function fc_debounce_exec(func, wait, immediate)
+	function fc_debounce_exec(func, wait, immediate, func_context)
 	{
 		var timeout;
 		return function() {
-			var context = this, args = arguments;
+			var context = func_context || this, args = arguments;
 			var later = function() {
 				timeout = null;
 				if (!immediate) func.apply(context, args);
@@ -1244,7 +1244,7 @@
 		};
 	}
 	
-	var fc_dialog_resize = fc_debounce_exec(fc_dialog_resize_now, 200, false);
+	var fc_dialog_resize = fc_debounce_exec(fc_dialog_resize_now, 200, false, null);
 	
 	jQuery(window).resize(function() {
 		fc_dialog_resize();
