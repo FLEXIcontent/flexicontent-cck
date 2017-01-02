@@ -1,26 +1,228 @@
 
-	var fc_file_props_handle = null;
-	var fc_file_count = 0;
-	var fc_plupload_loaded_imgs = {};
+var fc_file_props_handle = null;
+var fc_file_count = 0;
+var fc_plupload_loaded_imgs = {};
 
-	var fc_plupload_handle_init;
-	var fc_plupload_handle_filesChanged;
-	var fc_plupload_extend_row;
-	var fc_plupload_submit_props_form;
-	var fc_plupload_sanitize_filename;
+var fc_plupload_submit_props_form;
+var fc_plupload;
 
-	var fc_plupload;
 
 (function($) {
 
-	// Handle the PostInit event. At this point, we will know which runtime
-	// has loaded, and whether or not drag-drop functionality is supported.
-	// --
-	// NOTE: we use the "PostInit" instead of the "Init" event in order for the "dragdrop" feature to be correct defined
 
-	fc_plupload_handle_init = function(uploader)
+fc_plupload = function(options)
+{
+	this.options = {
+		mode: 'ui'
+	};
+
+	if( typeof options !== 'undefined') for (var key in options)
 	{
-		//if(window.console) window.console.log( "PostInit event" );
+		this.options[key] = options[key];  //window.console.log(key, options[key]);
+	};
+
+	this.uploader_instances = {};
+
+
+
+	// *
+	// * Auto-resize the currently open dialog vertically or horizontally
+	// *
+
+	this.autoResize = function(sfx)
+	{
+		var uploader_container = sfx ? $('#' + this.options.tag_id + sfx) : $('.'+this.options.tag_id);
+		if (this.options.height_spare == 0) return;  // No resizing
+		var window_h = $( window ).height();
+		var window_w = $( window ).width();
+
+		// Also set filelist height
+		var max_filelist_h = 568;
+		var plupload_filelist_h = max_filelist_h > (window_h - this.options.height_spare) ? (window_h - this.options.height_spare) : max_filelist_h;
+		uploader_container.find('.plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)').css({ 'height': plupload_filelist_h+'px' });
+	}
+
+
+
+	// *
+	// * Show plupload , also loading it if not already loaded
+	// *
+
+	this.toggleUploader = function(sfx, forced_action)
+	{
+		sfx = typeof sfx !== 'undefined' && sfx !== null ? sfx : '_';
+		var uploader_container = $('#' + this.options.tag_id + sfx);
+		var toggle_action = forced_action || (!this.uploader_instances[sfx] || uploader_container.is(':hidden') ? 'show' : 'hide');
+
+		var IEversion = isIE();
+		var is_IE8_IE9 = IEversion && IEversion < 10;
+		var runtimes = !is_IE8_IE9  ?  'html5,flash,silverlight,html4'  : 'flash,html4';  //,silverlight,html5
+
+		if (!this.uploader_instances[sfx] && is_IE8_IE9 && !fc_has_flash_addon())
+		{
+			$('<div class="alert alert-warning fc-iblock">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</div>').insertBefore(uploader_container);
+		}
+
+		// Already initialized
+		if (this.uploader_instances[sfx])
+		{
+			//this.uploader_instances[sfx].refresh();  // refresh it
+			//this.uploader_instances[sfx].splice();   // empty it, ... not needed and problematic ... commented out
+			toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
+			return this.uploader_instances[sfx];
+		}
+		//window.console.log(this.options.mode=='ui' ? 'Creating plupload UI' : 'Creating pluploadQueue');
+
+
+		// Resize images at client-side if supported by the browser
+		var resize_options = !this.options.resize_on_upload ? null :
+		{
+			width : this.options.upload_max_w,
+			height : this.options.upload_max_h,
+			quality : this.options.upload_quality,
+			crop: this.options.upload_crop
+		};
+
+		// Specify which files to browse for, if using plupload UI then it is also possible to prevent picking file over the upload limit, but since we have client-side resizing, we will not use it
+		var filters_options = !this.options.view_layout == 'image'  ? null : (this.options.mode=='ui' ?
+			{
+				//max_file_size : this.options.upload_maxsize,
+				mime_types: [
+					{title : 'Image files', extensions : 'jpg,jpeg,gif,png'},
+					{title : 'Zip files', extensions : 'zip,avi'}
+				]
+			} :
+			[
+				{title : 'Image files', extensions : 'jpg,jpeg,gif,png'},
+				{title : 'Zip files', extensions : 'zip,avi'}
+			]
+		);
+
+
+		var uploader_options =
+		{
+			// Multiple runtimes in prefered order
+			runtimes : runtimes,
+
+			// Flash & Silverlight runtimes (optional / fallback 'runtimes', usefull mostly for older browsers)
+			flash_swf_url : this.options.flash_swf_url,
+			silverlight_xap_url : this.options.silverlight_xap_url,
+
+			// General settings
+			url : this.options.action,
+			prevent_duplicates : true,
+			max_file_count: this.options.upload_maxcount,
+			edit_properties: this.options.edit_properties,
+
+			// Set maximum file size and chunking to 1 MB
+			max_file_size : this.options.upload_maxsize,
+			chunk_size: '1mb',
+
+			// Resize images at client-side
+			resize : resize_options,
+
+			// Specify what files to browse for
+			filters : filters_options,
+
+			// Rename files by clicking on their titles
+			rename: true,
+
+			// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
+			dragdrop: true,
+
+			init: {
+				PostInit: this.handle_init,
+				FilesAdded: this.handle_filesChanged,
+				FilesRemoved: this.handle_filesChanged,
+
+				BeforeUpload: function (up, file)
+				{
+					// Called right before the upload for a given file starts, can be used to cancel it if required
+					up.settings.multipart_params = {
+						filename: file.name,
+						file_row_id: file.id
+					};
+				},
+
+				QueueChanged: function (up)
+				{
+					var max_file_count = up.getOption('max_file_count');
+					if (!!max_file_count && up.files.length > max_file_count)
+					{
+						up.files.splice(max_file_count, up.files.length);
+						alert('Please add only ' + max_file_count + ' files');
+					}
+				},
+
+				UploadComplete: function (up, files)
+				{
+					window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
+					window.location.reload(true);  //window.location.replace(window.location.href);
+				}
+			}
+		}
+
+
+		// Options supported only by plupload in jQuery UI mode
+		if (this.options.mode=='ui')
+		{
+			var plupload_ui_options =
+			{
+				// Sort files
+				sortable: true,
+
+				// Native views to activate
+				views: {
+					list: true,
+					thumbs: true,
+					active: 'list'
+				}
+			}
+		}
+
+		// Options supported only by plupload in jQuery UI mode
+		else
+		{
+			// 'sortable', and 'views' are not natively supported by '*Queue' , but we will add them and also enhance them ...
+			var plupload_q_options = {};
+		}
+
+		// Instantiate the uploader
+		if (this.options.mode=='ui')
+		{
+			var up = this.uploader_instances[sfx] = uploader_container.plupload( jQuery.extend(uploader_options, plupload_ui_options) );
+		}
+		else
+		{
+			// Need to make 2nd call to get the created uploader instance
+			uploader_container.pluploadQueue( jQuery.extend(uploader_options, plupload_q_options) );
+			var up = this.uploader_instances[sfx] = uploader_container.pluploadQueue();
+		}
+
+		// Set our uploader instance to use it inside member functions when called statically
+		$(up).data('fc_plupload_instance', this);
+		$(uploader_container).data('plupload_instance', up);
+
+		// It is also possible to bind events also after initialization
+		//up.bind('PostInit', this.handle_init);
+		//up.bind('FilesAdded', this.handle_filesChanged);
+		//up.bind('FilesRemoved', this.handle_filesChanged);
+
+		// Toggle the uploader container
+		toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
+		return this.uploader_instances[sfx];
+	};
+
+
+
+	// *
+	// * Handle the PostInit event. At this point, we will know which runtime
+	// * has loaded, and whether or not drag-drop functionality is supported.
+	// * NOTE: we use the "PostInit" instead of the "Init" event in order for the "dragdrop" feature to be correct defined
+	// *
+
+	this.handle_init = function(uploader)
+	{
 		if (typeof fc_uploader_slider_cfg === 'undefined') return;
 		var uploader_container = $(uploader.settings.container);
 
@@ -59,16 +261,17 @@
 
 			if (typeof fc_uploader_slider_cfg !== 'undefined') setTimeout(function(){ fc_attachSingleSlider(fc_uploader_slider_cfg); }, 40);
 		}
-	}
+	};
 
 
-	// Handle the files-added event. This is different that the queue-changed event.
-	// Since at this point, we have an opportunity to reject files from the queue.
 
-	fc_plupload_handle_filesChanged = function(uploader, files)
+	// *
+	// * Handle the files-added event. This is different that the queue-changed event.
+	// * Since at this point, we have an opportunity to reject files from the queue.
+	// *
+
+	this.handle_filesChanged = function(uploader, files)
 	{
-		//if(window.console) window.console.log( "Files added." );
-
 		// Get per file form data from uploader
 		var form_data = $(uploader.settings.container).data('form_data');
 		if (!form_data) form_data = {};
@@ -78,7 +281,7 @@
 		for ( var i = 0 ; i < uploader.files.length ; i++ )   //for ( var i = 0 ; i < files.length ; i++ )
 		{
 			// Add extra functionality to the file row: File properties and file preview
-			fc_plupload_extend_row( uploader, i );
+			$(uploader).data('fc_plupload_instance').extend_row( uploader, i );
 
 			// Mark edit button with SUCCESS color to show that it has already assigned file properties
 			var file_row_id = uploader.files[i].id;
@@ -86,23 +289,26 @@
 				$('#'+file_row_id).find('.fc_props_edit_btn').addClass('btn-success') :
 				$('#'+file_row_id).find('.fc_props_edit_btn').removeClass('btn-success') ;
 		}
-		
+	
 		$('#fc-uploader-grid-thumb-size-sel').trigger('change');
 		$('#fc-uploader-grid-thumb-size_nouislider').trigger('change');
-	}
+	};
 
 
-	// Create client side image preview. This is given a File object (as presented by Plupload),
-	// and show the client-side-only preview of the selected image object.
 
-	fc_plupload_extend_row = function(uploader, i)
+	// *
+	// * Create client side image preview. This is given a File object (as presented by Plupload),
+	// * and show the client-side-only preview of the selected image object.
+	// *
+
+	this.extend_row = function(uploader, i)
 	{
 		var IEversion = isIE();
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 
 		edit_properties = uploader.getOption('edit_properties') ;
 		edit_properties = edit_properties !== false ? true : edit_properties;
-		
+	
 		var file = uploader.files[i];
 		var file_row_id = file.id;
 		var file_row = $('#'+file_row_id);
@@ -110,7 +316,7 @@
 		var is_img = is_IE8_IE9 && !fc_has_flash_addon() ? 0 : file.name.match(/\.(jpg|jpeg|png|gif)$/i);
 
 		// Add extra CSS classes to the delete buttons
-		file_row.find('.plupload_file_action > a').addClass('icon-remove fc_uploader_row_remove');
+		file_row.find('.plupload_file_action > a').addClass('fc_uploader_row_remove');
 		file_row.addClass('thumb_' + $('#fc-uploader-grid-thumb-size-val').val());
 
 		/*
@@ -248,10 +454,16 @@
 	}
 
 
-	fc_plupload_submit_props_form = function(obj, uploader)
+
+	// *
+	// * AJAX submit a files property form
+	// *
+
+	this.submit_props_form = function(obj, uploader)
 	{
-		fc_file_props_handle.dialog('close');  // Close form dialog
-	
+		// Close (hide) the modal containing form
+		fc_file_props_handle.dialog('close');
+
 		// Get form, form data
 		var IEversion = isIE();
 		var form = (!IEversion || IEversion > 8) ? $(obj.form) : $(obj).closest('form');
@@ -272,7 +484,7 @@
 
 		// Update file row so that new filename is displayed
 		var new_filename = form.find('[name="file-props-name"]').val();
-		new_filename = fc_plupload_sanitize_filename( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
+		new_filename = $(uploader).data('fc_plupload_instance').sanitize_filename( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
 		if (new_filename != '')
 		{
 			var file_name_box = file_row.find('.plupload_file_name');
@@ -330,12 +542,17 @@
 	}
 
 
-	fc_plupload_sanitize_filename = function(text)
+
+	// *
+	// * Create a sanitized filename similar to what server-side code will accept
+	// *
+
+	this.sanitize_filename = function(text)
 	{
-		var result = '';
-		if (!text) return result;
+		if (!text) return '';
 
 		var validChars = new RegExp('[A-Za-z0-9\.\_\-]+');
+		var result = '';
 
 		for (var i = 0; i < text.length; ++i)
 		{
@@ -346,244 +563,7 @@
 		}
 		return result;
 	}
+}
 
-
-	fc_plupload = function(options)
-	{
-		this.options = {
-			mode: 'ui'
-		};
-
-		if( typeof options !== 'undefined') for (var key in options)
-		{
-			this.options[key] = options[key];  //window.console.log(key, options[key]);
-		};
-
-
-		// Auto-resize the currently open dialog vertically or horizontally
-		this.autoResize = function()
-		{
-			if (this.options.height_spare == 0) return;  // No resizing
-			var window_h = jQuery( window ).height();
-			var window_w = jQuery( window ).width();
-
-			// Also set filelist height
-			var max_filelist_h = 568;
-			var plupload_filelist_h = max_filelist_h > (window_h - this.options.height_spare) ? (window_h - this.options.height_spare) : max_filelist_h;
-			jQuery('.plupload_filelist:not(.plupload_filelist_header):not(.plupload_filelist_footer)').css({ 'height': plupload_filelist_h+'px' });
-		}
-
-
-		// Show plupload , also loading it if not already loaded
-		this.toggleUploader = function(sfx, forced_action)
-		{
-			sfx = typeof sfx !== 'undefined' && sfx !== null ? sfx : '';
-			var uploader_container = $('#' + this.options.tag_id + sfx);
-			var toggle_action = forced_action || (!this.uploader_instance || uploader_container.is(':hidden') ? 'show' : 'hide');
-
-			var IEversion = isIE();
-			var is_IE8_IE9 = IEversion && IEversion < 10;
-			var runtimes = !is_IE8_IE9  ?  'html5,flash,silverlight,html4'  : 'flash,html4';  //,silverlight,html5
-
-			if (!this.uploader_instance && is_IE8_IE9 && !fc_has_flash_addon())
-			{
-				$('<div class="alert alert-warning fc-iblock">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</div>').insertBefore(uploader_container);
-			}
-
-			// Already initialized
-			if (this.uploader_instance)
-			{
-				//this.uploader_instance.refresh();  // refresh it
-				//this.uploader_instance.splice();   // empty it, ... not needed and problematic ... commented out
-				toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
-				return this.uploader_instance;
-			}
-			//window.console.log(this.options.mode=='ui' ? 'Creating plupload UI' : 'Creating pluploadQueue');
-
-			var resize_options = !this.options.resize_on_upload ? null : {
-				width : this.options.upload_max_w,
-				height : this.options.upload_max_h,
-				quality : this.options.upload_quality,
-				crop: this.options.upload_crop
-			};
-
-			var filters_options = !this.options.view_layout == 'image'  ? null : (this.options.mode=='ui' ?
-				{
-					//max_file_size : this.options.upload_maxsize,
-					mime_types: [
-						{title : 'Image files', extensions : 'jpg,jpeg,gif,png'},
-						{title : 'Zip files', extensions : 'zip,avi'}
-					]
-				} :
-				[
-					{title : 'Image files', extensions : 'jpg,jpeg,gif,png'},
-					{title : 'Zip files', extensions : 'zip,avi'}
-				]
-			);
-
-			if (this.options.mode=='ui')
-			{
-				this.uploader_instance = uploader_container.plupload(
-				{
-					// General settings
-					runtimes : runtimes,
-					url : this.options.action,
-					prevent_duplicates : true,
-					max_file_count: this.options.upload_maxcount,
-					edit_properties: this.options.edit_properties,
-
-					// Set maximum file size and chunking to 1 MB
-					max_file_size : this.options.upload_maxsize,
-					chunk_size: '1mb',
-
-					// Resize images on clientside if we can
-					resize : resize_options,
-
-					// Specify what files to browse for
-					// Also it is possible to prevent picking file over the upload limit, but since we have resize do not use it
-					filters : filters_options,
-
-					// Rename files by clicking on their titles
-					rename: true,
-
-					// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
-					dragdrop: true,
-
-					// Sort files
-					sortable: true,
-
-					// Views to activate
-					views: {
-						list: true,
-						thumbs: true, // Show thumbs
-						active: 'list'
-					},
-
-					// Flash settings
-					flash_swf_url : this.options.flash_swf_url,
-
-					// Silverlight settings
-					silverlight_xap_url : this.options.silverlight_xap_url,
-
-					init: {
-						BeforeUpload: function (up, file) {
-							// Called right before the upload for a given file starts, can be used to cancel it if required
-							up.settings.multipart_params = {
-								filename: file.name,
-								file_row_id: file.id
-							};
-						},
-
-						PostInit: fc_plupload_handle_init,
-						FilesAdded: fc_plupload_handle_filesChanged,
-						FilesRemoved: fc_plupload_handle_filesChanged,
-
-						QueueChanged: function (up)
-						{
-							var max_file_count = up.getOption('max_file_count');
-							if (!!max_file_count && up.files.length > max_file_count)
-							{
-								up.files.splice(max_file_count, up.files.length);
-								alert('Please add only ' + max_file_count + ' files');
-							}
-						},
-
-						UploadComplete: function (up, files)
-						{
-							if(window.console) window.console.log('All Files Uploaded');
-							window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
-							window.location.reload(true);  //window.location.replace(window.location.href);
-						}
-					}
-		    });
-
-				// Binding event handlers is also possible after initialization
-				//this.uploader_instance.bind(\'PostInit\', fc_plupload_handle_init);
-				//this.uploader_instance.bind(\'FilesAdded\', fc_plupload_handle_filesChanged);
-				//this.uploader_instance.bind(\'FilesRemoved\', fc_plupload_handle_filesChanged);
-			}
-
-			else
-			{
-				uploader_container.pluploadQueue(
-				{
-					// General settings
-					runtimes : runtimes,
-					url : this.options.action,
-					prevent_duplicates : true,
-					max_file_count: this.options.upload_maxcount,
-					edit_properties: this.options.edit_properties,
-
-					// Set maximum file size and chunking to 1 MB
-					max_file_size : this.options.upload_maxsize,
-					chunk_size: '1mb',
-
-					// Resize images on clientside if we can
-					resize : resize_options,
-
-					// Specify what files to browse for
-					filters : filters_options,
-
-					// Rename files by clicking on their titles
-					rename: true,
-
-					// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
-					dragdrop: true,
-
-					// 'sortable', and 'views' are not natively supported by '*Queue' , but we will add them and also enhance them ...
-
-					// Flash settings
-					flash_swf_url : this.options.flash_swf_url,
-
-					// Silverlight settings
-					silverlight_xap_url : this.options.silverlight_xap_url,
-
-					init: {
-						BeforeUpload: function (up, file)
-						{
-							// Called right before the upload for a given file starts, can be used to cancel it if required
-							up.settings.multipart_params = {
-								filename: file.name,
-								file_row_id: file.id
-							};
-						},
-
-						PostInit: fc_plupload_handle_init,
-						FilesAdded: fc_plupload_handle_filesChanged,
-						FilesRemoved: fc_plupload_handle_filesChanged,
-
-						QueueChanged: function (up)
-						{
-							var max_file_count = up.getOption('max_file_count');
-							if (!!max_file_count && up.files.length > max_file_count)
-							{
-								up.files.splice(max_file_count, up.files.length);
-								alert('Please add only ' + max_file_count + ' files');
-							}
-						},
-
-						UploadComplete: function (up, files)
-						{
-							if (window.console) window.console.log('All Files Uploaded');
-							window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
-							window.location.reload(true);  //window.location.replace(window.location.href);
-						}
-					}
-				});
-
-				// Need to make 2nd call to get the created uploader instance
-				this.uploader_instance = uploader_container.pluploadQueue();
-
-				// It is also possible to bind events also after initialization
-				//this.uploader_instance.bind(\'PostInit\', fc_plupload_handle_init);
-				//this.uploader_instance.bind(\'FilesAdded\', fc_plupload_handle_filesChanged);
-				//this.uploader_instance.bind(\'FilesRemoved\', fc_plupload_handle_filesChanged);
-
-				// Toggle the uploader container
-				toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
-				return this.uploader_instance;
-			}
-		};
-	}
 
 })(jQuery);

@@ -869,10 +869,10 @@ body .btn-group.group-fcsuccess .btn:not(.btn-primary),
 body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
 	color: #333;
-	background-color: #e6e6e6;
-	background-image: -webkit-linear-gradient(top,#ffffff,#e6e6e6);
-	background-image: linear-gradient(to bottom,#ffffff,#e6e6e6);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e6e6e6);
+	background-color: #e7e7e7;
+	background-image: -webkit-linear-gradient(top,#ffffff,#e7e7e7);
+	background-image: linear-gradient(to bottom,#ffffff,#e7e7e7);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff,endColorstr=#e7e7e7);
 	background-repeat: repeat-x;
 	border-color: #bbb #bbb #a2a2a2;
 	border-image: none;
@@ -1969,6 +1969,8 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	> li.plupload_delete.thumb_200 span.plupload_img_preview > img { max-width: 200px; max-height: 200px; }
 	> li.plupload_delete.thumb_250 span.plupload_img_preview > img { max-width: 250px; max-height: 250px; }
 
+	> li.plupload_uploading img { width: 64px; height: 64px; }
+
 	> li.plupload_delete.thumb_90,
 	> li.plupload_delete.thumb_120,
 	> li.plupload_delete.thumb_150,
@@ -2145,6 +2147,11 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	.plupload_container ul.plupload_filelist > li {
 		position: relative;
 	}
+
+	.plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist > li.plupload_uploading{
+		height: unset;
+		max-height: 64px;
+	}
 	.plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist > li.fc_uploader_is_image {
 		height: 64px;
 	}
@@ -2248,6 +2255,9 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 				max-width: 100%;
 			}
 
+			> li.plupload_uploading .plupload_file_action,
+			> li.plupload_failed .plupload_file_action,
+			> li.plupload_done .plupload_file_action,
 			> li.plupload_delete .plupload_file_action {
 				position: relative;
 				top: -3px;
@@ -2265,17 +2275,71 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 					text-decoration: none;
 				}
 				> a.fc_uploader_row_remove:before {
-					background-color: transparent;
-					color: red;
-					border: 0;
-					border-radius: 4px;
 					display: inline-block;
 					margin: 0;
-					padding: 8px 5px;
-					background-color: white;
+					padding: 7px 4px;
+					border: 1px solid #d0d0d0;
+					border-radius: 4px;
+					background-color: #e7e7e7;
+					font-family: 'IcoMoon';
+					font-style: normal;
+					font-size: 14px;
+					speak: none;
+					line-height: 14px;
+				}
+			}
+
+			/* UPLOADIN ICON */
+			> li.plupload_uploading .plupload_file_action {
+				> a.fc_uploader_row_remove:before {
+					color: darkorange;
+					content: "\e022";
+					outline: 0;
+					background-image: none;
+				}
+			}
+
+			/* WARNING ICON */
+			> li.plupload_failed .plupload_file_action {
+				> a.fc_uploader_row_remove:before {
+					font-size: 16px;
+					padding: 5px 3px 7px;
+					color: yellow;
+					content: "\48";
+					outline: 0;
+					background-image: none;
+					-webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+					box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+				}
+			}
+
+			/* DONE ICON */
+			> li.plupload_done .plupload_file_action {
+				> a.fc_uploader_row_remove:before {
+					color: green;
+					content: "\47";
+					outline: 0;
+					background-image: none;
+					-webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+					box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+				}
+			}
+
+			/* REMOVE ICON */
+			> li.plupload_delete .plupload_file_action {
+				> a.fc_uploader_row_remove:before {
+					background-image: -webkit-linear-gradient(top,#f7f7f7,#d7d7d7);
+					background-image: linear-gradient(to bottom,#f7f7f7,#d7d7d7);
+					filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f7f7f7,endColorstr=#d7d7d7);
+					color: red;
+					content: "\49";
 				}
 				> a.fc_uploader_row_remove:hover:before {
-					background-color: #d0d0d0;
+					border: 1px solid #b7b7b7;
+					background-color: #c7c7c7;
+					background-image: -webkit-linear-gradient(top,#e7e7e7,#c0c0c0);
+					background-image: linear-gradient(to bottom,#e7e7e7,#c0c0c0);
+					filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#e7e7e7,endColorstr=#c0c0c0);
 				}
 			}			
 		}
@@ -2442,6 +2506,10 @@ table.fc_uploader_header_tbl {
 }
 @media (max-width: 900px) {
 	#flexicontent .fc_file_uploader {
+		.plupload_container ul.plupload_filelist > li.plupload_uploading {
+			height: unset;
+			max-height: 32px;
+		}
 		.plupload_container ul.plupload_filelist > li.fc_uploader_is_image,
 		.plupload_container:not(.fc_uploader_hide_preview) ul.plupload_filelist > li.fc_uploader_is_image {
 			height: 32px;
