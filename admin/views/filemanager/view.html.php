@@ -386,32 +386,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$lists['order_Dir']	= $filter_order_Dir;
 		$lists['order']			= $filter_order;
 
-
-		// BOF *** REMOVED files *** fileselement VIEW
-		if ($view=='fileselement')
-		{
-			$filelist = $jinput->get('files', '', 'string');
-			$file = $jinput->get('file', 0, 'int');
-
-			$filelist = explode(',', $filelist);
-			$files = array();
-			foreach ($filelist as $fileid)
-			{
-				if ($fileid && $fileid != $file)
-				{
-					$files[] = (int)$fileid;
-				}
-			}
-
-			$files = implode(',', $files);
-			if (strlen($files) > 0) {
-				$files .= ',';
-			}
-			$files .= $file;
-		}
-		// EOF *** REMOVED files *** fileselement VIEW
-
-
 		// uploadstuff
 		jimport('joomla.client.helper');
 		$require_ftp = !JClientHelper::hasCredentials('ftp');
@@ -453,7 +427,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			$this->img_folder = $img_folder;
 			$this->thumb_w    = $thumb_w;
 			$this->thumb_h    = $thumb_h;
-			$this->files      = $files;
 			$this->targetid   = $targetid;
 			$this->files_selected = $files_selected;
 		}

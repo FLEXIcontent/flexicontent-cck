@@ -31,33 +31,41 @@ abstract class JHtmlFcuploader
 	 */
 	public static function getUploader($field, $u_item_id, $up_tag_id=null, $n=0, $options=array())
 	{
-		$field_id = $field ? $field->id : '';
 		$up_tag_id = $up_tag_id ?: 'custom_' . $field->name . '_uploader_';
+		$up_css_class = isset($options['container_class']) ? $options['container_class'] : '';
 
-		self::init($field, $u_item_id, $up_tag_id, $n, $options);
+		self::init($field, $u_item_id, $up_tag_id, $options);
 
 		return (object) array(
-			'toggleBtn' => '<span class="btn fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="fc_files_uploader_'.$field_id.'.toggleUploader(jQuery(this).data(\'rowno\'));"><span class="icon-upload"></span>'.JText::_('FLEXI_UPLOAD').'</span>',
-			'container' => '<div class="clear"></div><div id="'. $up_tag_id . $n .'" class="fc_file_uploader fc_inline_uploader"></div>'
+			'toggleBtn' => '
+				<span class="btn fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$up_tag_id.'.toggleUploader(jQuery(this).data(\'rowno\'));">
+					<span class="icon-upload"></span>'.JText::_('FLEXI_UPLOAD').'
+				</span>
+			',
+			'container' => '
+				<div class="clear"></div>
+				<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display:none;">
+					<span class="alert alert-warning">
+						File uploader script failed to start
+					</span>
+				</div>
+			'
 		);
 	}
-	
-	
+
+
 	/**
 	 * Initialize an Uploader
 	 *
 	 * @param   int      $field      The field (can be empty)
 	 * @param   string   $u_item_id  The unique item id (can be empty)
 	 * @param   int      $up_tagid   The HTML Tag ID of the uploader container
-	 * @param   int      $n          The row number
 	 * @param   string   $option     Options
 	 *
 	 * @return  string       HTML code
 	 */
-	public static function init($field, $u_item_id, $up_tag_id, $n, $options)
+	public static function init($field, $u_item_id, $up_tag_id, $options)
 	{
-		$field_id = $field ? $field->id : '';
-
 		static $initialized = array();
 		if (isset($initialized[$up_tag_id]))
 		{
@@ -68,10 +76,9 @@ abstract class JHtmlFcuploader
 		$defaults = array(
 			'maxcount' => 1,  'layout' => 'default',  'edit_properties' => 'false',  'height_spare' => 0,
 			'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
-				. '&'.JSession::getFormToken().'=1' . '&fieldid='.$field_id . '&u_item_id='.$u_item_id
+				. '&'.JSession::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id
 		);
 		foreach($defaults as $i => $v)  isset($options[$i]) || $options[$i] = $v;
-
 
 		$uops = self::getUploadConf($field);
 
@@ -91,8 +98,8 @@ abstract class JHtmlFcuploader
 
 		// Add plupload Queue handling functions and initialize a plupload Queue
 		$js = '
-		var fc_files_uploader_'.$field_id.';
-		var fc_files_uploader_'.$field_id.'_options = {
+		var '.$up_tag_id.';
+		var '.$up_tag_id.'_options = {
 			mode: "'.$plupload_mode.'",
 			tag_id: "'.$up_tag_id.'",
 			action: "'.$options['action'].'",
@@ -102,8 +109,8 @@ abstract class JHtmlFcuploader
 			edit_properties: '.$options['edit_properties'].',
 			height_spare: '.$options['height_spare'].',
 
-			handle_select: "fc_files_uploader_handle_select_'.$field_id.'",
-			handle_complete: "fc_files_uploader_handle_complete_'.$field_id.'",
+			handle_select: null,  // TODO implement
+			handle_complete: null,  // TODO implement
 
 			resize_on_upload: '.($uops['resize_on_upload'] ? 'true' : 'false').',
 			'.($uops['resize_on_upload'] ? '
@@ -116,21 +123,13 @@ abstract class JHtmlFcuploader
 			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
 			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
 		};
-		var fc_files_uploader_handle_select_'.$field_id.' = function()
-		{
-			alert("select");
-		}
-		var fc_files_uploader_handle_complete_'.$field_id.' = function()
-		{
-			alert("complete");
-		}
 
 		jQuery(document).ready(function()
 		{
-			// Instantiate uploader
-			var uploader = fc_files_uploader_'.$field_id.' = new fc_plupload(fc_files_uploader_'.$field_id.'_options);
+			// Create a configuration object, to be used by all uploaders in this group
+			var uploader = '.$up_tag_id.' = new fc_plupload('.$up_tag_id.'_options);
 
-			// Register debounced autoresizing of the uploader
+			// Register debounced autoresizing of all uploaders in this group
 			var uploader_resize = fc_debounce_exec(uploader.autoResize, 200, false, uploader);
 			jQuery(window).resize(function()
 			{
@@ -149,9 +148,9 @@ abstract class JHtmlFcuploader
 	public static function getUploadConf($field)
 	{
 		static $uops = array();
-		$field_id = $field ? $field->id : '';
+		$conf_index = $field ? $field->id : 'component';
 
-		if (isset($uops[$field_id])) return $uops[$field_id];
+		if (isset($uops[$conf_index])) return $uops[$conf_index];
 		
 		$uconf = new JRegistry();
 		$uconf->merge( JComponentHelper::getParams('com_flexicontent') );
@@ -172,6 +171,6 @@ abstract class JHtmlFcuploader
 			$u['upload_method']  = (int) $uconf->get('upload_method', 1);
 		}
 
-		return $uops[$field_id] = $u;
+		return $uops[$conf_index] = $u;
 	}
 }

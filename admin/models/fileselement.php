@@ -333,93 +333,62 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		return $rows;
 	}
-	
-	
-	/**
-	 * Method to load the configuration parameters of specific field
-	 *
-	 * @access	public
-	 * @param	int file identifier
-	 * @since	3.0
-	 */
-	function & getFieldParams($fieldid=0)
-	{
-		static $field_params = array();
-		$fieldid = (int) $fieldid ?: $this->fieldid;
-		if (isset($field_params[$fieldid])) return $field_params[$fieldid];
 
-		if (!$fieldid)
-		{
-			$field_params[0] = new JRegistry();
-			return $field_params[0];
-		}
 
-		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE id='".$fieldid."'";
-		$this->_db->setQuery($query);
-		$data = $this->_db->loadObject();
-
-		$field_params[$fieldid] = new JRegistry($data->attribs);
-		return $field_params[$fieldid];
-	}
-	
-	
 	/**
 	 * Method to get the folder path defined in a field
 	 *
 	 * @access	public
-	 * @param	int file identifier
 	 */
 	function getFieldFolderPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir')
 	{
-		$field_params = $this->getFieldParams($fieldid);
-		$gallery_path = JPATH_SITE.DS.$field_params->get($folder_param_name, 'images/stories/flexicontent') . '/';
+		$field = $this->getField();
+		if (!$field)
+		{
+			die('Field for id:' . $this->fieldid . ' was not found');
+		}
+		$gallery_path = JPATH_SITE . DS . $field->parameters->get($folder_param_name, 'images/stories/flexicontent') . '/';
 		if ($append_item) $gallery_path .= 'item_' . $itemid;
 		if ($append_field) $gallery_path .= '_field_' . $fieldid;
 		$gallery_path .= '/original';
 		return str_replace('\\','/', $gallery_path);
 	}
-	
-	
-	/**
-	 * Method to get the field name when given fieldid
-	 *
-	 * @access	public
-	 * @param	int file identifier
-	 */
-	function getFieldName($fieldid)
-	{
-		$query = "SELECT name FROM #__flexicontent_fields WHERE id='{$fieldid}';";
-		$this->_db->setQuery($query);
-		return $this->_db->loadResult();
-	}
 
 
 	/**
-	 * Method to get the field data when given fieldid
+	 * Method to get field data
 	 *
-	 * @access	public
-	 * @param	int file identifier
+	 * @access public
+	 * @return object
 	 */
-	function getFieldData($fieldid=0)
+	function getField($fieldid=0)
 	{
-		static $field_data = array();
-		$fieldid = (int) $fieldid ?: $this->fieldid;
-		if (isset($field_data[$fieldid])) return $field_data[$fieldid];
-
-		if (!$fieldid)
+		static $fields = array();
+		
+		// Return cached field data
+		$fieldid = (int) ($fieldid ?: $this->fieldid);
+		if (isset($fields[$fieldid]))
 		{
-			$field_data[0] = false;
-			return $field_data[0];
+			return $fields[$fieldid];
 		}
 
-		$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}';";
-		$this->_db->setQuery($query);
+		// Get field data from DB
+		$fields[$fieldid] = false;
+		if ($fieldid)
+		{
+			$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id= ' . $fieldid);
+			$fields[$fieldid] = $this->_db->loadObject();
+		}
 
-		$field_data[$fieldid] = $this->_db->loadObject();
-		return $field_data[$fieldid];
+		// Parse field parameters and return field
+		if (!empty($fields[$fieldid]))
+		{
+			$fields[$fieldid]->parameters = new JRegistry($fields[$fieldid]->attribs);
+		}
+		return $fields[$fieldid];
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for the files
 	 *
@@ -546,8 +515,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 
 		$where = array();
 
-		$params = $this->getFieldParams();
-		$field  = $this->getFieldData();
+		$field  = $this->getField();
+		$params = $field ? $field->parameters : new JRegistry();
 
 		// Limit listed files to specific uploader,  1: current user, 0: any user, and respect 'filter_uploader' URL variable
 		$limit_by_uploader = 0;

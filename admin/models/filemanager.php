@@ -84,7 +84,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $option.'.'.$view.'.';
 		
-		$this->fieldid = 0;  // $jinput->get('field', null, 'int');  // not yet used for filemanager view, only for fileselement views
+		$this->fieldid = $jinput->get('field', null, 'int');  // not yet used for filemanager view, only for fileselement views
 		$this->viewid  = $view.$this->fieldid;
 		
 		
@@ -271,78 +271,43 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		}
 
 		return $this->_pagination;
-}
+	}
 
 
-	
 	/**
-	 * Method to load the configuration parameters of specific field
+	 * Method to get field data
 	 *
-	 * @access	public
-	 * @param	int file identifier
-	 * @since	3.0
+	 * @access public
+	 * @return object
 	 */
-	function & getFieldParams($fieldid=0)
+	function getField($fieldid=0)
 	{
-		static $field_params = array();
-		$fieldid = (int) $fieldid ?: $this->fieldid;
-		if (isset($field_params[$fieldid])) return $field_params[$fieldid];
-
-		if (!$fieldid)
+		static $fields = array();
+		
+		// Return cached field data
+		$fieldid = (int) ($fieldid ?: $this->fieldid);
+		if (isset($fields[$fieldid]))
 		{
-			$field_params[0] = new JRegistry();
-			return $field_params[0];
+			return $fields[$fieldid];
 		}
 
-		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE id='".$fieldid."'";
-		$this->_db->setQuery($query);
-		$data = $this->_db->loadObject();
-
-		$field_params[$fieldid] = new JRegistry($data->attribs);
-		return $field_params[$fieldid];
-	}
-	
-	
-	/**
-	 * Method to get the field name when given fieldid
-	 *
-	 * @access	public
-	 * @param	int file identifier
-	 */
-	function getFieldName($fieldid)
-	{
-		$query = "SELECT name FROM #__flexicontent_fields WHERE id='{$fieldid}';";
-		$this->_db->setQuery($query);
-		return $this->_db->loadResult();
-	}
-
-
-	/**
-	 * Method to get the field data when given fieldid
-	 *
-	 * @access	public
-	 * @param	int file identifier
-	 */
-	function getFieldData($fieldid=0)
-	{
-		static $field_data = array();
-		$fieldid = (int) $fieldid ?: $this->fieldid;
-		if (isset($field_data[$fieldid])) return $field_data[$fieldid];
-
-		if (!$fieldid)
+		// Get field data from DB
+		$fields[$fieldid] = false;
+		if ($fieldid)
 		{
-			$field_data[0] = false;
-			return $field_data[0];
+			$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id= ' . $fieldid);
+			$fields[$fieldid] = $this->_db->loadObject();
 		}
 
-		$query = "SELECT * FROM #__flexicontent_fields WHERE id='{$fieldid}';";
-		$this->_db->setQuery($query);
-
-		$field_data[$fieldid] = $this->_db->loadObject();
-		return $field_data[$fieldid];
+		// Parse field parameters and return field
+		if (!empty($fields[$fieldid]))
+		{
+			$fields[$fieldid]->parameters = new JRegistry($fields[$fieldid]->attribs);
+		}
+		return $fields[$fieldid];
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for the files
 	 *
@@ -469,11 +434,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		$where = array();
 
-		$params = $this->getFieldParams();
-		$field  = $this->getFieldData();
+		$field  = $this->getField();
+		$params = $field ? $field->parameters : new JRegistry();
 
 		// Limit listed files to specific uploader,  1: current user, 0: any user, and respect 'filter_uploader' URL variable
-		$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
+		$limit_by_uploader = 0;
 
 		// Calculate a default value for limiting to 'media' or 'secure' folder,  0: media folder, 1: secure folder, 2: no folder limitation AND respect 'filter_secure' URL variable
 		$default_dir = 2;
@@ -487,11 +452,12 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$target_dir = $params->get('target_dir', $default_dir);
 		
 		// Handles special cases of fields, that have special rules for listing specific files only
-		if ($field && $field->field_type =='image')
+		if ($field && $field->field_type =='image' && $params->get('image_source', 0) == 0)
 		{
+			$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
 			$where[] = $params->get('list_all_media_files', 0)
 				? ' f.ext IN ("jpg","gif","png","jpeg") '
-				: ' f.id IN ('.implode(', ', $this->getFilesUsedByImageField($field, $params)).')';
+				: $this->getFilesUsedByImageField($field, $params);
 		}
 
 		$scope  = $this->getState( 'scope' );
@@ -621,8 +587,66 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		;
 		return $query;
 	}
-	
-	
+
+
+	/**
+	 * Method to build find the (id of) files used by an image field
+	 *
+	 * @access public
+	 * @return integer
+	 * @since 3.2
+	 */
+	function getFilesUsedByImageField($field, $params)
+	{
+		// Get configuration parameters
+		$target_dir = (int) $params->get('target_dir', 1);
+		$securepath = JPath::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
+
+		// Retrieve usage of images for the given field from the DB
+		$query = 'SELECT value'
+			. ' FROM #__flexicontent_fields_item_relations'
+			. ' WHERE field_id = '. (int) $field->id .' AND value<>"" ';
+		$this->_db->setQuery($query);
+		$values = $this->_db->loadColumn();
+
+		// Create original filenames array skipping any empty records
+		$filenames = array();
+		foreach ( $values as $value )
+		{
+			if ( empty($value) ) continue;
+			$value = @ unserialize($value);
+
+			if ( empty($value['originalname']) ) continue;
+			$filenames[$value['originalname']] = 1;
+		}
+		$filenames = array_keys($filenames);
+
+		// Eliminate records that have no original files
+		$existing_files = array();
+		foreach($filenames as $filename)
+		{
+			if (!$filename) continue;  // Skip empty values
+			if (file_exists($securepath . $filename))
+			{
+				$existing_files[$this->_db->Quote($filename)] = 1;
+			}
+		}
+		$filenames = $existing_files;
+
+		if (!$filenames) return '';  // No files found
+
+		$query = 'SELECT id'
+			.' FROM #__flexicontent_files'
+			.' WHERE '
+			.'  filename IN ('.implode(',', array_keys($filenames)).')'
+			.($target_dir != 2 ? '  AND secure = '. (int)$target_dir : '');
+		$this->_db->setQuery($query);
+		$file_ids = $this->_db->loadColumn();
+
+		return !$file_ids ? '' : ' f.id IN ('.implode(', ', $file_ids).')';
+	}
+
+
 	/**
 	 * Method to get file uploaders according to current filtering (Currently not used ?)
 	 *
