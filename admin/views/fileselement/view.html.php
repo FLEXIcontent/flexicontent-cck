@@ -334,7 +334,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					if (original_objs[i].value) imgobjs.push(original_objs[i].value);
 					if (delfilename!='' && original_objs[i].value == delfilename)
 					{
-						window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '1');
+						window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', '1');
 						remove_existing_files_from_list = 1;
 					}
 				}
@@ -343,7 +343,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					if (existing_objs[i].value) imgobjs.push(existing_objs[i].value);
 					if (delfilename!='' && existing_objs[i].value == delfilename)
 					{
-						window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '1');
+						window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', '1');
 						remove_new_files_from_list = 1;
 					}
 				}
@@ -353,7 +353,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					mssg = '".JText::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
 					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".JText::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
 					alert( mssg );
-					window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '2');
+					window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', '2');
 				}
 				
 				for (i=0,n=imgobjs.length; i<n; i++)
@@ -468,11 +468,14 @@ class FlexicontentViewFileselement extends JViewLegacy
 				}, 50);
 			}
 
-			function fc_fileselement_assign_file(obj, id, file, targetid, file_data)
+			function fc_fileselement_assign_file(target_valuebox_tagid, file_data, f_preview)
 			{
-				var result = window.parent.qfSelectFile".$fieldid."(obj, id, file, targetid, file_data, fc_fileselement_close_modal);
-				if ((typeof result) != 'undefined' && result == 'cancel') return;
-				obj.className = 'striketext';
+				file_data.preview = f_preview;
+				var result = window.parent.fcfield_assignFile".$fieldid."(target_valuebox_tagid, file_data, fc_fileselement_close_modal);
+				if (result != 'cancel')
+				{
+					jQuery('file'+file_data.id).className = 'striketext';
+				}
 			}
 
 			function fc_fileselement_delete_files()

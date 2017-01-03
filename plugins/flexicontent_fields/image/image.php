@@ -271,10 +271,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$auto_enable_imgpicker = 0;  // Disabled imagepicker during copy to help performance
 			$js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
 				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
@@ -297,6 +293,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (has_select2)     newField.find('div.select2-container').remove();
 				" : "").
 			"
+
+				// Update uploader related data
+				var fcUploader = newField.find('.fc_file_uploader');
+				if (fcUploader.length)
+				{
+					// Update uploader attributes
+					fcUploader.empty();
+					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowNum".$field->id.");
+
+					// Update button for toggling uploader
+					var theBTN = newField.find('.fc_files_uploader_toggle_btn');
+					theBTN.attr('data-rowno',uniqueRowNum".$field->id.");
+				}
+
 				newField.find('div.imgremove').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_imgremove');
 				newField.find('input.imgremove').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][remove]');
 				newField.find('input.imgremove').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_remove');
@@ -339,7 +349,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						return false;
 					});
 				});
-				
+
 				// COPY an preview box
 				var img_preview = newField.find('img.preview_image');
 				if (img_preview.length)
@@ -482,20 +492,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			";
 			
 			$css .= '
-			ul#sortables_'.$field->id.' {
-				float:left; margin:0px; padding:0px;
-				list-style:none; white-space:normal;
-			}
-			ul#sortables_'.$field->id.' li {
-				'.($none_props ?
-					'clear:none; white-space:normal;' :
-					'').'
-				float:left;
-				display: block;
-				list-style: none;
-				position: relative;  .'/* do not make important */.'
-			}
-			.fcfieldval_container_'.$field->id.' input { cursor:text; }
+			ul#sortables_'.$field->id.' > li { '.($none_props ? 'clear:none; white-space:normal;' : '').' }
 			.fcfieldval_container_'.$field->id.' .fcimg_preview_box { min-width:'.($preview_thumb_w+6).'px; min-height:'.($preview_thumb_h+8).'px; }
 			.fcfieldval_container_'.$field->id.' .fcimg_preview_box img.preview_image { width:'.$preview_thumb_w.'px; height:'.$preview_thumb_h.'px; }
 			';
@@ -517,11 +514,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$image_folder = JURI::root(true).'/'.$dir_url;
 		$js .= "
 			var fc_db_img_path='".$image_folder."';
-			function qmAssignFile".$field->id."(tagid, file, preview_url, action, file_original)
+			function fcfield_assignImage".$field->id."(tagid, file, preview_url, action, file_original)
 			{
 				// Get TAG ID of the main form element of this field
-				var action = typeof action!== 'undefined' ? action : '0';
-				var file_original = typeof file_original!== 'undefined' ? file_original : file;
 				var ff_suffix = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
 				var elementid = tagid.replace(ff_suffix,'');
 				
@@ -631,7 +626,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					tmpDiv.insertAfter( prv_obj );
 					prv_obj.remove();
 					
-					if (file) jQuery('#' + elementid + '_fcimg_preview_msg' ).val(file_original);
+					if (file) jQuery('#' + elementid + '_fcimg_preview_msg' ).val( !!file_original ? file_original : file );
 					
 					if (file || (fileUrlGiven && existingAllowed && !existing_obj.hasClass('no_value_selected')) || action!='0') {
 					} else {
@@ -699,12 +694,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			});
 			";
 		}
-		
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+
 		flexicontent_html::loadFramework('flexi-lib');
-		
-		
+		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+
 		$class = ' class="'.$required_class.' "';
 		$onchange= ' onchange="';
 		
@@ -758,7 +751,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$rebuild_res = !empty($value['existingname']) ? true : plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item);
 			
 			// Check if rebuilding thumbnails failed (e.g. file has been deleted)  
-			if ( !$rebuild_res ) {
+			if ( !$rebuild_res )
+			{
 				// For non-empty value set a message when we have examined all values
 				if ($image_subpath) $skipped_vals[] = $image_subpath;
 				
@@ -770,7 +764,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					// 1st value or empty value for fieldgroup position
 					$image_subpath = '';
 				}
-			} else {
+			}
+			else
+			{
 				$count_vals++;
 			}
 
@@ -920,17 +916,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			{
 				$onclick_open_selection = $select_in_modal ? ' fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj, null, null, null, {\'title\': \''.JText::_('FLEXI_SELECT_IMAGE', true).'\'}); ' : ' obj.toggle(); ';
 
+				$uploader_html = JHtml::_('fcuploader.getUploader', $field, $u_item_id, null, $n, array('container_class'=> 'fc_inline_uploader', 'up_auto_show'=>true));
 				$change = '
 				<div class="'.$input_grp_class.'" style="margin-top:12px;" >
 					<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); '.$onclick_open_selection.'">
 						<i class="icon-search"></i>
 						'.JText::_($select_in_modal ? 'FLEXI_SELECT' : 'FLEXI_TOGGLE_IMAGE_SELECTOR').'
 					</span>
+					'.$uploader_html->toggleBtn.'
 					<span class="btn btn-warning '.$tooltip_class.'" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearField'.$field->id.'(this);">
 						<i class="icon-remove"></i>
 					</span>
 				</div>
-				';
+				'.$uploader_html->container;
 			}
 			else $change = '';
 
@@ -1049,7 +1047,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$image_added = true;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-		
+
+
+		$js .= "
+			var uniqueRowNum".$field->id."	= ".$count_vals.";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".$count_vals.";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
+
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html = !count($field->html) ? '' :

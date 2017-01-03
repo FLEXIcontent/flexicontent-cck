@@ -223,6 +223,9 @@ fc_plupload = function(options)
 
 	this.handle_init = function(uploader)
 	{
+		// Get 'fc_plupload' class instance from uploader
+		var _this = $(uploader).data('fc_plupload_instance');
+
 		if (typeof fc_uploader_slider_cfg === 'undefined') return;
 		var uploader_container = $(uploader.settings.container);
 
@@ -272,6 +275,9 @@ fc_plupload = function(options)
 
 	this.handle_filesChanged = function(uploader, files)
 	{
+		// Get 'fc_plupload' class instance from uploader
+		var _this = $(uploader).data('fc_plupload_instance');
+
 		// Get per file form data from uploader
 		var form_data = $(uploader.settings.container).data('form_data');
 		if (!form_data) form_data = {};
@@ -281,7 +287,7 @@ fc_plupload = function(options)
 		for ( var i = 0 ; i < uploader.files.length ; i++ )   //for ( var i = 0 ; i < files.length ; i++ )
 		{
 			// Add extra functionality to the file row: File properties and file preview
-			$(uploader).data('fc_plupload_instance').extend_row( uploader, i );
+			_this.extend_row( uploader, i );
 
 			// Mark edit button with SUCCESS color to show that it has already assigned file properties
 			var file_row_id = uploader.files[i].id;
@@ -303,6 +309,9 @@ fc_plupload = function(options)
 
 	this.extend_row = function(uploader, i)
 	{
+		// Get 'fc_plupload' class instance from uploader
+		var _this = $(uploader).data('fc_plupload_instance');
+
 		var IEversion = isIE();
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 
@@ -461,6 +470,9 @@ fc_plupload = function(options)
 
 	this.submit_props_form = function(obj, uploader)
 	{
+		// Get 'fc_plupload' class instance from uploader
+		var _this = $(uploader).data('fc_plupload_instance');
+
 		// Close (hide) the modal containing form
 		fc_file_props_handle.dialog('close');
 
@@ -484,7 +496,7 @@ fc_plupload = function(options)
 
 		// Update file row so that new filename is displayed
 		var new_filename = form.find('[name="file-props-name"]').val();
-		new_filename = $(uploader).data('fc_plupload_instance').sanitize_filename( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
+		new_filename = fc_sanitize_filename( new_filename ) + '.' +  form.find('[name="file-props-name-ext"]').val();
 		if (new_filename != '')
 		{
 			var file_name_box = file_row.find('.plupload_file_name');
@@ -539,29 +551,6 @@ fc_plupload = function(options)
 				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 			}
 		});
-	}
-
-
-
-	// *
-	// * Create a sanitized filename similar to what server-side code will accept
-	// *
-
-	this.sanitize_filename = function(text)
-	{
-		if (!text) return '';
-
-		var validChars = new RegExp('[A-Za-z0-9\.\_\-]+');
-		var result = '';
-
-		for (var i = 0; i < text.length; ++i)
-		{
-			if (validChars.test(text[i]))
-			{
-				result += text[i];
-			}
-		}
-		return result;
 	}
 }
 

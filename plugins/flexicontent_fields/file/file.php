@@ -155,8 +155,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$autoselect = 1; //$field->parameters->get( 'autoselect', 1 ) ;
 		$addExistingURL = JURI::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
-			.'&amp;layout=default&amp;filter_secure=S'
-			.'&amp;folder_mode=0&amp;index=%s'
+			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect
 			.'&amp;filter_uploader='.$user->id
 			.'&amp;targetid=%s'
@@ -176,6 +175,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
 
+
 			function file_fcfield_del_existing_value".$field->id."(el)
 			{
 				var el  = jQuery(el);
@@ -189,6 +189,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 			}
 
+
 			function fc_openFileSelection_".$field->id."(event)
 			{
 				var obj = jQuery(event.data.obj);
@@ -201,53 +202,46 @@ class plgFlexicontent_fieldsFile extends FCField
 				return false;
 			}
 
-			function qfSelectFile".$field->id."(obj, id, file, targetid, file_data, close_modal)
+
+			function fcfield_assignFile".$field->id."(value_container_id, file, close_modal)
 			{
-				var result = 1;
-				var preview = typeof file_data.preview !== 'undefined' ? file_data.preview : '';
-				var altname     = typeof file_data.altname     !== 'undefined' ? file_data.altname     : '';
-				var description = typeof file_data.description !== 'undefined' ? file_data.description : '';
-				var language    = typeof file_data.language    !== 'undefined' ? file_data.language    : '';
+				// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
+				var originalname = file.filename_original ? file.filename_original : file.filename;
+				var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
+				var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
 
-				var strorage_name = typeof file_data.filename !== 'undefined' ? file_data.filename : file;
-				var altname = typeof file_data.altname !== 'undefined' ? file_data.altname : '';
-				var displaytitle = altname && (altname!=file) ? altname : '-';
-				var hidden_text  = altname && (altname!=file) ? file+'<br/>'+altname : '';
+				var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
 
-				var container = jQuery('#'+targetid).closest('.fcfieldval_container');
-				container.find('.fc_fileid').val(id);
-				container.find('.fc_filedata_storage_name').html(strorage_name);
-
-				container.find('.fc_filedata_txt_nowrap').html(hidden_text).show();
-				container.find('.fc_filedata_txt').removeClass('file_unpublished').val(file).blur();
+				container.find('.fc_fileid').val(file.id);
+				container.find('.fc_filedata_storage_name').html(file.filename);
+				container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
+				container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
 				container.find('.fc_filedata_title').html(displaytitle);
 
-				container.find('.fc_preview_thumb').attr('src', preview ? preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-				if (preview) container.find('.fc_preview_thumb').show();
-				else container.find('.fc_preview_thumb').hide();
+				container.find('.fc_preview_thumb').attr('src', file.preview ? file.preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 
 				".($form_file_preview == 2 ? "
-				preview ? container.find('.fc_preview_thumb').show() : container.find('.fc_preview_thumb').hide();
+				file.preview ? container.find('.fc_preview_thumb').show() : container.find('.fc_preview_thumb').hide();
 				" : "")."
 
-				container.find('.fc_filetitle').val(altname).blur();
-				container.find('.fc_filelang').val(language).trigger('change');
-				container.find('.fc_filedesc').val(description);
+				container.find('.fc_filetitle').val(file.altname).blur();
+				container.find('.fc_filelang').val(file.language).trigger('change');
+				container.find('.fc_filedesc').val(file.description);
 
 				// Increment value counter (which is optionally used as 'required' form element)
 				var valcounter = document.getElementById('".$elementid."');
-				if (valcounter) {
+				if (valcounter)
+				{
 					valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
-					//if (window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
-
-				close_modal = typeof close_modal !== 'undefined' ? close_modal : targetid;
-				if (close_modal) fc_field_dialog_handle_".$field->id.".dialog('close');
 
 				var remove_obj = container.find('.inlinefile-del');
 				remove_obj.removeAttr('checked').trigger('change');
-				return result;
+
+				if (close_modal) fc_field_dialog_handle_".$field->id.".dialog('close');
+				return true;
 			}
+
 
 			jQuery(document).ready(function() {
 				jQuery('a.addfile_".$field->id."').each(function(index, value) {
@@ -330,7 +324,9 @@ class plgFlexicontent_fieldsFile extends FCField
 				
 				var imgPreview = newField.find('.fc_preview_thumb').first();
 				imgPreview.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_img_preview');
-				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=').hide();
+				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+				".($form_file_preview != 1 ? '
+				imgPreview.hide();' : '')."
 				
 				".($iform_title ? "
 				var theInput = newField.find('input.fc_filetitle').first();
