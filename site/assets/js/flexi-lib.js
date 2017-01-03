@@ -1761,6 +1761,8 @@
 		});
 	}
 
+
+
 	// Toggle elements of all other views when switching between views (e.g. details / thumbnails views)
 	function fc_toggle_view_mode(new_btn)
 	{
@@ -1776,3 +1778,23 @@
 		new_btn.addClass('active');
 		jQuery(new_btn.data('toggle_selector')).show().css('display', '').css('visibility', '');
 	}
+
+
+
+	// Create a sanitized filename similar to what server-side code will accept
+	fc_sanitize_filename = function(text)
+	{
+		if (!text) return '';
+
+		var validChars = new RegExp('[A-Za-z0-9\.\_\-]+');
+		var result = '';
+
+		for (var i = 0; i < text.length; ++i)
+		{
+			if (validChars.test(text[i]))
+			{
+				result += text[i];
+			}
+		}
+		return result;
+	}	
