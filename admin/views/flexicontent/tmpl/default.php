@@ -55,9 +55,6 @@ else if (
 ) $commentsShown = true;
 else $commentsShown = false;
 
-// Special case fieldset, do not consider 'items' ...
-$skip_content_fieldset = $skip_content_fieldset || (!$this->perms->CanCats && !$commentsShown);
-
 // disable dashboard sliders
 $dashboard_sliders_disable = $this->params->get('dashboard_sliders_disable', array());
 $dashboard_sliders_disable  = FLEXIUtilities::paramToArray($dashboard_sliders_disable);

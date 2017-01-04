@@ -27,7 +27,7 @@ class FlexicontentHelperPerm
 		
 		// Return cached data
 		if ( FLEXI_CACHE ) {
-			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
+			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 			
@@ -177,7 +177,7 @@ class FlexicontentHelperPerm
 		// Return cached data
 		$user_id = $user ? $user->id : JFactory::getUser()->id;
 		if (FLEXI_CACHE) {
-			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
+			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // set expire time (default is 1 hour)
 			
@@ -390,79 +390,20 @@ class FlexicontentHelperPerm
 		}
 		return $allowed[$rule][$type_id];
 	}
-	
-	
-	
-	//*******************************************************************************
-	// THIS function implementation  works properly too, but the above is more proper
-	//*******************************************************************************
-	
-	/*function checkAllItemAccess($uid, $section, $id, $force=false, $recursive = false)
-	{
-		// $actions[$uid][$asset] is an array of ACTION names
-		// allowed for USER with ID {$uid} on the ASSET with name {$asset}
-		static $actions = array();
-		
-		// For compatibility reasons, we use 'com_content' assets for both categories and items section
-		$extension = ($section == 'category' || $section == 'item' ) ? 'com_content' : 'com_flexicontent';
-		
-		// For compatibility reasons, we use 'article' assets for items
-		$dbsection = ($section == 'item') ? 'article' : $section;
-		
-		// Create the asset name
-		$asset = "{$extension}.{$dbsection}.{$id}";
-		
-		if(!isset($actions[$uid][$asset]) || $force) {
-			$user = JFactory::getUser($uid);
-			$db = JFactory::getDBO();
-			
-			// Build the database query to get the rules for the asset.
-			$query	= $db->getQuery(true);
-			$query->select($recursive ? 'b.rules' : 'a.rules');
-			$query->from('#__assets AS a');
-			$query->where('name="'.$asset.'"');
-			
-			// If we want the rules cascading up to the global asset node we need a self-join.
-			if ($recursive) {
-				$query->leftJoin('#__assets AS b ON b.lft <= a.lft AND b.rgt >= a.rgt');
-				$query->order('b.lft');
-			}
-			
-			// Execute the query and load the rules from the result.
-			$db->setQuery($query);
-			$rules_string	= $db->loadResult(); // $db->loadColumn();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			
-			// Instantiate a JAccessRules object for the asset rules
-			jimport('joomla.access.rules');
-			$rules = new JAccessRules($rules_string);       //SAME AS: $rules = new JAccessRules(); $rules->merge($rules_string);
-			
-			// Get user's groups (user identities)
-			$groups = $user->getAuthorisedGroups();   //SAME AS: $groups = JAccess::getGroupsByUser($uid, $recursive);
-			
-			// This string will be removed from action names to make them shorter e.g. will make 'core.edit.own' to be 'edit.own'
-			$action_start = ($dbsection == 'category' || $dbsection == 'article' ) ? 'core.' : 'flexicontent.';
-			
-			// Create an empty array that will contain the actions allowed on the asset
-			$actions[$uid][$asset] = array();
-			
-			// Retrieve all available user actions for the section
-			$actions_arr = JAccess::getActions('com_flexicontent', $dbsection);
-			
-			// Find all allowed user actions on the asset
-			foreach($actions_arr as $action_data) {
-				$action_name = $action_data->name;
-				if($rules->allow($action_name, $groups) || $user->authorise($action_name, 'com_flexicontent') ) {
-					$action_shortname = str_replace($action_start, "", $action_name);
-					$actions[$uid][$asset][] = $action_shortname;
-				}
-			}
-		}
-		return $actions[$uid][$asset];
-	}*/
-	
 
-	static function getPermAny($perm_type = null, $user_id = null)
+
+	/*
+	 * Lookup if the given ACL action is allowed in at least 1 category for a given user
+	 *
+	 * @access	public
+	 * @param	string		$user_id		The ACL action name
+	 * @param	integer		$action			The USER ID
+	 *
+	 * @return boolean , true if allowed
+	 * @since	3.1.0
+	 * 
+	 */
+	static function getPermAny($action = null, $user_id = null, $assetname='com_flexicontent')
 	{
 		// Find permissions for given user id
 		$user = $user_id ? JFactory::getUser($user_id) : JFactory::getUser();  // no user id given, use current user)
@@ -470,17 +411,23 @@ class FlexicontentHelperPerm
 		
 		// Return already calculated data
 		static $permsAny = array();
-		if ( isset($permsAny[$user_id][$perm_type]) ) return $permsAny[$user_id][$perm_type];
+		if ( isset($permsAny[$user_id][$action]) ) return $permsAny[$user_id][$action];
 		
-		$permsAny[$user_id][$perm_type] = $user->authorise('core.create', 'com_flexicontent');
-		
-		if ($permsAny[$user_id][$perm_type] === NULL) {
-			// get Allowed Cats is cacheable
-			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, false, $find_first = true );
-			$permsAny[$user_id][$perm_type] = count($allowedcats) > 0;
+		$permsAny[$user_id][$action] = $user->authorise($action, $assetname);
+
+		if (!$permsAny[$user_id][$action])
+		{
+			$permsAny[$user_id][$action] = JAccess::check($user_id, $action, $assetname);
+		}
+
+		//if ($permsAny[$user_id][$action] === NULL)  // Soft deny check was broken in J3.6.5, use JAccess::check above
+		if (!$permsAny[$user_id][$action])
+		{
+			// Get Allowed Cats which is cacheable !
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array($action), $require_all=true, $check_published = true, false, $find_first = true );
+			$permsAny[$user_id][$action] = count($allowedcats) > 0;
 		}
 		
-		return $permsAny[$user_id][$perm_type];
+		return $permsAny[$user_id][$action];
 	}
 }
-

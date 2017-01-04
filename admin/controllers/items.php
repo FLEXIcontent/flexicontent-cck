@@ -535,11 +535,6 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ****************************************************************************************************************************
 		$asset = 'com_content.article.' . $model->get('id');
 		$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-		// ALTERNATIVE 1
-		//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-		// ALTERNATIVE 2
-		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-		//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 		
 		
 		// *******************************************************************************************************
