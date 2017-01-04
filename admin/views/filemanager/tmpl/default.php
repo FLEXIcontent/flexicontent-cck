@@ -362,18 +362,19 @@ if ($enable_multi_uploader)
 	";
 	$document->addScriptDeclaration($js);
 
-		$upload_options = array(
-			'maxcount' => 0,
-			'layout' => $this->layout,
-			'edit_properties' => 'true',
-			'height_spare' => ($isFilesElement ? 320 : 460),
-			'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
-				. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id
-		);
+	$upload_options = array(
+		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
+			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
+		'maxcount' => 0,
+		'layout' => $this->layout,
+		'edit_properties' => true,
+		'refresh_on_upload' => true,
+		'height_spare' => ($isFilesElement ? 320 : 460)
+	);
 
-		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-		$upConf = JHtml::_('fcuploader.getUploadConf', $this->field);
-		$uploader_html = JHtml::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
+	JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+	$upConf = JHtml::_('fcuploader.getUploadConf', $this->field);
+	$uploader_html = JHtml::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
 	$js = '
 		jQuery(document).ready(function()

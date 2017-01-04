@@ -39,15 +39,13 @@ abstract class JHtmlFcuploader
 		return (object) array(
 			'toggleBtn' => '
 				<span class="btn fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$up_tag_id.'.toggleUploader(jQuery(this).data(\'rowno\'));">
-					<span class="icon-upload"></span>'.JText::_('FLEXI_UPLOAD').'
+					<span class="icon-upload"></span> ' . JText::_('FLEXI_UPLOAD').'
 				</span>
 			',
 			'container' => '
 				<div class="clear"></div>
 				<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display:none;">
-					<span class="alert alert-warning">
-						File uploader script failed to start
-					</span>
+					<span class="alert alert-warning">File uploader script failed to start</span>
 				</div>
 			'
 		);
@@ -74,9 +72,13 @@ abstract class JHtmlFcuploader
 		$initialized[$up_tag_id] = true;
 
 		$defaults = array(
-			'maxcount' => 1,  'layout' => 'default',  'edit_properties' => 'false',  'height_spare' => 0,
 			'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
-				. '&'.JSession::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id
+				. '&'.JSession::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id,
+			'maxcount' => 0,
+			'layout' => 'default',
+			'edit_properties' => false,
+			'refresh_on_upload' => true,
+			'height_spare' => 0
 		);
 		foreach($defaults as $i => $v)  isset($options[$i]) || $options[$i] = $v;
 
@@ -103,10 +105,13 @@ abstract class JHtmlFcuploader
 			mode: "'.$plupload_mode.'",
 			tag_id: "'.$up_tag_id.'",
 			action: "'.$options['action'].'",
+
 			upload_maxsize: "'.$uops['upload_maxsize'].'",
 			upload_maxcount: '.$options['maxcount'].',
+
 			view_layout: "'.$options['layout'].'",
-			edit_properties: '.$options['edit_properties'].',
+			edit_properties: '.($options['edit_properties'] ? 'true' : 'false').',
+			refresh_on_upload: '.($options['refresh_on_upload'] ? 'true' : 'false').',
 			height_spare: '.$options['height_spare'].',
 
 			handle_select: null,  // TODO implement

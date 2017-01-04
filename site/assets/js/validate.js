@@ -23,7 +23,7 @@ var JFormValidator_fc = null;
 var JFormValidator = function()
 {
 	"use strict";
-	var handlers, inputEmail, custom, IEversion, isIE8, isIE9,
+	var handlers, inputEmail, custom, IEversion, isIE8, isIE9, isRTL,
 
 	initialize = function()
 	{
@@ -39,6 +39,7 @@ var JFormValidator = function()
 		IEversion = isIE();
 		isIE8 = IEversion ? IEversion < 9 : false;
 		isIE9 = IEversion ? IEversion < 10 : false;
+		isRTL = jQuery(document.querySelector("html")).attr('dir') === 'rtl' ? true : false;
 
  	 	inputEmail = (function() {
  	 	 	var input = document.createElement("input");
@@ -192,20 +193,30 @@ var JFormValidator = function()
 			}
 
 			var $el = jQuery(el);
-			var $next = $el.next();
+			var $el_NP = !isRTL ? $el.next() : $el.prev();
 
 			if ( errorMessage )
 			{
-				if ( $next.hasClass('invalid_jfield_message') )
-					$next.html(errorMessage);
+				if ( $el_NP.hasClass('invalid_fcfield_message') )
+					$el_NP.html(errorMessage);
 				else
-					jQuery('<span class="alert alert-warning invalid_jfield_message" style="display:inline-block; margin: 2px 12px;">' + errorMessage + '</span>').insertAfter( $el );
+				{
+					var err_msg = jQuery('<span class="alert alert-warning invalid_fcfield_message fc_notes">' + errorMessage + '</span>');
+					!isRTL ? err_msg.insertAfter( $el ) : err_msg.insertBefore( $el );
+				}
+
+				/*var $sel2box = $el.prev('.select2-container');
+				if ( $sel2box.length && !$sel2box.prev().hasClass('invalid_fcfield_message') )
+				{
+					var err_msg = jQuery('<span class="alert alert-error invalid_fcfield_message">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>');
+					!isRTL ? err_msg.insertBefore( $sel2box ) : err_msg.insertAfter( $sel2box );
+				}*/
 				return false;
 			}
 
-			else if ( $next.hasClass('invalid_jfield_message') )
+			else if ( $el_NP.hasClass('invalid_fcfield_message') )
 			{
-				$next.remove();
+				$el_NP.remove();
 			}
 
 			return true;
@@ -260,20 +271,25 @@ var JFormValidator = function()
 
 			var $el = jQuery(el);
 			var $parent = $el.closest('.fc_input_set');
-			var $next = $parent.next();
+			var $el_NP = !isRTL ? $parent.next() : $parent.prev();
 
 			if ( errorMessage )
 			{
-				if ( $next.hasClass('invalid_jfield_message') )
-					$next.html(errorMessage);
+
+				if ( $el_NP.hasClass('invalid_fcfield_message') )
+					$el_NP.html(errorMessage);
 				else
-					jQuery('<span class="alert alert-warning invalid_jfield_message" style="display:inline-block; margin: 2px 12px;">' + errorMessage + '</span>').insertAfter( $parent );
+				{
+					var err_msg = jQuery('<span class="alert alert-warning invalid_fcfield_message fc_notes">' + errorMessage + '</span>');
+					!isRTL ? err_msg.insertAfter( $parent ) : err_msg.insertBefore( $parent );
+				}
+
 				return false;
 			}
 			
-			else if ( $next.hasClass('invalid_jfield_message') )
+			else if ( $el_NP.hasClass('invalid_fcfield_message') )
 			{
-				$next.remove();
+				$el_NP.remove();
 			}
 			
 			return true;
@@ -571,7 +587,7 @@ var JFormValidator = function()
  		var fields, valid = true, message, error, label, label_text, usage_text, invalid_el, invalid = [], i, l;
  		
  		// Remove any inline error messages (added by any previous form, note we do not add this to individual fields)
-		jQuery('.invalid_jfield_message').remove();
+		jQuery('.invalid_fcfield_message').remove();
 		
 		// Global variable defined above, we use this to focus the first tab that contains required field
 		fcform_1st_invalid_found = false;
@@ -706,12 +722,15 @@ var JFormValidator = function()
 
 			// No label found, add an inline message
 			else if ($el.data('use_fcfield_box')) {
-				if (!$el.closest('.fcfield_box.required_box').prev().hasClass('invalid_jfield_message'))
-					jQuery('<span class="alert alert-error invalid_jfield_message" style="display:inline-block; margin: 2px 4px 4px 0;">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
+				if (!$el.closest('.fcfield_box.required_box').prev().hasClass('invalid_fcfield_message'))
+					jQuery('<span class="alert alert-error invalid_fcfield_message">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
 			} else if (!is_radio_check) {
-				if (!$el.next().hasClass('invalid_jfield_message'))
-					jQuery('<span class="alert alert-error invalid_jfield_message" style="display:inline-block; margin: 2px 0 4px 4px;">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertAfter( $el );
-			} else {
+				if (!$el.next().hasClass('invalid_fcfield_message'))
+					jQuery('<span class="alert alert-error invalid_fcfield_message">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertAfter( $el );
+			}
+			
+			if (is_radio_check)
+			{
 				var inputSet = $el.data('inputSet');
 				if (inputSet === undefined)
 				{
@@ -720,12 +739,14 @@ var JFormValidator = function()
 				}
 				if (inputSet && inputSet.length)
 				{
-					if (!inputSet.prev().hasClass('invalid_jfield_message'))
+					var inputSet_NP = !isRTL ? inputSet.next() : inputSet.prev();
+
+					if (!inputSet_NP.hasClass('invalid_fcfield_message'))
 					{
-						jQuery('<span class="alert alert-error invalid_jfield_message" style="display:inline-block; margin: 2px 4px 4px 0;">' + Joomla.JText._('FLEXI_INVALID') + '</span>').insertBefore( inputSet ) ;
+						var err_msg = jQuery('<span class="alert alert-error invalid_fcfield_message">' + Joomla.JText._('FLEXI_INVALID') + '</span>');
+						!isRTL ? err_msg.insertAfter( inputSet ) : err_msg.insertBefore( inputSet );
 					}
 					inputSet.addClass('invalid');
-					alert('added');
 				}
 				else {
 					//if (!$label) $el.addClass('invalid').attr('aria-invalid', 'true');
@@ -746,14 +767,19 @@ var JFormValidator = function()
 
 			// No label found, remove any inline message
 			else if ($el.data('use_fcfield_box'))
-				$el.closest('.fcfield_box.required_box').prev('.invalid_jfield_message').remove();
+				$el.closest('.fcfield_box.required_box').prev('.invalid_fcfield_message').remove();
 			else if (!is_radio_check)
-				$el.next('.invalid_jfield_message').remove() ;
-			else {
-				if ( $el.data('inputSet') )
+				$el.next('.invalid_fcfield_message').remove() ;
+
+			if (is_radio_check)
+			{
+				var inputSet = $el.data('inputSet');
+				if ( inputSet && inputSet.length )
 				{
-					$el.data('inputSet').prev('.invalid_jfield_message').remove();
-					$el.data('inputSet').removeClass('invalid');
+					var inputSet_NP = !isRTL ? inputSet.next() : inputSet.prev();
+
+					if (inputSet_NP.hasClass('invalid_fcfield_message')) inputSet_NP.remove();
+					inputSet.removeClass('invalid');
 				}
 			}
 
