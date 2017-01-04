@@ -44,7 +44,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'apply_type', 'save' );
 		$this->registerTask( 'apply',      'save' );
 		$this->registerTask( 'apply_ajax', 'save' );
-		$this->registerTask( 'saveandnew', 'save' );
+		$this->registerTask( 'save2new',   'save' );
+		$this->registerTask( 'save2copy',  'save' );
 		$this->registerTask( 'unfeatured', 'featured' );
 
 		$this->returnURL = 'index.php?option=com_flexicontent&view=items';
@@ -88,26 +89,51 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
 		$data_id = (int) $data['id'];
 		$isnew   = $data_id == 0;
-		
+
 		// If new make sure that type id is set too, before creating the model
 		if ($isnew)
 		{
-			$typeid = JRequest::setvar('typeid', (int) @ $data['type_id']);
+			$typeid = $jinput->set('typeid', (int) @ $data['type_id']);
 		}
-		
+
 		// Get the model
 		$model = $this->getModel('item');
 		$model->setId($data_id);  // Make sure id is correct
-		
-		// Get some flags this will also trigger item loading if not already loaded
-		$isOwner = $model->get('created_by') == $user->get('id');
-		
+
+		// The save2copy task needs to be handled slightly differently.
+		if ($task == 'save2copy')
+		{
+			// Check-in the original row.
+			if ($model->checkin($data_id ) === false)
+			{
+				// Check-in failed. Go back to the item and display a notice.
+				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+				$this->setMessage($this->getError(), 'error');
+
+				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+
+				return false;
+			}
+
+			// Reset the ID, the multilingual associations and then treat the request as for Apply.
+			$isnew = 1;
+			$data['id'] = 0;
+			$data['associations'] = array();
+			$task = 'apply';
+
+			// Maybe existing model data are not needed ? possibly try to keep them
+			$model->set('id', 0);
+			$model->setProperty('_id', 0);
+		}
+
 		
 		// Get merged parameters: component, type, and (FE only) menu
 		$params = new JRegistry();
 		$model_params = $model->getComponentTypeParams();
 		$params->merge($model_params);
 
+		// Get some flags this will also trigger item loading if not already loaded
+		$isOwner = $model->get('created_by') == $user->get('id');
 
 		// Unique id for new items, needed by some fields for temporary data
 		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
@@ -145,8 +171,10 @@ class FlexicontentControllerItems extends FlexicontentController
 			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
 			
 			$featured_cid = array();
-			if (!$isnew) {
-				foreach($model->get('categories') as $item_cat) {
+			if (!$isnew)
+			{
+				foreach($model->get('categories') as $item_cat)
+				{
 					if (isset($featured_tree[$item_cat]) && !isset($disabled_cats[$item_cat])) $featured_cid[] = $item_cat;
 				}
 			}
@@ -157,19 +185,24 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (
 			!$enable_cid_selector   // user can not change / set secondary cats
 		) {
-			if ($isnew) {
-			  // For new item use default secondary categories from type configuration
+			// For new item use default secondary categories from type configuration
+			if ($isnew)
+			{
 				$data['cid'] = $params->get('cid_default');
 			}
-			else if ( isset($featured_cid) ) {
-				// Use featured cats if these are set
+
+			// Use featured cats if these are set
+			else if ( isset($featured_cid) )
+			{
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
 				foreach($model->get('cats') as $item_cat) if (!isset($featured_cid_arr[$item_cat])) $sec_cid[] = $item_cat;
 				$data['cid'] = $sec_cid;
 			}
-			else {
-				// Use already assigned categories (existing item)
+
+			// Use already assigned categories (existing item)
+			else
+			{
 				$data['cid'] = $model->get('cats');
 			}
 		}
@@ -307,7 +340,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( JRequest::getVar('fc_doajax_submit') ) {
+			if ( $jinput->get('fc_doajax_submit') ) {
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -320,7 +353,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( JRequest::getVar('fc_doajax_submit') ) {
+			if ( $jinput->get('fc_doajax_submit') ) {
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -333,7 +366,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				' Content Type '.$type_id.' was not found OR is not published';
 			JError::raiseWarning( 403, $msg );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( JRequest::getVar('fc_doajax_submit') ) {
+			if ( $jinput->get('fc_doajax_submit') ) {
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -375,7 +408,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$model->checkin();
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			
-			if ( JRequest::getVar('fc_doajax_submit') )
+			if ( $jinput->get('fc_doajax_submit') )
 			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
@@ -392,7 +425,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Get items marked as newly submitted
 		$newly_submitted = $session->get('newly_submitted', array(), 'flexicontent');
-		if ($isnew) {
+		if ($isnew)
+		{
 			// Mark item as newly submitted, to allow to a proper "THANKS" message after final save & close operation (since user may have clicked add instead of add & close)
 			$newly_submitted[$model->get('id')] = 1;
 			$session->set('newly_submitted', $newly_submitted, 'flexicontent');
@@ -411,7 +445,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
 		// ********************************************************************************************
 		$is_first_save = true;
-		if ($session->has('saved_fcitems', 'flexicontent')) {
+		if ($session->has('saved_fcitems', 'flexicontent'))
+		{
 			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
 			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
 		}
@@ -428,14 +463,17 @@ class FlexicontentControllerItems extends FlexicontentController
 			. ' WHERE rel.itemid = '.(int) $model->get('id');
 		$db->setQuery( $query );
 		$after_cats = $db->loadObjectList('id');
-		if ( !$isnew ) {
+		if ( !$isnew )
+		{
 			$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
-			foreach($cats_added_ids as $cats_added_id) {
+			foreach($cats_added_ids as $cats_added_id)
+			{
 				$cats_added_titles[] = $after_cats[$cats_added_id]->title;
 			}
 			
 			$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
-			foreach($cats_removed_ids as $cats_removed_id) {
+			foreach($cats_removed_ids as $cats_removed_id)
+			{
 				$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
 			}
 			$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
@@ -542,31 +580,36 @@ class FlexicontentControllerItems extends FlexicontentController
 		// *******************************************************************************************************
 		if (!$canEdit)
 		{
-			if ($task=='apply' || $task=='apply_type') {
-				// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
-				// (we will/should clear this flag when item is closed, since we have another flag to indicate new items
+			// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
+			// (we will/should clear this flag when item is closed, since we have another flag to indicate new items
+			if ($task=='apply' || $task=='apply_type')
+			{
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$rendered_uneditable[$model->get('id')] = -1;
 				$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 				$canEdit = 1;
 			}
 			
-			else if ( $newly_submitted_item ) {
-				// NEW ITEM: Do not use editable till logoff behaviour
-				// ALSO: Clear editable FLAG set in the case that 'apply' button was used during new item creation
-				if ( !$params->get('items_session_editable', 0) ) {
+			// NEW ITEM: Do not use editable till logoff behaviour
+			// ALSO: Clear editable FLAG set in the case that 'apply' button was used during new item creation
+			else if ( $newly_submitted_item )
+			{
+				if ( !$params->get('items_session_editable', 0) )
+				{
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-					if ( isset($rendered_uneditable[$model->get('id')]) ) {
+					if ( isset($rendered_uneditable[$model->get('id')]) )
+					{
 						unset( $rendered_uneditable[$model->get('id')] );
 						$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 					}
 				}
 			}
 			
-			else {
-				// EXISTING ITEM: (if enabled) Use the editable till logoff behaviour
-				if ( $params->get('items_session_editable', 0) ) {
-					
+			// EXISTING ITEM: (if enabled) Use the editable till logoff behaviour
+			else
+			{
+				if ( $params->get('items_session_editable', 0) )
+				{
 					// Set notice for existing item being editable till logoff 
 					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
 					
@@ -577,9 +620,10 @@ class FlexicontentControllerItems extends FlexicontentController
 					$canEdit = 1;
 				}
 			}
-			
+
 			// Set notice about saving an item that cannot be changed further
-			if ( !$canEdit ) {
+			if ( !$canEdit )
+			{
 				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT' ), 'message' );
 			}
 		}
@@ -597,9 +641,11 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			// The 'apply' task may set 'editable till logoff' FLAG ...
 			// CLEAR IT, since NEW content this is meant to be used temporarily
-			if ( !$params->get('items_session_editable', 0) ) {
+			if ( !$params->get('items_session_editable', 0) )
+			{
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				if ( isset($rendered_uneditable[$model->get('id')]) ) {
+				if ( isset($rendered_uneditable[$model->get('id')]) )
+				{
 					unset( $rendered_uneditable[$model->get('id')] );
 					$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 				}
@@ -616,7 +662,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			case 'apply_type':
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&view=item&id='.(int) $model->get('id');
 				break;
-			case 'saveandnew':
+
+			case 'save2new':
 				$link = $type_id ?
 					'index.php?option=com_flexicontent&view=item&typeid='.$type_id :
 					'index.php?option=com_flexicontent&view=item' ;
@@ -628,8 +675,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 		$this->setRedirect($link, $msg);
 		//return;  // comment above and decomment this one to profile the saving operation
-		
-		if ( JRequest::getVar('fc_doajax_submit') ) {
+
+		if ( $jinput->get('fc_doajax_submit') )
+		{
 			JFactory::getApplication()->enqueueMessage($msg, 'message');
 			echo flexicontent_html::get_system_messages_html();
 			exit();  // Ajax submit, do not rerender the view
@@ -654,30 +702,32 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(0), 'array');
-		JArrayHelper::toInteger($cid);
-
 		$ord_catid  = $this->input->get('ord_catid', array(0), 'array');
 		$prev_order = $this->input->get('prev_order', array(0), 'array');
 		$item_cb    = $this->input->get('item_cb', array(0), 'array');
 
+		JArrayHelper::toInteger($cid);
 		JArrayHelper::toInteger($ord_catid);
 		JArrayHelper::toInteger($prev_order);
 		JArrayHelper::toInteger($item_cb);
 
-		// calculate access
+		// Calculate access of orderitems ACL
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 		
-		// check access
-		if ( !$canOrder ) {
+		// Check access
+		if ( !$canOrder )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-		} else if ( $model->move($dir, $ord_catid, $prev_order, $item_cb) ){
-			// success
-		} else {
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
-			JError::raiseWarning( 500, $model->getError() );
+			$app->redirect($this->returnURL);
 		}
 
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items');
+		if ( !$model->move($dir, $ord_catid, $prev_order, $item_cb) )
+		{
+			JError::raiseWarning( 500, JText::_( 'FLEXI_ERROR_SAVING_ORDER' ) . ': ' . $model->getError() );
+			$app->redirect($this->returnURL);
+		}
+
+		$this->setRedirect( $this->returnURL/*, JText::_( 'FLEXI_NEW_ORDERING_SAVED' )*/ );
 	}
 	
 	
@@ -732,21 +782,23 @@ class FlexicontentControllerItems extends FlexicontentController
 		JArrayHelper::toInteger($ord_catid);
 		JArrayHelper::toInteger($prev_order);
 		
-		// calculate access
+		// Calculate access of orderitems ACL
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 		
-		// check access
-		if ( !$canOrder ) {
+		// Check access
+		if ( !$canOrder )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-		} else if (!$model->saveorder($cid, $order, $ord_catid, $prev_order)) {
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
-			JError::raiseWarning( 500, $msg ." " . $model->getError() );
-			$msg = '';
-		} else {
-			$msg = ''; //JText::_( 'FLEXI_NEW_ORDERING_SAVED' );
+			$app->redirect($this->returnURL);
 		}
 
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
+		if ( !$model->saveorder($cid, $order, $ord_catid, $prev_order) )
+		{
+			JError::raiseWarning( 500, JText::_( 'FLEXI_ERROR_SAVING_ORDER' ) . ': ' . $model->getError() );
+			$app->redirect($this->returnURL);
+		}
+
+		$this->setRedirect( $this->returnURL/*, JText::_( 'FLEXI_NEW_ORDERING_SAVED' )*/ );
 	}
 
 
@@ -762,23 +814,34 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db   = JFactory::getDBO();
-		$user = JFactory::getUser();
-		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
+
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
-		
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		// Calculate access of copyitems task
 		$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
-		
-		// check access of copy task
-		if ( !$canCopy ) {
+
+		// Check access
+		if ( !$canCopy )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect('index.php?option=com_flexicontent&view=items');
-			return false;
+			$app->redirect($this->returnURL);
 		}
 		
 		// Access check
 		$copytask_allow_uneditable = JComponentHelper::getParams( 'com_flexicontent' )->get('copytask_allow_uneditable', 1);
-		if (!$copytask_allow_uneditable) {
+		if (!$copytask_allow_uneditable)
+		{
 			// Remove uneditable items
 			$auth_cid = array();
 			$non_auth_cid = array();
@@ -801,7 +864,9 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 			//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
-		} else {
+		}
+		else
+		{
 			$auth_cid = & $cid;
 			$non_auth_cid = array();
 		}
@@ -811,9 +876,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg_noauth = JText::_( 'FLEXI_CANNOT_COPY_ASSETS' );
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_EDIT_PERMISSION' ) ." - ". JText::_( 'FLEXI_IDS_SKIPPED' );
 			JError::raiseNotice(500, $msg_noauth);
-			if ( !count($auth_cid) ) {  // Cancel task if no items can be copied
-				$this->setRedirect('index.php?option=com_flexicontent&view=items');
-				return false;
+			if ( !count($auth_cid) )  // Cancel task if no items can be copied
+			{
+				$app->redirect($this->returnURL);
 			}
 		}
 		
@@ -836,14 +901,33 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
+		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$task  = $this->getTask();
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
 		
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
-		
+
+		// *** Check at least one item was selected
+		if (!count($cid))
+		{
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->redirect($this->returnURL);
+		}
+
+		// Calculate access of copyitems task
+		$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
+
+		// Check access
+		if ( !$canCopy )
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$this->setRedirect($this->returnURL);
+			return false;
+		}
+
 		$method   = JRequest::getInt( 'method', 1);
 		$keeepcats= JRequest::getInt( 'keeepcats', 1 );
 		$keeptags = JRequest::getInt( 'keeptags', 1 );
@@ -865,19 +949,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;
-		
-		$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
-		
-		// check access of copy task
-		if ( !$canCopy ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect('index.php?option=com_flexicontent&view=items');
-			return false;
-		}
-		
+
 		// Access check
 		$copytask_allow_uneditable = JComponentHelper::getParams( 'com_flexicontent' )->get('copytask_allow_uneditable', 1);
-		if (!$copytask_allow_uneditable || $method==2) { // if method is 2 (move) we will deny moving uneditable items
+		if (!$copytask_allow_uneditable || $method==2)  // if method is 2 (move) we will deny moving uneditable items
+		{
 			// Remove uneditable items
 			$auth_cid = array();
 			$non_auth_cid = array();
@@ -900,18 +976,22 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 			//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
-		} else {
+		}
+		else
+		{
 			$auth_cid = & $cid;
 			$non_auth_cid = array();
 		}
 		
 		// Set warning for uneditable items
-		if (count($non_auth_cid)) {
+		if (count($non_auth_cid))
+		{
 			$msg_noauth = JText::_( 'FLEXI_CANNOT_COPY_ASSETS' );
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_EDIT_PERMISSION' ) ." - ". JText::_( 'FLEXI_IDS_SKIPPED' );
 			JError::raiseNotice(500, $msg_noauth);
-			if ( !count($auth_cid) ) {  // Cancel task if no items can be copied
-				$this->setRedirect('index.php?option=com_flexicontent&view=items');
+			if ( !count($auth_cid) )  // Cancel task if no items can be copied
+			{
+				$this->setRedirect($this->returnURL);
 				return false;
 			}
 		}
@@ -1079,24 +1159,26 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		$user   = JFactory::getUser();
-		$ids    = $this->input->get('cid', array(), 'array');
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+
+		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('featured' => 1, 'unfeatured' => 0);
 		$task   = $this->getTask();
 		$value  = JArrayHelper::getValue($values, $task, 0, 'int');
 
 		// Access checks.
-		foreach ($ids as $i => $id)
+		foreach ($cid as $i => $id)
 		{
 			if (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $id))
 			{
 				// Prune items that you can't change.
-				unset($ids[$i]);
+				unset($cid[$i]);
 				JError::raiseNotice(403, JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
 			}
 		}
 
-		if (empty($ids))
+		if (empty($cid))
 		{
 			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$app->redirect($this->returnURL);
@@ -1106,15 +1188,15 @@ class FlexicontentControllerItems extends FlexicontentController
 		$itemmodel = $this->getModel('item');
 
 		// Update featured flag (model will also handle cache cleaning)
-		if (!$itemmodel->featured($ids, $value))
+		if (!$itemmodel->featured($cid, $value))
 		{
 			$app->enqueueMessage($itemmodel->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
 		$message = $value == 1
-			? JText::plural('COM_CONTENT_N_ITEMS_FEATURED', count($ids))
-			: JText::plural('COM_CONTENT_N_ITEMS_UNFEATURED', count($ids));
+			? JText::plural('COM_CONTENT_N_ITEMS_FEATURED', count($cid))
+			: JText::plural('COM_CONTENT_N_ITEMS_UNFEATURED', count($cid));
 		$this->setRedirect($this->returnURL, $message);
 	}
 
@@ -1158,7 +1240,6 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->enqueueMessage(JText::_('Invalid State') . ': ' . $newstate, 'error');
 			$app->redirect($this->returnURL);
 		}
-
 
 		// Remove unauthorized (undeletable) items
 		$auth_cid = array();
@@ -1218,7 +1299,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache->clean('com_flexicontent_filters');
 		}
 
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
+		$this->setRedirect( $this->returnURL, $msg );
 	}
 
 	
@@ -1233,6 +1314,8 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app   = JFactory::getApplication();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
@@ -1263,6 +1346,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
+		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		
@@ -1331,7 +1415,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$cache->clean('com_flexicontent_filters');
 
 		$msg = count($auth_cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
+		$this->setRedirect( $this->returnURL, $msg );
 	}
 	
 	
@@ -1346,8 +1430,9 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$user	= JFactory::getUser();
+
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid);
@@ -1503,7 +1588,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			// A. Check create privilege
 			if( !$canAdd ) {
 				JError::raiseNotice( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ));
-				$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+				$this->setRedirect( $this->returnURL, '');
 				return;
 			}
 			
@@ -1518,7 +1603,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$authored_count = $db->loadResult();
 				if ($authored_count >= $max_auth_limit) {
 					JError::raiseNotice( 403, JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) );
-					$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
+					$this->setRedirect( $this->returnURL, '' );
 					return;
 				}
 			}
@@ -1535,7 +1620,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$type_name = isset($types[$$typeid]) ? '"'.JText::_($types[$$typeid]->name).'"' : JText::_('FLEXI_ANY');
 				$msg = JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
 				JError::raiseNotice( 403, $msg );
-				$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+				$this->setRedirect( $this->returnURL, '');
 				return;
 			}
 		}
@@ -1544,7 +1629,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		else {
 			if ( !$canEdit ) {
 				JError::raiseNotice( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ));
-				$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+				$this->setRedirect( $this->returnURL, '');
 				return;
 			}
 		}
@@ -1552,14 +1637,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check if record is checked out by other editor
 		if ( $model->isCheckedOut( $user->get('id') ) ) {
 			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+			$this->setRedirect( $this->returnURL, '');
 			return;
 		}
 		
 		// Checkout the record and proceed to edit form
 		if ( !$model->checkout() ) {
 			JError::raiseWarning( 500, $model->getError() );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+			$this->setRedirect( $this->returnURL, '');
 			return;
 		}
 		

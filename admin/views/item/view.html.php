@@ -243,7 +243,8 @@ class FlexicontentViewItem extends JViewLegacy
 			'data-placement="bottom" title="Fast saving, without reloading the form. <br/><br/>Note: new files will not be uploaded, <br/>- in such a case please use \'Apply\'"');*/
 		
 		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
-		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		if (!$isnew || $item->version) JToolBarHelper::save2new('group.save2new'); //JToolBarHelper::custom( 'items.save2new', 'save2new.png', 'save2new.png', 'FLEXI_SAVE_AND_NEW', false );
+		if (!$isnew || $item->version) JToolBarHelper::save2copy('group.save2copy'); //JToolBarHelper::custom( 'items.save2copy', 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_NEW', false );
 		JToolBarHelper::cancel('items.cancel');
 
 
