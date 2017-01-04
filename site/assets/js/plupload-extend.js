@@ -113,6 +113,7 @@ fc_plupload = function(options)
 			prevent_duplicates : true,
 			max_file_count: this.options.upload_maxcount,
 			edit_properties: this.options.edit_properties,
+			refresh_on_upload: this.options.refresh_on_upload,			
 
 			// Set maximum file size and chunking to 1 MB
 			max_file_size : this.options.upload_maxsize,
@@ -156,8 +157,11 @@ fc_plupload = function(options)
 
 				UploadComplete: function (up, files)
 				{
-					window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
-					window.location.reload(true);  //window.location.replace(window.location.href);
+					if (up.getOption('refresh_on_upload'))
+					{
+						window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
+						window.location.reload(true);  //window.location.replace(window.location.href);
+					}
 				}
 			}
 		}
@@ -257,8 +261,8 @@ fc_plupload = function(options)
 			')
 			.prepend('\
 			<div class="btn-group" style="margin: 12px; float: right;">\
-				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="width: 60px;" title="Details"><i class="icon-list-view"></i></button>\
-				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_container\').addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
+				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="width: 60px;" title="Details"><i class="icon-list-view"></i></button>\
+				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
 			</div>\
 			');
 
@@ -315,7 +319,7 @@ fc_plupload = function(options)
 		var IEversion = isIE();
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 
-		edit_properties = uploader.getOption('edit_properties') ;
+		edit_properties = uploader.getOption('edit_properties');
 		edit_properties = edit_properties !== false ? true : edit_properties;
 	
 		var file = uploader.files[i];
@@ -326,7 +330,7 @@ fc_plupload = function(options)
 
 		// Add extra CSS classes to the delete buttons
 		file_row.find('.plupload_file_action > a').addClass('fc_uploader_row_remove');
-		file_row.addClass('thumb_' + $('#fc-uploader-grid-thumb-size-val').val());
+		file_row.addClass('thumb_' + ($('#fc-uploader-grid-thumb-size-val').length ? $('#fc-uploader-grid-thumb-size-val').val() : '150'));
 
 		/*
 		 * Add properties editing button
@@ -421,7 +425,7 @@ fc_plupload = function(options)
 				else
 				{
 					if (file_row.hasClass('fc_zooming')) return;  // Zooming already started
-					if (is_img /*&& file_row.closest('.plupload_container').hasClass('fc_uploader_thumbs_view')*/) return;    // Avoid zooming when clicking thumbnails in grid view and for consistency in list view too ...
+					if (is_img /*&& file_row.closest('.plupload_scroll').parent().hasClass('fc_uploader_thumbs_view')*/) return;    // Avoid zooming when clicking thumbnails in grid view and for consistency in list view too ...
 					$('#fc-fileman-overlay').show();
 					file_row.addClass('fc_zooming');
 					setTimeout(function(){
