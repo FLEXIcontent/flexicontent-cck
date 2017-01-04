@@ -1936,10 +1936,7 @@ class flexicontent_html
 		// Determine if current user can delete the given item
 		$has_delete = false;
 		$asset = 'com_content.article.' . $item->id;
-		$has_delete = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
-		// ALTERNATIVE 1
-		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-		//$has_delete = in_array('delete', $rights) || (in_array('delete.own', $rights) && $item->created_by == $user->get('id')) ;
+		$has_delete = $user->authorise('core.delete', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.delete.own', $asset));
 
 		// Create the delete button only if user can delete the give item
 		if ( !$has_delete ) return;
@@ -2505,10 +2502,7 @@ class flexicontent_html
 		
 		// Determine if current user can edit state of the given item
 		$asset = 'com_content.article.' . $item->id;
-		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-		// ALTERNATIVE 1
-		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-		//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
+		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset));
 
 		// Create the approval button only if user cannot edit the item (**note check at top of this method)
 		if ( $has_edit_state ) return;
@@ -2571,10 +2565,7 @@ class flexicontent_html
 		// Determine if current user can edit the given item
 		$has_edit_state = false;
 		$asset = 'com_content.article.' . $item->id;
-		$has_edit_state = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
-		// ALTERNATIVE 1
-		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-		//$has_edit_state = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
+		$has_edit_state = $user->authorise('core.edit', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.edit.own', $asset));
 
 		// Create the edit button only if user can edit the give item
 		if ( !$has_edit_state ) return;
