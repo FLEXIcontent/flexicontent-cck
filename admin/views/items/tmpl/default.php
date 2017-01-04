@@ -885,7 +885,7 @@ jQuery(document).ready(function(){
 		<?php endif; ?>
 
 			<td class="col_state" style="padding-right: 8px;">
-				<div class="btn-group fc_btn_group">
+				<div class="btn-group fc-group fc-items">
 					<?php
 					$item_url = str_replace('&', '&amp;',
 						FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $row->categoryslug, 0, $row).

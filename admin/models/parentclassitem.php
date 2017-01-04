@@ -147,7 +147,8 @@ class ParentClassItem extends JModelAdmin
 	function setId($id, $currcatid=0, $typeid=0, $ilayout=null)
 	{
 		// Set a new item id and wipe data
-		if ($this->_id != $id) {
+		if ($this->_id != $id)
+		{
 			$this->_item = null;
 			$this->_version = null;
 			$this->_cparams = null;
@@ -200,7 +201,8 @@ class ParentClassItem extends JModelAdmin
 		$params->merge($cparams);
 		
 		// Merge into them the type parameters, *(type was set/verified above)
-		if ($this->_typeid) {
+		if ($this->_typeid)
+		{
 			$tparams = $this->getTypeparams();
 			$tparams = new JRegistry($tparams);
 			$params->merge($tparams);
@@ -259,8 +261,10 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_item || $this->_loadItem()) {
-			if(isset($this->_item->$property)) {
+		if ($this->_item || $this->_loadItem())
+		{
+			if (isset($this->_item->$property))
+			{
 				return $this->_item->$property;
 			}
 		}
@@ -272,19 +276,35 @@ class ParentClassItem extends JModelAdmin
 	 * Overridden set method to pass properties on to the item
 	 *
 	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return	boolean	True on success
+	 * @param	  string	 $property	 The name of the property
+	 * @param	  mixed	   $value		   The value of the property to set
+	 * @return	boolean  True on success
 	 * @since	1.5
 	 */
 	function set( $property, $value=null )
 	{
-		if ($this->_item || $this->_loadItem()) {
+		if ($this->_item || $this->_loadItem())
+		{
 			$this->_item->$property = $value;
 			return true;
-		} else {
-			return false;
 		}
+
+		return false;
+	}
+
+
+	/**
+	 * Set method to pass properties on to the model object
+	 *
+	 * @access	public
+	 * @param	  string	 $property	 The name of the property
+	 * @param	  mixed	   $value		   The value of the property to set
+	 * @return	void
+	 * @since	3.2
+	 */
+	function setProperty( $property, $value=null )
+	{
+		$this->$property = $value;
 	}
 	
 	
@@ -308,7 +328,8 @@ class ParentClassItem extends JModelAdmin
 		$pk = !empty($pk) ? $pk : (int) $this->getState($this->getName().'.id');
 		
 		// Set new item id, clearing item data, ONLY IF DIFFERENT than existing primary key
-		if ($pk != $this->_id) {
+		if ($pk != $this->_id)
+		{
 			$this->setId($pk);
 		}
 		
@@ -1779,7 +1800,9 @@ class ParentClassItem extends JModelAdmin
 		
 		// Trim title, but allow not setting it ... to maintain current value (but we will also need to override 'required' during validation)
 		if (isset($data['title']))
+		{
 			$data['title'] = trim($data['title']);
+		}
 		
 		// Set back the altered categories and tags to the form data
 		$data['categories']  = $cats;  // Set it to real name of field: 'categories' INSTEAD OF 'cid'
@@ -1818,7 +1841,8 @@ class ParentClassItem extends JModelAdmin
 		// *******************************************************
 		// Retrieve submit configuration for new items in frontend
 		// *******************************************************
-		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
+		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) )
+		{
 			$h = $data['submit_conf'];
 			$session = JFactory::getSession();
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
@@ -1826,20 +1850,25 @@ class ParentClassItem extends JModelAdmin
 			
 			$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
 			$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
-			if ( $autopublished) {
+			if ( $autopublished)
+			{
 				// Dates forced during autopublishing
-				if ( @ $submit_conf['autopublished_up_interval'] ) {
+				if ( @ $submit_conf['autopublished_up_interval'] )
+				{
 					$publish_up_date = JFactory::getDate(); // Gives editor's timezone by default
 					$publish_up_date->modify('+ '.$submit_conf['autopublished_up_interval'].' minutes');
 					$publish_up_forced = $publish_up_date->toSql();
 				}
-				if ( @ $submit_conf['autopublished_down_interval'] ) {
+				if ( @ $submit_conf['autopublished_down_interval'] )
+				{
 					$publish_down_date = JFactory::getDate(); // Gives editor's timezone by default
 					$publish_down_date->modify('+ '.$submit_conf['autopublished_down_interval'].' minutes');
 					$publish_down_forced = $publish_down_date->toSql();
 				}
 			}
-		} else {
+		}
+		else
+		{
 			$autopublished    = 0;
 			$overridecatperms = 0;
 		}

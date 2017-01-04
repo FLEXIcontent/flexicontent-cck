@@ -916,7 +916,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			{
 				$onclick_open_selection = $select_in_modal ? ' fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj, null, null, null, {\'title\': \''.JText::_('FLEXI_SELECT_IMAGE', true).'\'}); ' : ' obj.toggle(); ';
 
-				$uploader_html = JHtml::_('fcuploader.getUploader', $field, $u_item_id, null, $n, array('container_class'=>'fc_inline_uploader fc_uploader_thumbs_view', 'maxcount'=>1, 'refresh_on_upload'=>false));
+				$uploader_html = (object) array('toggleBtn'=>'', 'container'=>''); //JHtml::_('fcuploader.getUploader', $field, $u_item_id, null, $n, array('container_class'=>'fc_inline_uploader fc_uploader_thumbs_view', 'maxcount'=>1, 'refresh_on_upload'=>false));
 				$change = '
 				<div class="'.$input_grp_class.'" style="margin-top:12px;" >
 					<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); '.$onclick_open_selection.'">

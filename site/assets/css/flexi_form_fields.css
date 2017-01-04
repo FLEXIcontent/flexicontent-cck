@@ -435,6 +435,8 @@ div.empty_image {
 	color: #444;
 	border-radius: 2px;
 	cursor: auto;
+	font-style: italic;
+	font-weight: bold;
 }
 #flexicontent .fc_filedata_txt_nowrap,
 #flexicontent .fc_filedata_txt {

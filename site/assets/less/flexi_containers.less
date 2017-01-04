@@ -604,7 +604,7 @@ body .fc-nowrap-box,
 	margin: 0;
 }
 
-body .btn-group.fc_btn_group > .btn.btn-small {
+body .btn-group.fc-group > .btn.btn-small {
 	padding: 4px 4px;
 	line-height: 14px;
 	height: 14px;
@@ -615,13 +615,17 @@ div.statetoggler [class^="icon-"],
 div.statetoggler [class*=" icon-"], 
 div.statetoggler_disabled [class^="icon-"], 
 div.statetoggler_disabled [class*=" icon-"], 
-body .btn-group.fc_btn_group > .btn.btn-small [class^="icon-"],
-body .btn-group.fc_btn_group > .btn.btn-small [class*=" icon-"] {
+body .btn-group.fc-group > .btn.btn-small [class^="icon-"],
+body .btn-group.fc-group > .btn.btn-small [class*=" icon-"] {
 	font-size: 14px;
 }
 
-body .btn-group.fc_btn_group > .fc-preview-btn.btn.btn-small,
-body .btn-group.fc_btn_group > div.statetoggler_disabled.btn.btn-small,
-body .btn-group.fc_btn_group > div.statetoggler.btn.btn-small {	
+body .btn-group.fc-group > .fc-preview-btn.btn.btn-small,
+body .btn-group.fc-group > div.statetoggler_disabled.btn.btn-small,
+body .btn-group.fc-group > div.statetoggler.btn.btn-small {	
 	padding: 4px 8px;
+}
+
+.fc-items .icon-screen:before {
+	color: black;
 }
