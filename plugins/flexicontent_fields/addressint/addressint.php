@@ -438,7 +438,13 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		
+
+
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
+
+		$field->html = array();  // Make sure this is an array
 
 		// Render form field
 		$formlayout = $field->parameters->get('formlayout', '');

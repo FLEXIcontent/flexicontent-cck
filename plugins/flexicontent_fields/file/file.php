@@ -495,13 +495,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		flexicontent_html::loadFramework('flexi-lib');
-		
-		
+
+
 		// *****************************************
 		// Create field's HTML display for item form
 		// *****************************************
-		
-		$field->html = array();
+
+		$field->html = array();  // Make sure this is an array
 
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
