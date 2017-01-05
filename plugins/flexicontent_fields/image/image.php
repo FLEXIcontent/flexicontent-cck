@@ -187,9 +187,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
 			$mm_mode_common_js_added = true;
 		}
-		
-		$field->html = '';
-		
+
+
 		// Initialise property with default value
 		if ( !$field->value )
 		{
@@ -717,6 +716,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$files_data = $this->getFileData( $field->value, $published=false );
 		}
+
+		$field->html = array();  // Make sure this is an array
+
 		foreach ($field->value as $index => $value)
 		{
 			// Compatibility for unserialized values, e.g. Reload user input after form validation error
