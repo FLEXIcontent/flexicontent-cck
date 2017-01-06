@@ -57,12 +57,6 @@ class flexicontent_tags extends JTable
 			return false;
 		}
 		
-		$alias = JFilterOutput::stringURLSafe($this->name);
-
-		if(empty($this->alias) || $this->alias === $alias ) {
-			$this->alias = $alias;
-		}
-		
 		/** check for existing name */
 		$query = 'SELECT id'
 				.' FROM #__flexicontent_tags'
@@ -76,6 +70,43 @@ class flexicontent_tags extends JTable
 			//$this->_error = JText::sprintf('TAG NAME ALREADY EXIST', $this->name);
 			return false;
 		}
+
+		// check for empty alias
+		if(empty($this->alias)) {
+			$this->alias = $this->name;
+		}
+
+		// FLAGs
+		$unicodeslugs = JFactory::getConfig()->get('unicodeslugs');
+		
+		$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
+		$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
+		
+		// workaround for old joomla versions (Joomla <=3.5.x) that do not allowing to set transliteration language to be element's language
+		if ( !$unicodeslugs && !$supports_content_language_transliteration )
+		{
+			// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
+			$language = !empty($this->language) && $this->language != '*' ?
+				$this->language :
+				JComponentHelper::getParams('com_languages')->get('site', '*') ;
+			
+			// Remove any '-' from the string since they will be used as concatenaters
+			$this->alias = str_replace('-', ' ', $this->alias);
+			
+			// Do the transliteration accorting to ELEMENT's language
+			$this->alias = JLanguage::getInstance($language)->transliterate($this->alias);
+		}
+		
+		// make alias safe and transliterate it
+		$this->alias = JApplicationHelper::stringURLSafe($this->alias, $this->language);
+		
+		
+		// check for empty alias and fallback to using current date
+		if (trim(str_replace('-', '', $this->alias)) == '')
+		{
+			$this->alias = JFactory::getDate()->format('Y-m-d-H-i-s');
+		}
+
 	
 		return true;
 	}
