@@ -241,7 +241,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		}
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
-		
+
+		// Fields common CSS
+		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+
 		// This is not included automatically in frontend
 		flexicontent_html::loadFramework('flexi-lib');
 		
@@ -334,7 +337,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					if (original_objs[i].value) imgobjs.push(original_objs[i].value);
 					if (delfilename!='' && original_objs[i].value == delfilename)
 					{
-						window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', '1');
+						//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
 						remove_existing_files_from_list = 1;
 					}
 				}
@@ -343,7 +346,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					if (existing_objs[i].value) imgobjs.push(existing_objs[i].value);
 					if (delfilename!='' && existing_objs[i].value == delfilename)
 					{
-						window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', '1');
+						//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
 						remove_new_files_from_list = 1;
 					}
 				}
@@ -353,7 +356,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 					mssg = '".JText::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
 					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".JText::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
 					alert( mssg );
-					window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', '2');
+					//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
 				}
 				
 				for (i=0,n=imgobjs.length; i<n; i++)
@@ -430,8 +433,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 
 		$js .= "			
-			var fc_fileselement_close_modal = 1;
-			var fc_fileselement_targetid = '".$targetid."';
+			var fcfiles_keep_modal = 0;
+			var fcfiles_targetid = '".$targetid."';
 
 			function fc_fileselement_assign_files(el)
 			{
@@ -447,20 +450,20 @@ class FlexicontentViewFileselement extends JViewLegacy
 				
 				setTimeout(function()
 				{
-					fc_fileselement_close_modal = 0;
+					fcfiles_keep_modal = 1;
 					var row_count = 0;
 					rows.each(function(index, value)
 					{
 						var row = jQuery(this).closest('tr');
 						var assign_file_btn = row.find('.fc_set_file_assignment');
-						if (row_count > 0 || fc_fileselement_targetid == '')
+						if (row_count > 0 || fcfiles_targetid == '')
 						{
 							// Add after given element or at end if element was not provided
-							fc_fileselement_targetid = fc_fileselement_targetid ? 
-								window.parent.addField".$fieldid."(null, null, jQuery('#'+fc_fileselement_targetid, parent.document).closest('li'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
+							fcfiles_targetid = fcfiles_targetid ? 
+								window.parent.addField".$fieldid."(null, null, jQuery('#'+fcfiles_targetid, parent.document).closest('li'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
 								window.parent.addField".$fieldid."(null);
 						}
-						if (fc_fileselement_targetid == 'cancel')  return false;  // Stop .each() loop
+						if (fcfiles_targetid == 'cancel')  return false;  // Stop .each() loop
 						row_count++;
 						assign_file_btn.trigger('click');
 					});
@@ -471,7 +474,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 			function fc_fileselement_assign_file(target_valuebox_tagid, file_data, f_preview)
 			{
 				file_data.preview = f_preview;
-				var result = window.parent.fcfield_assignFile".$fieldid."(target_valuebox_tagid, file_data, fc_fileselement_close_modal);
+				var result = window.parent.fcfield_assignFile".$fieldid."(target_valuebox_tagid, file_data, fcfiles_keep_modal);
 				if (result != 'cancel')
 				{
 					jQuery('file'+file_data.id).className = 'striketext';

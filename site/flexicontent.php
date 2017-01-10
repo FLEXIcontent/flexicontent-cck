@@ -210,7 +210,14 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$inc_path = $path.'less/include/';
 	
 	$less_files = array(
-		'less/flexi_form_fields.less',
+		'less/flexi_file_fields.less'
+	);
+	$force = $stale_fields = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
+	$less_files = array('less/flexi_form_fields.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+	$less_files = array(
 		'less/flexi_filters.less',
 		'less/j3x.less',
 		'less/fcvote.less',

@@ -22,7 +22,7 @@ use Joomla\String\StringHelper;
 
 $tip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hint_image = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
+$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
 $warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
@@ -223,26 +223,25 @@ $document->addScriptDeclaration($js);
 
 flexicontent_html::loadFramework('nouislider');
 
-$slider_conf = new stdClass();
-$slider_conf->slider_name = $name = 'fc-fileman-list-thumb-size';
-$slider_conf->element_selector = 'div.fc-fileman-list-thumb-box';
-$slider_conf->element_class_prefix = 'thumb_';
-$slider_conf->values = array(40, 60, 90, 120, 150);
+$cfg = new stdClass();
+$cfg->slider_name = 'fc-fileman-list-thumb-size';
+$cfg->element_selector = 'div.fc-fileman-list-thumb-box';
+$cfg->element_class_prefix = 'thumb_';
+$cfg->values = array(40, 60, 90, 120, 150);
 
-$thumb_size['fm-list'] = $jinput->cookie->get($name . '-val', 40, 'int');
-$slider_conf->initial_pos = (int) array_search($thumb_size['fm-list'], $slider_conf->values);
-if ($slider_conf->initial_pos === false)
+$thumb_size['fm-list'] = $jinput->cookie->get($cfg->slider_name . '-val', 40, 'int');
+$cfg->initial_pos = (int) array_search($thumb_size['fm-list'], $cfg->values);
+if ($cfg->initial_pos === false)
 {
-	$slider_conf->initial_pos = 0;
+	$cfg->initial_pos = 0;
 }
-$thumb_size['fm-list'] = $slider_conf->values[$slider_conf->initial_pos];
-$jinput->cookie->set($name . '-val', $thumb_size['fm-list']);
+$thumb_size['fm-list'] = $cfg->values[$cfg->initial_pos];
+$jinput->cookie->set($cfg->slider_name . '-val', $thumb_size['fm-list']);
 
-$slider_conf->labels = array();
-foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
+$cfg->labels = array();
+foreach($cfg->values as $value) $cfg->labels[] = $value .'x'. $value;
 //include(dirname(__FILE__). '/../../filemanager/tmpl/layouts/single_slider.php');
 
-$cfg = $slider_conf;
 $element_classes = array();
 foreach($cfg->values as $value) $element_classes[] = $cfg->element_class_prefix . $value;
 
@@ -254,13 +253,17 @@ $js = "
 jQuery(document).ready(function()
 {
 	fc_attachSingleSlider({
-		'name': '".$name."',
+		'name': '".$cfg->slider_name."',
 		'step_values': ".$step_values.",
 		'step_labels': ".$step_labels.",
 		'initial_pos': ".$cfg->initial_pos.",
+		'start_hidden': false,
 		'element_selector': '".$cfg->element_selector."',
 		'element_class_list': '".$element_class_list."',
-		'element_class_prefix': '".$cfg->element_class_prefix."'
+		'element_class_prefix': '".$cfg->element_class_prefix."',
+		'elem_container_selector': '',
+		'elem_container_class': '',
+		'elem_container_prefix': '',
 	});
 });
 ";
@@ -272,26 +275,25 @@ $document->addScriptDeclaration($js);
 // *** Slider for files grid view
 // ***
 
-$slider_conf = new stdClass();
-$slider_conf->slider_name = $name = "fc-fileman-grid-thumb-size";
-$slider_conf->element_selector = "div.fc-fileman-grid-thumb-box";
-$slider_conf->element_class_prefix = "thumb_";
-$slider_conf->values = array(90, 120, 150, 200, 250);
-$slider_conf->labels = array();
+$cfg = new stdClass();
+$cfg->slider_name = "fc-fileman-grid-thumb-size";
+$cfg->element_selector = "div.fc-fileman-grid-thumb-box";
+$cfg->element_class_prefix = "thumb_";
+$cfg->values = array(90, 120, 150, 200, 250);
+$cfg->labels = array();
 
-$thumb_size['fm-grid'] = $jinput->cookie->get($name . '-val', 150, 'int');
-$slider_conf->initial_pos = (int) array_search($thumb_size['fm-grid'], $slider_conf->values);
-if ($slider_conf->initial_pos === false)
+$thumb_size['fm-grid'] = $jinput->cookie->get($cfg->slider_name . '-val', 150, 'int');
+$cfg->initial_pos = (int) array_search($thumb_size['fm-grid'], $cfg->values);
+if ($cfg->initial_pos === false)
 {
-	$slider_conf->initial_pos = 0;
+	$cfg->initial_pos = 0;
 }
-$thumb_size['fm-grid'] = $slider_conf->values[$slider_conf->initial_pos];
-$jinput->cookie->set($name . '-val', $thumb_size['fm-grid']);
+$thumb_size['fm-grid'] = $cfg->values[$cfg->initial_pos];
+$jinput->cookie->set($cfg->slider_name . '-val', $thumb_size['fm-grid']);
 
-foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
+foreach($cfg->values as $value) $cfg->labels[] = $value .'x'. $value;
 //include(dirname(__FILE__). '/../../filemanager/tmpl/layouts/single_slider.php');
 
-$cfg = $slider_conf;
 $element_classes = array();
 foreach($cfg->values as $value) $element_classes[] = $cfg->element_class_prefix . $value;
 
@@ -303,13 +305,17 @@ $js = "
 jQuery(document).ready(function()
 {
 	fc_attachSingleSlider({
-		'name': '".$name."',
+		'name': '".$cfg->slider_name."',
 		'step_values': ".$step_values.",
 		'step_labels': ".$step_labels.",
 		'initial_pos': ".$cfg->initial_pos.",
+		'start_hidden': true,
 		'element_selector': '".$cfg->element_selector."',
 		'element_class_list': '".$element_class_list."',
-		'element_class_prefix': '".$cfg->element_class_prefix."'
+		'element_class_prefix': '".$cfg->element_class_prefix."',
+		'elem_container_selector': '',
+		'elem_container_class': '',
+		'elem_container_prefix': '',
 	});
 });
 ";
@@ -323,25 +329,25 @@ if ($enable_multi_uploader)
 	// *** Create slider for resizing thumbnails in uploader
 	// ***
 
-	$slider_conf = new stdClass();
-	$slider_conf->slider_name = $name = 'fc-uploader-grid-thumb-size';
-	$slider_conf->element_selector = '#'.$uploader_tag_id . $up_sfx_n .' li.plupload_delete';
-	$slider_conf->element_class_prefix = 'thumb_';
-	$slider_conf->values = array(90, 120, 150, 200, 250);
-	$slider_conf->labels = array();
+	$cfg = new stdClass();
+	$cfg->slider_name = 'fc-uploader-grid-thumb-size';
+	$cfg->elem_container_selector = '#'.$uploader_tag_id . $up_sfx_n;
+	$cfg->element_selector = '#'.$uploader_tag_id . $up_sfx_n .' ul.plupload_filelist > li';
+	$cfg->element_class_prefix = 'thumb_';
+	$cfg->values = array(90, 120, 150, 200, 250);
+	$cfg->labels = array();
 
-	$thumb_size['up-grid'] = $jinput->cookie->get($name . '-val', 150, 'int');
-	$slider_conf->initial_pos = (int) array_search($thumb_size['up-grid'], $slider_conf->values);
-	if ($slider_conf->initial_pos === false)
+	$thumb_size['up-grid'] = $jinput->cookie->get($cfg->slider_name . '-val', 150, 'int');
+	$cfg->initial_pos = (int) array_search($thumb_size['up-grid'], $cfg->values);
+	if ($cfg->initial_pos === false)
 	{
-		$slider_conf->initial_pos = 1;
+		$cfg->initial_pos = 1;
 	}
-	$thumb_size['up-grid'] = $slider_conf->values[$slider_conf->initial_pos];
-	$jinput->cookie->set($name . '-val', $thumb_size['up-grid']);
+	$thumb_size['up-grid'] = $cfg->values[$cfg->initial_pos];
+	$jinput->cookie->set($cfg->slider_name . '-val', $thumb_size['up-grid']);
 
-	foreach($slider_conf->values as $value) $slider_conf->labels[] = $value .'x'. $value;
+	foreach($cfg->values as $value) $cfg->labels[] = $value .'x'. $value;
 
-	$cfg = $slider_conf;
 	$element_classes = array();
 	foreach($cfg->values as $value) $element_classes[] = $cfg->element_class_prefix . $value;
 
@@ -349,27 +355,27 @@ if ($enable_multi_uploader)
 	$step_values = '[' . implode(', ', $cfg->values) . ']';
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
-	$js = "
-	var fc_uploader_slider_cfg = {
-		'name': '".$name."',
-		'step_values': ".$step_values.",
-		'step_labels': ".$step_labels.",
-		'initial_pos': ".$cfg->initial_pos.",
-		'element_selector': '".$cfg->element_selector."',
-		'element_class_list': '".$element_class_list."',
-		'element_class_prefix': '".$cfg->element_class_prefix."'
-	}
-	";
-	$document->addScriptDeclaration($js);
-
 	$upload_options = array(
 		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
 			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
-		'maxcount' => 0,
+		'upload_maxcount' => 0,
 		'layout' => $this->layout,
 		'edit_properties' => true,
-		'refresh_on_upload' => true,
-		'height_spare' => ($isFilesElement ? 320 : 460)
+		'add_size_slider' => true,
+		'refresh_on_complete' => true,
+		'height_spare' => ($isFilesElement ? 320 : 460),
+		'thumb_size_slider_cfg' => "{
+			name: '".$cfg->slider_name."',
+			step_values: ".$step_values.",
+			step_labels: ".$step_labels.",
+			initial_pos: ".$cfg->initial_pos.",
+			element_selector: '".$cfg->element_selector."',
+			element_class_list: '',
+			element_class_prefix: '',
+			elem_container_selector: '".$cfg->elem_container_selector."',
+			elem_container_class: '".$element_class_list."',
+			elem_container_prefix: '".$cfg->element_class_prefix."'
+		}"
 	);
 
 	JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
@@ -589,7 +595,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 			</div>
 
 			<select id="fc-fileman-grid-thumb-size-sel" name="fc-fileman-grid-thumb-size-sel" style="display: none;"></select>
-			<div id="fc-fileman-grid-thumb-size_nouislider" class="fman_grid_element" style="visibility: hidden; display: none;"></div>
+			<div id="fc-fileman-grid-thumb-size_nouislider" class="fman_grid_element" style="display: none;"></div>
 			<div class="fc_slider_input_box">
 				<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />
 			</div>
@@ -787,8 +793,8 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 						// Link to assign file value into the content form
 						$file_assign_link = $this->assign_mode ?
-							"window.parent.fcfield_assignImage".$this->fieldid."(fc_fileselement_targetid, '".$filename."', '".$file_preview."', !fc_fileselement_close_modal, '".$filename_original."'); document.getElementById('file".$row->id."').className='striketext';" :
-							"fc_fileselement_assign_file(fc_fileselement_targetid, _file_data['".$i."'], '".$file_preview."');";
+							"window.parent.fcfield_assignImage".$this->fieldid."(fcfiles_targetid, '".$filename."', '".$file_preview."', fcfiles_keep_modal, '".$filename_original."'); document.getElementById('file".$row->id."').className='striketext';" :
+							"fc_fileselement_assign_file(fcfiles_targetid, _file_data['".$i."'], '".$file_preview."');";
 						$file_assign_arr[$i] = $file_assign_link;
 					}
 					else
@@ -1112,12 +1118,14 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 			<?php
 			// Configuration
 			$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
+
 			$server_limit_exceeded = $phpUploadLimit['value'] < $upConf['upload_maxsize'];
-			
-			$conf_limit_class = $server_limit_exceeded ? 'badge badge-box' : '';
-			$conf_limit_style = $server_limit_exceeded ? 'text-decoration: line-through;' : '';
-			$conf_lim_image   = $server_limit_exceeded ? $warn_image.$hint_image : $hint_image;
-			$sys_limit_class  = $server_limit_exceeded ? 'badge badge-box badge-important' : '';
+			$server_limit_active = $server_limit_exceeded && ! $enable_multi_uploader;
+
+			$conf_limit_class = $server_limit_active ? 'badge badge-box' : '';
+			$conf_limit_style = $server_limit_active ? 'text-decoration: line-through;' : '';
+			$conf_lim_image   = $server_limit_active ? $warn_image.$hint_image : $hint_image;
+			$sys_limit_class  = $server_limit_active ? 'badge badge-box badge-important' : '';
 
 			$has_field_upload_maxsize   = !empty($this->field) && strlen($this->field->parameters->get('upload_maxsize'));
 			$has_field_resize_on_upload = !empty($this->field) && strlen($this->field->parameters->get('resize_on_upload'));
@@ -1141,7 +1149,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 						'.($perms->SuperAdmin ?
 							'<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.flexicontent_html::getToolTip($limit_typename, $limit_typename.'_DESC', 1, 1).'" data-placement="top"></span>
 						' : '').'
-						'.($server_limit_exceeded && ! $enable_multi_uploader ? /* plupload JS overcomes server limitations so we will not display it, if using plupload*/
+						'.($server_limit_active ? /* plupload JS overcomes server limitations so we will not display it, if using plupload*/
 						'
 							<span class="fc-php-upload-limit-box fc-about-server-size-limit">
 								<span class="icon-database"></span>

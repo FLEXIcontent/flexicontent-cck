@@ -377,7 +377,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		
 		$limit = $pagination->limit;
-		$inline_ss_max = 500;
+		$inline_ss_max = 50000;
 		$drag_reorder_max = 150;
 		if ( $limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
 		

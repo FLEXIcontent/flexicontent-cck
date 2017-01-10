@@ -38,37 +38,55 @@
 				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
 
-			<field name="fields_box_placing" type="radio" default="0" label="Fields Container" description="You can save space by floating the form fields container" depend_class="fieldgroupoff" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_CLEARED</option>
-				<option value="1">FLEXI_FLOATED_LEFT</option>
-			</field>
-			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
-			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_GALLERY_MODE_DESC" depend_class="fieldgroupoff" level="level3" class="alert alert-info fcpadded" />
+
+			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
-				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
-				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
-				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
+			<field name="fields_box_placing" type="radio" default="1" label="FLEXI_FIELD_VALUES_PER_ROW" description="FLEXI_FIELD_VALUES_PER_ROW_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">1</option>
+				<option value="1">FLEXI_MULTIPLE</option>
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_BUTTONS" description="" depend_class="fieldgroupoff multivalue-mode" level="level2" />
+			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
+				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
+				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
+				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
+			</field>
+			<field name="file_btns_position" type="multilist" subtype="radio" default="2" label="FLEXI_FIELD_FILE_BTNS_POSITION" description="FLEXI_FIELD_FILE_BTNS_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_INTEGRATED_ICONS</option>
+				<option value="1">FLEXI_FIELD_SEPARATE_ROW_ICONS</option>
+				<option value="2">FLEXI_FIELD_SEPARATE_ROW_ICONS_TEXT</option>
+			</field>
+			
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png" size="60" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
-			<field name="" type="separator" default="FLEXI_ABOUT_PREVIEW_THUMBNAILS_SIZES" description="" level="level3" class="alert alert-info fcpadded"/>
-			<field name="preview_w" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
-			<field name="preview_h" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
-
+			<field name="thumb_size_resizer" type="radio" default="2" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
+			</field>
+			<field name="thumb_size_default" type="radio" default="120" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
+				<option value="90">90</option>
+				<option value="120">120</option>
+				<option value="150">150</option>
+				<option value="200">200</option>
+				<option value="250">250</option>
+			</field>
+			
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 
@@ -100,11 +118,6 @@
 				<option value="0" show_list="about-target-dir-mode" hide_list="">FLEXI_MEDIA</option>
 				<option value="1" show_list="about-target-dir-mode" hide_list="">FLEXI_SECURE</option>
 			</field>
-			<field name="select_in_modal" type="multilist" subtype="radio" default="1" toggle_related="1" label="Selection method" description="Show image selection in modal popup that maximizes available usable space" depend_class="img-db-mode" class="btn-group group-fcinfo">
-				<option value="1" show_list=""  hide_list="db-imgpicker">Filemanager (AJAX uploader)</option>
-				<option value="0" show_list="db-imgpicker"  hide_list="">Image picker (inline)</option>
-				<option value="2" show_list="db-imgpicker"  hide_list="">Image picker (popup)</option>
-			</field>
 			<field name="auto_delete_unused" type="radio" default="1" label="FLEXI_AUTO_DELETE_UNUSED" description="FLEXI_AUTO_DELETE_UNUSED_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_YES</option>
@@ -119,14 +132,6 @@
 				<option value="1">FLEXI_FIELD_CURRENT_USER</option>
 				<option value="0">FLEXI_FIELD_ANY_USER</option>
 			</field>
-
-			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_PICKER" description="FLEXI_FIELD_IMAGE_PICKER_DESC" level="level4" class="alert alert-info fcpadded" depend_class="img-db-mode db-imgpicker" />
-			<field name="existing_imgs" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_SHOW" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode db-imgpicker" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="db-existing-imgpicker">FLEXI_HIDE</option>
-				<option value="2" show_list="" hide_list="db-existing-imgpicker">Select drop-down</option>
-				<option value="1" show_list="db-existing-imgpicker" hide_list="">Select + Image picker</option>
-			</field>
-			<field name="imagepickerlimit" type="text" default="200" label="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode db-imgpicker db-existing-imgpicker" />
 
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level2" depend_class="client-resize"  />
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" depend_class="client-resize"  class="alert alert-info fcpadded"/>
