@@ -51,8 +51,8 @@
 				reader.onload = function (e) {
 					var img = jQuery('#'+img_id);
 					img.attr('src', e.target.result);
-					if (thumb_w) img.width(thumb_w);
-					if (thumb_h) img.height(thumb_h);
+					if (thumb_w)  parseInt(thumb_w) ? img.width(thumb_w)  : img.css('width',  thumb_w);
+					if (thumb_h)  parseInt(thumb_h) ? img.height(thumb_h) : img.css('height', thumb_h);
 					img.show();
 				};
 				reader.readAsDataURL(input_files[0]);
@@ -589,40 +589,65 @@
 		document.formvalidator.attachToForm(null, sel);
 	}
 
-	
+
 	/* Set children to have same minimum height e.g. floated elements that need to wrap properly */
-	function fc_setEqualHeights(box, property)
+	function fc_setEqualHeights(box, property, delay)
 	{
 		property = !!property ? property : 0;  // 0: both height + min-height, 1: height, 2: min-height
+		delay = !!delay ? delay : 20;
 		var elements = box.children();
 		elements.css({'height': '', 'min-height': ''});
-		var max_h  = Number.NEGATIVE_INFINITY;
-		var max_mh = Number.NEGATIVE_INFINITY;
+		setTimeout(function() {
+			var max_h  = Number.NEGATIVE_INFINITY;
+			var max_mh = Number.NEGATIVE_INFINITY;
 
-		jQuery.each(elements, function(index, item) {
-			if (property==1 || property==0)
-			{
-				if (jQuery(item).height() > max_h) max_h = jQuery(item).height();
-			}
-			if (property==2 || property==0)
-			{
-				if (jQuery(item).outerHeight() > max_mh) max_mh = jQuery(item).outerHeight();
-			}
-		})
+			jQuery.each(elements, function(index, item) {
+				if (property==1 || property==0)
+				{
+					if (jQuery(item).height() > max_h) max_h = jQuery(item).height();
+				}
+				if (property==2 || property==0)
+				{
+					if (jQuery(item).outerHeight() > max_mh) max_mh = jQuery(item).outerHeight();
+				}
+			});
 
-		var val_h  = '' + max_h + 'px';
-		var val_mh = '' + max_mh + 'px';
-		elements.each(function(i, v) {
-			if (property==1 || property==0)
-			{
-				if (v.style.height != val_h) v.style.height = val_h;
-			}
-			if (property==2 || property==0)
-			{
-				if (v.style.minHeight != val_mh) v.style.minHeight = val_mh;
-			}
-		});
+			var val_h  = '' + max_h + 'px';
+			var val_mh = '' + max_mh + 'px';
+			elements.each(function(i, v) {
+				if (property==1 || property==0)
+				{
+					if (v.style.height != val_h) v.style.height = val_h;
+				}
+				if (property==2 || property==0)
+				{
+					if (v.style.minHeight != val_mh) v.style.minHeight = val_mh;
+				}
+			});
+		}, delay);
 	}
+
+
+	function fc_toggleCompactValuesView(el, field_values_box)
+	{
+		// Find field value container
+		var rows = field_values_box.find('li');
+		var values = field_values_box.find('.fc-field-props-box');
+
+		// Set expanding flag and expand or compact properties
+		var is_expanded = jQuery(el).data('expandedFieldState');
+		jQuery(el).data('expandedFieldState', !is_expanded);
+
+		if (is_expanded)
+		{
+			rows.each(function() {  jQuery(this).removeClass('fc-expanded');  });
+		}
+		else
+		{
+			rows.each(function() {  jQuery(this).addClass('fc-expanded');  });
+		}
+	}
+
 
 	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
 	function fc_bootstrapAttach(sel)
@@ -1651,17 +1676,21 @@
 	}
 
 
-	function fc_attachSingleSlider(cfg)
+	function fc_attachSingleSlider(cfg, type)
 	{
-		var slider = document.getElementById(cfg.name + '_nouislider');
+		var slider_tag_id = cfg.name + (cfg.sfx || '');
+		var slider = document.getElementById(slider_tag_id + '_nouislider');
+		//if (jQuery(slider).length) { window.console.log('not found slider ID: ' + slider_tag_id + '_nouislider'); return; }
 
-		var selectSL = jQuery('#' + cfg.name + '-sel');
-		var inputSL = document.getElementById(cfg.name + '-val');
+		var selectSL = jQuery('#' + slider_tag_id + '-sel');
+		var inputSL = document.getElementById(slider_tag_id + '-val');
 		var isSingle = 1;
+		!!type || (type = 2);  // 1: drop-down select , 2: slider (default type)
 
 		var IEversion = isIE();
 		var is_IE8 = IEversion && IEversion < 9;
-		if (is_IE8)
+		var use_select = is_IE8 || type == 1;
+		if (use_select)
 		{
 			if (selectSL.length)
 			{
@@ -1678,10 +1707,17 @@
 				selectSL
 					.val(cfg.step_values[cfg.initial_pos])
 					.on('change', function(e, data) {
-						var slider_input = jQuery('#' + cfg.name + '-val').get(0);
-						jQuery(cfg.element_selector)
-							.removeClass(cfg.element_class_list)
-							.addClass(cfg.element_class_prefix + selectSL.val());
+						var slider_input = jQuery('#' + slider_tag_id + '-val').get(0);
+
+						if (cfg.element_class_list != '')
+						{
+							jQuery(cfg.element_selector).removeClass(cfg.element_class_list).addClass(cfg.element_class_prefix + selectSL.val());
+						}
+						if (cfg.elem_container_class != '')
+						{
+							jQuery(cfg.elem_container_selector).removeClass(cfg.elem_container_class).addClass(cfg.elem_container_prefix + selectSL.val());
+						}
+
 						fclib_setCookie(slider_input.name, selectSL.val(), 0);
 					})
 					.css('display', '');  // avoid show() it adds display: block
@@ -1699,12 +1735,14 @@
 			step: 1,
 			range: {'min': 0, 'max': (cfg.step_values.length - 1)},
 		});
+		if (!!cfg.start_hidden) jQuery(slider).hide();
 
 		var tipHandles = slider.getElementsByClassName('noUi-handle'),
 		tooltips = [];
 
 		// Add divs to the slider handles.
-		for ( var i = 0; i < tipHandles.length; i++ ){
+		for ( var i = 0; i < tipHandles.length; i++ )
+		{
 			tooltips[i] = document.createElement('span');
 			tipHandles[i].appendChild(tooltips[i]);
 
@@ -1743,11 +1781,18 @@
 
 		// Handle form autosubmit
 		slider.noUiSlider.on('change', function() {
-			var slider = jQuery('#' + cfg.name + '_nouislider');
-			var slider_input = jQuery('#' + cfg.name + '-val').get(0);
-			jQuery(cfg.element_selector)
-				.removeClass(cfg.element_class_list)
-				.addClass(cfg.element_class_prefix + slider_input.value);
+			var slider = jQuery('#' + slider_tag_id + '_nouislider');
+			var slider_input = jQuery('#' + slider_tag_id + '-val').get(0);
+
+			if (cfg.element_class_list != '')
+			{
+				jQuery(cfg.element_selector).removeClass(cfg.element_class_list).addClass(cfg.element_class_prefix + slider_input.value);
+			}
+			if (cfg.elem_container_class != '')
+			{
+				jQuery(cfg.elem_container_selector).removeClass(cfg.elem_container_class).addClass(cfg.elem_container_prefix + slider_input.value);
+			}
+
 			fclib_setCookie(slider_input.name, slider_input.value, 0);
 		});
 

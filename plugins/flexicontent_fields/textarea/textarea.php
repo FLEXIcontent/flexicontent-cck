@@ -160,15 +160,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
-					containment: 'parent',
+					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 0) ? "
+					".($field->parameters->get('fields_box_placing', 1) ? "
 					,start: function(e) {
-						jQuery(e.target).children().css('float', 'left');
-						fc_setEqualHeights(jQuery(e.target), 0);
+						//jQuery(e.target).children().css('float', 'left');
+						//fc_setEqualHeights(jQuery(e.target), 0);
 					}
 					,stop: function(e) {
-						jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
+						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
 					}
 					" : '')."
 				});

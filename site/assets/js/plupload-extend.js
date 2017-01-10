@@ -112,8 +112,13 @@ fc_plupload = function(options)
 			url : this.options.action,
 			prevent_duplicates : true,
 			max_file_count: this.options.upload_maxcount,
+			autostart_on_select: this.options.autostart_on_select,
 			edit_properties: this.options.edit_properties,
-			refresh_on_upload: this.options.refresh_on_upload,			
+			add_size_slider: this.options.add_size_slider,
+			tag_id_sfx: sfx,
+
+			refresh_on_complete: this.options.refresh_on_complete,
+			thumb_size_default: this.options.thumb_size_default,
 
 			// Set maximum file size and chunking to 1 MB
 			max_file_size : this.options.upload_maxsize,
@@ -143,6 +148,7 @@ fc_plupload = function(options)
 						filename: file.name,
 						file_row_id: file.id
 					};
+					$('#'+file.id).find('.fc_props_edit_btn').remove();
 				},
 
 				QueueChanged: function (up)
@@ -157,11 +163,15 @@ fc_plupload = function(options)
 
 				UploadComplete: function (up, files)
 				{
-					if (up.getOption('refresh_on_upload'))
+					if (up.getOption('refresh_on_complete'))
 					{
 						window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
 						window.location.reload(true);  //window.location.replace(window.location.href);
 					}
+					var _this = $(up).data('fc_plupload_instance');
+					$.each(files, function(i, file) {
+						_this.extend_row( up, i, {isapplicable: {edit: false, preview: true}} );
+					});
 				}
 			}
 		}
@@ -229,11 +239,19 @@ fc_plupload = function(options)
 	{
 		// Get 'fc_plupload' class instance from uploader
 		var _this = $(uploader).data('fc_plupload_instance');
-
-		if (typeof fc_uploader_slider_cfg === 'undefined') return;
 		var uploader_container = $(uploader.settings.container);
 
-		if (uploader_container.find('.fc_plupload_toggleThumbs_btn').length==0)
+		// Autostart uploading
+		if (uploader.getOption('autostart_on_select'))
+		{
+			uploader_container.find('.plupload_button.plupload_start').hide();
+		}
+
+		var slider_cfg = _this.options.thumb_size_slider_cfg;
+		var slider_sfx = uploader.getOption('add_size_slider') ? uploader.getOption('tag_id_sfx') : '';
+		var slider_tag_id = slider_cfg ? slider_cfg.name + slider_sfx : '';
+
+		if (!uploader.getOption('max_file_count') || uploader.getOption('max_file_count') > 1)
 		{
 			uploader_container.find('.plupload_filelist').sortable({
 				cancel: '.fc_zooming',
@@ -241,19 +259,33 @@ fc_plupload = function(options)
 				tolerance: 'pointer',
 				distance: 12
 			});
-			uploader_container.find('.plupload_header_content')
-			.prepend('\
-				<div id="fc-uploader-loading" class="fc-mssg-inline fc-success  fc-small fc-iblock fc-nobgimage" style="display: none;">\
+		}
+
+		var uploader_header = uploader_container.find('.plupload_header_content');
+
+		/*if (uploader_header.find('.fc-uploader-loading').length==0)
+		{
+			uploader_header.prepend('\
+				<div class="fc-mssg-inline fc-success fc-small fc-iblock fc-nobgimage fc-uploader-loading" style="display: none;">\
 					<img src="components/com_flexicontent/assets/images/ajax-loader.gif" /> ' + Joomla.JText._('FLEXI_LOADING_IMAGES') + ' ...\
 				</div>\
-			')
-			.prepend('\
-				<select id="fc-uploader-grid-thumb-size-sel" name="fc-uploader-grid-thumb-size-sel" type="text" style="display: none;"></select>\
-				<div id="fc-uploader-grid-thumb-size_nouislider" class="fc_uploader_grid_element" style="visibility: hidden; display: none;"></div>\
+			');
+		}*/
+
+		if (slider_cfg && uploader.getOption('add_size_slider'))
+		{
+			uploader_header.prepend('\
+				<select id="'+slider_tag_id+'-sel" name="'+slider_tag_id+'-sel" class="fc_uploader_size_select" type="text" style="display: none;"></select>\
+				<div id="'+slider_tag_id+'_nouislider" class="fc_uploader_grid_element fc_uploader_size_slider" style="display: none;"></div>\
 				<div class="fc_slider_input_box">\
-					<input id="fc-uploader-grid-thumb-size-val" name="fc-uploader-grid-thumb-size-val" type="text" size="12" value="150" />\
+					<input id="'+slider_tag_id+'-val" name="'+slider_tag_id+'-val" type="text" size="12" value="150" />\
 				</div>\
-			')
+			');
+		}
+
+		if (uploader_header.find('.fc_plupload_toggleThumbs_btn').length==0)
+		{
+			uploader_header
 			.prepend('\
 				<span class="btn fc_plupload_toggleThumbs_btn" style="float:right; margin: 12px 8px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
 					<span class="icon-image"></span> <span class="fc_hidden_960">' + Joomla.JText._('FLEXI_THUMBNAILS') + '</span>\
@@ -265,9 +297,19 @@ fc_plupload = function(options)
 				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 60px;" title="Grid"><i class="icon-grid-view"></i></button>\
 			</div>\
 			');
-
-			if (typeof fc_uploader_slider_cfg !== 'undefined') setTimeout(function(){ fc_attachSingleSlider(fc_uploader_slider_cfg); }, 40);
 		}
+
+		setTimeout(function(){
+			// Attach slider
+			if (slider_cfg && uploader.getOption('add_size_slider'))
+			{
+				fc_attachSingleSlider( jQuery.extend(true, {sfx: slider_sfx, start_hidden: true}, slider_cfg) );
+				$('#'+slider_tag_id).hide();  // TODO add config option for this
+			}
+			// Set initial thumbnail size
+			var thumb_size_default = slider_tag_id && $('#'+slider_tag_id+'-val').length ? $('#'+slider_tag_id+'-val').val() : (uploader.getOption('thumb_size_default') ? uploader.getOption('thumb_size_default') : '150');
+			$(uploader.settings.container).addClass('thumb_' + thumb_size_default);
+		}, 40);
 	};
 
 
@@ -286,12 +328,22 @@ fc_plupload = function(options)
 		var form_data = $(uploader.settings.container).data('form_data');
 		if (!form_data) form_data = {};
 
+		// Update thumb size
+		var slider_cfg = _this.options.thumb_size_slider_cfg;
+		var slider_sfx = uploader.getOption('add_size_slider') ? uploader.getOption('tag_id_sfx') : '';
+		var slider_tag_id = slider_cfg ? slider_cfg.name + slider_sfx : '';
+		if (slider_cfg)
+		{
+			var thumb_size_default = $('#'+slider_tag_id+'-val').length ? $('#'+slider_tag_id+'-val').val() : (uploader.getOption('thumb_size_default') ? uploader.getOption('thumb_size_default') : '150');
+			$(uploader.settings.container).addClass('thumb_' + thumb_size_default);
+		}
+
 		// Since the full list is recreated, on new file(s) added. We need to loop through all
 		// files and update their client-side preview, and not only through the newly added files
-		for ( var i = 0 ; i < uploader.files.length ; i++ )   //for ( var i = 0 ; i < files.length ; i++ )
+		for ( var i = 0 ; i < uploader.files.length ; i++ )
 		{
 			// Add extra functionality to the file row: File properties and file preview
-			_this.extend_row( uploader, i );
+			_this.extend_row( uploader, i, {isapplicable: {edit: true, preview: true}} );
 
 			// Mark edit button with SUCCESS color to show that it has already assigned file properties
 			var file_row_id = uploader.files[i].id;
@@ -299,9 +351,17 @@ fc_plupload = function(options)
 				$('#'+file_row_id).find('.fc_props_edit_btn').addClass('btn-success') :
 				$('#'+file_row_id).find('.fc_props_edit_btn').removeClass('btn-success') ;
 		}
-	
-		$('#fc-uploader-grid-thumb-size-sel').trigger('change');
-		$('#fc-uploader-grid-thumb-size_nouislider').trigger('change');
+
+		var slider_cfg = _this.options.thumb_size_slider_cfg;
+		$('#'+slider_tag_id+'-sel').trigger('change');
+		$('#'+slider_tag_id+'_nouislider').trigger('change');
+
+		// Autostart uploading
+		if (uploader.getOption('autostart_on_select'))
+		{
+			$(uploader.settings.container).find('.plupload_filelist_footer').hide();
+			setTimeout(function(){ uploader.start(); }, 5000);
+		}
 	};
 
 
@@ -311,7 +371,7 @@ fc_plupload = function(options)
 	// * and show the client-side-only preview of the selected image object.
 	// *
 
-	this.extend_row = function(uploader, i)
+	this.extend_row = function(uploader, i, ops)
 	{
 		// Get 'fc_plupload' class instance from uploader
 		var _this = $(uploader).data('fc_plupload_instance');
@@ -330,14 +390,13 @@ fc_plupload = function(options)
 
 		// Add extra CSS classes to the delete buttons
 		file_row.find('.plupload_file_action > a').addClass('fc_uploader_row_remove');
-		file_row.addClass('thumb_' + ($('#fc-uploader-grid-thumb-size-val').length ? $('#fc-uploader-grid-thumb-size-val').val() : '150'));
 
 		/*
 		 * Add properties editing button
 		 */
 		var btn_box = $('<span class="btn-group fc_uploader_row_btns"></span>').insertAfter( file_name_box );
 
-		if (edit_properties)
+		if (edit_properties && ops.isapplicable.edit)
 		{
 			var properties_handle = $('<span class="btn fc_props_edit_btn icon-pencil"></span>').appendTo( btn_box );
 			var fileprops_message = $('<div class="fileprops_message fc_ajax_message_box"></div>').insertAfter( btn_box );
@@ -380,7 +439,7 @@ fc_plupload = function(options)
 		/*
 		 * Add image preview button ... 
 		 */
-		if ( is_img )
+		if (is_img && ops.isapplicable.preview)
 		{
 			var imgpreview_handle = $('<span class="btn fc_img_preview_btn icon-search"></span>').appendTo( btn_box );
 			var box = $('<span class="plupload_img_preview"></span>').insertAfter( btn_box );
@@ -390,7 +449,7 @@ fc_plupload = function(options)
 			if (!image_already_loaded)
 			{
 				fc_file_count++;
-				$('#fc-uploader-loading').show();
+				//$('.fc-uploader-loading').show();
 				fc_plupload_loaded_imgs[file_row_id] = $('<img class="plupload_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
 			}
 
@@ -457,7 +516,7 @@ fc_plupload = function(options)
 				// Now that the image is preloaded, grab the Base64 encoded data URL. This will show the image without making an Network request using the client-side file binary.
 				fc_plupload_loaded_imgs[file_row_id].prop( "src", this.getAsDataURL() ).removeClass('plupload_loading_img');
 				fc_file_count--;
-				if (fc_file_count==0) $('#fc-uploader-loading').hide();
+				//if (fc_file_count==0) $('.fc-uploader-loading').hide();
 			};
 
 			// Calling the .getSource() on the file will return an instance of mOxie.File, which is a unified file wrapper that can be used across the various runtimes.

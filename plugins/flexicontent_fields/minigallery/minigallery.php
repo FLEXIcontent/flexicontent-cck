@@ -80,7 +80,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$top_notice = $use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
 		
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
-		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 0);
+		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 		$form_file_preview  = (int) $field->parameters->get('form_file_preview', 2);
 		
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
@@ -202,7 +202,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			}
 
 
-			function fcfield_assignFile".$field->id."(value_container_id, file, close_modal)
+			function fcfield_assignFile".$field->id."(value_container_id, file, keep_modal)
 			{
 				// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
 				var originalname = file.filename_original ? file.filename_original : file.filename;
@@ -237,7 +237,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				var remove_obj = container.find('.inlinefile-del');
 				remove_obj.removeAttr('checked').trigger('change');
 
-				if (close_modal) fc_field_dialog_handle_".$field->id.".dialog('close');
+				if (!keep_modal && fc_field_dialog_handle_".$field->id.")
+				{
+					fc_field_dialog_handle_".$field->id.".dialog('close');
+				}
 				return true;
 			}
 
@@ -257,15 +260,15 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
-					containment: 'parent',
+					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($fields_box_placing ? "
+					".($field->parameters->get('fields_box_placing', 1) ? "
 					,start: function(e) {
-						jQuery(e.target).children().css('float', 'left');
-						fc_setEqualHeights(jQuery(e.target), 0);
+						//jQuery(e.target).children().css('float', 'left');
+						//fc_setEqualHeights(jQuery(e.target), 0);
 					}
 					,stop: function(e) {
-						jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
+						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
 					}
 					" : '')."
 				});
@@ -424,19 +427,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				// return HTML Tag ID of field containing the file ID, needed when creating file rows to assign multi-fields at once
 				return '".$elementid."_' + (uniqueRowNum".$field->id." - 1) + '_file-id';
 			}
-			
-			function expandFields".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-				
-				var fields_s = row.find('.fc-xpended');
-				var fields_m = row.find('.fc-xpended-row');
-				
-				fields_s.each(function() {  jQuery(this).removeClass('fc-xpended').addClass('fc-xpended-row');  });
-				fields_m.each(function() {  jQuery(this).removeClass('fc-xpended-row').addClass('fc-xpended');  });
-			}
-			
+
+
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
 				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
@@ -476,14 +468,12 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			
 			$css .= '';
 			
-			$expand_view = '<span class="'.$add_on_class.' fcfield-expand-view'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_EXPAND_VALUES' ).'" onclick="expandFields'.$field->id.'(this);"></span>';
 			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
-			$expand_view = '';
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
@@ -517,7 +507,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
-					'.$expand_view.'
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here).'
 				</div>
@@ -541,7 +530,21 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
-		
+
+		// Add toggle button for: Compact values view (= multiple values per row)
+		if ($use_ingroup) {
+		} else {
+			if($multiple && $fields_box_placing && $formlayout == 'field_InlineBoxes')
+			{
+				$expand_view = '<span class="fcfield-expand-view'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'" data-expandedFieldState="0"></span>';
+				$field->html = '
+					<div class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\').find(\'ul.fcfield-sortables\'));">
+					'. $expand_view .'&nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
+					</div>
+					' . $field->html;
+			}
+		}
+
 		// Button for popup file selection
 		/*if (!$use_ingroup) $field->html .= '
 			<input id="'.$elementid.'" class="'.$required_class.' fc_hidden_value" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/

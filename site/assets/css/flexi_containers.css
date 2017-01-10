@@ -351,13 +351,14 @@ body .fc-nowrap-box,
 	margin-right: 4px;
 }
 #flexicontent .fc-xpended {
+	margin: 0 4px 4px 0 !important;
 	margin-top: 0;
 	margin-bottom: 12px;
 	margin-right: 12px;
 }
 #flexicontent .fc-xpended-btns {
 	margin: 0 0 8px 0 !important;
-	float: none !important;
+	float: none;
 }
 #flexicontent .fc-xpended-row {
 	box-sizing: border-box;
@@ -366,15 +367,10 @@ body .fc-nowrap-box,
 	margin: 0 4px 4px 0 !important;
 	width: 100%;
 }
-#flexicontent .fc-xpended .add-on:first-child {
-	float: left;
-	margin: 0 0 0 0;
-	padding-left: 4px;
-	padding-right: 4px;
-}
+#flexicontent .fc-xpended .add-on:first-child,
 #flexicontent .fc-xpended-row .add-on:first-child {
-	float: left;
 	min-width: 150px;
+	float: left;
 	margin: 0 0 0 0;
 	padding-left: 4px;
 	padding-right: 4px;
@@ -550,5 +546,30 @@ body .btn-group.fc-group > div.statetoggler.btn.btn-small {
 	padding: 4px 8px;
 }
 .fc-items .icon-screen:before {
-	color: black;
+	color: darkcyan;
+}
+#flexicontent .fc-box,
+.fc-box {
+	-webkit-transition: width 0.3s ease-in, height 0.3s ease-in;
+	transition: width 0.3s ease-in, height 0.3s ease-in;
+}
+#flexicontent .fc-box.thumb_90,
+.fc-box.thumb_90 {
+	width: 92px;
+}
+#flexicontent .fc-box.thumb_120,
+.fc-box.thumb_120 {
+	width: 122px;
+}
+#flexicontent .fc-box.thumb_150,
+.fc-box.thumb_150 {
+	width: 152px;
+}
+#flexicontent .fc-box.thumb_200,
+.fc-box.thumb_200 {
+	width: 202px;
+}
+#flexicontent .fc-box.thumb_250,
+.fc-box.thumb_250 {
+	width: 252px;
 }
