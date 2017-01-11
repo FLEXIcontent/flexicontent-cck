@@ -98,8 +98,8 @@ abstract class JHtmlFcuploader
 			'thumb_size_default' => 150,
 			'thumb_size_slider_cfg' => 0,
 			'height_spare' => 0,
-			'handle_FileFiltered' => 'false',
-			'handle_FileUploaded' => 'false'
+			'handle_FileFiltered' => 'null',
+			'handle_FileUploaded' => 'null'
 		);
 		foreach($defaults as $i => $v)  isset($options[$i]) || $options[$i] = $v;
 
