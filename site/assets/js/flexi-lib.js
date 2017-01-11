@@ -628,24 +628,25 @@
 	}
 
 
-	function fc_toggleCompactValuesView(el, field_values_box)
+	function fc_toggleCompactValuesView(el, field_values_box, btn_class)
 	{
-		// Find field value container
-		var rows = field_values_box.find('li');
-		var values = field_values_box.find('.fc-field-props-box');
+		btn_class = btn_class || 'btn-info';
+		// Get field value containers
+		var rows = field_values_box.find('> li');
+		var el = jQuery(el);
 
 		// Set expanding flag and expand or compact properties
-		var is_expanded = jQuery(el).data('expandedFieldState');
-		jQuery(el).data('expandedFieldState', !is_expanded);
-
-		if (is_expanded)
+		if (el.prop('tagName')=='INPUT')
 		{
-			rows.each(function() {  jQuery(this).removeClass('fc-expanded');  });
+			var expand_field = el.prop('type')=='checkbox' ? el.is(':checked') : el.val()=='1';
 		}
 		else
 		{
-			rows.each(function() {  jQuery(this).addClass('fc-expanded');  });
+			var expand_field = !el.data('expandedFieldState');
+			el.data('expandedFieldState', expand_field);
+			expand_field ? el.addClass('active ' + btn_class) : el.removeClass('active ' + btn_class);
 		}
+		expand_field ? rows.addClass('fc-expanded'): rows.removeClass('fc-expanded');
 	}
 
 

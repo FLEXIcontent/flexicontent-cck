@@ -97,7 +97,9 @@ abstract class JHtmlFcuploader
 			'refresh_on_complete' => true,
 			'thumb_size_default' => 150,
 			'thumb_size_slider_cfg' => 0,
-			'height_spare' => 0
+			'height_spare' => 0,
+			'handle_FileFiltered' => 'false',
+			'handle_FileUploaded' => 'false'
 		);
 		foreach($defaults as $i => $v)  isset($options[$i]) || $options[$i] = $v;
 
@@ -137,8 +139,8 @@ abstract class JHtmlFcuploader
 			thumb_size_slider_cfg: '.$options['thumb_size_slider_cfg'].',
 			height_spare: '.$options['height_spare'].',
 
-			handle_select: null,  // TODO implement
-			handle_complete: null,  // TODO implement
+			handle_FileFiltered: '.$options['handle_FileFiltered'].',
+			handle_FileUploaded: '.$options['handle_FileUploaded'].',
 
 			resize_on_upload: '.($uops['resize_on_upload'] ? 'true' : 'false').',
 			'.($uops['resize_on_upload'] ? '
