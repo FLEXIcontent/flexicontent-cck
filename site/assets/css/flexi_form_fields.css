@@ -1420,9 +1420,6 @@ div.empty_image {
 	padding: 0;
 	border: 1px solid transparent;
 }
-.fcimg_preview_box .imgactions_box {
-	display: inline-block;
-}
 .fcimg_preview_box img.preview_image {
 	border-radius: 4px;
 	border: 1px solid gray;

@@ -222,7 +222,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$new_file_names = array_flip($new_file_names);
 		if (count($new_file_names))
 		{
-			$app->enqueueMessage(JText::_( 'Recently uploaded files were selected. Please click "Insert selected" to add them' ), 'notice');
+			//$app->enqueueMessage(JText::_( 'Recently uploaded files were selected. Please click "Insert selected" to add them' ), 'notice');
 		}
 		$session->set($context.'ids', null);
 		$session->set($context.'names', null);

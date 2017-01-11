@@ -90,7 +90,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Number of values
 		// ****************
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$max_values = $use_ingroup ? 0 : !$multiple ? 1 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
@@ -306,10 +306,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		";
 		$css = '';
 		
-		if ($multiple) // handle multiple records
+		if (1) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
+			if (!$use_ingroup && $multiple) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -352,11 +352,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (has_select2)     newField.find('div.select2-container').remove();
 				" : "").
 			"
-				newField.find('div.imgremove').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_imgremove');
-				newField.find('input.imgremove').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][remove]');
-				newField.find('input.imgremove').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_remove');
-				newField.find('div.imgremove').find('label').prop('for','".$elementid."_'+uniqueRowNum".$field->id."+'_remove');
-				
+
 				newField.find('input.hasvalue').val('');
 				newField.find('input.hasvalue').attr('name','".$elementid."_'+uniqueRowNum".$field->id."+'_hasvalue');
 				newField.find('input.hasvalue').attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
@@ -550,10 +546,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.$font_icon_class.'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.$font_icon_class.'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-		} else {
-			$remove_button = '';
-			$move2 = '';
+		}
+
+		if (!$multiple)
+		{
 			$add_here = '';
+			$move2 = '';
 			$js .= '';
 			$css .= '';
 		}
@@ -887,20 +885,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				';
 			}
 
-			// Add current image or add an empty image container
-			$remove = '';
-			if ( (!$multiple || $is_ingroup) && $image_source == 0 )
-			{
-				if ( !$required_class ) {
-					$remove  = '<div id="'.$elementid_n.'_imgremove" class="imgremove">';
-					$remove .= ' <input class="imgremove" type="checkbox" name="'.$fieldname_n.'[remove]" id="'.$elementid_n.'_remove" value="1" onchange="var img_preview = jQuery(this).closest(\'.fcimg_preview_box\'); img_preview.find(\'.preview_image\').css(\'opacity\', (jQuery(this).parent().find(\'input\').prop(\'checked\') ? 0.4 : 1)); var fcimg_preview_msg = jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_preview_msg\'); fcimg_preview_msg.css(\'text-decoration\', (jQuery(this).parent().find(\'input\').prop(\'checked\') ? \'line-through\' : \'\')); " />';
-					$remove .= ' <label style="display:inline;" for="'.$elementid_n.'_remove" class="'.$tooltip_class.'" title="'.JText::_( 'FLEXI_FIELD_UNLOAD_IMAGE_DESC' ).'">'.JText::_( 'FLEXI_FIELD_UNLOAD_IMAGE' ).'</label>';
-					$remove .= '</div>';
-				} else {
-					$remove = '<span class="fc-mssg fc-note fc-iblock fc-nobgimage">'.JText::_('FLEXI_REQUIRED').'</span>';
-				}
-			}
-			
 			// Calculate image preview link
 			if ( $image_source == -2 || $image_source == -1 )
 			{
@@ -1024,7 +1008,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 
 			$field->html[] = '
-			'.($multiple ? '
+			'.(!$multiple ? '' : '
 				'.(!$none_props ? '<div class="fcclear"></div>' : '').'
 				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
@@ -1032,28 +1016,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here).'
 				</div>
-				'.($use_inline_uploaders && !$file_btns_position ?'
-				<div class="'.$input_grp_class.' fc-xpended-btns" style="margin-left: 8px !important;">
+				').'
+			')
+			.($use_inline_uploaders && !$file_btns_position ?'
+			<div class="'.$input_grp_class.' fc-xpended-btns" style="margin-left: 8px !important;">
+				'.$uploader_html->toggleBtn.'
+				'.$uploader_html->multiUploadBtn.'
+				'.$uploader_html->myFilesBtn.'
+				'.$uploader_html->clearBtn.'		
+			</div>
+			' : '')
+			.($use_inline_uploaders && $file_btns_position ? '
+			<div class="fcclear"></div>
+			<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
+				<div class="btn-group">
 					'.$uploader_html->toggleBtn.'
 					'.$uploader_html->multiUploadBtn.'
 					'.$uploader_html->myFilesBtn.'
-					'.$uploader_html->clearBtn.'		
+					'.$uploader_html->clearBtn.'
 				</div>
-				' : '').'
-				').
-				($use_inline_uploaders && $file_btns_position ? '
-				<div class="fcclear"></div>
-				<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-					<div class="btn-group">
-						'.$uploader_html->toggleBtn.'
-						'.$uploader_html->multiUploadBtn.'
-						'.$uploader_html->myFilesBtn.'
-						'.$uploader_html->clearBtn.'
-					</div>
-				</div>
-				' : '') . '
-				<div class="fcclear"></div>
-			' : '').'
+			</div>
+			' : '') . '
+			<div class="fcclear"></div>
 			'.$originalname.'
 			'.$existingname.'
 			<div class="fcclear"></div>
@@ -1065,9 +1049,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<div class="fcimg_preview_box fc-box thumb_'.$thumb_size_default.'">
 					'.$imgpreview.'
 					'.$fcimg_preview_msg.'
-					<div class="imgactions_box">
-						'.($remove ? $remove : '').'
-					</div>
 					<div class="fcclear"></div>
 				'.$select_existing.'
 				</div>
@@ -1105,7 +1086,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
-		} else if ($multiple) { // handle multiple records
+		} else if (1 || $multiple) { // handle multiple records
 			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
@@ -2537,25 +2518,22 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Defaut values for unset required properties of values
 			$v['originalname'] = isset($v['originalname']) ? $v['originalname'] : '';
 			$v['existingname'] = isset($v['existingname']) ? $v['existingname'] : '';
-			$v['remove'] = isset($v['remove']) ? $v['remove'] : false;
 			
-			if ( $v['originalname'] || $v['existingname'] ) {
-				//echo $v['originalname'] ." ". $v['existingname'] ."<br>";
-				
-				// (c) Handle replacing image with a new existing image
+			if ( $v['originalname'] || $v['existingname'] )
+			{
+				// Handle replacing image with a new existing image
 				if ( $v['existingname'] ) {
 					$v['originalname'] = $v['existingname'];
 					$v['existingname'] = '';
-				} else if ( $v['remove'] ) {
-					// Deleting or unloading current value: Skip current image row, but allow empty (null) placeholder value if in fieldgroup
-					$v = $use_ingroup ? null : false; //$use_ingroup ? array('originalname'=>'') : null;
-				}
-				
-			} else {
+				}				
+			}
+
+			else
+			{
 				// No new file posted and no existing selected: Skip current image row, but allow empty (null) placeholder value if in fieldgroup
 				$v = $use_ingroup ? null : false; //$use_ingroup ? array('originalname'=>'') : null;
 			}
-			
+
 			// Add image entry to a new array skipping empty image entries
 			if ($v!==false)
 			{
