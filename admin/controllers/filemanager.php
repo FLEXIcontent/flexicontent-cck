@@ -252,18 +252,19 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				if (!$out = @fopen("{$filePath_tmp}", "ab"))
 				{
-					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$filePath_tmp. ' fopen failed. reason: ' . implode(' ', error_get_last()) . '"}, "id" : "id"}');
+					//die("{'jsonrpc' : '2.0', 'error' : {'code': 102, 'message': 'Failed to open output stream: " . json_encode($filePath_tmp) . " fopen failed. reason: " . json_encode(implode(' ', error_get_last())) . "'}, 'data' : null}");
+					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream. Temporary path not writable."}, "data" : null}');
 				}
 			}
 			
 			if (!empty($_FILES)) {
 				if ($_FILES["file"]["error"] || !is_uploaded_file($_FILES["file"]["tmp_name"]))
-					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
+					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "data" : null}');
 				if (!$in = @fopen($_FILES["file"]["tmp_name"], "rb"))
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "data" : null}');
 			} else {	
 				if (!$in = @fopen("php://input", "rb"))
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "data" : null}');
 			}
 			// Read binary input stream and append it to temp file
 			while ($buff = fread($in, 4096)) {
@@ -277,7 +278,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			if ($chunk < $chunks - 1)
 			{
 				// Return Success JSON-RPC response
-				die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+				die('{"jsonrpc" : "2.0", "result" : null, "data" : null}');
 			}
 
 			// Remove no longer needed file properties from session data
@@ -333,6 +334,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Sanitize filename further and make unique
 		$params = null;
 		$err_text = null;
+		$filesize = $file['size'];
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename
 		$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
 		$filename     = flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
@@ -377,43 +379,39 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Upload Successful
 		// *****************
 
+		$obj = new stdClass();
+		$obj->id = $file_id = 0;
+
+		$obj->filename    = $filename;
+		$obj->filename_original = $filename_original;
+		$obj->altname     = $filetitle ? $filetitle : $filename_original;
+
+		$obj->url         = 0;
+		$obj->secure      = $secure;
+		$obj->ext         = $ext;
+
+		$obj->description = $filedesc;
+		$obj->language    = strlen($filelang) ? $filelang : '*';
+		$obj->access      = strlen($fileaccess) ? $fileaccess : 1;
+
+		$obj->hits        = 0;
+		$obj->size        = $filesize;
+		$obj->uploaded    = JFactory::getDate('now')->toSql();
+		$obj->uploaded_by = $user->get('id');
+
 		// a. Database mode
 		if ($file_mode == 'db_mode')
 		{
-			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-			$filepath = $path . $filename;
-			$filesize = file_exists($filepath) ? filesize($filepath) : 0;
-
-			$obj = new stdClass();
-			$obj->filename    = $filename;
-			$obj->filename_original = $filename_original;
-			$obj->altname     = $filetitle ? $filetitle : $filename_original;
-
-			$obj->url         = 0;
-			$obj->secure      = $secure;
-			$obj->ext         = $ext;
-
-			$obj->description = $filedesc;
-			$obj->language    = strlen($filelang) ? $filelang : '*';
-			$obj->access      = strlen($fileaccess) ? $fileaccess : 1;
-
-			$obj->hits        = 0;
-			$obj->size        = $filesize;
-			$obj->uploaded    = JFactory::getDate('now')->toSql();
-			$obj->uploaded_by = $user->get('id');
-
 			// Insert file record in DB
 			$db->insertObject('#__flexicontent_files', $obj);
 
 			// Get id of new file record
-			$file_id = (int) $db->insertid();
+			$obj->id = $file_id = (int) $db->insertid();
 		}
 
 		// b. Custom Folder mode
-		else
-		{
-			$file_id = 0;
-		}
+		else ;
+
 
 		// Add information about uploaded file data into the session
 		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
@@ -426,13 +424,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$_file_names[] = $filename;
 		$session->set($context.'names', $_file_names);
 
+
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
 		$this->exitMessages = array( 0 => array('message' => 'FLEXI_UPLOAD_COMPLETE') );
 		$this->exitLogTexts = array();
 		$this->exitSuccess  = true;
 
-		return $this->terminate($file_id, $exitMessages);
+		return $this->terminate($file_id, $exitMessages, $obj);
 	}
 
 
@@ -1295,7 +1294,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 * - or setting HTTP header and doing a JSON response with data or error message
 	 * - or setting HTTP header and enqueuing an error/success message and doing a redirect
 	 */
-	function terminate($exitData = null, & $exitMessages = null)
+	function terminate($exitData = null, & $exitMessages = null, $data = null)
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
@@ -1348,16 +1347,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				}
 			}
 
-			$msg_text_all = '';
+			$msg_text_all = array();
 			foreach	($this->exitMessages as $msg)
 			{
-				$msg_text_all .= ' <br/> ' . JText::_(reset($msg), true);
+				$msg_text_all[] = JText::_(reset($msg));
 			}
+			$msg_text_all = implode(' <br/> ', $msg_text_all);
 
 			if ($this->exitSuccess)
-				jexit('{"jsonrpc" : "2.0", "result" : "'.$msg_text_all.'", "id" : "id"}');
+				jexit('{"jsonrpc" : "2.0", "result" : '.json_encode($msg_text_all).', "data" : '.json_encode($data).'}');
 			else
-				jexit('{"jsonrpc" : "2.0", "error" : {"code": '.$httpStatus.', "message": "'.$msg_text_all.'"}, "id" : "id"}');
+				jexit('{"jsonrpc" : "2.0", "error" : {"code": '.$httpStatus.', "message": '.json_encode($msg_text_all).'}, "data" : '.json_encode($data).'}');
 		}
 
 

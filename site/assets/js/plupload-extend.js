@@ -172,7 +172,10 @@ fc_plupload = function(options)
 					$.each(files, function(i, file) {
 						_this.extend_row( up, i, {isapplicable: {edit: false, preview: true}} );
 					});
-				}
+				},
+
+				FileFiltered: this.options.handle_FileFiltered || null,
+				FileUploaded: this.options.handle_FileUploaded || null
 			}
 		}
 

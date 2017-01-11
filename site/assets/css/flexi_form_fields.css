@@ -1335,17 +1335,12 @@ table.fc_uploader_header_tbl td:last-child {
 	color: LimeGreen;
 }
 #flexicontent .fcfield-expand-view {
-	margin: 0px 0px 2px 0px;
 	background: url(../images/arrow-resize.png) 50% 50% no-repeat;
 }
-#flexicontent span.fcfield-expand-view:before {
-	color: black;
-}
 #flexicontent span.fcfield-expand-view.fcfont-icon:before {
-	content: "<";
-	color: black;
-	font-size: 16px;
+	content: "\68";
 	vertical-align: middle;
+	font-size: 100%;
 }
 #flexicontent .fcfield-delvalue {
 	margin: 0px 0px 2px 0px;
