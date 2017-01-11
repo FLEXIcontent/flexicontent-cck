@@ -135,11 +135,14 @@ fc_plupload = function(options)
 
 			// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
 			dragdrop: true,
+			
+			handle_FileFiltered: this.options.handle_FileFiltered,
+			handle_FileUploaded: this.options.handle_FileUploaded,
 
 			init: {
-				PostInit: this.handle_init,
-				FilesAdded: this.handle_filesChanged,
-				FilesRemoved: this.handle_filesChanged,
+				PostInit: this.handle_PostInit,
+				FilesAdded: this.handle_FilesChanged,
+				FilesRemoved: this.handle_FilesChanged,
 
 				BeforeUpload: function (up, file)
 				{
@@ -174,8 +177,16 @@ fc_plupload = function(options)
 					});
 				},
 
-				FileFiltered: this.options.handle_FileFiltered || null,
-				FileUploaded: this.options.handle_FileUploaded || null
+				FileFiltered: function (up, file)
+				{
+					var func = up.getOption('handle_FileFiltered');
+					if (typeof func == 'function') func.apply(this, arguments);
+				},
+				FileUploaded: function (up, file, result)
+				{
+					var func = up.getOption('handle_FileUploaded');
+					if (typeof func == 'function') func.apply(this, arguments);
+				}
 			}
 		}
 
@@ -221,9 +232,9 @@ fc_plupload = function(options)
 		$(uploader_container).data('plupload_instance', up);
 
 		// It is also possible to bind events also after initialization
-		//up.bind('PostInit', this.handle_init);
-		//up.bind('FilesAdded', this.handle_filesChanged);
-		//up.bind('FilesRemoved', this.handle_filesChanged);
+		//up.bind('PostInit', this.handle_PostInit);
+		//up.bind('FilesAdded', this.handle_FilesChanged);
+		//up.bind('FilesRemoved', this.handle_FilesChanged);
 
 		// Toggle the uploader container
 		toggle_action == 'hide' ? uploader_container.hide() : uploader_container.show();
@@ -238,7 +249,7 @@ fc_plupload = function(options)
 	// * NOTE: we use the "PostInit" instead of the "Init" event in order for the "dragdrop" feature to be correct defined
 	// *
 
-	this.handle_init = function(uploader)
+	this.handle_PostInit = function(uploader)
 	{
 		// Get 'fc_plupload' class instance from uploader
 		var _this = $(uploader).data('fc_plupload_instance');
@@ -322,7 +333,7 @@ fc_plupload = function(options)
 	// * Since at this point, we have an opportunity to reject files from the queue.
 	// *
 
-	this.handle_filesChanged = function(uploader, files)
+	this.handle_FilesChanged = function(uploader, files)
 	{
 		// Get 'fc_plupload' class instance from uploader
 		var _this = $(uploader).data('fc_plupload_instance');
@@ -363,7 +374,8 @@ fc_plupload = function(options)
 		if (uploader.getOption('autostart_on_select'))
 		{
 			$(uploader.settings.container).find('.plupload_filelist_footer').hide();
-			setTimeout(function(){ uploader.start(); }, 5000);
+			//setTimeout(function(){ uploader.start(); }, 5000);
+			uploader.start();
 		}
 	};
 
