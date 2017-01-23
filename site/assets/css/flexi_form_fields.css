@@ -1419,6 +1419,7 @@ div.empty_image {
 	margin-right: 0;
 	padding: 0;
 	border: 1px solid transparent;
+	vertical-align: top;
 }
 .fcimg_preview_box img.preview_image {
 	border-radius: 4px;

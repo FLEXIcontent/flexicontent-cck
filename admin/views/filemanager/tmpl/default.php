@@ -854,7 +854,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 							: htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8');
 						$filenames_cut[$i] = $filename_cut;
 						echo $isFilesElement ? '
-						<a id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$file_assign_link.'" title="'.$insert_entry.'">
+						<a id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="if (jQuery(this).hasClass(\'striketext\')) return; '.$file_assign_link.'" title="'.$insert_entry.'">
 							<span class="icon-checkbox"></span><span class="icon-new"></span>'.$filename_cut.'
 						</a>
 						' : '

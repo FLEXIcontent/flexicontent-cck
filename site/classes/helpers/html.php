@@ -1446,14 +1446,14 @@ class flexicontent_html
 				if ( $lang_code && $lang_code!='en' )
 				{
 					// Try language shortcode
-					if ( file_exists($framework_folder.DS.'js'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/js/'.$lang_code.'.js');
+					if ( file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$lang_code.'.js') ) {
+						$document->addScript($framework_path.'/js/i18n/'.$lang_code.'.js');
 					}
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
-						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/js/'.$country_code.'.js');
+						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$country_code.'.js') ) {
+							$document->addScript($framework_path.'/js/i18n/'.$country_code.'.js');
 						}
 					}
 				}
