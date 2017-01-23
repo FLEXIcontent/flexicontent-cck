@@ -388,10 +388,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					upBTN = newField.find('.fc_files_uploader_toggle_btn');
 					upBTN.attr('data-rowno',uniqueRowNum".$field->id.");
 
-					mulupBTN = newField.find('.fcfield-uploadvalue.multi');
+					mulupBTN = newField.find('.fc-files-modal-link.fc-up');
 					mulupBTN.attr('data-href', " . "'" . str_replace('&amp;', '&', sprintf($filesElementURL,  $elementid . "_' + uniqueRowNum".$field->id ." + '")) . "');
 
-					mulselBTN = newField.find('.fcfield-selectvalue.multi');
+					mulselBTN = newField.find('.fc-files-modal-link.fc-sel');
 					mulselBTN.attr('data-href', " . "'" . str_replace('&amp;', '&', sprintf($filesElementURL,  $elementid . "_' + uniqueRowNum".$field->id ." + '")) . "');
 				}
 
@@ -832,7 +832,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			else
 			{
 				$fcimg_preview_msg = '
-					<span type="text" class="fcimg_preview_msg"  id="'.$elementid_n.'_fcimg_preview_msg"  name="'.$elementid_n.'_fcimg_preview_msg"> '.$image_subpath.' </span>
+					<span type="text" class="fcimg_preview_msg"  id="'.$elementid_n.'_fcimg_preview_msg"  name="'.$elementid_n.'_fcimg_preview_msg">'.$image_subpath.'</span>
 				';
 			}
 
@@ -996,12 +996,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				);
 
 				$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
+				$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? 'btn btn-small' : $add_on_class . ' ' . $font_icon_class);
 				$uploader_html->multiUploadBtn = ''; /*$file_btns_position
-					? '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="btn btn-small"><span class="icon-stack"></span> <span class="icon-upload"></span> '.($file_btns_position==2 ? JText::_('FLEXI_UPLOAD') : '').'</span>'
-					: '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$add_on_class.' fcfield-uploadvalue multi '.$font_icon_class.'">&nbsp; '.$multi_icon.'</span>';*/
+					? '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up"><span class="icon-stack"></span> <span class="icon-upload"></span> '.($file_btns_position==2 ? JText::_('FLEXI_UPLOAD') : '').'</span>'
+					: '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi">&nbsp; '.$multi_icon.'</span>';*/
 				$uploader_html->myFilesBtn = $file_btns_position
-					? '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="btn btn-small"><span class="icon-stack"></span> '.($file_btns_position==2 ? JText::_('FLEXI_MY_FILES') : '').'</span>'
-					: '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$add_on_class.' fcfield-selectvalue multi '.$font_icon_class.'">&nbsp; '.$multi_icon.'</span>';
+					? '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel"><span class="icon-stack"></span> '.($file_btns_position==2 ? JText::_('FLEXI_MY_FILES') : '').'</span>'
+					: '<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel fcfield-selectvalue multi">&nbsp; '.$multi_icon.'</span>';
 				$uploader_html->clearBtn = $file_btns_position
 					? '<span class="btn btn-small btn-warning '.$tooltip_class.'" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearField'.$field->id.'(this);"><i class="icon-remove"></i></span>'
 					: '<span class="'.$add_on_class.' fcfield-clearvalue '.$font_icon_class.'" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearField'.$field->id.'(this);"></span>';
@@ -1077,8 +1078,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 
 		$js .= "
-			var uniqueRowNum".$field->id."	= ".($count_vals ?: 1).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".$count_vals.";      // Counts existing rows to be able to limit a max number of values
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
 		if ($js)  $document->addScriptDeclaration($js);
