@@ -84,7 +84,7 @@ fc_plupload = function(options)
 		};
 
 		// Specify which files to browse for, if using plupload UI then it is also possible to prevent picking file over the upload limit, but since we have client-side resizing, we will not use it
-		var filters_options = !this.options.view_layout == 'image'  ? null : (this.options.mode=='ui' ?
+		var filters_options = this.options.view_layout != 'image'  ? (this.options.mode=='ui' ? {} : []) : (this.options.mode=='ui' ?
 			{
 				//max_file_size : this.options.upload_maxsize,
 				mime_types: [
