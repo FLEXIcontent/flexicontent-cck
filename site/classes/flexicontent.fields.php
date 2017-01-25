@@ -3235,7 +3235,7 @@ class FlexicontentFields
 					$i = 1;
 					foreach ($results as $result) {
 						if ( !strlen($result->value) ) continue;
-						$step_values[] = "'".$result->value."'";
+						$step_values[] = "'".addcslashes($result->value, "'")."'";
 						$step_labels[] = $result->text;
 						if ($result->value==$value1) $start = $i;
 						if ($result->value==$value2) $end   = $i;
@@ -3270,17 +3270,20 @@ class FlexicontentFields
 							</div>';
 						break;
 					}
-					if (!strlen($custom_vals['min'])) $custom_vals['min'] = "''";
-					if (!strlen($custom_vals['max'])) $custom_vals['max'] = "''";
-					
+
 					$start = 0;
 					$end   = count($custom_vals)-1;
-					$step_values = $custom_vals;
+					foreach($custom_vals as $i => $v)
+					{
+						$step_values[$i] = "'".addcslashes($v, "'")."'";
+					}
+
 					$step_labels = & $custom_labels;
 					$i = 0;
 					$set_start = strlen($value1)>0;
 					$set_end   = strlen($value1)>0;
-					foreach($custom_vals as $n => $custom_val) {
+					foreach($custom_vals as $n => $custom_val)
+					{
 						if ($set_start && $custom_val==$value1) $start = $i;
 						if ($set_end   && $custom_val==$value2) $end   = $i;
 						$custom_vals[$n] = $i++;
@@ -3290,7 +3293,7 @@ class FlexicontentFields
 							range: '.json_encode($custom_vals).',
 					';
 				}
-				
+
 				flexicontent_html::loadFramework('nouislider');
 				$left_no = $display_filter_as==7 ? '' : '1';
 				$rght_no = '2';  // sometimes unused
