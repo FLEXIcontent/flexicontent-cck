@@ -1786,6 +1786,7 @@ class FlexicontentFields
 				$db->setQuery($query);
 				$results = $db->loadObjectList('value');
 			}
+			else $results = false;
 			if ($results && $lang_filter_values) {
 				foreach ($results as $val=>$result) {
 					$results[$val]->text  = JText::_($result->text);  // the text label
@@ -3302,7 +3303,7 @@ class FlexicontentFields
 						var input2 = document.getElementById('".$filter_ffid.$rght_no."');
 						var isSingle = ".($display_filter_as==7 ? '1' : '0').";
 						
-						var step_values = [".implode(', ', $step_values)."];
+						var step_values = [\"".implode('", "', array_map('addslashes', $step_values))."\"];
 						var step_labels = [\"".implode('", "', array_map('addslashes', $step_labels))."\"];
 						
 						noUiSlider.create(slider, {".
