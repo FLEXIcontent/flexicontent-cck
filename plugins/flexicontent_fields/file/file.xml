@@ -99,6 +99,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="iform_stamp" type="radio" default="0" label="FLEXI_DOWNLOAD_STAMPING" description="FLEXI_FILE_DOWNLOAD_STAMPING_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_DEFAULTS" description="" level="level3" depend_class="inline-edit-on" />
 			<field name="iform_title_default" type="text" default="" label="FLEXI_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
@@ -108,6 +112,10 @@
 			<field name="iform_dir_default" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
+			</field>
+			<field name="iform_stamp_default" type="radio" default="1" label="FLEXI_DOWNLOAD_STAMPING" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MY_FILES" description="" icon_class="icon-upload" level="tab_open" box_type="1" />
@@ -224,7 +232,8 @@
 			</field>
 			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" depend_class="multivalue-mode7" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			
-			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level2" />
+			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" description="" icon_class="icon-eye" level="tab_open" box_type="1" />
+
 			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode8">FLEXI_NO</option>
 				<option value="1" show_list="" hide_list="multivalue-mode8">FLEXI_YES</option>
@@ -237,6 +246,17 @@
 				<option value="2">New window</option>
 				<option value="3">Same window</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_STAMPING" description="" icon_class="icon-file" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_ADD_TEXT_ALL_PAGES" level="level2" />
+			<field name="stamp_pdfs" type="multilist" subtype="radio" default="0" label="Add stamp texts" toggle_related="1" description="Modify PDF files on download to add a stamping text" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="" hide_list="stamp_pdfs_mode">FLEXI_NO</option>
+				<option value="1" show_list="stamp_pdfs_mode" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="pdf_header_text" type="textarea" default="" label="FLEXI_HEADER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
+			<field name="pdf_footer_text" type="textarea" default="" label="FLEXI_FOOTER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
 
 			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART_SHORT" description="" icon_class="icon-cart" level="tab_open" box_type="1" />
 
@@ -379,12 +399,12 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 
-
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
-		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-envelope" label="Notifications" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-envelope" label="FLEXI_NOTIFICATIONS_CONF" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_DOWNLOAD_NOTIFICATION" level="level1" />
+			<field name="" type="separator" default="FLEXI_EMAIL_NOTIFICATIONS_ON_N_HITS" level="level2" />
 			<field name="send_notifications" type="multilist" subtype="radio" default="0" label="FLEXI_DOWNLOAD_HIT_NOTIFICATION" toggle_related="1" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode12">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode12" hide_list="">FLEXI_YES</option>
@@ -393,7 +413,7 @@
 			
 			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_HITS%% __FILE_HITS__ &#10; %%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" depend_class="multivalue-mode12" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_SEND_TO" level="level2" />
+			<field name="" type="separator" default="FLEXI_SEND_TO" level="level3" />
 			<field name="send_all_to_email" type="text" default="" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />
 			<field name="send_to_current_item_owner" type="radio" default="0" label="FLEXI_CONTENT_OWNER" description="FLEXI_CONTENT_OWNER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

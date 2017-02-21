@@ -4503,7 +4503,9 @@ class FlexicontentFields
 		$result = preg_match_all("/\%\%([^%]+)\%\%/", $relitem_html, $translate_matches);
 		$translate_strings = $result ? $translate_matches[1] : array('FLEXI_READ_MORE_ABOUT');
 		foreach ($translate_strings as $translate_string)
+		{
 			$relitem_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $relitem_html);
+		}
 		
 		foreach($item_list as $result)
 		{

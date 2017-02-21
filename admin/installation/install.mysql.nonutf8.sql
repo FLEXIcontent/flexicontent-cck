@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `language` char(7) NOT NULL DEFAULT '*',
   `hits` int(11) unsigned NOT NULL default '0',
   `size` int(11) unsigned NOT NULL default '0',
+  `stamp` tinyint(3) unsigned NOT NULL default '1',
   `uploaded` datetime NOT NULL default '0000-00-00 00:00:00',
   `uploaded_by` int(11) unsigned NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',

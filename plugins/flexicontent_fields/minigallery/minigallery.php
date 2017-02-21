@@ -88,6 +88,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
+		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 		
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
@@ -142,6 +143,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
 				'url'=>'',
 				'secure' => (int) $field->parameters->get('iform_dir_default', 1),
+				'stamp' => (int) $field->parameters->get('iform_stamp_default', 1),
 				'ext'=>'', 'published'=>1,
 				'language' => $field->parameters->get('iform_lang_default', '*'),
 				'access' => (int) $field->parameters->get('iform_access_default', 1),
@@ -365,6 +367,20 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][secure]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr);
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_secure_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-secure'+nr+'-lbl');
+					nr++;
+				});
+				" : "")."
+			
+				".($iform_stamp ? "
+				var nr = 0;
+				newField.find('.inlinefile-stamp-info').remove();
+				newField.find('.inlinefile-stamp-data').show();
+				newField.find('input.fc_filestamp').each(function() {
+					var elem = jQuery(this);
+					elem.removeAttr('disabled');
+					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][stamp]');
+					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr);
+					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-stamp'+nr+'-lbl');
 					nr++;
 				});
 				" : "")."
@@ -802,6 +818,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
+		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 		
 		// Execute once
 		static $initialized = null;
@@ -841,6 +858,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
 					$Fobj->file_filter_re = preg_quote($filename);
 					$Fobj->secure = 0;
+					$Fobj->stamp  = 1;
 					$Fobj->keep   = 1;
 
 					$upload_err = null;
@@ -879,6 +897,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
 				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
+				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
 				if( $new_file )
 				{
 					$v['secure']   = !$iform_dir    ? 0 : ((int) $v['secure'] ? 1 : 0);
@@ -894,6 +913,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					if ($iform_desc)   $dbdata['description'] = $v['file-desc'];
 					if ($iform_lang)   $dbdata['language'] = $v['file-lang'];
 					if ($iform_access) $dbdata['access'] = $v['file-access'];
+					if ($iform_stamp)  $dbdata['stamp']  = $v['stamp'];
 					//if ($iform_dir)  $dbdata['secure'] = $v['secure'];  // !! Do not change folder for existing files
 					
 					// Load file data from DB
@@ -904,16 +924,16 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					
 					// Security concern, check file is assigned to current item
 					$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
-					if ( $v['file-del'] ) {
-						if ( !$isAssigned ) {
-							//JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );
-						} else {
-							//JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$_filename."', that is not assigned to current item", 'warning' );
-						}
+					if ( $v['file-del'] )
+					{
+						/*!$isAssigned
+							? JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );
+							: JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 					}
 					
 					// Delete existing file if so requested
-					if ( $v['file-del'] ) {
+					if ( $v['file-del'] )
+					{
 						$canDelete = $this->canDeleteFile($field, $file_id, $item);
 						if ($isAssigned && $canDelete) {
 							$fm = new FlexicontentModelFilemanager();
@@ -971,6 +991,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 
 					$jinput->set('return-url', null);
 					$jinput->set('secure', $v['secure']);
+					$jinput->set('stamp', $v['stamp']);
 					$jinput->set('file-title', $v['file-title']);
 					$jinput->set('file-desc', $v['file-desc']);
 					$jinput->set('file-lang', $v['file-lang']);

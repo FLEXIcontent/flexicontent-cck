@@ -852,16 +852,16 @@ class FlexicontentControllerItems extends FlexicontentController
 			$itemdata = $db->loadObjectList('id');
 				
 			// Check authorization for edit operation
-			foreach ($cid as $id) {
-				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
-				$canEdit 		= in_array('edit', $rights);
-				$canEditOwn = in_array('edit.own', $rights) && $itemdata[$id]->created_by == $user->id;
-					
-				if ( $canEdit || $canEditOwn ) {
+			foreach ($cid as $id)
+			{
+				$isOwner = $itemdata[$id]->created_by == $user->id;
+				$asset = 'com_content.article.' . $id;
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+
+				if ( $canEdit )
 					$auth_cid[] = $id;
-				} else {
+				else
 					$non_auth_cid[] = $id;
-				}
 			}
 			//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 		}
@@ -964,16 +964,16 @@ class FlexicontentControllerItems extends FlexicontentController
 			$itemdata = $db->loadObjectList('id');
 				
 			// Check authorization for edit operation
-			foreach ($cid as $id) {
-				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
-				$canEdit 		= in_array('edit', $rights);
-				$canEditOwn = in_array('edit.own', $rights) && $itemdata[$id]->created_by == $user->id;
-				
-				if ( $canEdit || $canEditOwn ) {
+			foreach ($cid as $id)
+			{
+				$isOwner = $itemdata[$id]->created_by == $user->id;
+				$asset = 'com_content.article.' . $id;
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+
+				if ( $canEdit )
 					$auth_cid[] = $id;
-				} else {
+				else
 					$non_auth_cid[] = $id;
-				}
 			}
 			//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 		}
@@ -1376,15 +1376,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check authorization for delete operation
 		foreach ($cid as $id)
 		{
-			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $itemdata[$id]->id);
-			$canDelete 		= in_array('delete', $rights);
-			$canDeleteOwn = in_array('delete.own', $rights) && $itemdata[$id]->created_by == $user->id;
+			$isOwner = $itemdata[$id]->created_by == $user->id;
+			$asset = 'com_content.article.' . $id;
+			$canDelete = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
 
-			if ( $canDelete || $canDeleteOwn ) {
+			if ( $canDelete )
 				$auth_cid[] = $id;
-			} else {
+			else
 				$non_auth_cid[] = $id;
-			}
 		}
 		//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 		

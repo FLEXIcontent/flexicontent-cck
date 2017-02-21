@@ -86,6 +86,10 @@ class FlexicontentViewFile extends JViewLegacy {
 		$attribs = 'class="use_select2_lib"';
 		$lists['access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $row->access, $elementid, $translate=true );
 
+		$options = array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' ));
+		$elementid = $fieldname = 'stamp';
+		$lists['stamp'] = flexicontent_html::buildradiochecklist($options, $fieldname, $row->stamp, 0, ' class="fc_filestamp" ', $elementid);
+
 		// Build languages list
 		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
