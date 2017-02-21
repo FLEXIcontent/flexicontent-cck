@@ -32,46 +32,68 @@ class flexicontent_files extends JTable
 	 * @var int
 	 */
 	var $id 				= null;
+
 	/** @var string */
 	var $filename			= '';
+
 	/** @var string */
 	var $filename_original = '';
+
 	/** @var string */
-	var $altname			= '';
+	var $altname		= '';
+
+	/** @var text */
+	var $description= '';
+
 	/** @var int */
 	var $url				= 0;
+
 	/** @var int */
-	var $secure				= 1;
+	var $secure			= 1;
+
 	/** @var string */
 	var $ext				= '';
-	/** @var text */
-	var $description				= '';
+
 	/** @var int */
-	var $published			= 1;
+	var $published	= 1;
+
 	/** @var string */
 	var $language		= '*';
+
 	/** @var unsigned int */
 	var $hits				= 0;
+
 	/** @var unsigned int */
 	var $size				= 0;
+
+	/** @var int */
+	var $stamp			= 1;
+
 	/** @var date */
 	var $uploaded			= '';
+
 	/** @var int */
-	var $uploaded_by		= '';
+	var $uploaded_by	= '';
+
 	/** @var int */
-	var $checked_out 		= 0;
+	var $checked_out	= 0;
+
 	/** @var date */
 	var $checked_out_time	= '';
+
 	/** @var int */
-	var $access 			= 1;  // Public access
+	var $access				= 1;  // Public access
+
 	/** @var string */
-	var $attribs	 		= null;
+	var $attribs			= null;
+
 
 	function __construct(& $db)
 	{
 		parent::__construct('#__flexicontent_files', 'id', $db);
 	}
-	
+
+
 	// overloaded check function
 	function check()
 	{

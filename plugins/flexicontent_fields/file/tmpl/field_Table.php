@@ -149,6 +149,20 @@ foreach($field->value as $file_id)
 			</span>
 		</td>
 	</tr>' : '').
+	
+	( $iform_stamp ? '
+	<tr class="inlinefile-stamp-row">
+		<td class="key inlinefile-stamp-lbl-cell">
+			<label class="fc-prop-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
+				'.JText::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
+			</label>
+		</td>
+		<td class="inlinefile-stamp-data-cell">
+			<span class="inlinefile-stamp-data">
+				'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_NO' ), 1=> JText::_( 'FLEXI_YES' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['stamp']), 0, ' class="fc_filedir" ', $elementid_n.'_stamp').'
+			</span>
+		</td>
+	</tr>' : '').
 	'
 	</table>
 	<div class="fcclear"></div>'

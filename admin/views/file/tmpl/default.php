@@ -118,6 +118,17 @@ if (!$this->row->url)
 		</tr>
 
 		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1); ?>">
+				<label class="label" for="stamp">
+					<?php echo JText::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
+				</label>
+			</td>
+			<td>
+				<?php echo $this->lists['stamp']; ?>
+			</td>
+		</tr>
+
+		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_HITS', 'FLEXI_DOWNLOAD_HITS', 1, 1); ?>">
 				<label class="label" for="access">
 					<?php echo JText::_( 'FLEXI_HITS' ); ?>

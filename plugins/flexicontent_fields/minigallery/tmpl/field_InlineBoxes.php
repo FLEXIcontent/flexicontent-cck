@@ -28,6 +28,9 @@ foreach($field->value as $file_id)
 	// Get from session for new values
 	$default_secure_val = isset($form_data[$file_id])  ?  (int)$form_data[$file_id]['secure']  :  1;
 
+	// Get from session for new values
+	$default_stamp_val = isset($form_data[$file_id])  ?  (int)$form_data[$file_id]['stamp']  :  1;
+
 	$field->html[] = '
 		<div class="inlinefile-data-box">
 
@@ -120,6 +123,19 @@ foreach($field->value as $file_id)
 					<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_secure1">'.JText::_('FLEXI_NO').'</label>
 				</fieldset>
 			').'
+		</div>' : '').
+	
+	( $iform_stamp ? '
+		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-stamp-box">
+			<label class="'.$add_on_class.' fc-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
+				'.JText::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
+			</label>
+			<fieldset class="radio btn-group group-fcmethod fcoffactive">
+				<input class="fc_filestamp" id="'.$elementid_n.'_stamp1" name="'.$fieldname_n.'[stamp]" type="radio" value="0" '.( (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['stamp'])==0 ? 'checked="checked"' : '' ).'/>
+				<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_stamp1">'.JText::_('FLEXI_NO').'</label>
+				<input class="fc_filestamp" id="'.$elementid_n.'_stamp0" name="'.$fieldname_n.'[stamp]" type="radio" value="1" '.( (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['stamp'])==1 ? 'checked="checked"' : '' ).'/>
+				<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_stamp0">'.JText::_('FLEXI_YES').'</label>
+			</fieldset>
 		</div>' : '').
 	'
 	<div class="fcclear"></div>'

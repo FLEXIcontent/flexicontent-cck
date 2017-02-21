@@ -68,3 +68,4 @@ JLoader::register('flexicontent_images', JPATH_SITE.DS.'components'.DS.'com_flex
 JLoader::register('flexicontent_zip', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'zip.php');
 
 JLoader::register('FLEXIUtilities', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'flexiutilities.php');
+JLoader::register('flexicontent_FPDI', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'FPDI.php');

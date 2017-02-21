@@ -95,6 +95,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				 $folder_mode = $field->parameters->get('image_source')==0 ? 0 : 1;
 				 $assign_mode = 1;
 				}
+				$layout = in_array($field->field_type, array('image', 'minigallery')) ? 'image' : $layout;
 			}
 			else
 			{
@@ -121,9 +122,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
+		$filter_stamp     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_stamp',     'filter_stamp',     '',          'word' );
 		
 		$target_dir = $layout=='image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
-		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage');
+		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage', 'stamp');
 		$cols = array();
 
 
@@ -166,6 +168,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		{
 			if ($filter_lang) $count_filters++;
 			if ($filter_url) $count_filters++;
+			if ($filter_stamp) $count_filters++;
 			if ($filter_secure) $count_filters++;
 		}
 		
@@ -549,14 +552,26 @@ class FlexicontentViewFileselement extends JViewLegacy
 			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
 			'.JHTML::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
 		
-		//build url/file filterlist
-		$url 	= array();
-		$url[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
-		$url[] 	= JHTML::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
-		$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
+		if ($layout!='image')
+		{
+			//build url/file filterlist
+			$url 	= array();
+			$url[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
+			$url[] 	= JHTML::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
+			$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
-		$lists['url'] = ($filter_url || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_FILES').'</div>' : '').
-			JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_url );
+			$lists['url'] = ($filter_url || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_FILES').'</div>' : '').
+				JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_url );
+
+			//build stamp filterlist
+			$stamp 	= array();
+			$stamp[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
+			$stamp[] 	= JHTML::_('select.option',  '0', JText::_( 'FLEXI_NO' ) );
+			$stamp[] 	= JHTML::_('select.option',  '1', JText::_( 'FLEXI_YES' ) );
+
+			$lists['stamp'] = ($filter_stamp || 1 ? '<div class="add-on">'.JText::_('FLEXI_DOWNLOAD_STAMPING').'</div>' : '').
+				JHTML::_('select.genericlist', $stamp, 'filter_stamp', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_stamp );
+		}
 
 		//item lists
 		/*$items_list = array();

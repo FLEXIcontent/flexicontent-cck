@@ -542,7 +542,8 @@ class com_flexicontentInstallerScript
 		
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
-		foreach ($tbl_names_arr as $tbl_name) {
+		foreach ($tbl_names_arr as $tbl_name)
+		{
 			$full_tbl_name = $dbprefix . $tbl_name;
 			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
 			$db->setQuery($query);
@@ -747,6 +748,9 @@ class com_flexicontentInstallerScript
 					}
 					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__'.$tbl_name])) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
+					}
+					if ( $files_tbl_exists && !array_key_exists('stamp', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `size`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";

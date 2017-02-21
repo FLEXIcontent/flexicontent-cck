@@ -43,6 +43,7 @@ $perms = FlexicontentHelperPerm::getPerm();  // Get compoent permissions
 
 
 $secure_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
+$stamp_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1).'"></i>';
 
 // Common language strings
 $edit_entry = JText::_('FLEXI_EDIT_FILE', true);
@@ -104,6 +105,7 @@ function delAllFilters()
 	delFilter('filter_uploader');
 	delFilter('filter_lang');
 	delFilter('filter_url');
+	delFilter('filter_stamp');
 	delFilter('filter_secure');
 	delFilter('filter_ext');
 	delFilter('item_id');
@@ -524,6 +526,14 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				</div>
 				<?php endif; ?>
 
+				<?php if ($this->layout != 'image') : /* if layout == image then this STAMP filter is not applicable */ ?>
+				<div class="fc-filter nowrap_box">
+					<div <?php echo $fcfilter_attrs_row; ?> >
+						<?php echo $this->lists['stamp']; ?>
+					</div>
+				</div>
+				<?php endif; ?>
+
 				<?php if (!empty($this->cols['target']) && $dbFolder=='') :  /* if layout==image then this was force to unset */ ?>
 				<div class="fc-filter nowrap_box">
 					<div <?php echo $fcfilter_attrs_row; ?> >
@@ -644,7 +654,11 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				<?php if (!empty($this->cols['target'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo JHTML::_('grid.sort', 'FLEXI_URL_SECURE', 'f.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
-						
+					
+				<?php if (!empty($this->cols['stamp'])) : ?>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo JHTML::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'f.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+				<?php endif; ?>
+					
 				<?php if (!empty($this->cols['usage'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_FILE_USAGE' ); ?> </th>
 				<?php endif; ?>
@@ -924,7 +938,11 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				<?php endif; ?>
 				
 				<?php if (!empty($this->cols['target'])) : ?>
-					<td class="center hidden-phone"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
+					<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
+				<?php endif; ?>
+				
+				<?php if (!empty($this->cols['stamp'])) : ?>
+					<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 				
 				<?php if (!empty($this->cols['usage'])) : ?>

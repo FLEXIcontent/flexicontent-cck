@@ -139,6 +139,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$filelang   = $data_from_sess['filelang'];
 				$fileaccess = $data_from_sess['fileaccess'];
 				$secure     = $data_from_sess['secure'];
+				$stamp      = $data_from_sess['stamp'];
 
 				$fieldid    = $data_from_sess['fieldid'];
 				$u_item_id  = $data_from_sess['u_item_id'];
@@ -169,6 +170,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			$secure  = $this->input->get('secure', 1, 'int');
 			$secure  = $secure ? 1 : 0;
+
+			$stamp = $this->input->get('stamp', 1, 'int');
+			$stamp = $stamp  ? 1 : 0;
 
 			$filetitle  = $this->input->get('file-title', '', 'string');
 			$filedesc   = flexicontent_html::dataFilter($this->input->get('file-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
@@ -388,6 +392,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$obj->url         = 0;
 		$obj->secure      = $secure;
+		$obj->stamp       = $stamp;
 		$obj->ext         = $ext;
 
 		$obj->description = $filedesc;
@@ -506,6 +511,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$obj->url         = 1;
 		$obj->secure      = 1;
+		$obj->stamp       = 0;
 		$obj->ext         = $ext;
 
 		$obj->description = $filedesc;
@@ -566,6 +572,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Get file properties
 		$secure  = $Fobj ? $Fobj->secure : $this->input->get('secure', 1, 'int');
 		$secure  = $secure ? 1 : 0;
+
+		$stamp  = $Fobj ? $Fobj->stamp : $this->input->get('stamp', 1, 'int');
+		$stamp  = $stamp ? 1 : 0;
 
 		$filedesc   = flexicontent_html::dataFilter($this->input->get('file-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
 		$filelang   = $this->input->get('file-lang', '*', 'string');
@@ -656,6 +665,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 					$obj->url         = 0;
 					$obj->secure      = $secure;
+					$obj->stamp       = $stamp;
 					$obj->ext         = $ext;
 
 					$obj->description = $filedesc;
@@ -969,7 +979,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		$data['secure'] = $data['secure'] ? 1 : 0;   // only allow 1 or 0
-		$data['url'] = $data['url'] ? 1 : 0;   // only allow 1 or 0
+		$data['stamp']  = $data['stamp']  ? 1 : 0;   // only allow 1 or 0
+		$data['url']    = $data['url']    ? 1 : 0;   // only allow 1 or 0
 
 		// CASE local file
 		if (!$data['url'])
@@ -1026,7 +1037,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
-		else {
+		else
+		{
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' ).' : '.$model->getError();
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}

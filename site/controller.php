@@ -45,8 +45,9 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'apply',          'save');
 		$this->registerTask( 'download_tree',  'download');
 	}
-	
-	
+
+
+
 	/**
 	 * Logic to create SEF urls via AJAX requests
 	 *
@@ -75,8 +76,6 @@ class FlexicontentController extends JControllerLegacy
 		}
 		jexit();
 	}
-
-
 
 
 
@@ -167,9 +166,9 @@ class FlexicontentController extends JControllerLegacy
 		
 		$this->setRedirect( $link, $msg );
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Logic to save an item
 	 *
@@ -2019,6 +2018,8 @@ class FlexicontentController extends JControllerLegacy
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+
 		$jinput  = $app->input;
 
 		$task   = $jinput->get('task', 'download', 'cmd');
@@ -2084,6 +2085,7 @@ class FlexicontentController extends JControllerLegacy
 				return;
 			}
 		}
+
 		else
 		{
 			$file_node = new stdClass();
@@ -2158,6 +2160,7 @@ class FlexicontentController extends JControllerLegacy
 		$fields_conf  = array();
 		$valid_files  = array();
 		$email_recipients = array();
+
 		foreach ($tree_files as $file_node)
 		{
 			// Get file variable shortcuts (reforce being int)
@@ -2175,7 +2178,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 			
-			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits'
+			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
 					. ', i.access as item_access, i.language as item_language, ie.type_id as item_type_id'
 					
@@ -2218,21 +2221,28 @@ class FlexicontentController extends JControllerLegacy
 			
 			if ( empty($file) || ($using_access && (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access)) )
 			{
-				if (empty($file)) {
+				if (empty($file))
+				{
 					$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
 				}
-				
-				else {
+
+				else
+				{
 					$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
 					
-					if ( !empty($file_node->coupon) ) {
+					if ( !empty($file_node->coupon) )
+					{
 						if ( $file_node->coupon->has_expired )              $msg .= JText::_('FLEXI_FDC_COUPON_HAS_EXPIRED');         // No access and given coupon has expired
 						else if ( $file_node->coupon->has_reached_limit )   $msg .= JText::_('FLEXI_FDC_COUPON_REACHED_USAGE_LIMIT'); // No access and given coupon has reached download limit
 						else $msg = "unreachable code in download coupon handling";
 					}
-					
-					else {
-						if ( isset($file_node->coupon) )  $msg .= "<br/> <small>".JText::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
+
+					else
+					{
+						if ( isset($file_node->coupon) )
+						{
+							$msg .= "<br/> <small>".JText::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
+						}
 						$msg .= ''
 							.(!$file->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
 									." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
@@ -2244,12 +2254,14 @@ class FlexicontentController extends JControllerLegacy
 							.(!$file->has_file_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO') ." -- ".JText::_('FLEXI_FDC_FILE')." " : '')
 						;
 					}
+
 					$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_FILE_DATA', $file_id, $content_id, $field_id);
 					$app->enqueueMessage($msg,'notice');
 				}
 				
 				// Only abort for single file download
-				if ($task != 'download_tree') {
+				if ($task != 'download_tree')
+				{
 					$this->setRedirect('index.php', '');
 					return;
 				}
@@ -2259,37 +2271,40 @@ class FlexicontentController extends JControllerLegacy
 			// ****************************************************
 			// (for non-URL) Create file path and check file exists
 			// ****************************************************
-			
+
 			if ( !$file->url )
 			{
 				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 				$file->abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
-				
+
 				if ( !JFile::exists($file->abspath) )
 				{
 					$msg = JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
-					
+
 					// Only abort for single file download
 					if ($task != 'download_tree') { $this->setRedirect('index.php', ''); return; }
 				}
 			}
-			
-			
+
+
 			// *********************************************************************
 			// Increment hits counter of file, and hits counter of file-user history
 			// *********************************************************************
-			
+
 			$filetable = JTable::getInstance('flexicontent_files', '');
 			$filetable->hit($file_id);
-			if ( empty($file->history_id) ) {
+			if ( empty($file->history_id) )
+			{
 				$query = ' INSERT #__flexicontent_download_history '
 					. ' SET user_id = ' . (int)$user->id
 					. '  , file_id = ' . $file_id
 					. '  , last_hit_on = NOW()'
 					. '  , hits = 1'
 					;
-			} else {
+			}
+			else
+			{
 				$query = ' UPDATE #__flexicontent_download_history '
 					. ' SET last_hit_on = NOW()'
 					. '  , hits = hits + 1'
@@ -2303,8 +2318,10 @@ class FlexicontentController extends JControllerLegacy
 			// **************************************************************************************************
 			// Increment hits on download coupon or delete the coupon if it has expired due to date or hits limit 
 			// **************************************************************************************************
-			if ( !empty($file_node->coupon) ) {
-				if ( !$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired ) {
+			if ( !empty($file_node->coupon) )
+			{
+				if ( !$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired )
+				{
 					$query = ' UPDATE #__flexicontent_download_coupons'
 						.' SET hits = hits + 1'
 						.' WHERE id='. $file_node->coupon->id
@@ -2340,23 +2357,42 @@ class FlexicontentController extends JControllerLegacy
 				@header("Location: ".$url."");
 				$app->close();
 			}
-			
-			
+
+
 			// *********************************************************************
 			// Set file (tree) node and assign file into valid files for downloading
 			// *********************************************************************
-			
+
 			$file->node = $file_node;
 			$valid_files[$file_id] = $file;
-			
+
 			$file->hits++;
 			$per_downloads = $fields_conf[$field_id]->get('notifications_hits_step', 20);
-			if ( $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) ) {
-				
+
+			$file->header_text = $fields_conf[$field_id]->get('pdf_header_text', '');
+			$file->footer_text = $fields_conf[$field_id]->get('pdf_footer_text', '');
+
+			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->header_text, $translate_matches);
+			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
+			{
+				$file->header_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $file->header_text);
+			}
+			$file->header_text = str_replace('{{current_date}}', date('Y/m/d H:i:s'), $file->header_text);
+
+			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->footer_text, $translate_matches);
+			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
+			{
+				$file->footer_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $file->footer_text);
+			}
+			$file->footer_text = str_replace('{{current_date}}', date('Y/m/d H:i:s'), $file->footer_text);
+
+			if ( $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
+			{	
 				// Calculate (once per file) some text used for notifications
-				$file->__file_title__ = $file->altname && $file->altname != $file->filename ? 
-					$file->altname . ' ['.$file->filename.']'  :  $file->filename;
-				
+				$file->__file_title__ = $file->altname && $file->altname != $file->filename
+					? $file->altname . ' ['.$file->filename.']'
+					: $file->filename;
+
 				$item = new stdClass();
 				$item->access = $file->item_access;
 				$item->type_id = $file->item_type_id;
@@ -2365,7 +2401,8 @@ class FlexicontentController extends JControllerLegacy
 				
 				// Parse and identify language strings and then make language replacements
 				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
-				if ( empty($notification_tmpl) ) {
+				if ( empty($notification_tmpl) )
+				{
 					$notification_tmpl = JText::_('FLEXI_HITS') .": ".$file->hits;
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_NO%% __file_id__:  "__file_title__" '."\n";
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__item_title__":' ."\n";
@@ -2375,19 +2412,23 @@ class FlexicontentController extends JControllerLegacy
 				$result = preg_match_all("/\%\%([^%]+)\%\%/", $notification_tmpl, $translate_matches);
 				$translate_strings = $result ? $translate_matches[1] : array();
 				foreach ($translate_strings as $translate_string)
+				{
 					$notification_tmpl = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $notification_tmpl);
+				}
 				$file->notification_tmpl = $notification_tmpl;
 				
 				// Send to hard-coded email list
 				$send_all_to_email = $fields_conf[$field_id]->get('send_all_to_email');
-				if ($send_all_to_email) {
+				if ($send_all_to_email)
+				{
 					$emails = preg_split("/[\s]*;[\s]*/", $send_all_to_email);
 					foreach($emails as $email) $email_recipients[$email][] = $file;
 				}
 				
 				// Send to item owner
 				$send_to_current_item_owner = $fields_conf[$field_id]->get('send_to_current_item_owner');
-				if ($send_to_current_item_owner) {
+				if ($send_to_current_item_owner)
+				{
 					$email_recipients[$file->item_owner_email][] = $file;
 				}
 				
@@ -2420,7 +2461,8 @@ class FlexicontentController extends JControllerLegacy
 		//sjexit();
 		
 		
-		if ( !empty($email_recipients) ) {
+		if ( !empty($email_recipients) )
+		{
 			ob_start();
 			$sendermail	= $app->getCfg('mailfrom');
 			$sendermail	= JMailHelper::cleanAddress($sendermail);
@@ -2438,7 +2480,9 @@ class FlexicontentController extends JControllerLegacy
 			{
 				$to = JMailHelper::cleanAddress($email_addr);
 				$_message = $message_header;
-				foreach($files_arr as $filedata) {
+
+				foreach($files_arr as $filedata)
+				{
 					$_mssg_file = $filedata->notification_tmpl;
 					$_mssg_file = str_ireplace('__file_id__', $filedata->id, $_mssg_file);
 					$_mssg_file = str_ireplace('__file_title__', $filedata->__file_title__, $_mssg_file);
@@ -2465,11 +2509,21 @@ class FlexicontentController extends JControllerLegacy
 		
 		
 		// * Required for IE, otherwise Content-disposition is ignored
-		if (ini_get('zlib.output_compression')) {
+		if (ini_get('zlib.output_compression'))
+		{
 			ini_set('zlib.output_compression', 'Off');
 		}
-		
-		if ($task=='download_tree') {
+
+
+		// *** Single file download
+		if ($task != 'download_tree')
+		{
+			$dlfile = reset($valid_files);
+		}
+
+		// *** Multi-file download, create a compressed archive (e.g. ZIP) to contain them, also adding a text file with name and descriptions
+		else
+		{
 			// Create target (top level) folder
 			JFolder::create($targetpath, 0755);
 			// Copy Files
@@ -2511,28 +2565,11 @@ class FlexicontentController extends JControllerLegacy
 			// ******************
 			// Create the archive
 			// ******************
-			
-			/*$app = JFactory::getApplication('administrator');
-			$files = array();
-			foreach ($fileslist as $i => $filename) {
-				$files[$i]=array();
-				$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetpath, "", $filename) );  // STRIP PATH for filename inside zip
-				$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
-				$files[$i]['time'] = time();
-			}
-			
-			jimport('joomla.archive.archive');
-			$packager = JArchive::getAdapter('zip');
-			if (!$packager->create($archivepath, $files)) {
-				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
-				$app->enqueueMessage($msg, 'notice');
-				$this->setRedirect('index.php', '');
-				return;
-			}*/
-			
+
 			$za = new flexicontent_zip();
-			$res = $za->open($archivepath, ZipArchive::CREATE);
-			if($res !== true) {
+			$zip_result = $za->open($archivepath, ZipArchive::CREATE);
+			if ($zip_result !== true)
+			{
 				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
 				$app->enqueueMessage($msg, 'notice');
 				$this->setRedirect('index.php', '');
@@ -2546,7 +2583,8 @@ class FlexicontentController extends JControllerLegacy
 			// Remove temporary folder structure
 			// *********************************
 			
-			if (!JFolder::delete(($targetpath)) ) {
+			if (!JFolder::delete(($targetpath)) )
+			{
 				$msg = "Temporary folder ". $targetpath ." could not be deleted";
 				$app->enqueueMessage($msg, 'notice');
 			}
@@ -2554,7 +2592,9 @@ class FlexicontentController extends JControllerLegacy
 			// Delete old files (they can not be deleted during download time ...)
 			$tmp_path = JPath::clean($app->getCfg('tmp_path'));
 			$matched_files = JFolder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
-			foreach ($matched_files as $archive_file) {
+
+			foreach ($matched_files as $archive_file)
+			{
 				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
 				if (time() - filemtime($archive_file) > 3600) JFile::delete($archive_file);
 			}
@@ -2569,8 +2609,6 @@ class FlexicontentController extends JControllerLegacy
 			$dlfile = new stdClass();
 			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s'). '.zip';   // a friendly name instead of  $archivename
 			$dlfile->abspath  = $archivepath;
-		} else {
-			$dlfile = reset($valid_files);
 		}
 		
 		// Get file filesize and extension
@@ -2584,8 +2622,65 @@ class FlexicontentController extends JControllerLegacy
 			"gif" => "image/gif", "png" => "image/png", "jpeg" => "image/jpg", "jpg" => "image/jpg", "mp3" => "audio/mpeg"
 		);
 		$dlfile->ctype = isset($ctypes[$dlfile->ext]) ? $ctypes[$dlfile->ext] : "application/force-download";
-		
-		
+		$dlfile->download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
+
+
+
+
+		// ************************
+		// Handle PDF time-stamping
+		// ************************
+		$dlfile->abspath_tmp = false;
+		$dlfile->size_tmp = false;
+		if ($dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
+		{
+			// Create new PDF document (initiate FPDI)
+			$pdf = new flexicontent_FPDI();
+			$pdf->setAllPagesHeaderText($file->header_text);
+			$pdf->setAllPagesFooterText($file->footer_text);
+
+			// Set the source file
+			try
+			{
+				$pageCount = $pdf->setSourceFile($dlfile->abspath);
+				//echo '<span>Converting file: <span style="color: darkgreen; font-weight: bold;">'.$dlfile->abspath . '</span></span><br/>';
+			}
+			catch (Exception $e)
+			{
+				die('<blockquote>Cannot convert file: <span style="color: darkred; font-weight: bold;">'.$dlfile->abspath.'</span> Error: '. $e->getMessage() . '</blockquote>');
+			}
+
+			// Loop through all pages
+			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++)
+			{
+				// Read next page from source file
+				$tplIdx = $pdf->importPage($pageNo);
+
+				// Create new empty page, and add it to it the imported page, formating it according to our templage
+				$pdf->AddPage();
+				$pdf->useTemplate($tplIdx, null, null, 0, 0, true);
+			}
+
+			// Output formatted PDF data into a new file
+			$tmpDir = ini_get("upload_tmp_dir")  ?  ini_get("upload_tmp_dir")  :  sys_get_temp_dir();
+			$tmpDir .= DIRECTORY_SEPARATOR . "fc_pdf_downloads";
+
+			if (!file_exists($tmpDir))
+			{
+				if (@ !mkdir($tmpDir) ) die('Can not create temporary folder for handling PDF file');
+			}
+
+			$pdf_filename = basename($dlfile->abspath);
+			$dlfile->abspath_tmp = $tmpDir . DIRECTORY_SEPARATOR . date('Y_m_d_').uniqid() . '_' . $pdf_filename;
+			$pdf->Output($dlfile->abspath_tmp, "F");
+			$dlfile->size_tmp = filesize($dlfile->abspath_tmp);
+
+			// Output formatted PDF data to stdout (this browser if running via web-server, we would probably want to set HTTP headers first)
+			//$pdf->Output();
+
+			//die('is PDF: ' . $dlfile->abspath);
+		}
+
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
@@ -2594,15 +2689,14 @@ class FlexicontentController extends JControllerLegacy
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Cache-Control: private", false); // required for certain browsers
 		header("Content-Type: ".$dlfile->ctype);
-		//quotes to allow spaces in filenames
-		$download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
-		if ($method == 'view') {
-			header("Content-Disposition: inline; filename=\"".$download_filename."\";" );
-		} else {
-			header("Content-Disposition: attachment; filename=\"".$download_filename."\";" );
-		}
+
+		// Set desired filename when downloading, quoting it to allow spaces in filenames
+		$method == 'view'
+			? header("Content-Disposition: inline; filename=\"".$dlfile->download_filename."\";" )
+			: header("Content-Disposition: attachment; filename=\"".$dlfile->download_filename."\";" );
+
 		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: ".$dlfile->size);
+		header("Content-Length: " . ($dlfile->size_tmp ?: $dlfile->size));
 		
 		
 		// *******************************
@@ -2610,11 +2704,11 @@ class FlexicontentController extends JControllerLegacy
 		// *******************************
 		
 		if ( !FLEXIUtilities::funcIsDisabled('set_time_limit') ) @set_time_limit(0);
-		
+
 		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
 		if (1 || $dlfile->size > $chunksize)
 		{
-			$handle = @fopen($dlfile->abspath,"rb");
+			$handle = @fopen($dlfile->abspath_tmp ?: $dlfile->abspath, 'rb');
 			while(!feof($handle))
 			{
 				print(@fread($handle, $chunksize));
@@ -2622,15 +2716,18 @@ class FlexicontentController extends JControllerLegacy
 				flush();
 			}
 			fclose($handle);
-		} else {
+		}
+
+		else
+		{
 			// This is good for small files, it will read an output the file into
 			// memory and output it, it will cause a memory exhausted error on large files
 			ob_clean();
 			flush();
-			readfile($dlfile->abspath);
+			readfile($dlfile->abspath_tmp ?: $dlfile->abspath);
 		}
-		
-		
+
+
 		// ****************************************************
 		// In case of multi-download clear the session variable
 		// ****************************************************
