@@ -142,7 +142,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$none_props = !$linkto_url && !$usealt && !$usetitle && !$usedesc && !$usecust1 && !$usecust2;
 
 		// Inline uploaders flags
-		$use_inline_uploaders = !$use_ingroup && $image_source >= 0;
+		$use_inline_uploaders = $image_source >= 0;
 		$file_btns_position = (int) $field->parameters->get('file_btns_position', 0);
 
 
@@ -240,7 +240,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$document->addScriptDeclaration("
 			jQuery(document).ready(function()
 			{
-				fc_attachSingleSlider(".$thumb_size_slider_cfg.", $thumb_size_resizer);
+				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
 			});
 			");
 		}
@@ -1102,6 +1102,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$non_value_html = '<input id="'.$elementid.'" class="'.($use_ingroup ? '' : $required_class).' fc_hidden_value" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		if ($use_ingroup) {
 			$field->html[-1] = $non_value_html;
+			if ($use_inline_uploaders && $uploader_html->thumbResizer)
+			{
+				$field->html[-1] = $uploader_html->thumbResizer . ' ' . $field->html[-1];
+			}
 		} else {
 			$field->html .= $non_value_html;
 			if ($use_inline_uploaders && $uploader_html->thumbResizer)

@@ -394,7 +394,11 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		} else {
 			$field->html = '';
 		}
-		if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="jQuery(this).prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+		if (!$add_position) $field->html .= '
+			<div class="input-append input-prepend fc-xpended-btns" style="margin-left: 8px !important;">
+				<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="jQuery(this).prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
+			</div>
+		';
 		
 		// Check max allowed version
 		//$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
@@ -402,6 +406,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		// Append non value html of fields
 		$field->html =
+			($non_value_html ? '
+				<div class="fcclear"></div>'.$non_value_html : '') .
 			/*(version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', self::$prior_to_version), '>=') ?
 				'<span class="alert alert-warning fc-iblock fc-small" style="margin: 0 0 8px 0;">
 					<b>Warning</b>: installed version of Field: \'<b>'.$field->field_type.'</b>\' was meant for FLEXIcontent versions prior to: v'.self::$prior_to_version.' It may or may not work properly in later versions
@@ -416,9 +422,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				</span>
 			</div>
 				' : '').'
-			'.$field->html.
-			($non_value_html ? '
-				<div class="fcclear"></div>'.$non_value_html : '');
+			'.$field->html;
 	}
 	
 	
