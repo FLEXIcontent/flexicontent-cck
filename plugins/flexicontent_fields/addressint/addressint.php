@@ -585,7 +585,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$post = $newpost;
 
 		// Serialize multi-property data before storing them into the DB, also map some properties as fields
-		$props_to_fields = array('addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat');
+		$props_to_fields = array('name', 'addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat');
 		$_fields = array();
 		$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
 		foreach($post as $i => $v)
