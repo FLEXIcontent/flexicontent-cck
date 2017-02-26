@@ -461,7 +461,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
+		if ( empty($values) )
+		{
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
 		}
@@ -479,50 +480,16 @@ class plgFlexicontent_fieldsDate extends FCField
 		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
 		$display_tz_suffix   = $field->parameters->get( 'display_tz_suffix', 1) ;
 		
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-		
 		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
-		
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
 
-			case 1:
-			$separatorf = '<br class="fcclear" />';
-			break;
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
+		// Prefix - Suffix - Separator parameters - Other common parameters
+		$common_params_array = $this->getCommonParams($item, 1);
+		extract($common_params_array);
 		
 		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
 		if ( !$use_editor_tz ) {
@@ -534,30 +501,28 @@ class plgFlexicontent_fieldsDate extends FCField
 			$tz_suffix_type = $display_tz_guests;
 		}
 		
+		// Decide the timezone to use
 		$tz_info = '';
 		switch ($tz_suffix_type)
 		{
-		default: // including value -1 for raw for output, see above
-		case 0:
-			$timezone = 'UTC';
-			//$tz_info = '';
-			break;
-		case 1:
-			$timezone = 'UTC';
-			//$tz_info = ' UTC+0';
-			break;
-		case 2:
-			$timezone = $config->get('offset');
-			//$tz_info = ' (site's timezone)';
-			break;
-		case 3: 
-			$timezone = $user->getParam('timezone' );
-			//$tz_info = ' (local time)';
-			break;
+			default: // including value -1 for raw for output, see above
+			case 0:
+				$timezone = 'UTC';   // ''
+				break;
+			case 1:
+				$timezone = 'UTC';   // ' UTC+0'
+				break;
+			case 2:
+				$timezone = $config->get('offset');  // Site's timezone
+				break;
+			case 3: 
+				$timezone = $user->getParam('timezone' );  // User's local time
+				break;
 		}
-		
-		// display timezone suffix if this is enabled
-		if ($display_tz_suffix && $tz_suffix_type > 0) {
+
+		// Display timezone suffix if this is enabled
+		if ($display_tz_suffix && $tz_suffix_type > 0)
+		{
 			$tz = new DateTimeZone($timezone);
 			$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;

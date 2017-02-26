@@ -78,10 +78,10 @@ class FCField extends JPlugin
 	public function &getItem()  { return $this->item; }
 	
 	
-	protected function getSeparatorF($opentag, $closetag)
+	protected function getSeparatorF($opentag, $closetag, $sep_default = 1)
 	{
 		if(!$this->field) return false;
-		$separatorf = $this->field->parameters->get( 'separatorf', 1 ) ;
+		$separatorf = $this->field->parameters->get('separatorf', $sep_default);
 		switch($separatorf)
 		{
 			case 0:
@@ -384,10 +384,12 @@ class FCField extends JPlugin
 	// Functions to execute common value preparation
 	// *********************************************
 	
-	protected function getOpenTag() {
+	protected function getOpenTag()
+	{
 		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'opentag', '' ), 'opentag' );
 	}
-	protected function getCloseTag() {
+	protected function getCloseTag()
+	{
 		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
 	}
 	
@@ -398,7 +400,8 @@ class FCField extends JPlugin
 	protected function afterDisplayField() {}
 	
 	// Create and returns a default value
-	protected function getDefaultValues() {
+	protected function getDefaultValues()
+	{
 		return array('');
 	}
 	
@@ -423,5 +426,37 @@ class FCField extends JPlugin
 			}
 		}
 		return $vals;
+	}
+
+
+	// Get Prefix - Suffix - Separator parameters and other common parameters
+	protected function & getCommonParams(& $field, $item, $sep_default = 1)
+	{
+		static $conf = array();
+		if (isset($conf[$field->id]))
+		{
+			return $conf[$field->id];
+		}
+		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$arr = array();
+		$arr['remove_space'] = $field->parameters->get( 'remove_space', 0 ) ;
+		$arr['pretext']   = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$arr['posttext']  = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$arr['opentag']   = $this->getOpenTag();
+		$arr['closetag']  = $this->getCloseTag();
+		
+		if ($arr['pretext'])
+		{
+			$arr['pretext']  = $arr['remove_space'] ? $arr['pretext'] : $arr['pretext'] . ' ';
+		}
+		if ($arr['posttext'])
+		{
+			$arr['posttext'] = $arr['remove_space'] ? $arr['posttext'] : ' ' . $arr['posttext'];
+		}
+
+		$arr['separatorf'] = $this->getSeparatorF($arr['opentag'], $arr['closetag'], $sep_default);
+		
+		return $arr;
 	}
 }
