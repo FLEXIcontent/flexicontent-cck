@@ -149,20 +149,20 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TIMEZONE_PART" level="level2" />
-			<field name="display_tz_logged" type="list" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC">
+			<field name="display_tz_suffix" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX" description="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX_DESC">
+				<option value="0" show_list="" hide_list="stamp_timezone_on">FLEXI_FIELD_NO_I_WILL_DO_MANUALLY</option>
+				<option value="1" show_list="stamp_timezone_on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="display_tz_logged" type="list" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC" depend_class="stamp_timezone_on" >
 				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
 				<option value="1">FLEXI_DATE_UTC0</option>
 				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
 				<option value="3">FLEXI_DATE_USER_LOCALTIME</option>
 			</field>
-			<field name="display_tz_guests" type="list" default="0" label="FLEXI_DATE_TIMEZONE_GUESTS" description="FLEXI_DATE_TIMEZONE_GUESTS_DESC">
+			<field name="display_tz_guests" type="list" default="0" label="FLEXI_DATE_TIMEZONE_GUESTS" description="FLEXI_DATE_TIMEZONE_GUESTS_DESC" depend_class="stamp_timezone_on" >
 				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
 				<option value="1">FLEXI_DATE_UTC0</option>
 				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
-			</field>
-			<field name="display_tz_suffix" type="list" default="1" label="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX" description="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX_DESC">
-				<option value="0">FLEXI_FIELD_NO_I_WILL_DO_MANUALLY</option>
-				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />

@@ -278,7 +278,7 @@
 			<field name="" type="separator" default="FLEXI_STORE_PROPERTIES_AS_FIELDS" level="level2" />
 			<field name="" type="separator" default="FLEXI_STORE_PROPERTIES_AS_FIELDS_DESC" class="alert alert-info" level="level4" />
 			
-			<field name="field_name" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Bussiness name or location" description="" class="use_select2_lib"/>
+			<field name="field_name" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Business or location" description="" class="use_select2_lib"/>
 			<field name="field_addr1" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Address 1" description="" class="use_select2_lib"/>
 			<field name="field_addr2" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Address 2" description="" class="use_select2_lib"/>
 			<field name="field_addr3" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Address 3" description="" class="use_select2_lib"/>

@@ -249,14 +249,48 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_STAMPING" description="" icon_class="icon-file" level="tab_open" box_type="1" />
 
-			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_ADD_TEXT_ALL_PAGES" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_PDF_ADD_TEXT_ALL_PAGES" level="level1" />
 			<field name="stamp_pdfs" type="multilist" subtype="radio" default="0" label="Add stamp texts" toggle_related="1" description="Modify PDF files on download to add a stamping text" class="btn-group group-fcmethod fcoffactive">
 				<option value="0" show_list="" hide_list="stamp_pdfs_mode">FLEXI_NO</option>
 				<option value="1" show_list="stamp_pdfs_mode" hide_list="">FLEXI_YES</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_CUSTOMIZE" level="level2" depend_class="stamp_pdfs_mode" />
 			<field name="pdf_header_text" type="textarea" default="" label="FLEXI_HEADER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
 			<field name="pdf_footer_text" type="textarea" default="" label="FLEXI_FOOTER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
+
+			<field name="" type="separator" default="FLEXI_DATES" level="level2" />
+			<field name="" type="separator" default="FLEXI_DATE_PART" level="level4" />
+			<field name="stamp_date_format" type="multilist" subtype="list" toggle_related="1" default="DATE_FORMAT_LC2" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
+				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
+				<option value="DATE_FORMAT_LC2" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC2</option>
+				<option value="DATE_FORMAT_LC3" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC3</option>
+				<option value="DATE_FORMAT_LC4" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC4</option>
+				<option value="" show_list="custom-date-mode" hide_list="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+			</field>
+			<field name="stamp_custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" depend_class="custom-date-mode" />
+			<field name="stamp_lang_filter_format" type="radio" default="0" label="FLEXI_LANG_FILTER_FORMAT" description="FLEXI_LANG_FILTER_FORMAT_DESC" depend_class="custom-date-mode" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_TIMEZONE_PART" level="level4" />
+			<field name="stamp_display_tz_suffix" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX" description="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX_DESC">
+				<option value="0" show_list="" hide_list="stamp_timezone_on">FLEXI_FIELD_NO_I_WILL_DO_MANUALLY</option>
+				<option value="1" show_list="stamp_timezone_on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="stamp_display_tz_logged" type="list" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC" depend_class="stamp_timezone_on" >
+				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
+				<option value="1">FLEXI_DATE_UTC0</option>
+				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
+				<option value="3">FLEXI_DATE_USER_LOCALTIME</option>
+			</field>
+			<field name="stamp_display_tz_guests" type="list" default="0" label="FLEXI_DATE_TIMEZONE_GUESTS" description="FLEXI_DATE_TIMEZONE_GUESTS_DESC" depend_class="stamp_timezone_on" >
+				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
+				<option value="1">FLEXI_DATE_UTC0</option>
+				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
+			</field>
+
 
 			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART_SHORT" description="" icon_class="icon-cart" level="tab_open" box_type="1" />
 

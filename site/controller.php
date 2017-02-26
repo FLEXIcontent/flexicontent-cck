@@ -2369,6 +2369,9 @@ class FlexicontentController extends JControllerLegacy
 			$file->hits++;
 			$per_downloads = $fields_conf[$field_id]->get('notifications_hits_step', 20);
 
+			// Create current date string according to configuration
+			$current_date = flexicontent_html::getDateFieldDisplay($fields_conf[$field_id], $_date_ = '', 'stamp_');
+
 			$file->header_text = $fields_conf[$field_id]->get('pdf_header_text', '');
 			$file->footer_text = $fields_conf[$field_id]->get('pdf_footer_text', '');
 
@@ -2377,17 +2380,17 @@ class FlexicontentController extends JControllerLegacy
 			{
 				$file->header_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $file->header_text);
 			}
-			$file->header_text = str_replace('{{current_date}}', date('Y/m/d H:i:s'), $file->header_text);
+			$file->header_text = str_replace('{{current_date}}', $current_date, $file->header_text);
 
 			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->footer_text, $translate_matches);
 			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
 			{
 				$file->footer_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $file->footer_text);
 			}
-			$file->footer_text = str_replace('{{current_date}}', date('Y/m/d H:i:s'), $file->footer_text);
+			$file->footer_text = str_replace('{{current_date}}', $current_date, $file->footer_text);
 
 			if ( $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
-			{	
+			{
 				// Calculate (once per file) some text used for notifications
 				$file->__file_title__ = $file->altname && $file->altname != $file->filename
 					? $file->altname . ' ['.$file->filename.']'
@@ -2630,6 +2633,8 @@ class FlexicontentController extends JControllerLegacy
 		// ************************
 		// Handle PDF time-stamping
 		// ************************
+
+		$pdf = false;
 		$dlfile->abspath_tmp = false;
 		$dlfile->size_tmp = false;
 		if ($dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
@@ -2647,9 +2652,13 @@ class FlexicontentController extends JControllerLegacy
 			}
 			catch (Exception $e)
 			{
-				die('<blockquote>Cannot convert file: <span style="color: darkred; font-weight: bold;">'.$dlfile->abspath.'</span> Error: '. $e->getMessage() . '</blockquote>');
+				$pdf = false;
+				//die('<blockquote>Cannot convert file: <span style="color: darkred; font-weight: bold;">'.$dlfile->abspath.'</span> Error: '. $e->getMessage() . '</blockquote>');
 			}
+		}
 
+		if ($pdf)
+		{
 			// Loop through all pages
 			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++)
 			{

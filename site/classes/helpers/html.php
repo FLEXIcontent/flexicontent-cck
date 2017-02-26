@@ -4802,4 +4802,66 @@ class flexicontent_html
 		
 		return $layout_vars;
 	}
+
+	// Get Prefix - Suffix - Separator parameters and other common parameters
+	static function getDateFieldDisplay($field_parameters, $date = '', $pfx = '')
+	{
+		// Some variables
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
+		
+		// Timezone configuration
+		$date_allowtime = $field_parameters->get( $pfx.'date_allowtime', 1 ) ;
+		$use_editor_tz  = $field_parameters->get( $pfx.'use_editor_tz', 0 ) ;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
+		$customdate     = $field_parameters->get( $pfx.'custom_date', 'DATE_FORMAT_LC2' ) ;
+		$dateformat     = $field_parameters->get( $pfx.'date_format', '' ) ;
+		$dateformat = $dateformat ? JText::_($dateformat) :
+			($field_parameters->get( $pfx.'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+		
+		$display_tz_logged   = $field_parameters->get( $pfx.'display_tz_logged', 2) ;
+		$display_tz_guests   = $field_parameters->get( $pfx.'display_tz_guests', 2) ;
+		$display_tz_suffix   = $field_parameters->get( $pfx.'display_tz_suffix', 1) ;
+		
+		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
+		if ($user->id) {
+			$tz_suffix_type = $display_tz_logged;
+		} else {
+			$tz_suffix_type = $display_tz_guests;
+		}
+		
+		// Decide the timezone to use
+		$tz_info = '';
+		switch ($tz_suffix_type)
+		{
+			default: // including value -1 for raw for output, see above
+			case 0:
+				$timezone = 'UTC';
+				break;
+			case 1:
+				$timezone = 'UTC';   // ' UTC+0'
+				break;
+			case 2:
+				$timezone = $config->get('offset');  // Site's timezone
+				break;
+			case 3: 
+				$timezone = $user->getParam('timezone' );  // User's local time
+				break;
+		}
+
+		// Display timezone suffix if this is enabled
+		if ($display_tz_suffix && $tz_suffix_type > 0)
+		{
+			$tz = new DateTimeZone($timezone);
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
+			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+		}
+
+		// Return date
+		try {
+			return JHTML::_('date', $date, $dateformat, $timezone ) . $tz_info;
+		} catch ( Exception $e ) {
+			return '';
+		}
+	}
 }
