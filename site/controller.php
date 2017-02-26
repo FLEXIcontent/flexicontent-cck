@@ -2640,20 +2640,24 @@ class FlexicontentController extends JControllerLegacy
 		if ($dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
 		{
 			// Create new PDF document (initiate FPDI)
-			$pdf = new flexicontent_FPDI();
-			$pdf->setAllPagesHeaderText($file->header_text);
-			$pdf->setAllPagesFooterText($file->footer_text);
+			$TCPDF_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'TCPDF'.DS.'vendor'.DS.'autoload.php';
+			if (file_exists($TCPDF_path))
+			{
+				$pdf = new flexicontent_FPDI();
+				$pdf->setAllPagesHeaderText($file->header_text);
+				$pdf->setAllPagesFooterText($file->footer_text);
 
-			// Set the source file
-			try
-			{
-				$pageCount = $pdf->setSourceFile($dlfile->abspath);
-				//echo '<span>Converting file: <span style="color: darkgreen; font-weight: bold;">'.$dlfile->abspath . '</span></span><br/>';
-			}
-			catch (Exception $e)
-			{
-				$pdf = false;
-				//die('<blockquote>Cannot convert file: <span style="color: darkred; font-weight: bold;">'.$dlfile->abspath.'</span> Error: '. $e->getMessage() . '</blockquote>');
+				// Set the source file
+				try
+				{
+					$pageCount = $pdf->setSourceFile($dlfile->abspath);
+					//echo '<span>Converting file: <span style="color: darkgreen; font-weight: bold;">'.$dlfile->abspath . '</span></span><br/>';
+				}
+				catch (Exception $e)
+				{
+					$pdf = false;
+					//die('<blockquote>Cannot convert file: <span style="color: darkred; font-weight: bold;">'.$dlfile->abspath.'</span> Error: '. $e->getMessage() . '</blockquote>');
+				}
 			}
 		}
 
