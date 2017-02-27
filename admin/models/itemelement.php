@@ -155,6 +155,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 			. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+			. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
 			. $this->_buildContentWhere()
 			. $this->_buildContentOrderBy()
 			;
