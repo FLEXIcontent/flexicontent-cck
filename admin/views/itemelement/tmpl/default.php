@@ -18,7 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 $app = JFactory::getApplication();
-$option = JRequest::getVar('option');
+$option = $app->input->get('option');
+global $globalcats;
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
@@ -118,12 +119,13 @@ function delAllFilters() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
-			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="50px" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_MAIN_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -177,7 +179,16 @@ function delAllFilters() {
 			</td>
 			
 			<td align="left">
-				<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+				<?php
+					$parentcats_ids = isset($globalcats[$row->catid]) ? $globalcats[$row->catid]->ancestorsarray : array();
+					$pcpath = array();
+					foreach($parentcats_ids as $pcid)
+					{
+						$pcpath[] = $globalcats[$pcid]->title;
+					}
+					$pcpath = implode($pcpath, ' / ');
+				?>
+				<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_SELECT' ), $row->title . '<br/><br/>' .JText::_('FLEXI_MAIN_CATEGORY'). '<br/>' . $pcpath, 0, 1); ?>">
 				<?php if(JRequest::getVar('object','')==''): ?>
 					<a style="cursor:pointer" onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ? $this->filter_cats : $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
 				<?php else: ?>
@@ -187,9 +198,13 @@ function delAllFilters() {
 					</a>
 				</span>
 			</td>
-			
+
 			<td align="center" class="col_type"><?php echo $row->type_name; ?></td>
 			
+			<td align="left" class="col_cat">
+				<?php echo $globalcats[$row->catid]->title; ?>
+			</td>
+
 			<td align="center"><?php echo $row->author; ?></td>
 			
 			<td align="center">

@@ -18,7 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 $app = JFactory::getApplication();
-$option = JRequest::getVar('option');
+$option = $app->input->get('option');
+global $globalcats;
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
@@ -119,13 +120,13 @@ function delAllFilters() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="5%" class="nowrap">
+			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" class="nowrap">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'c.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			<th width="1%" nowrap="nowrap">
+			<th width="" nowrap="nowrap">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 		</tr>
@@ -149,26 +150,34 @@ function delAllFilters() {
 			$published = JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange=0 );
    	?>
 		<tr class="<?php echo "row$k"; ?>">
-			
+
 			<td>
 				<div class="adminlist-table-row"></div>
 				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
-			
+
 			<td align="left" class="col_title">
+				<?php
+					$parentcats_ids = isset($globalcats[$row->id]) ? $globalcats[$row->id]->ancestorsarray : array();
+					$pcpath = array();
+					foreach($parentcats_ids as $pcid)
+					{
+						$pcpath[] = $globalcats[$pcid]->title;
+					}
+					$pcpath = implode($pcpath, ' / ');
+				?>
 				<?php if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>
-				
-				<a style="cursor:pointer" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+				<a class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_SELECT' ), $pcpath, 0, 1); ?>" onclick="window.parent.fcSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 			</td>
-			
+
 			<td align="center"><?php echo $row->author; ?></td>
-			
+
 			<td align="center"><?php echo $published; ?></td>
-			
+
 			<td align="center"><?php echo $row->access_level; ?></td>
-			
+
 			<td class="center nowrap">
 				<?php
 				echo $row->language=='*' ?
