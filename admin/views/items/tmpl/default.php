@@ -614,9 +614,7 @@ jQuery(document).ready(function(){
 			<th class="left nowrap hideOnDemandClass" style="padding-left: 0px; padding-right: 0px;">
 				<?php
 				echo $this->CanOrder ? $image_ordering_tip : '';
-				echo !$this->filter_order_type
-					? str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] ))
-					: str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] )));
+				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
 
 				/*if ($this->CanOrder && $this->ordering) :
 					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
