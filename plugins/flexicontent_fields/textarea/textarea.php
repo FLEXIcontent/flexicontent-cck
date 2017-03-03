@@ -93,9 +93,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '98%') ;
-		if ($width != (int)$width) $width .= 'px';
+		if ( is_numeric($width) ) $width .= 'px';
 		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '250px' : '400px' ) ;
-		if ($height != (int)$height) $height .= 'px';
+		if (  is_numeric($height) ) $height .= 'px';
 		
 		// Decide editor plugin buttons to SKIP
 		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;

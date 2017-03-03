@@ -105,10 +105,9 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
-		$customdate     = $field->parameters->get( 'custom_date', $date_source!=3 ? 'Y-m-d' : 'Y M d, H:i:s' ) ;
-
+		$customdate     = $field->parameters->get( 'custom_date', $date_source!=3 ? 'Y-m-d' : 'Y-M-d, H:i:s' ) ;
 		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
-		$dateformat = $dateformat ? JText::_($dateformat) :
+		$dateformat = $dateformat && $dateformat != '_custom_' ? JText::_($dateformat) :
 			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 		
 		$timezone = 'UTC'; // Default is not to use TIMEZONE
@@ -473,7 +472,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 		$customdate     = $field->parameters->get( 'custom_date', $date_source!=3 ? 'Y-m-d' : 'Y-M-d, H:i:s' ) ;
 		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
-		$dateformat = $dateformat ? JText::_($dateformat) :
+		$dateformat = $dateformat && $dateformat != '_custom_' ? JText::_($dateformat) :
 			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 		
 		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
