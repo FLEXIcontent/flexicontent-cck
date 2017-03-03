@@ -67,11 +67,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Zero unneeded search index text
 		foreach ($items as $item) $item->search_index = '';
 		
-		// Nullify creator / modifier emails for JSON view
+		// Nullify some data for JSON view:
+		//   Items Creator / Modifier emails,
+		//   Items attributes, and fields attributes
 		foreach ($items as $item)
 		{
 			$item->cmail = null;
 			$item->mmail = null;
+			$item->attribs = null;
+			foreach($item->fields as $field) $field->attribs = null;
 		}
 		
 		// Use &test=1 to test / preview item data of first item
