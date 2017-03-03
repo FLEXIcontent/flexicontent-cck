@@ -280,6 +280,9 @@ foreach ($this->values as $n => $value)
 					rotateControl: false
 					'.($map_style ? ',styles: '.$map_style : '').'
 				});
+
+				mapBox.addClass("has_fc_google_maps_map");
+				mapBox.data("google_maps_ref", myMap);
 				
 				var myInfoWindow = new google.maps.InfoWindow({
 					content: mapContent

@@ -444,6 +444,11 @@ tabberObj.prototype.tabShow = function(tabberIndex)
   if (typeof this.onTabDisplay == 'function') {
     this.onTabDisplay({'tabber':this, 'index':tabberIndex});
   }
+  
+	// Force redraw of any google maps inside TAB
+	jQuery('.has_fc_google_maps_map').each(function() {
+		google.maps.event.trigger(jQuery(this).data('google_maps_ref'), 'resize');
+	});
 
   return this;
 };
