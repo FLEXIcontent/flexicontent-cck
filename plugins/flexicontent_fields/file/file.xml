@@ -266,7 +266,7 @@
 				<option value="DATE_FORMAT_LC2" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC2</option>
 				<option value="DATE_FORMAT_LC3" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC3</option>
 				<option value="DATE_FORMAT_LC4" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC4</option>
-				<option value="" show_list="custom-date-mode" hide_list="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+				<option value="_custom_" show_list="custom-date-mode" hide_list="">FLEXI_FIELD_CUSTOM_FORMAT</option>
 			</field>
 			<field name="stamp_custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" depend_class="custom-date-mode" />
 			<field name="stamp_lang_filter_format" type="radio" default="0" label="FLEXI_LANG_FILTER_FORMAT" description="FLEXI_LANG_FILTER_FORMAT_DESC" depend_class="custom-date-mode" class="btn-group btn-group-yesno">
