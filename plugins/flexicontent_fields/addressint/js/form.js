@@ -62,6 +62,9 @@
 			streetViewControl: false,
 			rotateControl: false,
 		});
+
+		jQuery('#map_canvas_' + elementid_n).addClass('has_fc_google_maps_map');
+		jQuery('#map_canvas_' + elementid_n).data('google_maps_ref', fcfield_addrint.google_maps[elementid_n]);
 		
 		myMarker = new google.maps.Marker({
 			map: fcfield_addrint.google_maps[elementid_n],

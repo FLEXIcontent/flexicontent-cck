@@ -268,6 +268,7 @@
 		    
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_CONFIG" level="level1" />
 			
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY" level="level4" />
 			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY_DESC" />
 			<field name="google_maps_static_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY_DESC" />
 			
