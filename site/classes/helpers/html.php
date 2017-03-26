@@ -3381,7 +3381,7 @@ class flexicontent_html
 			$query = 'SELECT '.($users_list_type==1 ? "u.username" : "u.name")
 				.' FROM #__flexicontent_favourites AS ff'
 				.' LEFT JOIN #__users AS u ON u.id=ff.userid '
-				.' WHERE ff.itemid=' . $item->id;
+				.' WHERE ff.itemid=' . $item->id . ' AND type = 0';
 			$db->setQuery($query);
 			$favusers = $db->loadColumn();
 			
@@ -3410,6 +3410,7 @@ class flexicontent_html
 	 */
 	static function favicon($field, $favoured, $item, $type='item')
 	{
+		static $allow_guests_favs;
 		$users_counter = (int) $field->parameters->get('display_favoured_usercount', 0);
 		
 		$user = JFactory::getUser();
@@ -3418,15 +3419,24 @@ class flexicontent_html
 
 		static $js_and_css_added = false;
 		static $tooltip_class, $addremove_tip, $img_fav_add, $img_fav_delete;
+		if (!$img_fav_delete)
+		{
+			$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL);
+		}
+		if (!$img_fav_add)
+		{
+			$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL);
+		}
 
 		if (!$js_and_css_added)
 		{
 			$document	= JFactory::getDocument();
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			
+			$allow_guests_favs = $cparams->get('allow_guests_favs', 1);
 			$tooltip_class = ' hasTooltip';
-			$text 		= $user->id ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
-			$overlib 	= $user->id ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
+			$text 		= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
+			$overlib 	= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
 			$addremove_tip = flexicontent_html::getToolTip($text, $overlib, 1, 1);
 			
 			// Make sure mootools are loaded before our js
@@ -3460,42 +3470,24 @@ class flexicontent_html
 
 		$output = "";
 
-		if ($user->id && $favoured)
+		if ($user->id || $allow_guests_favs)
 		{
-			$alt_text = JText::_( 'FLEXI_REMOVE_FAVOURITE' );
-			if (!$img_fav_delete) {
-				$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', $alt_text, NULL);
-			}
+			$link_class = $favoured ? 'fcfav_delete' : 'fcfav_add';
+			$link_text  = $favoured ? $img_fav_delete : $img_fav_add;
+
 			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
 			$link 		= "javascript:void(null)";
 
 			$output		.=
-				 '<span class="fcfav_delete">'
-				.' <a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$img_fav_delete.'</a>'
-				.' <span class="fav_item_id" style="display:none;">'.$item_id.'</span>'
-				.' <span class="fav_item_title" style="display:none;">'.$item_title.'</span>'
-				.'</span>';
-
-		}
-		elseif($user->id)
-		{
-			$alt_text = JText::_( 'FLEXI_FAVOURE' );
-			if (!$img_fav_add) {
-				$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', $alt_text, NULL);
-			}
-			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
-			$link 		= "javascript:void(null)";
-
-			$output		.=
-				 '<span class="fcfav_add">'
-				.' <a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$img_fav_add.'</a>'
+				 '<span class="'.$link_class.'">'
+				.' <a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$link_text.'</a>'
 				.' <span class="fav_item_id" style="display:none;">'.$item_id.'</span>'
 				.' <span class="fav_item_title" style="display:none;">'.$item_title.'</span>'
 				.'</span>';
 		}
-		else
+		else  // Favs for guests disabled
 		{
-			$attribs = 'class="btn '.$tooltip_class.'" title="'.$addremove_tip.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP' ).'\')"';
+			$attribs = 'class="btn '.$tooltip_class.'" title="'.$addremove_tip.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
 			$image = JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $attribs);
 
 			$output		= $image;

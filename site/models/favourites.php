@@ -309,7 +309,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		if ( in_array('order', $order) ) {
 			$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 		}
-		
+
 		$query = 'SELECT i.id, i.*, ie.* '
 			. $orderby_col
 			. $select_access
@@ -318,7 +318,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id'
+			. ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. $orderby_join
@@ -376,10 +376,24 @@ class FlexicontentModelFavourites extends JModelLegacy
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
-		
+
+		// Favourites via cookie
+		$jcookie = JFactory::getApplication()->input->cookie;
+
+		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+		try {
+			$fcfavs = json_decode($fcfavs);
+		}
+		catch (Exception $e) {
+			$jcookie->set('fcfavs', '{}');
+		}
+
+		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
+
 		// First thing we need to do is to select only the requested FAVOURED items
-		$where = ' WHERE fav.userid = '.(int)$user->get('id');
-		
+		$or_favs_via_cookie = empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')';
+		$where = ' WHERE (fav.userid = ' . (int)$user->get('id') . $or_favs_via_cookie . ')';
+
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');

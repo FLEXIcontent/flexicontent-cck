@@ -158,7 +158,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				.' FROM #__flexicontent_favourites AS f'
 				.' LEFT JOIN #__users AS u'
 				.' ON u.id = f.userid'
-				.' WHERE f.itemid = ' . (int)$itemid
+				.' WHERE f.itemid = ' . (int)$itemid . ' AND f.type = 0'
 				.'  AND u.block=0 '
 				;
 		$db->setQuery($query);

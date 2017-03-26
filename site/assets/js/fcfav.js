@@ -1,9 +1,54 @@
+if (!Array.prototype.indexOf)
+{
+	Array.prototype.indexOf = function(obj, start)
+	{
+		for (var i = (start || 0), j = this.length; i < j; i++)
+		{
+			if (this[i] === obj) { return i; }
+		}
+		return -1;
+	}
+}
+
+
+
+function toggleFCFavCookie(id, type)
+{
+	var fcfavs = fc_getCookie('fcfavs');
+
+	try {
+		fcfavs = JSON.parse(fcfavs);
+	} catch(e) {
+		fcfavs = {};
+	}
+
+	if (!fcfavs.hasOwnProperty(type))
+	{
+		fcfavs[type] = [];
+	}
+
+	var index = fcfavs[type].indexOf(id);
+	index === -1
+		? fcfavs[type].push(id)
+		: fcfavs[type].splice(index, 1);
+
+	fcfavs = JSON.stringify(fcfavs);
+	fc_setCookie('fcfavs', fcfavs, 365);
+}
+
+
+
 function FCFav(id, type, add_counter)
 {
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
 	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcfav_rfolder + '/';
 	type = (typeof type === "undefined" || type === null ) ? 'item' : type;
-	
+	add_counter = (typeof add_counter === "undefined" || add_counter === null ) ? false : add_counter;
+
+	// We will no do a client side updating of favourites cookie, the updated
+	// cookie will be received via the HTTP response of the AJAX server call
+	//toggleFCFavCookie(id, type);
+
 	var currentURL = window.location;
 	var live_site = currentURL.protocol + '//' + currentURL.host + fcfav_rfolder;
 	
@@ -19,7 +64,7 @@ function FCFav(id, type, add_counter)
 	{
 		div.innerHTML = _box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>';
 	}
-	
+
 	jQuery.ajax({
 		url: favurl,
 		dataType: "text",
@@ -71,5 +116,4 @@ function FCFav(id, type, add_counter)
 			alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 		}
 	});
-
 }

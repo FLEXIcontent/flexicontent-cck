@@ -1366,14 +1366,31 @@ class FlexicontentFields
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
-		$query 	= 'SELECT itemid, COUNT(id) AS favs FROM #__flexicontent_favourites'
-				. " WHERE itemid IN ('" . implode("','", $cids) . "')"
-				. ' GROUP BY itemid'
+		// Favourites via DB
+		$query 	= 'SELECT DISTINCT itemid, 1 AS favs FROM #__flexicontent_favourites'
+				. " WHERE type = 0 AND itemid IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
-		$favs = $db->loadObjectList('itemid');
+		$favourites = $db->loadObjectList('itemid');
 
-		return $favs;
+		// Favourites via cookie (Only current user is considered)
+		$jcookie = JFactory::getApplication()->input->cookie;
+		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+
+		try {
+			$fcfavs = json_decode($fcfavs);
+		}
+		catch (Exception $e) {
+			$jcookie->set('fcfavs', '{}');
+		}
+
+		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
+		foreach($favs as $itemid)
+		{
+			$favoured[$itemid] = (object) array('itemid'=>$itemid, 'fav'=>1);
+		}
+
+		return $favourites;
 	}
 
 	/**
@@ -1385,21 +1402,38 @@ class FlexicontentFields
 	 */
 	static function _getFavoured(&$items, $view = FLEXI_ITEMVIEW)
 	{
+		$user = JFactory::getUser();
 		$db = JFactory::getDBO();
+
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
-		$user = JFactory::getUser();
-
-		$query 	= 'SELECT itemid, COUNT(id) AS fav FROM #__flexicontent_favourites'
-				. " WHERE itemid IN ('" . implode("','", $cids) . "')"
-				. " AND userid = '" . ((int)$user->id) ."'"
-				. ' GROUP BY itemid'
-				;
+		// Favourites via DB
+		$query 	= 'SELECT DISTINCT itemid, 1 AS fav FROM #__flexicontent_favourites'
+			. ' WHERE type = 0 AND itemid IN (' . implode(',', $cids) . ')'
+			. ' AND userid = ' . ((int)$user->id)
+			;
 		$db->setQuery($query);
-		$fav = $db->loadObjectList('itemid');
+		$favoured = $db->loadObjectList('itemid');
 
-		return $fav;
+		// Favourites via cookie
+		$jcookie = JFactory::getApplication()->input->cookie;
+		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+
+		try {
+			$fcfavs = json_decode($fcfavs);
+		}
+		catch (Exception $e) {
+			$jcookie->set('fcfavs', '{}');
+		}
+
+		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
+		foreach($favs as $itemid)
+		{
+			$favoured[$itemid] = (object) array('itemid'=>$itemid, 'fav'=>1);
+		}
+
+		return $favoured;
 	}
 
 	/**
@@ -1419,9 +1453,9 @@ class FlexicontentFields
 		foreach ($items as $item) { array_push($cids, $item->id); }
 		
 		$query 	= 'SELECT i.id, u.name, u.username, u.email FROM #__content AS i'
-				. ' LEFT JOIN #__users AS u ON '  .  ( $versioned_item ? 'u.id = '.$items[0]->modified_by : 'u.id = i.modified_by' )
-				. " WHERE i.id IN ('" . implode("','", $cids) . "')"
-				;
+			. ' LEFT JOIN #__users AS u ON '  .  ( $versioned_item ? 'u.id = '.$items[0]->modified_by : 'u.id = i.modified_by' )
+			. " WHERE i.id IN ('" . implode("','", $cids) . "')"
+			;
 		$db->setQuery($query);
 		$modifiers = $db->loadObjectList('id');
 		

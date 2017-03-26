@@ -853,9 +853,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$tmp_only = $counting && !$text_search;
 		$from_clause = $counting ? ' FROM #__flexicontent_items_tmp AS i ' : ' FROM #__content AS i ';
-		
+
 		$_join_clauses = ''
-			. ($this->_layout=='favs' ? ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id' : '')
+			. ($this->_layout=='favs' ? ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND type = 0' : '')
 			. ($this->_layout=='tags' ? ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id' : '')
 			. ' JOIN #__flexicontent_types AS ty ON '. ($counting ? 'i.' : 'ie.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -925,7 +925,23 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Limit to favourites
 		if ($this->_layout=='favs')
-			$where .= ' AND fav.userid = ' . $db->Quote($this->_uid);
+		{
+			// Favourites via cookie
+			$jcookie = JFactory::getApplication()->input->cookie;
+			$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+
+			try {
+				$fcfavs = json_decode($fcfavs);
+			}
+			catch (Exception $e) {
+				$jcookie->set('fcfavs', '{}');
+			}
+
+			$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
+
+			$or_favs_via_cookie = empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')';
+			$where .= ' AND (fav.userid = ' . $db->Quote($this->_uid) . $or_favs_via_cookie . ')';
+		}
 		
 		// Limit to give tag id
 		if ($this->_layout=='tags')

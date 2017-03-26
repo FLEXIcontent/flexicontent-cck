@@ -100,7 +100,18 @@ class JFormFieldMultiList extends JFormField
 		if ($class = @$attributes['class']) {
 			$attribs['list.attr']['class'][] = $class;
 		}
-		
+
+		if (@$attributes['sortable'] == 'true')
+		{
+			$d = array();
+			foreach($values as $v)
+			{
+				$d[] = (object) array('id' => $options[$v]->value, 'text' => $options[$v]->text);
+			}
+			$attribs['list.attr']['data-select2-initdata'][] = htmlentities(json_encode($d), ENT_QUOTES, 'UTF-8');
+			$attribs['list.attr']['class'][] = 'fc_select2_sortable';
+		}
+
 		if (@$attributes['fccustom_revert']) {
 			$attribs['list.attr']['class'][] = 'fccustom_revert';
 		}
