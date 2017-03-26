@@ -18,6 +18,7 @@
 defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
+
 // Decide whether to show module contents
 $app    = JFactory::getApplication();
 $view   = JRequest::getVar('view');
@@ -40,71 +41,75 @@ if ($params->get('enable_php_rule', 0)) {
 	$show_mod = $views_show_mod;
 }
 
-if ( $show_mod )
+// ***
+// *** TERMINATE if not assigned to current view
+// ***
+if ( !$show_mod )  return;
+
+
+
+global $modfc_jprof;
+jimport('joomla.profiler.profiler');
+$modfc_jprof = new JProfiler();
+$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
+
+// Include helpers class file
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+static $mod_initialized = null;
+$modulename = 'mod_flexitagcloud';
+if ($mod_initialized === null)
 {
-	global $modfc_jprof;
-	jimport('joomla.profiler.profiler');
-	$modfc_jprof = new JProfiler();
-	$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
-	
-	// Include helpers class file
-	require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-	
-	static $mod_initialized = null;
-	$modulename = 'mod_flexitagcloud';
-	if ($mod_initialized === null)
-	{
-		flexicontent_html::loadModuleLanguage($modulename);
-		$mod_initialized = true;
-	}
-	
-	// initialize various variables
-	$document = JFactory::getDocument();
-	$caching 	= $app->getCfg('caching', 0);
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');
-	
-	// include the helper only once
-	require_once (dirname(__FILE__).DS.'helper.php');
+	flexicontent_html::loadModuleLanguage($modulename);
+	$mod_initialized = true;
+}
 
-	// get module's basic display parameters
-	$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
-	$layout 				= $params->get('layout', 'default');
+// initialize various variables
+$document = JFactory::getDocument();
+$caching 	= $app->getCfg('caching', 0);
+$flexiparams = JComponentHelper::getParams('com_flexicontent');
 
-	// Add css
-	if ($add_ccs) {
-		// Work around for extension that capture module's HTML 
-		if ($add_ccs==2) {
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VHASH.'">';
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VHASH.'">';
-			//allow css override
-			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
-			}
-		}
-		
-		// Standards compliant implementation by placing CSS link into the HTML HEAD
-		else {
-			$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VHASH);
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-			//allow css override
-			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
-			}
+// include the helper only once
+require_once (dirname(__FILE__).DS.'helper.php');
+
+// get module's basic display parameters
+$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
+$layout 				= $params->get('layout', 'default');
+
+// Add css
+if ($add_ccs) {
+	// Work around for extension that capture module's HTML 
+	if ($add_ccs==2) {
+		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VHASH.'">';
+		echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VHASH.'">';
+		//allow css override
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
 		}
 	}
 	
-	// Get data, etc by calling methods from helper file and include then include template to display them
-	$list = modFlexiTagCloudHelper::getTags($params, $module);
-
-	// Render Layout
-	require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
-	
-	// append performance stats to global variable
-	if ( $flexiparams->get('print_logging_info') )
-	{
-		$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
-		$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
-		global $fc_performance_msg;
-		$fc_performance_msg .= $msg;
+	// Standards compliant implementation by placing CSS link into the HTML HEAD
+	else {
+		$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		//allow css override
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+		}
 	}
+}
+
+// Get data, etc by calling methods from helper file and include then include template to display them
+$list = modFlexiTagCloudHelper::getTags($params, $module);
+
+// Render Layout
+require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
+
+// append performance stats to global variable
+if ( $flexiparams->get('print_logging_info') )
+{
+	$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
+	$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+	global $fc_performance_msg;
+	$fc_performance_msg .= $msg;
 }

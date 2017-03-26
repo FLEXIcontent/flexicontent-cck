@@ -25,6 +25,8 @@ if ( !JComponentHelper::isEnabled( 'com_flexicontent', true) )
 	echo '<div class="alert alert-warning">This module requires FLEXIcontent package to be installed</div>';
 	return;
 }
+
+
 // Decide whether to show module contents
 $app    = JFactory::getApplication();
 $view   = JRequest::getVar('view');
@@ -47,8 +49,13 @@ if ($params->get('enable_php_rule', 0)) {
 	$show_mod = $views_show_mod;
 }
 
-if ( $show_mod )
-{
+
+// ***
+// *** TERMINATE if not assigned to current view
+// ***
+if ( !$show_mod )  return;
+
+
 
 $moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx'));
 
@@ -60,4 +67,3 @@ $markerdisplay = modFlexigooglemapHelper::getMarkerURL($params);
 
 // Get Joomla Layout
 require JModuleHelper::getLayoutPath('mod_flexigooglemap', $params->get('layout', 'default'));
-}
