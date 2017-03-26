@@ -1820,6 +1820,7 @@ class FlexicontentFields
 				$db->setQuery($query);
 				$results = $db->loadObjectList('value');
 			}
+			else $results = false;
 			if ($results && $lang_filter_values) {
 				foreach ($results as $val=>$result) {
 					$results[$val]->text  = JText::_($result->text);  // the text label
