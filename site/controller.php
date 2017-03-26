@@ -1205,27 +1205,59 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput = $app->input;
+		$jinput  = $app->input;
+		$jcookie = $jinput->cookie;
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$id   = $jinput->get('id', 0, 'int');
 		$type = $jinput->get('type', 'item', 'cmd');
+
 		if ($type!='item' && $type!='category')
 		{
-			echo 'Type: '. $type .' not supported';
-			jexit();
+			jexit('Type: '. $type .' not supported');
 		}
-		$model = $this->getModel($type);
-		
-		if (!$user->get('id'))
+
+		// Guest user does not have DB data, instead use Cookie 
+		$allow_guests_favs = $cparams->get('allow_guests_favs', 1);
+		if (!$user->id && !$allow_guests_favs)
 		{
 			echo 'login';
-			jexit();
 		}
+
+		else if (!$user->id)
+		{
+			$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+
+			try {
+				$fcfavs = json_decode($fcfavs);
+			}
+			catch (Exception $e) {
+				$jcookie->set('fcfavs', '{}');
+			}
+
+			$favs = $fcfavs && isset($fcfavs->$type) ? $fcfavs->$type : array();
+
+			if (isset($favs[$id]))
+			{
+				unset($favs[$id]);
+				echo 'removed';
+			}
+			else
+			{
+				$favs[$id] = 1;
+				echo 'added';
+			}
+
+			$fcfavs->$type = $favs;
+			$jcookie->set('fcfavs', json_encode($fcfavs), time()+60*60*24*(365*5) );
+		}
+
+
+		// Logged user, update DB, adding / removing given id as favoured
 		else
 		{
+			$model = $this->getModel($type);
 			$isfav = $model->getFavoured();
-
-			// About security, model use current user, for adding / removing which is enough proper
 			if ($isfav)
 			{
 				$model->removefav();
@@ -1247,6 +1279,7 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
+
 		jexit();
 	}
 	
@@ -1262,7 +1295,7 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput = $app->input;
+		$jinput  = $app->input;
 
 		$html_tagid  = $jinput->get('tagid', '', 'cmd');
 		$content_id  = $jinput->get('content_id', 0, 'int');
@@ -1367,7 +1400,7 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput = $app->input;
+		$jinput  = $app->input;
 
 		$review_id   = $jinput->get('review_id', 0, 'int');
 		$content_id  = $jinput->get('content_id', 0, 'int');
@@ -1509,9 +1542,9 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
+		$jinput  = $app->input;
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$jinput  = $app->input;
 
 		$no_ajax     = $jinput->get('no_ajax', 0, 'int');
 		$user_rating = $jinput->get('user_rating', 0, 'int');

@@ -1828,29 +1828,76 @@ class plgSystemFlexisystem extends JPlugin
 		
 		return $_display;
 	}
-	
-	
-	
-	
+
+
+
 	function onContentBeforeDisplay($context, &$row, &$params, $page=0)
 	{
 		return $this->renderFields($context, $row, $params, $page, 'beforeContent');
 	}
-	
+
 	function onContentAfterDisplay($context, &$row, &$params, $page=0)
 	{
 		return $this->renderFields($context, $row, $params, $page, 'afterContent');
 	}
-	
-	
+
+
+
 	// AFTER LOGIN
 	public function onUserAfterLogin($options)
 	{
-		$jcookie = JFactory::getApplication()->input->cookie;
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$jinput  = $app->input;
+		$jcookie = $jinput->cookie;
+
+		// Set id for client-side (browser) caching via unique URLs (logged users)
 		$jcookie->set( 'fc_uid', JUserHelper::getShortHashedUserAgent(), 0);
+
+		// Add favourites via cookie to the DB
+		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+
+		try {
+			$fcfavs = json_decode($fcfavs);
+		}
+		catch (Exception $e) {
+			$jcookie->set('fcfavs', '{}');
+		}
+		
+		$types = array('item'=>0, 'category'=>1);
+		foreach($types as $type => $type_id)
+		{
+			$favs = $fcfavs && isset($fcfavs->$type) ? $fcfavs->$type : array();
+
+			// Favourites via DB
+			$query 	= 'SELECT DISTINCT itemid, 1 AS fav'
+				. ' FROM #__flexicontent_favourites'
+				. ' WHERE type = ' . $type_id . ' AND userid = ' . ((int)$user->id)
+				;
+			$db->setQuery($query);
+			$favoured = $db->loadObjectList('itemid');
+
+			// Collect ids favoured via Cookie but not already added as favoured via DB
+			$item_ids = array();
+			foreach($favs as $item_id)
+			{
+				if (!isset($favoured[$item_id]))
+				{
+					$item_ids[] = $item_id;
+				}
+			}
+
+			// Add to DB
+			$this->_addfavs($type, $item_ids, $user->id);
+		}
+
+		// Clear cookie
+		$jcookie->set('fcfavs', '{}', 0);
 	}
-	
-	
+
+
+
 	// AFTER LOGOUT
 	public function onUserAfterLogout($options)
 	{
@@ -1859,8 +1906,49 @@ class plgSystemFlexisystem extends JPlugin
 	}
 
 
+
+	// ***
+	// *** UTILITY FUNCTIONS
+	// ***
+
 	public function _getLastCheckTime($workname = '')
 	{
 		return time();
+	}
+
+
+	private function _addfavs($type, $item_ids, $user_id)
+	{
+		$db = JFactory::getDBO();
+		
+		if (!is_array($item_ids))
+		{
+			$obj = new stdClass();
+			$obj->itemid = (int)$item_ids;
+			$obj->userid = (int)$user_id;
+			$obj->type   = (int)$type;
+
+			return $db->insertObject('#__flexicontent_favourites', $obj);
+		}
+		else if (!empty($item_ids))
+		{
+			$vals = array();
+			foreach($item_ids as $item_id) $vals[]= ''
+				. '('
+				. ((int)$item_id)  . ', '
+				. ((int)$user_id)  . ', '
+				. ((int)$type)
+				. ')';
+			$query = 'INSERT INTO #__flexicontent_favourites'
+				. ' (itemid, userid, type) VALUES ' . implode($vals, ',');
+			$db->setQuery($query);
+			try {
+				$db->execute();
+			}
+			catch (Exception $e) {
+				JError::raiseWarning( 500, $e->getMessage() );
+				return false;
+			}
+		}
 	}
 }

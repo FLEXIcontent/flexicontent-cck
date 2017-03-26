@@ -1,9 +1,29 @@
-	function fc_getCookie(name) {
-	  match = document.cookie.match(new RegExp(name + '=([^;]+)'));
-	  if (match) return match[1];
-	  else return '';
+	/* Set a cookie */
+	function fc_setCookie(cookieName, cookieValue, nDays)
+	{
+		var today = new Date();
+		var expire = new Date();
+		var path = window.location.hostname;
+		if (nDays==null || nDays<0) nDays=0;
+
+		if (nDays)
+		{
+			expire.setTime(today.getTime() + 3600000*24*nDays);
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
+		} else {
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path;
+		}
+		//alert(cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path);
 	}
-	
+
+	/* Get a cookie */
+	function fc_getCookie(cookieName)
+	{
+		var matched = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
+	  return matched ? decodeURIComponent(matched[1]) : '';
+	}
+
+
 	function tableOrdering( order, dir, task )
 	{
 		var form = document.getElementById("adminForm");

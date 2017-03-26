@@ -1055,18 +1055,26 @@
 	{
 		var today = new Date();
 		var expire = new Date();
-		var path = "'.JURI::base(true).'";
+		var path = window.location.hostname;
 		if (nDays==null || nDays<0) nDays=0;
 
-		if (nDays) {
+		if (nDays)
+		{
 			expire.setTime(today.getTime() + 3600000*24*nDays);
-			document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
 		} else {
-			document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path;
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path;
 		}
-		//alert(cookieName+"="+escape(cookieValue) + ";path=" + path);
+		//alert(cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path);
 	}
 
+
+	/* Get a cookie */
+	function fclib_getCookie(cookieName)
+	{
+	  var matched = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
+	  return matched ? decodeURIComponent(matched[1]) : '';
+	}
 
 	/* Remove known textarea editors, optionally add a flag to restore editors laters */
 	function fc_removeAreaEditors(txtareas, addRestoreClass)
