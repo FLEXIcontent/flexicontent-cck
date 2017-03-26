@@ -32,16 +32,15 @@
 	</languages>
 
 	<config>
-
-		<fields name="params" addfieldpath="modules/mod_flexigooglemap/elements/">
+	<fields name="params" addfieldpath="modules/mod_flexigooglemap/elements/">
             
-            <fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
-			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group btn-group-yesno">
+		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
+			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" />
+			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level3" />
 			<field name="show_in_views" type="fccheckbox" default=""
 					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_DIRECTORY_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V"
 					checkvals="category,item,favourites,tags,flexicontent,search,others"
@@ -49,8 +48,8 @@
 					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
 			/>
 			
-			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" />
-			<field name="enable_php_rule" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level3" />
+			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
@@ -58,253 +57,252 @@
 			
 		</fieldset>
 
-			<fieldset name="basic">
+		<fieldset name="basic">
 
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_CONFIG" level="level1" />
-				<field
-					name="catidmode" type="radio" default="0"
-					label="FLEXI_GOOGLEMAP_CATIDMODE" description="FLEXI_GOOGLEMAP_CATIDMODE_DESC"
-					class="btn-group group-fcinfo"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_CATID_FIXED_CATS</option>
-					<option value="1">FLEXI_GOOGLEMAP_CATID_CURRENT</option>
-				</field>
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_CONFIG" level="level1" />
+			<field
+				name="catidmode" type="radio" default="0"
+				label="FLEXI_GOOGLEMAP_CATIDMODE" description="FLEXI_GOOGLEMAP_CATIDMODE_DESC"
+				class="btn-group group-fcinfo"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_CATID_FIXED_CATS</option>
+				<option value="1">FLEXI_GOOGLEMAP_CATID_CURRENT</option>
+			</field>
 
-				<field name="catid" type="flexicategories" multiple="true" label="FLEXI_GOOGLEMAP_CAT" description="FLEXI_GOOGLEMAP_DESC" showon="catidmode:0"/>
-				<field name="treeinclude" type="list" default="1" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC" showon="catidmode:0" >
-					<option value="0">FLEXI_NONE</option>
-					<option value="1">FLEXI_CHILDREN</option>
-					<option value="5">FLEXI_CHILDREN_EXCLUDE_SELECTED_CATS</option>
-					<option value="2">FLEXI_ANCESTORS</option>
-					<option value="3">FLEXI_CHILDREN_ANCESTORS</option>
-					<!--option value="4">FLEXI_OTHER_CATS_OF_ITEM</option-->
-				</field>
+			<field name="catid" type="flexicategories" multiple="true" label="FLEXI_GOOGLEMAP_CAT" description="FLEXI_GOOGLEMAP_DESC" showon="catidmode:0"/>
+			<field name="treeinclude" type="list" default="1" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC" showon="catidmode:0" >
+				<option value="0">FLEXI_NONE</option>
+				<option value="1">FLEXI_CHILDREN</option>
+				<option value="5">FLEXI_CHILDREN_EXCLUDE_SELECTED_CATS</option>
+				<option value="2">FLEXI_ANCESTORS</option>
+				<option value="3">FLEXI_CHILDREN_ANCESTORS</option>
+				<!--option value="4">FLEXI_OTHER_CATS_OF_ITEM</option-->
+			</field>
 
-				<field name="fieldaddressid" type="sql" default="10" label="FLEXI_GOOGLEMAP_ADDRESSFIELD" query="SELECT id AS value, concat( name, ' (', id, ')') AS title FROM #__flexicontent_fields WHERE field_type='addressint'" description="FLEXI_GOOGLEMAP_ADDRESSFIELD_DESC" value_field="title"/>
-				<field
-					name="apikey" type="text" default=""
-					label="FLEXI_GOOGLEMAP_APIKEY" description="FLEXI_GOOGLEMAP_APIKEY_DESC"
-				/>
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_DISPLAY" level="level1" />
-				<field
-					name="maptype" type="list" default="ROADMAP"
-					label="FLEXI_GOOGLEMAP_MAPTYPE" description="FLEXI_GOOGLEMAP_MAPTYPE_DESC"
-					>
-					<option value="ROADMAP">FLEXI_GOOGLEMAP_ROADMAP</option>
-					<option value="HYBRID">FLEXI_GOOGLEMAP_HYBRID</option>
-					<option value="SATELLITE">FLEXI_GOOGLEMAP_SATELLITE</option>
-					<option value="TERRAIN">FLEXI_GOOGLEMAP_TERRAIN</option>
-				</field>
-				<field
-					name="width" type="text"
-					default="300px" label="FLEXI_GOOGLEMAP_WIDTH"
-					description="FLEXI_GOOGLEMAP_WIDTH_DESC"
-				/>
-				<field
-					name="height" type="text"
-					default="600px" label="FLEXI_GOOGLEMAP_height"
-					description="FLEXI_GOOGLEMAP_HEIGHT_DESC"
-				/>
-				<field
-					name="ratiomap" type="text"
-					default="75%" label="FLEXI_GOOGLEMAP_RATIOMAP"
-					description="FLEXI_GOOGLEMAP_RATIOMAP_DESC"
-				/>
-				<field
-					name="maxzoommarker" type="text"
-					default="15" label="FLEXI_GOOGLEMAP_MAXZOOMMARKER"
-					description="FLEXI_GOOGLEMAP_MAXZOOMMARKER_DESC"
-				/>
+			<field name="fieldaddressid" type="sql" default="10" label="FLEXI_GOOGLEMAP_ADDRESSFIELD" query="SELECT id AS value, concat( name, ' (', id, ')') AS title FROM #__flexicontent_fields WHERE field_type='addressint'" description="FLEXI_GOOGLEMAP_ADDRESSFIELD_DESC" value_field="title"/>
+			<field
+				name="apikey" type="text" default=""
+				label="FLEXI_GOOGLEMAP_APIKEY" description="FLEXI_GOOGLEMAP_APIKEY_DESC"
+			/>
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_DISPLAY" level="level1" />
+			<field
+				name="maptype" type="list" default="ROADMAP"
+				label="FLEXI_GOOGLEMAP_MAPTYPE" description="FLEXI_GOOGLEMAP_MAPTYPE_DESC"
+				>
+				<option value="ROADMAP">FLEXI_GOOGLEMAP_ROADMAP</option>
+				<option value="HYBRID">FLEXI_GOOGLEMAP_HYBRID</option>
+				<option value="SATELLITE">FLEXI_GOOGLEMAP_SATELLITE</option>
+				<option value="TERRAIN">FLEXI_GOOGLEMAP_TERRAIN</option>
+			</field>
+			<field
+				name="width" type="text"
+				default="300px" label="FLEXI_GOOGLEMAP_WIDTH"
+				description="FLEXI_GOOGLEMAP_WIDTH_DESC"
+			/>
+			<field
+				name="height" type="text"
+				default="600px" label="FLEXI_GOOGLEMAP_height"
+				description="FLEXI_GOOGLEMAP_HEIGHT_DESC"
+			/>
+			<field
+				name="ratiomap" type="text"
+				default="75%" label="FLEXI_GOOGLEMAP_RATIOMAP"
+				description="FLEXI_GOOGLEMAP_RATIOMAP_DESC"
+			/>
+			<field
+				name="maxzoommarker" type="text"
+				default="15" label="FLEXI_GOOGLEMAP_MAXZOOMMARKER"
+				description="FLEXI_GOOGLEMAP_MAXZOOMMARKER_DESC"
+			/>
 
-				<field
-					name="count" type="list"
-					default="" label="FLEXI_GOOGLEMAP_NBITEM"
-					description="FLEXI_GOOGLEMAP_NBITEM_DESC">
-					<option	value="">FLEXI_GOOGLEMAP_NOLIMITE</option>
-					<option	value="DESC LIMIT 10">10</option>
-					<option	value="DESC LIMIT 50">50</option>
-					<option	value="DESC LIMIT 100">100</option>
-					<option	value="DESC LIMIT 150">150</option>
-					<option	value="DESC LIMIT 200">200</option>
-					<option	value="DESC LIMIT 250">250</option>
-					<option	value="DESC LIMIT 300">300</option>
-					<option	value="DESC LIMIT 350">350</option>
-					<option	value="DESC LIMIT 400">400</option>
-					<option	value="DESC LIMIT 450">450</option>
-					<option	value="DESC LIMIT 500">500</option>
-					<option	value="DESC LIMIT 1000">1000</option>
-				</field>
+			<field
+				name="count" type="list"
+				default="" label="FLEXI_GOOGLEMAP_NBITEM"
+				description="FLEXI_GOOGLEMAP_NBITEM_DESC">
+				<option	value="">FLEXI_GOOGLEMAP_NOLIMITE</option>
+				<option	value="DESC LIMIT 10">10</option>
+				<option	value="DESC LIMIT 50">50</option>
+				<option	value="DESC LIMIT 100">100</option>
+				<option	value="DESC LIMIT 150">150</option>
+				<option	value="DESC LIMIT 200">200</option>
+				<option	value="DESC LIMIT 250">250</option>
+				<option	value="DESC LIMIT 300">300</option>
+				<option	value="DESC LIMIT 350">350</option>
+				<option	value="DESC LIMIT 400">400</option>
+				<option	value="DESC LIMIT 450">450</option>
+				<option	value="DESC LIMIT 500">500</option>
+				<option	value="DESC LIMIT 1000">1000</option>
+			</field>
 
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSDISPLAY" level="level2" />
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSDISPLAY" level="level2" />
 
 
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSIMAGE" level="level3" />
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKERSIMAGE" level="level3" />
 
-				<field
-					name="markermode" type="radio"
-					default="0" label="FLEXI_GOOGLEMAP_MARKERMODE"
-					description="FLEXI_GOOGLEMAP_MARKERMODE_DESC"
-					class="btn-group group-fcinfo"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC</option>
-					<option value="1">FLEXI_GOOGLEMAP_LETTERMARKERMODE</option>
-				</field>
+			<field
+				name="markermode" type="radio"
+				default="0" label="FLEXI_GOOGLEMAP_MARKERMODE"
+				description="FLEXI_GOOGLEMAP_MARKERMODE_DESC"
+				class="btn-group group-fcinfo"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC</option>
+				<option value="1">FLEXI_GOOGLEMAP_LETTERMARKERMODE</option>
+			</field>
 
-				<field name="markerimage" type="fcmedia" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC"
-				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC_DESC" preview="true" preview_width="80" preview_height="80" showon="markermode:0" />
+			<field name="markerimage" type="fcmedia" directory="mod_flexigooglemap/marker" label="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC"
+			description="FLEXI_GOOGLEMAP_MARKERSIMAGE_SPECIFIC_DESC" preview="true" preview_width="80" preview_height="80" showon="markermode:0" />
 
-				<field
-					name="markercolor" type="list"
-					default="redpt" label="FLEXI_GOOGLEMAP_MARKERSCOLOR"
-					description="FLEXI_GOOGLEMAP_MARKERSCOLOR_DESC"
-					showon="markermode:1">
-					<option	value="red">FLEXI_GOOGLEMAP_MARKERSCOLOR_RED</option>
-					<option	value="green">FLEXI_GOOGLEMAP_MARKERSCOLOR_GREEN</option>
-				</field>
-				<field
-					name="lettermarker" type="text"
-					default="A" label="FLEXI_GOOGLEMAP_LETTERMARKER"
-					description="FLEXI_GOOGLEMAP_LETTERMARKER_DESC"
-					showon="markermode:1"
-				/>
+			<field
+				name="markercolor" type="list"
+				default="redpt" label="FLEXI_GOOGLEMAP_MARKERSCOLOR"
+				description="FLEXI_GOOGLEMAP_MARKERSCOLOR_DESC"
+				showon="markermode:1">
+				<option	value="red">FLEXI_GOOGLEMAP_MARKERSCOLOR_RED</option>
+				<option	value="green">FLEXI_GOOGLEMAP_MARKERSCOLOR_GREEN</option>
+			</field>
+			<field
+				name="lettermarker" type="text"
+				default="A" label="FLEXI_GOOGLEMAP_LETTERMARKER"
+				description="FLEXI_GOOGLEMAP_LETTERMARKER_DESC"
+				showon="markermode:1"
+			/>
 
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
-				<field
-					name="animationmarker" type="radio"
-					default="1" label="FLEXI_GOOGLEMAP_ANIMATIONMARKER"
-					description="FLEXI_GOOGLEMAP_ANIMATIONMARKER_DESC"
-					class="btn-group btn-group-yesno"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_NO</option>
-					<option value="1">FLEXI_GOOGLEMAP_YES</option>
-				</field>
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_BEHAVIOUR_N_STYLE" level="level3" />
+			<field
+				name="animationmarker" type="radio"
+				default="1" label="FLEXI_GOOGLEMAP_ANIMATIONMARKER"
+				description="FLEXI_GOOGLEMAP_ANIMATIONMARKER_DESC"
+				class="btn-group btn-group-yesno"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_NO</option>
+				<option value="1">FLEXI_GOOGLEMAP_YES</option>
+			</field>
 
-				<field name="mapstyle" type="textarea" hint="[Your style code]" label="FLEXI_GOOGLEMAP_STYLE" description="FLEXI_GOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw"/>
+			<field name="mapstyle" type="textarea" hint="[Your style code]" label="FLEXI_GOOGLEMAP_STYLE" description="FLEXI_GOOGLEMAP_STYLE_DESC" cols="120" rows="3" filter="raw"/>
 
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING" level="level2" />
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING" level="level2" />
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />
 				
-				<field
-					name="clustermode" type="radio"
-					default="1" label="FLEXI_GOOGLEMAP_CLUSTERMODE"
-					description="FLEXI_GOOGLEMAP_CLUSTERMODE_DESC"
-					class="btn-group btn-group-yesno"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_NO</option>
-					<option value="1">FLEXI_GOOGLEMAP_YES</option>
-				</field>
+			<field
+				name="clustermode" type="radio"
+				default="1" label="FLEXI_GOOGLEMAP_CLUSTERMODE"
+				description="FLEXI_GOOGLEMAP_CLUSTERMODE_DESC"
+				class="btn-group btn-group-yesno"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_NO</option>
+				<option value="1">FLEXI_GOOGLEMAP_YES</option>
+			</field>
 
-				<field name="imgcluster" type="fcmedia" directory="mod_flexigooglemap/cluster" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
-				description="FLEXI_GOOGLEMAP_MARKERSIMAGE_DESC" preview="true" preview_width="80" preview_height="80" showon="clustermode:1"/>
-				<field
-					name="gridsize" type="text"
-					default="50" label="FLEXI_GOOGLEMAP_GRIDESIZE"
-					description="FLEXI_GOOGLEMAP_GRIDESIZE_DESC"
-					showon="clustermode:1"
-				/>
-				<field
-					name="maxzoom" type="text"
-					default="15" label="FLEXI_GOOGLEMAP_MAXZOOM"
-					description="FLEXI_GOOGLEMAP_MAXZOOM_DESC"
-					showon="clustermode:1"
-				/>
-
-
-
-				<field name="" type="separator" default="FLEXI_GOOGLEMAP_INFOWINDOWS" level="level1" />
-				<field
-					name="uselink" type="radio"
-					default="1" label="FLEXI_GOOGLEMAP_USELINK"
-					description="FLEXI_GOOGLEMAP_USELINK_DESC"
-					class="btn-group btn-group-yesno"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_NO</option>
-					<option value="1">FLEXI_GOOGLEMAP_YES</option>
-				</field>
-
-				<field
-					name="linkmode" type="radio"
-					default="" label="FLEXI_GOOGLEMAP_LINKMODE"
-					description="FLEXI_GOOGLEMAP_LINKMODE_DESC"
-					class="btn-group btn-group-yesno" showon="uselink:1"
-					>
-					<option value="_blank">FLEXI_GOOGLEMAP_BLANK</option>
-					<option value="">FLEXI_GOOGLEMAP_SAME</option>
-				</field>
-
-				<field
-					name="$forced_itemid" type="text"
-					default="" label="FLEXI_GOOGLEMAP_FORCEITEMID"
-					description="FLEXI_GOOGLEMAP_FORCEITEMID_DESC"
-					showon="uselink:1"
-				/>
-
-				<field
-					name="infotextmode" type="radio"
-					default="0" label="FLEXI_GOOGLEMAP_INFOTEXTMODE"
-					description="FLEXI_GOOGLEMAP_INFOTEXTMODE_DESC"
-					class="btn-group btn-group-yesno"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
-					<option value="1">FLEXI_GOOGLEMAP_INFOTEXTMODE_FULL</option>
-				</field>
-
-				<field
-					name="useadress" type="radio"
-					default="1" label="FLEXI_GOOGLEMAP_USEADDRESS"
-					description="FLEXI_GOOGLEMAP_USEADDRESS_DESC"
-					class="btn-group btn-group-yesno" showon="infotextmode:0"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_NO</option>
-					<option value="1">FLEXI_GOOGLEMAP_YES</option>
-				</field>
-
-				<field name="relitem_html" type="textarea" cols="38" rows="5" default="your text {{fieldname}}" label="FLEXI_GOOGLEMAP_HTML_WITH_REPLACEMENTS" description="FLEXI_GOOGLEMAP_HTML_WITH_REPLACEMENTS_DESC"  showon="infotextmode:1"/>
-
-				<field
-					name="usedirection" type="radio"
-					default="1" label="FLEXI_GOOGLEMAP_USEDIRECTION"
-					description="FLEXI_GOOGLEMAP_USEDIRECTION_DESC"
-					class="btn-group btn-group-yesno"
-					>
-					<option value="0">FLEXI_GOOGLEMAP_NO</option>
-					<option value="1">FLEXI_GOOGLEMAP_YES</option>
-				</field>
-
-				<field
-					name="directionname" type="text"
-					default="FLEXI_GOOGLEMAP_DIRECTIONNAME_TXT" label="FLEXI_GOOGLEMAP_DIRECTIONNAME"
-					description="FLEXI_GOOGLEMAP_DIRECTIONNAME_DESC" class="input-xxlarge"
-					showon="usedirection:1"
-				/>
-
-				<field
-					name="readmore" type="text"
-					default="FLEXI_GOOGLEMAP_READMORE_TXT" label="FLEXI_GOOGLEMAP_READMORE"
-					description="FLEXI_GOOGLEMAP_READMORE_DESC" class="input-xxlarge"
-				/>
-
-			</fieldset>
+			<field name="imgcluster" type="fcmedia" directory="mod_flexigooglemap/cluster" label="FLEXI_GOOGLEMAP_MARKERSIMAGE"
+			description="FLEXI_GOOGLEMAP_MARKERSIMAGE_DESC" preview="true" preview_width="80" preview_height="80" showon="clustermode:1"/>
+			<field
+				name="gridsize" type="text"
+				default="50" label="FLEXI_GOOGLEMAP_GRIDESIZE"
+				description="FLEXI_GOOGLEMAP_GRIDESIZE_DESC"
+				showon="clustermode:1"
+			/>
+			<field
+				name="maxzoom" type="text"
+				default="15" label="FLEXI_GOOGLEMAP_MAXZOOM"
+				description="FLEXI_GOOGLEMAP_MAXZOOM_DESC"
+				showon="clustermode:1"
+			/>
 
 
-			<fieldset name="advanced">
 
-				<field
-					name="cache"
-					type="list"
-					default="1"
-					label="COM_MODULES_FIELD_CACHING_LABEL"
-					description="COM_MODULES_FIELD_CACHING_DESC">
-					<option
-					value="1">JGLOBAL_USE_GLOBAL</option>
-					<option
-					value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
-				</field>
+			<field name="" type="separator" default="FLEXI_GOOGLEMAP_INFOWINDOWS" level="level1" />
+			<field
+				name="uselink" type="radio"
+				default="1" label="FLEXI_GOOGLEMAP_USELINK"
+				description="FLEXI_GOOGLEMAP_USELINK_DESC"
+				class="btn-group btn-group-yesno"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_NO</option>
+				<option value="1">FLEXI_GOOGLEMAP_YES</option>
+			</field>
 
-			</fieldset>
+			<field
+				name="linkmode" type="radio"
+				default="" label="FLEXI_GOOGLEMAP_LINKMODE"
+				description="FLEXI_GOOGLEMAP_LINKMODE_DESC"
+				class="btn-group btn-group-yesno" showon="uselink:1"
+				>
+				<option value="_blank">FLEXI_GOOGLEMAP_BLANK</option>
+				<option value="">FLEXI_GOOGLEMAP_SAME</option>
+			</field>
 
-		</fields>
+			<field
+				name="$forced_itemid" type="text"
+				default="" label="FLEXI_GOOGLEMAP_FORCEITEMID"
+				description="FLEXI_GOOGLEMAP_FORCEITEMID_DESC"
+				showon="uselink:1"
+			/>
 
+			<field
+				name="infotextmode" type="radio"
+				default="0" label="FLEXI_GOOGLEMAP_INFOTEXTMODE"
+				description="FLEXI_GOOGLEMAP_INFOTEXTMODE_DESC"
+				class="btn-group btn-group-yesno"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
+				<option value="1">FLEXI_GOOGLEMAP_INFOTEXTMODE_FULL</option>
+			</field>
+
+			<field
+				name="useadress" type="radio"
+				default="1" label="FLEXI_GOOGLEMAP_USEADDRESS"
+				description="FLEXI_GOOGLEMAP_USEADDRESS_DESC"
+				class="btn-group btn-group-yesno" showon="infotextmode:0"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_NO</option>
+				<option value="1">FLEXI_GOOGLEMAP_YES</option>
+			</field>
+
+			<field name="relitem_html" type="textarea" cols="38" rows="5" default="your text {{fieldname}}" label="FLEXI_GOOGLEMAP_HTML_WITH_REPLACEMENTS" description="FLEXI_GOOGLEMAP_HTML_WITH_REPLACEMENTS_DESC"  showon="infotextmode:1"/>
+
+			<field
+				name="usedirection" type="radio"
+				default="1" label="FLEXI_GOOGLEMAP_USEDIRECTION"
+				description="FLEXI_GOOGLEMAP_USEDIRECTION_DESC"
+				class="btn-group btn-group-yesno"
+				>
+				<option value="0">FLEXI_GOOGLEMAP_NO</option>
+				<option value="1">FLEXI_GOOGLEMAP_YES</option>
+			</field>
+
+			<field
+				name="directionname" type="text"
+				default="FLEXI_GOOGLEMAP_DIRECTIONNAME_TXT" label="FLEXI_GOOGLEMAP_DIRECTIONNAME"
+				description="FLEXI_GOOGLEMAP_DIRECTIONNAME_DESC" class="input-xxlarge"
+				showon="usedirection:1"
+			/>
+
+			<field
+				name="readmore" type="text"
+				default="FLEXI_GOOGLEMAP_READMORE_TXT" label="FLEXI_GOOGLEMAP_READMORE"
+				description="FLEXI_GOOGLEMAP_READMORE_DESC" class="input-xxlarge"
+			/>
+
+		</fieldset>
+
+
+		<fieldset name="advanced">
+
+			<field
+				name="cache"
+				type="list"
+				default="1"
+				label="COM_MODULES_FIELD_CACHING_LABEL"
+				description="COM_MODULES_FIELD_CACHING_DESC">
+				<option
+				value="1">JGLOBAL_USE_GLOBAL</option>
+				<option
+				value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+			</field>
+
+		</fieldset>
+
+	</fields>
 	</config>
 
 	<!--updateservers>
