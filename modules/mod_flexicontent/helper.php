@@ -507,6 +507,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->voting = '';
 					if ($display_voting_feat && $has_access_voting) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
+						$votingfield->item = $row;
 						$lists[$ord]['featured'][$i]->voting .= $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.JText::_($votingfield->label).'</span> ' : '';
 						$lists[$ord]['featured'][$i]->voting .= '<div class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</div>';
 					}
@@ -654,6 +655,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->voting = '';
 					if ($display_voting && $has_access_voting) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
+						$votingfield->item = $row;
 						$lists[$ord]['standard'][$i]->voting .= $params->get('voting_label') ? '<span class="voting_label">'.JText::_($votingfield->label).'</span> ' : '';
 						$lists[$ord]['standard'][$i]->voting .= '<div class="voting_value">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</div>';
 					}

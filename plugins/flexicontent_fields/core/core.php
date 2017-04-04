@@ -110,6 +110,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			if($field->iscore != 1) continue;
 			$field->item_id = $item->id;
+			$field->item = $item;
 			
 			// Replace item properties or values of other fields
 			if (!$pretext_cacheable) {
