@@ -145,7 +145,7 @@ else
 $ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted fc-lbl-padded icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
 
 $ord_grp = 1;
-$isCatsOrder = $this->filter_order=='i.ordering' || $this->filter_order=='catsordering';
+$reOrderingActive = $this->filter_order=='i.ordering' || $this->filter_order=='catsordering';
 
 
 
@@ -558,7 +558,11 @@ jQuery(document).ready(function(){
 	<?php echo @$this->minihelp; ?>
 	<div class="fcclear"></div>
 
-	<?php if ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering'): ?>
+	<?php if ($reOrderingActive): ?>
+
+		<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
+			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
+		</div>
 
 		<?php
 		$order_msg = '';
@@ -574,24 +578,20 @@ jQuery(document).ready(function(){
 		endif;
 		?>
 
-		<?php if (!empty($order_msg)): ?>
-			<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 4px 0 0 0;">
-				<div <?php echo $fcfilter_attrs; ?> >
-					<div <?php echo $ordering_type_attrs; ?> > <?php echo JText::_('FLEXI_ORDER_TYPE'); ?></div>
-					<?php echo $this->lists['filter_order_type']; ?>
-				</div>
+		<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 8px 0 0 0;">
+			<div <?php echo $fcfilter_attrs; ?> >
+				<div <?php echo $ordering_type_attrs; ?> > <?php echo JText::_('FLEXI_ORDER_TYPE'); ?></div>
+				<?php echo $this->lists['filter_order_type']; ?>
 			</div>
+		</div>
 
+		<?php if (!empty($order_msg)): ?>
 			<div id="fcorder_notes_box" class="fc-mssg-inline fc-nobgimage fc-success" style="padding: 0px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
 				<span class="icon-checkbox"></span> <?php echo $order_msg;?>
 			</div>
-			<div class="fcclear"></div>
 
 		<?php endif; ?>
-
-		<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
-			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
-		</div>
+		<div class="fcclear"></div>
 
 	<?php endif; ?>
 
@@ -1050,7 +1050,7 @@ jQuery(document).ready(function(){
 					$isMainCat = ((int)$category->id == (int)$row->catid);
 
 					$catClass = ($isMainCat ? 'maincat' : 'secondarycat').
-						(($ix==0 && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')) ? ' orderingcat' : '');
+						(($ix==0 && $reOrderingActive) ? ' orderingcat' : '');
 					
 					$catLink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
