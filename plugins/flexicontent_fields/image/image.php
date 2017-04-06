@@ -1456,6 +1456,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Needed by some js galleries
 		$thumb_w_s = $field->parameters->get( 'w_s', 120);
 		$thumb_h_s = $field->parameters->get( 'h_s',  90);
+		$wl = $field->parameters->get( 'w_l', 800 );
+		$hl = $field->parameters->get( 'h_l', 600 );
 
 
 		// ******************************
@@ -1802,7 +1804,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ***************
 
 		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
-		foreach ($values as $val)
+		foreach ($values as $n => $val)
 		{
 			// Include common layout code for preparing values, but you may copy here to customize
 			//$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
@@ -1827,16 +1829,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// In other cases check for sub-path relative to the calculated 'original path'
-			else {
+			else
+			{
 				$dirname = dirname($image_subpath);
 				if ($dirname) $orig_urlpath .=  '/'. str_replace('\\', '/', $dirname);
 			}
 			$image_name = basename($image_subpath);
-			
+
+			// ***			
 			// Create thumbnails urls, note thumbnails have already been verified above
-			$wl = $field->parameters->get( 'w_l', 800 );
-			$hl = $field->parameters->get( 'h_l', 600 );
-			
+			// ***
+
 			// Optional properties
 			$title	= ($usetitle && @$value['title']) ? $value['title'] : '';
 			$alt	= ($usealt && @$value['alt']) ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
@@ -1909,11 +1912,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only
 			if ($is_ingroup) {
 				// In case of field displayed via in fieldgroup, this is an array
-				$field->{"display_backend_src"}[] = JURI::root(true).'/'.$srcb;
-				$field->{"display_small_src"}[] = JURI::root(true).'/'.$srcs;
-				$field->{"display_medium_src"}[] = JURI::root(true).'/'.$srcm;
-				$field->{"display_large_src"}[] = JURI::root(true).'/'.$srcl;
-				$field->{"display_original_src"}[] = JURI::root(true).'/'.$srco;
+				$field->{"display_backend_src"}[$n] = JURI::root(true).'/'.$srcb;
+				$field->{"display_small_src"}[$n] = JURI::root(true).'/'.$srcs;
+				$field->{"display_medium_src"}[$n] = JURI::root(true).'/'.$srcm;
+				$field->{"display_large_src"}[$n] = JURI::root(true).'/'.$srcl;
+				$field->{"display_original_src"}[$n] = JURI::root(true).'/'.$srco;
 			}
 			else if ($i==0) {
 				// Field displayed not via fieldgroup return only the 1st value
@@ -1923,17 +1926,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$field->{"display_large_src"} = JURI::root(true).'/'.$srcl;
 				$field->{"display_original_src"} = JURI::root(true).'/'.$srco;
 			}
-			$field->thumbs_src['backend'][] = JURI::root(true).'/'.$srcb;
-			$field->thumbs_src['small'][] = JURI::root(true).'/'.$srcs;
-			$field->thumbs_src['medium'][] = JURI::root(true).'/'.$srcm;
-			$field->thumbs_src['large'][] = JURI::root(true).'/'.$srcl;
-			$field->thumbs_src['original'][] = JURI::root(true).'/'.$srco;
+			$field->thumbs_src['backend'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcb;
+			$field->thumbs_src['small'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcs;
+			$field->thumbs_src['medium'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcm;
+			$field->thumbs_src['large'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcl;
+			$field->thumbs_src['original'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srco;
 			
-			$field->thumbs_path['backend'][] = JPATH_SITE.DS.$srcb;
-			$field->thumbs_path['small'][] = JPATH_SITE.DS.$srcs;
-			$field->thumbs_path['medium'][] = JPATH_SITE.DS.$srcm;
-			$field->thumbs_path['large'][] = JPATH_SITE.DS.$srcl;
-			$field->thumbs_path['original'][] = JPATH_SITE.DS.$srco;
+			$field->thumbs_path['backend'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcb;
+			$field->thumbs_path['small'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcs;
+			$field->thumbs_path['medium'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcm;
+			$field->thumbs_path['large'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
+			$field->thumbs_path['original'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
 			
 			// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
 			if ( $is_FE_html_view && $useogp )
