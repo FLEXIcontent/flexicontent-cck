@@ -395,18 +395,13 @@ if ($leadnum) :
 			</figure>
 			<?php endif; ?>
 			  
-			<?php if ($lead_use_description) : ?>
-			<p>
-			<?php
-				if ($this->params->get('lead_strip_html', 1)) :
-					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $lead_cut_text, $uncut_length );
-				else :
-					echo $item->fields['text']->display;
-				endif;
-			?>
-			</p>
-			<?php endif; ?>
-			
+			<?php if ($lead_use_description) :
+				$desc_text = $this->params->get('lead_strip_html', 1)
+					? flexicontent_html::striptagsandcut( $item->fields['text']->display, $lead_cut_text, $uncut_length )
+					: $item->fields['text']->display;
+				echo strlen($desc_text) ? '<p>' . $desc_text . '</p>' : '';
+			endif; ?>
+
 			</div>
 
 			<!-- BOF under-description-line1 block -->
@@ -763,18 +758,13 @@ if ($count > $leadnum) :
 			</figure>
 			<?php endif; ?>
 			
-			<?php if ($intro_use_description ) : ?>      
-			<p>
-			<?php
-				if ($this->params->get('intro_strip_html', 1)) :
-					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $intro_cut_text, $uncut_length );
-				else :
-					echo $item->fields['text']->display;
-				endif;
-			?>
-			</p>
-			<?php endif; ?>  
-			
+			<?php if ($intro_use_description) :
+				$desc_text = $this->params->get('intro_strip_html', 1)
+					? flexicontent_html::striptagsandcut( $item->fields['text']->display, $intro_cut_text, $uncut_length )
+					: $item->fields['text']->display;
+				echo strlen($desc_text) ? '<p>' . $desc_text . '</p>' : '';
+			endif; ?>
+
 			</div>
 
 			<!-- BOF under-description-line1 block -->
