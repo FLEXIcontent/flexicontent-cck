@@ -10,13 +10,15 @@ $field->file_data = array();
 $field->hits_total = 0;
 
 $n = 0;
+$i = 0;
 foreach($values as $file_id)
 {
+	// Skip empty value but add empty placeholder if inside fieldgroup
 	if (empty($file_id) || !isset($files_data[$file_id]))
 	{
-		if ($is_ingroup) {
-			$field->{$prop}[$n] = '';
-			$n++;
+		if ($is_ingroup)
+		{
+			$field->{$prop}[$n++] = '';
 		}
 		continue;
 	}
@@ -56,15 +58,15 @@ foreach($values as $file_id)
 		$is_public  = in_array($public_acclevel,$aid_arr);
 	}
 	
-	// If no access and set not to show then skip the value, if not in field group
-	if ( !$authorized && !$noaccess_display ) {
-		if (!$is_ingroup) continue; // not in field group
-		
-		$field->{$prop}[]	=  $pretext . $str . $posttext;
+	// If no access and set not to show 'no-access' message then skip the value, if not in field group
+	if ( !$authorized && !$noaccess_display )
+	{
 		// Some extra data for developers: (absolute) file URL and (absolute) file path
-		$field->url[] = '';
-		$field->abspath[] = '';
-		$field->file_data[] = $empty_file_data;
+		if ($is_ingroup)
+		{
+			$field->{$prop}[$n++]	=  '';
+		}
+		continue;
 	}
 	
 	// Initialize CSS classes variable
@@ -409,17 +411,18 @@ foreach($values as $file_id)
 	
 	
 	// Values Prefix and Suffix Texts
-	$field->{$prop}[]	=  $pretext . $str . $posttext;
+	$field->{$prop}[$n]	=  $pretext . $str . $posttext;
 	
 	// Some extra data for developers: (absolute) file URL and (absolute) file path
-	$field->url[] = $dl_link;
-	$field->abspath[] = $abspath;
-	$field->file_data[] = $file_data;
+	$field->url[$use_ingroup ? $n : $i] = $dl_link;
+	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
+	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
 	
 	// Add microdata to every value if field -- is -- in a field group
 	if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 	
 	$n++;
+	$i++;
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 

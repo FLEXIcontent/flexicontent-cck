@@ -866,19 +866,28 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value) && !$is_ingroup ) continue; // Skip empty if not in field group
-			if ( empty($value) ) {
-				$field->{$prop}[$n++]	= '';
+			// Skip empty value but add empty placeholder if inside fieldgroup
+			if ( empty($value) )
+			{
+				if ($is_ingroup)
+				{
+					$field->{$prop}[$n++] = '';
+				}
 				continue;
 			}
 			$value = unserialize($value);
-			
+
 			// Compatibility with deprecated fields
 			if (empty($value['api_type'])) $value['api_type'] = isset($value['videotype']) ? $value['videotype'] : (isset($value['audiotype']) ? $value['audiotype'] : '');
 			if (empty($value['media_id']))  $value['media_id']  = isset($value['videoid'])   ? $value['videoid']   : (isset($value['audioid'])   ? $value['audioid']   : '');
-			
-			if ((empty($value['api_type']) || empty($value['media_id'])) && empty($value['embed_url'])) {
-				if ($is_ingroup) $field->{$prop}[$n] = '';
+
+			// Skip empty value but add empty placeholder if inside fieldgroup
+			if ( (empty($value['api_type']) || empty($value['media_id'])) && empty($value['embed_url']) )
+			{
+				if ($is_ingroup)
+				{
+					$field->{$prop}[$n++] = '';
+				}
 				continue;
 			}
 			
