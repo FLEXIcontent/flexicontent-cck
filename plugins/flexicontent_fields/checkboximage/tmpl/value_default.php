@@ -87,7 +87,7 @@ foreach ($values as $value)
 			// Skip empty/invalid values but add empty display, if in field group
 			$element = !strlen($v) ? false : @$elements[ $v ];
 			if ( !$element ) {
-				if ( $use_ingroup ) $html[]	= '';
+				if ( $is_ingroup ) $html[]	= '';
 				continue;
 			}
 			

@@ -1773,7 +1773,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Initialize value handling arrays and loop's common variables
 		// ************************************************************
 
-		$i = -1;
 		$field->{$prop} = array();
 		$field->thumbs_src['backend'] = array();
 		$field->thumbs_src['small']   = array();
@@ -1804,6 +1803,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ***************
 
 		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
+		$i = -1;
 		foreach ($values as $n => $val)
 		{
 			// Include common layout code for preparing values, but you may copy here to customize
@@ -1836,7 +1836,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			$image_name = basename($image_subpath);
 
-			// ***			
+			// ***
 			// Create thumbnails urls, note thumbnails have already been verified above
 			// ***
 
@@ -1909,8 +1909,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			
-			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only
-			if ($is_ingroup) {
+			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only (for consistency use 'use_ingroup' of 'ingroup')
+			if ($use_ingroup)
+			{
 				// In case of field displayed via in fieldgroup, this is an array
 				$field->{"display_backend_src"}[$n] = JURI::root(true).'/'.$srcb;
 				$field->{"display_small_src"}[$n] = JURI::root(true).'/'.$srcs;
@@ -1918,25 +1919,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$field->{"display_large_src"}[$n] = JURI::root(true).'/'.$srcl;
 				$field->{"display_original_src"}[$n] = JURI::root(true).'/'.$srco;
 			}
-			else if ($i==0) {
-				// Field displayed not via fieldgroup return only the 1st value
+
+			// Field displayed not via fieldgroup return only the 1st value
+			else if ($i==0)
+			{
 				$field->{"display_backend_src"} = JURI::root(true).'/'.$srcb;
 				$field->{"display_small_src"} = JURI::root(true).'/'.$srcs;
 				$field->{"display_medium_src"} = JURI::root(true).'/'.$srcm;
 				$field->{"display_large_src"} = JURI::root(true).'/'.$srcl;
 				$field->{"display_original_src"} = JURI::root(true).'/'.$srco;
 			}
-			$field->thumbs_src['backend'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcb;
-			$field->thumbs_src['small'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcs;
-			$field->thumbs_src['medium'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcm;
-			$field->thumbs_src['large'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srcl;
-			$field->thumbs_src['original'][$is_ingroup ? $n : $i] = JURI::root(true).'/'.$srco;
+
+			$field->thumbs_src['backend'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcb;
+			$field->thumbs_src['small'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcs;
+			$field->thumbs_src['medium'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcm;
+			$field->thumbs_src['large'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcl;
+			$field->thumbs_src['original'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srco;
 			
-			$field->thumbs_path['backend'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcb;
-			$field->thumbs_path['small'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcs;
-			$field->thumbs_path['medium'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcm;
-			$field->thumbs_path['large'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
-			$field->thumbs_path['original'][$is_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
+			$field->thumbs_path['backend'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcb;
+			$field->thumbs_path['small'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcs;
+			$field->thumbs_path['medium'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcm;
+			$field->thumbs_path['large'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
+			$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
 			
 			// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
 			if ( $is_FE_html_view && $useogp )
