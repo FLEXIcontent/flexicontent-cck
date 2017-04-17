@@ -61,8 +61,27 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading"><?php echo JText::_("FLEXI_BASIC");?></h3>
 		
 		<br/>
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl keytop">			
 			
+			<tr>
+				<td class="key"><label class="label">Id</label></td>
+				<td class="data">
+					<?php
+						$dv = $this->model->getState('id_col');
+						$checked0 = $dv==0 ? 'checked="checked"' : '';
+						$checked1 = $dv==1 ? 'checked="checked"' : '';
+						$checked2 = $dv==2 ? 'checked="checked"' : '';
+					?>
+					<input type="radio" id="id_col0" name="id_col" value="0" <?php echo $checked0; ?> />
+					<label for="id_col0"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?></label>
+					<input type="radio" id="id_col1" name="id_col" value="1" <?php echo $checked1; ?> />
+					<label for="id_col1"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_ITEMS");?> **</label>
+					<input type="radio" id="id_col2" name="id_col" value="2" <?php echo $checked2; ?> />
+					<label for="id_col2"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_UPDATE_ITEMS");?></label>
+					<span class="fc-mssg-inline fc-info fc-nobgimage">** <?php echo JText::_("FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT");?></span>
+				</td>
+			</tr>
+
 			<tr>
 				<td class="key"><label class="label" id="type_id-lbl" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?></label></td>
 				<td class="data">
@@ -491,20 +510,6 @@ $tabCnt[$tabSetCnt] = 0;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_IGNORE_REDUDANT_COLS_DESC");?></span>
-				</td>
-			</tr>
-			
-			<tr>
-				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_CUSTOM_ITEM_ID");?></label></td>
-				<td class="data">
-					<?php
-						$_id_col_checked = $this->model->getState('id_col') ? 'checked="checked"' : '';
-					?>
-					<input type="checkbox" id="id_col" name="id_col" value="1" <?php echo $_id_col_checked; ?> />
-					<label for="id_col"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
-				</td>
-				<td class="data">
-					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT");?></span>
 				</td>
 			</tr>
 			

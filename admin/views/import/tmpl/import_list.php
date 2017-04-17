@@ -39,10 +39,12 @@ foreach($_levels as $_level) {
 					<span class="label">Item ID</span>
 				</td>
 				<td>
-					<?php if ($this->conf['id_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php if ($this->conf['id_col']==1): ?>
+						<span class="badge badge-info"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_ITEMS");?> </span>
+					<?php elseif ($this->conf['id_col']==2): ?>
+						<span class="badge badge-info"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_UPDATE_ITEMS");?> </span>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo 'AUTO (new ID)'; ?></span>
+						<span class="badge badge-success"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?></span>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -207,7 +209,11 @@ foreach($_levels as $_level) {
 			?>
 			<td>
 				<?php
-					if ($fieldname=='access') {
+					if ($fieldname=='id') {
+						$is_existing = isset($this->conf['existing_ids'][$field_values]);
+						echo ($is_existing ? ' <span class="badge badge-warning">Update</span> ' : '<span class="badge badge-success">Create</span>Create</span>');
+						echo $field_values;
+					} else if ($fieldname=='access') {
 						echo $field_values .' : ';
 						echo isset($access_levels[$field_values]) ? $access_levels[$field_values] : 'Invalid, no Access level with ID: '.$field_values;
 					} else if ($fieldname=='catid') {

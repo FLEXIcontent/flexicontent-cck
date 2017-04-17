@@ -206,6 +206,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$formvals = array();
 		
 		// Retrieve Basic configuration
+		$formvals['id_col']             = $model->getState('id_col');
 		$formvals['type_id']  = $model->getState('type_id');
 		$formvals['language'] = $model->getState('language');
 		$formvals['state']    = $model->getState('state');
@@ -236,7 +237,6 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		// Advanced configuration
 		$formvals['ignore_unused_cols'] = $model->getState('ignore_unused_cols');
-		$formvals['id_col']             = $model->getState('id_col');
 		$formvals['items_per_step']     = $model->getState('items_per_step');
 		
 		
