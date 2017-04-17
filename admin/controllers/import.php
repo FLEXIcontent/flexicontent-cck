@@ -559,6 +559,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		{
 			$_d = & $conf['contents_parsed'][$lineno];
 			$data = array();
+			$data['custom'] = array();
+
 			$data['type_id'] = $conf['type_id'];
 			$data['language']= $conf['language'];
 			$data['catid']   = $conf['maincat'];   // Default value maybe overriden by column
@@ -623,23 +625,45 @@ class FlexicontentControllerImport extends FlexicontentController
 				else if ( isset($conf['core_props'][$fieldname]) ) {
 					$data[$fieldname] = $field_values;
 				}
-				else if ( FLEXI_J16GE )
+				else
 				{
 					$data['custom'][$fieldname] = $field_values;
 				}
 			}
-			
-			// Set/Force id to zero to indicate creation of new item, in case item 'id' column is being used
+
+			// Before setting any new values try to load item if item ID was given and also updating is allowed
 			$c_item_id = @ $data['id'];
-			if ( $conf['id_col']!=2 )
+			if ( $conf['id_col']==2 && !empty($data['id']) )
+			{
+				// EITHER Load existing item into the ITEM model
+				$item = $itemmodel->getItem($data['id'], $check_view_access=false, $no_cache=true, $force_version=0);
+
+				// You can use $item to get existing values
+				if ($item)
+				{
+					// IMPORTANT: Get existing field values for the item
+					$items = array($item);
+					$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
+					$data_custom = $data['custom'];  // Backup field values from file
+					$data['custom'] = reset($items_custom_values); // Get data of first item
+					foreach($data_custom as $i => $v) $data['custom'][$i] = $v;  // Override existing item field values with those from file
+				}
+			}
+
+			// Set/Force id to zero to indicate creation of new item, in case item 'id' column is being used
+			else if ( $conf['id_col']!=2 )
 			{
 				$data['id'] = 0;
-			}
+			}			
+
 			$session->set('csvimport_lineno', $lineno, 'flexicontent');
-			
+
+
 			// If testing format then output some information
-			if ( $task == 'testcsv' ) {
-				if ($lineno==1) {
+			if ( $task == 'testcsv' )
+			{
+				if ($lineno==1)
+				{
 					$parse_log .= '
 						<span class="fc-mssg fc-info">
 						Testing file format <br/>
@@ -647,28 +671,35 @@ class FlexicontentControllerImport extends FlexicontentController
 						</span><hr/>
 					';
 				}
-				foreach ($_d as $i => $flddata) if (is_string($_d[$i])) {
+				foreach ($_d as $i => $flddata) if (is_string($_d[$i]))
+				{
 					if ( StringHelper::strlen($_d[$i]) > 80 ) $_d[$i] = StringHelper::substr(strip_tags($_d[$i]), 0, 80) . ' ... ';
 				}
-				if ($lineno <= $conf['debug_records']) {
+
+				if ($lineno <= $conf['debug_records'])
+				{
 					$parse_log .= "<pre><b>Item no $lineno:</b>\n". print_r($_d,true) ."</pre><hr/>";
-				} else {
+				}
+				else
+				{
 					$parse_log .= "<b>Item no $lineno:</b> <br/>".
 					"<u>TITLE</u>: ". $_d['title'] ."<br/>".
 					"<u>TEXT</u>: ". $_d['text'] ."<hr/>";
 				}
 			}
 			
-			// Otherwise (if not testing) try to create the item by using Item Model's store() method
-			else if ( !$itemmodel->store($data) ) {
+			// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
+			else if ( !$itemmodel->store($data) )
+			{
 				$conf['failure_count']++;
 				$msg = 'Failed item no: '. $lineno . ". titled as: '" . $data['title'] . "' : ". $itemmodel->getError();
 				JLog::add($msg, JLog::WARNING, 'com_flexicontent.importcsv');
 				echo $msg."<br/>";
 			}
 			
-			// Item record failed to be stored
-			else {
+			// Item record successfully stored
+			else
+			{
 				$conf['success_count']++;
 				$msg = 'Imported item no: '. $lineno . ". titled as: '" . $data['title'] . "'" ;
 				JLog::add($msg, JLog::INFO, 'com_flexicontent.importcsv');

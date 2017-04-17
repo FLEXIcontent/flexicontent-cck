@@ -61,7 +61,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading"><?php echo JText::_("FLEXI_BASIC");?></h3>
 		
 		<br/>
-		<table class="fc-form-tbl keytop">			
+		<table class="fc-form-tbl keytop">
 			
 			<tr>
 				<td class="key"><label class="label">Id</label></td>
