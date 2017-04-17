@@ -55,16 +55,19 @@ class FlexicontentModelImport extends JModelList
 		// **************
 		
 		// Retrieve Basic configuration
+		$id_col   = $fcform ? $jinput->get('id_col', 0, 'int')         :  $app->getUserStateFromRequest( $p.'id_col', 'id_col', $this->cparams->get('import_id_col', 0), 'int');
 		$type_id  = $fcform ? $jinput->get('type_id', 0, 'int')        :  $app->getUserStateFromRequest( $p.'type_id', 'type_id', 0, 'int');
 		$language = $fcform ? $jinput->get('language', '*', 'string')  :  $app->getUserStateFromRequest( $p.'language', 'language', $this->cparams->get('import_lang', '*'), 'string');
 		$state    = $fcform ? $jinput->get('state', 1, 'int')          :  $app->getUserStateFromRequest( $p.'state', 'state', $this->cparams->get('import_state', 1), 'int');
 		$access   = $fcform ? $jinput->get('access', 1, 'int')         :  $app->getUserStateFromRequest( $p.'access', 'access', $this->cparams->get('import_access', 1), 'int');
 		
+		$this->setState('id_col', $id_col);
 		$this->setState('type_id', $type_id);
 		$this->setState('language', $language);
 		$this->setState('state', $state);
 		$this->setState('access', $access);
 		
+		$app->setUserState($p.'id_col', $id_col);
 		$app->setUserState($p.'type_id', $type_id);
 		$app->setUserState($p.'language', $language);
 		$app->setUserState($p.'state', $state);
@@ -134,18 +137,15 @@ class FlexicontentModelImport extends JModelList
 		
 		// Advanced configuration
 		$ignore_unused_cols = $fcform ? $jinput->get('ignore_unused_cols', 0, 'int')  :  $app->getUserStateFromRequest( $p.'ignore_unused_cols', 'ignore_unused_cols', $this->cparams->get('import_ignore_unused_cols', 0), 'int');
-		$id_col             = $fcform ? $jinput->get('id_col', 0, 'int')              :  $app->getUserStateFromRequest( $p.'id_col', 'id_col', $this->cparams->get('import_id_col', 0), 'int');
 		$items_per_step     = $fcform ? $jinput->get('items_per_step', 0, 'int')      :  $app->getUserStateFromRequest( $p.'items_per_step', 'items_per_step', $this->cparams->get('import_items_per_step', 5), 'int');
 		
 		if ( $items_per_step > 50 ) $items_per_step = 50;
 		if ( ! $items_per_step )    $items_per_step = 5;
 		
 		$this->setState('ignore_unused_cols', $ignore_unused_cols);
-		$this->setState('id_col', $id_col);
 		$this->setState('items_per_step', $items_per_step);
 		
 		$app->setUserState($p.'ignore_unused_cols', $ignore_unused_cols);
-		$app->setUserState($p.'id_col', $id_col);
 		$app->setUserState($p.'items_per_step', $items_per_step);
 		
 		

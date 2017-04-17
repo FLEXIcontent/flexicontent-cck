@@ -80,7 +80,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
-		$task  = JRequest::getCmd( 'task' );
+		$task  = $jinput->get('task', '', 'cmd');
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
@@ -157,49 +157,49 @@ class FlexicontentControllerImport extends FlexicontentController
 			$conf['failure_count'] = $conf['success_count'] = 0;
 			
 			// Retrieve Basic configuration
-			$conf['type_id']  = JRequest::getInt( 'type_id', 0 );
-			$conf['language'] = JRequest::getVar( 'language', '' );
-			$conf['state']    = JRequest::getInt( 'state', '' );
-			$conf['access']   = JRequest::getInt( 'access', '' );
+			$conf['id_col'] = $jinput->get('id_col', 0, 'int');
+			$conf['type_id']  = $jinput->get('type_id', 0, 'int');
+			$conf['language'] = $jinput->get('language', '', 'string');
+			$conf['state']    = $jinput->get('state', '', 'int');
+			$conf['access']   = $jinput->get('access', '', 'int');
 			
 			// Main and secondary categories
-			$conf['maincat'] 	= JRequest::getInt( 'maincat', 0 );
-			$conf['maincat_col'] = JRequest::getInt( 'maincat_col', 0 );
-			$conf['seccats'] 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
-			$conf['seccats_col'] = JRequest::getInt( 'seccats_col', 0 );
+			$conf['maincat'] 	= $jinput->get('maincat', 0, 'int');
+			$conf['maincat_col'] = $jinput->get('maincat_col', 0, 'int');
+			$conf['seccats'] = $jinput->get('seccats', array(), 'array');
+			JArrayHelper::toInteger($conf['seccats']);
+			$conf['seccats_col'] = $jinput->get('seccats_col', 0, 'int');
 			
 			// Tags
-			$conf['tags_col'] = JRequest::getInt( 'tags_col', 0 );
+			$conf['tags_col'] = $jinput->get('tags_col', 0, 'int');
 			
 			// Publication: META data
-			$conf['created_by_col'] = JRequest::getInt( 'created_by_col', 0 );
-			$conf['modified_by_col'] = JRequest::getInt( 'modified_by_col', 0 );
+			$conf['created_by_col'] = $jinput->get('created_by_col', 0, 'int');
+			$conf['modified_by_col'] = $jinput->get('modified_by_col', 0, 'int');
 			
 			// Publication: META data
-			$conf['metadesc_col'] = JRequest::getInt( 'metadesc_col', 0 );
-			$conf['metakey_col'] = JRequest::getInt( 'metakey_col', 0 );
+			$conf['metadesc_col'] = $jinput->get('metadesc_col', 0, 'int');
+			$conf['metakey_col'] = $jinput->get('metakey_col', 0, 'int');
 			
 			// Publication: dates
-			$conf['modified_col'] = JRequest::getInt( 'modified_col', 0 );
-			$conf['created_col'] = JRequest::getInt( 'created_col', 0 );
-			$conf['publish_up_col'] = JRequest::getInt( 'publish_up_col', 0 );
-			$conf['publish_down_col'] = JRequest::getInt( 'publish_down_col', 0 );
+			$conf['modified_col'] = $jinput->get('modified_col', 0, 'int');
+			$conf['created_col'] = $jinput->get('created_col', 0, 'int');
+			$conf['publish_up_col'] = $jinput->get('publish_up_col', 0, 'int');
+			$conf['publish_down_col'] = $jinput->get('publish_down_col', 0, 'int');
 			
 			// Advanced configuration
-			$conf['ignore_unused_cols'] = JRequest::getInt( 'ignore_unused_cols', 0 );
-			
-			$conf['id_col'] = JRequest::getInt( 'id_col', 0 );
-			$conf['items_per_step'] = JRequest::getInt( 'items_per_step', 5 );
+			$conf['ignore_unused_cols'] = $jinput->get('ignore_unused_cols', 0, 'int');
+			$conf['items_per_step'] = $jinput->get('items_per_step', 5, 'int');
 			if ( $conf['items_per_step'] > 50 ) $conf['items_per_step'] = 50;
 			if ( ! $conf['items_per_step'] ) $conf['items_per_step'] = 5;
 			
 			// CSV file format
-			$conf['mval_separator']   = JRequest::getVar('mval_separator');
-			$conf['mprop_separator']  = JRequest::getVar('mprop_separator');
-			$conf['field_separator']  = JRequest::getVar('field_separator');
-			$conf['enclosure_char']   = JRequest::getVar('enclosure_char');
-			$conf['record_separator'] = JRequest::getVar('record_separator');
-			$conf['debug_records']    = JRequest::getInt('debug_records', 0);  // Debug, print parsed data without importing
+			$conf['mval_separator']   = $jinput->get('mval_separator', '', 'string');
+			$conf['mprop_separator']  = $jinput->get('mprop_separator', '', 'string');
+			$conf['field_separator']  = $jinput->get('field_separator', '', 'string');
+			$conf['enclosure_char']   = $jinput->get('enclosure_char', '', 'string');
+			$conf['record_separator'] = $jinput->get('record_separator', '', 'string');
+			$conf['debug_records']    = $jinput->get('debug_records', 0, 'int');  // Debug, print parsed data without importing
 			
 			
 			// ********************************************************************************************
@@ -443,11 +443,15 @@ class FlexicontentControllerImport extends FlexicontentController
 			// **********************************************************
 			// Verify that custom specified item ids do not already exist
 			// **********************************************************
-			if ( $conf['id_col'] ) {
+			$conf['existing_ids'] = array();
+			if ( $conf['id_col'] )
+			{
 				// Get 'id' column no
 				$id_col_no = 0;
-				foreach($conf['columns'] as $col_no => $column) {
-					if ( $conf['columns'][$col_no] == 'id' ) {
+				foreach($conf['columns'] as $col_no => $column)
+				{
+					if ( $conf['columns'][$col_no] == 'id' )
+					{
 						$id_col_no = $col_no;
 						break;
 					}
@@ -464,9 +468,12 @@ class FlexicontentControllerImport extends FlexicontentController
 				// Cross check them if they already exist in the DB
 				$q = "SELECT id FROM #__content WHERE id IN (".$custom_id_list.")";
 				$db->setQuery($q);
-				$existing_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				if ( $existing_ids && count($existing_ids) ) {
-					$app->enqueueMessage('File has '.count($existing_ids).' item IDs that already exist: \''.implode("\' , \'",$existing_ids).'\', please fix or set to ignore \'id\' column', 'error');
+				$conf['existing_ids'] = $db->loadObjectList('id');
+
+				// Throw error if we are only importing new items but existing item ids were found
+				if ( $conf['id_col'] == 1 && $conf['existing_ids'] && count($conf['existing_ids']) )
+				{
+					$app->enqueueMessage('File has '.count($conf['existing_ids']).' item IDs that already exist: \''.implode("\' , \'",$conf['existing_ids']).'\', please fix or enable update existing items option', 'error');
 					$app->redirect($link);
 				}
 			}
@@ -484,8 +491,8 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ***************************************************************
 			
 			// Get fields that use files
-			$conf['media_folder'] = JRequest::getVar('media_folder');
-			$conf['docs_folder']  = JRequest::getVar('docs_folder');
+			$conf['media_folder'] = $jinput->get('media_folder', '', 'string');
+			$conf['docs_folder']  = $jinput->get('docs_folder', '', 'string');
 			
 			$this->checkfiles($conf, $parse_log, $task);
 			$this->parsevalues($conf, $parse_log, $task);
@@ -539,9 +546,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		
 		$colcount  = count($conf['columns']);
 		$itemcount = count($conf['contents_parsed']);
-		$items_per_call = JRequest::getInt( 'items_per_call', 0 );
-		JRequest::setVar('import_media_folder', $conf['media_folder']);
-		JRequest::setVar('import_docs_folder', $conf['docs_folder']);
+		$items_per_call = $jinput->get('items_per_call', 0, 'int');
 		$jinput->set('import_media_folder', $conf['media_folder']);
 		$jinput->set('import_docs_folder', $conf['docs_folder']);
 		
@@ -583,7 +588,7 @@ class FlexicontentControllerImport extends FlexicontentController
 							$tns_list_quoted = implode(",", $tns_quoted);
 							$q = "SELECT name FROM #__flexicontent_tags WHERE name IN (". $tns_list_quoted .")";
 							$db->setQuery($q);
-							$tns_e = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+							$tns_e = $db->loadColumn();
 							$tns_m = array_diff( $tns , $tns_e );
 							
 							if ( count($tns_m) ) {
@@ -596,7 +601,7 @@ class FlexicontentControllerImport extends FlexicontentController
 							// Get tag ids
 							$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (". $tns_list_quoted .")";
 							$db->setQuery($q);
-							$data['tag'] = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+							$data['tag'] = $db->loadColumn();
 						}
 					}
 				}
@@ -612,7 +617,7 @@ class FlexicontentControllerImport extends FlexicontentController
 						$_tis_list = implode(",", array_keys($_tis));
 						$q = "SELECT id FROM #__flexicontent_tags WHERE id IN (". $_tis_list .")";
 						$db->setQuery($q);
-						$data['tag'] = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+						$data['tag'] = $db->loadColumn();
 					}
 				}
 				else if ( isset($conf['core_props'][$fieldname]) ) {
@@ -625,8 +630,11 @@ class FlexicontentControllerImport extends FlexicontentController
 			}
 			
 			// Set/Force id to zero to indicate creation of new item, in case item 'id' column is being used
-			$c_item_id = @$data['id'];
-			$data['id'] = 0;
+			$c_item_id = @ $data['id'];
+			if ( $conf['id_col']!=2 )
+			{
+				$data['id'] = 0;
+			}
 			$session->set('csvimport_lineno', $lineno, 'flexicontent');
 			
 			// If testing format then output some information
@@ -666,8 +674,8 @@ class FlexicontentControllerImport extends FlexicontentController
 				JLog::add($msg, JLog::INFO, 'com_flexicontent.importcsv');
 				echo $msg."<br/>";
 				
-				// Try to rename entry if id column is being used
-				if ( $conf['id_col'] && $c_item_id )
+				// Remap 'ID' of item (when 'id' column is being used)
+				if ( $conf['id_col']==1 && $c_item_id )
 				{
 					$item_id = $itemmodel->getId();
 					$q = "UPDATE #__content SET id='".$c_item_id."' WHERE id='".$item_id."'";
@@ -744,6 +752,9 @@ class FlexicontentControllerImport extends FlexicontentController
 	
 	function checkfiles(&$conf, &$parse_log, &$task)
 	{
+		$app = JFactory::getApplication();
+		$jinput = $app->input;
+
 		$mfolder  = JPath::clean( JPATH_SITE .DS. $conf['media_folder'] .DS );
 		$dfolder  = JPath::clean( JPATH_SITE .DS. $conf['docs_folder'] .DS );
 		
@@ -755,7 +766,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		}
 		
 		// Fields that should be skipped from file checking
-		$conf['skip_file_field'] = JRequest::getVar('skip_file_field', array());
+		$conf['skip_file_field'] = $jinput->get('skip_file_field', array(), 'array');
 		
 		// Get file field present in the header
 		$ff_fields = array();

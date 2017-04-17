@@ -1531,6 +1531,11 @@
 		<field name="" type="separator" default="FLEXI_IMPORT_MANAGER" icon_class="icon-upload" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="" type="separator" default="FLEXI_BASIC" label="" level="level1" />
+			<field name="import_id_col" type="fcradio" default="0" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IMPORT_AUTO_NEW_ID</option>
+				<option value="1">FLEXI_IMPORT_USE_ID_COL_CREATE_ITEMS</option>
+				<option value="2">FLEXI_IMPORT_USE_ID_COL_CREATE_UPDATE_ITEMS</option>
+			</field>
 			<field name="import_lang" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="Enter * OR en-GB or fr-FR or de-DE ..." />
 			<field name="import_state" type="list" default="1" label="FLEXI_STATE" description="...">
 				<option value="1">FLEXI_PUBLISHED</option>
@@ -1608,10 +1613,6 @@
 			<field name="import_ignore_unused_cols" type="fcradio" default="0" label="FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS" description="FLEXI_IMPORT_IGNORE_REDUDANT_COLS" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_IMPORT_STOP_IMPORT</option>
 				<option value="1">FLEXI_IGNORE</option>
-			</field>
-			<field name="import_id_col" type="fcradio" default="0" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_IMPORT_AUTO_NEW</option>
-				<option value="1">FLEXI_IMPORT_USE_ID_COL</option>
 			</field>
 			<field name="import_items_per_step" type="text" default="5" size="12" label="FLEXI_IMPORT_ITEMS_PER_STEP" description="FLEXI_IMPORT_ITEMS_PER_STEP_DESC"/>
 
