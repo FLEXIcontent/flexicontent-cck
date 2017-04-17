@@ -770,7 +770,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 			
 			// Sanitize the URL as absolute or relative
-			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int)$v['autoprefix']);
+			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int) @$v['autoprefix']);
 			
 			// Has protocol nothing to do
 			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
