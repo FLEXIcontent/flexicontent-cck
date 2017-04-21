@@ -320,7 +320,7 @@ foreach ($items as $i => $item) :
 				<div class="flexi infoblock <?php echo $top_cols; ?>cols group span8">
 					<ul class="flexi row">
 						<?php foreach ($item->positions['top'] as $field) : ?>
-						<li class="flexi <?php echo $span_class; ?>">
+						<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 							<div>
 								<?php if ($field->label) : ?>
 								<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -435,7 +435,7 @@ foreach ($items as $i => $item) :
 		<div class="flexi infoblock <?php echo $bottom_cols; ?>cols group">
 			<ul class="flexi row">
 				<?php foreach ($item->positions['bottom'] as $field) : ?>
-				<li class="flexi <?php echo $span_class; ?>">
+				<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 					<div>
 						<?php if ($field->label) : ?>
 						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
