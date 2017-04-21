@@ -14,7 +14,7 @@ if ($use_category_link)
 	if (!empty($rows[$item->id]->categoryslug)) {
 		$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($category_label, $category->title, 0) .'"' : '';
 		$html .= '
-			<a class="fcpagenav-return btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">
+			<a class="fcpagenav-return btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)) . ($start ? '?start='.$start : '') . '">
 				<i class="icon-undo"></i>
 				' . htmlspecialchars($category->title, ENT_NOQUOTES, 'UTF-8') . '
 				' . ($cat_image ? '
