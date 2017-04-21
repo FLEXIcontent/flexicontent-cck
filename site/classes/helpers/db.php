@@ -520,7 +520,16 @@ class flexicontent_db
 
 			// NEW ADDED
 			case 'random':
-				$order_col	= 'RAND()';
+				// Convert session id to array of hex strings (4 bytes each)
+				$sid = JFactory::getSession()->getId();
+				$sid = str_split(md5($sid), 8);
+				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
+				$seed = null;
+				foreach($sid as $b)
+				{
+					$seed = ($seed == null)  ?  hexdec($b)  :  ($seed ^ hexdec($b));
+				}
+				$order_col	= 'RAND(' . $seed . ')';  // 'RAND()';
 				$order_dir	= '';
 				break;
 			case 'commented':
@@ -641,7 +650,16 @@ class flexicontent_db
 				$order_dir = 'ASC';
 				break;
 			case 'random':
-				$order_col	= 'RAND()';
+				// Convert session id to array of hex strings (4 bytes each)
+				$sid = JFactory::getSession()->getId();
+				$sid = str_split(md5($sid), 8);
+				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
+				$seed = null;
+				foreach($sid as $b)
+				{
+					$seed = ($seed == null)  ?  hexdec($b)  :  ($seed ^ hexdec($b));
+				}
+				$order_col	= 'RAND(' . $seed . ')';  // 'RAND()';
 				$order_dir	= '';
 				break;
 			case 'default' :
