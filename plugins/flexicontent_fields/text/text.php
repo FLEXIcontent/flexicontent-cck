@@ -63,7 +63,6 @@ class plgFlexicontent_fieldsText extends FCField
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
@@ -291,7 +290,7 @@ class plgFlexicontent_fieldsText extends FCField
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
-		$classes  = 'fcfield_textval'.$required;
+		$classes  = 'fcfield_textval' . ($required ? ' required' : '');
 		
 		// Create attributes for JS inputmask validation
 		$validate_mask = '';
