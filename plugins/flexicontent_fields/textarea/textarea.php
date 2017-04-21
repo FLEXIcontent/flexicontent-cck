@@ -15,8 +15,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsTextarea extends JPlugin
+class plgFlexicontent_fieldsTextarea extends FCField
 {
 	static $field_types = array('textarea', 'maintext');
 	
@@ -193,11 +194,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			// Update the new textarea field
 			$js .= "
 				// Update the new textarea
 				var boxClass = 'txtarea';
@@ -356,9 +359,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		foreach ($field->value as $value)
 		{
 			// Special case TABULAR representation of single value textarea
-			if ($n==0 && $field->parameters->get('editorarea_per_tab', 0)) {
+			if ($n==0 && $field->parameters->get('editorarea_per_tab', 0))
+			{
 				$this->parseTabs($field, $item);
-				if ($field->tabs_detected) {
+				if ($field->tabs_detected)
+				{
 					$this->createTabs($field, $item, $fieldname, $elementid);
 					return;
 				}
@@ -469,7 +474,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				if ( empty($value) ) continue;  // skip further actions
+				if ( !strlen($value) ) continue;  // skip further actions
 				
 				if ($lang_filter_values) {
 					$value = JText::_($value);
@@ -495,6 +500,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		// Microdata (classify the field values for search engines)
+		$itemprop    = $field->parameters->get('microdata_itemprop');
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -530,24 +538,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			break;
 		}
 		
-		// Create field's HTML
-		$field->{$prop} = array();
-		$n = 0;
-		foreach ($values as $value)
-		{
-			if ( !strlen($value) && !$is_ingroup ) continue; // Skip empty if not in field group
-			if ( !strlen($value) ) {
-				$field->{$prop}[$n++]	= '';
-				continue;
-			}
-			
-			// Add prefix / suffix
-			$field->{$prop}[$n]	= $pretext . $value . $posttext;
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
+		// Create field's HTML, using layout file
+		$field->{$prop} = array();
+		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
@@ -558,8 +555,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
+				
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ( $itemprop )
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
 			}
 		}
 		
