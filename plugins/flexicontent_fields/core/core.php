@@ -692,7 +692,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			// MULTI-select: special label and prompts
 			if ($display_filter_as == 6)
 			{
-				$classes .= ' fc_prompt_internal';
+				$classes .= ' fc_prompt_internal fc_is_selmultiple';
 				
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$extra_param  = ' data-placeholder="'.$_inner_lb.'"';
@@ -703,7 +703,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			// Create HTML tag attributes
 			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
-			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="20" ' : '';
+			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="5" ' : '';
 			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 			
 			// Filter name and id
