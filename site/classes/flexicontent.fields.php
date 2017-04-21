@@ -3184,7 +3184,7 @@ class FlexicontentFields
 			// MULTI-select: special label and prompts
 			if ($display_filter_as == 6)
 			{
-				$classes .= ' fc_prompt_internal';
+				$classes .= ' fc_prompt_internal fc_is_selmultiple';
 				
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
@@ -3221,7 +3221,7 @@ class FlexicontentFields
 			
 			// Create HTML tag attributes
 			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
-			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="20" ' : '';
+			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="5" ' : '';
 			if ( $extra_attribs = $filter->parameters->get( 'filter_extra_attribs'.$_s, '' ) )
 			{
 				$attribs_str .= $extra_attribs;

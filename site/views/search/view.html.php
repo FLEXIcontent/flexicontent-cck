@@ -353,7 +353,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			}
 			
 			$multiple_param = $show_filters ? ' onchange="adminFormPrepare(this.form); this.form.submit();" ' : ' multiple="multiple" ';
-			$attribs  = $multiple_param.' size="5" class="fc_field_filter use_select2_lib fc_prompt_internal"';  // class="... fc_label_internal" data-fc_label_text="..."
+			$multiple_class = $show_filters ? ' fc_is_selmultiple' : '';
+			$attribs  = $multiple_param.' size="5" class="fc_field_filter use_select2_lib fc_prompt_internal '.$multiple_class.'"';  // class="... fc_label_internal" data-fc_label_text="..."
 			$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
 			$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
 			$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', $attribs, 'value', 'text', (empty($form_contenttypes) ? '' : $form_contenttypes), 'contenttypes');
@@ -399,7 +400,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$form_txtflds = array(); //array('__FC_ALL__'); //array_keys($fields_text);
 			}
 			
-			$attribs  = ' multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal"';  // class="... fc_label_internal" data-fc_label_text="..."
+			$attribs  = ' multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal fc_is_selmultiple"';  // class="... fc_label_internal" data-fc_label_text="..."
 			$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
 			$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
 			$lists['txtflds'] = JHTML::_('select.genericlist', $fields_text, 'txtflds[]', $attribs, 'name', 'label', $form_txtflds, 'txtflds');
@@ -527,7 +528,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$_area->value = $area;
 				$options[] = $_area;
 			}
-			$attribs  = ' multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal"';  // class="... fc_label_internal" data-fc_label_text="..."
+			$attribs  = ' multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal fc_is_selmultiple"';  // class="... fc_label_internal" data-fc_label_text="..."
 			$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
 			$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
 			$lists['areas'] = JHTML::_('select.genericlist', $options, 'areas[]', $attribs, 'value', 'text', $form_areas, 'areas', $do_jtext=true);
