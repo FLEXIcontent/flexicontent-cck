@@ -419,16 +419,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 
 		// Add information about uploaded file data into the session
-		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
+		if ($this->input->get('history', 0, 'int'))
+		{
+			$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
 
-		$_file_ids = $session->get($context.'ids', array());
-		$_file_ids[] = $file_id;
-		$session->set($context.'ids', $_file_ids);
+			$_file_ids = $session->get($context.'ids', array());
+			$_file_ids[] = $file_id;
+			$session->set($context.'ids', $_file_ids);
 
-		$_file_names = $session->get($context.'names', array());
-		$_file_names[] = $filename;
-		$session->set($context.'names', $_file_names);
-
+			$_file_names = $session->get($context.'names', array());
+			$_file_names[] = $filename;
+			$session->set($context.'names', $_file_names);
+		}
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );
@@ -529,15 +531,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file_id = (int) $db->insertid();
 
 		// Add information about added (URL) file data into the session
-		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
+		if ($this->input->get('history', 0, 'int'))
+		{
+			$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
 
-		$_file_ids = $session->get($context.'ids', array());
-		$_file_ids[] = $file_id;
-		$session->set($context.'ids', $_file_ids);
+			$_file_ids = $session->get($context.'ids', array());
+			$_file_ids[] = $file_id;
+			$session->set($context.'ids', $_file_ids);
 
-		$_file_names = $session->get($context.'names', array());
-		$_file_names[] = $filename;
-		$session->set($context.'names', $_file_names);
+			$_file_names = $session->get($context.'names', array());
+			$_file_names[] = $filename;
+			$session->set($context.'names', $_file_names);
+		}
 
 		// Terminate with proper messaging
 		$this->exitHttpHead = array( 0 => array('status' => '201 Created') );

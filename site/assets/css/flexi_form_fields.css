@@ -1376,8 +1376,14 @@ table.fc_uploader_header_tbl td:last-child {
 	margin: 0px 0px 2px 0px;
 	background: url(../images/upload.png) 50% 50% no-repeat;
 }
+#flexicontent .fcfield-uploadvalue.active {
+	background: #2f96b4 !important;
+}
 #flexicontent span.fcfield-uploadvalue.fcfont-icon:before {
 	content: "\e022";
+}
+#flexicontent span.fcfield-uploadvalue.active.fcfont-icon:before {
+	color: white;
 }
 #flexicontent span.fcfield-uploadvalue:before {
 	color: black;
