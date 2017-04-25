@@ -40,15 +40,15 @@ class FlexicontentControllerItems extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add',        'edit' );
-		$this->registerTask( 'apply_type', 'save' );
-		$this->registerTask( 'apply',      'save' );
-		$this->registerTask( 'apply_ajax', 'save' );
-		$this->registerTask( 'save2new',   'save' );
-		$this->registerTask( 'save2copy',  'save' );
-		$this->registerTask( 'unfeatured', 'featured' );
+		$this->registerTask( 'add',            'edit' );
+		$this->registerTask( 'apply_type',     'save' );
+		$this->registerTask( 'apply',          'save' );
+		$this->registerTask( 'apply_ajax',     'save' );
+		$this->registerTask( 'save2new',       'save' );
+		$this->registerTask( 'save2copy',      'save' );
+		$this->registerTask( 'unfeatured',     'featured' );
 
-		$this->returnURL = 'index.php?option=com_flexicontent&view=items';
+		$this->returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base();
 	}
 	
 	
@@ -228,6 +228,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
+		$fc_doajax_submit = $jinput->get('fc_doajax_submit', 0, 'int');
 		
 		// Validate Form data for core fields and for parameters
 		$validated_data = $model->validate($form, $data);
@@ -249,9 +250,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
 			// Redirect back to the edit form
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			$this->setRedirect( $this->returnURL );
 
-			if ($jinput->get('fc_doajax_submit'))
+			if ( $fc_doajax_submit )
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -339,8 +340,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		if ($isnew && !$canAdd)
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( $jinput->get('fc_doajax_submit') ) {
+			$this->setRedirect( $this->returnURL );
+			if ( $fc_doajax_submit )
+			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -352,8 +354,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!$isnew && !$canEdit)
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( $jinput->get('fc_doajax_submit') ) {
+			$this->setRedirect( $this->returnURL );
+			if ( $fc_doajax_submit )
+			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -365,8 +368,9 @@ class FlexicontentControllerItems extends FlexicontentController
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
 			JError::raiseWarning( 403, $msg );
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			if ( $jinput->get('fc_doajax_submit') ) {
+			$this->setRedirect( $this->returnURL );
+			if ( $fc_doajax_submit )
+			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
 			}
@@ -406,9 +410,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Saving has failed check-in and redirect back to the item form,
 			// Redirect back to the edit form reloading the posted data
 			$model->checkin();
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			$this->setRedirect( $this->returnURL );
 			
-			if ( $jinput->get('fc_doajax_submit') )
+			if ( $fc_doajax_submit )
 			{
 				echo flexicontent_html::get_system_messages_html();
 				exit();  // Ajax submit, do not rerender the view
@@ -658,25 +662,32 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ****************************************
 		switch ($task)
 		{
+			// REDIRECT CASE FOR APPLY / SAVE AS COPY: Save and reload the item edit form
 			case 'apply':
 			case 'apply_type':
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&view=item&id='.(int) $model->get('id');
 				break;
 
+			// REDIRECT CASE FOR SAVE and NEW: Save and load new item form
 			case 'save2new':
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 				$link = $type_id ?
 					'index.php?option=com_flexicontent&view=item&typeid='.$type_id :
 					'index.php?option=com_flexicontent&view=item' ;
 				break;
+
+			// REDIRECT CASES FOR SAVING
 			default:
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 				$link = 'index.php?option=com_flexicontent&view=items';
 				break;
 		}
-		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+
 		$this->setRedirect($link, $msg);
 		//return;  // comment above and decomment this one to profile the saving operation
 
-		if ( $jinput->get('fc_doajax_submit') )
+		if ($fc_doajax_submit)
 		{
 			JFactory::getApplication()->enqueueMessage($msg, 'message');
 			echo flexicontent_html::get_system_messages_html();

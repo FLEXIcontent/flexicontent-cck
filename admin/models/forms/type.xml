@@ -469,8 +469,8 @@
 			<field name="item_form_fe_tab_behaviour" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" icon_class="icon-cog" level="tab_open" box_type="1" />
 			
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
-				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
-				checkvals="apply,save_preview,preview_latest" defaultvals=""
+				checkoptions="FLEXI_APPLY,FLEXI_FAST_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
+				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals=""
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
 			<field name="buttons_placement_fe" type="radio" default="" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>

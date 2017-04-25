@@ -173,7 +173,11 @@ function fc_submit_form(form, task, validate)
 					jQuery('#fc_doajax_loading').remove();
 					jQuery('#fc_doajax_submit').remove();
 					jQuery('#fc_filter_form_blocker').remove();
+
+					if ($form.data('btn_box')) $form.data('btn_box').show();
+					if ($form.data('msg_box')) $form.data('msg_box').hide();
 					$form.show();
+
 					jQuery('#system-message-container').html(data);
 					if ( $form.data('form_was_serialized') )
 					{

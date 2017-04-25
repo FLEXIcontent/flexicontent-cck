@@ -836,13 +836,17 @@ function flexi_submit(task, btn_box, msg_box)
 	
 	if ($form.data('fcform_isValid'))
 	{
-		if (typeof btn_box !== 'undefined') {
+		if (typeof btn_box !== 'undefined')
+		{
 			//alert('hide submit btns');
 			jQuery('#'+btn_box).hide();
+			$form.data('btn_box', jQuery('#'+btn_box));
 		}
-		if (typeof msg_box !== 'undefined') {
+		if (typeof msg_box !== 'undefined')
+		{
 			//alert('show submit msg');
 			jQuery('#'+msg_box).show();
+			$form.data('msg_box', jQuery('#'+msg_box));
 		}
 	}
 }

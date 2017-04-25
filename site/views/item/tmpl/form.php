@@ -335,18 +335,36 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		</div>
 		<div id="flexi_form_submit_btns" class="flexi_buttons">
 			
-			<?php if ( (in_array( 'apply', $allowbuttons_fe) && $this->perms['canedit']) || !$typeid ) : ?>
+			<?php if ( in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
 				<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('<?php echo !$typeid ? 'apply_type' : 'apply'; ?>', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 				</button>
 			<?php endif; ?>
-			
+
 			<?php if ( $typeid ) : ?>
-				
+
+				<?php if ( in_array( 'apply_ajax', $allowbuttons_fe) && !$isnew ) : ?>
+					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('apply_ajax', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+						<span class="fcbutton_apply_ajax"><?php echo JText::_( in_array( 'apply', $allowbuttons_fe) ? 'FLEXI_FAST_APPLY' : 'FLEXI_APPLY' ) ?></span>
+					</button>
+				<?php endif; ?>
+
 				<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 				</button>
-			
+
+				<?php if ( in_array( 'save2new', $allowbuttons_fe) && !$isnew ) : ?>
+					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save2new', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+						<span class="fcbutton_save2new"><?php echo JText::_( 'FLEXI_SAVE_AND_NEW' ) ?></span>
+					</button>
+				<?php endif; ?>
+
+				<?php if ( in_array( 'save2copy', $allowbuttons_fe) && !$isnew ) : ?>
+					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save2copy', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+						<span class="fcbutton_save2copy"><?php echo JText::_( 'FLEXI_SAVE_AS_COPY' ) ?></span>
+					</button>
+				<?php endif; ?>
+
 				<?php if ( in_array( 'save_preview', $allowbuttons_fe) && !$isredirected_after_submit ) : ?>
 					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save_a_preview', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
