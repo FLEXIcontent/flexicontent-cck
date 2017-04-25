@@ -358,7 +358,7 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
+		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads&history=1'
 			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,

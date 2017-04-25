@@ -43,6 +43,14 @@ fc_plupload = function(options)
 	}
 
 
+	this.clearUploader = function(sfx)
+	{
+		if (!!this.uploader_instances[sfx])
+		{
+			this.uploader_instances[sfx].destroy();
+			this.uploader_instances[sfx] = null;
+		}
+	}
 
 	// *
 	// * Show plupload , also loading it if not already loaded
@@ -64,7 +72,7 @@ fc_plupload = function(options)
 		}
 
 		// Already initialized
-		if (this.uploader_instances[sfx])
+		if (!!this.uploader_instances[sfx])
 		{
 			//this.uploader_instances[sfx].refresh();  // refresh it
 			//this.uploader_instances[sfx].splice();   // empty it, ... not needed and problematic ... commented out

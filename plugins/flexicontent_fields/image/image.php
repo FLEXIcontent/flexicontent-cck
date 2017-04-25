@@ -362,7 +362,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				newField.find('input.originalname').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_originalname');
 				
 				newField.find('.existingname').val('');
-				newField.find('.existingname').addClass('no_value_selected');
 				newField.find('.existingname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
 				newField.find('.existingname').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_existingname');
 				
@@ -535,7 +534,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
-				//if(window.console) window.console.log(valcounter.value);
+				//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 			}
 			";
 			
@@ -568,81 +567,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var ff_suffix = '_existingname';
 				var elementid = tagid.replace(ff_suffix, '');
 
-				// Get current value of new / existing filename fields
-				var hasvalue_obj = jQuery('#' + elementid );
-				var original_obj = jQuery('#' + elementid + '_originalname' );
-				var existing_obj = jQuery('#' + elementid + '_existingname' );
-				var remove_obj   = jQuery('#' + elementid + '_remove' );
-
-				var existingAllowed = existing_obj.length != 0;
-
-				var originalname = original_obj.val();
-				var existingname = existingAllowed ? existing_obj.val() : '';
-				
-				// a flag if file URL was given
-				var fileUrlGiven = preview_url!='';
-				
-				".($image_source == 0 ? "
-				// DB-mode BOF
-				
-				// Assigning existingfile
-				//alert('file: ' + file + ' -- existingAllowed: ' + existingAllowed + ', existingname: ' + existingname + ', no_value_selected: ' + (existing_obj.hasClass('no_value_selected') ? 'yes' : 'no'));
-				if ( existingAllowed && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
-					var modify = ( originalname=='' ) ? 1 : 0;
-					existing_obj.removeClass('no_value_selected');
-				} else if ( existingAllowed && existingname=='' && !existing_obj.hasClass('no_value_selected') ) {
-					var modify = -1;
-					existing_obj.addClass('no_value_selected');
-				} else {
-					var modify = 0;
-				}
-
-				// Increment/decrement the form field used as value counter, we do not use ZERO in case of decrement, instead we set to empty string, so that is-required validation works
+				// Get current has-value Flag and also set new value to the flag
 				var valcounter = document.getElementById('".$elementid."');
-				if (modify>0)
+				var hasvalue_obj = jQuery('#' + elementid );
+				var hasValue = hasvalue_obj.val();
+				hasvalue_obj.val(file ? '1' : '');
+
+				// Increment/Make non-empty the form field used as value counter, so that is-required validation works
+				if (file && !hasValue)
 				{
-					if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
-					else valcounter.value = parseInt(valcounter.value) + modify;
-					hasvalue_obj.val('1');  // value assigned
+					valcounter.value = valcounter.value==''  ?  1  :  parseInt(valcounter.value) + 1;
 				}
-				
-				else if (modify<0)
+
+				// Decrement/Make empty the form field used as value counter, so that is-required validation works
+				else if (!file && hasValue)
 				{
-					if ( valcounter.value=='1' ) valcounter.value = '';
-					else valcounter.value = parseInt(valcounter.value) + modify;
-					hasvalue_obj.val('');  // value de-assigned, (or ? fieldgroup is being deleted)
+					valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 				}
-				
-				// DB-mode EOF
-				" : "")."
-				
-				".($image_source >= 1 ? "
-				// Folder-mode BOF
-				
-				if ( originalname=='' && existingname=='' )
-				{
-					// Increment/Make non-empty the form field used as value counter, so that is-required validation works
-					var valcounter = document.getElementById('".$elementid."');
-					if ( valcounter.value=='' ) valcounter.value = '1';
-					else valcounter.value = parseInt(valcounter.value) + 1;
-				}
-				hasvalue_obj.val('1');  // value assigned
-				
-				// Folder-mode EOF
-				" : "")."
-				
-				//if(window.console) window.console.log(valcounter.value);
-				
-				// Folder-mode
-				if (file != '' && existingAllowed)  existing_obj.val(file);
-				
-				// Clear original value for both DB-mode & Folder-mode(s)
-				original_obj.val('');
+				//if (window.console) window.console.log('valcounter: ' + valcounter.value);
+
+				// Set existing value & Clear original value for both DB-mode & Folder-mode(s)
+				jQuery('#' + elementid + '_existingname').val(file);
+				jQuery('#' + elementid + '_originalname').val('');
 
 				// Replace old preview image
 				var preview_img_OLD = jQuery('#' + elementid + '_preview_image' );
 				if (preview_img_OLD)
 				{
+					var box = preview_img_OLD.closest('.fcfieldval_container');
 					var preview_img_NEW = preview_url != ''
 						? '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+preview_url+'\" alt=\"Preview image\" />'
 						: '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"Preview image\" />';
@@ -654,13 +606,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					if (keep_modal!=2)
 					{
 						preview_img_NEW.closest('.fcimg_preview_box').show();
-						preview_img_NEW.closest('.fcimg_preview_box').parent().find('.fc_file_uploader').hide();
+						clearFieldUploader".$field->id."(box);
 					}
 
 					// Set new preview text too (a 'title')
 					if (file) jQuery('#' + elementid + '_fcimg_preview_msg' ).html( !!file_original ? file_original : file );
 
-					remove_obj.removeAttr('checked').trigger('change');
+					jQuery('#' + elementid + '_remove').removeAttr('checked').trigger('change');
 				}
 
 				// Close file select modal dialog
@@ -668,13 +620,31 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					fc_field_dialog_handle_".$field->id.".dialog('close');
 				}
+				//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 			}
 			
 			
+			function clearFieldUploader".$field->id."(box)
+			{
+				var upload_container = box.find('.fc_file_uploader');
+				var upload_instance = upload_container.data('plupload_instance');
+
+				var upBTN = box.find('.fc_files_uploader_toggle_btn');
+				if (upload_instance)
+				{
+					jQuery(upload_instance).data('fc_plupload_instance').clearUploader(upBTN.data('rowno'));
+				}
+				upBTN.removeClass('active btn-info');
+				upload_container.hide();
+			}
+
+
 			function clearField".$field->id."(el, options)
 			{
 				var box = jQuery(el).closest('.fcfieldval_container');
 				var hasValue = box.find('.hasvalue').val();
+				var valcounter = document.getElementById('".$elementid."');
+				//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 				options = options || {};
 				options.hide_image = options.hide_image || false;
 				options.keep_props = options.keep_props || false;
@@ -685,15 +655,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				else
 				{
+					clearFieldUploader".$field->id."(box);
+
 					box.find('.originalname').val('');
 					box.find('.existingname').val('');
 					box.find('.hasvalue').val('');
 					box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 					box.find('.fcimg_preview_msg').html(' ');
+					box.find('.fcimg_preview_box').show();
 
-					var valcounter = document.getElementById('".$elementid."');
-					if (hasValue) valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-					//if(window.console) window.console.log(valcounter.value);
+					if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+					//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 				}
 				if (options.keep_props)
 				{
@@ -709,11 +681,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var hasValue = box.find('.hasvalue').val();
 				box.find('.hasvalue').val('1');
 				var valcounter = document.getElementById('".$elementid."');
-				if (hasValue=='') {
-					if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
-					else valcounter.value = parseInt(valcounter.value) + 1;
+				if (hasValue=='')
+				{
+					valcounter.value = valcounter.value==''  ?  '1'  :  parseInt(valcounter.value) + 1;
 				}
-				//if(window.console) window.console.log(valcounter.value);
+				//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 			}
 
 
@@ -985,7 +957,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					'toggle_btn' => array(
 						'class' => $file_btns_position ? 'btn btn-small' : $add_on_class.' fcfield-uploadvalue' . $font_icon_class,
 						'text' => $file_btns_position ? ($file_btns_position==2 ? '<span class="icon-upload"></span>' : null): '',
-						'onclick' => 'var box = jQuery(this).closest(\'li.fcfieldval_container\').find(\'.fcimg_preview_box\'); box.parent().find(\'.fc_file_uploader\').is(\':visible\') ? box.show() : box.hide(); ',
+						'onclick' => 'var box = jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_preview_box\'); box.parent().find(\'.fc_file_uploader\').is(\':visible\') ? box.show() : box.hide(); box.is(\':visible\') ? jQuery(this).removeClass(\'active btn-info\') : jQuery(this).addClass(\'active btn-info\'); ',
 						'action' => null
 					),
 					'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
