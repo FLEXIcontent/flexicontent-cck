@@ -362,7 +362,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 			else {
 				// try embed.ly
-				ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url);
+				ajax_url = "https://noembed.com/embed?url="+encodeURIComponent(url); // TODO check if needed to add more URL vars
 				ajax_type = "json";
 			}
 
@@ -477,28 +477,36 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 
 		function noembedCallback_'.$field_name_js.'(data, element_id)
-{
-	element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;    // *** element_id not set if called as callback
+		{
+			element_id = typeof element_id === "undefined" || !element_id  ?  fc_elemID_'.$field_name_js.' : element_id;    // *** element_id not set if called as callback
 
-	if (typeof data === "object" && typeof data.error == "undefined") {
-
-			var urlregex = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
-			if (data.html.match(urlregex) != null)
+			if (typeof data === "object" && typeof data.error == "undefined")
 			{
-				toggleMETArows_'.$field_name_js.'(element_id, 1);
-				var embed_url = data.html.match(urlregex)[0];
-				setEmbedData_'.$field_name_js.'("noembed:"+data.provider_name.toLowerCase(), embed_url, element_id);
-				setMetaData_'.$field_name_js.'({title: data.title, author: data.author_name, duration: data.duration, description: data.description, thumb: data.thumbnail_url}, element_id);
-				jQuery("#fcfield_sm_mssg_" + element_id).html("");
-			} else {
-				jQuery("#fcfield_sm_mssg_" + element_id).html("IFRAME SRC parameter not found in response");
+				if (1)  // TODO Possibly add more checks
+				{
+					var urlregex = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+					if (data.html.match(urlregex) != null)
+					{
+						toggleMETArows_'.$field_name_js.'(element_id, 1);
+						var embed_url = data.html.match(urlregex)[0];
+						setEmbedData_'.$field_name_js.'("noembed:"+data.provider_name.toLowerCase(), embed_url, element_id);
+						setMetaData_'.$field_name_js.'({title: data.title, author: data.author_name, duration: data.duration, description: data.description, thumb: data.thumbnail_url}, element_id);
+						jQuery("#fcfield_sm_mssg_" + element_id).html("");
+					} else {
+						jQuery("#fcfield_sm_mssg_" + element_id).html("IFRAME SRC parameter not found in response");
+					}
+				}
+				else 
+				{
+					jQuery("#fcfield_sm_mssg_" + element_id).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_URL_NOT_'.$_MEDIA_).'</div>");
+				}
 			}
-	}
-	else {
-		var errorText = typeof data === "object" ? data.error_message : data;
-		jQuery("#fcfield_sm_mssg_" + element_id).html("<span class=\"alert alert-warning fc-iblock\"><i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_SERVER_RESPONDED_WITH_ERROR', true).'</i><br/><br/>"+errorText+"</span>");
-	}
-}
+			else {
+				var errorText = typeof data === "object" ? data.error_message : data;
+				jQuery("#fcfield_sm_mssg_" + element_id).html("<span class=\"alert alert-warning fc-iblock\"><i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_SERVER_RESPONDED_WITH_ERROR', true).'</i><br/><br/>"+errorText+"</span>");
+			}
+		}
+
 
 		function setEmbedData_'.$field_name_js.'(apiType, mediaID, element_id)
 		{
