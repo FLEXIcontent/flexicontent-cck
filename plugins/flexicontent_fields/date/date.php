@@ -249,7 +249,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				if (newCalendar)
 				{
 					theInput.parent().next().remove();
-					JoomlaCalendar.init('#' + df_tag_id);
+					JoomlaCalendar.init(document.getElementById(df_tag_id));
 				}
 				else
 				{
