@@ -171,9 +171,6 @@ select {
 #flexicontent .fc-sliders-plain-outer .pane-toggler-down {
 	border: 0 solid !important;
 }
-.tab-pane.active table {
-	width: auto;
-}
 .pane-sliders .panel {
 	margin-bottom: 3px;
 }
