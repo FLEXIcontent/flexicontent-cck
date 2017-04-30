@@ -146,6 +146,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$file_btns_position = (int) $field->parameters->get('file_btns_position', 0);
 
 
+		// Intro / Full mode
+		if ( $image_source == -1 )
+		{
+			$field->html = $use_ingroup ?
+				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use intro/full images, please disable use in group</div>') :
+				'_INTRO_FULL_IMAGES_HTML_';
+			return;
+		}
+
+
 		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
 		static $mm_mode_common_js_added = false;
 		if ( $image_source == -2 && !$mm_mode_common_js_added )
@@ -268,17 +278,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid=%s_existingname&amp;thumb_w='.$preview_thumb_w.'&amp;thumb_h='.$preview_thumb_h.'&amp;autoassign='.$autoassign
 				.'&amp;'.JSession::getFormToken().'=1';
 
-		// Intro / Full mode
-		if ( $image_source == -1 )
-		{
-			$field->html = $use_ingroup ?
-				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use intro/full images, please disable use in group</div>') :
-				'_INTRO_FULL_IMAGES_HTML_';
-			return;
-		}
-		
 		// Media manager mode
-		else if ( $image_source == -2 )
+		if ( $image_source == -2 )
 		{
 			//$start_microtime = microtime(true);
 			
@@ -297,7 +298,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			//$diff = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//echo sprintf('<br/>-- [Media manager field creation : %.3f s] ', $diff/1000000);
-			
 			return;*/
 		}
 		

@@ -44,7 +44,8 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// initialise property
-		if ( empty($field->value[0]) ) {
+		if ( empty($field->value[0]) )
+		{
 			$field->value[0] = '';
 		}
 		
@@ -60,7 +61,15 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		$value = unserialize($field->value[0]);
+		$value = reset($field->value);
+
+		// Compatibility for unserialized values or for NULL values in a field group (for fields that support this)
+		if ( !is_array($value) )
+		{
+			$v = !empty($value) ? @unserialize($value) : false;
+			$value = ( $v !== false || $v === 'b:0;' ) ? $v : array();
+		}
+
 		foreach ($mod_params as $mod_param)
 		{
 			if ( !strlen($mod_param) ) continue;
@@ -73,11 +82,11 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 				;
 			$n++;
 		}
-		
+
 		$field->html = '<div>'. implode('<br/', $field->html) .'</div>';
 	}
 
-	
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{

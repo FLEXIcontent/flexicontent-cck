@@ -68,8 +68,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
-		
-		
+		$link_source = (int) $field->parameters->get('link_source', 0);
+
+
 		// ***
 		// URL
 		// ***
@@ -140,7 +141,18 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
+
+		// Joomla article links mode
+		if ( $link_source == -1 )
+		{
+			$field->html = $use_ingroup ?
+				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use Joomla article links, please disable use in group</div>') :
+				'_JOOMLA_ARTICLE_LINKS_HTML_';
+			return;
+		}
+
+
 		$js = "";
 		$css = "";
 		
@@ -469,10 +481,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				$target_attribs = ' class="urltarget use_select2_lib" ';
 				$target_options = array(
 					(object) array('value'=>'', 'text'=>JText::_('FLEXI_DEFAULT')),
-					(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_EXTWL_BLANK')),
-					(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_EXTWL_PARENT')),
-					(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_EXTWL_SELF')),
-					(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_EXTWL_TOP'))
+					(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_EXTWL_NEW_WIN_TAB')),
+					(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_EXTWL_PARENT_FRM')),
+					(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_EXTWL_SAME_FRM_WIN_TAB')),
+					(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_EXTWL_TOP_FRM')),
+					(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_EXTWL_MODAL_POPUP_WIN'))
 				);
 				$target = '
 				<div class="'.$input_grp_class.' fc-xpended-row">
@@ -573,6 +586,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$link_source = (int) $field->parameters->get('link_source', 0);
+		$multiple = $link_source==-1 ? 1 : $multiple;
 		
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
@@ -619,7 +634,57 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		
+
+		// Joomla article links mode
+		if ( $link_source == -1 )
+		{
+			$usetitle = false;
+			$usetext = true;
+			$useclass = false;
+			$usetarget = true;
+			$useid = false;
+			$values = array();
+
+			$target_remap = array(
+				'', $default_target,
+				'0' => '_self',   // current window / frame /tab
+				'1' => '_blank',  // new window
+				'2' => '_popup',  // use onclick with window.open()
+				'3' => '_modal',  // use modal popu window
+			);
+
+			if ( $item->urls )
+			{
+				if (!is_object($item->urls))
+				{
+					try
+					{
+						$item->urls = new JRegistry($item->urls);
+					}
+					catch (Exception $e)
+					{
+						$item->urls = flexicontent_db::check_fix_JSON_column('urls', 'content', 'id', $item->id);
+					}
+				}
+				//echo "<pre>"; print_r($item->urls); echo "</pre>"; exit;
+
+				$c_arr = array('a', 'b', 'c');
+				foreach ($c_arr as $c)
+				{
+					if ($url = $item->urls->get('url'.$c, null))
+					{
+						$values[] = serialize(array(
+							'link' => $url,
+							'linktext' => $item->urls->get('url'.$c.'text', null),
+							'target' => $target_remap[$item->urls->get('target'.$c, 0)]
+						));
+					}
+				}
+				//echo "<pre>"; print_r($values); echo "</pre>"; exit;
+			}
+		}
+
+
 		// Check for no values and no default value, and return empty display
 		if ( empty($values) )
 		{
