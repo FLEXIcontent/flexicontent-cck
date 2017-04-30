@@ -1322,9 +1322,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 		width: 100% !important;
 	}
 }
-.container_fcfield.fcdualline {
-	width: auto !important;
-}
 .fcclear,
 #flexicontent .clear {
 	border: 0 !important;

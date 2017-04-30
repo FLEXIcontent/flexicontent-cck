@@ -834,6 +834,7 @@ if ($this->row->type_id) {
 			<?php
 			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			$row_k = 0;
+
 			foreach ($this->fields as $field)
 			{
 				if (
@@ -848,24 +849,49 @@ if ($this->row->type_id) {
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 				
 				$not_in_tabs = "";
-				if ($field->field_type=='groupmarker') {
+				if ($field->field_type=='groupmarker')
+				{
 					echo $field->html;
 					continue;
-				} else if ($field->field_type=='coreprops') {
+				}
+
+
+				else if ($field->field_type=='coreprops')
+				{
 					// not used in backend (yet?)
 					continue;
-				} else if ($field->field_type=='maintext') {
+				}
+
+
+				else if ($field->field_type=='maintext')
+				{
 					// placed in separate TAB
 					continue;
 				}
-				
-				if ($field->field_type=='image' && $field->parameters->get('image_source')==-1)
+
+
+				else if ($field->field_type=='image')
 				{
-					$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning fc-small fc-iblock">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
-					unset($FC_jfields_html['images']);
-					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
+					if ($field->parameters->get('image_source')==-1)
+					{
+						$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning fc-small fc-iblock">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
+						unset($FC_jfields_html['images']);
+						$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
+					}
 				}
-				
+
+
+				else if ($field->field_type=='extendedweblink')
+				{
+					if ($field->parameters->get('link_source')==-1)
+					{
+						$replace_txt = !empty($FC_jfields_html['urls']) ? $FC_jfields_html['urls'] : '<span class="alert alert-warning">'.JText::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION').'</span>';
+						unset($FC_jfields_html['urls']);
+						$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
+					}
+				}
+
+
 				// Decide label classes, tooltip, etc
 				$lbl_class = 'label pull-left label-fcinner label-toplevel';
 				$lbl_title = '';
@@ -1242,8 +1268,8 @@ if ($this->row->type_id) {
 	foreach ($fieldSets as $name => $fieldSet) :
 		if ( $name=='themes' || $name=='params-seoconf' || $name=='images' ||  $name=='urls' || substr($name, 0, 7) == "params-") continue;
 
-		$label = JText::_('COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL');
-		if ( $label=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = JText::_('COM_CONTENT_'.$name.'_FIELDSET_LABEL');
+		$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+		if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
 		$icon_class = $name == 'metafb' ? "icon-users" : 'icon-eye-open';
 		//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 		//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
@@ -1323,8 +1349,23 @@ if ($this->row->type_id) {
 if ( count($FC_jfields_html) ) : ?>
 	
 	<!-- Joomla images/urls tab -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla">
-		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_COMPATIBILITY'); ?> </h3>
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
+		<?php
+			if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
+				$fsetname = 'COM_CONTENT_IMAGES_AND_URLS';
+				$fseticon = 'icon-pencil-2';
+			} else if (isset($FC_jfields_html['images'])) {
+				$fsetname = 'FLEXI_IMAGES';
+				$fseticon = 'icon-images';
+			} else if (isset($FC_jfields_html['urls'])) {
+				$fsetname = 'FLEXI_LINKS';
+				$fseticon = 'icon-link';
+			} else {
+				$fsetname = 'FLEXI_COMPATIBILITY';
+				$fseticon = 'icon-pencil-2';
+			}
+		?>
+		<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
 		
 		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
 		<fieldset class="flexi_params fc_tabset_inner">

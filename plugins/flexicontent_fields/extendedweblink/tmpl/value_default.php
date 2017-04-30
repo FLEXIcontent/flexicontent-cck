@@ -32,12 +32,23 @@ foreach ($values as $value)
 	$hits     = (int) @ $value['hits'];
 	
 	$link_params  = $title  ? ' title="'.$title.'"'   : '';
-	$link_params .= $class  ? ' class="'.$class.'"'   : '';
 	$link_params .= $id     ? ' id="'   .$id.'"'      : '';
-	$link_params .= $target ? ' target="'.$target.'"' : '';
+	if ($target == '_popup')
+	{
+		$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
+	}
+	else if ($target == '_modal')
+	{
+		$link_params .= ' onclick="window.open(this.href, \'targetWindow\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=600\'); return false;" ';
+	}
+	else
+	{
+		$link_params .= $target ? ' target="'.$target.'"' : '';
+	}
+	$link_params .= $class  ? ' class="'.$class.'"'   : '';
 	$link_params .= $rel_nofollow;
 	
-	if ( $field->parameters->get( 'use_direct_link', 0 ) )
+	if ( $field->parameters->get('use_direct_link', 0) || $field->parameters->get('link_source', 0) ==-1 )
 		// Direct access to the web-link, hits counting not possible
 		$href = $value['link'];
 	else 

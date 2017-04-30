@@ -71,69 +71,74 @@
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
-			<field name="" type="separator" default="FLEXI_EXTWL_LINK" level="level2" />
-			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="link_source" type="multilist" subtype="list" default="0" toggle_related="1" label="FLEXI_EXTWL_LINK_SRC_MODE" description="FLEXI_EXTWL_LINK_SRC_MODE_DESC">
+				<option value="-1" show_list="" hide_list="not_jurls">FLEXI_EXTWL_JOOMLA_ARTICLE_LINKS</option>
+				<option value="0"  show_list="not_jurls" hide_list="">FLEXI_FIELD_EXTENDED_WEBLINK</option>
+			</field>
 
-			<!--field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" /-->
+			<field name="" type="separator" default="FLEXI_EXTWL_LINK" level="level2" depend_class="not_jurls" />
+			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" depend_class="not_jurls" />
 
-			<field name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level2" />
-			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<!--field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" depend_class="not_jurls" /-->
+
+			<field name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level2" depend_class="not_jurls" />
+			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
 				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="hiddefield-mode" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="hiddefield-mode" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_EXTWL_URLLINK_TEXT" level="level2" />
-			<field name="use_text" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLLINK_TEXT" level="level2" depend_class="not_jurls" />
+			<field name="use_text" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0" show_list="" hide_list="hiddefield-mode2">FLEXI_NO</option>
 				<option value="1" show_list="hiddefield-mode2" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_text" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="hiddefield-mode2" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="text_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="hiddefield-mode2" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_text" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode2" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="text_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode2" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_EXTWL_URLCLASS" level="level2" />
-			<field name="use_class" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLCLASS" level="level2" depend_class="not_jurls" />
+			<field name="use_class" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0" show_list="" hide_list="hiddefield-mode3,hiddefield-mode4">FLEXI_NO</option>
 				<option value="1" show_list="hiddefield-mode3" hide_list="hiddefield-mode4">FLEXI_YES</option>
 				<option value="2" show_list="hiddefield-mode3,hiddefield-mode4" hide_list="">FLEXI_YES_AS_SELECT</option>
 			</field>
-			<field name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="hiddefield-mode3" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="hiddefield-mode3" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode3" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode3" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="class_choices" type="textarea" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="hiddefield-mode4" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
+			<field name="class_choices" type="textarea" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="not_jurls hiddefield-mode4" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
 
-			<field name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" />
-			<field name="use_id" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" depend_class="not_jurls" />
+			<field name="use_id" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0" show_list="" hide_list="hiddefield-mode5">FLEXI_NO</option>
 				<option value="1" show_list="hiddefield-mode5" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="default_id" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="hiddefield-mode5" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="id_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="hiddefield-mode5" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			<field name="default_id" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" depend_class="not_jurls hiddefield-mode5" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="id_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" depend_class="not_jurls hiddefield-mode5" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_EXTWL_URLTARGET" level="level2" />
-			<field name="use_target" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLTARGET" level="level2" depend_class="not_jurls" />
+			<field name="use_target" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_HITS" level="level2" />
-			<field name="use_hits" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_HITS" level="level2" depend_class="not_jurls" />
+			<field name="use_hits" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -168,10 +173,11 @@
 			
 			<field name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET_DEFAULT" description="FLEXI_EXTWL_URLTARGET_DEFAULT_DESC" >
 				<option value="">FLEXI_EXTWL_NOTARGET</option>
-				<option value="_blank">FLEXI_EXTWL_BLANK</option>
-				<option value="_parent">FLEXI_EXTWL_PARENT</option>
-				<option value="_self">FLEXI_EXTWL_SELF</option>
-				<option value="_top">FLEXI_EXTWL_TOP</option>
+				<option value="_blank">FLEXI_EXTWL_NEW_WIN_TAB</option>
+				<option value="_parent">FLEXI_EXTWL_PARENT_FRM</option>
+				<option value="_self">FLEXI_EXTWL_SAME_FRM_WIN_TAB</option>
+				<option value="_top">FLEXI_EXTWL_TOP_FRM</option>
+				<option value="_modal">FLEXI_EXTWL_MODAL_POPUP_WIN</option>
 			</field>
 			<field name="use_direct_link" type="radio" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>

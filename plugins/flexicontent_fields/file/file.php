@@ -95,31 +95,39 @@ class plgFlexicontent_fieldsFile extends FCField
 		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $flexiparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
-		
-		// Load file data
-		if ( !$field->value ) {
-			// Field value empty
+
+		// Empty field value
+		if ( !$field->value )
+		{
 			$files_data = array();
 			$form_data = array();
 			$field->value = array();
 		}
-		else {
+
+		// Non empty field value
+		else
+		{
 			$file_ids  = array();
 			$form_data = array();
 			
-			// Check if reloading user data after form validation error
+			// Check if reloading user data after form reload (e.g. due to form validation error)
 			$v = reset($field->value);
 			if (is_array($v) && isset($v['file-id']))
 			{
-				foreach($field->value as $v) {
+				foreach($field->value as $v)
+				{
+					if (!isset($v['secure'])) $v['secure'] = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
+					if (!isset($v['stamp']))  $v['stamp']  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
 					$file_ids[] = $v['file-id'];
 					$form_data[$v['file-id']] = $v;
 				}
-			} else {
+			}
+			else
+			{
 				$file_ids = $field->value;
 			}
 			
-			// Get data for given file ids
+			// Get file data for given file ids
 			$files_data = $this->getFileData( $file_ids, $published=false );
 			
 			// Do not skip values if in fieldgroup
@@ -143,8 +151,8 @@ class plgFlexicontent_fieldsFile extends FCField
 			$files_data[0] = (object)array(
 				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
 				'url'=>'',
-				'secure' => (int) $field->parameters->get('iform_dir_default', 1),
-				'stamp' => (int) $field->parameters->get('iform_stamp_default', 1),
+				'secure' => (!$iform_dir  ? 1 : (int) $field->parameters->get('iform_dir_default', 1)),
+				'stamp' => (!$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1)),
 				'ext'=>'', 'published'=>1,
 				'language' => $field->parameters->get('iform_lang_default', '*'),
 				'access' => (int) $field->parameters->get('iform_access_default', 1),
@@ -890,8 +898,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					$Fobj->return_url     = null;
 					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
 					$Fobj->file_filter_re = preg_quote($filename);
-					$Fobj->secure = 1;
-					$Fobj->stamp  = 1;
+					$Fobj->secure = (int) $field->parameters->get('iform_dir_default', 1);
+					$Fobj->stamp  = (int) $field->parameters->get('iform_stamp_default', 1);
 					$Fobj->keep   = 1;
 
 					$upload_err = null;
@@ -902,7 +910,8 @@ class plgFlexicontent_fieldsFile extends FCField
 			}
 			
 			// Using inline property editing
-			else {
+			else
+			{
 	    	$file_id = isset($v['file-id']) ? (int) $v['file-id'] : $v;
 	    	$file_id = is_numeric($file_id) ? (int) $file_id : 0;  // if $v is not an array
 				

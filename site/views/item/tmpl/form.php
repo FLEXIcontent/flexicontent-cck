@@ -279,6 +279,7 @@ if ( $this->params->get('use_jimages_fe', $show_jui) || $this->params->get('use_
 	$fields_grps_compatibility = array();
 	if ( $this->params->get('use_jimages_fe', $show_jui) )  $fields_grps_compatibility[] = 'images';
 	if ( $this->params->get('use_jurls_fe', $show_jui) )    $fields_grps_compatibility[] = 'urls';
+
 	foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
 		
 		ob_start(); ?>
@@ -616,25 +617,26 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 	
 	<?php if ( $this->perms['canpublish'] ) : // Display state selection field to the user that can publish ?>
 
-		<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" id="container_fcfield_10" style="margin-right:4% !important;" >
+		<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state" id="container_fcfield_10">
 			<?php echo $this->lists['state']; ?>
 			<?php //echo $this->form->getInput('state'); ?>
 			<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_STATE_CHANGE_WARNING', 1, 1); ?>">
 				<?php echo $infoimage; ?>
 			</span>
 		</div>
-		
+		<div class="fcclear"></div>
+
 		<?php	if ( $this->params->get('use_versioning', 1) && $this->params->get('allow_unapproved_latest_version', 0) ) : /* PARAMETER MISSING currently disabled */ ?>
 			<?php
 				//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-				$label_tooltip = 'class="'.$tip_class.' label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
+				$label_tooltip = 'class="'.$tip_class.' label label-info" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 			?>
 			<span class="label-fcouter" id="jform_vstate-lbl-outer">
 				<label id="jform_vstate-lbl" data-for="jform_vstate" <?php echo $label_tooltip; ?> >
 					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
 				</label>
 			</span>
-			<div class="container_fcfield container_fcfield_name_vstate fcdualline">
+			<div class="container_fcfield container_fcfield_name_vstate">
 				<?php echo $this->lists['vstate']; ?>
 			</div>
 		<?php	else : ?>
@@ -652,6 +654,7 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 			<input type="hidden" id="state" name="jform[state]" value="<?php echo !$isnew ? $this->item->state : -4; ?>" />
 			<input type="hidden" id="vstate" name="jform[vstate]" value="<?php echo $item_vstate; ?>" />
 		</div>
+		<div class="fcclear"></div>
 
 	<?php endif; ?>
 <?php $captured['state'] = ob_get_clean(); endif;
@@ -1266,9 +1269,11 @@ if ($this->fields && $typeid) :
 	<div class="fc_edit_container_full">
 		
 		<?php
+
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 		$row_k = 0;
+
 		foreach ($this->fields as $field_name => $field)
 		{
 			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) )
@@ -1291,12 +1296,20 @@ if ($this->fields && $typeid) :
 			
 			// check to SKIP (hide) field e.g. description field ('maintext' field type), alias field etc
 			if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
-			
+
+
 			$not_in_tabs = "";
-			if ($field->field_type=='groupmarker') {
+
+
+			if ($field->field_type=='groupmarker')
+			{
 				echo $field->html;
 				continue;
-			} else if ($field->field_type=='coreprops') {
+			}
+
+
+			else if ($field->field_type=='coreprops')
+			{
 				$props_type = $field->parameters->get('props_type');
 				if ( isset($tab_fields['fman'][$props_type]) ) {
 					if ( !isset($captured[ $props_type ]) ) continue;
@@ -1305,34 +1318,58 @@ if ($this->fields && $typeid) :
 				}
 				continue;
 			}
-			
-			if ($field->field_type=='image' && $field->parameters->get('image_source')==-1)
+
+
+			else if ($field->field_type=='image')
 			{
-				$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
-				unset($FC_jfields_html['images']);
-				$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
+				if ($field->parameters->get('image_source')==-1)
+				{
+					$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
+					unset($FC_jfields_html['images']);
+					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
+				}
 			}
-			
+
+
+			else if ($field->field_type=='extendedweblink')
+			{
+				if ($field->parameters->get('link_source')==-1)
+				{
+					$replace_txt = !empty($FC_jfields_html['urls']) ? $FC_jfields_html['urls'] : '<span class="alert alert-warning">'.JText::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION').'</span>';
+					unset($FC_jfields_html['urls']);
+					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
+				}
+			}
+
+
 			// Check if 'Description' field will NOT be placed via fields manager placement/ordering,
 			// but instead it will be inside a custom TAB or inside the 'Description' TAB (default)
-			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) )
+			else if ( $field->field_type=='maintext')
 			{
-				ob_start();
+				if (isset($all_tab_fields['text']) )
+				{
+					ob_start();
+				}
 			}
-			
+
+
 			// Decide label classes, tooltip, etc
 			$lbl_class = 'label';
 			$lbl_title = '';
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;
-			if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
+			if ( $field->description && ($edithelp==1 || $edithelp==2) )
+			{
 				 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon ' : ' ') .$tip_class;
 				 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $field->description, 0, 1);
 			}
+
+
 			// field is required
 			$required = $field->parameters->get('required', 0 );
-			if ($required)  $lbl_class .= ' required';
-			
+			$lbl_class .= $required ? ' required' : '';
+
+
 			// Some fields may force a container width ?
 			$display_label_form = $field->parameters->get('display_label_form', 1);
 			$row_k = 1 - $row_k;
@@ -1665,9 +1702,23 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// JOOMLA IMAGE/URLS TAB
 	// *********************
 	if ( count($FC_jfields_html) ) : ?>
-
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla">
-			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_COMPATIBILITY'); ?> </h3>
+		<?php
+			if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
+				$fsetname = 'COM_CONTENT_IMAGES_AND_URLS';
+				$fseticon = 'icon-pencil-2';
+			} else if (isset($FC_jfields_html['images'])) {
+				$fsetname = 'FLEXI_IMAGES';
+				$fseticon = 'icon-images';
+			} else if (isset($FC_jfields_html['urls'])) {
+				$fsetname = 'FLEXI_LINKS';
+				$fseticon = 'icon-link';
+			} else {
+				$fsetname = 'FLEXI_COMPATIBILITY';
+				$fseticon = 'icon-pencil-2';
+			}
+		?>
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
+			<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
 			
 			<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
 			<fieldset class="flexi_params fc_tabset_inner">
