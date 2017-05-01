@@ -110,7 +110,7 @@ $this->document->addScriptDeclaration($js);
 				if ( substr($fsname, 0, $prefix_len)!='customize_field-' ) continue;
 				
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
-				//echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
+				//echo JHtml::_('sliders.panel', JText::_($label), $fsname.'-options');
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
 					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
@@ -143,7 +143,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="tabbertab" id="<?php echo $fsname; ?>-options" data-icon-class="<?php echo isset($fieldSet->icon_class) ? $fieldSet->icon_class : 'icon-pencil';?>" >
 			<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
 <?php
-			//echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
+			//echo JHtml::_('sliders.panel', JText::_($label), $fsname.'-options');
 			if (isset($fieldSet->description) && trim($fieldSet->description)) :
 				echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 			endif;

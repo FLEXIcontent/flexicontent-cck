@@ -97,19 +97,21 @@
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 
+			<field name="use_jslib" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="not_using_jslib" hide_list="">FLEXI_NO</option>
+				<option value="2" show_list="" hide_list="not_using_jslib">prettyCheckable</option>
+			</field>
 			<field name="form_vals_display" type="hidden" default="" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_PROMPT" description="" depend_class="custom_placeholder" level="level3" />
 			<field name="usefirstoption" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ADD_PROMPT" description="FLEXI_FIELD_ADD_PROMPT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="use_prompt">FLEXI_NO</option>
 				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_PROMPT_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_PROMPT_TEXT_DESC" />
-			<field name="size" type="hidden" default="" size="" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			<field name="use_jslib" type="radio" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="2">prettyCheckable</option>
-			</field>
 
-			
+			<field name="size" type="hidden" default="" size="" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />

@@ -1025,12 +1025,14 @@ class ParentClassItem extends JModelAdmin
 		// ****************************************************************************
 		// Load item data into the form and restore the changes done above to item data
 		// ****************************************************************************
-		$form = $this->loadForm('com_flexicontent.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
+		$context = 'com_content.article'; //'com_flexicontent.'.$this->getName();
+		$form = $this->loadForm($context, $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form))
+		{
 			return false;
 		}
 		$form->option = $this->option;
-		$form->context = $this->getName();
+		$form->context = $context;
 		
 		unset($this->_item->cid);
 		
