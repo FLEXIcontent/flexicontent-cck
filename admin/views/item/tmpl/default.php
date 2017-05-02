@@ -997,6 +997,48 @@ if ($this->row->type_id) {
 <?php	endif; ?>
 
 
+	<?php
+	//echo "<pre>"; print_r(array_keys($this->form->getFieldsets('attribs'))); echo "</pre>";
+	//echo "<pre>"; print_r(array_keys($this->form->getFieldsets())); echo "</pre>";
+
+	$fieldSets = $this->form->getFieldsets();
+	foreach ($fieldSets as $name => $fieldSet) :
+		if (substr($name, 0, 7) != 'fields-') continue;
+
+		$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+		if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
+
+		$icon_class = 'icon-pencil-2';
+		//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
+		//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
+	?>
+	<!-- CUSTOM parameters TABs -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+		
+		<div class="fc_tabset_inner">
+			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+				
+				<?php if ($field->hidden): ?>
+					<span style="display:none !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else: ?>
+					<fieldset class="panelform">
+						<?php echo ($field->label ? '
+							<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
+							<div class="container_fcfield">'.$field->input.'</div>
+						' : $field->input); ?>
+					</fieldset>
+				<?php endif; ?>
+				
+			<?php endforeach; ?>
+		</div>
+		
+	</div> <!-- end tab -->
+	
+	<?php endforeach; ?>
+
 
 	<!-- Assignment tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-tree-2">
@@ -1264,13 +1306,22 @@ if ($this->row->type_id) {
 
 
 	<?php
-	$fieldSets = $this->form->getFieldsets('attribs');
+	//echo "<pre>"; print_r(array_keys($this->form->getFieldsets('attribs'))); echo "</pre>";
+	//echo "<pre>"; print_r(array_keys($this->form->getFieldsets())); echo "</pre>";
+
+	$fieldSets = $this->form->getFieldsets();
 	foreach ($fieldSets as $name => $fieldSet) :
-		if ( $name=='themes' || $name=='params-seoconf' || $name=='images' ||  $name=='urls' || substr($name, 0, 7) == "params-") continue;
+		if ($name=='themes' || $name=='images' || $name=='urls' || substr($name, 0, 7) == 'params-' || substr($name, 0, 7) == 'fields-' || $name=='item_associations') continue;
 
 		$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
 		if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
-		$icon_class = $name == 'metafb' ? "icon-users" : 'icon-eye-open';
+
+		if ($name == 'metafb')
+			$icon_class = 'icon-users';
+		//else if (substr($name, 0, 7) == 'fields-')
+		//	$icon_class = 'icon-pencil-2';
+		else
+			$icon_class = '';
 		//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 		//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
 	?>
@@ -1312,7 +1363,7 @@ if ($this->row->type_id) {
 			$fieldSets = $this->form->getFieldsets('attribs');
 			foreach ($fieldSets as $name => $fieldSet) :
 			
-				if ( $name=='themes' || $name=='params-seoconf'  || $name=='images' ||  $name=='urls' || substr($name, 0, 7) != "params-") continue;
+				if (substr($name, 0, 7) != 'params-') continue;
 				
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');

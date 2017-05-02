@@ -33,9 +33,6 @@ $submit_redirect_url_fe = $this->params->get('submit_redirect_url_fe');
 $isredirected_after_submit = $newly_submitted_item && $submit_redirect_url_fe;
 $disable_langs = $this->params->get('disable_languages_fe', array());
 
-// Parameter configured to be displayed
-$fieldSets = $this->form->getFieldsets('attribs');
-		
 // J2.5+ requires Edit State privilege while J1.5 requires Edit privilege
 $publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
 
@@ -1099,8 +1096,11 @@ if ( $typeid && $this->params->get('useseoconf_fe', 0) ) : ob_start(); // seocon
 <?php $captured['seoconf'] = ob_get_clean(); endif;
 
 
+// Parameter configured to be displayed
 $has_custom_params = false;
-foreach ($fieldSets as $name => $fieldSet) {
+$fieldSets = $this->form->getFieldsets('attribs');
+foreach ($fieldSets as $name => $fieldSet)
+{
 	if ($name=='themes' || $name=='params-basic' || $name=='params-advanced' || $name=='params-seoconf') continue;
 	$has_custom_params = true;
 	break;
@@ -1553,9 +1553,9 @@ if ( count($tab_fields['above']) ) : ?>
 
 
 
-// *****************
-// MAIN TABSET START
-// *****************
+// ***
+// *** MAIN TABSET START
+// ***
 array_push($tabSetStack, $tabSetCnt);
 $tabSetCnt = ++$tabSetMax;
 $tabCnt[$tabSetCnt] = 0;
@@ -1566,9 +1566,9 @@ $tabCnt[$tabSetCnt] = 0;
 
 
 <?php
-// ***************
-// DESCRIPTION TAB
-// ***************
+// ***
+// *** DESCRIPTION TAB
+// ***
 if ( count($tab_fields['tab01']) ) :
 	$tab_lbl = isset($tab_titles['tab01']) ? $tab_titles['tab01'] : JText::_( 'FLEXI_DESCRIPTION' );
 	$tab_ico = isset($tab_icocss['tab01']) ? $tab_icocss['tab01'] : 'icon-file-2';
@@ -1586,11 +1586,11 @@ if ( count($tab_fields['tab01']) ) :
 
 
 
-// *********
-// BASIC TAB
-// *********
+// ***
+// *** CUSTOM FIELDS TAB (via TYPE)
+// ***
 if ( count($tab_fields['tab02']) ) :
-	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : JText::_( 'FLEXI_BASIC' );
+	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : JText::_( 'FLEXI_FIELDS' ); // __TYPE_NAME__
 	$tab_ico = isset($tab_icocss['tab02']) ? $tab_icocss['tab02'] : 'icon-tree-2';
 	?>
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
@@ -1605,12 +1605,50 @@ if ( count($tab_fields['tab02']) ) :
 <?php endif;
 
 
+$fieldSets = $this->form->getFieldsets();
+foreach ($fieldSets as $name => $fieldSet) :
+	if (substr($name, 0, 7) != 'fields-') continue;
 
-// *****************
-// CUSTOM FIELDS TAB
-// *****************
+	$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+	if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
+
+	$icon_class = 'icon-pencil-2';
+	//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
+	//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
+?>
+<!-- CUSTOM parameters TABs -->
+<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+	<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+	
+	<div class="fc_tabset_inner">
+		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+			
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+				<fieldset class="panelform">
+					<?php echo ($field->label ? '
+						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
+						<div class="container_fcfield">'.$field->input.'</div>
+					' : $field->input); ?>
+				</fieldset>
+			<?php endif; ?>
+			
+		<?php endforeach; ?>
+	</div>
+	
+</div> <!-- end tab -->
+
+<?php endforeach;
+
+
+// ***
+// *** ASSIGNMENTS TAB (Multi-category assignments  -- and --  Item language associations)
+// ***
 if ( count($tab_fields['tab03']) ) :
-	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_FIELDS' );
+	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_ASSIGNMENTS' );
 	$tab_ico = isset($tab_icocss['tab03']) ? $tab_icocss['tab03'] : 'icon-signup';
 	?>
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
@@ -1625,14 +1663,60 @@ if ( count($tab_fields['tab03']) ) :
 <?php endif;
 
 
+//echo "<pre>"; print_r(array_keys($this->form->getFieldsets('attribs'))); echo "</pre>";
+//echo "<pre>"; print_r(array_keys($this->form->getFieldsets())); echo "</pre>";
+
+$fieldSets = $this->form->getFieldsets();
+foreach ($fieldSets as $name => $fieldSet) :
+	if ($name=='themes' || $name=='images' || $name=='urls' || substr($name, 0, 7) == 'params-' || substr($name, 0, 7) == 'fields-' || $name=='item_associations') continue;
+
+	$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+	if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
+
+	if ($name == 'metafb')
+		$icon_class = 'icon-users';
+	//else if (substr($name, 0, 7) == 'fields-')
+	//	$icon_class = 'icon-pencil-2';
+	else
+		$icon_class = '';
+	//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
+	//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
+?>
+<!-- CUSTOM parameters TABs -->
+<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+	<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+	
+	<div class="fc_tabset_inner">
+		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+			
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+				<fieldset class="panelform">
+					<?php echo ($field->label ? '
+						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
+						<div class="container_fcfield">'.$field->input.'</div>
+					' : $field->input); ?>
+				</fieldset>
+			<?php endif; ?>
+			
+		<?php endforeach; ?>
+	</div>
+	
+</div> <!-- end tab -->
+
+<?php endforeach;
+
 
 if ($typeid) : // hide items parameters (standard, extended, template) if content type is not selected ?>
 
 	<?php
 	
-	// **************
-	// PUBLISHING TAB
-	// **************
+	// ***
+	// *** PUBLISHING TAB
+	// ***
 	// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
 	if ( count($tab_fields['tab04']) ) : ?>
 		<?php
@@ -1655,9 +1739,9 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	
 	
 	
-	// **************
-	// META / SEO TAB
-	// **************
+	// ***
+	// *** META / SEO TAB
+	// ***
 	if ( count($tab_fields['tab05']) ) : ?>
 		<?php
 		$tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' );
@@ -1677,9 +1761,9 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	
 	
 
-	// *************************
-	// DISPLAYING PARAMETERS TAB
-	// *************************
+	// ***
+	// *** DISPLAYING PARAMETERS TAB
+	// ***
 	if ( count($tab_fields['tab06']) ) : ?>
 		<?php
 		$tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' );
@@ -1698,9 +1782,9 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 
 
 
-	// *********************
-	// JOOMLA IMAGE/URLS TAB
-	// *********************
+	// ***
+	// *** JOOMLA IMAGE/URLS TAB
+	// ***
 	if ( count($FC_jfields_html) ) : ?>
 		<?php
 			if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
@@ -1732,9 +1816,9 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 
 
 
-	// ************
-	// TEMPLATE TAB
-	// ************
+	// ***
+	// *** TEMPLATE TAB
+	// ***
 	if ( count($tab_fields['tab07']) ) : ?>
 		<?php
 		$tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' );
@@ -1760,9 +1844,9 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 
 
 <?php
-// ***************
-// MAIN TABSET END
-// ***************
+// ***
+// *** MAIN TABSET END
+// ***
 ?>
 </div> <!-- end of tab set -->
 <?php $tabSetCnt = array_pop($tabSetStack); ?>
