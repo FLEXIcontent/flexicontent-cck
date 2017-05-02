@@ -453,7 +453,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		
 		
 		// Trigger the onContentAfterSave event.
-		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
+		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew, $data));
 
 		// Rebuild the path for the category:
 		if (!$table->rebuildPath($table->id))

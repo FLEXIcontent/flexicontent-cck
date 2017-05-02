@@ -131,7 +131,7 @@ class ParentClassItem extends JModelAdmin
 			$curcatid = 0;
 		}
 		
-		$typeid = !$pk ? JRequest::getInt('typeid', 0) : 0;  // Set type id only for new items
+		$typeid = !$pk ? $jinput->get('typeid', 0, 'int') : 0;  // Set type id only for new items
 		$this->setId($pk, $curcatid, $typeid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
 		
 		$this->populateState();
@@ -319,6 +319,7 @@ class ParentClassItem extends JModelAdmin
 	{
 		$app     = JFactory::getApplication();
 		$cparams = $this->_cparams;
+		$jinput  = $app->input;
 		
 		// View access done is meant only for FRONTEND !!! ... force it to false
 		if ( $app->isAdmin() ) $check_view_access = false;
@@ -358,7 +359,7 @@ class ParentClassItem extends JModelAdmin
 		// --. Initialize new item, currently this succeeds always
 		else
 		{
-			$this->_typeid = JRequest::getInt('typeid', 0);  // Get this again since it might have been change since model was constructed
+			$this->_typeid = $jinput->get('typeid', 0, 'int');  // Get this again since it might have been change since model was constructed
 			$this->_initItem();
 			if ( !$app->isAdmin() )  {
 				// Load item parameters with heritage, (SUBMIT ITEM FORM)
@@ -412,10 +413,11 @@ class ParentClassItem extends JModelAdmin
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$cparams = $this->_cparams;
-		$task    = JRequest::getVar('task', false);
-		$layout  = JRequest::getVar('layout', false);
-		$view    = JRequest::getVar('view', false);
-		$option  = JRequest::getVar('option', false);
+		$jinput  = $app->input;
+		$task    = $jinput->get('task', false, 'cmd');
+		$layout  = $jinput->get('layout', false, 'cmd');
+		$view    = $jinput->get('view', false, 'cmd');
+		$option  = $jinput->get('option', false, 'cmd');
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$editjf_translations = $cparams->get('editjf_translations', 0);
 		
@@ -1666,7 +1668,9 @@ class ParentClassItem extends JModelAdmin
 		$cparams    = $this->_cparams;
 		$nullDate   = $this->_db->getNullDate();
 
+		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
+		$task = $jinput->get('task', '', 'cmd');
 		$jinput->set('isflexicontent', 'yes');
 
 		$use_versioning = $cparams->get('use_versioning', 1);
@@ -2126,16 +2130,26 @@ class ParentClassItem extends JModelAdmin
 		// ******************************************************************************************************
 		
 		// Some compatibility steps
-		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );  $db->execute(); }
-		JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+		if (!$isnew)
+		{
+			$db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );
+			$db->execute();
+		}
+		$jinput->set('view', 'article');
+		$jinput->set('option', 'com_content');
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
 		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Reverse compatibility steps
-		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );  $db->execute(); }
-		JRequest::setVar('view', $view);	  JRequest::setVar('option', 'com_flexicontent');
+		if (!$isnew)
+		{
+			$db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );
+			$db->execute();
+		}
+		$jinput->set('view', $view);
+		$jinput->set('option', $option);
 		
 		if (in_array(false, $result, true))	{ $this->setError($item->getError()); return false; }    // cancel item save
 		
@@ -2173,7 +2187,6 @@ class ParentClassItem extends JModelAdmin
 		
 		// Do not try to load fields / save field values, if applying type
 		$result = true;
-		$task = JRequest::getCmd( 'task' );
 		if ($task != 'apply_type')
 		{
 			if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -2237,17 +2250,17 @@ class ParentClassItem extends JModelAdmin
 			// Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
 			// *****************************************************************************************************
 			if ( $print_logging_info ) $start_microtime = microtime(true);
-			
+
 			// Some compatibility steps
-			JRequest::setVar('view', 'article');
-			JRequest::setVar('option', 'com_content');
-		  
-			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
-			
+			$jinput->set('view', 'article');
+			$jinput->set('option', 'com_content');
+
+			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew, $data));
+
 			// Reverse compatibility steps
-			JRequest::setVar('view', $view);
-			JRequest::setVar('option', 'com_flexicontent');
-			
+			$jinput->set('view', $view);
+			$jinput->set('option', $option);
+
 			if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		
@@ -3798,6 +3811,9 @@ class ParentClassItem extends JModelAdmin
 		$jinput     = JFactory::getApplication()->input;
 		$dispatcher = JDispatcher::getInstance();
 
+		$option = $jinput->get('option', '', 'cmd');
+		$view = $jinput->get('view', '', 'cmd');
+
 		$jinput->set('isflexicontent', 'yes');
 		static $event_failed_notice_added = false;
 		
@@ -3848,20 +3864,21 @@ class ParentClassItem extends JModelAdmin
 		if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
 		else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
 		else $jm_state = $fc_state;                                      // trashed & archive states
-		$fc_itemview = $app->isSite() ? FLEXI_ITEMVIEW : 'item';
-		
+
 		$item = new stdClass();
 		
 		// Compatibility steps (including Joomla compatible state),
 		// so that 3rd party plugins using the change state event work properly
-		JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+		$jinput->set('view', 'article');
+		$jinput->set('option', 'com_content');
 		$item->state = $jm_state;
 		
 		$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
 		
 		// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
 		// besides the event_change_state using plugin should have updated DB state value anyway
-		JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');
+		$jinput->set('view', $view);
+		$jinput->set('option', $option);
 		if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
 		
 		if (in_array(false, $result, true) && !$event_failed_notice_added)
