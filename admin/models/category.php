@@ -343,7 +343,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			else
 			{
 				// Create form object and setting the relevant xml file
-				$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
+				$jform = new JForm($this->option.'.template.category', array('control' => 'jform', 'load_data' => false));
 				$tmpl_params = $xml->asXML();
 				$jform->load($tmpl_params);
 
@@ -674,20 +674,23 @@ class FlexicontentModelCategory extends JModelAdmin
 	public function getForm($data = array(), $loadData = true)
 	{
 		// Initialise variables.
-		$extension	= $this->getState('com_flexicontent.category.extension');
+		$extension	= $this->getState($this->option.'.'.$this->getName().'.extension');
 
 		// Get the form.
-		$form = $this->loadForm('com_flexicontent.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
+		$form = $this->loadForm($this->option.'.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form))
+		{
 			return false;
 		}
 
 		// Modify the form based on Edit State access controls.
-		if (empty($data['extension'])) {
+		if (empty($data['extension']))
+		{
 			$data['extension'] = $extension;
 		}
 
-		if (!$this->canEditState((object) $data)) {
+		if (!$this->canEditState((object) $data))
+		{
 			// Disable fields for display.
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
 			$form->setFieldAttribute('published', 'disabled', 'true');
@@ -712,13 +715,13 @@ class FlexicontentModelCategory extends JModelAdmin
 	{
 		// Check the session for previously entered form data.
 		$app = JFactory::getApplication();
-		$data = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+		$data = $app->getUserState($this->option.'.edit.category.data', array());
 
 		if (empty($data)) {
 			$data = $this->getItem();
 		}
 
-		$this->preprocessData('com_flexicontent.'.$this->getName(), $data);
+		$this->preprocessData($this->option.'.'.$this->getName(), $data);
 		//$this->preprocessData('com_categories.'.$this->getName(), $data);
 		
 		return $data;
@@ -743,8 +746,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		jimport('joomla.filesystem.path');
 
 		$lang = JFactory::getLanguage();
-		$component = $this->getState('com_flexicontent.category.component');
-		$section = $this->getState('com_flexicontent.category.section');
+		$component = $this->getState($this->option.'.'.$this->getName().'.component');
+		$section = $this->getState($this->option.'.'.$this->getName().'.section');
 		$extension = JFactory::getApplication()->input->get('extension', null);
 
 		// Get the component form if it exists
@@ -845,8 +848,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		{
 			// Prime required properties.
 			if (empty($item->id)) {
-				$item->parent_id	= $this->getState('com_flexicontent.category.parent_id');
-				$item->extension	= $this->getState('com_flexicontent.category.extension');
+				$item->parent_id	= $this->getState($this->option.'.'.$this->getName().'.parent_id');
+				$item->extension	= $this->getState($this->option.'.'.$this->getName().'.extension');
 			}
 
 			// Convert the metadata field to an array.
@@ -905,30 +908,31 @@ class FlexicontentModelCategory extends JModelAdmin
 	 *
 	 * @since	1.6
 	 */
-	protected function populateState() {
+	protected function populateState()
+	{
 		$app = JFactory::getApplication('administrator');
 
-		if (!($parentId = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.parent_id'))) {
+		if (!($parentId = $app->getUserState($this->option.'.edit.category.parent_id'))) {
 			$parentId = JRequest::getInt('parent_id');
 		}
-		$this->setState('com_flexicontent.category.parent_id', $parentId);
+		$this->setState($this->option.'.'.$this->getName().'.parent_id', $parentId);
 
 		// Get id from user state
 		$pk = $this->_id;
 		$this->setState($this->getName().'.id', $pk);
 		
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
+		if (!($extension = $app->getUserState($this->option.'.edit.category.extension'))) {
 			$extension = JRequest::getCmd('extension', FLEXI_CAT_EXTENSION);
 		}
 		
-		$this->setState('com_flexicontent.category.extension', $extension);
+		$this->setState($this->option.'.'.$this->getName().'.extension', $extension);
 		$parts = explode('.',$extension);
 		
 		// extract the component name
-		$this->setState('com_flexicontent.category.component', $parts[0]);
+		$this->setState($this->option.'.'.$this->getName().'.component', $parts[0]);
 		
 		// extract the optional section name
-		$this->setState('com_flexicontent.category.section', (count($parts)>1)?$parts[1]:null);
+		$this->setState($this->option.'.'.$this->getName().'.section', (count($parts)>1)?$parts[1]:null);
 
 		// Load the parameters.
 		$params	= JComponentHelper::getParams('com_flexicontent');

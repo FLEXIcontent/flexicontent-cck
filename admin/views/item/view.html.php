@@ -111,7 +111,7 @@ class FlexicontentViewItem extends JViewLegacy
 		if ($cid) {
 			$unique_tmp_itemid = $cid;
 		} else {
-			$unique_tmp_itemid = $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
+			$unique_tmp_itemid = $app->getUserState($form->option.'.edit.item.unique_tmp_itemid');
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
 		//print_r($unique_tmp_itemid);
@@ -373,7 +373,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// this step must be done in seperate loop, placed before FIELD HTML creation
 		// **************************************************************************
 		
-		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
+		$jcustom = $app->getUserState($form->option.'.edit.item.custom');
 		foreach ($fields as $field)
 		{
 			if (!$field->iscore)
@@ -849,9 +849,9 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('current_page'	, $current_page);
 		
 		// Clear custom form data from session
-		$app->setUserState($form->option.'.edit.'.$form->context.'.custom', false);
-		$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', false);
-		$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', false);
+		$app->setUserState($form->option.'.edit.item.custom', false);
+		$app->setUserState($form->option.'.edit.item.jfdata', false);
+		$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', false);
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);

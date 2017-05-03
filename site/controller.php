@@ -421,10 +421,10 @@ class FlexicontentController extends JControllerLegacy
 					$app->enqueueMessage(JText::_('FLEXI_CAPTCHA_FAILED') .' '. JText::_('FLEXI_MUST_REFILL_SOME_FIELDS'), 'error');
 					
 					// Set POST form date into the session, so that they get reloaded
-					$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session.
-					$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session.
-					$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
-					$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+					$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session.
+					$app->setUserState($form->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session.
+					$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
+					$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 					
 					// Redirect back to the edit form
 					$this->setRedirect( $this->returnURL );
@@ -453,10 +453,10 @@ class FlexicontentController extends JControllerLegacy
 			}
 
 			// Set POST form date into the session, so that they get reloaded
-			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
-			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
-			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
-			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+			$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session
+			$app->setUserState($form->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
 			// Redirect back to the edit form
 			$this->setRedirect( $this->returnURL );
@@ -615,10 +615,10 @@ class FlexicontentController extends JControllerLegacy
 			JError::raiseWarning( 500, $msg .": " . $model->getError() );
 			
 			// Set POST form date into the session, so that they get reloaded
-			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
-			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
-			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
-			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+			$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session
+			$app->setUserState($form->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
 			// Saving has failed check-in and redirect back to the item form,
 			// Redirect back to the edit form reloading the posted data

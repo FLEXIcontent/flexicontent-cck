@@ -1027,7 +1027,7 @@ class ParentClassItem extends JModelAdmin
 		// ****************************************************************************
 		// Load item data into the form and restore the changes done above to item data
 		// ****************************************************************************
-		$context = 'com_content.article'; //'com_flexicontent.'.$this->getName();
+		$context = 'com_content.article'; //$this->option.'.'.$this->getName();
 		$form = $this->loadForm($context, $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
 		if (empty($form))
 		{
@@ -1171,20 +1171,25 @@ class ParentClassItem extends JModelAdmin
 	{
 		// Check the session for previously entered form data.
 		$app = JFactory::getApplication();
-		$data = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-		
-		// Clear form data from session ?
-		$app->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
-		
-		if (empty($data)) {
+		$data = $app->getUserState($this->option.'.edit.item.data', array());
+
+		// Clear form data from session
+		$app->setUserState($this->option.'.edit.item.data', false);
+
+		if (empty($data))
+		{
 			$data = $this->_item ? $this->_item : $this->getItem();
-		} else {
+		}
+		else
+		{
 			// Split text to introtext & fulltext
-			if ( !StringHelper::strlen(StringHelper::trim(@$data['introtext'])) && !StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) ) {
+			if ( !StringHelper::strlen(StringHelper::trim(@$data['introtext'])) && !StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )
+			{
 				$this->splitText($data);
 			}
-			
-			if ($this->_item) {
+
+			if ($this->_item)
+			{
 				if ( StringHelper::strlen(StringHelper::trim(@$data['text'])) )      $this->_item->text      = $data['text'];
 				if ( StringHelper::strlen(StringHelper::trim(@$data['introtext'])) ) $this->_item->introtext = $data['introtext'];
 				if ( StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )  $this->_item->fulltext  = $data['fulltext'];
@@ -1199,8 +1204,9 @@ class ParentClassItem extends JModelAdmin
 			$data->params = $data->params->toArray();
 		}
 
-		$this->preprocessData('com_flexicontent.'.$this->getName(), $data);
-		
+		$context = 'com_content.article';  //$this->option.'.'.$this->getName();
+		$this->preprocessData($context, $data);
+
 		return $data;
 	}
 	

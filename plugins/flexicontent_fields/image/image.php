@@ -865,11 +865,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			else if ( $image_subpath )
 			{
-				// $image_source >= 0
+				// $image_source >= 0, if 'existingname' is set then it is propably a form reload
 				$img_link = rawurlencode(
 					JURI::root(true).'/'.$dir_url
 					.($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '')
-					.($item->id  ?  '/m_' .$extra_prefix .basename($image_subpath)  :  '/original/' .$image_subpath)
+					.($item->id && empty($value['existingname'])  ?  '/m_' .$extra_prefix .basename($image_subpath)  :  '/original/' .$image_subpath)
 				);
 
 				if (isset($value['existingname']))
