@@ -1511,10 +1511,15 @@ class flexicontent_html
 				JText::script("FLEXI_EDIT", true);
 				JText::script("FLEXI_ADD", true);
 				JText::script("FLEXI_NA", true);
+				JText::script("FLEXI_PUBLISHED", true);
+				JText::script("FLEXI_UNPUBLISHED", true);
+				JText::script("FLEXI_ARCHIVED", true);
+				JText::script("FLEXI_TRASHED", true);
 				JText::script("FLEXI_REMOVE", true);
 				JText::script("FLEXI_ORDER", true);
 				JText::script("FLEXI_INDEXED_FIELD_UNUSED_COL_DISABLED", true);
 				JText::script("FLEXI_INDEXED_FIELD_VALGRP_COL_DISABLED", true);
+				JText::script("FLEXI_INDEXED_FIELD_STATE_COL_DISABLED", true);
 				JText::script('FLEXI_REQUIRED',true);
 				JText::script('FLEXI_INVALID',true);
 				JText::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);

@@ -201,6 +201,8 @@ class JFormFieldFcSortableList extends JFormField
 				($attributes->props_used ? ' data-props_used="'.$attributes->props_used.'" ' : '') .
 				($attributes->master_fieldname ? ' data-master_fieldname="'.$attributes->master_fieldname.'" ' : '') .
 				($attributes->cascaded_prop ? ' data-cascaded_prop="'.$attributes->cascaded_prop.'" ' : '') .
+				($attributes->state_fieldname ? ' data-state_fieldname="'.$attributes->state_fieldname.'" ' : '') .
+				($attributes->state_prop ? ' data-state_prop="'.$attributes->state_prop.'" ' : '') .
 				' data-value_element_id="'.$element_id.'" ';
 
 			$props_header = array();
@@ -268,6 +270,8 @@ class JFormFieldFcSortableList extends JFormField
 					<div class="fcrec_general_msg alert alert-info" style="display: none;"></div>
 					<div class="fcclear"></div>
 					<div class="fcrec_cascaded_msg alert alert-info" style="display: none;"></div>
+					<div class="fcclear"></div>
+					<div class="fcrec_state_msg alert alert-info" style="display: none;"></div>
 					'.($props_header ? '<span class="fcrecord_header"> '.implode('', $props_header).'</span>' : '').'
 					<ul id="'.$sortable_id.'" class="fcrecords fcrecords_list" '.$list_attrs.'>';
 

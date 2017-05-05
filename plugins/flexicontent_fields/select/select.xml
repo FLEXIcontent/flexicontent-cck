@@ -57,8 +57,8 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			<field name="sql_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC"
-				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comments.png"  preview_img="database_green.png" 
-				inline_tip2="value1::label1::image1.png::valgrp%%&lt;br/&gt; value2::label2::image2.png::valgrp%% ..." tip_class2="elements_list" tip_img2="comments.png" preview_img2="text_area.png" 
+				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp, ... AS state FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comments.png"  preview_img="database_green.png" 
+				inline_tip2="value1::label1::image1.png::valgrp1::state1%%&lt;br/&gt; value2::label2::image2.png::valgrp2::state2%% ..." tip_class2="elements_list" tip_img2="comments.png" preview_img2="text_area.png" 
 				class="btn-group group-fcmethod">
 				<option value="0" show_list="elements_list" hide_list="elements_sql" fcreadonly="{'field_elements':1}">FLEXI_NO</option>
 				<option value="1" show_list="elements_sql" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_YES</option>
@@ -67,10 +67,16 @@
 				default="1::Yes%% 0::No%% "
 				add_end="1" add_before="1" add_after="1" skip_initial_list="1"
 				edit_inline="0" edit_popup="1" raw_inline="0" raw_popup="1"
-				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP" props_used="1,1,0,1"
+				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP,FLEXI_STATE" props_used="1,1,0,1,1"
 				editbtns_class="elements_list" value_area_class="elements_field"
-				master_fieldname="cascade_after" cascaded_prop="3"
+				master_fieldname="cascade_after" cascaded_prop="3" state_fieldname="use_elements_state" state_prop="4"
 				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" labelclass="label-info" />
+
+			<field name="" type="separator" default="FLEXI_OPTIONAL_ELEMENT_PROPERTIES" description="FLEXI_OPTIONAL_ELEMENT_PROPERTIES_DESC" level="level3" />
+			<field name="use_elements_state" type="radio" default="0" label="FLEXI_STATE_ELEMENT_PROPERTY" description="FLEXI_STATE_ELEMENT_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD" description="FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD_DESC" level="level3" />
 			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="FLEXI_VALGRP_MASTER_FIELD" description="FLEXI_VALGRP_MASTER_FIELD_DESC" 
@@ -82,7 +88,7 @@
 			<field name="imagedir" type="hidden" default="" label="FLEXI_FIELD_IMAGE_DIR" description="FLEXI_FIELD_IMAGE_DIR_DESC" />
 			<field name="icon_size_form" type="hidden" default="" label="FLEXI_ICON_SIZE" description="" />
 			<field name="icon_color_form" type="hidden" default="" label="FLEXI_ICON_COLOR" description="" />
-			
+
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-downarrow" level="tab_open" box_type="1" />
 
 			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
@@ -99,6 +105,7 @@
 			</field>
 			<field name="form_vals_display" type="hidden" default="" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" />
 			<field name="size" type="hidden" default="" size="" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="sortable" type="hidden" default="" label="FLEXI_FIELD_ALLOW_SORTABLE" description="FLEXI_FIELD_ALLOW_SORTABLE_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMPTY_OPTION_PROMPT" description="" depend_class="custom_placeholder" level="level3" />
 			<field name="usefirstoption" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_ADD_PROMPT" description="FLEXI_FIELD_ADD_EMPTY_OPTION_DESC" depend_class="custom_placeholder" class="btn-group btn-group-yesno">

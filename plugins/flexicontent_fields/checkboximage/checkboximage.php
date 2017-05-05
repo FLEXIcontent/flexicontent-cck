@@ -22,7 +22,7 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 	var $task_callable = array('getCascadedField');
 	
 	static $field_types = array('checkboximage');
-	static $extra_props = array('image', 'valgroup');
+	static $extra_props = array('image', 'valgrp', 'state');
 	static $valueIsArr = 1;
 	static $isDropDown = 0;
 	static $promptEnabled = 0;
@@ -802,12 +802,9 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 
 				// Parse query to find column expressions used to create field's elements
 				$element_cols = FlexicontentFields::indexedField_getColsExprs($field, $item, $field_elements);
-				$and_clause = ' 0 ';
-				$valgrp = 'valgrp';
-				if ( isset($element_cols[$valgrp]) )
-				{
-					$and_clause = $element_cols[$valgrp] . ' IN ('.implode(',', $_valgrps).')';
-				}
+				$and_clause = !isset($element_cols['valgrp'])
+					? ' 0 '
+					: $element_cols['valgrp'] . ' IN ('.implode(',', $_valgrps).')';
 			}
 
 			$item_pros = true;
@@ -824,7 +821,8 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 		else  // Elements mode
 		{
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
-			if ( !is_array($elements) ) {
+			if ( !is_array($elements) )
+			{
 				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
 				$elements = array('_field_selection_prompt_' => $prompt);
@@ -836,17 +834,22 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 				$_elements = array();
 				$_valgrps = array_flip($_valgrps);
 				foreach($elements as $element)
-					if (isset($_valgrps[$element->valgroup]))  $_elements[$element->value] = $element;
+				{
+					if (isset($_valgrps[$element->valgrp]))  $_elements[$element->value] = $element;
+				}
 				$elements = $_elements;
 			}
 		}
 		
-		if (empty($elements)) {
+		if (empty($elements))
+		{
 			//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
 			$elements = array('_field_selection_prompt_' => $prompt);
 			return $elements;
-		} else {
+		}
+		else
+		{
 			$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
 			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', $display_as_select ? 1 : 0 );
 			$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
@@ -855,6 +858,24 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				$elements = array('_field_selection_prompt_' => $prompt) + $elements;
+			}
+			// Handle element states
+			$values = array_flip($field->value);
+			foreach($elements as $i => $element)
+			{
+				if (!isset($element->state) || $element->state==1) continue;
+				switch ($element->state)
+				{
+					case -2:  // Trashed
+						unset($elements[$i]);
+						break;
+					case 0:   // Unpublished
+						if (!isset($values[$element->value])) unset($elements[$i]);
+						break;
+					case 2:   // Archived
+						$element->disable = !isset($values[$element->value]) ? true : null;
+						break;
+				}
 			}
 		}
 		

@@ -52,6 +52,12 @@ foreach ($values as $value)
 		$indexes = array_flip($value);
 		foreach ($elements as $val => $element)
 		{
+			if ( isset($element->state) && $element->state < 1 )   // 0: unpublished, 1: published, 2: archived
+			{
+				if ( $is_ingroup ) $html[]	= '';
+				continue;
+			}
+
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
 			
@@ -86,7 +92,8 @@ foreach ($values as $value)
 		{
 			// Skip empty/invalid values but add empty display, if in field group
 			$element = !strlen($v) ? false : @$elements[ $v ];
-			if ( !$element ) {
+			if ( !$element || (isset($element->state) && $element->state < 1) )   // 0: unpublished, 1: published, 2: archived
+			{
 				if ( $is_ingroup ) $html[]	= '';
 				continue;
 			}

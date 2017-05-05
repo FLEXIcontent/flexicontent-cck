@@ -180,6 +180,23 @@
 			list.parent().css('height', '').show();
 		}
 
+		var state_fieldname = list.data('state_fieldname');
+		state_fieldname = state_fieldname ? jQuery('#jform_attribs_'+state_fieldname+' input:checked') : jQuery();
+		var use_elements_state = state_fieldname.length ? parseInt(state_fieldname.val()) : 0;
+
+		if (!use_elements_state)
+		{
+			list.parent().find('.fcrec_state_msg').html(Joomla.JText._('FLEXI_INDEXED_FIELD_STATE_COL_DISABLED').replace(/\\/g, '')).show();
+			list.parent().find('.fcrec_state_col').addClass('fcrec_unused');
+			list.data('use_elements_state', null);
+		}
+		else
+		{
+			list.parent().find('.fcrec_state_msg').html('').hide();
+			list.parent().find('.fcrec_state_col').removeClass('fcrec_unused');
+			list.data('use_elements_state', '1');
+		}
+
 		var master_fieldname = list.data('master_fieldname');
 		master_fieldname = master_fieldname ? jQuery('#jform_attribs_'+master_fieldname) : jQuery();
 		var master_field_id = master_fieldname.length && parseInt(master_fieldname.val()) ? parseInt(master_fieldname.val()) : 0;
@@ -249,7 +266,9 @@
 		}
 
 		var cascaded_prop = list.data('cascaded_prop');
+		var state_prop    = list.data('state_prop');
 		cascaded_prop = cascaded_prop ? parseInt(cascaded_prop) : -1;
+		state_prop    = state_prop    ? parseInt(state_prop)    : -1;
 
 		var master_elements = list.data('master_elements');
 		var master_select = '';
@@ -265,6 +284,18 @@
 				master_values[master_elements[i].value] = master_elements;
 			}
 			master_select += '</select>';
+		}
+
+		var use_elements_state = list.data('use_elements_state');
+		var state_select = '';
+		if (use_elements_state)
+		{
+			state_select = '<select class="fcrecord_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
+			state_select += '<option value="1">' + Joomla.JText._('FLEXI_PUBLISHED') + '</option>';
+			state_select += '<option value="0">' + Joomla.JText._('FLEXI_UNPUBLISHED') + '</option>';
+			state_select += '<option value="2">' + Joomla.JText._('FLEXI_ARCHIVED') + '</option>';
+			state_select += '<option value="-2">' + Joomla.JText._('FLEXI_TRASHED') + '</option>';
+			state_select += '</select>';
 		}
 
 		record_value = typeof record_value !== 'undefined' ? record_value : '';
@@ -291,12 +322,10 @@
 			if (key > props_used - 1) return;
 			value = key > props.length - 1 ?
 				'' :  props[key];
-			var _unused = !parseInt(props_used[key]) || (key==cascaded_prop && !master_elements);
+			var _unused = !parseInt(props_used[key]) || (key==cascaded_prop && !master_elements) || (key==state_prop && !use_elements_state);
 			var _width = 'width:'+prop_widths[key]+'!important';
 			
-			if (key!=cascaded_prop || !master_select)
-				props_html += '<input type="text" value="'+value+'" class="fcrecord_prop '+(_unused ? ' fcrec_unused' : '')+'" onblur="fcrecord_store_values(jQuery(this).closest(\'ul\'));" style="'+_width+'" '+(_unused ? _unused_col : '')+'/>';
-			else
+			if (key==cascaded_prop && master_select)
 			{
 				var select = master_select.replace('__width__', _width);
 				select = value.length && !master_values.hasOwnProperty(value) ?
@@ -304,6 +333,14 @@
 					select = select.replace('__current_value__', '') ;
 				props_html += select;
 			}
+			else if (key==state_prop && state_select)
+			{
+				var select = state_select.replace('__width__', _width);
+				if (value.length) select = state_select.replace('value="'+value+'"', 'value="'+value+'" selected="selected"');
+				props_html += select;
+			}
+			else
+				props_html += '<input type="text" value="'+value+'" class="fcrecord_prop '+(_unused ? ' fcrec_unused' : '')+'" onblur="fcrecord_store_values(jQuery(this).closest(\'ul\'));" style="'+_width+'" '+(_unused ? _unused_col : '')+'/>';
 		});
 
 		var lbl = 'empty';
