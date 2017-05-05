@@ -173,15 +173,16 @@
 				default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field->id}' AND value != '' GROUP BY value"
 				add_end="1" add_before="1" add_after="1" skip_initial_list="1"
 				edit_inline="0" edit_popup="1" raw_inline="0" raw_popup="1"
-				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP" props_used="1,1,0,0"
+				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP,FLEXI_STATE" props_used="1,1,0,0,0"
 				editbtns_class="elements_list" value_area_class="elements_field"
-				master_fieldname="cascade_after" cascaded_prop="3"
+				master_fieldname="cascade_after" cascaded_prop="3" state_fieldname="use_elements_state" state_prop="4"
 				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_SELECT_ELEMENTS" description="FLEXI_FIELD_SELECT_ELEMENTS_DESC" labelclass="label-info" depend_class="elements_box"/>
 			<field name="select_field_prompt" type="text" size="40" default="" label="FLEXI_FIELD_SELECT_FIELD_PROMPT" description="FLEXI_FIELD_SELECT_FIELD_PROMPT_DESC" />
 
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
+		
 		<fieldset name="group-textselect-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
@@ -257,7 +258,7 @@
 			</field>
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			
+
 			<field name="opentag_closetag_separatorf_disabled_ingroup" type="separator" label="" default="FLEXI_OPENTAG_CLOSETAG_SEPARATORF_DISABLED_INGROUP" description="" class="alert fcpadded" depend_class="fieldgroupon" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>

@@ -1746,10 +1746,10 @@ class FlexicontentFields
 	// Common method to get the column expressions used to create the field's elements
 	static function indexedField_getColsExprs($field, $item, $field_elements)
 	{
-		$q = preg_replace('/\b(as\s+)(value|text|image|valgrp)\b\s*(,)?\s*/i', 'AS \2\3 ', $field_elements);		
+		$q = preg_replace('/\b(as\s+)(value|text|image|valgrp|state)\b\s*(,)?\s*/i', 'AS \2\3 ', $field_elements);		
 		$q = preg_replace('/^\s*(select)\b\s*/i', '', $q);		
 		$q = substr($q, 0, stripos($q, 'from'));		
-		$q = preg_split('/(AS value,?\s*|AS text,?\s*|AS image,?\s*|AS valgrp,?\s*)/i', $q, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$q = preg_split('/(AS value,?\s*|AS text,?\s*|AS image,?\s*|AS valgrp,?\s*|AS state,?\s*)/i', $q, -1, PREG_SPLIT_DELIM_CAPTURE);
 		array_pop($q);
 		
 		$cols = array();
@@ -1759,7 +1759,7 @@ class FlexicontentFields
 		{
 			if ($step % 2 == 1)
 			{
-				$d = preg_replace('/\b(as\s+)(value|text|image|valgrp)\b\s*(,)?\s*/i', '\2', $d);
+				$d = preg_replace('/\b(as\s+)(value|text|image|valgrp|state)\b\s*(,)?\s*/i', '\2', $d);
 				$cols[$d] = $prev;
 			}
 			$prev = $d;
@@ -1780,16 +1780,23 @@ class FlexicontentFields
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		
-		$default_extra_props = array('image','valgroup');
-		
-		if ($create_filter) {
+		$default_extra_props = array('image', 'valgrp', 'state');
+
+		if ($create_filter)
+		{
 			$filter_customize_options = $field->parameters->get('filter_customize_options', 0);
 			$filter_custom_options    = $field->parameters->get('filter_custom_options', '');
-			if ( $filter_customize_options && $filter_custom_options) {
-				// Custom query for value retrieval
+
+			// Custom query for value retrieval
+			if ( $filter_customize_options && $filter_custom_options)
+			{
 				$sql_mode =  $filter_customize_options==1;
 				$field_elements = $filter_custom_options;
-			} else if ( !$field_elements ) {
+			}
+
+			// Default query for value retrieval
+			else if ( !$field_elements )
+			{
 				$sql_mode = 1;
 				$field_elements = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
 			}
@@ -1816,19 +1823,24 @@ class FlexicontentFields
 			}
 
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
-			if ( $query ) {
+			$results = false;
+			if ( $query )
+			{
 				$db->setQuery($query);
 				$results = $db->loadObjectList('value');
 			}
-			else $results = false;
-			if ($results && $lang_filter_values) {
-				foreach ($results as $val=>$result) {
+
+			if ($results && $lang_filter_values)
+			{
+				foreach ($results as $val=>$result)
+				{
 					$results[$val]->text  = JText::_($result->text);  // the text label
 				}
 			}
 
 			// !! CHECK: DB query failed or produced an error (AN EMPTY ARRAY IS NOT AN ERROR)
-			if (!$query || !is_array($results)) {
+			if (!$query || !is_array($results))
+			{
 				if ( $canCache && !$and_clause ) $_elements_cache[$field->id] = false;
 				return false;
 			}
@@ -1852,35 +1864,26 @@ class FlexicontentFields
 			foreach ($listelements as $listelement)
 			{
 				$listelement_props  = preg_split("/[\s]*::[\s]*/", $listelement);
+				// Compatibility with previously stored elements, ignore missing 'valgrp' and 'state'
+				if (count($listelement_props) < $props_needed && count($listelement_props)==3 && $extra_props[1]=='valgrp')  $listelement_props[] = null;
+				if (count($listelement_props) < $props_needed && count($listelement_props)==4 && $extra_props[2]=='state')   $listelement_props[] = null;
 				if (count($listelement_props) < $props_needed)
 				{
-					if (count($listelement_props)==3 && $extra_props[1]=='valgroup') {
-						$listelement_props[3] = '';
-					} else {
-						echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
-						return ($_elements_cache[$field->id] = false);
-					}
+					echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
+					return ($_elements_cache[$field->id] = false);
 				}
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
 				$results[$val]->value = $listelement_props[0];
 				$results[$val]->text  = $lang_filter_values ? JText::_($listelement_props[1]) : $listelement_props[1];
 				$el_prop_count = 2;
-				if (!empty($extra_props))
+				$_props = !empty($extra_props) ? $extra_props : $default_extra_props;
+
+				// Optional extra properties for fields that use them
+				foreach ($_props as $extra_prop)
 				{
-					foreach ($extra_props as $extra_prop)
-					{
-						$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
-						$el_prop_count++;
-					}
-				}
-				else
-				{
-					foreach ($default_extra_props as $extra_prop)
-					{
-						$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
-						$el_prop_count++;
-					}
+					$results[$val]->{$extra_prop} = isset($listelement_props[$el_prop_count]) ? $listelement_props[$el_prop_count] : null;
+					$el_prop_count++;
 				}
 			}
 		}
@@ -3043,7 +3046,8 @@ class FlexicontentFields
 		//else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
 		
 		// Alter search property name (indexed fields only), remove underscore _ at start & end of it
-		if ($indexed_elements && $search_prop) {
+		if ($indexed_elements && $search_prop)
+		{
 			preg_match("/^_([a-zA-Z_0-9]+)_$/", $search_prop, $prop_matches);
 			$search_prop = @ $prop_matches[1];
 		}
@@ -3132,7 +3136,8 @@ class FlexicontentFields
 			// Set usage counters
 			$add_usage_counters = $faceted_filter==2 && $show_matches;
 			$results = array();
-			foreach ($results_shown as $i => $result) {
+			foreach ($results_shown as $i => $result)
+			{
 				$results[$i] = $result;
 				
 				// FACETED: 0,1 or NOT showing usage
@@ -3642,35 +3647,58 @@ class FlexicontentFields
 		//echo "<b> &nbsp;filters_where</b>: <br/>". print_r($filters_where, true) ."<br/><br/>\n";
 		//exit;
 		
-		if ($faceted_filter || !$indexed_elements) {
+		if ($faceted_filter || !$indexed_elements)
+		{
 			$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
 			//if ($filter->id==NN) echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
 		}
+
 		
 		// Support of value-indexed fields
-		if ( !$faceted_filter && $indexed_elements) {
-			// Clone 'indexed_elements' because they maybe modified
-			$results = array();
-			foreach ($indexed_elements as $i => $result) {
-				$results[$i] = clone($result);
-			}
-		} else 
-		if ( $indexed_elements ) {
-			
-			// Limit indexed element according to DB results found
-			$results = array_intersect_key($indexed_elements, $_results);
-			//echo "<pre>". $filter->label.": ". print_r($results, true) ."\n\n</pre>";
-			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result) {
-				$result->found = $_results[$i]->found;
+		if ($indexed_elements)
+		{
+			// non-FACETED filter
+			if (!$faceted_filter)
+			{
 				// Clone 'indexed_elements' because they maybe modified
-				$results[$i] = clone($result);
+				$results = array();
+				foreach ($indexed_elements as $i => $result)
+				{
+					if (isset($result->state) && $result->state < 1)
+					{
+						continue;
+					}
+					$results[$i] = clone($result);
+				}
 			}
 			
+			// FACETED filter
+			else
+			{
+				// Limit indexed element according to DB results found
+				$results = array_intersect_key($indexed_elements, $_results);
+				//echo "<pre>". $filter->label.": ". print_r($results, true) ."\n\n</pre>";
+				if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result)
+				{
+					//echo $filter->label . '<br/>'; print_r($result); exit;
+					if (isset($result->state) && $result->state < 1)
+					{
+						unset($results[$i]);
+						continue;
+					}
+					$result->found = $_results[$i]->found;
+					// Clone 'indexed_elements' because they maybe modified
+					$results[$i] = clone($result);
+				}
+			}
+		}
+
 		// Support for multi-property fields
-		} else if ($search_prop) {
-			
+		else if ($search_prop)
+		{
 			// Check and unserialize values
-			foreach ($_results as $i => $result) {
+			foreach ($_results as $i => $result)
+			{
 				$v = @unserialize($result->value);
 				if ( $v || $result->value === 'b:0;' ) $_results[$i] = & $v;
 			}

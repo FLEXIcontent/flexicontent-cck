@@ -584,7 +584,7 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			
 			$item_pros = false;
-			$extra_props = ($filter->field_type == 'radioimage' || $filter->field_type == 'checkboximage') ? array('image', 'valgroup') : array();
+			$extra_props = ($filter->field_type == 'radioimage' || $filter->field_type == 'checkboximage') ? array('image', 'valgrp', 'state') : array();
 			$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props, $item_pros, $create_filter=true);
 			
 			$filter->parameters->set( 'faceted_filter', 0 );

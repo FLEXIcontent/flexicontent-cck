@@ -1473,6 +1473,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord .delfield_handle:hover {
 	background-color: #d7d7d7;
 }
+.records_container .fcrec_state_msg,
 .records_container .fcrec_cascaded_msg,
 .records_container .fcrec_general_msg {
 	margin: 3px;
