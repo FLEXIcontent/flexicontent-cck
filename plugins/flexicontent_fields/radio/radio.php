@@ -533,32 +533,10 @@ class plgFlexicontent_fieldsRadio extends FCField
 		if (!$ajax && $css) $document->addStyleDeclaration($css);
 		
 		
-		// **************************
-		// Get indexed element values
-		// **************************
-		
-		// If cascading we will get it inside the value loop for every value, thus supporting field grouping properly
-		$elements = !$cascade_after ? $this->getLimitedProps($field, $item) : array();
-		if ( !is_array($elements) )
-		{
-			$field->html = $elements;
-			return;
-		}
-		
 		
 		// *****************************************
 		// Create field's HTML display for item form
 		// *****************************************
-
-		if ($display_as_select)
-		{
-			// Create form field options
-			$options = array();
-			foreach ($elements as $element)
-			{
-				$options[] = JHTML::_('select.option', $element->value, $element->text);
-			}
-		}
 
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
@@ -583,14 +561,15 @@ class plgFlexicontent_fieldsRadio extends FCField
 					$value = unserialize($value);
 				}
 			}
-			
+
 			// Make sure value is an array
 			if (!is_array($value))
+			{
 				$value = strlen($value) ? array($value) : array();
-			
+			}
+
 			// Skip empty if not in field group, and at least one value was added
-			if ( !count($value) && !$use_ingroup && $n)
-				continue;
+			if ( !count($value) && !$use_ingroup && $n)  continue;
 
 			// Only if needed ...
 			if (!$ajax || !$display_as_select)
@@ -599,10 +578,10 @@ class plgFlexicontent_fieldsRadio extends FCField
 				$elementid_n = $elementid.'_'.$n;
 			}
 
-			// Get options according to cascading, this is here so that it works with field grouping too
-			if ($cascade_after) {
-				$elements = $this->getLimitedProps($field, $item, !$ajax ? $cascade_prompt : null, $ajax, $n);
-			}
+			// Get options according to cascading and according to per element state, this is here so that it works with field grouping too
+			$elements = $cascade_after
+				? $this->getLimitedProps($field, $item, !$ajax ? $cascade_prompt : null, $ajax, $n, $value)
+				: $this->getLimitedProps($field, $item, null, $ajax, $n, $value);
 
 			if ($display_as_select)
 			{
@@ -615,7 +594,8 @@ class plgFlexicontent_fieldsRadio extends FCField
 				$options = array();
 				foreach ($elements as $element)
 				{
-					if ( !empty($element->isprompt) ) {
+					if ( !empty($element->isprompt) )
+					{
 						$options[] = '<span style="float: left;" class="'.$element->isprompt.'">'.$element->text.'</span>';
 						continue;
 					}
@@ -623,6 +603,10 @@ class plgFlexicontent_fieldsRadio extends FCField
 					$elementid_no = $elementid_n.'_'.$i;
 					//echo " &nbsp; &nbsp; $elementid_n , $elementid_no , $fieldname_n  , &nbsp; value: {$element->value} <br/>\n";
 					$input_attribs  = '';  //$use_prettycheckable && $prettycheckable_added ? ' data-labelPosition="right" data-labeltext="'.$element->text.'"' : '';
+					if ( !empty($element->disable) )
+					{
+						$input_attribs  .= ' disabled ';
+					}
 					$input_attribs .= ' class="' . $input_classes .' '. $elementid_n . '" ';
 					$input_fld = ' <input type="'.$fftype.'" id="'.$elementid_no.'" data-element-grpid="'.$elementid_n.'" name="'.$fieldname_n.'" '.$attribs.$input_attribs.' value="'.$element->value.'" '.$checked.' />';
 					$options[] = ''
@@ -682,7 +666,11 @@ class plgFlexicontent_fieldsRadio extends FCField
 					}
 					fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
 				";
-			} else {
+			}
+
+			// Non AJAX
+			else
+			{
 				$field->html = !$display_as_select ? $form_field : JHTML::_('select.options', $options, 'value', 'text', $value, $translate = false);
 			}
 			
@@ -759,18 +747,19 @@ class plgFlexicontent_fieldsRadio extends FCField
 	}
 
 
-	function & getLimitedProps(&$field, &$item, $cascade_prompt='Please select above', $ajax=false, $i=0)
+	function & getLimitedProps(&$field, &$item, $cascade_prompt=null, $ajax=false, $i=0, $row_values = array())
 	{
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$cascade_after  = (int)$field->parameters->get('cascade_after', 0);
 		$display_as_select = self::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
-		
+
 		if ($cascade_after)
 		{
-			$_valgrps = $ajax ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
-			if (empty($_valgrps))
+			$cascade_prompt = $cascade_prompt ?: JText::_('FLEXI_PLEASE_SELECT') . ' ' . JText::_('FLEXI_ABOVE');
+			$valgrps = $ajax ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
+			if (empty($valgrps))
 			{
 				$elements = array();
 				if (!$ajax)
@@ -782,7 +771,11 @@ class plgFlexicontent_fieldsRadio extends FCField
 				return $elements;
 			}
 		}
-		
+
+
+		// ***
+		// *** Get elements, either via SQL query or via parsing the elements string
+		// ***
 		if ($sql_mode)  // SQL query mode
 		{
 			$and_clause = false;
@@ -791,14 +784,14 @@ class plgFlexicontent_fieldsRadio extends FCField
 				// Filter out values not in the the value group, this is done by modifying the SQL query
 				$db = JFactory::getDBO();
 				$_elements = array();
-				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
+				foreach($valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);
 
 				// Parse query to find column expressions used to create field's elements
 				$element_cols = FlexicontentFields::indexedField_getColsExprs($field, $item, $field_elements);
 				$and_clause = !isset($element_cols['valgrp'])
 					? ' 0 '
-					: $element_cols['valgrp'] . ' IN ('.implode(',', $_valgrps).')';
+					: $element_cols['valgrp'] . ' IN ('.implode(',', $valgrps).')';
 			}
 
 			$item_pros = true;
@@ -826,7 +819,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 			{
 				// Filter out values not in the the value group, this is done after the elements text is parsed
 				$_elements = array();
-				$_valgrps = array_flip($_valgrps);
+				$_valgrps = array_flip($valgrps);
 				foreach($elements as $element)
 				{
 					if (isset($_valgrps[$element->valgrp]))  $_elements[$element->value] = $element;
@@ -834,7 +827,49 @@ class plgFlexicontent_fieldsRadio extends FCField
 				$elements = $_elements;
 			}
 		}
-		
+
+
+		// ***
+		// *** Handle element states, cloning the element objects if setting 'disable flag'
+		// ***
+		if ($field->parameters->get('use_elements_state', 0) && !empty($elements))
+		{
+			$values = array_flip($row_values);
+			$_elements = array();
+			foreach($elements as $i => $element)
+			{
+				$element->state = isset($element->state) ? $element->state : 1;
+				switch ($element->state)
+				{
+					case -2:  // Trashed
+						break;
+					case 0:   // Unpublished
+					case 2:   // Archived
+						if (isset($values[$element->value]))
+						{
+							$_elements[$i] = $element;
+						}
+						break;
+					case 9:   // Expired
+						if (!isset($values[$element->value]))
+						{
+							$_elements[$i] = clone($element);
+							$_elements[$i]->disable = true;
+							break;
+						}
+					case 1:   // Published
+					default:
+						$_elements[$i] = $element;
+						break;
+				}
+			}
+			$elements = $_elements;
+		}
+
+
+		// ***
+		// *** Terminate if no usuable values found
+		// ***
 		if (empty($elements))
 		{
 			//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
@@ -842,38 +877,27 @@ class plgFlexicontent_fieldsRadio extends FCField
 			$elements = array('_field_selection_prompt_' => $prompt);
 			return $elements;
 		}
-		else
+
+
+		// ***
+		// *** Add prompt / empty option prompt
+		// ***
+		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
+		$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', $display_as_select ? 1 : 0 );
+		$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
+
+		if ($usefirstoption)   // Add selection prompt
 		{
-			$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
-			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', $display_as_select ? 1 : 0 );
-			$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
-			if ($usefirstoption)   // Add selection prompt
-			{
-				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
-				$elements = array('_field_selection_prompt_' => $prompt) + $elements;
-			}
-			// Handle element states
-			$values = array_flip($field->value);
-			foreach($elements as $i => $element)
-			{
-				if (!isset($element->state) || $element->state==1) continue;
-				switch ($element->state)
-				{
-					case -2:  // Trashed
-						unset($elements[$i]);
-						break;
-					case 0:   // Unpublished
-						if (!isset($values[$element->value])) unset($elements[$i]);
-						break;
-					case 2:   // Archived
-						$element->disable = !isset($values[$element->value]) ? true : null;
-						break;
-				}
-			}
+			//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+			$elements = array('_field_selection_prompt_' => $prompt) + $elements;
 		}
-		
-		if ($field->field_type=='radioimage' || $field->field_type=='checkboximage')
+
+
+		// ***
+		// *** Handle fields that use images, like radioimage / checkboximage
+		// ***
+		if (self::$usesImages)
 		{
 			// image specific variables
 			$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
@@ -892,7 +916,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 			
 			foreach ($elements as $element)
 			{
-				if ($form_vals_display >0 && !isset($element->image_html) && empty($element->isprompt))
+				if ($form_vals_display > 0 && !isset($element->image_html) && empty($element->isprompt))
 				{
 					if (!$image_type)
 						$element->image_html = file_exists($imgfolder . $element->image) ?
@@ -905,7 +929,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 					$element->label_tip = flexicontent_html::getToolTip(null, $element->text, 0, 1);
 			}
 		}
-		
+
 		return $elements;
 	}
 	
@@ -1208,6 +1232,28 @@ class plgFlexicontent_fieldsRadio extends FCField
 		$item_pros = false;
 		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros, $create_filter=true);
 		
+
+		// ***
+		// *** Handle display for fields that use images, like radioimage / checkboximage
+		// ***
+		if (self::$usesImages)
+		{
+			$_s = $isSearchView ? '_s' : '';
+			$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
+			$filter_as_images = in_array($filter_vals_display, array(1,2)) ;
+			$image_type = (int)$filter->parameters->get( 'image_type', 0 );
+		
+			if ($filter_as_images && $elements && !$image_type)
+			{
+				// image specific variables
+				$imagedir = preg_replace('#^(/)*#', '', $filter->parameters->get( 'imagedir' ) );
+				$imgpath  = JURI::root(true) .'/'. $imagedir;
+				foreach($elements as $element) {
+					$element->image_url = $imgpath . $element->image;
+				}
+			}
+		}
+
 		// Check for error during getting indexed field elements
 		if ( !$elements ) {
 			$filter->html = '';

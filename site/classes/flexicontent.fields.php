@@ -3680,7 +3680,6 @@ class FlexicontentFields
 				//echo "<pre>". $filter->label.": ". print_r($results, true) ."\n\n</pre>";
 				if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result)
 				{
-					//echo $filter->label . '<br/>'; print_r($result); exit;
 					if (isset($result->state) && $result->state < 1)
 					{
 						unset($results[$i]);

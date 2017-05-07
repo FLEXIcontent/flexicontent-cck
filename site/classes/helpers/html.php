@@ -1513,6 +1513,7 @@ class flexicontent_html
 				JText::script("FLEXI_NA", true);
 				JText::script("FLEXI_PUBLISHED", true);
 				JText::script("FLEXI_UNPUBLISHED", true);
+				JText::script("FLEXI_EXPIRED", true);
 				JText::script("FLEXI_ARCHIVED", true);
 				JText::script("FLEXI_TRASHED", true);
 				JText::script("FLEXI_REMOVE", true);

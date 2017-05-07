@@ -782,9 +782,9 @@ jQuery(document).ready(function(){
 						<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 					</tr><tr>
 						<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td><?php echo JText::_( 'FLEXI_ARCHIVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 						<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
-						<td colspan="3"><?php echo JText::_( 'FLEXI_TRASHED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td colspan="3"><?php echo JText::_( 'FLEXI_TRASHED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 					</tr>
 				</table>
 			</td>
