@@ -73,7 +73,9 @@
 				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" labelclass="label-info" />
 
 			<field name="" type="separator" default="FLEXI_OPTIONAL_ELEMENT_PROPERTIES" description="FLEXI_OPTIONAL_ELEMENT_PROPERTIES_DESC" level="level3" />
-			<field name="use_elements_state" type="radio" default="0" label="FLEXI_STATE_ELEMENT_PROPERTY" description="FLEXI_STATE_ELEMENT_PROPERTY_DESC" class="btn-group btn-group-yesno">
+			<field name="use_elements_state" type="multilist" subtype="radio" default="0" label="FLEXI_STATE_ELEMENT_PROPERTY" description="FLEXI_STATE_ELEMENT_PROPERTY_DESC"
+				inline_tip="FLEXI_STATE_ELEMENT_PROPERTY_INFO" tip_class="" tip_img="information.png"
+				class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

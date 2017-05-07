@@ -26,3 +26,12 @@
 .prettyradio input, .prettycheckbox input {
 	display:inline-block !important; visibility:hidden !important; float:left !important;
 }
+
+.prettyradio > a.disabled,
+.prettycheckbox > a.disabled,
+.prettyradio > a.disabled + label,
+.prettycheckbox > a.disabled + label {
+	font-style: italic;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+}

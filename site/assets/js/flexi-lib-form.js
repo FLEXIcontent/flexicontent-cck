@@ -275,7 +275,7 @@
 		var master_values = {};
 		if (master_elements)
 		{
-			master_select = '<select class="fcrecord_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
+			master_select = '<select class="fcrecord_prop master_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
 			master_select += '<option value="">-</option>';
 			master_select += '__current_value__';
 			for (var i = 0; i < master_elements.length; i++)
@@ -290,9 +290,11 @@
 		var state_select = '';
 		if (use_elements_state)
 		{
-			state_select = '<select class="fcrecord_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
+			state_select = '<select class="fcrecord_prop state_prop" style="__width__" onchange="fcrecord_store_values(jQuery(this).closest(\'ul\'));" >';
+			state_select += '<option value="">-</option>';
 			state_select += '<option value="1">' + Joomla.JText._('FLEXI_PUBLISHED') + '</option>';
 			state_select += '<option value="0">' + Joomla.JText._('FLEXI_UNPUBLISHED') + '</option>';
+			state_select += '<option value="9">' + Joomla.JText._('FLEXI_EXPIRED') + '</option>';
 			state_select += '<option value="2">' + Joomla.JText._('FLEXI_ARCHIVED') + '</option>';
 			state_select += '<option value="-2">' + Joomla.JText._('FLEXI_TRASHED') + '</option>';
 			state_select += '</select>';
@@ -320,8 +322,7 @@
 		jQuery(props_used).each(function(key, in_use)
 		{
 			if (key > props_used - 1) return;
-			value = key > props.length - 1 ?
-				'' :  props[key];
+			value = key > props.length - 1 ? '' :  props[key];
 			var _unused = !parseInt(props_used[key]) || (key==cascaded_prop && !master_elements) || (key==state_prop && !use_elements_state);
 			var _width = 'width:'+prop_widths[key]+'!important';
 			
@@ -336,7 +337,7 @@
 			else if (key==state_prop && state_select)
 			{
 				var select = state_select.replace('__width__', _width);
-				if (value.length) select = state_select.replace('value="'+value+'"', 'value="'+value+'" selected="selected"');
+				if (value.length) select = select.replace('value="'+value+'"', 'value="'+value+'" selected="selected"');
 				props_html += select;
 			}
 			else
@@ -359,7 +360,7 @@
 		
 		if (master_select && props.length > cascaded_prop)
 		{
-			if ( props[cascaded_prop] ) newrec.find('select').val(props[cascaded_prop]);
+			if ( props[cascaded_prop] ) newrec.find('select.master_prop').val(props[cascaded_prop]);
 		}
 
 		if (list_el)

@@ -502,8 +502,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
 		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
 		$catsinstate[99] = JText::_( 'FLEXI_ANY' );
-		$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED_STATE' );
-		$catsinstate[-2] = JText::_( 'FLEXI_TRASHED_STATE' );
+		$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED' );
+		$catsinstate[-2] = JText::_( 'FLEXI_TRASHED' );
 		$_catsinstate = array();
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
