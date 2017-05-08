@@ -131,9 +131,9 @@ foreach($field->value as $file_id)
 				'.JText::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
 			</label>
 			<fieldset class="radio btn-group group-fcmethod fcoffactive">
-				<input class="fc_filestamp" id="'.$elementid_n.'_stamp1" name="'.$fieldname_n.'[stamp]" type="radio" value="0" '.( (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['stamp'])==0 ? 'checked="checked"' : '' ).'/>
+				<input class="fc_filestamp" id="'.$elementid_n.'_stamp1" name="'.$fieldname_n.'[stamp]" type="radio" value="0" '.( (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp'])==0 ? 'checked="checked"' : '' ).'/>
 				<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_stamp1">'.JText::_('FLEXI_NO').'</label>
-				<input class="fc_filestamp" id="'.$elementid_n.'_stamp0" name="'.$fieldname_n.'[stamp]" type="radio" value="1" '.( (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['stamp'])==1 ? 'checked="checked"' : '' ).'/>
+				<input class="fc_filestamp" id="'.$elementid_n.'_stamp0" name="'.$fieldname_n.'[stamp]" type="radio" value="1" '.( (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp'])==1 ? 'checked="checked"' : '' ).'/>
 				<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_stamp0">'.JText::_('FLEXI_YES').'</label>
 			</fieldset>
 		</div>' : '').

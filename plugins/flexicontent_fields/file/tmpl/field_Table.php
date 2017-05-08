@@ -145,7 +145,7 @@ foreach($field->value as $file_id)
 				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
 			</span>' : '').'
 			<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
-				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['secure']), 0, ' class="fc_filedir" ', $elementid_n.'_secure').'
+				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? $file_data->secure : (int)$form_data[$file_id]['secure']), 0, ' class="fc_filedir" ', $elementid_n.'_secure').'
 			</span>
 		</td>
 	</tr>' : '').
@@ -159,7 +159,7 @@ foreach($field->value as $file_id)
 		</td>
 		<td class="inlinefile-stamp-data-cell">
 			<span class="inlinefile-stamp-data">
-				'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_NO' ), 1=> JText::_( 'FLEXI_YES' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? 1 : (int)$form_data[$file_id]['stamp']), 0, ' class="fc_filedir" ', $elementid_n.'_stamp').'
+				'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_NO' ), 1=> JText::_( 'FLEXI_YES' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 0, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
 			</span>
 		</td>
 	</tr>' : '').
