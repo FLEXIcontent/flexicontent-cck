@@ -6,11 +6,17 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS
 
 class flexicontent_FPDI extends FPDI
 {
+	var $header_conf = array();
 	var $all_pages_header_text = null;
 	var $all_pages_footer_text = null;
 
 	var $per_page_headers = array();
 	var $addPageNumbers = false;
+
+	public function setHeaderConf($header_conf = array())
+	{
+		$this->header_conf = $header_conf;
+	}
 
 	public function setAllPagesHeaderText($all_pages_header_text = null)
 	{
@@ -25,8 +31,39 @@ class flexicontent_FPDI extends FPDI
 
 	public function Header()
 	{
-		$header = @ $this->per_page_headers[$this->page] ?: $this->all_pages_header_text;
-		if ($header) $this->Cell(0, 0, $header, 0, 1, 'C');
+		// Save current font values
+		$font_family = $this->FontFamily;
+		$font_style  = $this->FontStyle;
+		$font_size   = $this->FontSizePt;
+
+		// ***
+		// *** Prepare for output: text color, font family, font style
+		// ***
+
+		// Set text color (RGB values: 0-255)
+		$this->SetTextColor(0, 0, 0, false);
+
+		// Set font
+		$this->SetFont(@ $this->header_conf['ffamily'], @ $this->header_conf['fstyle'], @ $this->header_conf['fsize']);
+
+		// Set style for cell border
+		$prevlinewidth = $this->GetLineWidth();
+		if (!empty($this->header_conf['border_width']))  $this->SetLineWidth($this->header_conf['border_width']);
+		if (!empty($this->header_conf['border_color']))  $this->SetDrawColor($this->header_conf['border_color'][0], $this->header_conf['border_color'][1], $this->header_conf['border_color'][2]);
+
+		// ***
+		// *** Create header
+		// ***
+		$add_border = !empty($this->header_conf['border_width']) ? 1 : 0;
+		$text_align = !empty($this->header_conf['text_align']) ? $this->header_conf['text_align'] : 'C';
+		$header_text = @ $this->per_page_headers[$this->page] ?: $this->all_pages_header_text;
+		if ($header_text) $this->Cell(0, 0, $header_text, $add_border, 1, $text_align);
+
+		// ***
+		// *** Restore line width and font values
+		// ***
+		$this->SetLineWidth($prevlinewidth);
+		$this->SetFont($font_family, $font_style, $font_size);
 	}
 
 
