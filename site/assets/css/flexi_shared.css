@@ -860,6 +860,14 @@ form div.container_fcfield > select {
 #flexicontent div fieldset.panelform .input-prepend > button {
 	margin-left: 0px;
 }
+#flexicontent div .input-append > .btn:not(:last-child) {
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+#flexicontent div .input-prepend > .btn:not(:first-child) {
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
 #flexicontent div fieldset.panelform :not(.container_fcfield) textarea {
