@@ -2736,6 +2736,7 @@ class FlexicontentController extends JControllerLegacy
 		$pdf = false;
 		$dlfile->abspath_tmp = false;
 		$dlfile->size_tmp = false;
+
 		if ($dlfile->ext == 'pdf' && $cparams->get('stamp_pdfs', 1) && $dlfile->stamp)
 		{
 			// Create new PDF document (initiate FPDI)
@@ -2745,6 +2746,14 @@ class FlexicontentController extends JControllerLegacy
 				$pdf = new flexicontent_FPDI();
 				$pdf->setAllPagesHeaderText($file->header_text);
 				$pdf->setAllPagesFooterText($file->footer_text);
+				$pdf->setHeaderConf(array(
+					'ffamily' => $fields_conf[$field_id]->get('pdf_header_ffamily', 'Helvetica'),
+					'fstyle' => $fields_conf[$field_id]->get('pdf_header_fstyle', ''),
+					'fsize' => $fields_conf[$field_id]->get('pdf_header_fsize', '12'),
+					'border_width' => 0,
+					'border_color' => array(0,0,0),
+					'text_align' => $fields_conf[$field_id]->get('pdf_header_align', 'C')
+				));
 
 				// Set the source file
 				try
