@@ -60,9 +60,10 @@ class JFormFieldFcdate extends JFormField
 			$attribs_arr['class'] = $class;
 		}
 
-		if ($placeholder = @$attributes['placeholder'])
+		if ($hint = @$attributes['hint'])
 		{
-			$attribs_arr['placeholder'] = $placeholder;
+			$attribs_arr['hint'] = $hint;
+			$attribs_arr['placeholder'] = $hint;
 		}
 
 		$attribs_arr['size']     = isset($attributes['size']) ? $attributes['size'] : 18;
