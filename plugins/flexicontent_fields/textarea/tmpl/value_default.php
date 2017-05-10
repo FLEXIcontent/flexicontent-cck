@@ -8,7 +8,23 @@ foreach ($values as $value)
 		$field->{$prop}[$n++]	= '';
 		continue;
 	}
-	
+
+	// Cut text to a given limit, optionally adding a toggle button
+	if ($cut_text)
+	{
+		$uncut_length = 0;
+		$value = flexicontent_html::striptagsandcut(
+			$value, $cut_text_length, $uncut_length,
+			$ops = array(
+				'cut_at_word' => true,
+				'more_toggler' => $cut_text_display,
+				'more_icon' => $cut_text_display_btn_icon,
+				'more_txt' => $cut_text_display_btn_text,
+				'modal_title' => $field->label
+			)
+		);
+	}
+
 	// Add prefix / suffix
 	$field->{$prop}[$n]	= $pretext . $value . $posttext;
 	

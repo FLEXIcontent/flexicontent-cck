@@ -1702,20 +1702,22 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function striptagsandcut( $text, $chars=null, &$uncut_length=0, $ops = array('cut_at_word' => false, 'more_txt' => '...', 'more_toggler' => false))
+	static function striptagsandcut( $text, $chars=null, &$uncut_length=0, $options = null)
 	{
+		$options = $options ?: array('cut_at_word' => false, 'more_toggler' => 0, 'more_icon' => 'icon-paragraph-center', 'more_txt' => '...', 'modal_title'=>'...');
+		
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
-		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
+		$cleantext = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
 
 		// Strip SCRIPT tags AND their containing code
-		$text = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $text );
+		$cleantext = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $cleantext );
 
 		// Add whitespaces at start/end of tags so that words will not be joined,
-		//$text = preg_replace('/(<\/[^>]+>((?!\P{L})|(?=[0-9])))|(<[^>\/][^>]*>)/u', ' $1', $text);
-		$text = preg_replace('/(<\/[^>]+>(?![\:|\.|,|:|"|\']))|(<[^>\/][^>]*>)/u', ' $1', $text);
+		//$cleantext = preg_replace('/(<\/[^>]+>((?!\P{L})|(?=[0-9])))|(<[^>\/][^>]*>)/u', ' $1', $cleantext);
+		$cleantext = preg_replace('/(<\/[^>]+>(?![\:|\.|,|:|"|\']))|(<[^>\/][^>]*>)/u', ' $1', $cleantext);
 
 		// Strip html tags
-		$cleantext = strip_tags($text);
+		$cleantext = strip_tags($cleantext);
 
 		// Clean additionnal plugin tags
 		$patterns = array();
@@ -1738,24 +1740,53 @@ class flexicontent_html
 		if ($chars && $uncut_length > $chars)
 		{
 			// If not cutting at middle of word, then find closest whitespace, that is previous to the word
-			if ($ops['cut_at_word'])
+			if ($options['cut_at_word'])
 			{
 				$chars = StringHelper::strrpos(StringHelper::substr($cleantext, 0, $chars), ' ');
 	    }
 
+	    // Cut the text
 			$text1 = StringHelper::substr($cleantext, 0, $chars);
-			$text2 = $ops['more_toggler'] ? StringHelper::substr($cleantext, $chars) : false;
+
+			// Add a toggle of the full text
+			switch ($options['more_toggler'])
+			{
+			case 2:
+				$text2 =  '
+					<div style="display:none;">
+						'. $text . '
+					</div>
+					<span class="readmore">
+						<a href="javascript:;" class="btn btn-mini" onclick="var box = jQuery(this).parent().prev(); fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . JText::_($options['modal_title']) . '\'}); return false;">
+							<span class="'.$options['more_icon'].'"></span>
+							'.JText::_($options['more_txt']).'
+						</a>
+					</span>';
+				break;
+			case 1:
+				$text2 = '
+					<a href="javascript:;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\';">
+						<span class="'.$options['more_icon'].'"></span>
+						'.JText::_($options['more_txt']).'
+					</a>
+					<span class="fc_cutted_text" style="display: none;">
+						' . htmlspecialchars(StringHelper::substr($cleantext, $chars), ENT_QUOTES, 'UTF-8') . '
+					</span>';
+				break;
+			default:
+				$text2 = ' ' . JText::_($options['more_txt']);
+				break;
+			}
 		}
-		else $text1 = $cleantext;
+		else
+		{
+			$text1 = $cleantext;
+			$text2 = '';
+		}
 
 		// Reencode HTML special characters, (but do not encode UTF8 characters)
 		// and RETURN cutted text, optionally adding a show all text button
-		return htmlspecialchars($text1, ENT_QUOTES, 'UTF-8') . (empty($text2) ? JText::_($ops['more_txt']) : '
-			<span class="btn btn-mini btn-info" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\';">'.JText::_($ops['more_txt']).'</span>
-			<span class="fc_cutted_text" style="display: none;">
-				' . htmlspecialchars($text2, ENT_QUOTES, 'UTF-8') . '
-			</span>
-		');
+		return htmlspecialchars($text1, ENT_QUOTES, 'UTF-8') . $text2;
 	}
 
 
