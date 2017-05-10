@@ -1503,6 +1503,20 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
+			<field name="" type="separator" default="FLEXI_CATEGORY_VIEWS" level="level2" />
+			<field name="cut_text_catview" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_STRIP_N_CUT" description="FLEXI_FIELD_STRIP_N_CUT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cut_text_catview">FLEXI_NO</option>
+				<option value="1" show_list="cut_text_catview" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="cut_text_length_catview" type="text" size="4" default="200" label="FLEXI_FIELD_STRIP_N_CUT_LENGTH" description="FLEXI_FIELD_STRIP_N_CUT_LENGTH_DESC" depend_class="cut_text_catview" />
+			<field name="cut_text_display_catview" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_STRIP_N_CUT_DISPLAY" description="FLEXI_FIELD_STRIP_N_CUT_DISPLAY_DESC" depend_class="cut_text_catview" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cut_text_toggler_catview">FLEXI_NO</option>
+				<option value="1" show_list="cut_text_toggler_catview" hide_list="">FLEXI_INLINE</option>
+				<option value="2" show_list="cut_text_toggler_catview" hide_list="">FLEXI_MODAL_WINDOW</option>
+			</field>
+			<field name="cut_text_display_btn_icon_catview" type="text" size="40" default="icon-paragraph-center" label="FLEXI_BUTTON_ICON" description="..." depend_class="cut_text_catview cut_text_toggler_catview" />
+			<field name="cut_text_display_btn_text_catview" type="text" size="40" default="..." label="FLEXI_BUTTON_TEXT" description="..." depend_class="cut_text_catview cut_text_toggler_catview" />
+
 		</fieldset>
 		<fieldset name="group-maintext-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
