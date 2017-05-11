@@ -91,9 +91,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 		
-		$flexiparams = JComponentHelper::getParams('com_flexicontent');
-		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
-		$docspath    = $flexiparams->get('file_path', 'components/com_flexicontent/uploads');
+		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
+		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
 
 		// Empty field value
@@ -149,15 +148,15 @@ class plgFlexicontent_fieldsFile extends FCField
 			// Create an empty file properties value, used by code that creates empty inline file editing form fields
 			if (empty($field->value)) $field->value = array(0=>0);
 			$files_data[0] = (object)array(
-				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
-				'url'=>'',
+				'id' => '', 'filename' => '', 'filename_original' => '', 'altname' => '', 'description' => '',
+				'url' => '',
 				'secure' => (!$iform_dir  ? 1 : (int) $field->parameters->get('iform_dir_default', 1)),
 				'stamp' => (!$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1)),
-				'ext'=>'', 'published'=>1,
+				'ext' => '', 'published' => 1,
 				'language' => $field->parameters->get('iform_lang_default', '*'),
 				'access' => (int) $field->parameters->get('iform_access_default', 1),
-				'hits'=>0,
-				'uploaded'=>'', 'uploaded_by'=>0, 'checked_out'=>false, 'checked_out_time'=>''
+				'hits' => 0,
+				'uploaded' => '', 'uploaded_by' => 0, 'checked_out' => false, 'checked_out_time' => ''
 			);
 		}
 		
@@ -529,7 +528,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		foreach($field->html as &$_html) {
 			$_html = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -587,6 +586,17 @@ class plgFlexicontent_fieldsFile extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
 		
+		$field->label = JText::_($field->label);
+		
+		$values = $values ? $values : $field->value;
+		
+		// Check for no values and no default value, and return empty display
+		if ( empty($values) )
+		{
+			$field->{$prop} = $is_ingroup ? array() : '';
+			return;
+		}
+
 		static $langs = null;
 		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
 		
@@ -596,12 +606,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($useMobile===null) 
 		{
 			$force_desktop_layout = JComponentHelper::getParams( 'com_flexicontent' )->get('force_desktop_layout', 0 );
-			//$start_microtime = microtime(true);
+
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
-			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
 		}
 		
 		// Load the tooltip library according to configuration, FLAG is an array to have a different check per field ID
@@ -613,18 +621,8 @@ class plgFlexicontent_fieldsFile extends FCField
 			if ($add_tooltips) JHtml::_('bootstrap.tooltip');
 			$tooltips_added[$field->id] = true;
 		}
-		
-		$field->label = JText::_($field->label);
-		
-		$values = $values ? $values : $field->value;
-		
-		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			$field->{$prop} = $is_ingroup ? array() : '';
-			return;
-		}
-		
-		
+
+
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -934,7 +932,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 				
 				// validate data or empty/set default values
-				$v['file-del']   = !$iform_allowdel ? 0 : (int) @ $v['file-del'];
+				$v['file-del']   = !$iform_allowdel ? 0 : (int) (!empty($v['file-del']) ? 1 : 0);
 				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
 				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
@@ -1022,7 +1020,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					}
 					
 					// Skip file if unloading / removal was requested
-					if ( $v['file-del'] ) {
+					if ( $v['file-del'] )
+					{
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}

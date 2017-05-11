@@ -372,12 +372,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('link' => $value, 'title' => '', 'linktext'=>'', 'class'=>'', 'id'=>'', 'hits'=>0);
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array(
+					'link' => $value, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
+				);
 			}
 			if ( empty($value['link']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -507,7 +508,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -569,15 +570,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		static $useMobile = null;
 		if ($useMobile===null) 
 		{
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
-			//$start_microtime = microtime(true);
+			$force_desktop_layout = JComponentHelper::getParams( 'com_flexicontent' )->get('force_desktop_layout', 0 );
+
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
 		}
 		
 		$field->label = JText::_($field->label);
@@ -710,12 +708,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				// Compatibility for unserialized values or for NULL values in a field group
+				// Compatibility for non-serialized values or for NULL values in a field group
 				if ( !is_array($value) )
 				{
-					$v = !empty($value) ? @unserialize($value) : false;
-					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-						array('link' => $value, 'title' => '', 'linktext'=>'', 'class'=>'', 'id'=>'', 'hits'=>0);
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'link' => $value, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
+					);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
@@ -811,16 +810,16 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('link' => $v, 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
-				}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'link' => $v, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
+				);
 			}
-			
-			
+
+
 			// ***********************************************************
 			// Validate URL, skipping URLs that are empty after validation
 			// ***********************************************************
@@ -854,9 +853,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			// Validate other value properties
 			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
-			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
-			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
 			$newpost[$new]['linktext']= flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
+			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
+			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
 			$newpost[$new]['target']  = flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
 			$newpost[$new]['hits']    = (int) @ $v['hits'];
 			

@@ -2,8 +2,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsPhonenumbers extends JPlugin
+class plgFlexicontent_fieldsPhonenumbers extends FCField
 {
 	static $field_types = array('phonenumbers');
 	
@@ -269,12 +270,13 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('label'=>'', 'cc'=>'', 'phone1'=>$value, 'phone2'=>'', 'phone3'=>'');
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array(
+					'label' => '', 'cc' => '', 'phone1'=> $value , 'phone2' => '', 'phone3' => ''
+				);
 			}
 			if ( empty($value['label']) && empty($value['cc']) && empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -314,7 +316,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				</td></tr>';
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -393,12 +395,13 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			// Compatibility for unserialized values or for NULL values in a field group
+			// Compatibility for non-serialized values or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('label'=>'', 'cc'=>'', 'phone1'=>$value, 'phone2'=>'', 'phone3'=>'');
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array(
+					'label' => '', 'cc' => '', 'phone1'=> $value , 'phone2' => '', 'phone3' => ''
+				);
 			}
 
 			// Skip empty value but add empty placeholder if inside fieldgroup
@@ -474,15 +477,16 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('label'=>'', 'cc'=>'', 'phone1'=>'', 'phone2'=>$v, 'phone3'=>'');
-				}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'label' => '', 'cc' => '', 'phone1'=> $v , 'phone2' => '', 'phone3' => ''
+				);
 			}
-			
+
+
 			// ****************************************************************************
 			// Validate phone number, skipping phone number that are empty after validation
 			// ****************************************************************************

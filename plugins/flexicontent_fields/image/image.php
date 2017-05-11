@@ -15,13 +15,14 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
 JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
 
 if (!defined('_FC_CONTINUE_'))  define('_FC_CONTINUE_', 0);
 if (!defined('_FC_BREAK_'))  define('_FC_BREAK_', -1);
 
-class plgFlexicontent_fieldsImage extends JPlugin
+class plgFlexicontent_fieldsImage extends FCField
 {
 	static $field_types = array('image');
 	static $value_only_displays = array("display_backend_src"=>0, "display_small_src"=>1, "display_medium_src"=>2, "display_large_src"=>3, "display_original_src"=>4);
@@ -740,7 +741,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		foreach ($field->value as $index => $value)
 		{
-			// Compatibility for unserialized values, e.g. Reload user input after form validation error
+			// Compatibility for non-serialized values, e.g. Reload user input after form validation error
 			// or for NULL values in a field group or file ids as values (minigallery legacy field)
 			if ( !is_array($value) )
 			{
@@ -755,9 +756,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				else
 				{
-					$v = !empty($value) ? @unserialize($value) : false;
-					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-						array('originalname' => $value);
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'originalname' => $value
+					);
 				}
 				$field->value[$index] = $value;
 			}
@@ -983,7 +985,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->html[] = '
 			'.(!$multiple ? '' : '
 				'.(!$none_props ? '<div class="fcclear"></div>' : '').'
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -1303,7 +1305,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			foreach ($values as $index => $value)
 			{
-				// Compatibility for unserialized values, e.g file ids as values (minigallery legacy field)
+				// Compatibility for non-serialized values, e.g file ids as values (minigallery legacy field)
 				if ((string)(int)$value == $value)
 				{
 					if (isset($files_data[$value]))
@@ -1316,7 +1318,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				else
 				{
-					$value = unserialize($value);
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'originalname' => $value
+					);
 				}
 				
 				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item) )  $usable_values[] = $values[$index];
@@ -1776,7 +1781,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
 		$i = -1;
-		foreach ($values as $n => $val)
+		foreach ($values as $n => $value)
 		{
 			// Include common layout code for preparing values, but you may copy here to customize
 			//$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
@@ -1784,7 +1789,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			//if ($result === _FC_BREAK_) break;
 
 			// Unserialize value's properties and check for empty original name property
-			$value	= unserialize($val);
+			$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+			$value = $array ?: array(
+				'originalname' => $value
+			);
+
 			$image_subpath = $value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
 
 			if ( !strlen($image_subpath) )
@@ -2396,8 +2405,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **************************************************************************
 		//echo "<pre>"; print_r($file); echo "</pre>";
 		$files = array();
-		if ($file) foreach( $file as $key => $all ) {
-			foreach( $all as $i => $val ) {
+		if ($file) foreach( $file as $key => $all )
+		{
+			foreach( $all as $i => $val )
+			{
 				$files[$i][$key] = $val;
 			}
 		}
@@ -2412,21 +2423,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			if (empty($v)) {
+			if (empty($v))
+			{
 				// skip empty value, but allow empty (null) placeholder value if in fieldgroup
 				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
 			}
-			
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('originalname' => $v);
-				}
+
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'originalname' => $v
+				);
 			}
-			
+
+
 			// Add system message if upload error
 			$err_code = isset($files[$n]['error']) ? $files[$n]['error'] : UPLOAD_ERR_NO_FILE;
 			if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
@@ -2543,12 +2556,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Remove unused files
 			foreach($db_values as $i => $v)
 			{
-				$fdata = unserialize($v);
-				$filename = isset($fdata['originalname']) ? $fdata['originalname'] : '';
-				//echo $filename."\n";
-				if ($filename && !isset($new_filenames[$filename])) {
-					$canDeleteImage = $this->canDeleteImage( $field, $filename, $item );  // check if value is in use
-					if ($canDeleteImage) {
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'originalname' => $v
+				);
+
+				$filename = isset($v['originalname']) ? $v['originalname'] : false;
+				if ($filename && !isset($new_filenames[$filename]))
+				{
+					// Check if value is in use
+					$canDeleteImage = $this->canDeleteImage($field, $filename, $item);
+					if ($canDeleteImage)
+					{
 						$this->removeOriginalFile( $field, $filename );
 						//JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Deleted image file: '.$filename.' from server storage');
 					}
@@ -2558,7 +2577,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Serialize multi-property data before storing them into the DB,
 		// null indicates to increment valueorder without adding a value
-		foreach($post as $i => $v) {
+		foreach($post as $i => $v)
+		{
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 	}
@@ -2576,10 +2596,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( !$is_importcsv ) return;
 		
 		$values = array();
-		foreach($post as $i => $d)
+		foreach($post as $i => $v)
 		{
-			$values[$i] = ( @unserialize($d)!== false || $d === 'b:0;' ) ? unserialize($d) : $d;
-			plgFlexicontent_fieldsImage::rebuildThumbs( $field, $values[$i], $item );
+			if ( !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'originalname' => $v
+				);
+			}
+
+			$values[$i] = $v;
+			plgFlexicontent_fieldsImage::rebuildThumbs($field, $values[$i], $item);
 		}
 		//echo "<b>{$field->field_type}</b>: <br/> <pre>".print_r($values, true)."</pre>\n";
 	}
@@ -2669,7 +2697,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			foreach ($post as $index => $value)
 			{
-				// Compatibility for unserialized values, e.g file ids as values (minigallery legacy field)
+				// Compatibility for non-serialized values, e.g file ids as values (minigallery legacy field)
 				if ((string)(int)$value == $value)
 				{
 					if (isset($files_data[$value]))
@@ -2682,7 +2710,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				else
 				{
-					$value = unserialize($value);
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'originalname' => $value
+					);
 				}
 				$post[$index] = $value;
 			}
@@ -2713,7 +2744,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			foreach ($post as $index => $value)
 			{
-				// Compatibility for unserialized values, e.g file ids as values (minigallery legacy field)
+				// Compatibility for non-serialized values, e.g file ids as values (minigallery legacy field)
 				if ((string)(int)$value == $value)
 				{
 					if (isset($files_data[$value]))
@@ -2726,7 +2757,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				else
 				{
-					$value = unserialize($value);
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'originalname' => $value
+					);
 				}
 				$post[$index] = $value;
 			}
@@ -3216,7 +3250,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Create a string that concatenates various image information
 	// (Function is not called anywhere, used only for debugging)
 	// ************************************************************
-	function listImageUses( $field, $record )
+	function listImageUses($field, $record)
 	{
 		$db = JFactory::getDBO();
 		$query = 'SELECT value, item_id'
@@ -3224,20 +3258,26 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				. ' WHERE field_id = '. (int) $field->id
 				;
 		$db->setQuery($query);
-		$values = $db->loadObjectList();
+		$db_data = $db->loadObjectList();
 		
-		$itemid_list = ''; $sep = '';
-		for($n=0, $c=count($values); $n<$c; $n++)
+		$itemids = array();
+
+		// Remove unused files
+		foreach($db_data as $i => $data)
 		{
-			$val = unserialize($values[$n]->value);
-			$val = $val['originalname'];
-			if ($val == $record) {
-				$itemid_list .= $sep . $values[$n]->item_id.",";
-				$sep = ',';
+			$array = $this->unserialize_array($data->value, $force_array=false, $force_value=false);
+			$data->value = $array ?: array(
+				'originalname' => $data->value
+			);
+
+			$filename = isset($data->value['originalname']) ? $data->value['originalname'] : false;
+			if ($filename && $filename == $record)
+			{
+				$itemids[] = $data->item_id;
 			}
 		}
-		
-		return $itemid_list;
+
+		return implode(',' , $itemids);
 	}
 	
 	function getUploadLimitsTxt($field, $enable_multi_uploader = true)
@@ -3323,7 +3363,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
+			{
 				$return_data[$file_id] = $cached_data[$f];
+			}
 		}
 
 		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;

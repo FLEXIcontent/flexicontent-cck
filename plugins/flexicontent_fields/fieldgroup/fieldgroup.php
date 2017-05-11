@@ -322,7 +322,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		for ($n = 0; $n < $max_count; $n++)
 		{
 			$field->html[$n] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'

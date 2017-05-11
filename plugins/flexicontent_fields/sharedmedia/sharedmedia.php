@@ -598,12 +598,11 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 		foreach ($field->value as $n => $value)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array();
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array();
 			}
 
 			// Compatibility with deprecated fields
@@ -657,7 +656,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 
 			$html_field = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -820,6 +819,23 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$player_position = $field->parameters->get('player_position', 0);
 		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
 
+		$unserialize_vals = true;
+		if ($unserialize_vals)
+		{
+			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+			foreach ($values as &$value)
+			{
+				// Compatibility for non-serialized values or for NULL values in a field group
+				if ( !is_array($value) )
+				{
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array();
+				}
+			}
+			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
+		}
+
+
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -876,7 +892,6 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				}
 				continue;
 			}
-			$value = unserialize($value);
 
 			// Compatibility with deprecated fields
 			if (empty($value['api_type'])) $value['api_type'] = isset($value['videotype']) ? $value['videotype'] : (isset($value['audiotype']) ? $value['audiotype'] : '');
@@ -1003,13 +1018,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('url' => $v);
-				}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'url' => $v
+				);
 			}
 
 

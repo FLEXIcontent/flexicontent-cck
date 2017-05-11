@@ -991,4 +991,63 @@ class flexicontent_db
 		
 		return $assoc;
 	}
+
+
+	/**
+	 * Method to unserialize arrays only
+	 *
+	 * @return  array or empty array if invalid data (serialized inner object is found)
+	 */
+	static function unserialize_array($v, $force_array=false, $force_value = true)
+	{
+		static $pattern_obj_inner = '/o:\d+:"[a-z0-9_]+":\d+:{.*?}/i';
+		static $pattern_array_outer = '/^a:\d+:{.*?}$/i';
+
+		// ***
+		// *** SANITY CHECKs
+		// ***
+
+		// Already an array, return it
+		if (is_array($v))
+		{
+			return $v;
+		}
+
+		// Zero length value, return empty array or false (error)
+		if (!strlen($v))
+		{
+			return $force_array ? array() : false;
+		}
+
+		// ***
+		// *** Unserialize
+		// ***
+
+		// Check if value contains a serialized (inner) object, (and set error)
+		if (preg_match($pattern_obj_inner, $v))
+		{
+			if (JDEBUG) JFactory::getApplication()->enqueueMessage('Object not allowed inside serialized user-data', 'error');
+			$result = false;
+		}
+		// Check if value is as expected a serialized array, (and unserialize or set error)
+		else
+		{
+			$result = preg_match($pattern_array_outer, $v) ? @ unserialize($v) : false;
+		}
+
+		//***
+		// *** Return result of unserialization
+		//***
+
+		if ($result!==false)
+		{
+			return $force_array && !is_array($result) ? array($result) : $result;
+		}
+		else if ($force_value)
+		{
+			return $force_array ? array($v) : $v;
+		}
+
+		return false;
+	}
 }

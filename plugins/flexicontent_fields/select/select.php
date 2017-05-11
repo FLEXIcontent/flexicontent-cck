@@ -75,10 +75,16 @@ class plgFlexicontent_fieldsSelect extends FCField
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$multiple     = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$required     = $field->parameters->get( 'required', 0 ) ;
+		$min_values   = $use_ingroup || !self::$valueIsArr ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$exact_values	= $use_ingroup || !self::$valueIsArr ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+
+		// Sanitize limitations
+		if ($required && !$min_values && self::$valueIsArr) $min_values = 1;  // Comment this to allow simpler 'required' validation
+		if ($exact_values) $max_values = $min_values = $exact_values;
 		
 		
 		// **************
@@ -288,18 +294,21 @@ class plgFlexicontent_fieldsSelect extends FCField
 				
 				// Get values of cascade (on) source field
 				$field->valgrps = $byIds[$cascade_after]->value ? $byIds[$cascade_after]->value : array();
-				foreach($field->valgrps as & $vg) {
-					if (is_array($vg));
-					else if (@unserialize($vg)!== false || $vg === 'b:0;' ) {
-						$vg = unserialize($vg);
-					} else {
-						$vg = array($vg);
+				foreach($field->valgrps as & $vg)
+				{
+					if (!is_array($vg))
+					{
+						$vg = $this->unserialize_array($vg, $force_array=true, $force_value=true);
 					}
 				}
 				unset($vg);
-			} else {
+			}
+			else
+			{
 				foreach($field->value as $value)
+				{
 					$field->html[] = '<div class="alert alert-error fc-small fc-iblock">Error, master field no: '.$cascade_after.' is not assigned to current item type or was unpublished</div><br/>';
+				}
 				$cascade_after = 0;
 				return;
 			}
@@ -556,9 +565,9 @@ class plgFlexicontent_fieldsSelect extends FCField
 			// Compatibility for serialized values
 			if ( self::$valueIsArr )
 			{
-				if (is_array($value));
-				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
-					$value = unserialize($value);
+				if (!is_array($value))
+				{
+					$value = $this->unserialize_array($value, $force_array=true, $force_value=true);
 				}
 			}
 
@@ -651,7 +660,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 					).'
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -1145,10 +1154,23 @@ class plgFlexicontent_fieldsSelect extends FCField
 		
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$is_importcsv = JFactory::getApplication()->get('task', '', 'cmd') == 'importcsv';
 		$field->use_suborder = $multiple && self::$valueIsArr;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
+
+		// Make sure every value is an array (for multi-value per value fields)
+		if (self::$valueIsArr)
+		{
+			$v = reset($post);  // Get first value to examine it below (by attempting unserialize) and forcing an array
+			if (!is_array($v))
+			{
+				// An array of arrays
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$post = $array===false ? array($post) : $post;
+			}
+		}
 		
 		// Account for fact that ARRAY form elements are not submitted if they do not have a value
 		if ( $use_ingroup )
@@ -1171,22 +1193,44 @@ class plgFlexicontent_fieldsSelect extends FCField
 		
 		foreach ($post as $n => $v)
 		{
+			// Non multi-value per value fields, have only 1 value, convert it to single record array to use same code below
+			if (!self::$valueIsArr)
+			{
+				$v = array($v);
+			}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			else if ( $is_importcsv && !is_array($v) )
+			{
+				$v = $this->unserialize_array($v, $force_array=true, $force_value=true);
+			}
+
 			// Do server-side validation and skip empty/invalid values
-			$element = !strlen($post[$n]) ? false : @$elements[ $post[$n] ];
-			if ( !$element )  $post[$n] = '';  // clear invalid value
+			$vals = array();
+			foreach ($v as $i => $nv)
+			{
+				$element = !strlen($nv) ? false : @$elements[$nv];
+				if ( $element ) $vals[] = $nv;  // include only valid value
+			}
 			
 			// Skip empty value, but if in group increment the value position
-			if (!strlen($post[$n]))
+			if (!count($vals))
 			{
-				if ($use_ingroup) $newpost[$new++] = null;
+				if ($use_ingroup) $newpost[$new++] = self::$valueIsArr ? array() : null;
 				continue;
 			}
 			
-			$newpost[$new] = $post[$n];
+			// If multiple disabled, use 1st value ARRAY only (for multi-value per value fields)
+			if (self::$valueIsArr && !$multiple)
+			{
+				$newpost = $vals;
+				break;
+			}
+			
+			$newpost[$new] = self::$valueIsArr ? $vals : reset($vals);
 			$new++;
 			
 			// If multiple disabled, do not add more values
-			if (!$multiple) break;
+			if (!self::$valueIsArr && !$multiple) break;
 			
 			// max values limitation (*if in group, this was zeroed above)
 			if ($max_values && $new >= $max_values) continue;
