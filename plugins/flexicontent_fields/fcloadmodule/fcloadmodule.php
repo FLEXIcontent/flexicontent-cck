@@ -78,13 +78,19 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
 			$param_value = isset($value[$param_name]) ? $value[$param_name] : '';
 
-			$field->html[] = $param_label.
-				': <input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="input-xlarge" type="text" size="40" value="'.$param_value.'" />'
+			$field->html[] = '
+				<tr>
+					<td class="key"><label for="'.$elementid.'_'.$n.'" class="fc-prop-lbl">' . $param_label . '</label></td>
+					<td><input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="input-xlarge" type="text" size="40" value="'.$param_value.'" /></td>
+				</tr>'
 				;
 			$n++;
 		}
 
-		$field->html = '<div>'. implode('<br/', $field->html) .'</div>';
+		$field->html = '
+		<table class="fc-form-tbl fcinner"><tbody>
+			' . implode('', $field->html) . '
+		</tbody></table>';
 	}
 
 
