@@ -20,7 +20,7 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
  * @subpackage	com_categories
  * @since		1.6
  */
-class JFormFieldCategoryTree extends JFormFieldList
+class JFormFieldCategorytree extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -28,7 +28,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 	 * @var		string
 	 * @since	1.6
 	 */
-	protected $type = 'CategoryParent';
+	protected $type = 'Categorytree';
 
 	/**
 	 * Method to get the field input markup.
@@ -36,7 +36,8 @@ class JFormFieldCategoryTree extends JFormFieldList
 	 * @return	string	The field input markup.
 	 * @since	1.6
 	 */
-	protected function getInput() {
+	protected function getInput()
+	{
 		// Initialize variables.
 		$html = array();
 		$attr = '';
@@ -101,28 +102,31 @@ class JFormFieldCategoryTree extends JFormFieldList
 	 * @return	array	The field option objects.
 	 * @since	1.6
 	 */
-	protected function getOptions() {
+	protected function getOptions()
+	{
 		global $globalcats;
+		$jinput = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$cid  = JRequest::getVar('cid');
-		
-		$permission = FlexicontentHelperPerm::getPerm();
+		$cid  = $jinput->get('cid', 0, 'INT');
 
-		//$usercats 		= FAccess::checkUserCats($user->gmid);
-		$usercats		= array();
-		$viewallcats 	= $permission->ViewAllCats;
+		$usercats = array();
+		$viewallcats = FlexicontentHelperPerm::getPerm()->ViewAllCats;
+
+		$top = (int) $this->element['top'];
+		$published = $this->element['published'] && $this->element['published']!='false' ? true : false;
+		$filter = $this->element['filter'] && $this->element['filter']!='false' ? true : false;
 
 		$catlist 	= array();
-		$top = (int)$this->element->getAttribute('top');
-		$published = (bool)$this->element->getAttribute('published');
-		$filter = (bool)$this->element->getAttribute('filter');
-		if($top == 1) {
+		if($top == 1)
+		{
 			$obj = new stdClass;
 			$obj->value = $ROOT_CATEGORY_ID = 1;
 			$obj->level = 0;
 			$obj->text = JText::_( 'FLEXI_TOPLEVEL' );
 			$catlist[] 	= $obj;
-		} else if($top == 2) {
+		}
+		else if($top == 2)
+		{
 			$obj = new stdClass;
 			$obj->value = '';
 			$obj->level = 0;
@@ -131,30 +135,44 @@ class JFormFieldCategoryTree extends JFormFieldList
 		}
 		
 		foreach ($globalcats as $item) {
-			if ((!$published) || ($published && $item->published)) {
+			if ( !$published || ($published && $item->published) )
+			{
 				//if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($cid[0] == $item->id)) {
 				if ((JRequest::getVar('controller') == 'categories') && (JRequest::getVar('task') == 'edit') && ($item->lft >= @$globalcats[$cid[0]]->lft && $item->rgt <= @$globalcats[$cid[0]]->rgt)) {
-					if($top == 2) {
-						if($cid[0] != $item->id) {
+					if ($top == 2)
+					{
+						if ($cid[0] != $item->id)
+						{
 							$obj = new stdClass;
 							$obj->value = $item->id;
 							$obj->text = $item->treename;
 							$obj->level = $item->level;
 							$catlist[] = $obj;
-						}else {
+						}
+						else
+						{
 							$catlist[] = JHtml::_('select.option', $item->id, $item->treename, 'value', 'text', true);
 						}
 					}
-				} else if ($filter) {
-					if ( !in_array($item->id, $usercats) ) {
-						if ($viewallcats) { // only disable cats in the list else don't show them at all
+				}
+				else if ($filter)
+				{
+					if ( !in_array($item->id, $usercats) )
+					{
+						// Only disable cats in the list else don't show them at all
+						if ($viewallcats)
+						{
 							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
-					} else {
+					}
+					else
+					{
 						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
 						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 					}
-				} else {
+				}
+				else
+				{
 					$obj = new stdClass;
 					$obj->value = $item->id;
 					$obj->text = $item->treename;

@@ -61,12 +61,13 @@ class JFormFieldFclayout extends JFormFieldList
 		// Get current extension and id being edited
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$view   = JRequest::getVar('view');
-		$option = JRequest::getVar('option');
+		$option = $jinput->get('option', '', 'CMD');
+		$view   = $jinput->get('view', '', 'CMD');
+
 		if (
 			$option == 'com_modules' ||
 			$option == 'com_advancedmodules' ||
-			($option == 'com_falang' && JRequest::getVar('catid')=='modules')
+			($option == 'com_falang' && $jinput->get('catid', '', 'CMD')=='modules')
 		) $view = 'module';
 
 		$cid = $jinput->get('cid', array(0), 'array');
