@@ -55,31 +55,32 @@ class JFormFieldQfcategory extends JFormField
 	{
 		$allowEdit		= ((string) $this->element['edit'] == 'true') ? true : false;
 		$allowClear		= ((string) $this->element['clear'] != 'false') ? true : false;
-		
-		$attributes = get_object_vars($this->element->attributes());
-		$attributes = $attributes['@attributes'];
-		//echo "<pre>"; print_r($attributes); exit;
-		
-		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : false; // : 'request';
-		$required = isset($attributes['required']) ? $attributes['required'] : false;
-		
-		$value = $this->value;
-		if ($paramset) {
+
+		$paramset = $this->element['paramset'];   // optional custom group for the form element instead of e.g. 'params'
+		$required = $this->element['required'] && $this->element['required']!='false' ? true : false;
+
+		if ($paramset)
+		{
 			$fieldname = "jform[".$paramset."][".$this->element["name"]."]";
 			$element_id = "jform_".$paramset."_".$this->element["name"];
-		} else {
+		}
+		else
+		{
 			$fieldname  = $this->name;
 			$element_id = $this->id;
 		}
 
 		$item = JTable::getInstance('flexicontent_categories', '');
-		if ($value) {
-			$item->load($value);
-		} else {
+		if ($this->value)
+		{
+			$item->load($this->value);
+		}
+		else
+		{
 			$item->title = '';
 		}
-		
-		// J1.6+ does have required field capability, add a HTML tag parameter
+
+		// HTML tag parameters for required field
 		$required_param = $required ? ' required="required" class="required" aria-required="true" ' : '';
 		
 		static $js_added = false;
@@ -116,12 +117,11 @@ class JFormFieldQfcategory extends JFormField
 		
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+		$option = $jinput->get('option', '', 'CMD');
+		$view   = $jinput->get('view', '', 'CMD');
 		
 		$assocs_id  = 0;
-		$created_by = @$attributes['created_by'];
-		$language   = @$attributes['language'];
+		$language   = $this->element['language'];
 		
 		if ($language && $option=='com_flexicontent' && $view=='category')
 		{
@@ -136,10 +136,11 @@ class JFormFieldQfcategory extends JFormField
 				$assocs_id = (int) $cid[0];
 			}
 		}
+
 		$link = 'index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component';
-		$link .= $created_by ? '&amp;created_by='.$created_by : '';
-		$link .= $language ? '&amp;language='.$language : '';
-		$link .= ($language && $assocs_id) ? '&amp;assocs_id='.$assocs_id : '';
+		$link .= $this->element['created_by'] ? '&amp;created_by=' . $this->element['created_by'] : '';
+		$link .= $language ? '&amp;language=' . $language : '';
+		$link .= ($language && $assocs_id) ? '&amp;assocs_id=' . $assocs_id : '';
 		
 		//$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		$_select = JText::_('FLEXI_SELECT_CATEGORY', true);
@@ -151,16 +152,16 @@ class JFormFieldQfcategory extends JFormField
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
+			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;cid=' . $this->value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
 				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
 			</a>' : '').'
 			'.($allowClear ? '
-			<button id="' .$element_id. '_clear" class="btn'.($value ? '' : ' hidden').'" onclick="return fcClearSelectedCategory(\''.$element_id . '\')">
+			<button id="' .$element_id. '_clear" class="btn'.($this->value ? '' : ' hidden').'" onclick="return fcClearSelectedCategory(\''.$element_id . '\')">
 				<span class="icon-remove"></span>
 				'.JText::_('FLEXI_CLEAR').'
 			</button>' : '').'
 		</span>
-		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$value.'" class="fc_hidden_value" />
+		<input type="text" id="'.$element_id.'" name="'.$fieldname.'" value="'.$this->value.'" class="fc_hidden_value" />
 		';
 	}
 }

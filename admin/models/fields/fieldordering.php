@@ -31,7 +31,7 @@ class JFormFieldFieldordering extends JFormField
 	 * @var		string
 	 * @since	1.6
 	 */
-	protected $type = 'Ordering';
+	protected $type = 'Fieldordering';
 
 	/**
 	 * Method to get the field input markup.
