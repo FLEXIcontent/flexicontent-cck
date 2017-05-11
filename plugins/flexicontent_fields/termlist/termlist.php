@@ -15,8 +15,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsTermlist extends JPlugin
+class plgFlexicontent_fieldsTermlist extends FCField
 {
 	static $field_types = array('termlist');
 	
@@ -366,12 +367,13 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('title' => $value, 'text' => '');
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array(
+					'title' => $value, 'text' => ''
+				);
 			}
 			if ( empty($value['title']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -405,7 +407,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				</div>';
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -469,8 +471,10 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			if (!strlen($default_value)) {
+		if ( empty($values) )
+		{
+			if (!strlen($default_value))
+			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
@@ -485,7 +489,8 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Language filter, clean output, encode HTML
 		// ******************************************
 		
-		if ($clean_output) {
+		if ($clean_output)
+		{
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
 		if (1)
@@ -493,14 +498,15 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				// Compatibility for unserialized values or for NULL values in a field group
+				// Compatibility for non-serialized values or for NULL values in a field group
 				if ( !is_array($value) )
 				{
-					$v = !empty($value) ? @unserialize($value) : false;
-					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-						array('title' => $value, 'text' => '');
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'title' => $value, 'text' => ''
+					);
 				}
-				
+
 				if ($lang_filter_values) {
 					$value['title'] = JText::_($value['title']);
 					$value['text']  = JText::_($value['text']);
@@ -631,16 +637,16 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('title' => $v, 'text' => '');
-				}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'title' => $v, 'text' => ''
+				);
 			}
-			
-			
+
+
 			// **************************************************************
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************

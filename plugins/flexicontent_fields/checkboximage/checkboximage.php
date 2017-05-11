@@ -75,15 +75,15 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$min_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$multiple     = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$required     = $field->parameters->get( 'required', 0 ) ;
+		$min_values   = $use_ingroup || !self::$valueIsArr ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
+		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$exact_values	= $use_ingroup || !self::$valueIsArr ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 
 		// Sanitize limitations
-		$exact_values	= $use_ingroup ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
-		if ($required && !$min_values) $min_values = 1;  // comment to allow simpler 'required' validation
+		if ($required && !$min_values && self::$valueIsArr) $min_values = 1;  // Comment this to allow simpler 'required' validation
 		if ($exact_values) $max_values = $min_values = $exact_values;
 		
 		
@@ -294,18 +294,21 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 				
 				// Get values of cascade (on) source field
 				$field->valgrps = $byIds[$cascade_after]->value ? $byIds[$cascade_after]->value : array();
-				foreach($field->valgrps as & $vg) {
-					if (is_array($vg));
-					else if (@unserialize($vg)!== false || $vg === 'b:0;' ) {
-						$vg = unserialize($vg);
-					} else {
-						$vg = array($vg);
+				foreach($field->valgrps as & $vg)
+				{
+					if (!is_array($vg))
+					{
+						$vg = $this->unserialize_array($vg, $force_array=true, $force_value=true);
 					}
 				}
 				unset($vg);
-			} else {
+			}
+			else
+			{
 				foreach($field->value as $value)
+				{
 					$field->html[] = '<div class="alert alert-error fc-small fc-iblock">Error, master field no: '.$cascade_after.' is not assigned to current item type or was unpublished</div><br/>';
+				}
 				$cascade_after = 0;
 				return;
 			}
@@ -562,9 +565,9 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 			// Compatibility for serialized values
 			if ( self::$valueIsArr )
 			{
-				if (is_array($value));
-				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
-					$value = unserialize($value);
+				if (!is_array($value))
+				{
+					$value = $this->unserialize_array($value, $force_array=true, $force_value=true);
 				}
 			}
 
@@ -657,7 +660,7 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 					).'
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -1156,8 +1159,18 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		$v = reset($post);   // * unserialize if for importcsv TASK *
-		$post = (!is_array($v) && @unserialize($v)=== false)  ?  array($post)  :  $post;  // an array of arrays
+
+		// Make sure every value is an array (for multi-value per value fields)
+		if (self::$valueIsArr)
+		{
+			$v = reset($post);  // Get first value to examine it below (by attempting unserialize) and forcing an array
+			if (!is_array($v))
+			{
+				// An array of arrays
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$post = $array===false ? array($post) : $post;
+			}
+		}
 		
 		// Account for fact that ARRAY form elements are not submitted if they do not have a value
 		if ( $use_ingroup )
@@ -1180,36 +1193,44 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 		
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) )
+			// Non multi-value per value fields, have only 1 value, convert it to single record array to use same code below
+			if (!self::$valueIsArr)
 			{
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array($v);
-				}
+				$v = array($v);
 			}
-			
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			else if ( $is_importcsv && !is_array($v) )
+			{
+				$v = $this->unserialize_array($v, $force_array=true, $force_value=true);
+			}
+
 			// Do server-side validation and skip empty/invalid values
 			$vals = array();
 			foreach ($v as $i => $nv)
 			{
 				$element = !strlen($nv) ? false : @$elements[$nv];
-				if ( $element ) $vals[] = $nv;  // include value
+				if ( $element ) $vals[] = $nv;  // include only valid value
 			}
 			
 			// Skip empty value, but if in group increment the value position
-			if (empty($vals))
+			if (!count($vals))
 			{
-				if ($use_ingroup) $newpost[$new++] = array();
+				if ($use_ingroup) $newpost[$new++] = self::$valueIsArr ? array() : null;
 				continue;
 			}
 			
-			// If multiple disabled, use 1st value ARRAY only
-			if (!$multiple) {  $newpost = $vals;  break;  }
+			// If multiple disabled, use 1st value ARRAY only (for multi-value per value fields)
+			if (self::$valueIsArr && !$multiple)
+			{
+				$newpost = $vals;
+				break;
+			}
 			
-			$newpost[$new] = $vals;
+			$newpost[$new] = self::$valueIsArr ? $vals : reset($vals);
 			$new++;
+			
+			// If multiple disabled, do not add more values
+			if (!self::$valueIsArr && !$multiple) break;
 			
 			// max values limitation (*if in group, this was zeroed above)
 			if ($max_values && $new >= $max_values) continue;

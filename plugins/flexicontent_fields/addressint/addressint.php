@@ -458,7 +458,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		foreach($field->html as &$_html_) {
 			$_html_ = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'

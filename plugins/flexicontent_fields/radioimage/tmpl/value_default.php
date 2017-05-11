@@ -27,9 +27,9 @@ foreach ($values as $value)
 	// Compatibility for serialized values
 	if ( $multiple && self::$valueIsArr )
 	{
-		if ( is_array($value) );
-		else if (@unserialize($value)!== false || $value === 'b:0;' ) {
-			$value = unserialize($value);
+		if (!is_array($value))
+		{
+			$value = $this->unserialize_array($value, $force_array=true, $force_value=true);
 		}
 	}
 	

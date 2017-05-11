@@ -286,12 +286,13 @@ class plgFlexicontent_fieldsEmail extends FCField
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('addr' => $value, 'text' => '');
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array(
+					'addr' => $value, 'text' => ''
+				);
 			}
 			if ( empty($value['addr']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -319,7 +320,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			}
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -398,8 +399,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			if (!strlen($default_addr)) {
+		if ( empty($values) )
+		{
+			if (!strlen($default_addr))
+			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
@@ -415,12 +418,13 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				// Compatibility for unserialized values or for NULL values in a field group
+				// Compatibility for non-serialized values or for NULL values in a field group
 				if ( !is_array($value) )
 				{
-					$v = !empty($value) ? @unserialize($value) : false;
-					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-						array('addr' => $value, 'text' => '');
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'addr' => $value, 'text' => ''
+					);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
@@ -518,16 +522,16 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('addr' => $v, 'text' => '');
-				}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'addr' => $v, 'text' => ''
+				);
 			}
-			
-			
+
+
 			// **************************************************************
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************
@@ -551,7 +555,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// Serialize multi-property data before storing them into the DB,
 		// null indicates to increment valueorder without adding a value
-		foreach($post as $i => $v) {
+		foreach($post as $i => $v)
+		{
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {

@@ -90,9 +90,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 		
-		$flexiparams = JComponentHelper::getParams('com_flexicontent');
-		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
-		$docspath    = $flexiparams->get('file_path', 'components/com_flexicontent/uploads');
+		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
+		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
 
 		// Empty field value
@@ -148,15 +147,15 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			// Create an empty file properties value, used by code that creates empty inline file editing form fields
 			if (empty($field->value)) $field->value = array(0=>0);
 			$files_data[0] = (object)array(
-				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
-				'url'=>'',
+				'id' => '', 'filename' => '', 'filename_original' => '', 'altname' => '', 'description' => '',
+				'url' => '',
 				'secure' => (!$iform_dir  ? 0 : (int) $field->parameters->get('iform_dir_default', 0)),
 				'stamp' => (!$iform_stamp ? 0 : (int) $field->parameters->get('iform_stamp_default', 0)),
-				'ext'=>'', 'published'=>1,
+				'ext' => '', 'published' => 1,
 				'language' => $field->parameters->get('iform_lang_default', '*'),
 				'access' => (int) $field->parameters->get('iform_access_default', 1),
-				'hits'=>0,
-				'uploaded'=>'', 'uploaded_by'=>0, 'checked_out'=>false, 'checked_out_time'=>''
+				'hits' => 0,
+				'uploaded' => '', 'uploaded_by' => 0, 'checked_out' => false, 'checked_out_time' => ''
 			);
 		}
 		
@@ -528,7 +527,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 
 		foreach($field->html as &$_html) {
 			$_html = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -581,24 +580,35 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || 1; //(int) $field->parameters->get( 'allow_multiple', 1 ) ;
+		
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
-		// Load file data
-		if ( !$values ) {
-			$files_data = array();
-			$values = array();
-		} else {
-			$files_data = $this->getFileData( $values, $published=true );   //if ($field->id==NNN) { echo "<pre>"; print_r($files_data); exit; }
-			$values = array();
-			foreach($files_data as $file_id => $file_data) $values[] = $file_id;
+		
+		// Check for no values and no default value, and return empty display
+		if ( empty($values) )
+		{
+			$field->{$prop} = $is_ingroup ? array() : '';
+			return;
 		}
 
-		$app = JFactory::getApplication();
+		$files_data = $this->getFileData( $values, $published=true );   //if ($field->id==NNN) { echo "<pre>"; print_r($files_data); exit; }
+		$values = array();
+		foreach($files_data as $file_id => $file_data)
+		{
+			$values[] = $file_id;
+		}
 
-		$document    = JFactory::getDocument();
-		$flexiparams = JComponentHelper::getParams('com_flexicontent');
-		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		// Initialize framework objects and other variables
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$app  = JFactory::getApplication();
+
+		$mediapath = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$usepopup  = $field->parameters->get('usepopup', 1);
 		$popuptype = $field->parameters->get('popuptype', 4);
 
@@ -901,7 +911,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				}
 				
 				// validate data or empty/set default values
-				$v['file-del']   = !$iform_allowdel ? 0 : (int) @ $v['file-del'];
+				$v['file-del']   = !$iform_allowdel ? 0 : (int) (!empty($v['file-del']) ? 1 : 0);
 				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
 				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
@@ -989,7 +999,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					}
 					
 					// Skip file if unloading / removal was requested
-					if ( $v['file-del'] ) {
+					if ( $v['file-del'] )
+					{
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}

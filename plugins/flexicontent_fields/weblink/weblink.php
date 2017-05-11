@@ -286,12 +286,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
 			if ( !is_array($value) )
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('link' => $value, 'title' => '', 'hits'=>0);
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $array ?: array(
+					'link' => $value, 'title' => '', 'hits' => 0
+				);
 			}
 			if ( empty($value['link']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -331,7 +332,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			}
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -433,8 +434,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			if (!strlen($default_link)) {
+		if ( empty($values) )
+		{
+			if (!strlen($default_link))
+			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
@@ -451,12 +454,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				// Compatibility for unserialized values or for NULL values in a field group
+				// Compatibility for non-serialized values or for NULL values in a field group
 				if ( !is_array($value) )
 				{
-					$v = !empty($value) ? @unserialize($value) : false;
-					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-						array('link' => $value, 'title' => '', 'hits'=>0);
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array(
+						'link' => $value, 'title' => '', 'hits' => 0
+					);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
@@ -551,16 +555,16 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($v) ) {
-				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
-					$v = unserialize($v);
-				} else {
-					$v = array('link' => $v, 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
-				}
+			// Support for serialized user data, e.g. basic CSV import / export. (Safety concern: objects code will abort unserialization!)
+			if ( $is_importcsv && !is_array($v) )
+			{
+				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'link' => $v, 'title' => '', 'hits' => 0
+				);
 			}
-			
-			
+
+
 			// ***********************************************************
 			// Validate URL, skipping URLs that are empty after validation
 			// ***********************************************************

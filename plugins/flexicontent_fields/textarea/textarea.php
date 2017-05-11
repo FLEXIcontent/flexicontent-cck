@@ -396,7 +396,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				</div>';
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -443,7 +443,14 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
 		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
-		
+
+		// Optionally limit and cut text display in modal popup window
+		$cut_text        = $view=='item' ? 0 : $field->parameters->get('cut_text_catview', 0);
+		$cut_text_length = $field->parameters->get('cut_text_length_catview', 200);
+		$cut_text_display = $field->parameters->get('cut_text_display_catview', 0);
+		$cut_text_display_btn_icon = JText::_($field->parameters->get('cut_text_display_btn_icon_catview', 'icon-paragraph-center'));
+		$cut_text_display_btn_text = JText::_($field->parameters->get('cut_text_display_btn_text_catview', '...'));
+
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
@@ -453,8 +460,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			if (!strlen($default_value)) {
+		if ( empty($values) )
+		{
+			if (!strlen($default_value))
+			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
@@ -466,7 +475,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Language filter, clean output, encode HTML
 		// ******************************************
 		
-		if ($clean_output) {
+		if ($clean_output)
+		{
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output || !$use_html)

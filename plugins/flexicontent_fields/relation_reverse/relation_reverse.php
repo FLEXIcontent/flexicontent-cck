@@ -14,14 +14,18 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
 jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsRelation_reverse extends JPlugin
+class plgFlexicontent_fieldsRelation_reverse extends FCField
 {
+	static $field_types = array('relation_reverse');
+	
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
-	static $field_types = array('relation_reverse');
 	
 	function __construct( &$subject, $params )
 	{
@@ -40,28 +44,27 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-
+		$field->label = JText::_($field->label);
+		
 		// Initialize framework objects and other variables
 		$user = JFactory::getUser();
 
-
-		// *******************************************************
-		// Check that relation field to be reversed was configured
-		// *******************************************************
-		
-		$reversed_field_id = $field->parameters->get('reverse_field', 0) ;
-		if ( !$reversed_field_id )
+		// ***
+		// *** Check that relation field to be reversed was configured
+		// ***
+		$reverse_field_id = $field->parameters->get('reverse_field', 0);
+		if ( !$reverse_field_id )
 		{
 			$field->html = '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 			return;
 		}
 
 
-		// ******************************************
-		// Check relation field being reversed exists
-		// ******************************************
-		
-		$_fields = FlexicontentFields::getFieldsByIds(array($reversed_field_id));
+
+		// ***
+		// *** Check relation field being reversed exists
+		// ***
+		$_fields = FlexicontentFields::getFieldsByIds(array($reverse_field_id));
 		if (empty($_fields))
 		{
 			$field->html = '<div class="alert alert-warning">'.JText::sprintf('FLEXI_RIFLD_FIELD_BEING_REVERSED_NOT_FOUND', $autorelation_itemid).'</div>';
@@ -85,7 +88,7 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 		// Case of autorelated item
 		// ************************
 
-		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$reversed_field_id, 0, 'int');
+		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$reverse_field_id, 0, 'int');
 
 		if ( $autorelation_itemid )
 		{
@@ -122,7 +125,7 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 		// *************************************************************
 
 		$_items = null;
-		$field->html = FlexicontentFields::getItemsList($field->parameters, $_items, $isform=1, $reversed_field_id, $field, $item);
+		$field->html = FlexicontentFields::getItemsList($field->parameters, $_items, $isform=1, $reverse_field_id, $field, $item);
 	}
 
 
@@ -133,16 +136,27 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		$field->{$prop} = '';
+
 		$values = $values ? $values : $field->value;
+		if ( !is_array($values) )
+		{
+			$values = array($values);
+		}
+
+
+
+		// ***********************************************************
+		// Prepare item list data for rendering the related items list
+		// ***********************************************************
+
+		$reverse_field_id = $field->parameters->get('reverse_field', 0);
 
 		if ($field->field_type == 'relation_reverse')
 		{
-			$reversed_field_id = $field->parameters->get('reverse_field', 0) ;
-
 			// Check that relation field to be reversed was configured
-			if ( !$reversed_field_id )
+			if ( !$reverse_field_id )
 			{
-				$field->{$prop} = '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+				$field->{$prop} .= '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 				return;
 			}
 
@@ -152,26 +166,43 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 		else  // $field->field_type == 'relation')
 		{
 			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-			$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
-			// No related items, just return empty display
-			if ( !$values || !count($values) ) return;
-			
+			$array = $this->unserialize_array(reset($values), $force_array=false, $force_value=false);
+			$values = $array ?: $values;
+
+			// set upper limit as $values array length
+			$itemcount = count($values);
+
+			// change upper limit if itemcount is set and error checked
+			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&  
+				$field->parameters->get( 'itemcount', 0) > 0 && 
+				$field->parameters->get( 'itemcount', 0) < $itemcount
+			) {
+				$itemcount = $field->parameters->get( 'itemcount', 0);
+			}
+
+			// Limit list to desired max # items
 			$_itemids_catids = array();
-			foreach($values as $i => $val)
+
+			for($i = 0; $i < $itemcount; $i++)
 			{
-				list ($itemid,$catid) = explode(":", $val);
+				list ($itemid,$catid) = explode(":", $values[$i]);
 				$_itemids_catids[$itemid] = new stdClass();
 				$_itemids_catids[$itemid]->itemid = $itemid;
 				$_itemids_catids[$itemid]->catid = $catid;
-				$_itemids_catids[$itemid]->value  = $val;
+				$_itemids_catids[$itemid]->value  = $values[$i];
 			}
 		}
 
-		$field->{$prop} = FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, @ $reversed_field_id, $field, $item);
+		if (1)
+		{
+			$field->{$prop} .= ''
+				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, $reverse_field_id, $field, $item)
+				;
+		}
 	}
-	
-	
-	
+
+
+
 	// **************************************************************
 	// METHODS HANDLING before & after saving / deleting field events
 	// **************************************************************
@@ -182,11 +213,11 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
-		$reversed_field_id = $field->parameters->get('reverse_field', 0) ;
+		$reverse_field_id = $field->parameters->get('reverse_field', 0);
 		
-		if ($reversed_field_id)
+		if ($reverse_field_id)
 		{
-			$_fields = FlexicontentFields::getFieldsByIds(array($reversed_field_id));
+			$_fields = FlexicontentFields::getFieldsByIds(array($reverse_field_id));
 			if (!empty($_fields))
 			{
 				$reversed_field = reset($_fields);
@@ -205,11 +236,11 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 						$db->setQuery(
 							'SELECT MAX(valueorder) '
 							. ' FROM #__flexicontent_fields_item_relations '
-							. ' WHERE field_id = '.$reversed_field_id.' AND item_id ='. $master_item_id
+							. ' WHERE field_id = '.$reverse_field_id.' AND item_id ='. $master_item_id
 						);
 						$max_valueorder = (int)$db->loadResult();
 
-						$field->use_field_id = $reversed_field_id;
+						$field->use_field_id = $reverse_field_id;
 						$field->use_item_id  = $master_item_id;
 						$field->use_valueorder  = $max_valueorder + 1;
 

@@ -43,12 +43,14 @@
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			<field name="min_values" type="hidden" default="0" size="2" label="FLEXI_FIELD_MIN_OPTIONS" description="FLEXI_FIELD_MIN_OPTIONS_DESC" />
+			<field name="exact_values" type="hidden" default="0" size="2" label="FLEXI_FIELD_EXACT_OPTIONS" description="FLEXI_FIELD_EXACT_OPTIONS_DESC" />
+
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_value" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">

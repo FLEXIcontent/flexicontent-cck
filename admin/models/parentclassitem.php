@@ -743,48 +743,71 @@ class ParentClassItem extends JModelAdmin
 				$fields = $db->loadObjectList();
 				$fields = $fields ? $fields : array();
 				
+				// Use versioned data, by overwriting the item data 
 				//echo "<br/>Overwritting fields with version: $version";
-				foreach($fields as $f) {
+				foreach($fields as $f)
+				{
 					//echo "<br/><b>{$f->field_id} : ". $f->name."</b> : "; print_r($f->value);
 					
-					// Use versioned data, by overwriting the item data 
 					$fieldname = $f->name;
-					if ($f->field_type=='hits' || $f->field_type=='state' || $f->field_type=='voting') {
-						// skip fields that should not have been versioned: hits, state, voting
+
+					// Skip fields that should not have been versioned: hits, state, voting
+					if ($f->field_type=='hits' || $f->field_type=='state' || $f->field_type=='voting')
+					{
 						continue;
-					} else if ($f->field_type=='version') {
-						// set version variable to indicate the loaded version
+					}
+
+					// Set version variable to indicate the loaded version
+					else if ($f->field_type=='version')
+					{
 						$item->version = $version;
-					} else if( $fieldname=='categories'|| $fieldname=='tags' ) {
-						// categories and tags must have been serialized but some earlier versions did not do it,
-						// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
-						$item->$fieldname = ($array = @unserialize($f->value)) ? $array : explode(",", $f->value);
-					} else if ($f->field_id==-1) {
-						if ( FLEXI_FISH ) {
-							$jfdata = unserialize($f->value);
+					}
+
+					// categories and tags must have been serialized but some earlier versions did not do it,
+					// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
+					else if( $fieldname=='categories'|| $fieldname=='tags' )
+					{
+						$array = flexicontent_db::unserialize_array($f->value, $force_array=false, $force_value=false);
+						$item->$fieldname = $array ?: explode(',', $f->value);
+					}
+
+					else if ($f->field_id==-1)
+					{
+						if ( FLEXI_FISH )
+						{
+							$jfdata = flexicontent_db::unserialize_array($f->value, $force_array=false, $force_value=false);
 							$item_lang = substr($item->language ,0,2);
-							foreach ($item_translations as $lang_id => $translation_data) {
+							if ($jfdata) foreach ($item_translations as $lang_id => $translation_data)
+							{
 								//echo "<br/>Adding values for: ".$translation_data->shortcode;
 								if ( empty($jfdata[$translation_data->shortcode]) ) continue;
 								foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
 								{
 									//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
-									if ($translation_data->shortcode != $item_lang) {
+									if ($translation_data->shortcode != $item_lang)
+									{
 										$translation_data->fields->$fieldname = new stdClass();
 										$translation_data->fields->$fieldname->value = $fieldvalue;
-									} else {
+									}
+									else
+									{
 										$item->$fieldname = $fieldvalue;
 									}
 								}
 							}
 						}
-					} else if ($f->field_id==-2) {
-						// Other item properties that were versioned, such as alias, catid, meta params, attribs
-						$item_data = unserialize($f->value);
-						//$item->bind($item_data);
-						foreach ($item_data as $k => $v) $item->$k = $v;
-					} else if ($fieldname) {
-						// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
+					}
+
+					// Other item properties that were versioned, such as alias, catid, meta params, attribs
+					else if ($f->field_id==-2)
+					{
+						$item_data = flexicontent_db::unserialize_array($f->value, $force_array=false, $force_value=false);
+						if ($item_data) foreach ($item_data as $k => $v) $item->$k = $v;
+					}
+
+					// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
+					else if ($fieldname)
+					{
 						$item->$fieldname = $f->value;
 					}
 				}
@@ -886,8 +909,8 @@ class ParentClassItem extends JModelAdmin
 				$item->rating       = !$rating_data ? 0 : $rating_data->rating_count;
 				$item->score        = !$rating_data ? 0 : $rating_data->score;
 			}
-			$item->typename     = (string) @ $item->typename;
-			$item->typealias    = (string) @ $item->typealias;
+			$item->typename   = !empty($item->typename)  ? $item->typename  : '';
+			$item->typealias  = !empty($item->typealias) ? $item->typealias : '';
 			
 			// Retrieve Creator NAME and email (used to display the gravatar)
 			$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
@@ -1039,7 +1062,7 @@ class ParentClassItem extends JModelAdmin
 		unset($this->_item->cid);
 		
 		// Determine correct permissions to check.
-		$id = @$data['id'] ? $data['id'] : (int) $this->getState($this->getName().'.id');
+		$id = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName().'.id');
 		if ($id) {
 			// Existing record. Can only edit in selected categories.
 			$form->setFieldAttribute('catid', 'action', 'core.edit');
@@ -1745,10 +1768,12 @@ class ParentClassItem extends JModelAdmin
 		// *********************************
 		
 		// tags and cats will need some manipulation so we retieve them
-		$tags = $this->formatToArray( @ $data['tag'] );
-		$cats = $this->formatToArray( @ $data['cid'] );
-		$featured_cats = $this->formatToArray( @ $data['featured_cid'] );
-		unset($data['tag']);  unset($data['cid']);  unset($data['featured_cid']);
+		$tags = isset($data['tag']) ? $this->formatToArray($data['tag']) : array();
+		$cats = isset($data['cid']) ? $this->formatToArray($data['cid']) : array();
+		$featured_cats = isset($data['featured_cid']) ? $this->formatToArray($data['featured_cid']) : array();
+		unset($data['tag']);
+		unset($data['cid']);
+		unset($data['featured_cid']);
 		
 		// Make tags unique
 		$tags = array_keys(array_flip($tags));
@@ -1910,7 +1935,7 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// Check multi category tampering
-			$postcats = @ $submit_conf['postcats'];
+			$postcats = isset($submit_conf['postcats']) ? $submit_conf['postcats'] : null;
 			if ( !$isnew || !$overridecatperms || $postcats==2 )
 				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
 			else if ( $postcats==0 )
@@ -2457,7 +2482,10 @@ class ParentClassItem extends JModelAdmin
 					$postdata[$field->name] = $field->value;
 					$maintain_dbval = true;*/
 					
-				} else if ($field->iscore) {
+				}
+
+				else if ($field->iscore)
+				{
 					// (posted) CORE FIELDS: if not set maintain their DB value ...
 					if ( isset($core_via_post[$field->name]) )
 					{
@@ -2468,54 +2496,68 @@ class ParentClassItem extends JModelAdmin
 							$postdata[$field->name] = $field->value;
 							$maintain_dbval = true;
 						}
+					}
 
 					// (not posted) CORE FIELDS: get current value
-					} else {
+					else
+					{
 						// Get value from the updated item instead of old data
 						$postdata[$field->name] = $this->getCoreFieldValue($field, 0);
 					}
+				}
+
 				// OTHER CUSTOM FIELDS (not hidden and not untranslatable)
-				} else {
-					$postdata[$field->name] = @$data['custom'][$field->name];
+				else
+				{
+					$postdata[$field->name] = isset($data['custom'][$field->name]) ? $data['custom'][$field->name] : null;
 				}
 				
-				// Unserialize values already serialized values, e.g. (a) if current values used are from DB or (b) are being imported from CSV file
-				if ( !is_array($postdata[$field->name]) ) {
+				// Force array for field values
+				if ( !is_array($postdata[$field->name]) )
+				{
 					$postdata[$field->name] = strlen($postdata[$field->name]) ? array($postdata[$field->name]) : array();
 				}
-				foreach ($postdata[$field->name] as $i => $postdata_val) {
-					if ( @unserialize($postdata_val)!== false || $postdata_val === 'b:0;' ) {
-						$postdata[$field->name][$i] = unserialize($postdata_val);
-					}
+
+				// Unserialize values already serialized values
+				// e.g. (a) if current values used are from DB or (b) are being imported from CSV file that contains exported serialized data
+				// (we exclude inner serialized objects, as theses are not valid user data)
+				foreach ($postdata[$field->name] as $i => $postdata_val)
+				{
+					$postdata[$field->name][$i] = flexicontent_db::unserialize_array($postdata_val, $force_array=false, $force_value=true);
 				}
-				
+
 				// Trigger plugin Event 'onBeforeSaveField'
 				if (!$field->iscore || isset($core_via_post[$field->name]))
 				{
 					$field_type = $field->iscore ? 'core' : $field->field_type;
 					$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
 					$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item ));
-					
-					if ($result===false) {
+
+					if ($result===false)
+					{
 						// Field requested to abort item saving
 						$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
 						return 'abort';
 					}
-					
+
 					// For CORE field get the modified data, which will be used for storing in DB (these will be re-bind later)
-					if ( isset($core_via_post[$field->name]) ) {
+					if ( isset($core_via_post[$field->name]) )
+					{
 						$core_data_via_events[$field->name] = isset($postdata[$field->name][0]) ? $postdata[$field->name][0] : '';  // The validation may have skipped it !!
 					}
 					
-				} else {
-					// Currently other CORE fields, these are skipped we will not call onBeforeSaveField() on them, neither rebind them
 				}
-				
+
+				// Currently other CORE fields, these are skipped we will not call onBeforeSaveField() on them, neither rebind them
+				else
+				{
+				}
+
 				//$qindex[$field->name] = NULL;
 				//$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
 				//$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item, &$qindex[$field->name] ));
 				//if ($result===false) { ... }
-				
+
 				// Get vstate property from the field object back to the data array ... in case it was modified, since some field may decide to prevent approval !
 				$data['vstate'] = $field->item_vstate;
 			}
@@ -3773,24 +3815,37 @@ class ParentClassItem extends JModelAdmin
 		$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
 		
 		// Get values of language parent item (if not loading a specific version) to use them for untranslatable fields
-		if ( $lang_parent_id && !$this->_version) {
+		if ( $lang_parent_id && !$this->_version)
+		{
 			$custom_vals[$lang_parent_id] = $this->getCustomFieldsValues($lang_parent_id, 0);
 		}
+
 		foreach ($fields as $field)
 		{
-			$field->item_id		= (int)$this->_id;
-			// version number should be ZERO when versioning disabled, or when wanting to load the current version !!!
-			if ( (!$this->_version || !$use_versioning) && $field->iscore) {
-				// Load CURRENT (non-versioned) core field from properties of item object
+			$field->item_id = (int)$this->_id;
+
+			// Version number should be ZERO when versioning disabled, or when wanting to load the current version !!!
+			// Load CURRENT (non-versioned) core field from properties of item object
+			if ( (!$this->_version || !$use_versioning) && $field->iscore)
+			{
 				$field->value = $this->getCoreFieldValue($field, $this->_version, $old_item);
-			} else {
-				// Load non core field (versioned or non-versioned) OR core field (versioned only)
-				// while checking if current field is using untranslatable value from original content item
-				$item_id = ($lang_parent_id && @$field->untranslatable && !$this->_version) ? $lang_parent_id : $this->_id;
-				$field->value = isset( $custom_vals[$item_id][$field->id] ) ? $custom_vals[$item_id][$field->id] : array();
-				if( ( $field->name=='categories') || $field->name=='tags' ) {
-					// categories and tags must have been serialized but some early versions did not do it, we will check before unserializing them
-					$field->value = ($array = @unserialize($field->value[0]) ) ? $array : $field->value;
+			}
+
+			// Load non core field (versioned or non-versioned) OR core field (versioned only)
+			// while checking if current field is using untranslatable value from original content item
+			else
+			{
+				$item_id = ($lang_parent_id && $field->untranslatable && !$this->_version) ? $lang_parent_id : $this->_id;
+				$field->value = isset($custom_vals[$item_id][$field->id]) ? $custom_vals[$item_id][$field->id] : array();
+
+				// Categories and Tags must have been serialized but some early versions did not do it, we will check before unserializing them
+				if ($field->name=='categories' || $field->name=='tags')
+				{
+					$array = flexicontent_db::unserialize_array($field->value[0], $force_array=true, $force_value=false);
+					if ( $array!==false )
+					{
+						$field->value = $array;
+					}
 				}
 			}
 			
@@ -3939,7 +3994,8 @@ class ParentClassItem extends JModelAdmin
 		$this->_db->setQuery($query);
 		return $this->_db->loadResult();
 	}
-	
+
+
 	/**
 	 * Helper method to format a value as array
 	 * 
@@ -3948,10 +4004,17 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function formatToArray($value)
 	{
-		$value = $value ? $value : array();
-		$value = is_array($value) ? $value : array($value);
-		return $value;
+		if (is_object($value))
+		{
+			return (array) $value;
+		}
+		if (!is_array($value) && !strlen($value))
+		{
+			return array();
+		}
+		return is_array($value) ? $value : array($value);
 	}
+
 
 	/**
 	 * Helper method to bind form posted item parameters and and metadata to the item

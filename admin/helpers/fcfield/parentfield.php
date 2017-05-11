@@ -459,4 +459,11 @@ class FCField extends JPlugin
 		
 		return $arr;
 	}
+
+
+	// Unserialize array from string but abort if objects are detected
+	function unserialize_array($v, $force_array=false, $force_value = true)
+	{
+		return flexicontent_db::unserialize_array($v, $force_array, $force_value);
+	}
 }

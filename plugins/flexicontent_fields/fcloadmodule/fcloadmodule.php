@@ -15,8 +15,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsFcloadmodule extends JPlugin
+class plgFlexicontent_fieldsFcloadmodule extends FCField
 {
 	static $field_types = array('fcloadmodule');
 	
@@ -61,13 +62,13 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		$value = reset($field->value);
 
-		// Compatibility for unserialized values or for NULL values in a field group (for fields that support this)
+		// Compatibility for non-serialized values or for NULL values in a field group
+		$value = reset($field->value);
 		if ( !is_array($value) )
 		{
-			$v = !empty($value) ? @unserialize($value) : false;
-			$value = ( $v !== false || $v === 'b:0;' ) ? $v : array();
+			$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+			$value = $array ?: array();
 		}
 
 		foreach ($mod_params as $mod_param)
@@ -75,7 +76,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 			if ( !strlen($mod_param) ) continue;
 
 			list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
-			$param_value = @ $value[$param_name];
+			$param_value = isset($value[$param_name]) ? $value[$param_name] : '';
 
 			$field->html[] = $param_label.
 				': <input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'[0]['.$param_name.']" class="input-xlarge" type="text" size="40" value="'.$param_value.'" />'
@@ -91,45 +92,62 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		
-		global $addthis;
-		$mainframe = JFactory::getApplication();
-		
+
 		$values = $values ? $values : $field->value;
-		if ( empty($values[0]) )
+		if (empty($values))
 		{
-			$values[0] = '';
+			$values = array(array());
 		}
 		
+		$unserialize_vals = true;
+		if ($unserialize_vals)
+		{
+			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+			foreach ($values as &$value)
+			{
+				// Compatibility for non-serialized values or for NULL values in a field group
+				if ( !is_array($value) )
+				{
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array();
+				}
+			}
+			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
+		}
+
 		// parameters shortcuts
 		$module_method_oldname = $field->parameters->get('module-method', 1);
 		$module_method	= $field->parameters->get('module_method', $module_method_oldname );
 		$mymodule		= (int) $field->parameters->get('modules', 0);
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
-		
+
 		$document		= JFactory::getDocument();
 		$display 		= array();
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
-		
-		
+
+
 		// *********************
 		// CASE: specific module
 		// *********************
 		if ($module_method == 1)
 		{
-			if ( $mymodule==0 ) { $field->{$prop} = 'Please select a module'; return; }
-			
-			
+			if ($mymodule == 0)
+			{
+				$field->{$prop} = 'Please select a module';
+				return;
+			}
+
+
 			// *****************
 			// Query module data
 			// *****************
 			$object  = $this->_getModuleObject($mymodule);
 			if ( empty($object) ) { $field->{$prop} = 'Selected module was not found, e.g. it was deleted'; return; }
 			//echo '<pre>'; print_r($object); echo '</pre>';
-			
-			
+
+
 			// *****************
 			// Get module object
 			// *****************
@@ -137,40 +155,44 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 			//$mod = JModuleHelper::getModule(substr($object->module, 4), $object->title);
 			//echo '<pre>'; print_r($mod); echo '</pre>';
 			//echo '<pre>'; echo substr($object->module, 4) . ": ". $object->title; echo '</pre>';
-			
-			
+
+
 			// *****************************
 			// Set module parameter per item 
 			// *****************************
 			$mod_params	= $field->parameters->get( 'mod_params', '') ;
 			$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
 			$mod_params = !empty($mod_params[0]) ? $mod_params : array();
-			
-			
+
+
 			// ***************************************************************************
 			// Apply per item configuration to the module (set module parameters per item)
 			// ***************************************************************************
-			$value = unserialize($values[0]);
+			$value = reset($values);
+
 			$custom_mod_params = array();
 			foreach ($mod_params as $mod_param)
 			{
 				if ( !strlen($mod_param) ) continue;
 
 				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
-				$custom_mod_params[ $param_name ] = $value[$param_name];
+				$custom_mod_params[$param_name] = isset($value[$param_name]) ? $value[$param_name] : null;
 			}
 			$_mod_params = new JRegistry($mod->params);
-			foreach ($custom_mod_params as $i => $v) $_mod_params->set($i,$v);
-			$mod->params = $_mod_params ->toString();
-			
-			
+			foreach ($custom_mod_params as $i => $v)
+			{
+				$_mod_params->set($i,$v);
+			}
+			$mod->params = $_mod_params->toString();
+
+
 			// ************************
 			// Render the module's HTML
 			// ************************
 			$display[] = $renderer->render($mod, $mparams);
 		}
-		
-		
+
+
 		// ************************************
 		// CASE: all modules in module position
 		// ************************************

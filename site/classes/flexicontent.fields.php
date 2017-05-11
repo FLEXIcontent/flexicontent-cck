@@ -1169,9 +1169,10 @@ class FlexicontentFields
 				// Unserialize values already serialized values
 				foreach ($fvalues as $i => $val)
 				{
-					if ( @unserialize($val)!== false || $val === 'b:0;' )
+					$array = flexicontent_db::unserialize_array($val, $force_array=false, $force_value=false);
+					if ( $array!== false )
 					{
-						$fvalues[$i] = unserialize($val);
+						$fvalues[$i] = $array;
 					}
 				}
 
@@ -1631,10 +1632,14 @@ class FlexicontentFields
 				$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name=".$db->Quote($field->name."_".$typealias);
 				$db->setQuery($query);  //echo $query;
 				$data = $db->loadObject(); //print_r($data);
-				if (@$data->published) JFactory::getApplication()->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
+				if ($data && $data->published)
+				{
+					JFactory::getApplication()->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
+				}
 				
 				// Finally merge custom field parameters with the type specific parameters ones
-				if ($data) {
+				if ($data)
+				{
 					$ts_params = new JRegistry($data->attribs);
 					$fdata[$tindex][$field->name]->parameters->merge($ts_params);
 				}
@@ -2438,10 +2443,13 @@ class FlexicontentFields
 			foreach($item_values as $vi => $v)
 			{
 				// Make sure multi-property data are unserialized
-				if ($unserialize)
+				if ($unserialize && !is_array($v))
 				{
-					$data = @ unserialize($v);
-					$v = ($v === 'b:0;' || $data !== false) ? $data : $v;
+					$array = flexicontent_db::unserialize_array($v, $force_array=false, $force_value=false);
+					if ( $array!==false )
+					{
+						$v = $array;
+					}
 				}
 
 				// Check value is not empty
@@ -2488,7 +2496,12 @@ class FlexicontentFields
 						}
 						catch (Exception $e) {
 							$indexed_pdfs[$abspath] = '';
-							$err_msg = (JFactory::getApplication()->isAdmin() ? implode(' ', error_get_last()) . ' <br/> ' : '' )  .  $e->getMessage();
+							$err_msg = '';
+							if (JFactory::getApplication()->isAdmin() && ($last_error = error_get_last()))
+							{
+								$err_msg .= implode(' ', error_get_last()) . ' <br/> ';
+							}
+							$err_msg .= $e->getMessage();
 						}
 					}
 				}
@@ -3625,8 +3638,7 @@ class FlexicontentFields
 		$time_formats_map = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
 		$date_time_format = $date_format . $time_formats_map[$date_allowtime];
 		$attribs['showTime'] = $date_allowtime ? 1 : 0;
-		$calendar = JHTML::_('calendar', $date, $fieldname, $elementid, $date_time_format, $attribs);
-		return $calendar;
+		return JHTML::_('calendar', $date, $fieldname, $elementid, $date_time_format, $attribs);
 	}
 	
 	
@@ -3698,16 +3710,24 @@ class FlexicontentFields
 			// Check and unserialize values
 			foreach ($_results as $i => $result)
 			{
-				$v = @unserialize($result->value);
-				if ( $v || $result->value === 'b:0;' ) $_results[$i] = & $v;
+				$array = flexicontent_db::unserialize_array($result->value, $force_array=false, $force_value=false);
+				if ( $array!==false )
+				{
+					$_results[$i] = $array;
+				}
 			}
-			
+
 			// Index values via the search property
 			$results = array();
-			foreach ($_results as $i => $result) {
-				if ( is_array($_results[$i]) ) $_results[$i] = (object) $_results[$i];
-				else $_results[$i] = (object) array($search_prop=>$_results[$i]);
-				if ( isset($_results[$i]->$search_prop) ) $results[ $_results[$i]->$search_prop ] = $_results[$i];
+			foreach ($_results as $i => $result)
+			{
+				$_results[$i] = is_array($_results[$i])
+					? (object) $_results[$i]
+					: (object) array($search_prop=>$_results[$i]);
+				if ( isset($_results[$i]->$search_prop) )
+				{
+					$results[ $_results[$i]->$search_prop ] = $_results[$i];
+				}
 			}
 		
 		// non-indexable or single property field
@@ -3717,8 +3737,10 @@ class FlexicontentFields
 		if (empty($results)) $results = array();
 		
 		// Language filter labels
-		if ($lang_filter_values) {
-			foreach ($results as $i => $result) {
+		if ($lang_filter_values)
+		{
+			foreach ($results as $i => $result)
+			{
 				$results[$i]->text = JText::_($result->text);
 			}
 		}

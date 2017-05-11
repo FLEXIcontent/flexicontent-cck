@@ -47,7 +47,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_OPTIONS_PER_VALUE" description="" level="level3" />
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_OPTIONS" description="FLEXI_FIELD_MAX_OPTIONS_DESC" />
 			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_OPTIONS" description="FLEXI_FIELD_MIN_OPTIONS_DESC" />

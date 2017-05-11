@@ -342,7 +342,7 @@ class plgFlexicontent_fieldsText extends FCField
 			$field->html[] = '
 				'.$text_field.'
 				'.$select_field.'
-				'.($use_ingroup ? '' : '
+				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -406,8 +406,10 @@ class plgFlexicontent_fieldsText extends FCField
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and no default value, and return empty display
-		if ( empty($values) ) {
-			if (!strlen($default_value)) {
+		if ( empty($values) )
+		{
+			if (!strlen($default_value))
+			{
 				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
@@ -419,7 +421,8 @@ class plgFlexicontent_fieldsText extends FCField
 		// Language filter, clean output, encode HTML
 		// ******************************************
 		
-		if ($clean_output) {
+		if ($clean_output)
+		{
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output || $format_output)

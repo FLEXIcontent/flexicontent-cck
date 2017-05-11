@@ -14,10 +14,11 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
 use Joomla\String\StringHelper;
+jimport('cms.plugin.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsRelation extends JPlugin
+class plgFlexicontent_fieldsRelation extends FCField
 {
 	var $task_callable = array('getCategoryItems');
 	
@@ -57,16 +58,20 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		$field->html = '';
-		
+
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
+
+		// ************************
 		// Case of autorelated item
-		$autorelation_itemid = JRequest::getInt('autorelation_'.$field->id);
+		// ************************
+
+		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$field->id, 0, 'int');
 
 		if ( $autorelation_itemid )
 		{
-			$field->html = 'You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field';
+			$field->html = '<div class="alert alert-warning">You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field</div>';
 			return;
 		}
 
@@ -74,16 +79,22 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// ************************************************************************
 		// Initialise values and split them into: (a) item ids and (b) category ids
 		// ************************************************************************
-		$default_values		= '';
-		if( $item->version == 0 && $default_values) {
-			$field->value = explode(",", $default_values);
-		} else if (!$field->value) {
+		if (!$field->value)
+		{
 			$field->value = array();
-		} else {
-			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed more easily !!!
-			$field->value = ( $field_data = @unserialize($field->value[0]) ) ? $field_data : $field->value;
 		}
-		
+		else
+		{
+			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
+			if ( !is_array($field->value) )
+			{
+				$field->value = array($field->value);
+			}
+			$array = $this->unserialize_array(reset($field->value), $force_array=false, $force_value=false);
+			$field->value = $array ?: $field->value;
+		}
+
+
 		$_itemids_catids = array();
 		$_itemids = array();
 		foreach($field->value as $i => $val)
@@ -367,8 +378,8 @@ jQuery(document).ready(function()
 		
 		$document->addScriptDeclaration( $js );
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
@@ -376,7 +387,12 @@ jQuery(document).ready(function()
 		
 		$field->label = JText::_($field->label);
 		$field->{$prop} = '';
+
 		$values = $values ? $values : $field->value;
+		if ( !is_array($values) )
+		{
+			$values = array($values);
+		}
 
 		$user = JFactory::getUser();
 		$show_total_only     = $field->parameters->get('show_total_only', 0);
@@ -431,22 +447,28 @@ jQuery(document).ready(function()
 		// Prepare item list data for rendering the related items list
 		// ***********************************************************
 
+		$reverse_field_id = $field->parameters->get('reverse_field', 0);
+
 		if ($field->field_type == 'relation_reverse')
 		{
-			$reverse_field = $field->parameters->get( 'reverse_field', 0) ;
-			if ( !$reverse_field ) {
-				$field->{$prop} .= 'Field [id:'.$field->id.'] : '.JText::_('FLEXI_FIELD_NO_FIELD_SELECTED');
+			// Check that relation field to be reversed was configured
+			if ( !$reverse_field_id )
+			{
+				$field->{$prop} .= '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 				return;
 			}
-			$_itemids_catids = null;  // Always ignore passed items, the DB query will determine the items
+
+			// Always ignore passed items, the DB query will determine the items
+			$_itemids_catids = null;
 		}
 		else  // $field->field_type == 'relation')
 		{
 			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-			$values = ( $field_data = @unserialize($values) ) ? $field_data : $values;
+			$array = $this->unserialize_array(reset($values), $force_array=false, $force_value=false);
+			$values = $array ?: $values;
 
 			// set upper limit as $values array length
-			$itemcount = count ($values);
+			$itemcount = count($values);
 
 			// change upper limit if itemcount is set and error checked
 			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&  
@@ -524,7 +546,7 @@ jQuery(document).ready(function()
 			
 			$field->{$prop} .= ''
 				.($add_before ? $auto_rel_btn : '')
-				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, @ $reverse_field, $field, $item)
+				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, $reverse_field_id, $field, $item)
 				.($add_after ? $auto_rel_btn : '');
 		}
 
@@ -546,8 +568,8 @@ jQuery(document).ready(function()
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
@@ -557,8 +579,8 @@ jQuery(document).ready(function()
 	function onBeforeDeleteField(&$field, &$item) {
 	}
 
-	
-	
+
+
 	// *********************************
 	// CATEGORY/SEARCH FILTERING METHODS
 	// *********************************
