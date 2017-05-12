@@ -1240,9 +1240,11 @@ class FlexicontentModelItems extends JModelLegacy
 				if ($filter_catsinstate == 99) {
 					$_sub_cids = $globalcats[$filter_cats]->descendantsarray;
 				} else {
+				if (!empty($globalcats[$filter_cats])) {
 					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid) {
 						if ($globalcats[$_dcatid]->published==$filter_catsinstate) $_sub_cids[] = $_dcatid;
 					}
+				}
 				}
 				if ( empty ($_sub_cids) ) $where[] = ' FALSE  ';
 				else $where[] = '('.$cat_type.' IN (' . implode( ', ', $_sub_cids ) . ')' .' OR '. 'c.id IN (' . implode( ', ', $_sub_cids ) . '))';
