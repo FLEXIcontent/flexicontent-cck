@@ -259,6 +259,7 @@
 
 			<field name="pdf_header_text" type="textarea" cols="50" rows="2" default="" label="FLEXI_HEADER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
 			<field name="pdf_footer_text" type="textarea" cols="50" rows="2" default="" label="FLEXI_FOOTER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
+
 			<field name="" type="separator" default="FLEXI_HEADER" level="level3" depend_class="stamp_pdfs_mode" />
 			<field name="pdf_header_ffamily" type="list" default="Helvetica" label="Font family" depend_class="stamp_pdfs_mode" description="Select a font-family to for the header text">
 				<option value="Courier">Courier</option>
@@ -269,12 +270,31 @@
 				<option value="ZapfDingbats">ZapfDingbats</option>
 			</field>
 			<field name="pdf_header_fstyle" type="text" default="" label="Font style" depend_class="stamp_pdfs_mode" description="Either leave this empty, which means regular font, &lt;br/&gt; Or enter a combination of &lt;br/&gt; b i u (b:bold, i:italic, u:underline). &lt;br/&gt;&lt;br/&gt; Example for bold and italic: &lt;br/&gt; bi"/>
-			<field name="pdf_header_fsize" type="number" size="40" default="12" label="Font size" depend_class="stamp_pdfs_mode" description="Size is in points. Enter only integers without any suffix"/>
-			<field name="pdf_header_align" type="list" default="C" label="Align" depend_class="stamp_pdfs_mode" description="Left, right, center alignmnet of text">
+			<field name="pdf_header_fsize" type="number" size="40" default="11" label="Font size" depend_class="stamp_pdfs_mode" description="Size is in points. Enter only integers without any suffix"/>
+			<field name="pdf_header_align" type="list" default="C" label="Align" depend_class="stamp_pdfs_mode" description="Left, right, center alignment of text">
 				<option value="C">Center</option>
 				<option value="L">Left</option>
 				<option value="R">Right</option>
 			</field>
+			<field name="pdf_header_border_type" type="text" default="0" label="Border type" depend_class="stamp_pdfs_mode" description="Indicates if borders must be drawn around the cell.&lt;br/&gt; The value can be either a number: &lt;br/&gt; 0: no border (default), 1: frame &lt;br/&gt; or a string containing some or all of the following characters (in any order): &lt;br/&gt; L: left, T: top, R: right, B: bottom" />
+
+			<field name="" type="separator" default="FLEXI_FOOTER" level="level3" depend_class="stamp_pdfs_mode" />
+			<field name="pdf_footer_ffamily" type="list" default="Helvetica" label="Font family" depend_class="stamp_pdfs_mode" description="Select a font-family to for the header text">
+				<option value="Courier">Courier</option>
+				<option value="Helvetica">Helvetica</option>
+				<option value="Arial">Arial</option>
+				<option value="Times">Times</option>
+				<option value="Symbol">Symbol</option>
+				<option value="ZapfDingbats">ZapfDingbats</option>
+			</field>
+			<field name="pdf_footer_fstyle" type="text" default="" label="Font style" depend_class="stamp_pdfs_mode" description="Either leave this empty, which means regular font, &lt;br/&gt; Or enter a combination of &lt;br/&gt; b i u (b:bold, i:italic, u:underline). &lt;br/&gt;&lt;br/&gt; Example for bold and italic: &lt;br/&gt; bi"/>
+			<field name="pdf_footer_fsize" type="number" size="40" default="11" label="Font size" depend_class="stamp_pdfs_mode" description="Size is in points. Enter only integers without any suffix"/>
+			<field name="pdf_footer_align" type="list" default="C" label="Align" depend_class="stamp_pdfs_mode" description="Left, right, center alignment of text">
+				<option value="C">Center</option>
+				<option value="L">Left</option>
+				<option value="R">Right</option>
+			</field>
+			<field name="pdf_footer_border_type" type="text" default="0" label="Border type" depend_class="stamp_pdfs_mode" description="Indicates if borders must be drawn around the cell.&lt;br/&gt; The value can be either a number: &lt;br/&gt; 0: no border (default), 1: frame &lt;br/&gt; or a string containing some or all of the following characters (in any order): &lt;br/&gt; L: left, T: top, R: right, B: bottom" />
 
 			<field name="" type="separator" default="FLEXI_DATES" level="level2" />
 			<field name="" type="separator" default="FLEXI_DATE_PART" level="level4" />

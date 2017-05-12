@@ -1,3 +1,4 @@
+@import 'mixins.less';
 select.fc_is_selmultiple.use_select2_lib {
 	max-height: 0 !important;
 }
