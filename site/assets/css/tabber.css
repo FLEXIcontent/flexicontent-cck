@@ -35,11 +35,6 @@ ul.tabbernav > li > a [class*=" icon-"] {
 	padding-top: 4px;
 	vertical-align: top;
 }
-ul.tabbernav > li:not(.tabberactive):not(:hover) > a [class^="icon-"],
-ul.tabbernav > li:not(.tabberactive):not(:hover) > a [class*=" icon-"] {
-	opacity: 0.7;
-	filter: alpha(opacity=70);
-}
 ul.tabbernav > li.tabberactive a {
 	background-color: #fff;
 	border-bottom: 1px solid #fff;
@@ -112,7 +107,7 @@ body ul.tabbernav > li > a,
 	font-family: arial, helvetica, sans-serif;
 	text-decoration: none;
 	line-height: 220%;
-	font-size: 11px;
+	font-size: 12px;
 	margin: 0px;
 	padding-left: 5px;
 	padding-right: 5px;
@@ -124,8 +119,8 @@ body ul.tabbernav > li > a,
 	border-top: 1px solid #B0B0B0;
 	border-right: 1px solid #808080;
 	border-bottom: 1px solid #808080;
-	font-weight: bold;
-	color: #d0d0d0;
+	font-weight: normal;
+	color: #3071a9;
 	border: 1px solid #25729a;
 	border-color: transparent;
 	background-color: transparent;
@@ -176,7 +171,7 @@ body .tabber-inline ul.tabbernav > li > a,
 }
 body .s-gray ul.tabbernav > li > a,
 #flexicontent .s-gray ul.tabbernav > li > a {
-	color: #d0d0d0;
+	color: #808080;
 	border: 1px solid #838383;
 	border-color: transparent;
 	border-bottom-width: 0;
@@ -219,7 +214,7 @@ body .s-gray ul.tabbernav > li.tabberactive a:before,
 }
 body .s-cblue ul.tabbernav > li > a,
 #flexicontent .s-cblue ul.tabbernav > li > a {
-	color: #d0d0d0;
+	color: #3071a9;
 	border: 1px solid #3377bb;
 	border-color: transparent;
 }

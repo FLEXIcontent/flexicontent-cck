@@ -2750,9 +2750,19 @@ class FlexicontentController extends JControllerLegacy
 					'ffamily' => $fields_conf[$field_id]->get('pdf_header_ffamily', 'Helvetica'),
 					'fstyle' => $fields_conf[$field_id]->get('pdf_header_fstyle', ''),
 					'fsize' => $fields_conf[$field_id]->get('pdf_header_fsize', '12'),
-					'border_width' => 0,
+					'border_type' => $fields_conf[$field_id]->get('pdf_header_border_type', '0'),
+					'border_width' => 2,
 					'border_color' => array(0,0,0),
 					'text_align' => $fields_conf[$field_id]->get('pdf_header_align', 'C')
+				));
+				$pdf->setFooterConf(array(
+					'ffamily' => $fields_conf[$field_id]->get('pdf_footer_ffamily', 'Helvetica'),
+					'fstyle' => $fields_conf[$field_id]->get('pdf_footer_fstyle', ''),
+					'fsize' => $fields_conf[$field_id]->get('pdf_footer_fsize', '12'),
+					'border_type' => $fields_conf[$field_id]->get('pdf_footer_border_type', '0'),
+					'border_width' => 2,
+					'border_color' => array(0,0,0),
+					'text_align' => $fields_conf[$field_id]->get('pdf_footer_align', 'C')
 				));
 
 				// Set the source file

@@ -7,22 +7,29 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS
 class flexicontent_FPDI extends FPDI
 {
 	var $header_conf = array();
+	var $footer_conf = array();
 	var $all_pages_header_text = null;
 	var $all_pages_footer_text = null;
 
 	var $per_page_headers = array();
+	var $per_page_footers = array();
 	var $addPageNumbers = false;
+
 
 	public function setHeaderConf($header_conf = array())
 	{
 		$this->header_conf = $header_conf;
 	}
+	public function setFooterConf($footer_conf = array())
+	{
+		$this->footer_conf = $footer_conf;
+	}
+
 
 	public function setAllPagesHeaderText($all_pages_header_text = null)
 	{
 		if ($all_pages_header_text !== null) $this->all_pages_header_text = $all_pages_header_text;
 	}
-
 	public function setAllPagesFooterText($all_pages_footer_text = null)
 	{
 		if ($all_pages_footer_text !== null) $this->all_pages_footer_text = $all_pages_footer_text;
@@ -31,10 +38,16 @@ class flexicontent_FPDI extends FPDI
 
 	public function Header()
 	{
+		if (!$this->print_header /*|| $this->page == 0*/)
+		{
+			return;
+		}
+
 		// Save current font values
 		$font_family = $this->FontFamily;
 		$font_style  = $this->FontStyle;
 		$font_size   = $this->FontSizePt;
+
 
 		// ***
 		// *** Prepare for output: text color, font family, font style
@@ -44,20 +57,31 @@ class flexicontent_FPDI extends FPDI
 		$this->SetTextColor(0, 0, 0, false);
 
 		// Set font
-		$this->SetFont(@ $this->header_conf['ffamily'], @ $this->header_conf['fstyle'], @ $this->header_conf['fsize']);
+		$this->SetFont(
+			!empty($this->header_conf['ffamily']) ? $this->header_conf['ffamily'] : null,//$this->header_font[0],
+			!empty($this->header_conf['fstyle']) ? $this->header_conf['fstyle'] : null,//$this->header_font[0],
+			!empty($this->header_conf['fsize']) ? $this->header_conf['fsize'] : null//$this->header_font[0]
+		);
 
 		// Set style for cell border
 		$prevlinewidth = $this->GetLineWidth();
 		if (!empty($this->header_conf['border_width']))  $this->SetLineWidth($this->header_conf['border_width']);
 		if (!empty($this->header_conf['border_color']))  $this->SetDrawColor($this->header_conf['border_color'][0], $this->header_conf['border_color'][1], $this->header_conf['border_color'][2]);
 
+
 		// ***
-		// *** Create header
+		// *** Add Header text
 		// ***
-		$add_border = !empty($this->header_conf['border_width']) ? 1 : 0;
+
+		$border_type = !empty($this->header_conf['border_type']) ? $this->header_conf['border_type'] : 0;
 		$text_align = !empty($this->header_conf['text_align']) ? $this->header_conf['text_align'] : 'C';
 		$header_text = @ $this->per_page_headers[$this->page] ?: $this->all_pages_header_text;
-		if ($header_text) $this->Cell(0, 0, $header_text, $add_border, 1, $text_align);
+
+		if ($header_text)
+		{
+			$this->Cell(0, 0, $header_text, $border_type, 1, $text_align);
+		}
+
 
 		// ***
 		// *** Restore line width and font values
@@ -69,7 +93,7 @@ class flexicontent_FPDI extends FPDI
 
 	public function Footer()
 	{
-		if (!$this->print_footer || $this->page == 0)
+		if (!$this->print_footer /*|| $this->page == 0*/)
 		{
 			return;
 		}
@@ -80,14 +104,8 @@ class flexicontent_FPDI extends FPDI
 		// ***
 
 		// Store (on 1st method call) original header margins
-		if (!isset($this->original_lMargin))
-		{
-			$this->original_lMargin = $this->lMargin;
-		}
-		if (!isset($this->original_rMargin))
-		{
-			$this->original_rMargin = $this->rMargin;
-		}
+		$this->original_lMargin = !isset($this->original_lMargin) ? $this->lMargin : $this->original_lMargin;
+		$this->original_rMargin = !isset($this->original_rMargin) ? $this->rMargin : $this->original_rMargin;
 
 		// Save current font values
 		$font_family = $this->FontFamily;
@@ -103,13 +121,16 @@ class flexicontent_FPDI extends FPDI
 		$this->SetTextColor(0, 0, 0, false);
 
 		// Set font
-		$this->SetFont($this->footer_font[0], $this->footer_font[1] , $this->footer_font[2]);
+		$this->SetFont(
+			!empty($this->footer_conf['ffamily']) ? $this->footer_conf['ffamily'] : null,//$this->footer_font[0],
+			!empty($this->footer_conf['fstyle']) ? $this->footer_conf['fstyle'] : null,//$this->footer_font[0],
+			!empty($this->footer_conf['fsize']) ? $this->footer_conf['fsize'] : null//$this->footer_font[0]
+		);
 
 		// Set style for cell border
 		$prevlinewidth = $this->GetLineWidth();
-		$line_width = 0.3;
-		$this->SetLineWidth($line_width);
-		$this->SetDrawColor(0, 0, 0);
+		if (!empty($this->footer_conf['border_width']))  $this->SetLineWidth($this->footer_conf['border_width']);
+		if (!empty($this->footer_conf['border_color']))  $this->SetDrawColor($this->footer_conf['border_color'][0], $this->footer_conf['border_color'][1], $this->footer_conf['border_color'][2]);
 
 
 		// ***
@@ -167,10 +188,17 @@ class flexicontent_FPDI extends FPDI
 
 
 		// ***
-		// *** Add common Footer text, if this was set
+		// *** Add Footer text
 		// ***
-		$footer = $this->all_pages_footer_text;
-		if ($footer) $this->Cell(0, $footer_height, $footer, 'T', 0, 'R');
+
+		$border_type = !empty($this->footer_conf['border_type']) ? $this->footer_conf['border_type'] : 0;
+		$text_align = !empty($this->footer_conf['text_align']) ? $this->footer_conf['text_align'] : 'C';
+		$footer_text = @ $this->per_page_footers[$this->page] ?: $this->all_pages_footer_text;
+
+		if ($footer_text)
+		{
+			$this->Cell(0, $footer_height, $footer_text, $border_type, 0, $text_align);
+		}
 
 
 		// ***
@@ -179,5 +207,4 @@ class flexicontent_FPDI extends FPDI
 		$this->SetLineWidth($prevlinewidth);
 		$this->SetFont($font_family, $font_style, $font_size);
 	}
-
 }
