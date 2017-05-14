@@ -2478,6 +2478,7 @@ class FlexicontentFields
 
 				// Support for indexing text in PDF files
 				$err_msg = '';
+				$pdf_indexing_aborted = false;
 				if ( $pdf_parser && !empty($field->field_isfile) && strtolower(flexicontent_upload::getExt($v['filename'])) == 'pdf' )
 				{
 					$abspath = JPath::clean( ($v['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) .DS. $v['filename'] );  //echo $abspath . "<br/>";  					//echo "<pre>"; print_r($v); echo "</pre>";
@@ -2495,20 +2496,26 @@ class FlexicontentFields
 							$search_value[] = $indexed_pdfs[$abspath] = @ $pdf_data->getText();
 						}
 						catch (Exception $e) {
+							$pdf_indexing_aborted = true;
 							$indexed_pdfs[$abspath] = '';
 							$err_msg = '';
 							if (JFactory::getApplication()->isAdmin() && ($last_error = error_get_last()))
 							{
 								$err_msg .= implode(' ', error_get_last()) . ' <br/> ';
+								if (function_exists('error_clear_last')) error_clear_last();
 							}
 							$err_msg .= $e->getMessage();
 						}
 					}
 				}
 
+				if ($pdf_indexing_aborted)
+				{
+					JFactory::getApplication()->enqueueMessage('<b>' . $v['filename'] . '</b> : ' . JText::_('FLEXI_PATH_PDF_PARSING_NOT_SUPPORTED_BY_SEARCH_INDEXING'), 'notice');
+				}
 				if ($err_msg)
 				{
-					JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
+					if (0 && JDEBUG) JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
 				}
 
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
