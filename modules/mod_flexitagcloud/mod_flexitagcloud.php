@@ -77,23 +77,34 @@ $add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
 $layout 				= $params->get('layout', 'default');
 
 // Add css
-if ($add_ccs) {
+if ($add_ccs)
+{
 	// Work around for extension that capture module's HTML 
-	if ($add_ccs==2) {
+	if ($add_ccs==2)
+	{
+
+		// Module 's core CSS
 		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VHASH.'">';
-		echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VHASH.'">';
-		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
+
+		// Component CSS with optional override
+		echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
+		{
+			echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 	}
 	
 	// Standards compliant implementation by placing CSS link into the HTML HEAD
-	else {
+	else
+	{
+
+		// Module 's core CSS
 		$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VHASH);
+
+		// Component CSS with optional override
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
+		{
 			$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}

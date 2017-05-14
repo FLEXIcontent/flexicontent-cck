@@ -7,6 +7,50 @@ class flexicontent_html
 	static $use_bootstrap = true;
 	static $icon_classes = null;
 	static $option = 'com_flexicontent';
+	static $inline_links = array();
+
+	static function getInlineLinkOnce($link, $options)
+	{
+		// Check if already added
+		if ( isset(self::$inline_links[$link]) )
+		{
+			foreach(self::$inline_links[$link]['options'] as $i => $v)
+			{
+				if ( isset($options[$i]) && $options[$i] == $v )
+				{
+					return '';
+				}
+			}
+			return '';
+		}
+
+		// Check if link already added to head object
+		if( isset(JFactory::getDocument()->_styleSheets[$link]) )
+		{
+			$headlink = JFactory::getDocument()->_styleSheets[$link];
+			if (isset($headlink['options']))
+			{
+				foreach($headlink['options'] as $i => $v)
+				{
+					if ( isset($options[$i]) && $options[$i] == $v )
+					{
+						return '';
+					}
+				}
+			}
+		}
+
+		// return an inline link
+		self::$inline_links[$link]['options'] = $options;
+		$ops = array();
+		foreach($options as $i => $v)
+		{
+			$ops[] =  $i . '=' . $v;
+		}
+		if ($ops) $link .= '?' . implode('&', $ops);
+		return '<link rel="stylesheet" href="'.$link.'">';
+	}
+
 
 	static function load_class_config()
 	{
