@@ -257,22 +257,6 @@ div fieldset.panelform ul.adminformlist > li .input-append,
 div fieldset.panelform ul.adminformlist > li .input-prepend {
 	margin: 0px;
 }
-#jform_tid-lbl,
-#jform_attribs_ilayout-lbl,
-div fieldset.panelform :not(.label-fcouter) label:not(.btn).hasTooltip {
-	clear: both;
-	padding: 5px 3px !important;
-	margin: 2px 4px 0px 4px !important;
-	background-color: #F2F2F2;
-	border-bottom: 1px solid #D0D0D0;
-	border-right: 1px solid #D0D0D0;
-	color: #666666;
-	font-weight: normal;
-	text-align: right;
-	width: 132px;
-	overflow: hidden;
-	display: inline-block;
-}
 div fieldset label:not(.btn) {
 	margin: 1px 6px 1px 2px;
 	clear: none;
@@ -294,10 +278,6 @@ div.width-80 fieldset,
 div.width-100 fieldset {
 	background-color: #FFFFFF !important;
 	padding: 5px 8px 8px 5px !important;
-}
-div fieldset.panelform :not(.label-fcouter) label:not(.btn) {
-	min-width: 132px;
-	text-align: right;
 }
 div fieldset.panelform td {
 	border: 1px solid #e0e0e0;

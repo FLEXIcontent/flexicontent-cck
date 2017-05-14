@@ -148,7 +148,7 @@
 			</field>
 
 			<field name="" type="separator" default="Values Layout" description="" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="Select layout" description="" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="value*" exclude="value.php" stripext="1" hide_none="1" hide_default="" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			

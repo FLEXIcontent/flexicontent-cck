@@ -64,7 +64,7 @@ $this->document->addScriptDeclaration($js);
 	
 		<!--span class="badge"><h3><?php echo JText::_( /*'FLEXI_STANDARD_FIELDS_PROPERTIES'*/'Common configuration' ); ?></h3></span-->
 		
-		<table class="fc-form-tbl" style="margin-bottom:12px;">
+		<table class="fc-form-tbl fcinner" style="margin-bottom:12px;">
 			<tr>
 				<td class="key">
 					<?php echo $form->getLabel('label'); ?>
@@ -141,7 +141,7 @@ $this->document->addScriptDeclaration($js);
 			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-home-2" >
 				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 				
-				<table class="fc-form-tbl">
+				<table class="fc-form-tbl fcinner">
 					<tr>
 						<td class="key">
 							<?php echo $form->getLabel('published'); ?>
@@ -172,7 +172,7 @@ $this->document->addScriptDeclaration($js);
 				
 				<div class="fcclear"></div>				
 
-				<table class="fc-form-tbl">
+				<table class="fc-form-tbl fcinner">
 					<tr>
 						<td style="padding-top:24px;">
 							<?php $box_class = $this->row->iscore ? 'fc-info' : ($this->typesselected ? 'fc-success' : 'fc-warning'); ?>
@@ -183,9 +183,9 @@ $this->document->addScriptDeclaration($js);
 					</tr>
 					<tr>
 						<td>
-							<span class="label label-warning" style="vertical-align:middle;">
+							<label class="label label-warning" style="vertical-align:middle;">
 								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
-							</span>
+							</label>
 							<?php echo /*FLEXI_J16GE ? $form->getInput('tid') :*/ $this->lists['tid']; ?>
 						</td>
 					</tr>
@@ -196,7 +196,7 @@ $this->document->addScriptDeclaration($js);
 			
 			<div class="tabbertab" id="fcform_tabset_common_item_form_tab" data-icon-class="icon-pencil" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?> </h3>
-				<table class="fc-form-tbl">
+				<table class="fc-form-tbl fcinner">
 					
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
@@ -256,7 +256,7 @@ $this->document->addScriptDeclaration($js);
 					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
 					<div class="fcclear"></div>
 				
-					<table class="fc-form-tbl">
+					<table class="fc-form-tbl fcinner">
 						<?php if ($this->supportsearch) : ?>
 						<tr>
 							<td class="key">
@@ -293,7 +293,7 @@ $this->document->addScriptDeclaration($js);
 					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
 					<div class="fcclear"></div>
 					
-					<table class="fc-form-tbl">
+					<table class="fc-form-tbl fcinner">
 						<?php if ($this->supportadvsearch) : ?>
 						<tr>
 							<td class="key">
@@ -404,7 +404,7 @@ $this->document->addScriptDeclaration($js);
 							echo '
 						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 							'.($field->label ? '
-								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+								<span class="label-fcouter">'.str_replace('class="', 'class="label-fcinner ', $field->label).'</span>
 								<div class="container_fcfield">'.$field->input.'</div>
 							' : $field->input).'
 						</fieldset>

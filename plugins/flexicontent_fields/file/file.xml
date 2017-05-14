@@ -57,7 +57,7 @@
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 			
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
-			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
 			<field name="form_file_preview" type="radio" default="0" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
@@ -362,7 +362,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_TOTALS" level="level2" />
 			<field name="display_total_count" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT_DESC" class="btn-group btn-group-yesno">

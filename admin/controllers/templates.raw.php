@@ -290,7 +290,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 					$_depends = $field->getAttribute('depend_class');
 					
 					//echo $field->label . $field->input;
-					$_label = str_replace('class="', 'class="label label-fcinner ', $field->label);
+					$_label = str_replace('class="', 'class="label-fcinner ', $field->label);
 					if ($ext_type == 'templates')
 					{
 						$_label = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_', $_label);

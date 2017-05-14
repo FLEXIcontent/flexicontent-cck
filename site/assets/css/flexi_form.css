@@ -15,7 +15,7 @@ select.fc_is_selmultiple.use_select2_lib {
 	border-radius: 4px;
 	height: auto;
 }
-.controls *:not(.input-append):not(.input-prepend):not(.input-group) input[type="text"]:not(.minicolors),
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
 .controls textarea,
 .controls fieldset.radio,
 .controls fieldset.checkbox,

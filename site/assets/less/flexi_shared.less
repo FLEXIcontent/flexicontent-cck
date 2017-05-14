@@ -992,7 +992,15 @@ body input.fc_hidden_value {
 	box-sizing: border-box !important;
 }
 
+#flexicontent form div fieldset.panelform > div,
+form div.container_fcfield > div {
+	margin: 0;
+}
+
 #flexicontent form div fieldset.panelform > fieldset,
+#flexicontent form div fieldset.panelform > div > div.input-append,
+#flexicontent form div fieldset.panelform > div > div.input-prepend,
+#flexicontent form div fieldset.panelform > div > div.btn-group,
 #flexicontent form div fieldset.panelform > div.input-append,
 #flexicontent form div fieldset.panelform > div.input-prepend,
 #flexicontent form div fieldset.panelform > div.btn-group,
@@ -1005,6 +1013,9 @@ body input.fc_hidden_value {
 #flexicontent form div fieldset.panelform > span,
 
 form div.container_fcfield > fieldset,
+form div.container_fcfield > div > div.input-append,
+form div.container_fcfield > div > div.input-prepend,
+form div.container_fcfield > div > div.btn-group,
 form div.container_fcfield > div.input-append,
 form div.container_fcfield > div.input-prepend,
 form div.container_fcfield > div.btn-group,
@@ -1146,12 +1157,12 @@ table.adminform td #search {
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
 #flexicontent .flexi_label {
-	color: white;
+	/*color: white;
 	background-color: #999;
 	border-radius: 3px;
 	
 	font-size: 12px;
-	font-weight: bold;
+	font-weight: bold;*/
 	text-align: right;
 	
 	border: 0px solid;
@@ -1164,7 +1175,7 @@ table.adminform td #search {
 	float: left;
 	clear: left;
 	margin: 2px 1% 3px 0% !important;
-	padding: 8px !important;
+	/*padding: 6px !important;*/
 	box-sizing: border-box;
 }
 body .label-fcouter,
@@ -1181,18 +1192,21 @@ body .label-fcouter > label,
 body .label-fcinner,
 #flexicontent .label-fcouter > label,
 #flexicontent .label-fcinner {
-	font-size: 12px;
 	text-align: right;
 	min-width: 90px;
 	width: 100%;
 	line-height: 150%;
-	float: right;
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+	/*float: right;*/
+	/*font-size: 12px;*/
+	/*text-shadow: 1px 1px 1px rgba(0,0,0,0.2);*/
 	
 	/* important for proper form placement, override ALL or NONE */
-	border: 0px solid !important; /* non-zero causes wrapping */
-	margin: 0 !important;
-	padding: 6px !important;
+	border-left: 0 !important; /* non-zero causes wrapping */
+	border-right: 0 !important; /* non-zero causes wrapping */
+	border-top: 0;
+	border-bottom: 0;
+	margin: 2px 0 3px 0 !important;
+	/*padding: 6px !important;*/
 	box-sizing: border-box;
 	white-space: normal !important;
 }
@@ -1201,10 +1215,15 @@ body .label-fcouter > label.fc_tooltip_icon,
 body .label-fcinner.fc_tooltip_icon,
 #flexicontent .label-fcouter > label.fc_tooltip_icon,
 #flexicontent .label-fcinner.fc_tooltip_icon {
-	padding: 8px 8px 8px 21px !important;
-	background-image: url(../images/information.png);
-	background-position: 3px 5px;
+	padding: 2px 21px 2px 6px !important;
+	background-image: url(../images/comments.png);
+	background-position: 100% 2px;
 	background-repeat: no-repeat;
+}
+
+body label.label-fcaction,
+#flexicontent label.label-fcaction {
+	border-bottom: 1px dashed gray;
 }
 
 body .nowrap_box .label-fcouter,
@@ -1664,7 +1683,7 @@ table.fc-form-tbl.fccompact td {
 table.fc-form-tbl td.key {
 	vertical-align: top;
 	text-align: right;
-	padding: 4px 0px;
+	padding: 2px 0px;
 	max-width: 140px;
 	min-width: 114px;
 }
@@ -1708,6 +1727,7 @@ table.fc-form-tbl td.data {
 }
 table.fc-form-tbl td.key > .fc-prop-lbl {
 	margin: 0 8px 0;
+	display: inline-block;
 }
 
 
@@ -1873,30 +1893,33 @@ div.current ul.config-option-list li {
 }
 
 /* .control-group .control-label label */
-*:not(.form-vertical) > div.control-group div.control-label label,
+:not(.form-vertical) > div.control-group div.control-label label,
 div.current ul.config-option-list li label {
-	font-size: 12px;
-	font-weight: bold; 
 	text-align: right;
 	min-width: 90px;
-	line-height: 150%;
-	
-	margin: 0px 4% 3px 0 !important;
 	width: 96%;
+	line-height: 150%;
 	float: right;
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+	/*font-size: 12px;*/
+	/*text-shadow: 1px 1px 1px rgba(0,0,0,0.2);*/
 	
-	border: 0px solid;
-	padding: 6px !important;
+	/* important for proper form placement, override ALL or NONE */
+	border-left: 0 !important; /* non-zero causes wrapping */
+	border-right: 0 !important; /* non-zero causes wrapping */
+	border-top: 0;
+	border-bottom: 0;
+	margin: 2px 4% 3px 0 !important;
+	/*padding: 6px !important;*/
 	box-sizing: border-box;
-	white-space: normal;
+	white-space: normal !important;
 	display: inline-block;
-	border-radius: 3px;
+	/*border-radius: 3px;*/
 }
 *:not(.form-vertical) > div.control-group div.control-label label:not(.label),
 div.current ul.config-option-list li label:not(.label) {
+	/*font-weight: bold; 
 	color: white;
-	background-color: #999;
+	background-color: #999;*/
 }
 
 
