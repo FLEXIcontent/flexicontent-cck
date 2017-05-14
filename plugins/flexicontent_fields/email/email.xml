@@ -115,7 +115,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_RENDERING_OPTIONS" description="" level="level2" />
 			<field name="email_cloaking" type="radio" default="1" label="FLEXI_FIELD_EMAIL_CLOAKING" description="FLEXI_FIELD_EMAIL_CLOAKING_DESC" class="btn-group btn-group-yesno">

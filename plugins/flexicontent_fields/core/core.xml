@@ -39,7 +39,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/title/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/title/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
@@ -119,7 +119,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/created/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/created/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 
 			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
 				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
@@ -428,7 +428,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/modified/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/modified/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 
 			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
 				<option value="DATE_FORMAT_LC1" show_list="" hide_list="custom-date-mode">DATE_FORMAT_LC1</option>
@@ -1217,7 +1217,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/categories/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/categories/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
@@ -1312,7 +1312,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/tags/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_CORE_DESC" directory="plugins/flexicontent_fields/core/tmpl/tags/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
@@ -1471,7 +1471,7 @@
 				<option value="0" show_list="" hide_list="using-editor-btns">FLEXI_NO</option>
 				<option value="1" show_list="using-editor-btns" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_LIST" description="FLEXI_SKIP_BUTTONS_LIST_DESC" depend_class="using-html-editor" />
+			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_EDITOR_BUTTONS_LIST" description="FLEXI_SKIP_EDITOR_BUTTONS_LIST_DESC" depend_class="using-html-editor" />
 			
 		</fieldset>			
 		<fieldset name="group-maintext-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->

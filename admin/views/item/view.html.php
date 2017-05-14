@@ -115,7 +115,6 @@ class FlexicontentViewItem extends JViewLegacy
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
 		//print_r($unique_tmp_itemid);
-		JRequest::setVar('unique_tmp_itemid', $unique_tmp_itemid);
 		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 
 		// Get number of subscribers
@@ -236,9 +235,9 @@ class FlexicontentViewItem extends JViewLegacy
 		// **************
 		
 		// Applying new item type is a special case that has not loaded custom fieds yet
-		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type', !$isnew ? 'FLEXI_APPLY' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ), false);
+		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type', !$isnew ? 'FLEXI_APPLY_N_RELOAD' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ), false);
 		if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
-			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('items.apply_ajax')", $msg_alert='', $msg_confirm='',
+			'FLEXI_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('items.apply_ajax')", $msg_alert='', $msg_confirm='',
 			$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
 			//'data-placement="bottom" title="Fast saving, without reloading the form. <br/><br/>Note: new files will not be uploaded, <br/>- in such a case please use \'Apply\'"');
 			'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"');
@@ -418,7 +417,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		if ($isnew) {
 			// Case for preselected main category for new items
-			$maincat = $item->catid ? $item->catid : JRequest::getInt('maincat', 0);
+			$maincat = $item->catid ? $item->catid : $jinput->get('maincat', 0, 'int');
 			if (!$maincat) {
 				$maincat = $app->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 			}

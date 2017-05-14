@@ -44,7 +44,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="span6 full_width_980">
 
 			<span class="label-fcouter">
-				<?php echo str_replace('" class="', '" class="label label-fcinner ', $this->form->getLabel('title')); ?>
+				<?php echo str_replace('" class="', '" class="label-fcinner ', $this->form->getLabel('title')); ?>
 			</span>
 			<div class="container_fcfield">
 				<?php echo $this->form->getInput('title'); ?>
@@ -52,7 +52,7 @@ $this->document->addScriptDeclaration($js);
 
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('alias')); ?>
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('alias')); ?>
 			</span>
 			<div class="container_fcfield">
 				<?php echo $this->form->getInput('alias'); ?>
@@ -60,7 +60,7 @@ $this->document->addScriptDeclaration($js);
 
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('language')); ?>
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('language')); ?>
 			</span>
 			<div class="container_fcfield">
 				<?php echo $this->form->getInput('language'); ?>
@@ -71,7 +71,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="span6 full_width_980">
 
 			<span class="label-fcouter">
-				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('published')); ?>
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('published')); ?>
 			</span>
 			<div class="container_fcfield">
 					<?php echo $this->form->getInput('published'); ?>
@@ -79,7 +79,7 @@ $this->document->addScriptDeclaration($js);
 
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('parent_id')); ?>
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('parent_id')); ?>
 			</span>
 			<div class="container_fcfield">
 				<?php echo $this->Lists['parent_id']; ?>

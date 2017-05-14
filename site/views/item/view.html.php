@@ -41,8 +41,11 @@ class FlexicontentViewItem  extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		// check for form layout
-		if($this->getLayout() == 'form' || in_array(JRequest::getVar('task'), array('add','edit')) )
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+
+		// Check for form layout
+		if($this->getLayout() == 'form' || in_array($jinput->get('task', '', 'cmd'), array('add','edit')) )
 		{
 			// Important set layout to be form since various category view SEF links may have this variable set
 			$this->setLayout('form');
@@ -61,8 +64,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
-		$app      = JFactory::getApplication();
-		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
@@ -86,8 +87,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
 		
 		// Decide version to load
-		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
-		$preview = JRequest::getVar( 'preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
+		$version = $jinput->get( 'version', 0, 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$preview = $jinput->get( 'preview', 0, 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
 		$version = $preview && !$version ? -1 : $version;
 		
 		// Allow ilayout from HTTP request, this will be checked during loading item parameters
@@ -318,7 +319,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');
 
-		$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
+		$limitstart = $jinput->get('limitstart', 0, 'int');
 
 		// These events return text that could be displayed at appropriate positions by our templates
 		$item->event = new stdClass();
@@ -333,8 +334,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
-		JRequest::setVar('view', FLEXI_ITEMVIEW);
-		JRequest::setVar('option', 'com_flexicontent');
 		$jinput->set('view', FLEXI_ITEMVIEW);
 		$jinput->set('option', 'com_flexicontent');
 
@@ -477,11 +476,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		// ZERO means allow user to select type, but if user is only allowed a single type, then autoselect it!
 
 		// Try type from session
-		$jdata = $app->getUserState($form->option.'.edit.item.data');
+		$jdata = $app->getUserState('com_flexicontent.edit.item.data');
 		if (!empty($jdata['type_id']) )
 		{
 			// This also forces zero if value not set
-			JRequest::setVar('typeid', (int)$jdata['type_id']);
 			$jinput->set('typeid', (int)$jdata['type_id']);
 		}
 		
@@ -489,14 +487,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		else if ( $menu && isset($menu->query['typeid']) )
 		{
 			// This also forces zero if value not set
-			JRequest::setVar('typeid', (int)$menu->query['typeid']);
 			$jinput->set('typeid', (int)$menu->query['typeid']);
 		}
 		
 		// NOTE about -new_typeid-, this is it used only for CREATING new item (ignored for EDIT existing item)
 		
 		// Verify type ID is exists
-		$new_typeid = JRequest::getVar('typeid', 0, '', 'int');
+		$new_typeid = $jinput->get('typeid', 0, 'int');
 		$type_data = $model->getTypeslist(array($new_typeid), $check_perms = false, $_published=true);
 		if ( $new_typeid && empty($type_data) ) 
 		{
@@ -512,13 +509,12 @@ class FlexicontentViewItem  extends JViewLegacy
 				$single_type = reset($types);
 				$new_typeid = $single_type->id;
 			}
-			JRequest::setVar('typeid', $new_typeid);
 			$jinput->set('typeid', $new_typeid);
 			$canCreateType = true;
 		}
 		
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
-		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$version = $jinput->get( 'version', 0, 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
 		
@@ -644,7 +640,6 @@ class FlexicontentViewItem  extends JViewLegacy
 			$unique_tmp_itemid = $app->getUserState($form->option.'.edit.item.unique_tmp_itemid');
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
-		JRequest::setVar('unique_tmp_itemid', $unique_tmp_itemid);
 		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 		
 		// Component / Menu Item parameters
@@ -728,7 +723,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			// If no edit privilege, check if edit COUPON was provided
 			if ( !$canEdit )
 			{
-				$edittok = JRequest::getCmd('edittok', false);
+				$edittok = $jinput->get('edittok', null, 'cmd');
 				if ($edittok)
 				{
 					$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_edit_coupons"';
@@ -1056,6 +1051,8 @@ class FlexicontentViewItem  extends JViewLegacy
 	 */
 	function _buildEditLists(&$perms, &$params, &$authorparams)
 	{
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();	// get current user
 		$model    = $this->getModel();
@@ -1074,24 +1071,31 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get categories used by the item
 		// *******************************
 		
-		if ($isnew) {
+		if ($isnew)
+		{
 			// Case for preselected main category for new items
-			$maincat = $item->catid ? $item->catid : JRequest::getInt('maincat', 0);
-			if ($maincat) {
+			$maincat = $item->catid ? $item->catid : $jinput->get('maincat', 0, 'int');
+			if ($maincat)
+			{
 				$selectedcats = array($maincat);
 				$item->catid = $maincat;
-			} else {
+			}
+			else
+			{
 				$selectedcats = array();
 			}
 			
-			if ( $params->get('cid_default') ) {
+			if ( $params->get('cid_default') )
+			{
 				$selectedcats = $params->get('cid_default');
 			}
-			if ( $params->get('catid_default') ) {
+			if ( $params->get('catid_default') )
+			{
 				$item->catid = $params->get('catid_default');
 			}
-			
-		} else {
+		}
+		else
+		{
 			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
 			$selectedcats = $this->get( 'Catsselected' );
 		}

@@ -84,9 +84,9 @@ class FlexicontentViewField extends JViewLegacy
 			: JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
 		$ctrl = 'fields.';
 
-		JToolBarHelper::apply( $ctrl.'apply', 'FLEXI_APPLY' );
+		JToolBarHelper::apply( $ctrl.'apply', 'FLEXI_APPLY_N_RELOAD' );
 		if ( !$isnew ) flexicontent_html::addToolBarButton(
-			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('".$ctrl."apply_ajax')", $msg_alert='', $msg_confirm='',
+			'FLEXI_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('".$ctrl."apply_ajax')", $msg_alert='', $msg_confirm='',
 			$btn_task=$ctrl.'apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop"
 		);
 		JToolBarHelper::save( $ctrl.'save' );
