@@ -2515,7 +2515,7 @@ class FlexicontentFields
 				}
 				if ($err_msg)
 				{
-					if (0 && JDEBUG) JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
+					if (JDEBUG) JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
 				}
 
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value

@@ -273,12 +273,37 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
 	$less_files = array('less/flexicontentbackend.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+
+	/* RTL BOF */
+	$less_files = array(
+		'less/flexi_form_rtl.less',
+		'less/flexi_containers_rtl.less',
+		'less/flexi_shared_rtl.less',
+		'less/flexi_frontend_rtl.less'
+	);
 	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+	
+	// Files in backend assets folder
+	$path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
+	
+	$less_files = array('less/flexi_backend_rtl.less');
+	$stale_backend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	
+	$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
+	$less_files = array('less/flexicontentbackend_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+	/* RTL EOF */
+
+
 	$less_files = array('less/j3x.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	
-	$less_files = array('less/flexicontentbackend_rtl.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

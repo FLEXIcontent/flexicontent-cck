@@ -3,7 +3,7 @@ input.fc-inherited-value + label {
 	text-decoration: underline !important;
 }
 div.fc-inherited-value {
-	float: left;
+	float: right;
 	font-weight: bold !important;
 	text-shadow: 0 0 6px;
 	margin: 4px;
@@ -12,7 +12,7 @@ div.fc-inherited-value {
 .ui-dialog.fc-fixed-dialog {
 	position: fixed;
 	top: 40px;
-	left: 30px;
+	right: 30px;
 	overflow: auto;
 }
 body > #system-message-container {
@@ -30,12 +30,12 @@ body.fc-no-scroll {
 }
 .fccleared {
 	clear: both !important;
-	float: left !important;
+	float: right !important;
 }
 #fc_perf_box {
 	margin: 12px 1% 48px;
-	text-align: left;
-	float: left;
+	text-align: right;
+	float: right;
 	width: 98%;
 	display: inline-block;
 	clear: both;
@@ -61,7 +61,7 @@ table#version_tb tr#active-version td {
 }
 #pager {
 	clear: both;
-	float: left;
+	float: right;
 	overflow: hidden;
 	width: 100%;
 	margin-bottom: 5px;
@@ -114,9 +114,9 @@ body ul.fc_plain {
 	list-style-type: disc;
 	margin-top: 2px;
 	margin-bottom: 0px;
-	margin-left: 0;
 	margin-right: 0;
-	padding-left: 16px;
+	margin-left: 0;
+	padding-right: 16px;
 }
 body ul.fc_plain > li {
 	display: list-item;
@@ -197,7 +197,7 @@ ul.fcrecords {
 	}
 }
 .ui-dialog-content > .fcrecords_textarea {
-	float: left !important;
+	float: right !important;
 	max-width: 1000px;
 	width: 62% !important;
 	height: 100% !important;
@@ -217,7 +217,7 @@ ul.fcrecords {
 	display: block;
 	border: 1px solid silver;
 	margin: 2px 4px;
-	float: left;
+	float: right;
 	border-radius: 2px;
 	white-space: nowrap;
 	width: auto;
@@ -267,7 +267,7 @@ ul.fcrecords {
 .records_container .addfield_handle.fc_end {
 	min-width: 200px;
 	box-sizing: border-box;
-	float: left;
+	float: right;
 	margin: 4px 4px;
 }
 .records_container > ul > li.fcrecord .addfield_handle.fc_after {
@@ -356,22 +356,22 @@ table.adminlist thead th.center,
 table.adminlist td.center {
 	text-align: center !important;
 }
-table.adminlist thead th.left,
-table.adminlist td.left {
-	text-align: left !important;
-}
 table.adminlist thead th.right,
 table.adminlist td.right {
 	text-align: right !important;
+}
+table.adminlist thead th.left,
+table.adminlist td.left {
+	text-align: left !important;
 }
 table.adminlist thead a:hover {
 	text-decoration: none;
 }
 table.adminlist thead th img {
-	padding-left: 3px;
+	padding-right: 3px;
 	vertical-align: middle;
 }
-table.adminlist thead td.left .radio {
+table.adminlist thead td.right .radio {
 	display: block;
 	margin-bottom: 5px;
 }
@@ -389,8 +389,8 @@ table.adminlist tr td:first-child::after {
 }
 table.adminlist input[type="text"] {
 	width: auto !important;
-	padding-left: 0px !important;
 	padding-right: 0px !important;
+	padding-left: 0px !important;
 }
 table.adminlist tr td.yellow,
 table.adminlist tbody tr.row0 td.yellow,
@@ -413,7 +413,7 @@ table.adminlist tbody tr:first-child {
 table.adminlist tbody tr {
 	border-top: 1px solid #dadada !important;
 	background: transparent !important;
-	text-align: left;
+	text-align: right;
 }
 table.adminlist tbody tr.collapsed_row {
 	visibility: collapse;
@@ -430,7 +430,7 @@ table.adminlist tbody tr.row1 td {
 .adminlist-table-row {
 	position: absolute;
 	top: 0;
-	left: 0;
+	right: 0;
 	width: 100%;
 	height: 100%;
 	z-index: -1;
@@ -472,7 +472,7 @@ table.adminlist .pagination {
 }
 .submitbutton {
 	background: url(../images/bullet_add.png) no-repeat 0% 50%;
-	padding-left: 12px;
+	padding-right: 12px;
 }
 body div .badge-info-2 {
 	background-color: #2b89a4;
@@ -488,7 +488,7 @@ ul#ultagbox {
 ul#ultagbox > li {
 	list-style-type: none;
 	display: block;
-	float: left;
+	float: right;
 	margin: 2px;
 	line-height: 100%;
 	border-radius: 3px;
@@ -507,7 +507,7 @@ ul#ultagbox > li.tagitem .deletetag {
 	display: block;
 	width: 18px;
 	height: 18px;
-	float: left;
+	float: right;
 	margin: -6px 0 0 -4px;
 	padding: 4px;
 	outline: none;
@@ -516,7 +516,7 @@ ul#ultagbox > li.tagitem .deletetag {
 div#tags {
 	margin: 0px 8px 8px 0;
 	padding: 0px;
-	float: left;
+	float: right;
 }
 div#tags #input-tags {
 	width: auto;
@@ -538,14 +538,14 @@ div#tags #input_new_tag {
 	background: #fff;
 	margin: 0px 4px 4px 0px;
 	padding: 0 0 0 8px;
-	float: left;
+	float: right;
 	min-width: 16px;
 	min-height: 24px;
 }
 .fc_tagidbox {
 	width: 20px !important;
 	display: block !important;
-	float: left !important;
+	float: right !important;
 	margin-top: -4px !important;
 }
 .fc_addtag {
@@ -566,7 +566,7 @@ div#tags #input_new_tag {
 }
 .fc_select_button {
 	display: block;
-	float: left;
+	float: right;
 	padding: 6px;
 	margin: 12px;
 	background-color: #eeeeee;
@@ -574,7 +574,7 @@ div#tags #input_new_tag {
 	border-radius: 6px;
 	font-weight: bold;
 	font-size: 11px;
-	text-align: left;
+	text-align: right;
 	text-decoration: none;
 }
 .fc_select_button:hover {
@@ -614,13 +614,13 @@ div label.lang_box img {
 	border: 1px solid lightgray;
 	padding: 0px;
 	margin: 0px;
-	float: left;
+	float: right;
 }
 .fc_assoc_translation {
 	display: inline-block;
-	float: left;
+	float: right;
 	text-decoration: none;
-	margin-right: 5px;
+	margin-left: 5px;
 	padding: 1px;
 	border: 0px solid green;
 	font-weight: bold !important;
@@ -655,8 +655,8 @@ div label.lang_box img {
 	padding: 0px 0px 4px 0px;
 }
 #flexicontent .pane-sliders .panel .pane-slider {
-	padding-left: 8px;
 	padding-right: 8px;
+	padding-left: 8px;
 }
 #flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
 	padding: 0px !important;
@@ -680,7 +680,7 @@ div fieldset.panelform {
 @media (min-width: 1020px) {
 	.btn.spaced-btn,
 	#toolbar .btn.spaced-btn {
-		margin-left: 32px;
+		margin-right: 32px;
 	}
 }
 body .controls .btn-group.btn-group-yesno .btn,
@@ -780,7 +780,7 @@ body .group-fcset.fc-cleared.fc_input_set {
 }
 body .group-fcset.radio > label,
 body .group-fcset.fc_input_set > div {
-	float: left;
+	float: right;
 	display: inline-block;
 	white-space: nowrap;
 }
@@ -790,7 +790,7 @@ body .group-fcset.fc_input_set.fc-cleared > div {
 	margin: 0 0 2px 0;
 }
 body .group-fcset.fc_input_set.fc-columned > div {
-	float: left;
+	float: right;
 	box-sizing: border-box;
 	margin: 0;
 	border: 0;
@@ -851,7 +851,7 @@ form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
 	margin: 1px 2px 1px 2px;
-	float: left;
+	float: right;
 }
 form div.container_fcfield > input,
 form div.container_fcfield > button,
@@ -865,19 +865,19 @@ form div.container_fcfield > select {
 }
 #flexicontent div fieldset.panelform .input-append,
 #flexicontent div fieldset.panelform .input-prepend {
-	float: left;
+	float: right;
 }
 #flexicontent div fieldset.panelform .input-append > input,
 #flexicontent div fieldset.panelform .input-prepend > button {
-	margin-left: 0px;
+	margin-right: 0px;
 }
 #flexicontent div .input-append > .btn:not(:last-child) {
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
-}
-#flexicontent div .input-prepend > .btn:not(:first-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
+}
+#flexicontent div .input-prepend > .btn:not(:first-child) {
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
@@ -886,8 +886,8 @@ form div.container_fcfield > select {
 	max-width: 81%;
 	box-sizing: border-box;
 	display: inline-block;
-	margin-left: 0 !important;
-	margin-right: 0;
+	margin-right: 0 !important;
+	margin-left: 0;
 	line-height: unset;
 	height: unset;
 }
@@ -958,7 +958,7 @@ table.adminform td #search {
 	padding: 4px !important;
 }
 #flexicontent span.flexi_label label {
-	float: right;
+	float: left;
 	margin: 0px;
 	padding: 0px;
 	color: unset;
@@ -969,15 +969,15 @@ table.adminform td #search {
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
 #flexicontent .flexi_label {
-	text-align: right;
+	text-align: left;
 	border: 0px solid;
 	white-space: normal;
 	display: inline-block;
 	width: 17%;
 	min-width: 90px;
 	max-width: 150px;
-	float: left;
-	clear: left;
+	float: right;
+	clear: right;
 	margin: 2px 1% 3px 0% !important;
 	box-sizing: border-box;
 }
@@ -987,7 +987,7 @@ body .label-fcouter,
 	width: 15%;
 	min-width: 90px;
 	max-width: 150px;
-	float: left;
+	float: right;
 	margin: 2px 1% 3px 0% !important;
 	padding: 0 !important;
 }
@@ -995,12 +995,12 @@ body .label-fcouter > label,
 body .label-fcinner,
 #flexicontent .label-fcouter > label,
 #flexicontent .label-fcinner {
-	text-align: right;
+	text-align: left;
 	min-width: 90px;
 	width: 100%;
 	line-height: 150%;
-	border-left: 0 !important;
 	border-right: 0 !important;
+	border-left: 0 !important;
 	border-top: 0;
 	border-bottom: 0;
 	margin: 2px 0 3px 0 !important;
@@ -1097,8 +1097,8 @@ body .span6 .container_fcfield,
 body .input-fcmax.container_fcfield input,
 #flexicontent .input-fcmax.container_fcfield input {
 	width: 90%;
-	padding-left: 2%;
 	padding-right: 2%;
+	padding-left: 2%;
 }
 body .container_fcfield input.input-xxlarge,
 #flexicontent .container_fcfield input.input-xxlarge {
@@ -1208,10 +1208,10 @@ fieldset.adminform legend {
 	margin: 6px 6px 4px 0;
 }
 .fieldgrprow_cell {
-	padding-right: 6px;
+	padding-left: 6px;
 }
 .fieldgrprow_cell:last-child {
-	padding-right: 0px;
+	padding-left: 0px;
 }
 .fc_legend_box {
 	border-bottom: 1px dashed gray;
@@ -1229,21 +1229,21 @@ ul.thumbnails.image_picker_selector {
 	margin: 8px 0px 2px 0px !important;
 }
 ul.thumbnails.image_picker_selector li {
-	float: left !important;
+	float: right !important;
 	clear: none !important;
 	margin: 0px 4px 4px 0px !important;
 }
 ul.thumbnails.image_picker_selector li div.thumbnail {
-	float: left;
+	float: right;
 }
 ul.thumbnails.image_picker_selector li div.thumbnail img {
-	float: left;
+	float: right;
 	border: 1px solid lightgray;
 	padding: 0px !important;
 	margin: 4px !important;
 }
 ul.thumbnails.image_picker_selector li div.thumbnail p {
-	float: left;
+	float: right;
 	clear: both;
 	padding: 0px !important;
 	margin: 0px !important;
@@ -1253,13 +1253,13 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin: 0px;
 	padding: 0px;
 	width: 68%;
-	float: left;
+	float: right;
 }
 .container_fcfield .container_fcfield-inner {
 	width: 100%;
 }
 .container_fcfield {
-	float: left !important;
+	float: right !important;
 	padding: 0px !important;
 	margin: 2px 0% 3px 0% !important;
 	width: 82% !important;
@@ -1420,7 +1420,7 @@ table.fc-form-tbl.fccompact td {
 }
 table.fc-form-tbl td.key {
 	vertical-align: top;
-	text-align: right;
+	text-align: left;
 	padding: 2px 0px;
 	max-width: 140px;
 	min-width: 114px;
@@ -1433,7 +1433,7 @@ table.fc-form-tbl.fcfullwidth {
 }
 table.fc-form-tbl.fcfullwidth td.key {
 	width: 114px;
-	padding-right: 8px;
+	padding-left: 8px;
 }
 table.fc-form-tbl.fcfullwidth td.key .label {
 	white-space: unset;
@@ -1482,7 +1482,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	z-index: 2000;
 	position: fixed;
 	top: 0;
-	left: 0;
+	right: 0;
 	width: 100%;
 	height: 100%;
 }
@@ -1491,7 +1491,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	z-index: 2000;
 	position: absolute;
 	top: 0;
-	left: 0;
+	right: 0;
 	opacity: 0.3;
 	filter: alpha(opacity=30);
 	background-color: #000;
@@ -1503,7 +1503,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	z-index: 2001;
 	position: fixed;
 	top: 35%;
-	left: 50%;
+	right: 50%;
 	color: black;
 	background: white 30px 40px no-repeat;
 	opacity: 1;
@@ -1515,7 +1515,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	font-weight: bold;
 	border: 1px solid lightgray;
 	border-radius: 8px;
-	text-align: left;
+	text-align: right;
 	width: 300px;
 	-webkit-transform: translate(-50%,0);
 	transform: translate(-50%,0);
@@ -1528,7 +1528,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	background-color: #f5f5f5;
 	box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 	position: relative;
-	left: -15px;
+	right: -15px;
 	top: 6px;
 }
 #fc_filter_form_blocker .fc_blocker_bar div {
@@ -1536,7 +1536,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	display: block;
 	height: 100%;
 	color: #fff;
-	text-align: right;
+	text-align: left;
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
@@ -1544,8 +1544,8 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 body .popover-title {
 	font-weight: bold;
 }
-body .popover.right .arrow::after {
-	border-right-color: #333;
+body .popover.left .arrow::after {
+	border-left-color: #333;
 }
 body .popover .arrow::after {
 	border-width: 0;
@@ -1558,7 +1558,7 @@ div.pane-sliders ul.adminformlist li fieldset {
 	padding: 0;
 }
 div.current ul.config-option-list li .fcsep_level3 {
-	left: 232px !important;
+	right: 232px !important;
 }
 div.current ul.config-option-list li select {
 	margin-bottom: 0px;
@@ -1586,13 +1586,13 @@ div.current ul.config-option-list li {
 }
 :not(.form-vertical) > div.control-group div.control-label label,
 div.current ul.config-option-list li label {
-	text-align: right;
+	text-align: left;
 	min-width: 90px;
 	width: 96%;
 	line-height: 150%;
-	float: right;
-	border-left: 0 !important;
+	float: left;
 	border-right: 0 !important;
+	border-left: 0 !important;
 	border-top: 0;
 	border-bottom: 0;
 	margin: 2px 4% 3px 0 !important;
@@ -1611,10 +1611,10 @@ div.current ul.config-option-list li label {
 	margin: 0px !important;
 }
 *:not(.form-vertical) > .control-label {
-	clear: left;
-	float: left;
+	clear: right;
+	float: right;
 	min-width: 120px;
-	text-align: right;
+	text-align: left;
 	padding: 4px 16px 4px 2px;
 }
 *:not(.form-vertical) > .control-label .label {
@@ -1626,11 +1626,11 @@ div.current ul.config-option-list li label {
 	width: auto !important;
 }
 #toolbar .buttons.btn-group a.toolbar {
-	text-align: left;
+	text-align: right;
 }
 #toolbar .buttons.btn-group a.toolbar > [class^="icon-"],
 #toolbar .buttons.btn-group a.toolbar > [class*=" icon-"] {
-	float: left;
+	float: right;
 	text-align: center;
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu {
@@ -1640,7 +1640,7 @@ div.current ul.config-option-list li label {
 	padding: 0;
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu > li > a.toolbar {
-	float: left;
+	float: right;
 	min-width: 120px;
 	margin-top: 2px;
 	width: 100%;
@@ -1653,18 +1653,18 @@ div.current ul.config-option-list li label {
 	margin: 0;
 }
 #toolbar .buttons.btn-group > a + .dropdown-toggle {
-	margin: 0 8px 0 0;
+	margin: 0 0 0 8px;
 	padding-top: 1px;
 }
 #toolbar .buttons.btn-group > .dropdown-toggle:first-child .caret {
 	margin-top: 10px;
-	margin-left: 4px;
+	margin-right: 4px;
 }
 #toolbar .btn.btn-fcaction > [class^="icon-"],
 #toolbar .btn.btn-fcaction > [class*=" icon-"] {
-	padding-right: 8px;
-	border-right: 1px solid #777;
-	margin-right: 8px;
+	padding-left: 8px;
+	border-left: 1px solid #777;
+	margin-left: 8px;
 }
 .prettycheckbox.fcradiocheck label,
 .prettyradio.fcradiocheck label {
@@ -1680,7 +1680,7 @@ div.current ul.config-option-list li label {
 .prettyradio.fcradiocheckimage,
 .prettycheckbox.fcradiocheck,
 .prettyradio.fcradiocheck {
-	float: left !important;
+	float: right !important;
 	display: block !important;
 	clear: none !important;
 	margin: -2px 12px 0px 0px !important;
@@ -1689,7 +1689,7 @@ div.current ul.config-option-list li label {
 .prettycheckbox input {
 	display: inline-block !important;
 	visibility: hidden !important;
-	float: left !important;
+	float: right !important;
 }
 .prettyradio > a.disabled,
 .prettycheckbox > a.disabled,
@@ -1723,7 +1723,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	list-style-type: none !important;
 	position: relative !important;
 	top: 0 !important;
-	left: 0 !important;
+	right: 0 !important;
 	padding: 0px !important;
 	margin: 0 6px 0 0 !important;
 	white-space: normal !important;
@@ -1745,7 +1745,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	margin-top: 1px !important;
 	border: 1px solid lightgray !important;
 	background: #fff url('select2.png') no-repeat 100% -22px !important;
-	background: url('select2.png') no-repeat 100% -22px, -webkit-gradient(linear,left bottom,left top,color-stop(0.85,#fff),color-stop(0.99,#eee)) !important;
+	background: url('select2.png') no-repeat 100% -22px, -webkit-gradient(linear,right bottom,right top,color-stop(0.85,#fff),color-stop(0.99,#eee)) !important;
 	background: url('select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
 	background: url('select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
 	background: url('select2.png') no-repeat 100% -22px, linear-gradient(to bottom,#fff 85%,#eee 99%) 0 0 !important;
@@ -1766,7 +1766,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	cursor: pointer !important;
 }
 .select2-container-multi .select2-search-choice-close {
-	left: 0px !important;
+	right: 0px !important;
 	margin: -1px 0 0 !important;
 	padding: 0 0 0 8px !important;
 }

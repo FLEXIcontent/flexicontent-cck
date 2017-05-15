@@ -4518,6 +4518,8 @@ class flexicontent_html
 		return $output;
 	}
 
+
+	// * Create a custom button inside Joomla Toolbar
 	static function addToolBarButton(
 		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask',
 		$extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true)
@@ -4561,6 +4563,7 @@ class flexicontent_html
 	}
 
 
+	// * Create a drop down button menu inside Joomla Toolbar
 	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null)
 	{
 		$toolbar = JToolBar::getInstance('toolbar');

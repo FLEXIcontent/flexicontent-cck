@@ -175,11 +175,9 @@ class FlexicontentViewItem extends JViewLegacy
 		// *****************
 		
 		// Add css to document
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-		if (JFactory::getLanguage()->isRtl())
-		{
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		}
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		// Fields common CSS
@@ -343,7 +341,7 @@ class FlexicontentViewItem extends JViewLegacy
 			// PREVIEW for latest version
 			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
 			{
-				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small btn-fcaction spaced-btn" onClick="window.open(\''.$previewlink.'\');"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW').'</button>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW').'</button>', 'preview' );
 			}
 			
 			// PREVIEW for non-approved versions of the item, if they exist
@@ -383,7 +381,7 @@ class FlexicontentViewItem extends JViewLegacy
 					'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name, $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-					$btn_class="btn-fcaction".$tip_class, $btn_icon="icon-pencil",
+					$btn_class="btn-fcaction btn-info".$tip_class, $btn_icon="icon-pencil",
 					'data-placement="right" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='.$item->itemparams->get('ilayout', $tparams->get('ilayout', 'default')).
 					'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"', $auto_add = 0
 				);
@@ -416,7 +414,7 @@ class FlexicontentViewItem extends JViewLegacy
 					$btn_title, $btn_name, $full_js ,
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-					$btn_class="btn-fcaction".$tip_class, $btn_icon="icon-mail",
+					$btn_class="btn-fcaction btn-info".$tip_class, $btn_icon="icon-mail",
 					'data-placement="right" data-href="'.$send_form_url.'" title="Send email to other reviewers"', $auto_add = 0
 				);
 		}
@@ -432,7 +430,7 @@ class FlexicontentViewItem extends JViewLegacy
 				'.JText::_('FLEXI_MORE').'
 				<span class="caret"></span>
 			</button>';
-		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group', $drop_btn);
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'fcaction_btns_group', $drop_btn);
 
 
 

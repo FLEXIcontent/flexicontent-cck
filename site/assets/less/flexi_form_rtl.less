@@ -1,0 +1,734 @@
+@import 'include/config.less';
+
+/*******************************
+ * Input / select / form styling
+ *******************************/
+
+select.fc_is_selmultiple.use_select2_lib {
+	max-height: 0 !important; /* hide it (almost), till JS is initialized */
+}
+.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
+	display: inline-block;
+	margin: 1px 2px 1px 2px;
+	/*padding: 4px 2px 5px;*/
+	/*border-radius: 4px;*/
+}
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
+	margin: 1px 2px 1px 2px;
+}
+.flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select {
+	display: inline-block;
+	margin: 1px 2px 1px 2px;
+	padding: 4px;
+	border-radius: 4px;
+	height: auto;
+}
+
+.controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
+.controls textarea,
+.controls fieldset.radio,
+.controls fieldset.checkbox,
+.flexicontent textarea,
+.flexicontent fieldset.radio,
+.flexicontent fieldset.checkbox {
+	margin: 1px 2px 1px 2px;
+}
+.flexicontent form {
+	margin: 0px;
+	padding: 0px;
+}
+
+body .fc_isselect.fc_ismobile {
+	min-width: 140px;
+}
+
+
+/********
+ * Labels
+ ********/
+
+body label.fc-prop-lbl,
+body span.fc-prop-lbl,
+body #flexicontent label.fc-prop-lbl,
+body #flexicontent span.fc-prop-lbl {
+	font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+	font-size: 13px;
+	color: #040507;
+}
+.fc-label-num1:after { content: " 1"; }
+.fc-label-num2:after { content: " 2"; }
+.fc-label-num3:after { content: " 3"; }
+.fc-label-num4:after { content: " 4"; }
+.fc-label-num5:after { content: " 5"; }
+.fc-label-num6:after { content: " 6"; }
+.fc-label-num7:after { content: " 7"; }
+.fc-label-num8:after { content: " 8"; }
+.fc-label-num9:after { content: " 9"; }
+.fc-label-num10:after { content: " 10"; }
+
+
+/*****************************************
+ * Checkbox / Radio styling (and hide them)
+ *****************************************/
+
+/* Labels with these classes must have input/select placed inside them */
+
+#flexicontent .fcradiocheckimage label.fccheckradio_lbl {
+	vertical-align: unset !important;
+}
+label.fccheckradio_lbl,
+span.fcselect_lbl {
+	display: inline-block;
+	white-space: nowrap;
+	padding-left: 8px;
+	min-width: 0px;
+	margin: 0px 0px 0px 2px;
+	float: none;
+	clear: none;
+}
+
+
+/* J3.x styles for radio button sets */
+
+.flexicontent span.radio {
+	white-space: normal !important;
+	display: inline-block !important;
+	padding: 0px !important;
+}
+
+.flexicontent label.radio {
+	white-space: nowrap !important;
+	width: auto !important;
+	display: inline-block !important;
+	padding: 0px 4px 0px 0px !important;
+	margin: 0px !important;
+}
+
+
+
+/* Hide input field, but exclude input inside labels (graceful fallback for older browsers) */
+
+input[type="checkbox"].fc_checkradio,
+input[type="radio"].fc_checkradio,
+
+[name="adminForm"] input[type="checkbox"]:not(.skip_fccr),
+[name="adminForm"] input[type="radio"]:not(.skip_fccr),
+
+.flexicontent input[type="checkbox"]:not(.skip_fccr),
+.flexicontent input[type="radio"]:not(.skip_fccr) {
+	width: 24px !important;
+	/*width: 19px !important;*/
+	margin: 0 !important;
+	padding: 0 !important;
+	opacity: 0 !important;
+	display: none !important;
+}
+
+
+label input[type="checkbox"].fc_checkradio,
+label input[type="radio"].fc_checkradio,
+
+//[name="adminForm"] input[type="checkbox"][name^="cid"],
+[name="adminForm"] input[type="checkbox"]:only-child,
+[name="adminForm"] label input[type="checkbox"]:not(.skip_fccr),
+[name="adminForm"] label input[type="radio"]:not(.skip_fccr),
+
+.flexicontent label input[type="checkbox"]:not(.skip_fccr),
+.flexicontent label input[type="radio"]:not(.skip_fccr) {
+	width: auto !important;
+	margin: 3px 3px 0px 0px !important;
+	padding: unset !important;
+	opacity: inherit !important;
+	display: inline !important;
+	vertical-align: bottom !important;
+}
+
+
+
+/* Style the label to also include the checkbox, radio */
+
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
+
+input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
+input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
+
+[name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
+
+.flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
+	display: inline-block !important;
+	margin: 1px 12px 1px 0px;
+	padding: 0px 0px 0px 24px !important;
+	line-height: 22px !important;
+	height: 22px !important;
+	text-align: right !important;
+	min-width: 1px !important;
+	cursor: pointer !important;
+	color: #333;
+	/*margin-right: -19px !important;
+	padding-right: 19px !important;
+	line-height: 19px !important;
+	height: 19px !important;*/
+}
+
+
+div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
+
+input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
+	background-position: 0 0 !important;
+	font-style: italic !important;
+	cursor: default !important;
+	opacity: 0.6 !important;
+}
+
+input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
+	background-position: 0 -72px !important;
+	font-style: italic !important;
+	color: gray !important;
+	cursor: default !important;
+	opacity: 0.6 !important;
+}
+
+
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
+
+input[type="checkbox"].fc_checkradio + label,
+[name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn) {
+	background: url(../images/checks2.png) no-repeat 0 0 !important;
+}
+input[type="radio"].fc_checkradio + label,
+[name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
+	background: url(../images/checks2.png) no-repeat 0 -72px !important;
+}
+
+
+input[type="checkbox"].fc_checkradio + label.green,
+[name="adminForm"] input[type="checkbox"] + label.green:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"] + label.green:not(.plupload_button):not(.btn) {
+	background: url(../images/checks3.png) no-repeat 0 0 !important;
+}
+input[type="radio"].fc_checkradio + label.green,
+[name="adminForm"] input[type="radio"] + label.green:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"] + label.green:not(.plupload_button):not(.btn) {
+	background: url(../images/checks3.png) no-repeat 0 -72px !important;
+}
+
+.flexicontent input[type="radio"] + label.green.single,
+.flexicontent input[type="checkbox"] + label.green.single,
+.fc_checkradio + label.green.single {
+	padding-right: 18px !important;
+	margin: 0px !important;
+}
+
+/* Style the checked versions of checkbox,radio */
+
+div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
+
+input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn) {
+	background-position: 0 -24px !important;
+	/*background-position: 0 -19px !important;*/
+}
+
+input[type="radio"]:checked + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="radio"]:checked + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:checked + label:not(.plupload_button):not(.btn) {
+	background-position: 0 -48px !important;
+	/*background-position: 0 -57px !important;*/
+}
+
+input[type="checkbox"].fc_checkradio,
+input[type="checkbox"].fc_checkradio:focus,
+input[type="radio"].fc_checkradio,
+input[type="radio"].fc_checkradio:focus,
+[name="adminForm"] input[type="checkbox"],
+[name="adminForm"] input[type="checkbox"]:focus,
+[name="adminForm"] input[type="radio"],
+[name="adminForm"] input[type="radio"]:focus,
+.flexicontent input[type="checkbox"],
+.flexicontent input[type="checkbox"]:focus,
+.flexicontent input[type="radio"],
+.flexicontent input[type="radio"]:focus {
+	border: 0px !important;
+}
+
+
+
+/* Styling for radio/checkboxes , for browser not supporting above, e.g. ie8,ie9) */
+
+input.fc_checkradio {
+	margin: 0px 4px 3px 4px;
+	padding: 0px;
+	vertical-align: bottom;
+	position: relative;
+	top: -1px;
+}
+
+
+/* Styling for radio/checkboxes lists */
+
+.fc_input_set {
+	display: inline-block;
+	vertical-align: top;
+}
+div.fc_checkradio_group_wrapper {
+	display: inline-block;
+	float: right;
+	clear: both;
+	margin: 0px;
+	padding: 0px;
+	overflow-y: auto;
+	overflow-x: visible;
+	height: auto;
+	max-height: 220px;
+}
+ul.fc_checkradio_group,
+li.fc_checkradio_option {
+	padding: 0px;
+	margin: 0px;
+	background: none transparent;
+}
+ul.fc_checkradio_group {
+	list-style-type: none;
+	display: block;
+	clear: both;
+}
+li.fc_checkradio_option {
+	white-space: nowrap;
+	display: inline-block; /* auto-hide do not force display */
+	margin-top: 1px;
+	margin-bottom: 1px;
+	vertical-align: top;
+}
+
+
+
+/**********************************************************
+ * ALTERNATIVE display like a bar (use 'fc_checkradio_bar')
+/**********************************************************/
+
+/* Style the label to also include the checkbox, radio */
+
+input[type="checkbox"].fc_checkradio_bar + label,
+input[type="radio"].fc_checkradio_bar + label {
+	display: inline-block !important;
+	margin: -2px !important;
+	padding: 4px 12px !important;
+	margin-bottom: 0 !important;
+	font-size: 14px !important;
+	line-height: 20px !important;
+	color: #333 !important;
+	text-align: center !important;
+	text-shadow: 0 1px 1px rgba(255,255,255,0.75) !important;
+	vertical-align: middle !important;
+	cursor: pointer !important;
+	background-color: #f5f5f5 !important;
+	background-image: -webkit-linear-gradient(top,#fff,#e6e6e6) !important;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6) !important;
+	background-repeat: repeat-x !important;
+	border: 1px solid #ccc !important;
+	border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
+	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25) !important;
+	border-bottom-color: #b3b3b3 !important;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0) !important;
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !important;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+
+/* Style the checked versions of checkbox,radio */
+
+input[type="checkbox"].fc_checkradio_bar:checked + label,
+input[type="radio"].fc_checkradio_bar:checked + label {
+	background-image: none !important;
+	outline: 0 !important;
+	box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
+	background-color: #e0e0e0 !important;
+}
+
+
+
+
+/********************************
+ * Flexicontent buttons for Forms
+ *******************************/
+
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group {
+	width: 100%;
+	max-width: 1200px;
+	box-sizing:border-box;
+	margin-right: 0;
+	margin-left: 0;
+}
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group > button {
+	margin-right: 0;
+	margin-left: 0;
+}
+div .listall-lbl {
+	max-width: 1200px;
+	width: 100%;
+	box-sizing: border-box;
+	margin:8px 0;
+}
+
+div .flexi_buttons,
+div .fc_buttons {
+	margin: 0px;
+	padding: 0px 2px 0px 2px;
+	display: inline-block;
+}
+
+div .fc_button:not(.btn),
+div .fc_buttons button:not(.btn),
+div .flexi_buttons button:not(.btn) {
+	float: none !important;
+	height: auto !important;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	line-height: 1.5em;
+	font-size: 12px;
+	font-family: arial, helvetica, sans-serif;
+	padding: 4px 8px;
+	margin: 2px 2px 2px 2px;
+	text-decoration: none;
+	text-transform: none;
+	display: inline-block;
+	font-weight: bold;
+	color: black;
+	background-color: #eeeeee;
+	background-image: -webkit-linear-gradient(top,#eeeeee,#dddddd);
+	background-image: linear-gradient(to bottom,#eeeeee,#dddddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
+}
+
+div .fc_button.fcsimple:not(.btn) {
+	-moz-border-bottom-colors: none;
+	-moz-border-right-colors: none;
+	-moz-border-left-colors: none;
+	-moz-border-top-colors: none;
+	background-color: #f5f5f5;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
+	background-repeat: repeat-x;
+	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) #b3b3b3;
+	border-image: none;
+	border-radius: 4px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
+	color: #333;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 20px;
+	margin: 0;
+	padding: 4px 12px;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+	vertical-align: middle;
+}
+
+div .fc_button.fcsimple:not(.btn):hover,
+div .fc_button.fcsimple:not(.btn):focus {
+	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) #b3b3b3;
+	color: #333333;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
+	background-color: #e6e6e6;
+	text-decoration: none;
+	background-position: 0 -15px;
+	-webkit-transition: background-position 0.1s linear;
+	-moz-transition: background-position 0.1s linear;
+	-o-transition: background-position 0.1s linear;
+	transition: background-position 0.1s linear;
+}
+
+div .fc_button:not(.btn):hover,
+div .fc_buttons button:not(.btn):hover,
+div .flexi_buttons button:not(.btn):hover {
+	border: 1px solid #bbbbbb;
+	background-color: #dddddd;
+	background-image: -webkit-linear-gradient(top,#dddddd,#cccccc);
+	background-image: linear-gradient(to bottom,#dddddd,#cccccc);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
+}
+
+/*
+.fcbutton_apply, .fcbutton_save, .fcbutton_cancel,
+.fcbutton_preview, .fcbutton_preview_save,
+.fcbutton_go, .fcbutton_reset { padding-right: 20px !important; }
+.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_save { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important; }
+.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; }
+.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important; }
+*/
+
+
+
+/***********************************
+ * Flexicontent form submit handling
+ ***********************************/
+ 
+/* Form submit handling */
+#flexi_form_submit_msg {
+	font-size: 11px;
+	display: none;
+	padding: 4px 0px 4px 30px;
+	background: transparent url(../images/ajax-loader.gif) 0px 3px no-repeat;
+}
+.fc_loading_msg {
+	font-size: 14px;
+	font-family: times;
+	padding: 4px 0px 4px 30px;
+	background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
+	
+	display: inline-block;
+	min-height: 1em;
+	line-height: 1.1em;
+	box-sizing: unset;
+	margin: 0;
+	vertical-align: top;
+}
+#flexi_form_submit_btns {
+	font-size: 11px;
+}
+.ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll right center transparent;
+	height: 16px;
+	padding: 0 0 0 20px;
+	display: inline-block;
+}
+
+
+
+/**********************************************
+ * Form field separator element CSS for forms *
+ **********************************************/
+
+.fcsep_level_h,
+.fcsep_level0,
+.fcsep_level1,
+.fcsep_level2,
+.fcsep_level3 {
+	display: block;
+	position: relative;
+	border-radius: 5px;
+	clear: both;
+	float: right;
+	font-size: 12px;
+	line-height: 1.5em;
+}
+
+.fcsep_level_h {
+	margin: 0 0 12px 0;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: #123973;
+	color: white;
+	font-size: 14px;
+	padding: 6px 16px;
+	font-family: Verdana, "Lucida Console";
+}
+
+.fcsep_level0 {
+	background-color: #0066AA;
+	color: white;
+	padding: 0.8em 1%;
+	margin: 48px 0% 4px 0%;
+	width: 100%;
+	box-sizing: border-box;
+	font-weight: bold;
+}
+.fcsep_level1 {
+	background-color: #2096C9;
+	color: white;
+	padding: 0.8em 1%;
+	margin: 20px 0% 4px 0%;
+	width: 100%;
+	box-sizing: border-box;
+	font-weight: bold;
+}
+.fcsep_level2 {
+	background-color: #7fc1ff;
+	color: #3a57ad;
+	padding: 0.4em 1%;
+	margin: 4px 0% 3px 0%;
+	width: 100%;
+	box-sizing: border-box;
+}
+.fcsep_level3 {
+	background-color: #9fe1ff;
+	border: 1px solid #96c7ef;
+	color: #3a579d;
+	padding: 0.3em 2em;
+	margin: 4px 5% 3px;
+	width: auto;
+}
+.fcsep_level4 {
+	background: #f7f7f7;
+	color: #333;
+	float: right;
+	font-weight: normal;
+	font-style: italic;
+	font-size: 12px;
+	border: 1px solid #777;
+	padding: 2px 16px 2px 16px;
+	margin: 5px 10% 2px;
+	display: block;
+	border-radius: 5px;
+	clear: both;
+	max-width: 60%;
+}
+body .fcsep_level4.fc-mssg,
+body .fcsep_level4.fc-mssg-inline,
+body .fcsep_level4.alert,
+body .fcsep_level4.alert.fcpadded {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	max-width: 90%;
+	margin-right: 5%;
+	margin-left: 5%;
+}
+.fcsep_level_br {
+	line-height: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	display: block;
+}
+
+body .alert.fcpadded {
+	padding: 4px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	box-sizing: border-box;
+	float: right;
+	clear: both;
+}
+body .control-group .alert.fcpadded,
+.control-group .fcsep_level0,
+.control-group .fcsep_level1,
+.control-group .fcsep_level2,
+.control-group .fcsep_level3,
+.control-group .fcsep_level4 {
+	float: right;
+	margin-bottom: -3px;
+}
+
+/* prevent margin when parameter list starts */
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
+fieldset:nth-child(1) > .fcsep_level0,
+fieldset:nth-child(1) > .fcsep_level1,
+fieldset:nth-child(1) > .fcsep_level2,
+.container_fcfield:nth-child(1) > .fcsep_level0,
+.container_fcfield:nth-child(1) > .fcsep_level1,
+.container_fcfield:nth-child(1) > .fcsep_level2,
+li:first-child .fcsep_level0,
+li:first-child .fcsep_level1,
+li:first-child .fcsep_level2,
+h3:first-child + .fcsep_level0,
+h3:first-child + .fcsep_level1,
+h3:first-child + .fcsep_level2,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level0,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level1,
+div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2,
+div.tab-pane.active > .fcsep_level0:nth-of-type(1),
+div.tab-pane.active > .fcsep_level1:nth-of-type(1),
+div.tab-pane.active > .fcsep_level2:nth-of-type(1) {
+	margin-top: 4px !important;
+}
+
+.fcsep_level0.fc-nomargin,
+.fcsep_level1.fc-nomargin,
+.fcsep_level2.fc-nomargin,
+.fc-nomargin > .fcsep_level0,
+.fc-nomargin > .fcsep_level1,
+.fc-nomargin > .fcsep_level2 {
+	margin-top: 4px !important;
+}
+
+.fcsep_level0.fc-ngmargin,
+.fcsep_level1.fc-ngmargin,
+.fcsep_level2.fc-ngmargin {
+	margin-top: -12px !important;
+}
+
+div.control-group:first-of-type > div > .fcsep_level0,
+div.control-group:first-of-type > div > .fcsep_level1,
+div.control-group:first-of-type > div > .fcsep_level2 {
+	margin-top: 0px;
+}
+
+body .nowrap_hidden {
+	display: block;
+	visibility: hidden;
+	height: 1px;
+	overflow: hidden;
+	padding: 0;
+	margin: -1px 0 0 0;
+	white-space: nowrap;
+}
+
+/* bootstrap INPUT groups */
+#flexicontent div.input-group-addon > *:not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:last-child):not(.select2-container) {
+	border-top-left-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+}
+#flexicontent div.input-group-addon > *:not(:first-child),
+#flexicontent div.input-prepend > *:not(:first-child) {
+	border-top-right-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+}
+
+/* media manager image field */
+.flexicontent .field-media-wrapper,
+.flexicontent .field-media-wrapper > div:not(.modal) {
+	min-width: 50%;
+	box-sizing: border-box;
+}
+.flexicontent .field-media-wrapper .field-media-input {
+	width: unset;
+	min-width: 80%;
+	max-width: unset;
+}
+
+.flexicontent iframe.seamless {
+	background-color: transparent;
+	border: 0px none transparent;
+	padding: 0px;
+	overflow: hidden;
+}
+
+.flexicontent .fc_less_parameter::before {
+	background-color: darkcyan;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	border-radius: 4px;
+	content: "L";
+	padding: 2px 4px;
+	box-sizing: content-box;
+	height: 1em;
+	line-height: 1em;
+}
+.flexicontent label.fc_less_parameter::before {
+	float: right;
+	position: relative;
+	top: -4px;
+	right: -4px;
+}
