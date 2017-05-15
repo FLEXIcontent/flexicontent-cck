@@ -4518,7 +4518,9 @@ class flexicontent_html
 		return $output;
 	}
 
-	static function addToolBarButton($text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='')
+	static function addToolBarButton(
+		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask',
+		$extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true)
 	{
 		$toolbar = JToolBar::getInstance('toolbar');
 		$text  = JText::_($text);
@@ -4550,7 +4552,44 @@ class flexicontent_html
 			'.$text.'
 		</a>
 		';
+		
+		if (!$auto_add)
+		{
+			return $button_html;
+		}
 		$toolbar->appendButton('Custom', $button_html, $btn_name);
+	}
+
+
+	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null)
+	{
+		$toolbar = JToolBar::getInstance('toolbar');
+		
+		if (!count($btn_arr))
+		{
+			return;
+		}
+		if (count($btn_arr) == 1)
+		{
+			$button_html = end($btn_arr);
+			$btn_name = key($btn_arr); 
+			$toolbar->appendButton('Custom', $button_html, $btn_name);
+			return;
+		}
+
+		$buttons_html = '
+		<div class="buttons btn-group">
+			'.array_shift($btn_arr).'
+		  '.($drop_btn ?: '
+		  <button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+		    <span class="caret"></span>
+		  </button>').'
+			<ul class="dropdown-menu" role="menu">
+				<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
+			<ul>
+		</div>';
+
+		$toolbar->appendButton('Custom', $buttons_html, $btn_group_name);
 	}
 
 

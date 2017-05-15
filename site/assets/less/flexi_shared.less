@@ -844,7 +844,8 @@ div fieldset.panelform {
 	outline-width: 0;
 }
 @media (min-width: 1020px) {
-	.btn.spaced-btn {
+	.btn.spaced-btn,
+	#toolbar .btn.spaced-btn {
 		margin-left: 32px;
 	}
 }
@@ -1955,3 +1956,50 @@ div.current ul.config-option-list li label:not(.label) {
 	max-width: 300px !important;
 	width: auto !important;
 }
+
+#toolbar .buttons.btn-group {
+	a.toolbar {
+		text-align: left;
+
+	> [class^="icon-"],
+	> [class*=" icon-"] {
+			float: left;
+			text-align: center;
+		}
+	}
+
+	> ul.dropdown-menu {
+		background: unset;
+		border: unset;
+		box-shadow: unset;
+		padding: 0;
+
+		> li > a.toolbar {
+			float: left;
+			min-width: 120px;
+			margin-top: 2px;
+			width: 100%;
+		}
+		> li > a.toolbar:hover {
+			background: #e0e0e0;
+			color: black;
+		}
+	}
+	
+	> a.toolbar {
+		margin: 0;
+	}
+
+	> a + .dropdown-toggle {
+		margin: 0 8px 0 0;
+		padding-top: 1px;
+	}
+	> .dropdown-toggle:first-child .caret {
+		margin-top: 10px;
+		margin-left: 4px;
+	}
+}
+
+#toolbar .btn.btn-fcaction {
+	color: black;
+}	
