@@ -178,7 +178,9 @@ class FlexicontentViewItem extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Fields common CSS
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
@@ -345,18 +347,29 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			
 			// PREVIEW for non-approved versions of the item, if they exist
-			else {
+			else
+			{
+				$btn_arr = array();
+
 				// Add a preview button for (currently) LOADED version of the item
 				$previewlink_loaded_ver = $previewlink .'&version='.$item->version;
-				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</button>', 'preview' );
+				//$toolbar->appendButton( 'Custom',
+				$btn_arr['preview_current'] = '<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</a>';
+				//, 'preview' );
 
 				// Add a preview button for currently ACTIVE version of the item
 				$previewlink_active_ver = $previewlink .'&version='.$item->current_version;
-				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_active_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</button>', 'preview' );
+				//$toolbar->appendButton( 'Custom',
+				$btn_arr['preview_active'] = '<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_active_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</a>';
+				//, 'preview' );
 
 				// Add a preview button for currently LATEST version of the item
 				$previewlink_last_ver = $previewlink; //'&version='.$item->last_version;
-				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_last_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</button>', 'preview' );
+				//$toolbar->appendButton( 'Custom',
+				$btn_arr['preview_latest'] = '<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_last_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</a>';
+				//, 'preview' );
+
+				flexicontent_html::addToolBarDropMenu($btn_arr, 'preview_btns_group', null);
 			}
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
@@ -381,7 +394,7 @@ class FlexicontentViewItem extends JViewLegacy
 					'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name, $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-					$btn_class="btn-fcaction btn-info".$tip_class, $btn_icon="icon-pencil",
+					$btn_class="btn-fcaction".$tip_class, $btn_icon="icon-pencil",
 					'data-placement="right" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='.$item->itemparams->get('ilayout', $tparams->get('ilayout', 'default')).
 					'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"', $auto_add = 0
 				);
@@ -414,7 +427,7 @@ class FlexicontentViewItem extends JViewLegacy
 					$btn_title, $btn_name, $full_js ,
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-					$btn_class="btn-fcaction btn-info".$tip_class, $btn_icon="icon-mail",
+					$btn_class="btn-fcaction".$tip_class, $btn_icon="icon-mail",
 					'data-placement="right" data-href="'.$send_form_url.'" title="Send email to other reviewers"', $auto_add = 0
 				);
 		}
@@ -430,7 +443,7 @@ class FlexicontentViewItem extends JViewLegacy
 				'.JText::_('FLEXI_MORE').'
 				<span class="caret"></span>
 			</button>';
-		flexicontent_html::addToolBarDropMenu($btn_arr, 'fcaction_btns_group', $drop_btn);
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', $drop_btn);
 
 
 
