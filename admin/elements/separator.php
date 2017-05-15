@@ -76,7 +76,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 					: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 			}
 
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 			// Add flexicontent specific TABBing to non-flexicontent views
 			$this->add_tab_css_js();

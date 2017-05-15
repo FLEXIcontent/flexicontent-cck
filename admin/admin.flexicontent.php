@@ -245,9 +245,10 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 
 	$less_files = array(
 		'less/flexi_filters.less',
-		'less/j3x.less',
 		'less/fcvote.less',
-		'less/tabber.less'
+		'less/tabber.less',
+		'less/j3x.less',
+		'less/j3x_rtl.less'
 	);
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	
@@ -274,6 +275,9 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$less_files = array('less/flexicontentbackend.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 
+	$less_files = array('less/j3x.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
 
 	/* RTL BOF */
 	$less_files = array(
@@ -298,13 +302,12 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$force = ($stale_frontend && count($stale_frontend)) || ($stale_backend && count($stale_backend)) ;
 	$less_files = array('less/flexicontentbackend_rtl.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+	$less_files = array('less/j3x_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	/* RTL EOF */
 
 
-	$less_files = array('less/j3x.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-	
-	
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
