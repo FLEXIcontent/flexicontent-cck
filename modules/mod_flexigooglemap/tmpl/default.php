@@ -86,8 +86,8 @@ if ($markermode==0 && $markerimage && $img_info = getimagesize(JPATH::clean(JPAT
 flexicontent_html::loadFramework('google-maps', '', $params);
 ?>
 
-<div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;padding-bottom: <?php echo $ratiomap; ?>;">
-	<div id="map" style="position: absolute;width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
+<div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
+	<div id="map" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
 
 	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script type="text/javascript">
@@ -144,6 +144,12 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 					infowindow.open(map, marker);
 				}
 			})(marker, i));
+
+			google.maps.event.addDomListener(window, "resize", function() {
+   var center = map.getCenter();
+   google.maps.event.trigger(map, "resize");
+   map.setCenter(center);
+});
 
 			iconCounter++;
 			// We only have a limited number of possible icon colors, so we may have to restart the counter

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <extension type="module" version="1.6" client="site" method="upgrade">
-	
+
 	<name>mod_flexigooglemap</name>
 	<author>Berges Yannick</author>
 	<creationDate>Janvier 2016</creationDate>
@@ -33,7 +33,7 @@
 
 	<config>
 	<fields name="params" addfieldpath="modules/mod_flexigooglemap/elements/">
-            
+
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
 			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
 				<option value="OR">FLEXI_OR</option>
@@ -47,14 +47,14 @@
 					defaultvals="category,item,favourites,tags,flexicontent,search,others"
 					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
 			/>
-			
+
 			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level3" />
 			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
-			
+
 		</fieldset>
 
 		<fieldset name="basic">
@@ -103,11 +103,6 @@
 				name="height" type="text"
 				default="600px" label="MOD_FLEXIGOOGLEMAP_height"
 				description="MOD_FLEXIGOOGLEMAP_HEIGHT_DESC"
-			/>
-			<field
-				name="ratiomap" type="text"
-				default="75%" label="MOD_FLEXIGOOGLEMAP_RATIOMAP"
-				description="MOD_FLEXIGOOGLEMAP_RATIOMAP_DESC"
 			/>
 			<field
 				name="maxzoommarker" type="text"
@@ -182,7 +177,7 @@
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING" level="level2" />
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKER_GROUPING_ABOUT" level="level3" class="alert alert-info fcpadded" />
-				
+
 			<field
 				name="clustermode" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_CLUSTERMODE"
