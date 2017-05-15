@@ -38,7 +38,7 @@ class modFlexigooglemapHelper
 		$fieldaddressid = $params->get('fieldaddressid');
 		if ( empty($fieldaddressid) )
 		{
-			echo '<div class="alert alert-warning">' . JText::_('FLEXI_GOOGLEMAP_ADDRESSFORGOT') .'</div>';
+			echo '<div class="alert alert-warning">' . JText::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') .'</div>';
 			return null;
 		}
 
