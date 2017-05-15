@@ -236,7 +236,23 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 	$force = $stale_frontend && count($stale_frontend);
 	$less_files = array('less/flexicontent.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+
+
+	/* RTL BOF */
+	$less_files = array(
+		'less/flexi_form_rtl.less',
+		'less/flexi_containers_rtl.less',
+		'less/flexi_shared_rtl.less',
+		'less/flexi_frontend_rtl.less'
+	);
 	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent_rtl.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+	/* RTL EOF */
+
+
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }

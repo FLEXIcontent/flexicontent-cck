@@ -1,41 +1,68 @@
+@import 'include/config.less';
+
+/**********************************
+ * CSS for inherited values marking
+ **********************************/
+ 
 input.fc-inherited-value + label {
-	font-weight: bold !important;
+	font-weight: bold !important; /*font-style: italic !important; text-decoration: underline !important;*/
+	/*text-shadow: 0 0 6px !important;*/ /* difficult to read */
 	text-decoration: underline !important;
 }
 div.fc-inherited-value {
-	float: left;
-	font-weight: bold !important;
+	float: right;
+	font-weight: bold !important; /*font-style: italic !important; text-decoration: underline !important;*/
 	text-shadow: 0 0 6px;
 	margin: 4px;
 	font-style: italic;
 }
+
+/****************************************
+ * auto sized / positioned jquery dialogs
+ ****************************************/
+ 
 .ui-dialog.fc-fixed-dialog {
 	position: fixed;
 	top: 40px;
-	left: 30px;
+	right: 30px;
 	overflow: auto;
 }
 body > #system-message-container {
 	margin: 6px 0 0 0;
+	.alert {
+		margin: 0;
+	}
 }
-body > #system-message-container .alert {
-	margin: 0;
+
+
+/**********************
+ * yet unclassified CSS
+ **********************/
+ 
+.flexicontent .ui-autocomplete-loading {
+	/*background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;*/
 }
 .flexicontent .calendar {
 	vertical-align: middle;
 }
-body.fc-no-scroll {
+body.fc-no-scroll {  /* prevents scrolling of the document */
 	height: 100% !important;
 	overflow: hidden !important;
 }
 .fccleared {
 	clear: both !important;
-	float: left !important;
+	float: right !important;
 }
+
+
+/***********************
+ * Performance stats box
+ ***********************/
+ 
 #fc_perf_box {
 	margin: 12px 1% 48px;
-	text-align: left;
-	float: left;
+	text-align: right;
+	float: right;
 	width: 98%;
 	display: inline-block;
 	clear: both;
@@ -44,6 +71,14 @@ body.fc-no-scroll {
 .flexicontent #fc_perf_box {
 	margin: 12px 0% 48px;
 	width: 100%;
+}
+
+
+/****************************
+ * Versioning TAB (item form)
+ ****************************/
+
+table#version_tbl {
 }
 table#version_tbl td.versions-first {
 	border-bottom: 1px dotted silver;
@@ -61,11 +96,20 @@ table#version_tb tr#active-version td {
 }
 #pager {
 	clear: both;
-	float: left;
+	float: right;
 	overflow: hidden;
 	width: 100%;
 	margin-bottom: 5px;
 }
+#result {
+}
+
+
+
+/*****************
+ * Access fieldset
+ *****************/
+
 #flexicontent fieldset#flexiaccess,
 #flexicontent fieldset.flexiaccess {
 	margin-top: 8px;
@@ -86,6 +130,13 @@ option[disabled],
 option[readonly] {
 	color: #bbb;
 }
+
+
+
+/************************************
+ * Categories / tags / types managers
+ ************************************/
+ 
 body span.orderingcat {
 	display: inline-block;
 	border-radius: 6px;
@@ -109,22 +160,25 @@ body span.secondarycat a {
 	font-size: 12px;
 	font-family: tahoma, arial;
 }
-body ul.fc_plain {
+body ul.fc_plain
+{
 	display: block;
 	list-style-type: disc;
 	margin-top: 2px;
 	margin-bottom: 0px;
-	margin-left: 0;
 	margin-right: 0;
-	padding-left: 16px;
-}
-body ul.fc_plain > li {
-	display: list-item;
-	line-height: 1.2em;
+	margin-left: 0;
+	padding-right: 16px;
+	> li {
+		display: list-item;
+		line-height: 1.2em;
+	}
 }
 .fc_assignments_box {
 	display: none;
 }
+
+/* Category view */
 h3.themes-title {
 	font-size: 12px;
 	font-weight: normal;
@@ -137,11 +191,20 @@ h3.themes-title {
 h3.themes-title small {
 	font-weight: normal;
 }
+
+/* Panes disabled */
 .pane-disabled {
 	opacity: 0.4;
 	filter: alpha(opacity=40);
 	font-style: oblique;
 }
+
+
+
+/**************************************************************************
+ * Layout edit form (template positions), sortable fields / records element
+ **************************************************************************/
+
 div.records_container,
 div.positions_container {
 	overflow: visible !important;
@@ -151,19 +214,23 @@ div.positions_container {
 	padding: 0;
 	margin: 0;
 	width: 100%;
-	min-height: 12px;
+	min-height:12px; 
 	box-sizing: border-box;
 }
 div.records_container {
-	margin-top: 12px;
+	margin-top: 12px; 
 	margin-bottom: 6px;
 	min-height: 48px;
 }
+
+
 .fcrecords_title,
 .positions_title {
 	margin: 10px 0 2px;
 	font-weight: bold;
 }
+
+
 ul.fcrecords,
 ul.positions {
 	display: block;
@@ -174,13 +241,17 @@ ul.positions {
 	width: 100%;
 	background: lightgray;
 	border: 0;
-	overflow: visible;
+	overflow: visible;  /* hidden, CAUSES annoying jumps with jQuery sortable */
 }
 ul.fcrecords {
 	padding: 0;
 }
+
+/* Editing records inside jQuery modal */
 *:not(.ui-dialog-content) > .fcrecords_desc {
 	display: none !important;
+}
+.ui-dialog-content > .records_container {
 }
 .ui-dialog-content > .fcrecords_desc {
 	float: none !important;
@@ -197,7 +268,7 @@ ul.fcrecords {
 	}
 }
 .ui-dialog-content > .fcrecords_textarea {
-	float: left !important;
+	float: right !important;
 	max-width: 1000px;
 	width: 62% !important;
 	height: 100% !important;
@@ -211,13 +282,16 @@ ul.fcrecords {
 	opacity: 0.65;
 	filter: alpha(opacity=65);
 }
+
+
+/* Sortable fields / records */
 .records_container > ul > li.fcrecord,
 .positions_container > ul > li.fields {
 	background: white;
 	display: block;
 	border: 1px solid silver;
 	margin: 2px 4px;
-	float: left;
+	float: right;
 	border-radius: 2px;
 	white-space: nowrap;
 	width: auto;
@@ -230,6 +304,9 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord {
 	padding: 2px 4px;
 }
+
+
+/* Sortable fields in layout positions */
 .positions_container .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat 3px 50%;
 	white-space: nowrap;
@@ -238,6 +315,9 @@ ul.fcrecords {
 	background: url(../images/textfield_key.png) #f9f9f9 no-repeat 3px 50%;
 	white-space: nowrap;
 }
+
+
+/* Sortable records with delete / add actions */
 .records_container > ul > li.fcrecord .fcprop_box {
 	display: inline-block;
 }
@@ -267,7 +347,7 @@ ul.fcrecords {
 .records_container .addfield_handle.fc_end {
 	min-width: 200px;
 	box-sizing: border-box;
-	float: left;
+	float: right;
 	margin: 4px 4px;
 }
 .records_container > ul > li.fcrecord .addfield_handle.fc_after {
@@ -287,6 +367,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord .delfield_handle:hover {
 	background-color: #d7d7d7;
 }
+
 .records_container .fcrec_state_msg,
 .records_container .fcrec_cascaded_msg,
 .records_container .fcrec_general_msg {
@@ -313,8 +394,10 @@ ul.fcrecords {
 }
 .records_container .fcrecord_header .fcrecord_label.fcrec_hidden,
 .records_container > ul > li.fcrecord > .fcrecord_prop.fcrec_hidden {
-	display: none;
+	display:none;
 }
+
+/* Record with full-width */
 div.sorter-full-width {
 	width: 100% !important;
 	max-width: unset !important;
@@ -332,52 +415,67 @@ div.sorter-full-width > ul.fcrecords > li.fcrecord .addfield_handle,
 div.sorter-full-width > ul.fcrecords > li.fcrecord .delfield_handle {
 	float: none;
 }
+
+
+
+/**************************
+ * 'adminlist' Table styles
+ **************************/
+
+/* ADMINLIST table, e.g. collapse, white background  */
 table.adminlist {
-	position: relative !important;
-	background: transparent !important;
-	border-spacing: 0px !important;
-	border-collapse: collapse !important;
+	position: relative !important; /* forced for hover highlighting via absolute positioned div */
+	background: transparent !important; /* forced for hover highlighting via absolute positioned div */
+	border-spacing: 0px !important; /* forced, combines with table, row, cell borders */
+	border-collapse: collapse !important; /* forced */
 	color: #555;
 	width: 100%;
 	margin-bottom: 20px;
 }
+
+/* HEAD row, e.g. bottom border only */
 table.adminlist thead tr {
-	border-bottom: 1px solid #aaa !important;
+	border-bottom: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
 }
+
+/* HEAD cell */
 table.adminlist thead th {
-	background: none repeat scroll 0 0 #fff !important;
+	background: none repeat scroll 0 0 #fff !important; /* forced, combines with table, row, cell borders */
 	border: none;
-	border-width: 0px !important;
+	border-width: 0px !important; /* forced, avoid border of cell overlapping over the border of the row */
 	color: #555;
 	text-align: unset;
 	padding: 6px 4px;
 }
+
 table.adminlist thead th.center,
 table.adminlist td.center {
 	text-align: center !important;
-}
-table.adminlist thead th.left,
-table.adminlist td.left {
-	text-align: left !important;
 }
 table.adminlist thead th.right,
 table.adminlist td.right {
 	text-align: right !important;
 }
+table.adminlist thead th.left,
+table.adminlist td.left {
+	text-align: left !important;
+}
 table.adminlist thead a:hover {
 	text-decoration: none;
 }
 table.adminlist thead th img {
-	padding-left: 3px;
+	padding-right: 3px;
 	vertical-align: middle;
 }
-table.adminlist thead td.left .radio {
+table.adminlist thead td.right .radio {
 	display: block;
 	margin-bottom: 5px;
 }
 table.adminlist thead th .filterdel img {
 	vertical-align: bottom;
 }
+
+/* Table cell */
 table.adminlist td {
 	padding: 4px;
 }
@@ -388,10 +486,12 @@ table.adminlist tr td:first-child::after {
 	min-height: 30px;
 }
 table.adminlist input[type="text"] {
-	width: auto !important;
-	padding-left: 0px !important;
-	padding-right: 0px !important;
+	width: auto !important;  /* forced to avoid fitting problems */
+	padding-right: 0px !important;  /* forced to save space */
+	padding-left: 0px !important;  /* forced to save space */
 }
+
+/* Highlighted columns, e.g. filtered */
 table.adminlist tr td.yellow,
 table.adminlist tbody tr.row0 td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
@@ -404,33 +504,43 @@ table.adminlist tbody tr.row0:hover td.yellow,
 table.adminlist tbody tr.row1:hover td.yellow {
 	background: transparent !important;
 }
+/* header cell inside tbody */
 table.adminlist tbody th {
 	font-weight: bold;
 }
+
+/* TR, NO background default align right */
 table.adminlist tbody tr:first-child {
-	border-top: 1px solid #aaa !important;
+	border-top: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
 }
 table.adminlist tbody tr {
-	border-top: 1px solid #dadada !important;
+	border-top: 1px solid #dadada !important; /* forced, combines with table, row, cell borders */
 	background: transparent !important;
-	text-align: left;
+	text-align: right;
 }
 table.adminlist tbody tr.collapsed_row {
 	visibility: collapse;
 }
+
+/* TR.row0 TR.row1 differences */
 table.adminlist tbody tr td {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: none;
-	border-width: 0px !important;
+	border-width: 0px !important; /* fored, to avoid border of cell overlapping over the border of the row */
 	text-align: unset;
 }
 table.adminlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #f7f7f7;
 }
+
+/* Mouse over ROW */
+table.adminlist tbody tr.row0:hover,
+table.adminlist tbody tr.row1:hover {
+}
 .adminlist-table-row {
 	position: absolute;
 	top: 0;
-	left: 0;
+	right: 0;
 	width: 100%;
 	height: 100%;
 	z-index: -1;
@@ -442,8 +552,10 @@ table.adminlist tbody tr.row0:hover td,
 table.adminlist tbody tr.row1:hover td {
 	background: transparent;
 }
+
+/* FOOTER of table */
 table.adminlist tfoot {
-	border-top: 1px solid #ddd !important;
+	border-top: 1px solid #ddd !important; /* forced, combines with table, row, cell borders */
 }
 table.adminlist tfoot tr {
 	color: #333333;
@@ -453,26 +565,33 @@ table.adminlist tfoot td,
 table.adminlist tfoot th {
 	background-color: #fff;
 	border: none;
-	border-width: 0px !important;
+	border-width: 0px !important; /* forced, to avoid border of cell overlapping over the border of the row */
 	text-align: center;
 }
+
+/* ORDER column no wrapping and proper alignment */
 table.adminlist td.order {
 	text-align: center;
 	white-space: nowrap;
 	width: auto;
 }
+
+/* IF PAGINATION is inside the table the force center alignment */
 table.adminlist .pagination {
 	display: inline-block;
 	margin: 4px auto 2px;
 	padding: 0;
 }
+
+
+/* various */
 .novalue {
 	color: gray;
 	font-style: italic;
 }
 .submitbutton {
 	background: url(../images/bullet_add.png) no-repeat 0% 50%;
-	padding-left: 12px;
+	padding-right: 12px;
 }
 body div .badge-info-2 {
 	background-color: #2b89a4;
@@ -480,6 +599,14 @@ body div .badge-info-2 {
 body div .badge-box {
 	border-radius: 3px;
 }
+
+
+
+/******************
+/* Tags (item form)
+ ******************/
+
+/* Selected tags list */
 ul#ultagbox {
 	margin: 0;
 	padding: 0;
@@ -488,7 +615,7 @@ ul#ultagbox {
 ul#ultagbox > li {
 	list-style-type: none;
 	display: block;
-	float: left;
+	float: right;
 	margin: 2px;
 	line-height: 100%;
 	border-radius: 3px;
@@ -498,6 +625,16 @@ ul#ultagbox > li.tagitem.plain {
 	padding: 6px 6px 5px 24px;
 	background: url(../images/tag_blue.png) transparent no-repeat 4px 4px;
 }
+/*input[type="checkbox"] + label.tagitem::before {
+	background: #fff url("../images/tag_blue.png") no-repeat scroll 0 0;
+	content: " ";
+	display: inline-block;
+	height: 16px;
+	margin: 4px 2px 0 4px;
+	padding: 0;
+	vertical-align: top;
+	width: 16px;
+}*/
 ul#ultagbox > li.tagitem {
 	border: 1px solid silver;
 	padding: 6px 6px 0px 6px;
@@ -507,16 +644,18 @@ ul#ultagbox > li.tagitem .deletetag {
 	display: block;
 	width: 18px;
 	height: 18px;
-	float: left;
+	float: right;
 	margin: -6px 0 0 -4px;
 	padding: 4px;
 	outline: none;
 	background-color: transparent;
 }
+
+/** Tag autocomplete box */
 div#tags {
 	margin: 0px 8px 8px 0;
 	padding: 0px;
-	float: left;
+	float: right;
 }
 div#tags #input-tags {
 	width: auto;
@@ -538,19 +677,26 @@ div#tags #input_new_tag {
 	background: #fff;
 	margin: 0px 4px 4px 0px;
 	padding: 0 0 0 8px;
-	float: left;
+	float: right;
 	min-width: 16px;
 	min-height: 24px;
 }
 .fc_tagidbox {
 	width: 20px !important;
 	display: block !important;
-	float: left !important;
+	float: right !important;
 	margin-top: -4px !important;
 }
 .fc_addtag {
 	margin-top: 10px !important;
 }
+
+
+
+/****************
+ * Clearing class
+ ****************/
+ 
 .flexicontent .clear,
 #flexicontent .clear,
 .clear {
@@ -564,9 +710,10 @@ div#tags #input_new_tag {
 	padding: 0;
 	visibility: hidden;
 }
+
 .fc_select_button {
 	display: block;
-	float: left;
+	float: right;
 	padding: 6px;
 	margin: 12px;
 	background-color: #eeeeee;
@@ -574,7 +721,7 @@ div#tags #input_new_tag {
 	border-radius: 6px;
 	font-weight: bold;
 	font-size: 11px;
-	text-align: left;
+	text-align: right;
 	text-decoration: none;
 }
 .fc_select_button:hover {
@@ -589,6 +736,7 @@ span.fc_select_button {
 span.fc_select_button:hover {
 	background-color: white;
 }
+
 div label.state_box,
 div label.lang_box {
 	display: inline-block;
@@ -610,21 +758,32 @@ div label.lang_box img {
 div label.lang_box img {
 	border: 1px solid lightgray;
 }
+
+/* language associations */
 .fc_assoc_translation img {
 	border: 1px solid lightgray;
 	padding: 0px;
 	margin: 0px;
-	float: left;
+	float: right;
 }
 .fc_assoc_translation {
 	display: inline-block;
-	float: left;
+	float: right;
 	text-decoration: none;
-	margin-right: 5px;
+	margin-left: 5px;
 	padding: 1px;
 	border: 0px solid green;
 	font-weight: bold !important;
 }
+.fc_assoc_translation.fc_assoc_later_mod {
+}
+
+
+
+/*******
+ * Forms
+ *******/
+
 #flexicontent .fc_tabset_inner {
 	float: none;
 	width: 100%;
@@ -640,23 +799,27 @@ div label.lang_box img {
 	padding: 0px;
 	display: inline-block;
 	border: 0 none;
+	/*background-color: cyan;*/ /* for testing */
 }
+
 #flexicontent div.fields_tabset,
 #flexicontent div.params_tabset {
 	width: 100% !important;
 	margin: 0 !important;
 	padding: 0 !important;
 }
+
 #flexicontent div.fields_tabset .tabbertab,
 #flexicontent div.params_tabset .tabbertab {
 	padding-bottom: 1.4em !important;
 }
+
 #flexicontent .panel > h3 a {
 	padding: 0px 0px 4px 0px;
 }
 #flexicontent .pane-sliders .panel .pane-slider {
-	padding-left: 8px;
 	padding-right: 8px;
+	padding-left: 8px;
 }
 #flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
 	padding: 0px !important;
@@ -669,6 +832,9 @@ div fieldset.panelform {
 	margin: 0px !important;
 	width: 100% !important;
 }
+
+
+/* Extra buttons style for button groups to override Joomla default YES-NO only styling */
 #flexicontent .btn,
 .btn {
 	-webkit-user-select: none;
@@ -680,9 +846,10 @@ div fieldset.panelform {
 @media (min-width: 1020px) {
 	.btn.spaced-btn,
 	#toolbar .btn.spaced-btn {
-		margin-left: 32px;
+		margin-right: 32px;
 	}
 }
+
 body .controls .btn-group.btn-group-yesno .btn,
 body .btn-group.btn-group-yesno .btn,
 body .btn-group.group-fcinfo .btn,
@@ -693,6 +860,7 @@ body .btn-group.group-fcmethod .btn,
 body .btn-group input[value=""]:first-of-type + label.btn {
 	min-width: 64px;
 }
+
 body .btn-group.group-fcinfo .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn:not(.btn-primary),
 body .btn-group.group-fcsuccess .btn:not(.btn-primary),
@@ -718,6 +886,7 @@ body .btn-group.group-fcmethod .btn.active:not(.btn-primary) {
 	box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.15);
 	outline: 0 none;
 }
+
 body .btn-group.group-fcinfo .btn.active:not(.btn-primary) {
 	background-color: #2f96b4;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#2f96b4,endColorstr=#1f6377);
@@ -738,6 +907,7 @@ body .btn-group.group-fcwarning .btn.active:not(.btn-primary) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#faa732,endColorstr=#ad6704);
 	border-color: #faa732 #faa732 #ad6704;
 }
+
 body .btn-group.group-fcmethod.fcnoyes input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary):first-of-type {
 	background-color: #942a25;
@@ -749,6 +919,7 @@ body .btn-group.group-fcmethod.fcnoyes .btn.active:not(.btn-primary) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
+
 body .btn-group.group-fcmethod.fcoffactive input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
@@ -760,6 +931,7 @@ body .btn-group.group-fcmethod.fcoffactive .btn.active:not(.btn-primary) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#378137,endColorstr=#204b20);
 	border-color: #378137 #378137 #204b20;
 }
+
 body .btn-group.group-fcmethod input[value=""] + label + input + .btn.active,
 body .btn-group.group-fcmethod .btn.active:not(.btn-primary):first-of-type {
 	background-color: #444444;
@@ -780,7 +952,7 @@ body .group-fcset.fc-cleared.fc_input_set {
 }
 body .group-fcset.radio > label,
 body .group-fcset.fc_input_set > div {
-	float: left;
+	float: right;
 	display: inline-block;
 	white-space: nowrap;
 }
@@ -789,11 +961,12 @@ body .group-fcset.fc_input_set.fc-cleared > div {
 	clear: both;
 	margin: 0 0 2px 0;
 }
+
 body .group-fcset.fc_input_set.fc-columned > div {
-	float: left;
+	float:right;
 	box-sizing: border-box;
 	margin: 0;
-	border: 0;
+	border:0;
 	padding: 0 12px 0 0;
 	min-width: 120px !important;
 }
@@ -809,6 +982,7 @@ body .group-fcset.fc_input_set.fc-aligned-150 > div {
 body .group-fcset.fc_input_set.fc-aligned-100 > div {
 	min-width: 150px !important;
 }
+
 body input.fc_hidden_value {
 	width: 0 !important;
 	height: 0 !important;
@@ -818,10 +992,12 @@ body input.fc_hidden_value {
 	display: inline-block;
 	box-sizing: border-box !important;
 }
+
 #flexicontent form div fieldset.panelform > div,
 form div.container_fcfield > div {
 	margin: 0;
 }
+
 #flexicontent form div fieldset.panelform > fieldset,
 #flexicontent form div fieldset.panelform > div > div.input-append,
 #flexicontent form div fieldset.panelform > div > div.input-prepend,
@@ -836,6 +1012,7 @@ form div.container_fcfield > div {
 #flexicontent form div fieldset.panelform > select,
 #flexicontent form div fieldset.panelform > img,
 #flexicontent form div fieldset.panelform > span,
+
 form div.container_fcfield > fieldset,
 form div.container_fcfield > div > div.input-append,
 form div.container_fcfield > div > div.input-prepend,
@@ -851,7 +1028,7 @@ form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
 	margin: 1px 2px 1px 2px;
-	float: left;
+	float: right;
 }
 form div.container_fcfield > input,
 form div.container_fcfield > button,
@@ -859,26 +1036,30 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select {
 	max-width: 96%;
 }
+
 #flexicontent div fieldset .input-append,
 #flexicontent div fieldset .input-prepend {
 	margin-bottom: 0px;
 }
+
 #flexicontent div fieldset.panelform .input-append,
 #flexicontent div fieldset.panelform .input-prepend {
-	float: left;
+	float: right;
 }
+
 #flexicontent div fieldset.panelform .input-append > input,
 #flexicontent div fieldset.panelform .input-prepend > button {
-	margin-left: 0px;
+	margin-right: 0px;
 }
 #flexicontent div .input-append > .btn:not(:last-child) {
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
-}
-#flexicontent div .input-prepend > .btn:not(:first-child) {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 }
+#flexicontent div .input-prepend > .btn:not(:first-child) {
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
 #flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.group-fcset,
 #flexicontent div fieldset.panelform :not(.container_fcfield) textarea {
@@ -886,17 +1067,20 @@ form div.container_fcfield > select {
 	max-width: 81%;
 	box-sizing: border-box;
 	display: inline-block;
-	margin-left: 0 !important;
-	margin-right: 0;
+	margin-right: 0 !important;
+	margin-left: 0;
 	line-height: unset;
 	height: unset;
 }
+
 #flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
 #flexicontent div fieldset.panelform textarea,
 div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
 div fieldset td textarea {
 	min-width: 80%;
+	/*padding:2px 4px;*/
 }
+
 fieldset.panelform ul.adminformlist input,
 fieldset.panelform ul.adminformlist button,
 fieldset.panelform ul.adminformlist textarea,
@@ -904,6 +1088,7 @@ fieldset.panelform ul.adminformlist select,
 fieldset.panelform ul.adminformlist img {
 	margin-bottom: 0px;
 }
+
 #flexicontent .current ul.tabbernav > li a {
 	border-radius: 0px !important;
 	background-color: grey !important;
@@ -935,6 +1120,7 @@ dl.tabs dt:not(.open):hover,
 .flexicontent dl.tabs dt:not(.open):hover {
 	background: darkred !important;
 }
+
 dl.tabs dt span,
 dl.tabs dt h3 a {
 	font-size: 11px !important;
@@ -947,6 +1133,7 @@ dl.tabs dt.open h3 a {
 	font-weight: bold !important;
 	color: darkred !important;
 }
+
 #flexicontent table.adminform td {
 	padding: 0px 2px 0px 2px;
 }
@@ -957,28 +1144,39 @@ table.adminform td #search {
 	margin-bottom: 0px;
 	padding: 4px !important;
 }
+
 #flexicontent span.flexi_label label {
-	float: right;
+	float: left;
 	margin: 0px;
 	padding: 0px;
 	color: unset;
 	font-size: 12px;
 	font-style: normal;
 }
+
 #flexicontent .flexi_params > label,
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
 #flexicontent .flexi_label {
-	text-align: right;
+	/*color: white;
+	background-color: #999;
+	border-radius: 3px;
+	
+	font-size: 12px;
+	font-weight: bold;*/
+	text-align: left;
+	
 	border: 0px solid;
 	white-space: normal;
+
 	display: inline-block;
 	width: 17%;
 	min-width: 90px;
 	max-width: 150px;
-	float: left;
-	clear: left;
+	float: right;
+	clear: right;
 	margin: 2px 1% 3px 0% !important;
+	/*padding: 6px !important;*/
 	box-sizing: border-box;
 }
 body .label-fcouter,
@@ -987,7 +1185,7 @@ body .label-fcouter,
 	width: 15%;
 	min-width: 90px;
 	max-width: 150px;
-	float: left;
+	float: right;
 	margin: 2px 1% 3px 0% !important;
 	padding: 0 !important;
 }
@@ -995,18 +1193,25 @@ body .label-fcouter > label,
 body .label-fcinner,
 #flexicontent .label-fcouter > label,
 #flexicontent .label-fcinner {
-	text-align: right;
+	text-align: left;
 	min-width: 90px;
 	width: 100%;
 	line-height: 150%;
-	border-left: 0 !important;
-	border-right: 0 !important;
+	/*float: left;*/
+	/*font-size: 12px;*/
+	/*text-shadow: 1px 1px 1px rgba(0,0,0,0.2);*/
+	
+	/* important for proper form placement, override ALL or NONE */
+	border-right: 0 !important; /* non-zero causes wrapping */
+	border-left: 0 !important; /* non-zero causes wrapping */
 	border-top: 0;
 	border-bottom: 0;
 	margin: 2px 0 3px 0 !important;
+	/*padding: 6px !important;*/
 	box-sizing: border-box;
 	white-space: normal !important;
 }
+
 body .label-fcouter > label.fc_tooltip_icon,
 body .label-fcinner.fc_tooltip_icon,
 #flexicontent .label-fcouter > label.fc_tooltip_icon,
@@ -1016,10 +1221,12 @@ body .label-fcinner.fc_tooltip_icon,
 	background-position: 100% 2px;
 	background-repeat: no-repeat;
 }
+
 body label.label-fcaction,
 #flexicontent label.label-fcaction {
 	border-bottom: 1px dashed gray;
 }
+
 body .nowrap_box .label-fcouter,
 #flexicontent .nowrap_box .label-fcouter {
 	float: none;
@@ -1030,6 +1237,8 @@ body .nowrap_box .container_fcfield,
 #flexicontent .nowrap_box .container_fcfield {
 	float: none !important;
 }
+
+
 #flexicontent .span6.full_width_980 {
 	width: 50%;
 }
@@ -1055,6 +1264,8 @@ body .nowrap_box .container_fcfield,
 		margin-top: 48px !important;
 	}
 }
+
+
 #flexicontent .span6.full_width_1340 {
 	width: 50%;
 }
@@ -1066,6 +1277,7 @@ body .nowrap_box .container_fcfield,
 #flexicontent .full_width_1340:first-child {
 	padding: 0 32px 0 0;
 }
+
 #flexicontent .full_width_1340.padded_wrap_box {
 	padding: 0;
 }
@@ -1086,6 +1298,7 @@ body .nowrap_box .container_fcfield,
 		width: 75%;
 	}
 }
+
 body .span6 .label-fcouter,
 #flexicontent .span6 .label-fcouter {
 	width: 28% !important;
@@ -1094,11 +1307,12 @@ body .span6 .container_fcfield,
 #flexicontent .span6 .container_fcfield {
 	width: 71% !important;
 }
+
 body .input-fcmax.container_fcfield input,
 #flexicontent .input-fcmax.container_fcfield input {
 	width: 90%;
-	padding-left: 2%;
 	padding-right: 2%;
+	padding-left: 2%;
 }
 body .container_fcfield input.input-xxlarge,
 #flexicontent .container_fcfield input.input-xxlarge {
@@ -1108,6 +1322,7 @@ body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
 }
+
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
 	margin: 0 !important;
@@ -1115,6 +1330,9 @@ body .container_fcfield input,
 	border: 0 none !important;
 	background: none !important;
 }
+
+
+/* Forced elements to display as INVALID, MUST avoid CSS conflicts here */
 body span.alert.invalid_fcfield_message {
 	display: inline-block;
 	padding: 6px 8px;
@@ -1124,44 +1342,49 @@ body span.alert.invalid_fcfield_message.fc_notes {
 	margin: 2px 12px;
 	padding: 6px 8px;
 }
+
 textarea.invalid,
 input.invalid,
 select.invalid {
-	border: 1px solid #CC0000 !important;
+	border: 1px solid #CC0000 !important; /* forced, display as INVALID */
 }
 .fc_input_set.invalid,
 .fcfield_box.invalid {
-	border: 1px dashed #CC0000 !important;
+	border: 1px dashed #CC0000 !important; /* forced, display as INVALID */
 	border-radius: 3px;
 }
 label.invalid > img {
-	border: 2px dashed #CC0000 !important;
+	border: 2px dashed #CC0000 !important; /* forced, display as INVALID */
 }
 label.invalid {
-	color: #CC0000 !important;
+	color: #CC0000 !important; /* forced, display as INVALID */
 }
+
 .use_prettycheckable.invalid + a + label,
 input.invalid + .fccheckradio_lbl {
-	color: #cc0000 !important;
+	color: #cc0000 !important; /* FORCED styling, display as INVALID */
 }
 .use_prettycheckable.invalid + a + label > img {
-	border: 1px dashed #CC0000 !important;
+	border: 1px dashed #CC0000 !important; /* FORCED styling, display as INVALID */
 }
 #flexicontent .label.invalid,
 #flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
-	color: #CC0000 !important;
+	color: #CC0000 !important; /* forced, display as INVALID */
 }
+
 #flexicontent .flexi_formblock {
 	clear: both;
 	width: 100%;
 	padding: 0;
 	margin: 0;
 }
+
 #flexicontent {
 	margin: 0px;
 }
+/* Override template values ... */
 body.contentpane.component,
 body.contentpane.modal {
 	margin: 0px;
@@ -1172,6 +1395,7 @@ body.contentpane.component #flexicontent,
 body.contentpane.modal #flexicontent {
 	padding: 8px 8px 4px 8px;
 }
+
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess,
 fieldset.adminform,
@@ -1180,7 +1404,7 @@ fieldset.adminform,
 	margin: 8px 4px !important;
 	padding: 4px 4px 4px 4px !important;
 	width: auto !important;
-	min-width: inherit !important;
+	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
 #flexicontent fieldset.params_set legend,
@@ -1207,15 +1431,19 @@ fieldset.adminform legend {
 #adminForm a.mb:active {
 	margin: 6px 6px 4px 0;
 }
+
 .fieldgrprow_cell {
-	padding-right: 6px;
+	padding-left: 6px;
 }
+
 .fieldgrprow_cell:last-child {
-	padding-right: 0px;
+	padding-left: 0px;
 }
+
 .fc_legend_box {
 	border-bottom: 1px dashed gray;
 }
+
 .key.tbl_group {
 	text-align: center !important;
 	color: darkgreen !important;
@@ -1223,43 +1451,50 @@ fieldset.adminform legend {
 	font-size: 12px !important;
 	padding: 6px !important;
 }
+
 ul.thumbnails.image_picker_selector {
 	clear: both;
 	overflow: auto;
 	margin: 8px 0px 2px 0px !important;
 }
 ul.thumbnails.image_picker_selector li {
-	float: left !important;
+	float: right !important;
 	clear: none !important;
 	margin: 0px 4px 4px 0px !important;
 }
 ul.thumbnails.image_picker_selector li div.thumbnail {
-	float: left;
+	float: right;
 }
 ul.thumbnails.image_picker_selector li div.thumbnail img {
-	float: left;
+	float: right;
 	border: 1px solid lightgray;
 	padding: 0px !important;
 	margin: 4px !important;
 }
 ul.thumbnails.image_picker_selector li div.thumbnail p {
-	float: left;
+	float: right;
 	clear: both;
 	padding: 0px !important;
 	margin: 0px !important;
 }
+
+
+/************************************************************
+ * The field container in various forms, e.g. FE/BE item form
+ ************************************************************/
+
 .container_fcfield-inner {
 	border-width: 0px;
 	margin: 0px;
 	padding: 0px;
 	width: 68%;
-	float: left;
+	float: right;
 }
 .container_fcfield .container_fcfield-inner {
 	width: 100%;
 }
 .container_fcfield {
-	float: left !important;
+	float: right !important;
 	padding: 0px !important;
 	margin: 2px 0% 3px 0% !important;
 	width: 82% !important;
@@ -1267,6 +1502,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	vertical-align: top;
 	box-sizing: border-box;
 }
+
+/* Adjust containers according to screen width */
 @media only screen and (min-width: 2090px) {
 	.full_body_box .container_fcfield.fcfield_row0,
 	.full_body_box .container_fcfield.fcfield_row1 {
@@ -1305,8 +1542,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 @media only screen and (min-width: 1390px) and (max-width: 1490px) {
 	.full_body_box .container_fcfield.fcfield_row0,
-	.full_body_box .container_fcfield.fcfield_row1 {
-		width: 87% !important;
+	.full_body_box .container_fcfield.fcfield_row1 {		width: 87% !important;
 	}
 }
 @media only screen and (min-width: 1290px) and (max-width: 1390px) {
@@ -1339,6 +1575,16 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 		width: 100% !important;
 	}
 }
+
+/* Odd / even field container */
+.container_fcfield.fcfield_row0 {}
+.container_fcfield.fcfield_row1 {}
+
+
+/********************************
+ * clear classes, forcing to wrap
+ ********************************/
+
 .fcclear,
 #flexicontent .clear {
 	border: 0 !important;
@@ -1352,6 +1598,12 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	visibility: hidden !important;
 	display: block !important;
 }
+
+
+/******************************************
+ * General styling for form fields per type
+ ******************************************/
+
 #flexicontent form .fcfield_textareaval,
 #flexicontent form .fcfield_selectval,
 #flexicontent form .fcfield_selectmulval,
@@ -1402,15 +1654,25 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	min-width: 0;
 	width: auto;
 }
+
+/* A special case for using inside backend managers/views that use "admintable" class */
 #flexicontent form .admintable input.fcfield_textval {
 	height: 22px;
 	line-height: 100%;
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
+
+
+
+/*******************************************
+ * 'fc-form-tbl', a table for using in forms
+ *******************************************/
+
 table.fc-form-tbl.keytop td.key {
 	vertical-align: top;
 }
+
 table.fc-form-tbl td {
 	vertical-align: middle;
 	padding: 2px 24px 6px 0px;
@@ -1418,9 +1680,10 @@ table.fc-form-tbl td {
 table.fc-form-tbl.fccompact td {
 	padding: 0px 8px 4px 0px;
 }
+
 table.fc-form-tbl td.key {
 	vertical-align: top;
-	text-align: right;
+	text-align: left;
 	padding: 2px 0px;
 	max-width: 140px;
 	min-width: 114px;
@@ -1428,12 +1691,13 @@ table.fc-form-tbl td.key {
 table.fc-form-tbl.fccompact td.key {
 	min-width: auto;
 }
+
 table.fc-form-tbl.fcfullwidth {
 	width: 100% !important;
 }
 table.fc-form-tbl.fcfullwidth td.key {
 	width: 114px;
-	padding-right: 8px;
+	padding-left: 8px;
 }
 table.fc-form-tbl.fcfullwidth td.key .label {
 	white-space: unset;
@@ -1445,6 +1709,7 @@ table.fc-form-tbl td.key label.label {
 	margin: 0px 5%;
 	white-space: normal;
 }
+
 table.fc-form-tbl.fcinner td.key label.label,
 table.fc-form-tbl.fccompact td.key label.label {
 	padding: 2px 4px;
@@ -1452,6 +1717,7 @@ table.fc-form-tbl.fccompact td.key label.label {
 table.fc-form-tbl.fccompact td.key label.label {
 	font-size: 11px;
 }
+
 table.fc-form-tbl fieldset {
 	margin: 0px;
 	padding: 0px;
@@ -1464,6 +1730,14 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	margin: 0 8px 0;
 	display: inline-block;
 }
+
+
+
+/************************
+ * Styling for select2 JS
+ ************************/
+
+// Highlighting selected choices for select2 JS
 .fc_filter_html .select2-search-choice div,
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
@@ -1477,12 +1751,20 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	text-decoration: line-through !important;
 	font-style: italic !important;
 }
+
+
+
+/**********************************
+ * Blocking overlay during form,
+ * being applied and page reloading
+ **********************************/
+
 #fc_filter_form_blocker {
 	display: none;
 	z-index: 2000;
 	position: fixed;
 	top: 0;
-	left: 0;
+	right: 0;
 	width: 100%;
 	height: 100%;
 }
@@ -1491,7 +1773,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	z-index: 2000;
 	position: absolute;
 	top: 0;
-	left: 0;
+	right: 0;
 	opacity: 0.3;
 	filter: alpha(opacity=30);
 	background-color: #000;
@@ -1503,7 +1785,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	z-index: 2001;
 	position: fixed;
 	top: 35%;
-	left: 50%;
+	right: 50%;
 	color: black;
 	background: white 30px 40px no-repeat;
 	opacity: 1;
@@ -1515,10 +1797,10 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	font-weight: bold;
 	border: 1px solid lightgray;
 	border-radius: 8px;
-	text-align: left;
+	text-align: right;
 	width: 300px;
-	-webkit-transform: translate(-50%,0);
-	transform: translate(-50%,0);
+	-webkit-transform: translate(-50%, 0);
+	transform: translate(-50%, 0);
 }
 #fc_filter_form_blocker .fc_blocker_bar {
 	display: block;
@@ -1528,7 +1810,7 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	background-color: #f5f5f5;
 	box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 	position: relative;
-	left: -15px;
+	right: -15px;
 	top: 6px;
 }
 #fc_filter_form_blocker .fc_blocker_bar div {
@@ -1536,38 +1818,62 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	display: block;
 	height: 100%;
 	color: #fff;
-	text-align: right;
+	text-align: left;
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
 }
+
+
+
+/* tip */
+.tool-tip { }
+.tip-title { }
+
+
+/*********
+ * popover
+ *********/
+
+body .popover {
+	/*width: 300px;*/
+	/*max-width: 50% !important;*/
+}
 body .popover-title {
 	font-weight: bold;
 }
-body .popover.right .arrow::after {
-	border-right-color: #333;
+body .popover.left .arrow::after {
+	border-left-color: #333;
 }
 body .popover .arrow::after {
 	border-width: 0;
 }
+
+
 div.pane-sliders ul.adminformlist li select {
 	margin-bottom: 0px;
 }
 div.pane-sliders ul.adminformlist li fieldset {
-	margin: 0;
-	padding: 0;
+	margin: 0; padding: 0;
 }
 div.current ul.config-option-list li .fcsep_level3 {
-	left: 232px !important;
+	right: 232px !important;
 }
 div.current ul.config-option-list li select {
 	margin-bottom: 0px;
-	font-size: 12px;
+	font-size:12px;
 }
 div.current ul.config-option-list li fieldset {
 	margin: 0;
 	padding: 0;
 }
+
+
+/***************************************
+ * Parameters inside .control-group box
+ **************************************/
+
+/* .control-group */
 *:not(.form-vertical) > div.control-group {
 	margin-bottom: 2px;
 	clear: both;
@@ -1575,6 +1881,8 @@ div.current ul.config-option-list li fieldset {
 fieldset.form-vertical div.control-group {
 	margin-bottom: 8px;
 }
+
+/* .control-group .control-label */
 *:not(.form-vertical) > div.control-group div.control-label,
 div.current ul.config-option-list li {
 	margin: 0 8px 0 0 !important;
@@ -1582,115 +1890,158 @@ div.current ul.config-option-list li {
 	max-width: 160px;
 	min-width: 120px;
 	width: 15%;
-	border: 0;
+	border:0;
 }
+
+/* .control-group .control-label label */
 :not(.form-vertical) > div.control-group div.control-label label,
 div.current ul.config-option-list li label {
-	text-align: right;
+	text-align: left;
 	min-width: 90px;
 	width: 96%;
 	line-height: 150%;
-	float: right;
-	border-left: 0 !important;
-	border-right: 0 !important;
+	float: left;
+	/*font-size: 12px;*/
+	/*text-shadow: 1px 1px 1px rgba(0,0,0,0.2);*/
+	
+	/* important for proper form placement, override ALL or NONE */
+	border-right: 0 !important; /* non-zero causes wrapping */
+	border-left: 0 !important; /* non-zero causes wrapping */
 	border-top: 0;
 	border-bottom: 0;
 	margin: 2px 4% 3px 0 !important;
+	/*padding: 6px !important;*/
 	box-sizing: border-box;
 	white-space: normal !important;
 	display: inline-block;
+	/*border-radius: 3px;*/
 }
+*:not(.form-vertical) > div.control-group div.control-label label:not(.label),
+div.current ul.config-option-list li label:not(.label) {
+	/*font-weight: bold; 
+	color: white;
+	background-color: #999;*/
+}
+
+
+/* .control-group .controls */
 *:not(.form-vertical) > div.control-group div.controls {
 	min-width: 60%;
 	max-width: 81%;
 	box-sizing: border-box;
 	display: inline-block;
+
 	line-height: unset;
 	height: unset;
+
 	padding: 0px !important;
 	margin: 0px !important;
 }
+
+
+/* control field labels */
 *:not(.form-vertical) > .control-label {
-	clear: left;
-	float: left;
+	clear: right;
+	float: right;
 	min-width: 120px;
-	text-align: right;
+	text-align: left;
 	padding: 4px 16px 4px 2px;
 }
 *:not(.form-vertical) > .control-label .label {
 	width: auto;
 	display: inline-block;
 }
+
 .control_special_box  .control-label {
 	max-width: 300px !important;
 	width: auto !important;
 }
-#toolbar .buttons.btn-group a.toolbar {
-	text-align: left;
+
+
+/*
+ * Joomla Toolbar customization
+ * e.g. Drop down menu of buttons
+ */
+ 
+#toolbar .buttons.btn-group {
+	a.toolbar {
+		text-align: right;
+
+	> [class^="icon-"],
+	> [class*=" icon-"] {
+			float: right;
+			text-align: center;
+		}
+	}
+
+	> ul.dropdown-menu {
+		background: unset;
+		border: unset;
+		box-shadow: unset;
+		padding: 0;
+
+		> li > a.toolbar {
+			float: right;
+			min-width: 120px;
+			margin-top: 2px;
+			width: 100%;
+		}
+		> li > a.toolbar:hover {
+			background: #e0e0e0;
+			color: black;
+		}
+	}
+	
+	> a.toolbar {
+		margin: 0;
+	}
+
+	> a + .dropdown-toggle {
+		margin: 0 0 0 8px;
+		padding-top: 1px;
+	}
+	> .dropdown-toggle:first-child .caret {
+		margin-top: 10px;
+		margin-right: 4px;
+	}
 }
-#toolbar .buttons.btn-group a.toolbar > [class^="icon-"],
-#toolbar .buttons.btn-group a.toolbar > [class*=" icon-"] {
-	float: left;
-	text-align: center;
-}
-#toolbar .buttons.btn-group > ul.dropdown-menu {
-	background: unset;
-	border: unset;
-	box-shadow: unset;
-	padding: 0;
-}
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > a.toolbar {
-	float: left;
-	min-width: 120px;
-	margin-top: 2px;
-	width: 100%;
-}
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > a.toolbar:hover {
-	background: #e0e0e0;
-	color: black;
-}
-#toolbar .buttons.btn-group > a.toolbar {
-	margin: 0;
-}
-#toolbar .buttons.btn-group > a + .dropdown-toggle {
-	margin: 0 8px 0 0;
-	padding-top: 1px;
-}
-#toolbar .buttons.btn-group > .dropdown-toggle:first-child .caret {
-	margin-top: 10px;
-	margin-left: 4px;
-}
-#toolbar .btn.btn-fcaction > [class^="icon-"],
-#toolbar .btn.btn-fcaction > [class*=" icon-"] {
-	padding-right: 8px;
-	border-right: 1px solid #777;
-	margin-right: 8px;
-}
-.prettycheckbox.fcradiocheck label,
-.prettyradio.fcradiocheck label {
+
+#toolbar .btn.btn-fcaction {
+	> [class^="icon-"],
+	> [class*=" icon-"] {
+		padding-left: 8px;
+		border-left: 1px solid #777;
+		margin-left: 8px;
+	}
+}	
+
+
+/*
+ * PrettyCheckable
+ */
+
+.prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {
 	margin: 7px 0px 0px 0px !important;
 	clear: none !important;
 }
-.prettycheckbox.fcradiocheckimage label,
-.prettyradio.fcradiocheckimage label {
+
+.prettycheckbox.fcradiocheckimage label, .prettyradio.fcradiocheckimage label {
 	margin: 2px 0px 0px 0px !important;
 	clear: none !important;
 }
-.prettycheckbox.fcradiocheckimage,
-.prettyradio.fcradiocheckimage,
-.prettycheckbox.fcradiocheck,
-.prettyradio.fcradiocheck {
-	float: left !important;
-	display: block !important;
-	clear: none !important;
-	margin: -2px 12px 0px 0px !important;
+
+.prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
+.prettycheckbox.fcradiocheck, .prettyradio.fcradiocheck {
+	float:right !important;
+	display:block !important;
+	clear:none !important;
+	margin:-2px 12px 0px 0px !important;
 }
-.prettyradio input,
-.prettycheckbox input {
-	display: inline-block !important;
-	visibility: hidden !important;
-	float: left !important;
+
+.prettyradio input, .prettycheckbox input {
+	display:inline-block !important; visibility:hidden !important; float:right !important;
 }
+
 .prettyradio > a.disabled,
 .prettycheckbox > a.disabled,
 .prettyradio > a.disabled + label,
@@ -1699,12 +2050,19 @@ div.current ul.config-option-list li label {
 	opacity: 0.4;
 	filter: alpha(opacity=40);
 }
+
+
+/*
+ * select2.js : SINGLE  SELECT customizations and enforced CSS
+ */
+ 
+/* select choice container */
 .select2-container .select2-choice {
 	padding: 0 0 0 8px !important;
 	margin: 0 6px 0 0 !important;
 	font-weight: normal !important;
 	min-height: 26px;
-	height: auto !important;
+	height:auto !important;
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
@@ -1713,29 +2071,40 @@ html[dir="rtl"] .select2-container .select2-choice {
 	color: black;
 	white-space: pre-wrap !important;
 }
+/* Form validation failed, having 'invalid' CLASS */
 .select2-container.invalid .select2-choice > .select2-chosen {
 	color: red !important;
 }
 .select2-container-multi.invalid .select2-choices .select2-search-field input.select2-input {
 	border: 1px solid red !important;
 }
+
+
+/*
+ * select2.js : MULTI SELECT customizations and enforced CSS
+ */
+
+/* already selected choices container */
 .select2-container .select2-choices {
 	list-style-type: none !important;
 	position: relative !important;
-	top: 0 !important;
-	left: 0 !important;
+	top: 0 !important; right: 0 !important;
 	padding: 0px !important;
 	margin: 0 6px 0 0 !important;
-	white-space: normal !important;
+	white-space: normal !important; /* for chrome! */
 	width: auto !important;
 	min-width: 24px !important;
 }
+
+/* search box container */
 .select2-container .select2-search-field {
 	padding: 0px !important;
 	margin: 0px 2px !important;
 	line-height: 1em !important;
 	position: relative !important;
 }
+
+/* Make search (filtering) field always visible, forcing the search icon too  */
 .select2-container-multi .select2-choices .select2-search-field input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	cursor: pointer;
@@ -1744,16 +2113,20 @@ html[dir="rtl"] .select2-container .select2-choice {
 	padding: 1px 4px !important;
 	margin-top: 1px !important;
 	border: 1px solid lightgray !important;
+	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
+
 	background: #fff url('select2.png') no-repeat 100% -22px !important;
-	background: url('select2.png') no-repeat 100% -22px, -webkit-gradient(linear,left bottom,left top,color-stop(0.85,#fff),color-stop(0.99,#eee)) !important;
-	background: url('select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
-	background: url('select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom,#fff 85%,#eee 99%) !important;
-	background: url('select2.png') no-repeat 100% -22px, linear-gradient(to bottom,#fff 85%,#eee 99%) 0 0 !important;
+	background: url('select2.png') no-repeat 100% -22px, -webkit-gradient(linear, right bottom, right top, color-stop(0.85, #fff), color-stop(0.99, #eee)) !important;
+	background: url('select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
+	background: url('select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
+	background: url('select2.png') no-repeat 100% -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0 !important;
 }
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	min-width: 124px !important;
 	cursor: default;
 }
+
+/* Enlarge above when focused */
 .select2-container-multi .select2-choices > li:first-child input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices > li:first-child input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
@@ -1762,14 +2135,19 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
 	min-width: 124px !important;
 }
+
+/* Make sure above is has clickable appearance (cursor pointer) */
 .select2-container-multi .select2-choices .select2-search-field input.select2-input:hover {
 	cursor: pointer !important;
 }
+
+/* Enlarge the removal icon padding to allow easier removal of multiple choices */
 .select2-container-multi .select2-search-choice-close {
-	left: 0px !important;
+	right: 0px !important;
 	margin: -1px 0 0 !important;
 	padding: 0 0 0 8px !important;
 }
+/* ?? */
 .select2-drop .select2-results .select2-result.select2-selected-highlight div {
 	font-size: 11px !important;
 }

@@ -63,14 +63,19 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$isAdmin = $app->isAdmin();
 
-			!$isAdmin ?
-				$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
-				$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-
-			if ($isAdmin && JFactory::getLanguage()->isRtl())
+			if (!JFactory::getLanguage()->isRtl())
 			{
-				$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+				!$isAdmin ?
+					$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
+					$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
 			}
+			else
+			{
+				!$isAdmin
+					? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH)
+					: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			}
+
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 
 			// Add flexicontent specific TABBing to non-flexicontent views
