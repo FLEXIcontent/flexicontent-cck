@@ -69,6 +69,15 @@
 				<option value="1">MOD_FLEXIGOOGLEMAP_CATID_CURRENT</option>
 			</field>
 
+			<field
+				name="catmethode" type="radio" default="0"
+				label="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_LABEL" description="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_DESC" showon="catidmode:0"
+				class="btn-group btn-group-yesno"
+				>
+				<option value="0">MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_INCLUDE</option>
+				<option value="1">MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_EXCLUDE</option>
+			</field>
+
 			<field name="catid" type="flexicategories" multiple="true" label="MOD_FLEXIGOOGLEMAP_CAT" description="MOD_FLEXIGOOGLEMAP_DESC" showon="catidmode:0"/>
 			<field name="treeinclude" type="list" default="1" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC" showon="catidmode:0" >
 				<option value="0">FLEXI_NONE</option>
