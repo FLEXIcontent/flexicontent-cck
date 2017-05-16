@@ -79,11 +79,11 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 
 		// Return error message if api keys are missing
-		if( empty($embedly_key) && !$use_native_apis ) {
-			$api_key_name = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_EMBEDLY_API_KEY');
-			$api_key_desc = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_EMBEDLY_API_KEY_DESC');
-			$error_text = JText::sprintf('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_API_KEY_REQUIRED', $api_key_name) ." <br/> ". $api_key_desc;
-		}
+		//if( empty($embedly_key) && !$use_native_apis ) {
+		//  $api_key_name = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_EMBEDLY_API_KEY');
+		//	$api_key_desc = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_EMBEDLY_API_KEY_DESC');
+		//	$error_text = JText::sprintf('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_API_KEY_REQUIRED', $api_key_name) ." <br/> ". $api_key_desc;
+		//}
 		if( empty($youtube_key) && $use_native_apis ) {
 			$api_key_name = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_YOUTUBE_API_KEY');
 			$api_key_desc = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_YOUTUBE_API_KEY_DESC');
@@ -496,7 +496,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 						jQuery("#fcfield_sm_mssg_" + element_id).html("IFRAME SRC parameter not found in response");
 					}
 				}
-				else 
+				else
 				{
 					jQuery("#fcfield_sm_mssg_" + element_id).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_URL_NOT_'.$_MEDIA_).'</div>");
 				}
