@@ -60,19 +60,25 @@ class modFlexigooglemapHelper
 
 		$count = $params->get('count');
 		$forced_itemid = $params->get('forced_itemid', 0);
-
+		$methode = $params->get('catmethode', '1');       // 1 include or 0 exclude categories
+		$categoriesID = implode(',', $catids_arr);
+		if ($methode == 0) {
+			$catWheres = "rel.catid IN (".$categoriesID.")";
+		} else {
+			$catWheres = "rel.catid NOT IN (".$categoriesID.")";
+		}
 		$db = JFactory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
 			.' FROM #__content  AS a'
 			.' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
 			.' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
-			.' WHERE b.field_id = '.$fieldaddressid.' AND rel.catid IN (' . implode(',', $catids_arr) . ') AND state = 1'
+			.' WHERE b.field_id = '.$fieldaddressid.' AND '.$catWheres.'  AND state = 1'
 			.' ORDER BY title '.$count
 			;
 		$db->setQuery( $queryLoc );
 		$itemsLoc = $db->loadObjectList();
 
-		foreach ($itemsLoc as &$itemLoc) 
+		foreach ($itemsLoc as &$itemLoc)
 		{
 			$itemLoc->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemLoc->id, $itemLoc->catid, $forced_itemid, $itemLoc));
 		}
@@ -218,7 +224,7 @@ class modFlexigooglemapHelper
 					. $color_to_file[$params->get('markercolor', '')]
 					. "?text=" . $params->get('lettermarker')
 					. "&psize=16&font=fonts/arialuni_t.ttf&color=ff330000&scale=1&ax=44&ay=48"
-					. "'";	
+					. "'";
 
 			default:  // 'Local image file' mode
 				$markerimage = $params->get('markerimage');
