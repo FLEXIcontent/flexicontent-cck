@@ -85,7 +85,7 @@ if ($markermode==0 && $markerimage && $img_info = getimagesize(JPATH::clean(JPAT
 // Add google maps API
 flexicontent_html::loadFramework('google-maps', '', $params);
 ?>
-
+<?php if (!empty($tMapTips)): //no maps if no point?>
 <div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
 	<div id="map" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
 
@@ -192,3 +192,4 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 
 	</script>
 </div>
+<?php endif;?>
