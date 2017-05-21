@@ -366,6 +366,7 @@ class flexicontent_cats
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
 		// a subtree should be given or else the first category out of top level category will be removed, which is of little sense
 		else if($top == 3) {
+			// Backup first element's modified properties, so that we restore them later
 			$first_item = reset($list); //$first_key = key($list);
 			$_first_item_treename = $first_item->treename; $_first_item_title = $first_item->title; $_first_item_id = $first_item->id;
 			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CATEGORY' );
@@ -438,10 +439,14 @@ class flexicontent_cats
 			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
 			JHTML::_('select.genericlist', $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
 			;
-		
-		if ($top == 3) { // Restore first category element
+
+		// Restore first category element
+		if ($top == 3)
+		{
 			$first_item = reset($list); 
-			$first_item->treename = $_first_item_treename; $first_item->title = $_first_item_title; $first_item->id = $_first_item_id ;
+			$first_item->treename = $_first_item_treename;
+			$first_item->title = $_first_item_title;
+			$first_item->id = $_first_item_id ;
 		}
 		
 		if ( $print_logging_info ) @$fc_run_times['render_categories_select'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
