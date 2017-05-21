@@ -2811,11 +2811,11 @@ div.current ul.config-option-list li label {
 	max-width: 300px !important;
 	width: auto !important;
 }
-#toolbar .buttons.btn-group a.toolbar {
+#toolbar .buttons.btn-group .toolbar {
 	text-align: right;
 }
-#toolbar .buttons.btn-group a.toolbar > [class^="icon-"],
-#toolbar .buttons.btn-group a.toolbar > [class*=" icon-"] {
+#toolbar .buttons.btn-group .toolbar > [class^="icon-"],
+#toolbar .buttons.btn-group .toolbar > [class*=" icon-"] {
 	float: right;
 	text-align: center;
 }
@@ -2825,20 +2825,20 @@ div.current ul.config-option-list li label {
 	box-shadow: unset;
 	padding: 0;
 }
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > a.toolbar {
+#toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar {
 	float: right;
 	min-width: 120px;
-	margin-top: 2px;
+	margin-top: 1px;
 	width: 100%;
 }
-#toolbar .buttons.btn-group > ul.dropdown-menu > li > a.toolbar:hover {
+#toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar:hover {
 	background: #e0e0e0;
 	color: black;
 }
-#toolbar .buttons.btn-group > a.toolbar {
+#toolbar .buttons.btn-group > .toolbar {
 	margin: 0;
 }
-#toolbar .buttons.btn-group > a + .dropdown-toggle {
+#toolbar .buttons.btn-group > .toolbar + .dropdown-toggle {
 	margin: 0 0 0 8px;
 	padding-top: 1px;
 }

@@ -1964,7 +1964,7 @@ div.current ul.config-option-list li label:not(.label) {
  */
  
 #toolbar .buttons.btn-group {
-	a.toolbar {
+	.toolbar {
 		text-align: right;
 
 	> [class^="icon-"],
@@ -1980,23 +1980,23 @@ div.current ul.config-option-list li label:not(.label) {
 		box-shadow: unset;
 		padding: 0;
 
-		> li > a.toolbar {
+		> li > .toolbar {
 			float: right;
 			min-width: 120px;
-			margin-top: 2px;
+			margin-top: 1px;
 			width: 100%;
 		}
-		> li > a.toolbar:hover {
+		> li > .toolbar:hover {
 			background: #e0e0e0;
 			color: black;
 		}
 	}
 	
-	> a.toolbar {
+	> .toolbar {
 		margin: 0;
 	}
 
-	> a + .dropdown-toggle {
+	> .toolbar + .dropdown-toggle {
 		margin: 0 0 0 8px;
 		padding-top: 1px;
 	}
