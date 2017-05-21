@@ -427,7 +427,7 @@ class FlexicontentController extends JControllerLegacy
 					$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 					
 					// Redirect back to the edit form
-					$this->setRedirect( $this->returnURL );
+					$this->setRedirect($this->returnURL);
 					
 					if ( $fc_doajax_submit )
 					{
@@ -459,7 +459,7 @@ class FlexicontentController extends JControllerLegacy
 			$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
 			// Redirect back to the edit form
-			$this->setRedirect( $this->returnURL );
+			$this->setRedirect($this->returnURL);
 
 			if ( $fc_doajax_submit )
 				jexit(flexicontent_html::get_system_messages_html());
@@ -553,7 +553,7 @@ class FlexicontentController extends JControllerLegacy
 		if ($isnew && !$canAdd)
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
-			$this->setRedirect( $this->returnURL );
+			$this->setRedirect($this->returnURL);
 			if ( $fc_doajax_submit )
 			{
 				echo flexicontent_html::get_system_messages_html();
@@ -567,7 +567,7 @@ class FlexicontentController extends JControllerLegacy
 		if (!$isnew && !$canEdit)
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
-			$this->setRedirect( $this->returnURL );
+			$this->setRedirect($this->returnURL);
 			if ( $fc_doajax_submit )
 			{
 				echo flexicontent_html::get_system_messages_html();
@@ -581,7 +581,7 @@ class FlexicontentController extends JControllerLegacy
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
 			JError::raiseWarning( 403, $msg );
-			$this->setRedirect( $this->returnURL );
+			$this->setRedirect($this->returnURL);
 			if ( $fc_doajax_submit )
 			{
 				echo flexicontent_html::get_system_messages_html();
@@ -623,7 +623,7 @@ class FlexicontentController extends JControllerLegacy
 			// Saving has failed check-in and redirect back to the item form,
 			// Redirect back to the edit form reloading the posted data
 			$model->checkin();
-			$this->setRedirect( $this->returnURL );
+			$this->setRedirect($this->returnURL);
 			
 			if ( $fc_doajax_submit )
 			{
@@ -1120,6 +1120,9 @@ class FlexicontentController extends JControllerLegacy
 		//JError::raiseNotice(500, 'IN edit()');   // Debuging message
 		$document = JFactory::getDocument();
 		
+		$this->input->set('view', 'item');
+		$this->input->set('hidemainmenu', 1);
+
 		// Get/Create the view
 		$viewType   = $document->getType();
 		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
@@ -1135,7 +1138,6 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
-		//parent::display();
 	}
 	
 	/**
@@ -1150,6 +1152,9 @@ class FlexicontentController extends JControllerLegacy
 		//JError::raiseNotice(500, 'IN ADD()');   // Debuging message
 		$document = JFactory::getDocument();
 		
+		$this->input->set('view', 'item');
+		$this->input->set('hidemainmenu', 1);
+
 		// Get/Create the view
 		$viewType   = $document->getType();
 		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
@@ -1165,7 +1170,6 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
-		//parent::display();
 	}
 
 
@@ -2072,9 +2076,13 @@ class FlexicontentController extends JControllerLegacy
 
 		// Add the new tag and output it so that it gets loaded by the form
 		try {
-			$result = $model->addtag($name);
+			$obj = new stdClass();
+			$obj->name = $name;
+			$obj->published	= 1;
+			$result = $model->store($obj);
 			echo  $result  ?  $model->_tag->id."|".$model->_tag->name :  "0|New tag was not created" ;
-		} catch (Exception $e) {
+		}
+		catch (Exception $e) {
 			echo "0|New tag creation failed";
 		}
 		jexit();

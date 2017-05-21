@@ -50,11 +50,12 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		// Get tag and set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
 		$tag = $model->getTag();
-		if ( empty($tag) ) {
+		if ( empty($tag) )
+		{
 			// Raise a 404 error, if tag doesn't exist or access isn't permitted, maybe move this into model ??
 			$tid = JRequest::getInt('id', 0);
 			$msg = JText::sprintf( $tid ? 'Tag id was not set (is 0)' : 'Tag #%d not found', $tid );
-			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			throw new Exception($msg, 404);
 		}
 		
 		// Get parameters via model

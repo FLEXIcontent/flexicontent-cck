@@ -586,9 +586,9 @@
 				<option value="1">FLEXI_OUTSIDE</option>
 				<option value="2">FLEXI_INSIDE</option>
 			</field>
-			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="clayout_selector_on"/>
+			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label label-success" class="clayout_selector_on"/>
 			<field name="" type="separator" default="URL / Links" description="" level="level3" />
-			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="" />
+			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label label-success" class="" />
 
 
 		<field name="cat_items_list" type="separator" default="FLEXI_ITEMS_LIST" icon_class="icon-list-2 fc-display-params-icon" level="tab_open" box_type="1" />

@@ -202,7 +202,7 @@
 			</field>
 
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_CONFIG" level="level3" depend_class="disp-native-apis" />
-			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY_DESC" depend_class="disp-native-apis" labelclass="label-info" />
+			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY_DESC" depend_class="disp-native-apis" labelclass="label label-info" />
 
 			<field name="" type="separator" default="Debug" level="level1" />
 			<field name="debug_to_console" type="radio" default="0" label="Javascript debug" description="Enable this to add debug information to browser console about AJAX server API calls" class="btn-group btn-group-yesno">

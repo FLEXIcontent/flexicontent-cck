@@ -1071,14 +1071,14 @@
 			<field name="vote_9_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num9" />
 
 		</fieldset>
-		<!--fieldset name="group-voting-reviews" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-voting-reviews" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-		</fieldset-->
+		</fieldset>
 		<fieldset name="group-voting-config" repeat="1" icon_class="icon-star-2" label="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY" description="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="rating_resolution" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_RESOLUTION" description="FLEXI_FIELD_VOTE_RATING_RESOLUTION_DESC" />

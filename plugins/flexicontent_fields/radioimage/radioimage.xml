@@ -72,7 +72,7 @@
 				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP,FLEXI_STATE" props_used="1,1,1,1,1"
 				editbtns_class="elements_list" value_area_class="elements_field"
 				master_fieldname="cascade_after" cascaded_prop="3" state_fieldname="use_elements_state" state_prop="4"
-				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" labelclass="label-info" />
+				class="sorter-full-width required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" labelclass="label label-info" />
 
 			<field name="" type="separator" default="FLEXI_OPTIONAL_ELEMENT_PROPERTIES" description="FLEXI_OPTIONAL_ELEMENT_PROPERTIES_DESC" level="level3" />
 			<field name="use_elements_state" type="multilist" subtype="radio" default="0" label="FLEXI_STATE_ELEMENT_PROPERTY" description="FLEXI_STATE_ELEMENT_PROPERTY_DESC"

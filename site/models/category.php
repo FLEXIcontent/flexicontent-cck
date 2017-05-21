@@ -1677,9 +1677,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			
 			// Throw error -OR- return if errors suppresed
-			if ($err_mssg) {
+			if ($err_mssg)
+			{
 				if (!$raiseErrors) return false;
-				if (FLEXI_J16GE) throw new Exception($err_mssg, $err_type); else JError::raiseError($err_type, $err_mssg);
+				throw new Exception($err_mssg, $err_type);
 			}
 		}
 		
@@ -1742,7 +1743,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				if (!$raiseErrors) return false;
 				
-				if (!empty($login_redirect)) {
+				if (!empty($login_redirect))
+				{
 					// redirect unlogged user to login
 					$uri		= JFactory::getURI();
 					$return	= $uri->toString();
@@ -1754,8 +1756,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 					
 					JError::raiseWarning( $err_type, $err_mssg);
 					$app->redirect( $url );
-				} else {
-					if (FLEXI_J16GE) throw new Exception($err_mssg, $err_type); else JError::raiseError($err_type, $err_mssg);
+				}
+				else
+				{
+					throw new Exception($err_mssg, $err_type);
 				}
 			}
 		}
