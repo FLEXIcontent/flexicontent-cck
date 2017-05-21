@@ -92,7 +92,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="addr_edit_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE_DESC" toggle_related="1" class="btn-group group-fcmethod" labelclass="label-info">
+			<field name="addr_edit_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE_DESC" toggle_related="1" class="btn-group group-fcmethod" labelclass="label label-info">
 				<option value="plaintext" show_list="" hide_list="addr-formatted-mode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLAINTEXT_MODE</option>
 				<option value="formatted" show_list="addr-formatted-mode" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
 			</field>

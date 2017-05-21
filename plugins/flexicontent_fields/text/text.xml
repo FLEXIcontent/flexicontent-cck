@@ -59,7 +59,7 @@
 
 
 			<field name="" type="separator" default="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" level="level3" />
-			<field name="inputmask" type="multilist" subtype="list" default="" label="FLEXI_VALUE_VALIDATION_MASK" toggle_related="1" description="FLEXI_VALUE_VALIDATION_MASK_DESC" class="use_select2_lib fc_skip_highlight" labelclass="label-warning">
+			<field name="inputmask" type="multilist" subtype="list" default="" label="FLEXI_VALUE_VALIDATION_MASK" toggle_related="1" description="FLEXI_VALUE_VALIDATION_MASK_DESC" class="use_select2_lib fc_skip_highlight" labelclass="label label-warning">
 				<option value="" show_list="" hide_list="regexmask-mode,custommask-mode" fcreadonly="{'validation':0}">FLEXI_NO_MASK</option>
 				<option value="__regex__" show_list="regexmask-mode"  hide_list="custommask-mode" fcreadonly="{'validation':0}">- REGULAR EXPRESSION (regex) -</option>
 				<option value="__custom__" show_list="custommask-mode"  hide_list="regexmask-mode" fcreadonly="{'validation':0}">- CUSTOM MASK (property list)</option>

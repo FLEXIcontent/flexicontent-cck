@@ -53,7 +53,7 @@
 
 			<field name="date_source" type="multilist" subtype="list" default="0" label="FLEXI_FIELD_DATE_SOURCE" description="FLEXI_FIELD_DATE_SOURCE_DESC" class="" toggle_related="1"
 				inline_tip="You may want to set microdate type in SEO Tab" tip_class="itemprop_tip_date" tip_img="information.png" 
-				inline_tip2="You may want to set microdate type to 'datePublished' in SEO Tab" tip_class2="itemprop_tip_datepublished" tip_img2="warning.png" labelclass="label-info">
+				inline_tip2="You may want to set microdate type to 'datePublished' in SEO Tab" tip_class2="itemprop_tip_datepublished" tip_img2="warning.png" labelclass="label label-info">
 				<option value="0" show_list="itemprop_tip_date" hide_list="itemprop_tip_datepublished">FLEXI_FIELD_NORMAL_DATE_EDITABLE</option>
 				<option value="1" show_list="itemprop_tip_datepublished" hide_list="itemprop_tip_date">FLEXI_FIELD_SHOW_START_PUBLICATION</option>
 				<option value="2" show_list="itemprop_tip_date" hide_list="itemprop_tip_datepublished">FLEXI_FIELD_SHOW_END_PUBLICATION</option>

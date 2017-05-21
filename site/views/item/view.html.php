@@ -775,7 +775,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				{
 					// user isn't authorize to edit this content
 					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
-					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+					throw new Exception($msg, 403);
 				}
 			}
 		}
@@ -837,7 +837,7 @@ class FlexicontentViewItem  extends JViewLegacy
 					$app->redirect($unauthorized_page);
 				} else {
 					// c. Finally fallback to raising a 403 Exception/Error that will redirect to site's default 403 unauthorized page
-					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+					throw new Exception($msg, 403);
 				}
 			}
 
