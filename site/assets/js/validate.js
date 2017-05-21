@@ -655,6 +655,10 @@ var JFormValidator = function()
 			}
 			Joomla.renderMessages(error);
 		}
+		else
+		{
+			jQuery('#system-message-container').html('');
+		}
 
 		$form.data('fcform_isValid', valid);    // Set flag for form validation state
 		$form.data('fcform_input_sets', null);  // Clear to allow atomic calls to validate()
