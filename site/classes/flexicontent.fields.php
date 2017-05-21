@@ -2284,13 +2284,34 @@ class FlexicontentFields
 	}
 
 
+	// Get a pdf parser for parsing the text of CSV files to be added to the search index
+	static function getCSVParser()
+	{
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$index_csv_files = $cparams->get('index_csv_files', 0);
+		$pdfparser_path = 'helpers';
+
+		static $parser = null;
+		if ($parser !== null) return $parser;
+		$parser = false;
+
+		if (!$index_csv_files || !$pdfparser_path) return $parser;
+
+		// Create parser
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'csv.php');
+		$parser = new flexicontent_csv();
+
+		return $parser;
+	}
+
+
 	// Get a pdf parser for parsing the text of PDF files to be added to the search index
 	static function getPDFParser()
 	{
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$index_pdf_files = $cparams->get('index_pdf_files', 0);
 		$pdfparser_path = $cparams->get('pdfparser_path', '');
-		
+
 		static $parser = null;
 		if ($parser !== null) return $parser;
 		$parser = false;
@@ -2311,24 +2332,22 @@ class FlexicontentFields
 			}
 			$pdfparser_path = $_pdfparser_path;
 		}
-		
+
 		$vendor_path = JPATH::clean($pdfparser_path.DS.'vendor');
 		if (! is_dir($vendor_path) || ! is_readable($vendor_path))
 		{
 			JFactory::getApplication()->enqueueMessage('PDF parser path does not seem to have installed dependent libraries in vendor subfolder: '. $vendor_path .' please run composer');
 			return $parser;
 		}
-		
-		require_once(JPATH::clean($vendor_path.DS.'autoload.php'));
-		require_once(JPATH::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
-		
+
 		// Create paser
-		$parser = new \Smalot\PdfParser\Parser();
-		
-		// Parse pdf file and build necessary objects.
-		//$pdf = $parser->parseFile(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'pdfparser'.DS.'samples'.DS.'Document1_foxitreader.pdf');
-		//$text = $pdf->getText();
-		//echo $text; exit;
+		//require_once(JPATH::clean($vendor_path.DS.'autoload.php'));
+		//require_once(JPATH::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
+		//$parser = new \Smalot\PdfParser\Parser();
+
+		// Create parser
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'pdf.php');
+		$parser = new flexicontent_pdf();
 
 		return $parser;
 	}
@@ -2372,6 +2391,7 @@ class FlexicontentFields
 		// * Per language handlers e.g. word segmenter objects (add spaces between words for language without spaces)
 		static $lang_handlers = array();
 		static $pdf_parser = null;
+		static $csv_parser = null;
 		static $search_prefix = null;
 		static $indexed_pdfs = array();
 		static $pdf_count = 0;
@@ -2386,6 +2406,12 @@ class FlexicontentFields
 		if ( $pdf_parser === null && !empty($field->field_isfile) )
 		{
 			$pdf_parser = FlexicontentFields::getPDFParser();
+		}
+		
+		// Get CSV parser for indexing CSV / Excel (TODO) files
+		if ( $csv_parser === null && !empty($field->field_isfile) )
+		{
+			$csv_parser = FlexicontentFields::getCSVParser();
 		}
 
 
@@ -2513,9 +2539,50 @@ class FlexicontentFields
 				{
 					JFactory::getApplication()->enqueueMessage('<b>' . $v['filename'] . '</b> : ' . JText::_('FLEXI_PATH_PDF_PARSING_NOT_SUPPORTED_BY_SEARCH_INDEXING'), 'notice');
 				}
-				if ($err_msg)
+				if ($err_msg && JDEBUG)
 				{
-					if (JDEBUG) JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
+					JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
+				}
+
+				// Support for indexing text in CSV / Excel files
+				$err_msg = '';
+				$csv_indexing_aborted = false;
+				if ( $csv_parser && !empty($field->field_isfile) && strtolower(flexicontent_upload::getExt($v['filename'])) == 'csv' )
+				{
+					$abspath = JPath::clean( ($v['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) .DS. $v['filename'] );  //echo $abspath . "<br/>";  					//echo "<pre>"; print_r($v); echo "</pre>";
+					if ( isset($indexed_csvs[$abspath]) )
+					{
+						if (strlen($indexed_csvs[$abspath])) $search_value[] = $indexed_csvs[$abspath];
+					}
+					else
+					{
+						try {
+							//JFactory::getApplication()->enqueueMessage(($for_advsearch ? 'Parsing (ADV Index)' : 'Parsing (BASIC Index)') . ': ' . $abspath, 'message');
+							$csv_count++;
+							if ($csv_count % 5 == 0)  gc_collect_cycles();   // Call garbage collector every nnn CSV file parsings
+							$csv_data = @ $csv_parser->parseFile($abspath);
+							$search_value[] = $indexed_csvs[$abspath] = @ $csv_data->getText();
+						}
+						catch (Exception $e) {
+							$csv_indexing_aborted = true;
+							$indexed_csvs[$abspath] = '';
+							$err_msg = '';
+							if (JFactory::getApplication()->isAdmin() && ($last_error = error_get_last()))
+							{
+								$err_msg .= implode(' ', error_get_last()) . ' <br/> ';
+								if (function_exists('error_clear_last')) error_clear_last();
+							}
+							$err_msg .= $e->getMessage();
+						}
+					}
+				}
+				if ($csv_indexing_aborted)
+				{
+					JFactory::getApplication()->enqueueMessage('<b>' . $v['filename'] . '</b> : ' . JText::_('FLEXI_PATH_CSV_PARSING_NOT_SUPPORTED_BY_SEARCH_INDEXING'), 'notice');
+				}
+				if ($err_msg && JDEBUG)
+				{
+					JFactory::getApplication()->enqueueMessage($err_msg, 'warning');
 				}
 
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
@@ -2523,12 +2590,9 @@ class FlexicontentFields
 				$searchindex[$vi] = $filter_func ? $filter_func($searchindex[$vi]) : $searchindex[$vi];
 			}
 			
-			if (!empty($pdf_data))
-			{
-				//echo "<pre>";
-				//print_r($searchindex);
-				//exit;
-			}
+			// if (!empty($pdf_data)) { echo "<pre>"; print_r($searchindex); exit; }
+			// if (!empty($csv_data)) { echo "<pre>"; print_r($searchindex); exit; }
+
 			
 			// * Use word segmenter (if it was created) to add spaces between words
 			if ($lang_handler)
