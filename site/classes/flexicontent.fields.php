@@ -2587,7 +2587,14 @@ class FlexicontentFields
 
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
 				$searchindex[$vi] = (count($search_props))  ?  implode($props_spacer, $search_value)  :  $v;
-				$searchindex[$vi] = $filter_func ? $filter_func($searchindex[$vi]) : $searchindex[$vi];
+
+				$searchindex[$vi] = flexicontent_html::striptagsandcut( $searchindex[$vi] );
+
+				// Do not rerun a strip_tags on the text, since this was done already above
+				if ($filter_func != 'strip_tags')
+				{
+					$searchindex[$vi] = $filter_func ? $filter_func($searchindex[$vi]) : $searchindex[$vi];
+				}
 			}
 			
 			// if (!empty($pdf_data)) { echo "<pre>"; print_r($searchindex); exit; }

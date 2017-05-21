@@ -1748,30 +1748,48 @@ class flexicontent_html
 	 */
 	static function striptagsandcut( $text, $chars=null, &$uncut_length=0, $options = null)
 	{
-		$options = $options ?: array('cut_at_word' => false, 'more_toggler' => 0, 'more_icon' => 'icon-paragraph-center', 'more_txt' => '...', 'modal_title'=>'...');
+		$options = $options ?: array(
+			'cut_at_word' => false,
+			'more_toggler' => 0,
+			'more_icon' => 'icon-paragraph-center',
+			'more_txt' => '...',
+			'modal_title'=>'...',
+			'keep_jplugins_code' => false
+		);
 		
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
 		$cleantext = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
 
-		// Strip SCRIPT tags AND their containing code
-		$cleantext = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $cleantext );
-
 		// Add whitespaces at start/end of tags so that words will not be joined,
 		//$cleantext = preg_replace('/(<\/[^>]+>((?!\P{L})|(?=[0-9])))|(<[^>\/][^>]*>)/u', ' $1', $cleantext);
-		$cleantext = preg_replace('/(<\/[^>]+>(?![\:|\.|,|:|"|\']))|(<[^>\/][^>]*>)/u', ' $1', $cleantext);
+		//$cleantext = preg_replace('/(<\/[^>]+>(?![\:|\.|,|:|"|\']))|(<[^>\/][^>]*>)/u', ' $1', $cleantext);
+
+		// Add whitespaces at start/end of BLOCK AND LINE BREAKING TAGS so that words will not be joined,
+		$cleantext = preg_replace('/(<|<\/)('.
+			'address|article|aside|blockquote|br|canvas|dd|div|dl|dt|'.
+			'fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|li|'.
+			'main|nav|noscript|ol|output|p|pre|section|table|tfoot|ul|video'.
+			')\b/i',
+		' $1$2', $cleantext);
 
 		// Strip html tags
 		$cleantext = strip_tags($cleantext);
 
-		// Clean additionnal plugin tags
-		$patterns = array();
-		$patterns[] = '#\[(.*?)\]#';
-		$patterns[] = '#{(.*?)}#';
-		$patterns[] = '#&(.*?);#';
+		// Strip SCRIPT tags already done above
+		//$cleantext = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $cleantext );
 
-		foreach ($patterns as $pattern)
+		// Clean Joomla Plugin code
+		if ( empty($options['keep_jplugins_code']) )
 		{
-			$cleantext = preg_replace( $pattern, '', $cleantext );
+			$patterns = array();
+			$patterns[] = '#\[(.*?)\]#';
+			$patterns[] = '#{(.*?)}#';
+			$patterns[] = '#&(.*?);#';
+
+			foreach ($patterns as $pattern)
+			{
+				$cleantext = preg_replace( $pattern, '', $cleantext );
+			}
 		}
 
 		// Replace multiple spaces, tabs, newlines, etc with a SINGLE whitespace so that text length will be calculated correctly
@@ -2056,7 +2074,7 @@ class flexicontent_html
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
-		//$Itemid = JFactory::getApplication()->input('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
+		//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 		$Itemid = 0;
 		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 		$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=remove';
@@ -2686,7 +2704,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 
 		if ( $params->get('show_editbutton', 1) == '1') {
-			//$Itemid = JFactory::getApplication()->input('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
+			//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 			$Itemid = 0;
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
