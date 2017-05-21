@@ -1,0 +1,916 @@
+    [Version : 1.6.5]	[Date : 2017/05/20]     [Author : CV]
+	. Complemented the Unicode to Ansi mapping table.
+	. Added the AddAdobeExtraMappings() method, to complement the standard Adobe character maps when given
+	  character names refer to a glyph that has no Unicode equivalent.
+	. Added the MarkTextLike() method to mark certain portions of text based on their font name and size.
+	. Changed the GetCaptures() method to return by default a collection of stdClass objects instead of
+	  PdfToText objects whose contents takes time to be displayed when using the print_r() function.
+	  The new boolean parameter $full allows to return PdfToText objects instead when set to true.
+	
+    [Version : 1.6.3]	[Date : 2017/05/17]     [Author : CV]
+	. Changed the $CharacterClasses table, which was causing some constructs, such as T*, not to be 
+	  recognized as a single instruction.
+	. Fixed a decoding bug when a series of hex digits enclosed in '<>' also contained spaces and newlines
+	  (which should have been ignored).
+	. Allow names in the /Differences array to use the '#xy' notation, where 'xy' are hex digits.
+	. Significantly complemented character maps for the four Adobe predefined character sets.
+	. Text captures : changed the behavior of the <rectangle> definitions ; now, captured areas are
+	  accessible by their page number, instead of a sequential index starting from zero. A capture is
+	  defined for each page of the document, even if not in the list of applicable pages. Of course, empty
+	  captures will be contained in the list if nothing was captured on the corresponding page.
+	
+    [Version : 1.6.2]	[Date : 2017/05/17]     [Author : CV]
+	. The adobe-charsets.map file was searched in the wrong directory.	
+
+    [Version : 1.6.1]	[Date : 2017/05/12]     [Author : CV]
+	. Text captures :
+	  - Fixed a mistake where columns having empty values were not present in the object returned by the
+	    GetCaptures() method.
+	. Complemented the table that maps Unicode special characters such as spaces, quotes, hyphens, etc. to
+	  their Ascii counterpart (mainly for quotes)
+	. Enforced the ability of the class to work in 'degraded mode' whem some external tables are missing.
+	. Complemented the four Adobe standard character sets with more entity names, such as Polish characters,
+	  Greek characters and special symbols (hundreds of symbols added).
+	. Moved the adobe-charsets.map file to the new Maps directory
+	. Created a Maps/unicode-to-ascii.map mapping file.
+	
+    [Version : 1.6.0]	[Date : 2017/05/08]     [Author : CV]
+	. Added the possibility to capture areas of text :
+	  - The SetCaptures() and SetCapturesFromString() methods define the pages and areas of text within the
+	    pages to be captured (see file README.md for more information). It can be used to define rectangle
+	    shapes or line/columns information
+	  - The GetCaptures() method returns an object containing the captured text areas
+	  - Added the PDFOPT_LOOSE_X_CAPTURE and PDFOPT_LOOSE_Y_CAPTURE to include text that might exceed the
+	    captured area, but whose top/left coordinates are included in the captured area.
+	. Complemented the Adobe 4 standard character set encodings, to include Polish characters.
+	. Exported the Adobe standard character sets to external file 'adobe-charsets.map'.
+	
+    [Version : 1.5.8]	[Date : 2017/05/01]     [Author : CV]
+	. Added undocumented aliases for stream encoding (for example, /Fl stands for /FlateDecode).
+	
+    [Version : 1.5.7]	[Date : 2017/04/26]     [Author : CV]
+	. Added the possibility to extract form data :
+	  - Added the HasFormData(), GetFormCount() and GetFormData() methods
+	  - Data extraction based on XML form templates, which maps form fields to human-readable ones
+	  - Form data is returned as an object inherited from the PdfToTextFormData class
+	. Added the PDFOPT_DEBUG_SHOW_COORDINATES option, which shows coordinates of every text block in the 
+	  output text. This option has been designed for the future feature to be implemented, that will allow
+	  to capture text areas.
+	. Added the Subject and Keywords properties regarding author information
+	. Changed the text/document_strxpos() methods to use the mb_strxpos() functions instead of strxpos().
+	  The supplied searched string must be encoded in UTF-8.
+	. Added the PdfToTextBase::GetStringParameter() method, which is able to retrieve parameter values such
+	  as :
+		/FlagName (parameter value)
+	  and :
+		/FlagName <parameter value as hexdigits>
+
+    [Version : 1.5.6]	[Date : 2017/04/21]     [Author : CV]
+	. Added font metrics information for the Adobe Standard 14 fonts, which are hardcoded (in new directory
+	  FontMetrics). This includes Times, Helvetica and Courier with their variations (bold, italic, etc.)
+	  along with the Symbol and ZapDingbats fonts. Currently, font information relates to individual 
+	  character widths, which are used for page layout rendering.
+	. Enhanced layout rendering, which was giving strange results due to improper handling of certain
+	  positioning instructions.
+	. Complemented the $UnicodeToSimpleAscii table to include special hyphens
+
+    [Version : 1.5.5]	[Date : 2017/04/20]     [Author : CV]
+	. Added the $UnicodeToSimpleAscii table, which maps Unicode characters which can have an ASCII
+	  equivalent. For example, German "fi" with ligature (U+FB01) becomes ASCII string "fi" ; special
+	  spaces (such as unbreakable space) become an ASCII space (0x20), etc.
+	. Fixed a warning issued when a page entry does not contain a width and a height.
+	. Suppressed a warning in non-debug mode when an unsupported encryption algorithm has been found
+	
+    [Version : 1.5.4]	[Date : 2017/04/07]     [Author : CV]
+	. Fixed an issue with the /Kids flag, whose parameters are normally the ids of the objects containing
+	  a page's contents. Sometimes, there is an additional indirection level : the parameter of the /Kids
+	  flag is an obect which in turn contains the ids of page contents objects. Not handling this
+	  situation caused some page contents to be missed.
+	. Some line breaks were not respected
+	
+    [Version : 1.5.3]	[Date : 2017/04/06]     [Author : CV]
+	. Enhanced page layout rendering :
+	  - Better handle text positioning, especially when a line contains super/subscripted text
+	  - Implemented additional text positioning instructions
+	  - First experimental implementation of templates (which are correctly implemented in the non-page 
+	    layout version)
+	  - Fixed a regression intoduced in versions 1.5.1 and 1.5.2.
+	. Completed some missing codes for the WinAnsiEncoding font, which is far bigger than stated in the
+	  PDF specifications.
+	. Modified the default value of the ExtraTextWidth property to -5%, since most of the widths 
+	  computed by the GetStringWidth() method are a little bit too large.
+	
+    [Version : 1.5.2]	[Date : 2017/04/05]     [Author : CV]
+	. Page layout rendering enhancements :
+	  - Interpret more instructions
+	  - Fixed a problem where two lines, the first one having the biggest font, were joined together
+	. Fixed a bug in the Unescape() method which allowed octal sequences of more than 3 characters to be 
+	  interpreted, giving an incorrect character code as output.
+	. Some drawing objects were not recognized in the input ; this could affect page layout rendering.
+	. The document_strpos() methods were not returning the correct page number, but a zero-based offset
+	  (the Pages property is indexed by the actual page number)
+	
+    [Version : 1.5.1]	[Date : 2017/03/31]     [Author : CV]
+	. Corrected a bug in the LZW decompression algorithm.
+	
+    [Version : 1.5.0]	[Date : 2017/03/31]     [Author : CV]
+	. Implemented page layout rendering !!!
+	  - Text parts are displayed in the same order as Acrobat Reader displays them
+	  - Spaces are inserted in the same line when necessary (the BlockSeparator property can be used
+	    to separate items that are on the same line, at different -x-coordinates)
+	  - The PDFOPT_RAW_LAYOUT and PDFOPT_BASIC_LAYOUT options have been added. The default is 
+	    PDFOPT_RAW_LAYOUT, which behaves as in the previous versions. The PDFOPT_BASIC_LAYOUT will 
+	    activate layout rendering.
+	  - The new ExtraTextWidth property allows to adjust the computed text widths to help determine if
+	    two consecutive blocks of text on the same line should be separated by a whitespace or not.
+	  - Hold a separate set of instructions to be removed from PDF stream before interpretation,
+	    depending on whether the page layout option has been activated or not. This is done not to impact
+	    the performance of this class for callers that use it the traditional way.
+	  This new feature allows to process more efficiently PDF files presenting tabular data or form data
+	  (such as tickets reservations for example). Note that the PDFOPT_BASIC_LAYOUT option simply ensures
+	  that items coming from the PDF file are shown in the correct order and not improperly concatenated ; 
+	  it does not visually reproduce  what you could see with Acrobat Reader.
+	. Font descriptors were mistakenly interpreted as font entries.
+
+    [Version : 1.4.19]	[Date : 2017/03/25]     [Author : CV]
+	. Added the PDFOPT_ENHANCED_STATISTICS flag (for debugging/optimization purposes)
+	. Added more useless instructions to be removed from the PDF input stream before processing
+	. Fixed a warning issued when processing certain objects not having stream data
+	. Fixed a warning issued when a character map does not contain a begincodespacerange/endcodespacerange
+	  construct.
+	. Fixed a warning issued by the MapKids() method when a page catalog refers to a non-existing object.
+	. Re-established PCRE error handling during PDF file processing, since the pcre.backtrack_limit clearly 
+	  imposes a limit on the size of the data that can be captured (it does not only depends on the 
+	  complexity of the regular expression). This means that PDF file scanning will be stopping with an 
+	  exception if the size of the object to be captured exceeds such a limit.
+	. Fixed inappropriate warnings about undefined fonts
+	
+    [Version : 1.4.18]	[Date : 2017/03/25]     [Author : CV]
+	. Fixed a warning issued when author information in buggy PDFs referred to non-existing objects.
+	. The PageSeparator property was not taken into account by the GetPageFromOffset() method.
+	. Fixed a regression which caused an exception to be thrown if the PDF document did not exactly start
+	  with '%PDF'
+	. Remove more useless instruction from the input stream before processing it (graphic-related
+	  instructions).
+	. Trying to process object streams that contain invalid gzip data led to an infinite loop.
+	. Handle buggy PDF containing object streams which do not start with an even number of integer values
+	  (this should normally be a list of object number/offset pairs)
+	. The CodePointToUtf8() function was running into an inifinite loop when the high order bit of the
+	  supplied value was set (unsigned right-shift operator does not exist in PHP 5.*).
+	. Handle another kind of buggy PDF that have a page catalog referring to a non-existing object ; in this
+	  case the behavior is the same as if there is no page catalog at all : everything is grouped onto a
+	  single page.
+	
+    [Version : 1.4.17]	[Date : 2017/03/21]     [Author : CV]
+	. Drawing instructions between BX/EX were unduly removed, causing some text to be missing sometimes in
+	  the output.
+	. Fixed an inappropriate property setting in class PdfTexterTimeoutException
+	. Handle the case where /XObjects contents are not inline but specify another object with the inline
+	  contents. This caused some text to be missed in the output.
+	. When a Unicode font had a secondary character map (representing the /Differences array), the 
+	  secondary cmap was not searched if the character to be mapped was not also defined in the primary
+	  cmap. This caused some mappings to be missed.
+	
+    [Version : 1.4.16]	[Date : 2017/03/19]     [Author : CV]
+	. Completely reviewed the way PDF objects are parsed ; the original code sometimes forced the user to
+	  change the pcre.backtrack_limit PHP setting to abnormal values (14 000 000 for parsing the Adobe
+	  PDF Specifications document itself !)
+	. Implemented the LZW decompression algorithm for text objects.
+	
+    [Version : 1.4.15]	[Date : 2017/03/17]     [Author : CV]
+	. Added the PDFOPT_IGNORE_HEADERS_AND_FOOTERS option. The previous behavior was to ignore them
+	  systematically.
+	. Changed the PdfTexterFont object to handle basic encodings
+	. Refactored class for decryption support :
+	  - Moved some functions to the PfTexterObjectBase object
+	  - Created the PdfEncryptionData class to hold encryption data defined in the PDF file, by
+	    transfering all the encryption-related properties from the PdfToText class to PdfEncryptionData
+	  - Added the EncryptionData property, which currently has the "protected" visibility
+	  - Renamed the IsPasswordProtected property to IsEncrypted
+	  Note : processing of encrypted files is not yet functional
+
+    [Version : 1.4.14]	[Date : 2017/03/14]     [Author : CV]
+	. Fixed a regression in text decoding when compound text contained angle brackets and right square 
+	  brackets (originally fixed in 1.4.12, but regressed in 1.4.13).
+	
+    [Version : 1.4.13]	[Date : 2017/03/13]     [Author : CV]
+	. Updated IDENTITY-H CID font mapping to add more characters.
+	. Handle the case where a character map states that it handles 2-bytes character codes (using the 
+	  begincoderange/endcoderange constructs) while the map itself only contains 1-byte character codes...
+	. Changed character maps that are secondary to a Unicode map to handle only the characters listed in
+	  the /Differences parameter.
+	. Updated the offical Adobe WinAnsi character map to include UTF8 codes which have no Windows
+	  equivalent (PdfTexterEncodingMap::$Encodings array).
+	
+    [Version : 1.4.12]	[Date : 2017/03/12]     [Author : CV]
+	. Added the LoadFromString() method, which allows to process PDF contents directly from a string.
+	. Changed the Load() method to be able to handle remote urls.
+	. Fixed a bug in the __next_token() method which caused contents following a regular square bracket
+	  character to be wrongly interpreted.
+	. Integrated a modification resolving the interpretation of escaped octal sequences, that was missed
+	  in version 1.4.11.
+	. Fixed : The new PdfToTextDecodingException class did not report the supplied error message.
+
+    [Version : 1.4.11]	[Date : 2017/03/11]     [Author : CV]
+	. Corrected decoding of Ascii85 data (the original version from the 'unknown developer' did consider
+	  that the '%' character was the start of a comment, which is not the case in Ascii85 encoded data)
+	. Handle the case where data using Ascii85 encoding contains in turn gzipped data
+	. Optimized the __decode_ascii85() method
+	. Characters using octal escape sequences were not correctly interpreted when followed by digits after
+	  the 3rd one of the escape sequence. This so&metimes caused incorrect character decoding.
+	. Added timeout handling features ; when the PDFOPT_ENFORCE_EXECUTION_TIME or 
+	  PDFOPT_ENFORCE_GLOBAL_EXECUTION_TIME are specified, the $MaxExecutionTime property and 
+	  $MaxGlobalExecutionTime static property (respectively) will be used to prevent exceeding the PHP setting
+	  'max_execution_time'. If such a situation happens, a PdfToTextTimeoutException exception will be
+	  thrown.
+	. Added the $MaxExtractedImages property, to limit the number of extracted images.
+
+    [Version : 1.4.10]	[Date : 2017/03/09]     [Author : CV]
+	. Fixed an issue when decoding object streams : a lack of whitespace after the list of object number/
+	  offset pairs implied a shift of one character in object data extraction, making most of the objects
+	  contained in the object stream to be missed.
+	
+    [Version : 1.4.9]	[Date : 2017/03/09]     [Author : CV]
+	. Handle the case where character mappings specified through the /Differences keyword can contain
+	  constructs such as '/uniabcd', where 'abcd' is a sequence of hex digits representing a Unicode code
+	  point.
+	. Found rare cases where a Unicode map mapped character IDs to a value between 0xF000 and 0xF0FF, which
+	  do not correspond to any Unicode codepoint, but rather to an undocumented font. The class
+	  PdfTexterAdobeUndocumentedFont has been designed to handle such mappings.
+
+    [Version : 1.4.8]	[Date : 2017/03/08]     [Author : CV]
+	. The new PdfTexterAdobeMap classes did not specify the width of character codes, which caused bad
+	  interpretation of characters expressed as octal escaped sequences.
+	. Fixed a regression, where the numeric value of octal escape sequences was displayed as is
+	. Fixed a warning issued when an empty date is specified in Author information
+	. Fixed a warning issued when instantianting objects of class PdfTexterFont with a missing 4th argument.
+	. Object streams (compound objects) are now discarded from the object list after processing their 
+	  embedded objects
+	. Fixed bad interpretation of font sizes less than 1 with no leading zero (eg, '.93')
+	. Better process text contents using characters escaped in octal notation
+	
+    [Version : 1.4.7]	[Date : 2017/03/05]     [Author : CV]
+	. First (and partial) implementation of CID fonts for the eastern Europe languages (currently tested on
+	  Polish).
+	. Fixed a warning about an undefined $map variable in class PdfTexterIdentityHCIDFont.
+	
+    [Version : 1.4.6]	[Date : 2017/03/04]     [Author : CV]
+	. Fixed errors regarding undefined PdfTexterFont::$WinAnsiCharacterMap and $MacRomanCharacter map, which
+	  had been moved to the PdfTexterAdobeWinAnsiMap and PdfTexterAdobeMacRomanMap classes, respectively.
+
+    [Version : 1.4.5]	[Date : 2017/03/05]     [Author : CV]
+	. Implemented Cyrillic fonts (ISO-8859-5).
+	. Created the PdfTexterAdobe*Map classes, to implement the WinAnsi and Mac Roman encodings, instead of
+	  implementing them as tables at the PdfTexterFont class level.
+	
+    [Version : 1.4.4]	[Date : 2017/03/04]     [Author : CV]
+	. Fixed several issues that affected text output :
+	  - Completely changed the way "beginbfrange..endbfrange" constructs are handled ; some interpretation
+	    problems occurred when line breaks were present at unexpected places, giving incorrect character 
+	    mappings.
+	  - Unified the way escaped characters are handled in a text stream ; sometimes, the escaped character
+	    appeared as is in the output, instead of being mapped.
+	  - Handle more character escapes such as backspace, which has no equivalent in PHP.
+	. Handle the case where author information contains parentheses, which are also used as delimiters
+	
+    [Version : 1.4.3]	[Date : 2017/03/03]     [Author : CV]
+	. Handle the case where Unicode fonts can also have an associated /Encoding object, specifying a
+	  /Differences flag that maps character ids to other character ids.
+	. The checkings performed on special /Contents references which reference an object holding the list
+	  of the objects contained in the page was a little bit too relaxed and, in some rare cases, caused
+	  a few text blocks to be missing in the output (this feature was introduced in version 1.4.1).
+	. Corrected a warning in method GetMappedFonts()
+	. For better performance, remove all useless instructions at the start and end of each drawing
+	  instruction block.
+	. Started expanding the PdfTexterEncodingFont::$Encodings table to add character mappings with
+	  character names not described in the PDF specifications.
+	. Better handle recognition of author information (sometimes, the hex2bin() function issued a warning)
+
+    [Version : 1.4.2]	[Date : 2017/03/02]     [Author : CV]
+	. Fixed mapping issue when the same character map was referenced by several font definitions (only the
+	  first definition was associated to the character map, which caused incorrect character mappings when
+	  subsequent fonts were used).
+	. The regular expression catching author information was a little bit too greedy, causing some 
+	  misinterpretations and warnings in the output.
+
+    [Version : 1.4.1]	[Date : 2017/02/27]     [Author : CV]
+	. Enhanced page contents decoding (sometimes, the parameter of the /Contents flags does not reference
+	  objects containing drawing instructions, but objects containing the list of objects which in turn
+	  contain the real drawing instructions). This caused in rare cases some contents to be missed in the
+	  output.
+	. Changed the way compound objects are handled : instead of decoding them on-the-fly, preprocess them
+	  before any other processing takes place. This ensure that forward references to objects defined later
+	  in the pdf file will be satisfied.
+	. Ignore embedded images inside drawing instructions blocks ; the presence of gzipped data inside the
+	  embedded image could cause misinterpretation of drawing instructions following it. For the current
+	  version, embedded images will not be integrated into the image-extraction process.
+	. Fixed issue where the same group of text was extracted several times with some PDF samples.
+	. Better handle Japanese documents
+	
+    [Version : 1.4.0]	[Date : 26/02/2017]     [Author : CV]
+	. First implementation for handling languages written from right-to-left (RTL).
+
+    [Version : 1.3.18]	[Date : 25/02/2017]     [Author : CV]
+	. Corrected the PdfTexterUnicodeMap class, which did not correctly decode character maps in files 
+	  generated on Apple where line-endings are carriage returns. As a result, output looked like garbage
+	  data.
+
+    [Version : 1.3.17]	[Date : 25/02/2017]     [Author : CV]
+	. Completely rewrote the way text specified between parentheses, either as plain text or 2-bytes
+	  character codes, is processed. Some character values preceded with a backslash are escape sequences,
+	  which were not recognized in all cases, thus causing a shift when interpreting 2-bytes values and a
+	  bad mapping for the 2-bytes sequences that followed.
+
+    [Version : 1.3.16]	[Date : 2017/02/23]     [Author : CV]
+	. Changed the GetFontByMapId() method which was incorrectly searching a global font instead of searching
+	  first for a page-specific font.
+	. Compound objects were not correctly handled when object number/offset pairs were separated by a newline
+	  (str_replace() was called instead of preg_replace). This caused some objects to be missed.
+	. Performed some optimizations which allow for a performance gain of 5 to 10 percent in certain cases.
+	. Removed the suppression of carriage returns, as this is the only line separator used by Adobe software
+	  on Apple.
+
+    [Version : 1.3.15]	[Date : 2017/02/12]     [Author : CV]
+	. Handles author information whose keyword values refer to existing object contents instead of
+	  referring to a direct value
+	. Handles new constructions for beginbfchar/endbfchar constructs, which can act as beginbfrange ; 
+	  Example :
+		<21> <0009 0020 000d>
+	  means :
+	  	. Map character #21 to #0009
+		. Map character #22 to #0020
+		. Map character #23 to #000D
+	 There is no clue in the Adobe PDF specification that a single character could be mapped to a range.
+	 The normal constructs would be :
+		<21> <0009>
+		<22> <0020>
+		<23> <0000D>
+	. Regular expressions matching Postscript instructions to be removed before interpreting the remaining
+	  contents were sometimes catenating one instruction with the first parameter of the following one,
+	  which caused bad interpretation, some warnings and bad handling of the layout (some lines could be
+	  catenated together).
+	. Changed the MinSpaceWidth value from 250 to 200 (certain files separate words with lower spacing
+	  values)
+
+    [Version : 1.3.14]	[Date : 2017/02/07]     [Author : CV]
+	. Fixed the *_strpos methods which did not return correct page information any more
+	. Added new font aliases possibilities (/0 through /9 and /a through /z)
+
+    [Version : 1.3.13]	[Date : 2017/02/05]     [Author : CV]
+	. Added the MaxSelectedPages property to extract only the first or last x pages of the document.
+	. Pure JPEG images are no more loaded into memory (using the gd library) when the 
+	  PDFOPT_AUTOSAVE_IMAGES flag is specified.
+
+    [Version : 1.3.12]	[Date : 2017/02/01]     [Author : CV]
+	. Enhanced image extraction by adding support for more image formats, notably those having the
+	  /FlateDecode flag. The new supported image formats are :
+	  - Standard JPEG data, not initially specified as a real image
+	  - Image data encoded as :
+	    . RGB color values
+	    . CMYK color values
+	    . Gray scale color values
+	    Currently, only 8-bits color components are supported.
+	. Added the PdfInlinedImage class, and changed the AddImage() and DecodeImage() methods to handle
+	  these new image processing enhancements.
+	. Corrected incorrect character mappings : the regex that matches beginbfrange such as : 
+		<32> <33> <100>
+	  also matched :
+		<32> <33> [<57> <59]
+	  (!) as if it was specified as :
+		<32> <33> <59>
+	  This caused incorrect translation of characters sometimes. This seems to be a bug of the PCRE package ; 
+	  as a workaround, the regex matching the second form is tried first.
+
+    [Version : 1.3.11]	[Date : 2017/01/28]     [Author : CV]
+	. Added the possibility to handle images encoded with the /FlateDecode/DCTDecode flags, which contain
+	  gzipped JPEG data. Other types of images can also be encoded this way but in different formats, and 
+	  will be processed later.
+	. Added the PFOPT_AUTOSAVE_IMAGES flag to autosave images to external files without keeping them
+	  into memory. 
+	. The new property ImageAutoSaveFileTemplate give the template for the external file name when autosave
+	  mode is enabled.
+	. The new property ImageAutoSaveFormat can be set to one of the IMG_* constants defined in the gd lib.
+	. Added the ImageCount property, which counts the number of images found in the document even if they
+	  are not processed.
+	. Added the Output() method to the PdfImage class to display image contents on standard output
+	. Changed the PeekAuthorInformation() method to remove extraneous newlines when dealing with hex-encoded
+	  data.
+	. Corrected the ExtractText() method which could generate divisions by zero in some cases.
+	. Added the PdfImage::DestroyImageResource() method, to free libgd memory.
+
+    [Version : 1.3.10]	[Date : 2017/01/11]     [Author : CV]
+	. Prevented a warning in GetFontAttributes() when no font resource is defined (this typically happens
+	  for pdf files where the text is graphically drawn and does not use font tables).
+	. Added a custom hex2bin() function for PHP versions < 5.4.0
+
+    [Version : 1.3.9]	[Date : 2016/01/01]     [Author : CV]
+	. Fixed warning messages produced when encountering font/map associations in objects with no stream
+	  defined.
+
+    [Version : 1.3.8]	[Date : 2016/12/24]     [Author : CV]
+	. Added one more place in the Load() method where to recognize associations between font aliases and
+	  the object containing their definitions (some associations were "missed" in certain documents)
+	. Font specifiers containing a dot were not recognized (eg : /F1.0).
+	. Corrected a few warnings issued for certain files containing CID fonts
+
+    [Version : 1.3.7]	[Date : 2016/12/07]     [Author : CV]
+	. The PdfTexterFontTable::MapCharacter() method was generating notices for fonts without character maps.
+	. The regular expression in the PdfToText::Load() method was sometimes confusing PCRE when trying to
+	  match stream/endstream constructs because it contained [backslash]r and [backslash]n. This caused
+	  some objects to be missed from the input PDF file. They have been replaced with [backslash]s, and 
+	  carriage returns/line feeds are removed later from the beginning of the stream data.
+
+    [Version : 1.3.6]	[Date : 2016/12/02]     [Author : CV]
+	. Started implementation of CID fonts (EXPERIMENTAL) :
+	  - Added the PdfTexterCIDMap abstract class.
+	  - Added the PdfTexterIdentityHMap class, to implement the IDENTITY-H CID font.
+	. CID tables are externalized and located into the directory pointed to by the PdfToText::CIDTablesDirectory 
+	  public static property. Currently, only the IDENTITY-H CID font is (partially) implemented.
+	. Usual behavior remains for inexisting CID substitution tables : garbage will be produced.
+
+    [Version : 1.3.5]	[Date : 2016/12/02]     [Author : CV]
+	. Now handles references to font aliases that are local to a page. Previously, font aliases were
+	  considered as global to the document, which caused some incorrect character substitutions.
+	. Throw an exception if the mbstring extension is not loaded.
+	. Compatibility with PHP versions prior to 5.6 :
+	  - The memory_get_usage() and memory_get_peak_usage() functions are used only if implemented (they were
+	    implemented far later on Windows than on Unix). If not available, the MemoryUsage and MemoryPeakUsage
+	    properties will be set to zero.
+	. Fixed : Offsets specified between character strings were incorrectly interpreted, which sometimes
+	  caused groups of characters to be catenated together.
+
+    [Version : 1.3.4]	[Date : 2016/11/11]     [Author : CV]
+	. The PdfToText class is now compatible with PHP versions < 5.6
+	. Changed errors to warnings about unimplemented features.
+	. Corrected a warning issued by the Load() function when looping through page contents : some of them
+	  were NULL, instead of being an array, because of the modifications included in template processing
+	  in version 1.3.2 (related function : PdfTexterPageMap::MapKids).
+
+    [Version : 1.3.3]	[Date : 2016/11/05]     [Author : CV]
+	. Allow the %PDF tag that signals the start of the PDF document to be located anywhere in the file,
+	  even if preceded with garbage (Acrobat Reader is able to open such files)
+	. Added the $DocumentStartOffset property to indicate the real start of the document
+	. Add the $Statistics property with the following entries :
+	  - 'TextSize'          : total size of drawing instructions (text objects)
+	  - 'OptimizedTextSize' : total size of drawing instructions, after removing the ones that are
+	    useless for text extraction
+	. Added new regular expressions to remove useless drawing instructions
+	. __strip_useless_instructions() method : removed carriage returns to simplify regular expressions and
+	  added a second preg_match() to remove single-line instructions not processed by the first one
+	. Handle the case where author information is expressed in UTF-16 with a BOM.
+	. Handle the case where author information is expressed as a series of hex digits.
+
+    [Version : 1.3.2]	[Date : 2016/11/02]     [Author : CV]
+	. Template references can reference an object, which in turn has its own template references.
+	  Changed the ProcessTemplateReferences() method to recursively handle such a situation.
+	. Reset internal structures at the end of the Load() method to save memory usage
+	. For backward compatibility with PHP versions < 5.2.11 where the mb_convert_encoding() function did not
+	  recognize hexadecimal HTML entities, changed the CodePointToUtf8() method to use only HTML entities
+	  expressed as decimal values.
+
+    [Version : 1.3.1]	[Date : 2016/10/30]     [Author : CV]
+	. Author data was not correctly extracted in some cases.
+	. The ProcessTemplateReferences() issued some warnings in some cases, when no page structure is defined
+	  by the document
+
+    [Version : 1.3.0]	[2016/10/27]     [Author : CV]
+	. Added support for indirect object references in text drawing instructions. Such references may be of
+	  the form /Tplx, and are further described as /XObjects within the PDF file. Without this, some parts
+	  of the text contained in the PDF file will be completely missed.
+	. Added the MemoryUsage and MemoryPeakUsage properties, that give the difference between the memory
+	  occupied at the start and at the end of the Load() method. Note that this will not give the maximum
+	  amount of memory that has been occupied at a given time.
+
+    [Version : 1.2.52]	[Date : 2016/10/23]     [Author : CV]
+	. Although page header and footer contents are not yet publicly available, they are internally extracted
+	  and removed from page contents. The regular expression that captured such data was too greedy, and 
+	  caused regular page contents to be mistakenly interpreted as header or footer contents.
+
+    [Version : 1.2.51]	[Date : 2016/10/22]     [Author : CV]
+	. Load() method : Added a comprehensive coverage of errors that may be returned by preg_match_all()
+	  when called for extracting obj/endobj constructs (some PDF files may lead pcre functions to reach the 
+	  pcre.recursion_limit or pcre_backtrack_limit settings of php.ini).
+
+    [Version : 1.2.50]	[Date : 2016/10/19]     [Author : CV]
+	. In the Adobe Postscript language, displaying text such as "(my car)" requires the left and right 
+	  parentheses to be escaped escaped with a backslash. The class did not handle the case where the 
+	  current font uses two-bytes characters, including the backslash itself : in such cases, the backslash
+	  was recognized as a normal character and, since escaped characters are always represented with one byte,
+	  the remaining input was shifted by one byte, giving most frequently far-east Unicode characters,
+	  such as Chinese. Thus, "(my car)" produced the string "\" followed by Unicode garbage.
+
+    [Version : 1.2.49]	[Date : 2016/10/15]     [Author : CV]
+	. Font name specifiers (/Fx, /TTy, /Rz etc.) were processed differently by the IsFontMap() method (used
+	  to recognize an object that has font specifier/pdf object associations), the AddFontMap() method
+	  (which adds a font map to the internal font table) and the __next_instruction() method (which tries
+	  to recognize font specifiers within Postscript instructions). Such differences in the way of handling
+	  font specifiers led to discrepancies in the output text, with regards to the original text.
+	. Added the PdfToTextBase::$FontSpecifiers, which is now the regular expression used throughout this
+	  class to recognize a font specifier.
+	. Added the /OPBaseFont and /OPSUFont font specifiers (used by Ranx Xerox scanners).
+	. Added the PdfTexterPageMap::GetResourceMappings() method.
+
+    [Version : 1.2.48]	[Date : 2016/10/14]     [Author : CV]
+	. Some pages could not be extracted correctly from PDF documents including nested page content
+	  descriptions (ie, pages leading to another object listing in turn the objects that describe the page,
+	  instead of directly leading to the object that describe the page).
+
+    [Version : 1.2.47]	[Date : 2016/09/13]     [Author : CV]
+	. Changed the licensing model from GPL TO LGPL.
+	. Specialized the PdfImage class into subclasses. The only available subclass for now is PdfJpegImage.
+	. Added the $EncryptMetadata property, coming from encyption information present in the PDF file.
+
+    [Version : 1.2.46]	[Date : 2016/08/24]     [Author : CV]
+	. A number of inconsistencies was found in the chain of MapCharacter() methods up to  array access
+	  on a PdfTexterCharacterMap object. Sometimes, a UTF8 string was returned, and sometimes it was a 
+	  Unicode code point. This conducted to bad character mappings, especially on files generated with
+	  PrimoPdf.
+	. Added the Title property, coming from author information
+	. Added a few regular expressions to remove unprocessed drawing instructions in the 
+	  $IgnoredInstructionsTemplates array, to reduce the number of instructions processed.
+	. Fixed a few caching issues about character maps
+
+    [Version : 1.2.45]	[Date : 2016/08/22]     [Author : CV]
+	. Text objects containing page header/footer drawing instructions were unduly discarded, even if they
+	  contained normal text. Added the ExtractTextData() method to handle such cases.
+
+    [Version : 1.2.44]	[Date : 2016/08/21]     [Author : CV]
+	. Temporarily disabled processing of far-east characters specified as plain text ( "(xy)" ) instead of
+	  hex string ( "<abcd>" ). This was causing problems with PDF files that really use plain-text (mostly
+	  causing Chinese characters to be displayed instead of strings using the European alphabet).
+
+    [Version : 1.2.43]	[Date : 2016/08/21]     [Author : CV]
+	. Enhanced handling of fonts not using Unicode character maps :
+	  - Added support for the "/gxx" notation for the /Differences tag, where "xx" is a character number.
+	  - Characters not listed in the /Differences tag were not using the standard Adobe encoding maps
+	. Added support for password-protected files (note that the current version is not able to decrypt 
+	  files yet) :
+	  - Added the $user_password and $owner_password parameters to the class constructor and the Load() 
+	    method.
+	  - Added the ID/ID2 readonly property, which comes from the unique file identifier extracted 
+	    from the file contents.
+	  - Added the UserPassword, OwnerPassword and IsPasswordProtected properties.
+	  - Added the GetTrailerInformation() and Decrypt() methods
+	  - Added the Encryption* properties
+
+    [Version : 1.2.42]	[Date : 2016/08/12]     [Author : CV]
+	. The /R font alias was no more recognized, which caused bad character translations.
+	. Some characters were not properly encoded into UTF8, for blocks of text using the internal Adobe
+	  Windows Ansi and Mac Roman character sets.
+	. Rearranged some property initialization values that caused syntax errors for PHP versions < 5.6.
+	. Fixed some y-positioning issues when relative "Td" instructions are used. This prevented line breaks
+	  to be inserted when necessary.
+	. Temporarily commented out lines of code which were trying to interpret x-position : they were 
+	  unnecessarily inserting spaces inside words written in multiple chunks
+	. Fix : 2-bytes codes can not only specified as hex digits, but also as ascii characters. Eg : "bh" 
+	  means : 0x6268.Ths caused for example Chinese characters to be wrongly interpreted on a document
+	  generated from OpenOffice to PrimoPdf.
+
+    [Version : 1.2.41]	[Date : 2016/08/10]     [Author : CV]
+	. Series of hex digits that represent characters and are related to unmapped fonts using the WinAnsi or 
+	  MacRoman encoding scheme where inappropriately split into chunks of 4 digits instead of 2. This 
+	  caused in some occasions normal characters to be interpreted as far-east languages, such as Chinese.
+
+    [Version : 1.2.40]	[Date : 2016/08/09]     [Author : CV]
+	. Changed the way the PdfToText::$CharacterClass array is initialized. It was using constructs such as :
+		[ 'a' => self::CTYPE_ALNUM | self::CTYPE_XDIGIT, ... ]
+	  which is authorized only for PHP versions >= 5.6.
+	  
+    [Version : 1.2.39]	[Date : 2016/08/09]     [Author : CV]
+	. Entirely rewrote the PdfTexterPageMap class, which was incorrectly handling nested page descriptions.
+	. In the Load() method, changed the way text is extracted from objects : instead of starting from the
+	  list of available text objects and trying to retrieve their page number, the method now loops through
+	  page numbers (defined in the PageMap object property) and use the associated text object ids to 
+	  extract their contents.
+
+    [Version : 1.2.38]	[Date : 2016/08/09]     [Author : CV]
+	. Bug fix : The PdfTexterFont::MapCharacter() method was not modified after the transition to a better
+	  Unicode-to-UTF8 translation ; it was still accepting characters, while it should have been accepting 
+	  integer values (character codes).
+	. Bug fix : unwanted headers and footers were not recognized appropriately in some cases.
+
+    [Version : 1.2.37]	[Date : 2016/08/08]     [Author : CV]
+	. (optimization) Checking against header or footer data is now made in the ExtractText() method, instead
+	  of __next_instruction(), which caused too many calls to the preg_match() function.
+	. Added the IsPageHeaderOrFooter() method.
+	. Bug fix : Positive offsets between two text groups were unduly taken into account for the number of 
+	  spaces to be inserted between those groups (negative offsets add spacing, while positive ones are 
+	  subtracted from the current x-position).
+	. Bug fix : Space insertion for relative x-positioning did not take into account the last x position.
+
+    [Version : 1.2.36]	[Date : 2016/08/07]     [Author : CV]
+	. Added the PDFOPT_NO_HYPHENATED_WORDS option to remove hyphens that break words on two lines.
+	. (optimization) Introduced a static array giving the character class for some characters 
+	  (alpha, digit, etc.)
+	. Bug fix : characters present in plain text were translated to Ascii NUL
+	. Bug fix : the __next_token() function was also returning the next character after character codes
+	  specified within angle brackets ("<>"), which caused extra NUL values to be displayed in the output.
+
+    [Version : 1.2.35]	[Date : 2016/08/06]     [Author : CV]
+	. (optimization) Reduced the number of times author information is scanned in pdf objects.
+	. (optimization) Removed useless calls to str_pad(), strcasecmp() and substr().
+	. Optimized the __next_token() method
+
+    [Version : 1.2.34]	[Date : 2016/08/05]     [Author : CV]
+	. Reduced the number of calls to certain built-in functions (ctype_* functions)
+	. Font maps were stored using only the number part of their specification (eg, "1_0" for "/C1_0"). This
+	  led to override existing fonts using different notations (ie, "/C1_0" will override an existing font
+	  map that was declared using "/T1_0"). The consequence is that sometimes, the charater map used to
+	  translate text was not the appropriate one, hence some badly displayed characters.
+	. Fixed an "uninitialized string offset" PHP notice in the __next_token() method.
+	. Fixed some cases where too many line breaks were inserted between two lines.
+
+    [Version : 1.2.33]	[Date : 2016/08/05]     [Author : CV]
+	. For optimization reasons, reduced the number of times certain methods were called (GetMapWidth, 
+	  PeekAuthorInformation, IsMapped, GetFontByMapId, __get_character_padding, ...)
+	. Removed a regular expression for reducing drawing contents size which was a little bit too greedy
+	  and caused some characters to be removed from plain text.
+
+    [Version : 1.2.32]	[Date : 2016/08/05]     [Author : CV]
+	. Optimized regular expressions that remove useless Adobe Postscript instructions and added new ones.
+	. Rewrote the CodePointToUtf8() method.
+	. Handled a new way to specify font aliases : /TTx.
+
+    [Version : 1.2.31]	[Date : 2016/08/04]     [Author : CV]
+	. Removed irrelevant Postscript instructions from text streams (such as graphical drawing instructions), 
+	  to reduce the work of the tokenizer (the __next_token() method), which is written in PHP and not as
+	  efficient as a tokenizer written in C.
+	  Removal is done using the preg_replace() function.
+	. Character translation results are now buffered, to avoid unnecessary calls to the MapCharacter()
+	  method of the PdfTexterFontTable class.
+
+    [Version : 1.2.30]	[Date : 2016/08/02]     [Author : CV]
+	. Handle object streams, which is a way to group several objects into a single pdf object (in the same
+	  stream). The object flags are : /Type/ObjStm. This explains why certain paragraphs were missing in
+	  certain PDF samples : they were simply "hidden" in object streams.
+	. The static variable PdfToText::$Utf8PlaceHolder can now include a format to be used for substitutions
+	  of Unicode characters that cannot be translated ; one parameter will be passed to the sprintf()
+	  function before putting it in the output text, the Unicode code point (an integer value).
+	. The default value for the PdfToText::$Utf8PlaceHolder, when in debug mode, is : 
+		'[unknown character 0x%08X]'  
+	  Note that the $DEBUG static variable must be set BEFORE the first instantiation of a PdfToText object.
+
+    [Version : 1.2.29]	[Date : 2016/08/02]     [Author : CV]
+	. Changed the way the PdfTexterUnicodeCharacterMap class handles character ranges to reduce memory usage
+	  for PDF files defining numerous ranges in character maps. A sample that needed more than 128Mb of
+	  memory now runs correctly with a memory limit of 32Mb.
+	. Corrected an incorrect reference to self::$DEBUG in PdfObjectBase class.
+	. Added the IsObjectStream() method.
+
+    [Version : 1.2.28]	[Date : 2016/08/01]     [Author : CV]
+	. Better handle Unicode translations. Added the CodePointToUtf8() method.
+	. Added the static PdfToText::$Utf8Placeholder property, which is used when a Unicode character could
+	  not be converted to an UTF8 string.
+
+    [Version : 1.2.27]	[Date : 2016/08/01]     [Author : CV]
+	. Corrected a bad if() condition in the __next_token() method which caused the message 'Unitialized
+	  string offset xxx' to sometimes occur.
+	. Added the PDFOPT_IGNORE_TEXT_LEADING option. This option must be used when you notice that an
+	  unnecessary amount of empty lines are inserted between two text elements. This is the symptom that
+	  the pdf file contains only relative positioning instructions combined with big values of text leading
+	  instructions.
+	. For text fonts not having character maps, take into account the encoding specified in the font 
+	  attributes, such as WinAnsi or MacOsRoman, where some characters codes cannot be directly mapped to
+	  Unicode characters (this was causing characters such as the Euro or (TM) signs to be incorrectly
+	  translated).
+
+    [Version : 1.2.26]	[Date : 2016/07/30]     [Author : CV]
+	. Throw an exception when an unsupported encoding format or when bad flate decoding data is encountered
+	  only if self::$DEBUG is greater than 1.
+	. Added the EOL property, which is used for line breaks in the extracted text. Default is PHP_EOL.
+	. Some text constructs can contain a continuation line, such as :
+		(this is a sentence \
+		 split over two lines)
+	  Removed the continuation line sequence, which caused unnecessary line break.
+
+    [Version : 1.2.25]	[Date : 2016/07/28]     [Author : CV]
+	. Handled yet another way to specify a font resource : /C0_0, /C0_1, etc. It behaves like the /Fx and
+	  /fx-y notations, in the sense they are a way to associate a font resource object with some kind of
+	  alias (although the pdf specification only talks about /Fx).
+
+    [Version : 1.2.24]	[Date : 2016/07/28]     [Author : CV]
+	. Decimal numbers not having a leading zero were not recognized as decimal numbers in text coordinates.
+	. Page maps using the /Kids and /Count flags can be nested ; the top-level /Kids page map contains the
+	  sum of all the pages in its /Kids descendents for its /Count parameter. The warning signalling this
+	  discrepancy has been disabled when not in debug mode, but the PdfTexterPageMap class will need to be
+	  reviewed to handle this new situation.
+
+    [Version : 1.2.23]	[Date : 2016/07/27]     [Author : CV]
+	. Added the following properties : Author, CreatorApplication, ProducerApplication, CreationDate and
+	  ModificationDate
+	. Added the PeekAuthorInformation() internal method to retrieve the values of the above properties, if
+	  present.
+	. Added the GetUTCDate() method to the PdfObjectBase class to reformat dates from Adobe UTC format to
+	  an UTC format that can be understood by the strtotime() function (some dates may for example be 
+	  specified in the following format : 20160707182114+02'00', where the '00' string is not recognized)
+
+    [Version : 1.2.22]	[Date : 2016/07/26]     [Author : CV]
+	. The BlockSeparator property was not used is some cases, which caused certain data presented in a 
+	  certain format by certain Pdf generators to appear catenated.
+
+    [Version : 1.2.21]	[Date : 2016/07/26]     [Author : CV]
+	. Changed the Unescape() method which did not handle at all character specifications using the octal
+	  notation.
+
+    [Version : 1.2.20]	[Date : 2016/07/24]     [Author : CV]
+	. When encountering an unrecognized FlateDecode stream, throws an exception only if the $DEBUG global
+	  variable is non-false, otherwise ignores the stream data.
+	  This is a temporary measure until I find out how to properly decode such encoded streams correctly.
+
+    [Version : 1.2.19]	[Date : 2016/07/19]     [Author : CV]
+	. The class do not process any more image contents by default. The following flags can now be specified
+	  to the constructor if image data is to be retrieved :
+		. PDFOPT_GET_IMAGE_DATA :
+			Will put raw (undecoded) image data in the new $ImageData[] array property.
+		. PDFOPT_DECODE_IMAGE_DATA :
+			Will use the graphics glib library to create a jpeg resource from the raw data
+			encountered in the PDF stream. Specifying this flag automatically enables the
+			PDFOPT_GET_IMAGE_DATA flag.
+	. The new $ImageData property is an array of associative arrays that contains the following entries :
+		. 'type' -
+			Image type. Can be one of the following :
+			. 'jpeg' -
+				Jpeg image type.
+			Note that in the current version, only jpeg images are processed, until I find the 
+			method to decode other proprietary Adobe formats.
+		. 'data' -
+			Raw image data.
+
+    [Version : 1.2.18]	[Date : 2016/07/05]     [Author : CV]
+	. For debugging purposes, added the $object_id parameter to the DecodeData() method.
+	. The DecodeData() method now throws an exception if the stream object does not contain valid gzip data
+	. Handled the case of empty streams (!), such as :
+		18 0 obj
+		<<
+		/Filter /FlateDecode
+		/Length 0
+		>>
+		stream
+
+		endstream
+		endobj
+	  which was causing warnings from the gzuncompress() function.
+
+    [Version : 1.2.17]	[Date : 2016/07/02]     [Author : CV]
+	. Avoided processing of empty text blocks, which were causing extraneous line breaks in the output
+	. For debugging purposes, added a 'token' element in the associative array returned by the
+	  __next_instruction() method.
+	. Made the difference between absolute positioning instructions ("Tm") and relative ones ("Td" and "TD")
+	  which are often used in tabular data, by introducing the $last_relative_goto_y variable in the 
+	  ExtractText() method (individual cell contents were broken into separate lines).
+
+    [Version : 1.2.16]	[Date : 2016/07/01]     [Author : CV]
+	. No line break was inserted when relative positioning instructions (Td and TD) were encountered. This
+	  caused consecutive lines to be joined together.
+
+    [Version : 1.2.15]	[Date : 2016/06/30]     [Author : CV]
+	. Corrected the __extract_chars_from_array() methods, which incorrectly handled escaped characters in
+	  text groups and ate up the next character following the escaped one. For example, the following group :
+		[(3)-3(4)-3(.)11(5)-3(\(f\) a)9(n)4(d)-3( 3)6(4)-3(.6\()6(g)-3(\)\()8(2)4(\), )4(t)-3(h)-3(a)8(t)]
+	  was represented as :
+		34.5(f)nd 34.6(g)2)that
+	  instead of :
+		34.5(f) and 34.6(g)(2), that		
+
+    [Version : 1.2.14]	[Date : 2016/06/24]     [Author : CV]
+	. Added the __get_character_padding() method to compute the number of spaces needed between two 
+	  chunks of characters, taking into account the MinSpaceWidth property.
+
+    [Version : 1.2.13]	[Date : 2016/06/23]     [Author : CV]
+	. Took into account the relative x-offset specified with Td/TD instructions
+	. Added the MinSpaceWidth property, which is to be measured in thousands of text units, to help the
+	  class determine if spaces should be inserted between two character units. The default value is 250.
+	  Although the value can be less than 1000, only a multiple of 1000 units will determine the total
+	  number of spaces to be inserted if the PDF_REPEAT_SEPARATOR flag is set in the Options property.
+	. Relaxed a little bit the cases where a newline should be inserted
+	. Don't add the BlockSeparator string if the Separator and BlockSeparator properties are the same, and
+	  the current result ends with the Separator string. When both properties are set to a space, this 
+	  avoids inserting double space between column elements.
+
+    [Version : 1.2.12]	[Date : 2016/06/21]     [Author : CV]
+	. Better handle relative positioning instructions so that text parts supposed to be on the same line 
+	  stay on the same line.
+	. Added the PageSeparator property
+
+    [Version : 1.2.11]	[Date : 2016/06/19]     [Author : CV]
+	. Renamed the "Separator" property to "BlockSeparator"
+	. The "Separator" property is now used as a separator for notations such as :
+		[(1)-1000(2)]
+	  where "-1000" is a value that is subtracted to the current x-position. Some pdf documents presenting
+	  tabular data use this characteristic to separate text in columns. The default value is " " (white
+	  space).
+	. Added the PDFOPT_* option constants, which can either be specified to the class constructor or changed
+	  by setting the new "Options" property. The only flag available for now is PDFOPT_REPEAT_SEPARATOR, which
+	  has an interest if the offset between two text chunks is less than -2000 ; for example, the following
+	  construct :
+
+		[(1)-2000(2)]
+
+	  will give the string "1 2" if the PDF_REPEAT_SEPARATOR flag is not set, and "1  2" if set (assuming
+	  the Separator property is set to a space).
+
+    [Version : 1.2.10]	[Date : 2016/06/16]     [Author : CV]
+	. The character after an octal notation was skipped. For example, (\101 X) was rendered as "AX" instead
+	  of "A X".
+
+    [Version : 1.2.9]	[Date : 2016/06/15]     [Author : CV]
+	. Array of characters which included line breaks were not correctly interpreted
+	. Added the Separator property, which can be used to separate chunks of text that are recognized to be
+	  on the same line. This is useful for pdf documents that contain mainly tabular data, but it could
+	  break words if it contains textual data.
+	. Handled a new strange way to specify font numbers (/f-x-y instead of /Fx).
+
+    [Version : 1.2.8]	[Date : 2016/06/12]     [Author : CV]
+	. Corrected the visibility of the Isxxx() methods, which were public instead of protected.
+	. Some positioning instructions can be cumulated (a 'Tm' can be followed by a 'Td'). Consider that the
+	  last instruction wins.
+
+    [Version : 1.2.7]	[Date : 2016/06/11]     [Author : CV]
+	. Added the Images array property, which makes available the images found in the document. The elements
+	  of this array are image data.
+	. Added a few PDF_*_ENCODING constants which were missing. Not all encoding types have been implemented,
+	  however.
+	. Added the IsImage() and DecodeImage() methods.
+	. Added the PdfImage class
+	. To simplify the management of this source between the Thrak framework and the specific version made
+	  for publishing on phpclasses, added the following :
+	  - error() and warning() functions
+	  - PdfToTextException class
+
+    [Version : 1.2.6]	[Date : 2016/06/08]     [Author : CV]
+	. Stream/endstream contents can be unencoded and appear in clear text ! Added the PDF_TEXT_ENCODING 
+	  constant to handle this case.
+	. Changed the regular expression in IsFontMap() to allow spaces between "<<" and the first "/F". 
+	. Character maps strike again ! after the issue uncovered in version 1.2.2, where constructs such as :
+
+		<012B> <00660067>
+
+	  means "replace every reference to 0x0012B with unicode characters 0x0066 and 0x0067 (for maps having 
+	  a width of 2 bytes), I discovered that some pdf documents having character maps of 1 byte could hold 
+	  entries such as :
+
+		<03> <0020>
+
+	  which simply means "replace every reference to 0x03 with character 0x20"... I have not seen any 
+	  differentiating factor between the sample I handled in version 1.2.2 and this one. All I can say is
+	  that I put a horrible kludge in PdfTexterUnicodeMap::offsetGet(), to handle a situation were 
+	  character widths are one-byte long, and their substitutions can be 2-bytes long, with a leading byte
+	  of zero. S..t.
+
+    [Version : 1.2.5]	[Date : 2016/06/07]     [Author : CV]
+	. Tried to enhance performance by first looking for objects that contain stream/endstream constructs, 
+	  to avoid unnecessary detections of character maps, font definitions, etc.
+	. Consecutive text shapes introduced by the "Do" instruction were gathered on the same text line.  A
+	  line break is now inserted when a "Do" instruction is encountered.
+
+    [Version : 1.2.4]	[Date : 2016/06/03]     [Author : CV]
+	. Introduced the PdfObjectBase class, from which all the classes defined here inherit. Moved all general
+	  methods at this level.
+	. Added the PdfPageMap class
+
+    [Version : 1.2.3]	[Date : 2016/06/01]     [Author : CV]
+	. Found a PDF coming from MAC outer galaxies where some lines were terminated by "\r\n", and some other
+	  by "\r".
+	. Added more debugging messages when the $DEBUG static class variable is set to an integer value
+	  greater than 1.
+	. Character references to a CMAP can be specified as \xyz, where "xyz" are octal digits
+	. The begincmap/endcmap constructs can be omitted, which initially was the criteria to determine if the
+	  current object is a character map. Checked for the presence of beginbfchar/beginbfrange in this case.
+
+    [Version : 1.2.2]	[Date : 2016/05/31]     [Author : CV]
+	. Modified the PdfTexterUnicodeMap class to handle cases where substitutions in beginbfchar/endbfchar
+	  constructs contains several characters. For example :
+
+		<012B> <00660067>
+
+	  which means that a reference to character #012B must be substituted with #0066 and #0067.
+
+    [Version : 1.2.1]	[Date : 2016/05/28]     [Author : CV]
+	. Changed the regular expression to match stream/endstream constructs because it captured too much as
+	  in the following example :
+
+		<< ... /Type /Stream >>
+		stream 
+			...
+		endstream
+
+	  (the captured data was : " >>\nstream..."). Now a stream construct is detected if not preceded by a
+	  slash.
+	. Found one case where the beginbfchar/enbfchar and all its contents were put on one line, thus making
+	  the regular expression for capturing characters to fail. Hope this will not happen with beginbfrange...
+
+    [Version : 1.1]	[Date : 2016/05/21]     [Author : CV]
+	. Added support to retrieve the page number associated to a character offset in the Text contents. New
+	  methods are :
+	  - GetPageFromOffset
+	  - text_strpos/text_stripos
+	  - document_strpos/document_stripos
+	  - text_match/document_match
+
+    [Version : 1.0.1]	[Date : 2016/05/12]     [Author : CV]
+	. Added code to ignore page headers and footers, which caused unnecessary newlines to be added to the
+	  output (handling page headers and footers would require to break the code).
+	. The last y-position was not correctly tracked in some cases.
+
+    [Version : 1.0]	[Date : 2016/04/16]     [Author : CV]
+        Initial version.
