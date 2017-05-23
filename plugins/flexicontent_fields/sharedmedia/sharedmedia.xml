@@ -8,6 +8,7 @@
 	<authorEmail>info@lyquix.com</authorEmail>
 	<authorUrl>http://www.lyquix.com</authorUrl>
 	<version>1.0</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA</description>
 	<files>
 		<filename plugin="sharedmedia">sharedmedia.php</filename>

@@ -8,6 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.0</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>FLEXI_FIELD_CHECKBOX</description>
 	<files>
 		<filename plugin="checkbox">checkbox.php</filename>

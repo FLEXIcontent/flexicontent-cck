@@ -8,6 +8,7 @@
 	<authorEmail>ggppdk@...</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>Item Form CORE property placer Plugin for FLEXIcontent. This field is used to define the place that the CORE property will appear in Item Form. This is done by ordering it in fields manager, while Content Type filter is enabled</description>
 	<files>
 		<filename plugin="coreprops">coreprops.php</filename>
