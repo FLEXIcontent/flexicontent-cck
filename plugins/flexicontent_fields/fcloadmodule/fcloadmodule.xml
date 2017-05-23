@@ -8,6 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.1</version>
+	<documentation url="http://www.flexicontent.org/documentation/faq.html" title="FLEXI_ABOUT" modal="1" icon="info" />
 	<description>Load a module or module position inside a content item</description>
 	<files>
 		<filename plugin="fcloadmodule">fcloadmodule.php</filename>
