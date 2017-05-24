@@ -17,10 +17,10 @@
 			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 			
 			<field name="disp_params" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
-			<field name="description_cut_text" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			<field name="descr_cut_text" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			
 			<field name="subcat_conf" type="separator" default="FLEXI_SUBCATEGORIES" level="level2" />
-			<field name="description_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			<field name="descr_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			<field name="tmpl_cols" type="radio" default="" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="1">FLEXI_1_COL</option>

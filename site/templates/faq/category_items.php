@@ -197,7 +197,7 @@ foreach ($cat_items as $catid => $items) :
 			<?php if ($this->params->get(($catid!=$currcatid? 'show_description_subcat' : 'show_description'), 1)) : ?>
 				<!-- BOF subcategory description  -->
 				<div class="catdescription group">
-					<?php	echo flexicontent_html::striptagsandcut( $sub->description, (int) $this->params->get(($catid!=$currcatid? 'description_cut_text_subcat' : 'description_cut_text'), 120) ); ?>
+					<?php	echo flexicontent_html::striptagsandcut( $sub->description, (int) $this->params->get(($catid!=$currcatid? 'descr_cut_text_subcat' : 'descr_cut_text'), 120) ); ?>
 				</div>
 				<!-- EOF subcategory description -->
 			<?php endif; ?>
