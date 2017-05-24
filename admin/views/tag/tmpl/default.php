@@ -17,73 +17,53 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$form = $this->form;
 ?>
 
-<div id="flexicontent" class="flexicontent">
+<div class="flexicontent" id="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
 
+	<?php
+	$fieldSets = $this->form->getFieldsets();
+	foreach ($fieldSets as $name => $fieldSet) :
+
+		//$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+		//echo '<h2>' . JText::_($label) . '</h2>';
+	?>
+
 	<table class="fc-form-tbl">
-		<tr>
-			<td class="key">
-				<label class="label">
-					<?php echo JText::_( 'FLEXI_ID' ); ?>
-				</label>
-			</td>
-			<td>
-				<span id="id" class=""><?php echo $this->row->id; ?></span>
-			</td>
-		</tr><tr>
-			<td class="key">
-				<label class="label" for="name">
-					<?php echo JText::_( 'FLEXI_TAG_NAME' ); ?>
-				</label>
-			</td>
-			<td>
-				<input type="text" id="name" name="name" class="required input-xxlarge" value="<?php echo $this->row->name; ?>" size="200" maxlength="100" />
-			</td>
-		</tr><tr>
-			<td class="key">
-				<label class="label" for="alias">
-					<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
-				</label>
-			</td>
-			<td>
-				<input type="text" id="alias" name="alias" class="input-xxlarge" value="<?php echo $this->row->alias; ?>" size="200" maxlength="100" />
-			</td>
-		</tr><tr>
-			<td class="key">
-				<label class="label">
-					<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>
-				</label>
-			</td>
-			<td>
-				<fieldset class="radio btn-group btn-group-yesno" id="published">
-					<?php
-					$options = array( 0 => JText::_('FLEXI_NO'), 1 => JText::_('FLEXI_YES') );
-					$curvalue = $this->row->published;
-					$fieldname = 'published';
-					$n=0;
-					foreach ($options as $value => $label) {
-						$checked = $curvalue==$value ? ' checked="checked" ' : '';
-						echo '
-							<input type="radio" '.$checked.' value="'.$value.'" name="'.$fieldname.'" id="'.$fieldname.$n.'">
-							<label for="'.$fieldname.$n.'">'.$label.'</label>';
-						$n++;
-					}
-					?>
-				</fieldset>
-			</td>
-		</tr>
+
+		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+			<tr>
+				<td class="key">
+					<?php echo $field->label; ?>
+				</td>
+				<td>
+					<?php echo $field->input; ?>
+				</td>
+			</tr>
+			<?php endif; ?>
+		<?php endforeach; ?>
 	</table>
+
+	<?php endforeach; ?>
 
 	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
+	<?php echo $this->form->getInput('id'); ?>
 	<input type="hidden" name="controller" value="tags" />
 	<input type="hidden" name="view" value="tag" />
 	<input type="hidden" name="task" value="" />
+
 </form>
 </div>
+<div style="margin-bottom:24px;"></div>
 
 <?php
 //keep session alive while editing

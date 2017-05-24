@@ -82,14 +82,14 @@ class flexicontent_tags extends JTable
 		$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
 		$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
 		
+		// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
+		$language = !empty($this->language) && $this->language != '*' ?
+			$this->language :
+			JComponentHelper::getParams('com_languages')->get('site', '*') ;
+
 		// workaround for old joomla versions (Joomla <=3.5.x) that do not allowing to set transliteration language to be element's language
 		if ( !$unicodeslugs && !$supports_content_language_transliteration )
 		{
-			// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
-			$language = !empty($this->language) && $this->language != '*' ?
-				$this->language :
-				JComponentHelper::getParams('com_languages')->get('site', '*') ;
-			
 			// Remove any '-' from the string since they will be used as concatenaters
 			$this->alias = str_replace('-', ' ', $this->alias);
 			
@@ -98,7 +98,7 @@ class flexicontent_tags extends JTable
 		}
 		
 		// make alias safe and transliterate it
-		$this->alias = JApplicationHelper::stringURLSafe($this->alias, $this->language);
+		$this->alias = JApplicationHelper::stringURLSafe($this->alias, $language);
 		
 		
 		// check for empty alias and fallback to using current date

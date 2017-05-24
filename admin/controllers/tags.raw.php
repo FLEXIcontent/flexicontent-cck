@@ -130,9 +130,13 @@ class FlexicontentControllerTags extends FlexicontentController
 		
 		// Add the new tag and output it so that it gets loaded by the form
 		try {
-			$result = $model->addtag($name);
+			$obj = new stdClass();
+			$obj->name = $name;
+			$obj->published	= 1;
+			$result = $model->store($obj);
 			echo  $result  ?  $model->_tag->id."|".$model->_tag->name :  "0|New tag was not created" ;
-		} catch (Exception $e) {
+		}
+		catch (Exception $e) {
 			echo "0|New tag creation failed";
 		}
 		jexit();

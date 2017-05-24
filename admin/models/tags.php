@@ -392,6 +392,46 @@ class FlexicontentModelTags extends JModelLegacy
 
 
 	/**
+	 * Method to check if given records can not be deleted e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function candelete($cid, & $cid_noauth=array(), & $cid_wassocs=array())
+	{
+		$cid_noauth = $cid_wassocs = array();
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Method to check if given records can not be unpublished e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function canunpublish($cid, & $cid_noauth=array(), & $cid_wassocs=array())
+	{
+		$cid_noauth = $cid_wassocs = array();
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Method to remove a tag
 	 *
 	 * @access	public
