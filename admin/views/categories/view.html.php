@@ -32,55 +32,65 @@ class FlexicontentViewCategories extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		// ********************
 		// Initialise variables
-		// ********************
-		
 		global $globalcats;
-		
 		$app      = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 		$order_property = 'c.lft';
 		
 		// Get model
-		$model =  $this->getModel();
+		$model = $this->getModel();
 		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		
+		
 		// ***********
 		// Get filters
 		// ***********
+
 		$count_filters = 0;
-		
-		// various filters
-		$filter_state     = $model->getState( 'filter_state' );
-		$filter_cats      = $model->getState( 'filter_cats' );
-		$filter_level     = $model->getState( 'filter_level' );
-		$filter_access    = $model->getState( 'filter_access' );
-		$filter_language	= $model->getState( 'filter_language' );
-		
-		if ($filter_state) $count_filters++; if ($filter_cats) $count_filters++;
-		if ($filter_level) $count_filters++; if ($filter_access) $count_filters++;
+
+		// Various filters
+		$filter_state     = $model->getState('filter_state');
+		$filter_cats      = $model->getState('filter_cats');
+		$filter_level     = $model->getState('filter_level');
+		$filter_access    = $model->getState('filter_access');
+		$filter_language	= $model->getState('filter_language');
+
+		if ($filter_state) $count_filters++;
+		if ($filter_cats) $count_filters++;
+		if ($filter_level) $count_filters++;
+		if ($filter_access) $count_filters++;
 		if ($filter_language) $count_filters++;
 		
 		// Item ID filter
-		$filter_id  = $model->getState('filter_id');
+		$filter_id = $model->getState('filter_id');
 		if ($filter_id) $count_filters++;
-		
-		// text search
+
+		// Text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
-		// ordering
-		$filter_order     = $model->getState( 'filter_order' );
-		$filter_order_Dir = $model->getState( 'filter_order_Dir' );
+		// Order and order direction
+		$filter_order     = $model->getState('filter_order');
+		$filter_order_Dir = $model->getState('filter_order_Dir');
+
+
+		// ****************************
+		// Important usability messages
+		// ****************************
+		
+		if ( $cparams->get('show_usability_messages', 1) )
+		{
+		}
 		
 		
 		
@@ -121,6 +131,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'fc_categories' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
+		// Create the toolbar
 		$js = "jQuery(document).ready(function(){";
 
 		$contrl = "categories.";
