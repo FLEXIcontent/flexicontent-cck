@@ -24,8 +24,7 @@ $hint_image = '<i class="icon-info"></i>';//JHTML::image ( 'administrator/compon
 $warn_image = '<i class="icon-warning"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
-unset($form);
-$form = & $this->form;
+$form = $this->form;
 
 // Load JS tabber lib
 $this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
@@ -425,21 +424,21 @@ $this->document->addScriptDeclaration($js);
 </div>
 
 
-<?php echo JHTML::_( 'form.token' ); ?>
-<input type="hidden" name="option" value="com_flexicontent" />
-<?php echo $this->form->getInput('id'); ?>
-<?php if ($form->getValue('iscore') == 1) : ?>
-<input type="hidden" name="jform[iscore]" value="<?php echo $form->getValue("iscore"); ?>" />
-<input type="hidden" name="jform[name]" value="<?php echo $form->getValue("name"); ?>" />
-<?php endif; ?>
-<input type="hidden" name="jform[id]" value="<?php echo $form->getValue("id"); ?>" />
-<input type="hidden" name="controller" value="fields" />
-<input type="hidden" name="view" value="field" />
-<input type="hidden" name="task" value="" />
+	<?php echo JHTML::_( 'form.token' ); ?>
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<?php echo $this->form->getInput('id'); ?>
+	<input type="hidden" name="controller" value="fields" />
+	<input type="hidden" name="view" value="field" />
+	<input type="hidden" name="task" value="" />
+	<?php if ($form->getValue('iscore') == 1) : ?>
+		<input type="hidden" name="jform[iscore]" value="<?php echo $form->getValue("iscore"); ?>" />
+		<input type="hidden" name="jform[name]" value="<?php echo $form->getValue("name"); ?>" />
+	<?php endif; ?>
+
 </form>
 </div>
 <div style="margin-bottom:24px;"></div>
-			
+
 <?php
 //keep session alive while editing
 JHTML::_('behavior.keepalive');

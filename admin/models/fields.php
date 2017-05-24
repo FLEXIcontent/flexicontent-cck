@@ -31,15 +31,18 @@ use Joomla\String\StringHelper;
  */
 class FlexicontentModelFields extends JModelList
 {
+	var $records_dbtbl = 'flexicontent_fields';
+	var $records_jtable = 'flexicontent_fields';
+
 	/**
-	 * Field rows
+	 * Record rows
 	 *
 	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * rows total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -53,7 +56,7 @@ class FlexicontentModelFields extends JModelList
 	var $_pagination = null;
 
 	/**
-	 * Field id
+	 * Single record id (used in operations)
 	 *
 	 * @var int
 	 */
@@ -62,7 +65,7 @@ class FlexicontentModelFields extends JModelList
 	/**
 	 * Constructor
 	 *
-	 * @since 1.5
+	 * @since 1.0
 	 */
 	function __construct()
 	{
@@ -83,7 +86,7 @@ class FlexicontentModelFields extends JModelList
 		// Various filters
 		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'cmd' );
 		$filter_type      = $fcform ? $jinput->get('filter_type',      0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_type',      'filter_type',      0,  'int' );
-		$filter_state     = $fcform ? $jinput->get('filter_state',     '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',      '', 'string' );   // we may check for '*', so string filter
+		$filter_state     = $fcform ? $jinput->get('filter_state',     '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',      '', 'string' );    // we may check for '*', so string filter
 		$filter_access    = $fcform ? $jinput->get('filter_access',    0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_access',    'filter_access',    0,  'int' );
 		$filter_assigned  = $fcform ? $jinput->get('filter_assigned',  '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_assigned',  'filter_assigned',  '', 'cmd' );
 		
@@ -104,9 +107,9 @@ class FlexicontentModelFields extends JModelList
 		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
 		$this->setState('search', $search);
 		$app->setUserState($p.'search', $search);
-		
-		
-		
+
+
+
 		// ****************************************
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
@@ -120,9 +123,12 @@ class FlexicontentModelFields extends JModelList
 		if (!$filter_order)     $filter_order     = $default_order;
 		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		
-		if ($filter_type && $filter_order == 't.ordering') {
+		if ($filter_type && $filter_order == 't.ordering')
+		{
 			$filter_order = 'typeordering';
-		} else if (!$filter_type && $filter_order == 'typeordering') {
+		}
+		else if (!$filter_type && $filter_order == 'typeordering')
+		{
 			$filter_order = 't.ordering';
 		}
 		
@@ -156,13 +162,13 @@ class FlexicontentModelFields extends JModelList
 		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
 	}
-	
-	
+
+
 	/**
-	 * Method to set the Field identifier
+	 * Method to set the Record identifier and clear record rows
 	 *
 	 * @access	public
-	 * @param	int Field identifier
+	 * @param	int Record identifier
 	 */
 	function setId($id)
 	{
@@ -171,17 +177,17 @@ class FlexicontentModelFields extends JModelList
 		$this->_data = null;
 		$this->_total= null;
 	}
-	
-	
+
+
 	/**
-	 * Method to get a pagination object for the fields
+	 * Method to get a pagination object for the records
 	 *
 	 * @access public
 	 * @return integer
 	 */
 	function getPagination()
 	{
-		// Lets load the fields if it doesn't already exist
+		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
 			jimport('cms.pagination.pagination');
@@ -190,8 +196,8 @@ class FlexicontentModelFields extends JModelList
 
 		return $this->_pagination;
 	}
-	
-	
+
+
 	/**
 	 * Method to get All fields by clear the where clause
 	 *
@@ -220,8 +226,8 @@ class FlexicontentModelFields extends JModelList
 		// Return data
 		return $items;
 	}
-	
-	
+
+
 	/**
 	 * Method to get All fields by clearing the where clause
 	 *
@@ -261,8 +267,8 @@ class FlexicontentModelFields extends JModelList
 		// Return data
 		return $this->_data;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the query for the fields
 	 *
@@ -287,7 +293,7 @@ class FlexicontentModelFields extends JModelList
 				' CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', t.access) ELSE level.title END AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendly'
 			)
 		);
-		$query->from('#__flexicontent_fields AS t');
+		$query->from('#__' . $this->records_dbtbl . ' AS t');
 		$query->join('LEFT', '#__extensions AS plg ON (plg.element = t.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')');
 		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
 		$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
@@ -299,10 +305,10 @@ class FlexicontentModelFields extends JModelList
 		
 		return $query;
 	}
-	
-	
+
+
 	/**
-	 * Method to build the orderby clause of the query for the fields
+	 * Method to build the orderby clause of the query for the records
 	 *
 	 * @access private
 	 * @return string
@@ -312,15 +318,16 @@ class FlexicontentModelFields extends JModelList
 	{
 		$filter_type      = $this->getState( 'filter_type' );
 		$filter_order     = $this->getState( 'filter_order' );
-		$filter_order_Dir	= $this->getState( 'filter_order_Dir' );
+		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
 		
 		$orderby 	= ' '.$filter_order.' '.$filter_order_Dir;
+
 		return $orderby;
 	}
-	
-	
+
+
 	/**
-	 * Method to build the where clause of the query for the fields
+	 * Method to build the where clause of the query for the records
 	 *
 	 * @access private
 	 * @return string
@@ -330,12 +337,14 @@ class FlexicontentModelFields extends JModelList
 	{
 		static $where;
 		if(isset($where))  return $where;
-		
+
+		// Various filters
 		$filter_fieldtype = $this->getState( 'filter_fieldtype' );
 		$filter_type      = $this->getState( 'filter_type' );
 		$filter_state     = $this->getState( 'filter_state' );
 		$filter_access    = $this->getState( 'filter_access' );
 		
+		// Text search
 		$search = $this->getState( 'search' );
 		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 
@@ -367,27 +376,27 @@ class FlexicontentModelFields extends JModelList
 				$where[] = 't.published = 0';
 			} // else ALL: published & unpublished (in future we may have more states, e.g. archived, trashed)
 		}
-		
+
 		// Filter by access level
 		if ( $filter_access ) {
 			$where[] = 't.access = '.(int) $filter_access;
 		}
-		
+
 		// Filter by search word
 		if ($search) {
 			$escaped_search = $this->_db->escape( $search, true );
 			$where[] = ' (LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false )
 				.' OR LOWER(t.label) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) .')';
 		}
-		
+
 		$where[] = ' (plg.extension_id IS NULL OR plg.folder="flexicontent_fields") ';
-		
+
 		$where = ( count( $where ) ? implode( ' AND ', $where ) : '' );
-		
+
 		return $where;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
@@ -412,8 +421,9 @@ class FlexicontentModelFields extends JModelList
 		return $having;
 	}
 
+
 	/**
-	 * Method to (un)publish a field
+	 * Method to (un)publish a record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -426,7 +436,7 @@ class FlexicontentModelFields extends JModelList
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
-			
+
 			// Force dirty properties, NOTE: for this reason only fields changing publication state are updated
 			if ($publish) {
 				$set_search_properties =
@@ -439,13 +449,13 @@ class FlexicontentModelFields extends JModelList
 						', isadvsearch = CASE isadvsearch WHEN 0 THEN 0   ELSE -1   END'.
 						', isadvfilter = CASE isadvfilter WHEN 0 THEN 0   ELSE -1   END';
 			}
-			$query = 'UPDATE #__flexicontent_fields'
+			$query = 'UPDATE #__' . $this->records_dbtbl
 				. ' SET published = ' . (int) $publish
 				. $set_search_properties
 				. ' WHERE id IN ('. $cids .') '
 				. '   AND published<>' . (int) $publish   // IMPORTANT only update fields changing publication state
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-			;
+				;
 			$this->_db->setQuery( $query );
 			if (!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -467,7 +477,7 @@ class FlexicontentModelFields extends JModelList
 	{
 		if (!$propname) return false;
 		$user = JFactory::getUser();
-		
+
 		$affected = 0;
 		if (count( $cid ))
 		{
@@ -500,7 +510,7 @@ class FlexicontentModelFields extends JModelList
 				' SET '. $propname .' = 1-'. $propname;
 			
 			// Toggle the property for fields supporting the property
-			$query = 'UPDATE #__flexicontent_fields'
+			$query = 'UPDATE #__' . $this->records_dbtbl
 				. $set_clause
 				. ' WHERE id IN ('. implode(",",$support_ids) .')'
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
@@ -510,70 +520,113 @@ class FlexicontentModelFields extends JModelList
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			
+
 			// Get affected fields, non affected fields must have been locked by another user
 			$affected = $this->_db->getAffectedRows();
 			$locked = count($support_ids) - $affected;
 		}
 		return $affected;
 	}
+
+
+	/**
+	 * Method to check if given records can not be deleted e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function candelete($cid, & $cid_noauth=array(), & $cid_core=array())
+	{
+		$cid_noauth = $cid_core = array();
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		// Find ACL disallowed
+		$user = JFactory::getUser();
+		foreach($cid as $i => $_id)
+		{
+			if (!$user->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $_id))
+			{
+				$cid_noauth[] = $_id;
+			}
+		}
+
+		// Find being CORE non-deletable
+		$cid_core = $this->filterByCoreTypes($cid);
+
+		return !count($cid_noauth) && !count($cid_core);
+	}
+
+
+	/**
+	 * Method to check if given records can not be unpublished e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function canunpublish($cid, & $cid_noauth=array(), & $cid_core=array())
+	{
+		$cid_noauth = $cid_core = array();
+
+		if ( !count($cid) )
+		{
+			return false;
+		}
+
+		// Find ACL disallowed
+		$user = JFactory::getUser();
+		foreach($cid as $i => $_id)
+		{
+			if (!$user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $_id))
+			{
+				$cid_noauth[] = $_id;
+			}
+		}
 		
-	
-	/**
-	 * Method to check if we can remove a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function candelete($cid = array())
-	{
-		$n		= count( $cid );
-		if (count( $cid ))
+		// Find being CORE non-unpublishable
+		foreach($cid as $i => $_id)
 		{
-			for ($i = 0; $i < $n; $i++)
+			// The fields having ID 1 to 6, are needed for versioning, filtering and search indexing
+			if ($_id < 7)
 			{
-				$query = 'SELECT COUNT( id )'
-				. ' FROM #__flexicontent_fields'
-				. ' WHERE id = '. (int) $cid[$i]
-				. ' AND iscore = 1'
-				;
-				$this->_db->setQuery( $query );
-				$count = $this->_db->loadResult();
-				
-				if ($count > 0) {
-					return false;
-				}
+				$cid_core[] = $_id;
 			}
-			return true;
 		}
+
+		return !count($cid_noauth) && !count($cid_core);
 	}
 
-	/**
-	 * Method to check if we can unpublish a field
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function canunpublish($cid = array())
-	{
-		$n		= count( $cid );
-		if (count( $cid ))
-		{
-			for ($i = 0; $i < $n; $i++)
-			{
-				// the six first fields are needed for versioning, filtering and advanced search
-				if ($cid[$i] < 7) {
-					return false;
-				}
-			}
-			return true;
-		}
-	}
 
 	/**
-	 * Method to remove a field
+	 * Method to find which type are core
+	 *
+	 * @access	public
+	 * @param   cid  array() with type ids
+	 *
+	 * @return	array()  of record ids having assignments
+	 * @since	1.5
+	 */
+	function filterByCoreTypes($cid = array())
+	{
+		JArrayHelper::toInteger($cid);
+
+		$query = 'SELECT id '
+		. ' FROM #__flexicontent_fields'
+		. ' WHERE id = '. (int) $cid[$i]
+		. ' AND iscore = 1'
+		;
+		$this->_db->setQuery( $query );
+		return $this->_db->loadColumn();
+	}
+
+
+	/**
+	 * Method to remove a record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -586,7 +639,7 @@ class FlexicontentModelFields extends JModelList
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__flexicontent_fields'
+			$query = 'DELETE FROM #__' . $this->records_dbtbl
 					. ' WHERE id IN ('. $cids .')'
 					;
 
@@ -649,7 +702,7 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function saveaccess($id, $access)
 	{
-		$row = JTable::getInstance('flexicontent_fields', '');
+		$row = JTable::getInstance($this->records_jtable, $prefix='');
 		
 		$row->load( $id );
 		$row->id = $id;
@@ -673,7 +726,7 @@ class FlexicontentModelFields extends JModelList
 	 * @return	int
 	 * @since	1.5
 	 */
-	function _getLastId()
+	private function _getLastId()
 	{
 		$query  = 'SELECT MAX(id)'
 				. ' FROM #__flexicontent_fields'
