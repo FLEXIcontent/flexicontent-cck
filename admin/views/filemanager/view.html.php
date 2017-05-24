@@ -275,9 +275,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// FOLDER mode
 		else
 		{
-			$exts = $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
-			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
-			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
+			$rows = $model->getFilesFromPath($u_item_id, $fieldid);
+			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid);
 		}
 		$pagination = $this->get('Pagination');
 		//$users = $this->get('Users');

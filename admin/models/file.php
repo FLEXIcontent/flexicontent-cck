@@ -80,8 +80,10 @@ class FlexicontentModelFile extends JModelAdmin
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_loadFile()) {
-			if(isset($this->_file->$property)) {
+		if ($this->_loadRecord())
+		{
+			if(isset($this->_file->$property))
+			{
 				return $this->_file->$property;
 			}
 		}
@@ -89,19 +91,31 @@ class FlexicontentModelFile extends JModelAdmin
 	}
 
 	/**
-	 * Method to get file data
+	 * Method to get record data
 	 *
 	 * @access	public
 	 * @return	array
 	 * @since	1.0
 	 */
-	function &getFile()
+	function & getItem()
 	{
-		if ($this->_loadFile())
+		if ($this->_loadRecord())
 		{
-
 		}
 		return $this->_file;
+	}
+
+
+	/**
+	 * Alias for legacy method to get the record
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.0
+	 */
+	function & getFile()
+	{
+		return $this->getItem();
 	}
 
 
@@ -112,7 +126,7 @@ class FlexicontentModelFile extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadFile()
+	private function _loadRecord()
 	{
 		// Lets load the file if it doesn't already exist
 		if (empty($this->_file))
@@ -158,7 +172,7 @@ class FlexicontentModelFile extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
+	function checkout($pk = null)
 	{
 		// Make sure we have a record id to checkout the record with
 		if ( !$pk ) $pk = $this->_id;
@@ -173,7 +187,7 @@ class FlexicontentModelFile extends JModelAdmin
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 		
 		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
+		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
 		return false;
 	}
 	
@@ -188,7 +202,7 @@ class FlexicontentModelFile extends JModelAdmin
 	 */
 	function isCheckedOut( $uid=0 )
 	{
-		if ($this->_loadFile())
+		if ($this->_loadRecord())
 		{
 			if ($uid) {
 				return ($this->_file->checked_out && $this->_file->checked_out != $uid);
