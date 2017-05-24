@@ -31,7 +31,60 @@ use Joomla\String\StringHelper;
  */
 class ParentClassItem extends JModelAdmin
 {
-	var $_name = 'ParentClassItem';
+	/**
+	 * Record name
+	 *
+	 * @var string
+	 */
+	var $record_name = 'item';
+
+	/**
+	 * Record database table 
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = 'content';
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = null;
+
+	/**
+	 * Record primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+
+	/**
+	 * Record data
+	 *
+	 * @var object
+	 */
+	var $_record = null;
+
+	/**
+	 * Flag to indicate adding new records with next available ordering (at the end),
+	 * this is ignored if this record DB model does not have 'ordering'
+	 *
+	 * @var boolean
+	 */
+	var $useLastOrdering = false;
+
+	/**
+	 * Plugin group used to trigger events
+	 *
+	 * @var boolean
+	 */
+	var $plugins_group = 'content';
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
 	
 	/**
 	 * component + type parameters
@@ -39,21 +92,7 @@ class ParentClassItem extends JModelAdmin
 	 * @var object
 	 */
 	var $_cparams = null;
-	
-	/**
-	 * Item data
-	 *
-	 * @var object
-	 */
-	var $_item = null;
 
-	/**
-	 * Item primary key
-	 *
-	 * @var int
-	 */
-	var $_id = null;
-	
 	/**
 	 * Item current category id (used for FRONTEND only)
 	 *
@@ -94,94 +133,95 @@ class ParentClassItem extends JModelAdmin
 	 *
 	 * @since 1.0
 	 */
-	public function __construct()
+	function __construct()
 	{
 		parent::__construct();
-		
-		$app = JFactory::getApplication();
-		$jinput = $app->input;
-		
-		// --. Get & Set ITEM's primary key (pk) and (for frontend) the current category
-		if (!$app->isAdmin())
-		{
-			// FRONTEND, use "id" from request
-			$pk = $jinput->get('id', 0, 'int');
-			$curcatid = $jinput->get('task', '', 'cmd')  ?  0  :  $jinput->get('cid', 0, 'int');
-		}
-		else
-		{
-			$id = $jinput->get('id', array(0), 'array');
-			JArrayHelper::toInteger($id, array(0));
-			$pk = (int) $id[0];
-			
-			if (!$pk)
-			{
-				$cid = $jinput->get('cid', array(0), 'array');
-				JArrayHelper::toInteger($cid, array(0));
-				$pk = (int) $cid[0];
-			}
-			
-			// Finally try form
-			if (!$pk)
-			{
-				$data = $jinput->get('jform', array('id'=>0), 'array');
-				$pk = (int) $data['id'];
-			}
 
-			$curcatid = 0;
+		// Initialize using default naming if not already set
+		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->record_name . 's';
+		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->record_name . 's';
+		
+		$jinput = JFactory::getApplication()->input;
+
+		$id = $jinput->get('id', array(0), 'array');
+		JArrayHelper::toInteger($id, array(0));
+		$pk = (int) $id[0];
+
+		if (!$pk)
+		{
+			$cid = $jinput->get('cid', array(0), 'array');
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = (int) $cid[0];
 		}
 		
-		$typeid = !$pk ? $jinput->get('typeid', 0, 'int') : 0;  // Set type id only for new items
-		$this->setId($pk, $curcatid, $typeid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
-		
+		if (!$pk)
+		{
+			$data = $jinput->get('jform', array('id'=>0), 'array');
+			$pk = (int) $data['id'];
+		}
+
+		// Set current category ID and current type ID only for new items
+		$curcatid = $pk
+			? 0
+			: $jinput->get('cid', 0, 'int');
+		$typeid = $pk
+			? 0
+			: $jinput->get('typeid', 0, 'int');
+
+		$this->setId($pk, $curcatid, $typeid);
+
 		$this->populateState();
 	}
-	
-	
+
+
 	/**
 	 * Method to set the identifier
 	 *
 	 * @access	public
-	 * @param	int item identifier
+	 * @param	int record identifier
 	 */
 	function setId($id, $currcatid=0, $typeid=0, $ilayout=null)
 	{
-		// Set a new item id and wipe data
+		// Set record id and wipe data
 		if ($this->_id != $id)
 		{
-			$this->_item = null;
+			$this->_record = null;
 			$this->_version = null;
 			$this->_cparams = null;
 		}
-		$this->_id = (int) $id;
-		
+		$this->_id     = (int) $id;
+
 		// Set current category and verify that item is assigned to this category, (SECURITY concern)
 		$this->_cid = (int) $currcatid;
-		if ($this->_cid)
+
+		// Clear cid, if category not assigned to the item
+		if ($this->_id)
 		{
-			$q = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid =". (int)$this->_id ." AND catid = ". (int)$this->_cid;
-			$this->_db->setQuery($q);
-			$result = $this->_db->loadResult();
-			$this->_cid = $result ? $this->_cid : 0;  // Clear cid, if category not assigned to the item
+			$query = 'SELECT catid '
+				. ' FROM #__flexicontent_cats_item_relations '
+				. ' WHERE itemid = ' . (int) $this->_id
+				. '  AND catid = '. (int) $this->_cid;
+			$this->_db->setQuery($query);
+			$this->_cid = $this->_db->loadResult() ? $this->_cid : 0;
 		}
-		
+
 		// Set item layout
 		$this->_ilayout = $ilayout;
-		
+
 		// Set item type, will be verified below
 		$this->_typeid = $typeid;
-		
+
 		// Get the type of an existing item, or check that the type of new item exists
 		if ($this->_id || $this->_typeid)
 		{
 			$this->getTypesselected();  // Check, set, or clear member variable: $this->_typeid
 		}
-		
+
 		// Recalcuclate if needed, component + type parameters
 		$this->getComponentTypeParams();
 	}
-	
-	
+
+
 	/**
 	 * Method to get component + type parameters these are enough for the backend,
 	 * also they are needed before frontend view's FULL item parameters are created
@@ -212,20 +252,20 @@ class ParentClassItem extends JModelAdmin
 		$this->_cparams = $params;
 		return $this->_cparams;
 	}
-	
-	
+
+
 	/**
-	 * Method to get item's id
+	 * Method to get the record identifier
 	 *
 	 * @access	public
-	 * @return	int item identifier
+	 * @return	int record identifier
 	 */
 	function getId()
 	{
 		return $this->_id;
 	}
-	
-	
+
+
 	/**
 	 * Method to get item's type id
 	 *
@@ -251,21 +291,21 @@ class ParentClassItem extends JModelAdmin
 	
 	
 	/**
-	 * Overridden get method to get properties from the item
+	 * Overridden get method to get properties from the record
 	 *
 	 * @access	public
 	 * @param	string	$property	The name of the property
 	 * @param	mixed	$value		The value of the property to set
 	 * @return 	mixed 				The value of the property
-	 * @since	1.5
+	 * @since	1.0
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_item || $this->_loadItem())
+		if ($this->_record || $this->_loadRecord())
 		{
-			if (isset($this->_item->$property))
+			if (isset($this->_record->$property))
 			{
-				return $this->_item->$property;
+				return $this->_record->$property;
 			}
 		}
 		return $default;
@@ -281,11 +321,11 @@ class ParentClassItem extends JModelAdmin
 	 * @return	boolean  True on success
 	 * @since	1.5
 	 */
-	function set( $property, $value=null )
+	function set($property, $value=null)
 	{
-		if ($this->_item || $this->_loadItem())
+		if ($this->_record || $this->_loadRecord())
 		{
-			$this->_item->$property = $value;
+			$this->_record->$property = $value;
 			return true;
 		}
 
@@ -302,12 +342,12 @@ class ParentClassItem extends JModelAdmin
 	 * @return	void
 	 * @since	3.2
 	 */
-	function setProperty( $property, $value=null )
+	function setProperty($property, $value=null)
 	{
 		$this->$property = $value;
 	}
-	
-	
+
+
 	/**
 	 * Method to get item data
 	 *
@@ -335,7 +375,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
-		if ( $pk && $this->_loadItem($no_cache, $force_version) )
+		if ( $pk && $this->_loadRecord($no_cache, $force_version) )
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			// Extra Steps for Frontend
@@ -360,28 +400,29 @@ class ParentClassItem extends JModelAdmin
 		else
 		{
 			$this->_typeid = $jinput->get('typeid', 0, 'int');  // Get this again since it might have been change since model was constructed
-			$this->_initItem();
-			if ( !$app->isAdmin() )  {
+			$this->_initRecord();
+			if ( !$app->isAdmin() )
+			{
 				// Load item parameters with heritage, (SUBMIT ITEM FORM)
 				$this->_loadItemParams($no_cache);
 			}
 		}
 		
 		// Verify item's type
-		$this->_item->type_id = $this->getTypesselected()->id;  // Also checks, sets, or clears member variable: $this->_typeid
+		$this->_record->type_id = $this->getTypesselected()->id;  // Also checks, sets, or clears member variable: $this->_typeid
 		
-		return $this->_item;
+		return $this->_record;
 	}
 	
 	
 	/**
-	 * Method to load item data
+	 * Method to load record data
 	 *
 	 * @access	private
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadItem( $no_cache=false, $force_version=0 )
+	private function _loadRecord( $no_cache=false, $force_version=0 )
 	{
 		if(!$this->_id) return false;  // Only try to load existing item
 		
@@ -398,13 +439,13 @@ class ParentClassItem extends JModelAdmin
 		
 		// Clear item to make sure it is reloaded
 		if ( $no_cache ) {
-			$this->_item = null;
+			$this->_record = null;
 		}
 		
 		// Only retrieve item if not already, ZERO $force_version means unversioned data or maintain currently loaded version
-		else if ( isset($this->_item) && (!$force_version || $force_version==$this->_version) ) {
+		else if ( isset($this->_record) && (!$force_version || $force_version==$this->_version) ) {
 			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$this->_id}<br/> ********************************<br/><br/><br/>";
-			return (boolean) $this->_item;
+			return (boolean) $this->_record;
 		}
 		
 		static $unapproved_version_notice;
@@ -445,8 +486,8 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// Check if item is alredy loaded and is of correct version
-		if ( $this->_version == $version && isset($this->_item) ) {
-			return (boolean) $this->_item;
+		if ( $this->_version == $version && isset($this->_record) ) {
+			return (boolean) $this->_record;
 		}
 		$this->_version = $version; // Set number of loaded version
 		//echo 'version: '.$version ."<br/>";
@@ -472,8 +513,8 @@ class ParentClassItem extends JModelAdmin
 		// Only unversioned items are cached, use cache if no specific version was requested
 		if ( !$version && isset($items[$this->_id]) ) {
 			//echo "********************************<br/>\n RETURNING CACHED item: {$this->_id}<br/> ********************************<br/><br/><br/>";
-			$this->_item = $items[$this->_id];
-			return (boolean) $this->_item;
+			$this->_record = $items[$this->_id];
+			return (boolean) $this->_record;
 		}
 		
 		//echo "**************************<br/>\n LOADING item id: {$this->_id}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
@@ -491,10 +532,10 @@ class ParentClassItem extends JModelAdmin
 				$item   = $this->getTable('flexicontent_items', '');
 				$result = $item->load($this->_id);  // try loading existing item data
 				if ($result===false) {
-					$this->_item = false;
+					$this->_record = false;
 					if (!$version) {
-						$items[$this->_id] = $this->_item;
-						$fc_list_items[$this->_id] = $this->_item;
+						$items[$this->_id] = $this->_record;
+						$fc_list_items[$this->_id] = $this->_record;
 					}
 					return false; // item not found, return
 				}
@@ -610,11 +651,11 @@ class ParentClassItem extends JModelAdmin
 				//print_r($data); exit;
 				
 				if (!$data) {
-					$this->_item = false;
+					$this->_record = false;
 					$this->_typeid = 0;
 					if (!$version) {
-						$items[$this->_id] = $this->_item;
-						$fc_list_items[$this->_id] = $this->_item;
+						$items[$this->_id] = $this->_record;
+						$fc_list_items[$this->_id] = $this->_record;
 					}
 					return false; // item not found, return
 				}
@@ -938,10 +979,10 @@ class ParentClassItem extends JModelAdmin
 			// ***************************************************************************************
 			// Assign to the item data member variable and cache it if loaded an unversioned item data
 			// ***************************************************************************************
-			$this->_item = & $item;
+			$this->_record = & $item;
 			if (!$version) {
-				$items[$this->_id] = $this->_item;
-				$fc_list_items[$this->_id] = $this->_item;
+				$items[$this->_id] = $this->_record;
+				$fc_list_items[$this->_id] = $this->_record;
 			}
 			
 			// ******************************************************************************************************
@@ -960,7 +1001,7 @@ class ParentClassItem extends JModelAdmin
 		// ***********************************************
 		catch (JException $e)
 		{
-			$this->_item = false;
+			$this->_record = false;
 			if ($e->getCode() == 404) {
 				// Need to go thru the error handler to allow Redirect to work.
 				$msg = $e->getMessage();
@@ -968,7 +1009,7 @@ class ParentClassItem extends JModelAdmin
 			}
 			else {
 				$this->setError($e);
-				$this->_item = false;
+				$this->_record = false;
 			}
 		}
 		
@@ -981,12 +1022,12 @@ class ParentClassItem extends JModelAdmin
 		
 		// Add to cache if it is non-version data
 		if (!$version) {
-			$items[$this->_id] = $this->_item;
-			$fc_list_items[$this->_id] = $this->_item;
+			$items[$this->_id] = $this->_record;
+			$fc_list_items[$this->_id] = $this->_record;
 		}
 		
 		// return true if item was loaded successfully
-		return (boolean) $this->_item;
+		return (boolean) $this->_record;
 	}
 	
 	
@@ -1026,7 +1067,7 @@ class ParentClassItem extends JModelAdmin
 		// (b) Set property 'cid' (form field categories)
 		// *********************************************************
 		
-		$this->_item->itemparams = new JRegistry();
+		$this->_record->itemparams = new JRegistry();
 		
 		if ($this->_id)
 		{
@@ -1037,15 +1078,15 @@ class ParentClassItem extends JModelAdmin
 		}
 		else
 		{
-			$this->_item->attribs = array();
-			$this->_item->metadata = array();
-			$this->_item->images = array();
-			$this->_item->urls = array();
+			$this->_record->attribs = array();
+			$this->_record->metadata = array();
+			$this->_record->images = array();
+			$this->_record->urls = array();
 		}
-		//echo "<pre>"; print_r($this->_item->itemparams); exit;
+		//echo "<pre>"; print_r($this->_record->itemparams); exit;
 		
 		// Set item property 'cid' (form field categories is named cid)
-		$this->_item->cid = $this->_item->categories;
+		$this->_record->cid = $this->_record->categories;
 		
 		// ****************************************************************************
 		// Load item data into the form and restore the changes done above to item data
@@ -1059,7 +1100,7 @@ class ParentClassItem extends JModelAdmin
 		$form->option = $this->option;
 		$form->context = $context;
 		
-		unset($this->_item->cid);
+		unset($this->_record->cid);
 		
 		// Determine correct permissions to check.
 		$id = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName().'.id');
@@ -1075,7 +1116,7 @@ class ParentClassItem extends JModelAdmin
 		}
 
 		// Modify the form based on Edit State access controls.
-		if ( empty($this->_item->submit_conf['autopublished']) && !$this->canEditState( empty($data) ? null : (object)$data ) )
+		if ( empty($this->_record->submit_conf['autopublished']) && !$this->canEditState( empty($data) ? null : (object)$data ) )
 		{
 			$frontend_new = !$id && $app->isSite();
 			
@@ -1201,7 +1242,7 @@ class ParentClassItem extends JModelAdmin
 
 		if (empty($data))
 		{
-			$data = $this->_item ? $this->_item : $this->getItem();
+			$data = $this->_record ? $this->_record : $this->getItem();
 		}
 		else
 		{
@@ -1211,13 +1252,13 @@ class ParentClassItem extends JModelAdmin
 				$this->splitText($data);
 			}
 
-			if ($this->_item)
+			if ($this->_record)
 			{
-				if ( StringHelper::strlen(StringHelper::trim(@$data['text'])) )      $this->_item->text      = $data['text'];
-				if ( StringHelper::strlen(StringHelper::trim(@$data['introtext'])) ) $this->_item->introtext = $data['introtext'];
-				if ( StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )  $this->_item->fulltext  = $data['fulltext'];
-				if ( isset($data['language']) )  $this->_item->language  = $data['language'];
-				if ( isset($data['catid']) )     $this->_item->catid  = $data['catid'];
+				if ( StringHelper::strlen(StringHelper::trim(@$data['text'])) )      $this->_record->text      = $data['text'];
+				if ( StringHelper::strlen(StringHelper::trim(@$data['introtext'])) ) $this->_record->introtext = $data['introtext'];
+				if ( StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )  $this->_record->fulltext  = $data['fulltext'];
+				if ( isset($data['language']) )  $this->_record->language  = $data['language'];
+				if ( isset($data['catid']) )     $this->_record->catid  = $data['catid'];
 			}
 		}
 
@@ -1247,7 +1288,7 @@ class ParentClassItem extends JModelAdmin
 		$session = JFactory::getSession();
 		$asset	= 'com_content.article.'.$this->_id;
 		
-		$isOwner = !empty($this->_item->created_by) && $this->_item->created_by == $user->get('id');
+		$isOwner = !empty($this->_record->created_by) && $this->_record->created_by == $user->get('id');
 		$hasTmpEdit = false;
 		$hasCoupon  = false;
 		if ($session->has('rendered_uneditable', 'flexicontent')) {
@@ -1278,8 +1319,8 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// Not a new item retrieve item if not already done
-		if ( empty($this->_item) ) {
-			$this->_item = $this->getItem();
+		if ( empty($this->_record) ) {
+			$this->_record = $this->getItem();
 		}
 
 		// Compute EDIT access permissions.
@@ -1350,18 +1391,18 @@ class ParentClassItem extends JModelAdmin
 			// the layout takes some responsibility for display of limited information,
 			$groups = JAccess::getAuthorisedViewLevels($user->id);
 			
-			if ( !isset($this->_item->has_item_access) ) {
-				$this->_item->has_item_access = in_array($this->_item->access, $groups);
+			if ( !isset($this->_record->has_item_access) ) {
+				$this->_record->has_item_access = in_array($this->_record->access, $groups);
 			}
-			if ( !isset($this->_item->has_mcat_access) ) {
-				$no_mcat_info = $this->_item->catid == 0 || !isset($this->_item->category_access) || $this->_item->category_access === null;
-				$this->_item->has_mcat_access = $no_mcat_info || in_array($this->_item->category_access, $groups);
+			if ( !isset($this->_record->has_mcat_access) ) {
+				$no_mcat_info = $this->_record->catid == 0 || !isset($this->_record->category_access) || $this->_record->category_access === null;
+				$this->_record->has_mcat_access = $no_mcat_info || in_array($this->_record->category_access, $groups);
 			}
-			if ( !isset($this->_item->has_type_access) ) {
-				$no_type_info = $this->_typeid == 0 || !isset($this->_item->type_access) || $this->_item->type_access === null;
-				$this->_item->has_type_access = $no_type_info || in_array($this->_item->type_access, $groups);
+			if ( !isset($this->_record->has_type_access) ) {
+				$no_type_info = $this->_typeid == 0 || !isset($this->_record->type_access) || $this->_record->type_access === null;
+				$this->_record->has_type_access = $no_type_info || in_array($this->_record->type_access, $groups);
 			}
-			$iparams_extra->set('access-view', $this->_item->has_item_access && $this->_item->has_mcat_access && $this->_item->has_type_access);
+			$iparams_extra->set('access-view', $this->_record->has_item_access && $this->_record->has_mcat_access && $this->_record->has_type_access);
 		}
 
 		return $iparams_extra;
@@ -1446,7 +1487,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function canEditState($item=null, $check_cat_perm=true)
 	{
-		if ( empty($item) ) $item = $this->_item;
+		if ( empty($item) ) $item = $this->_record;
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 		
@@ -1491,16 +1532,16 @@ class ParentClassItem extends JModelAdmin
 	
 	
 	/**
-	 * Method to initialise the item data
+	 * Method to initialise the record data
 	 *
 	 * @access	private
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _initItem()
+	private function _initRecord()
 	{
 		// Lets load the item if it doesn't already exist
-		if (empty($this->_item))
+		if (empty($this->_record))
 		{
 			// Get some variables
 			$app  = JFactory::getApplication();
@@ -1579,7 +1620,7 @@ class ParentClassItem extends JModelAdmin
 			$this->_db->setQuery($query);
 			$item->access_level = $this->_db->loadResult();
 			
-			$this->_item				= $item;
+			$this->_record				= $item;
 		}
 		return true;
 	}
@@ -1612,11 +1653,11 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function isCheckedOut( $uid=0 )
 	{
-		if ($this->_item || $this->_loadItem()) {
+		if ($this->_record || $this->_loadRecord()) {
 			if ($uid) {
-				return ($this->_item->checked_out && $this->_item->checked_out != $uid);
+				return ($this->_record->checked_out && $this->_record->checked_out != $uid);
 			} else {
-				return $this->_item->checked_out;
+				return $this->_record->checked_out;
 			}
 		} elseif ($this->_id < 1) {
 			return false;
@@ -1655,7 +1696,7 @@ class ParentClassItem extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
+	function checkout($pk = null)
 	{
 		// Make sure we have a record id to checkout the record with
 		if ( !$pk ) $pk = $this->_id;
@@ -1670,7 +1711,7 @@ class ParentClassItem extends JModelAdmin
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 		
 		// Reaching this points means checkout failed
-		$this->setError( $tbl->getError() /* JText::_("FLEXI_ALERT_CHECKOUT_FAILED")*/ );
+		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
 		return false;
 	}
 	
@@ -1729,11 +1770,11 @@ class ParentClassItem extends JModelAdmin
 		$item = $this->getTable('flexicontent_items', '');
 		$item->_isnew = $isnew;  // Pass information, if item is new to the fields
 		
-		// ... existing items Load item GET some data
-		if ( !$isnew ) {
-			// Load existing item into the empty item model
+		// Load existing item into the empty item model
+		if ( !$isnew )
+		{
 			$item->load( $data['id'] );
-			
+
 			// Retrieve property: 'tags', that do not exist in the DB TABLE class, but are created by the ITEM model
 			$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . $item->id;
 			$db->setQuery($query);
@@ -1753,9 +1794,14 @@ class ParentClassItem extends JModelAdmin
 			
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!! ... or for items without type ?!
 			if( !$app->isAdmin() && $item->type_id ) 
+			{
 				unset($data['type_id']);
-		} else {
-			// New ITEM: since we create new item only via DB TABLE object,
+			}
+		}
+
+		// New ITEM: just set some properties since we have already created a new item only via DB TABLE object
+		else
+		{
 			// create default values for SOME properties that do not exist in the DB TABLE class, but are created by the ITEM model
 			$item->categories = array();
 			$item->tags = array();
@@ -1779,19 +1825,22 @@ class ParentClassItem extends JModelAdmin
 		$tags = array_keys(array_flip($tags));
 		
 		// Auto-assign a not set main category, to be the first out of secondary categories, 
-		if ( empty($data['catid']) && !empty($cats[0]) ) {
+		if ( empty($data['catid']) && !empty($cats[0]) )
+		{
 			$data['catid'] = $cats[0];
 		}
 		
 		$cats_indexed = array_flip($cats);
 		// Add the primary cat to the array if it's not already in
-		if ( @ $data['catid'] && !isset($cats_indexed[$data['catid']]) ) {
+		if ( !empty($data['catid']) && !isset($cats_indexed[$data['catid']]) )
+		{
 			$cats_indexed[$data['catid']] = 1;
 		}
 		
 		// Add the featured cats to the array if it's not already in
-		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat ) {
-			if (@ $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats_indexed[$featured_cat] = 1;
+		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat )
+		{
+			if ( $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats_indexed[$featured_cat] = 1;
 		}
 		
 		// Reassign (unique) categories back to the cats array
@@ -1804,37 +1853,40 @@ class ParentClassItem extends JModelAdmin
 		$authorparams = flexicontent_db::getUserConfig($user->id);
 		
 		// At least one category needs to be assigned
-		if (!is_array( $cats ) || count( $cats ) < 1) {
-			
+		if (!is_array( $cats ) || count( $cats ) < 1)
+		{
 			$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
-			
+		}
+
 		// Check more than allowed categories
-		} else {
-			
+		else
+		{
 			// Get author's maximum allowed categories per item and set js limitation
 			$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
 			
 			// Verify category limitation for current author
-			if ( $max_cat_assign ) {
-				if ( count($cats) > $max_cat_assign ) {
-					if ( count($cats) <= count($item->categories) ) {
-						$existing_only = true;
-						// Maximum number of categories is exceeded, but do not abort if only using existing categories
-						foreach ($cats as $newcat) {
-							$existing_only = $existing_only && in_array($newcat, $item->categories);
-						}
-					} else {
-						$existing_only = false;
+			if ( $max_cat_assign && count($cats) > $max_cat_assign )
+			{
+				$existing_only = false;
+				if ( count($cats) <= count($item->categories) )
+				{
+					// Maximum number of categories is exceeded, but do not abort if only using existing categories
+					$existing_only = true;
+					foreach ($cats as $newcat)
+					{
+						$existing_only = $existing_only && in_array($newcat, $item->categories);
 					}
-					if (!$existing_only) {
-						$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').$max_cat_assign);
-						return false;
-					}
+				}
+
+				if (!$existing_only)
+				{
+					$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').$max_cat_assign);
+					return false;
 				}
 			}
 		}
-		
+
 		// Trim title, but allow not setting it ... to maintain current value (but we will also need to override 'required' during validation)
 		if (isset($data['title']))
 		{
@@ -1856,25 +1908,26 @@ class ParentClassItem extends JModelAdmin
 		// The text field is stored in the db as to seperate fields: introtext & fulltext
 		// So we search for the {readmore} tag and split up the text field accordingly.
 		$this->splitText($data);
-		
-		
-		// ***************************************************************************************
-		// Handle Parameters: attribs & metadata, merging POST values into existing values,
-		// IF these were not set at all then there will be no need to merge,
-		// BUT part of them may have been displayed, so we use mergeAttributes() instead of bind()
-		// Keys that are not set will not be set, thus the previous value is maintained
-		// ***************************************************************************************
-		
-		// Retrieve (a) item parameters (array PARAMS or ATTRIBS ) and (b) item metadata (array METADATA or META )
-		$params   = $this->formatToArray( @ $data['attribs'] );
-		$metadata = $this->formatToArray( @ $data['metadata'] );
-		unset($data['attribs']);
-		unset($data['metadata']);
-		
-		// Merge (form posted) item attributes and metadata parameters INTO EXISTING DATA (see above for explanation)
-		$this->mergeAttributes($item, $params, $metadata);
-		
-		
+
+
+		// ***
+		// *** Special handling of some FIELDSETs: e.g. 'attribs/params' and optionally for other fieldsets too, like: 'metadata'
+		// *** By doing partial merging of these arrays we support having only a sub-set of them inside the form
+		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
+		// ***
+		$mergeProperties = array('attribs', 'metadata');
+		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item');
+		$this->mergeAttributes($item, $data, $mergeProperties, $mergeOptions );
+
+
+		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
+		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
+		foreach($mergeProperties as $prop)
+		{
+			unset($data[$prop]);
+		}
+
+
 		// *******************************************************
 		// Retrieve submit configuration for new items in frontend
 		// *******************************************************
@@ -2205,7 +2258,7 @@ class ParentClassItem extends JModelAdmin
 			// e.g. a getForm() used to validate input data may have set an empty item and empty id
 			// e.g. type_id of item may have been altered by authorized users
 			$this->_id     = $item->id;
-			$this->_item   = & $item;
+			$this->_record   = & $item;
 			$this->_typeid = $item->type_id;
 		}
 		if ( $print_logging_info ) $fc_run_times['item_store_core'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -3031,7 +3084,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Set model properties
 		$this->_id     = $item->id;
-		$this->_item   = & $item;
+		$this->_record   = & $item;
 		$this->_typeid = $item->type_id;
 		
 		
@@ -3213,10 +3266,10 @@ class ParentClassItem extends JModelAdmin
 		// Allow retrieval of tags of any item
 		$item_id = $item_id ? $item_id : $this->_id;
 		
-		// *** NOTE: this->_item->tags may already contain a VERSIONED array of values !!!
-		if( $this->_id == $item_id && !empty($this->_item->tags) ) {
+		// *** NOTE: this->_record->tags may already contain a VERSIONED array of values !!!
+		if( $this->_id == $item_id && !empty($this->_record->tags) ) {
 			// Return existing tags of current item
-			return $this->_item->tags;
+			return $this->_record->tags;
 		}
 		else if ($item_id) {
 			// Not current item, or current item's tags are not set
@@ -3225,7 +3278,7 @@ class ParentClassItem extends JModelAdmin
 			$tags = $this->_db->loadColumn();
 			if ($this->_id == $item_id) {
 				// Retrieved tags of current item, set them
-				$this->_item->tags = $tags;
+				$this->_record->tags = $tags;
 			}
 			$tags = array_reverse($tags); 
 			return $tags;
@@ -3568,10 +3621,10 @@ class ParentClassItem extends JModelAdmin
 		// Allow retrieval of categories of any item
 		$item_id = $item_id ? $item_id : $this->_id;
 		
-		// *** NOTE: this->_item->categories may already contain a VERSIONED array of values !!!
-		if( $this->_id == $item_id && !empty($this->_item->categories) ) {
+		// *** NOTE: this->_record->categories may already contain a VERSIONED array of values !!!
+		if( $this->_id == $item_id && !empty($this->_record->categories) ) {
 			// Return existing categories of current item
-			return $this->_item->categories;
+			return $this->_record->categories;
 		}
 		else if ($item_id) {
 			// Not current item, or current item's categories are not set
@@ -3580,9 +3633,9 @@ class ParentClassItem extends JModelAdmin
 			$categories = $this->_db->loadColumn();
 			if ($this->_id == $item_id) {
 				// Retrieved categories of current item, set them
-				$this->_item->categories = & $categories;
+				$this->_record->categories = & $categories;
 				// 'cats' is alias of categories
-				$this->_item->cats = & $this->_item->categories;  // possibly used by CORE plugin for displaying in frontend
+				$this->_record->cats = & $this->_record->categories;  // possibly used by CORE plugin for displaying in frontend
 			}
 			return $categories;
 		} else {
@@ -3661,8 +3714,8 @@ class ParentClassItem extends JModelAdmin
 	{
 		if ($old_item) {
 			$item = & $old_item;
-		} else if (isset($this->_item)) {
-			$item = $this->_item;
+		} else if (isset($this->_record)) {
+			$item = $this->_record;
 		} else {
 			$item = $this->getItem();  // This fuction calls the load item function for existing item and init item function in the case of new item
 		}
@@ -3996,155 +4049,6 @@ class ParentClassItem extends JModelAdmin
 	}
 
 
-	/**
-	 * Helper method to format a value as array
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-	function formatToArray($value)
-	{
-		if (is_object($value))
-		{
-			return (array) $value;
-		}
-		if (!is_array($value) && !strlen($value))
-		{
-			return array();
-		}
-		return is_array($value) ? $value : array($value);
-	}
-
-
-	/**
-	 * Helper method to bind form posted item parameters and and metadata to the item
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-	function mergeAttributes(&$item, &$params, &$metadata)
-	{
-		// Build item parameters INI string
-		if (is_array($params))
-		{
-			// Get current item attributes
-			$item->attribs = new JRegistry($item->attribs);
-			
-			// Get new and old layout names
-			$new_ilayout = isset($params['ilayout']) ? $params['ilayout'] : null;  // a non-set will return null, but let's make this cleaner
-			$old_ilayout = $item->attribs->get('ilayout');
-			
-			//echo "new_ilayout: $new_ilayout,  old_ilayout: $old_ilayout <br/>";
-			//echo "<pre>"; print_r($params); exit;
-
-
-			// *************************
-			// Verify layout file exists
-			// *************************
-			$layoutpath = !$new_ilayout ? '' : JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$new_ilayout.DS.'item.xml');
-			if ($layoutpath && !file_exists($layoutpath))
-			{
-				$layoutpath = '';
-			}
-
-
-			// **************************************************************************************
-			// THIS is costly if site has many templates but it will only happen if layout is changed
-			// **************************************************************************************
-
-			// WARNING: NULL layout means layout was not present in the FORM, aka do not clear parameters
-			if (
-				// (a) non-null but empty new ilayout, and (b) old layout was non empty: clear parameters of old layout, to allow proper heritage from content type (= aka use type's defaults for ilayout and its parameters)
-				($layoutpath && $new_ilayout!==null && $new_ilayout=='' && !empty($old_ilayout))  ||
-				
-				// (a) new ilayout was given and (b) is different than old ilayout, clear ilayout parameters, in case old parameters are have same name with of new ilayout parameters
-				($layoutpath && $new_ilayout!='' && $new_ilayout!=$old_ilayout)
-			) {
-				//JFactory::getApplication()->enqueueMessage('Layout changed, cleared old layout parameters', 'message');
-				
-				$themes = flexicontent_tmpl::getTemplates();
-				foreach ($themes->items as $tmpl_name => $tmpl)
-				{
-					//if ( $tmpl_name == @$params['ilayout'] ) continue;
-					
-					$tmpl_params = $tmpl->params;
-					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
-					$jform->load($tmpl_params);
-					foreach ($jform->getGroup('attribs') as $field)
-					{
-						// !! Do not call empty() on a variable created by magic __get function
-						if ( @ $field->fieldname ) $item->attribs->set($field->fieldname, null);
-					}
-				}
-			}
-
-
-			// Load XML file of the ilayout and filter / validate selected ilayout parameters
-			$layout_data = array();
-			$fset = 'attribs';
-			if ( $layoutpath && isset($params['layouts'][$new_ilayout]) )
-			{
-				// Attempt to parse the XML file
-				$xml = simplexml_load_file($layoutpath);
-				if (!$xml)
-				{
-					JFactory::getApplication()->enqueueMessage('Error parsing layout file of "'.$new_ilayout.'". Layout parameters were not saved', 'warning');
-				}
-
-				else
-				{
-					// Create form object and load the relevant xml file
-					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
-					$tmpl_params = $xml->asXML();
-					$jform->load($tmpl_params);
-
-					$layout_data[$fset] = $params['layouts'][$new_ilayout];
-					//foreach ($jform->getGroup($fset) as $field) { if ( !empty($field->getAttribute('filter')) ) echo $field->fieldname .' filt: '. $field->getAttribute('filter') . "<br/>"; } exit;
-
-					// Filter and validate the resulting data
-					$layout_data = $jform->filter($layout_data);   //echo "<pre>"; print_r($layout_data); echo "</pre>"; exit();
-					$isValid = $jform->validate($layout_data, $fset);
-					if (!$isValid)
-					{
-						JFactory::getApplication()->enqueueMessage('Error validating layout posted parameters. Layout parameters were not saved', 'warning');
-					}
-				}
-			}
-
-			// Merge the parameters of the selected layout (if not empty)
-			if ( !empty($layout_data[$fset]) )
-			{
-				foreach ($layout_data[$fset] as $k => $v)
-				{
-					$item->attribs->set($k, $v);  //echo "$k: $v <br/>";
-				}
-			}
-			unset($params['layouts']);
-
-
-			foreach ($params as $k => $v)
-			{
-				//$v = is_array($v) ? implode('|', $v) : $v;
-				$item->attribs->set($k, $v);
-			}
-			//echo "<pre>"; print_r($params); print_r($item->attribs); exit;
-			$item->attribs = $item->attribs->toString();
-		}
-		
-		// Build item metadata INI string
-		if (is_array($metadata))
-		{
-			$item->metadata = new JRegistry($item->metadata);
-			// NOTE: metadesc, metakey are directly under jform 'attribs' so they do not need special handling
-			foreach ($metadata as $k => $v)
-			{
-				$item->metadata->set($k, $v);
-			}
-			$item->metadata = $item->metadata->toString();
-		}
-	}
-	
-	
 	/*
 	 * Method to retrieve the configuration for the Content Submit/Update notifications
 	 */
@@ -4483,7 +4387,7 @@ class ParentClassItem extends JModelAdmin
 		// ADD INFO for introtext/fulltext
 		if ( $params->get('nf_add_introtext') )
 		{
-			//echo "<pre>"; print_r($this->_item); exit;
+			//echo "<pre>"; print_r($this->_record); exit;
 			$body .= "<br/><br/>\r\n";
 			$body .= "*************************************************************** <br/>\r\n";
 			$body .= JText::_( 'FLEXI_NF_INTROTEXT_LONG' ) . "<br/>\r\n";
@@ -4894,7 +4798,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function saveAssociations(&$item, &$data)
 	{
-		$item = $item ? $item: $this->_item;
+		$item = $item ? $item: $this->_record;
 		$context = 'com_content';
 		
 		return flexicontent_db::saveAssociations($item, $data, $context);
@@ -4921,14 +4825,14 @@ class ParentClassItem extends JModelAdmin
 		$registry = new JRegistry;
 		try
 		{
-			$registry->loadString($this->_item->$colname);
+			$registry->loadString($this->_record->$colname);
 		}
 		catch (Exception $e)
 		{
-			$registry = flexicontent_db::check_fix_JSON_column($colname, 'content', 'id', $this->_item->id, $this->_item->$colname);
+			$registry = flexicontent_db::check_fix_JSON_column($colname, 'content', 'id', $this->_record->id, $this->_record->$colname);
 		}
-		$this->_item->$colname = $registry->toArray();
-		$this->_item->itemparams->merge($registry);
+		$this->_record->$colname = $registry->toArray();
+		$this->_record->itemparams->merge($registry);
 	}
 	
 	
@@ -4944,5 +4848,100 @@ class ParentClassItem extends JModelAdmin
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
 		}
+	}
+
+
+	/**
+	 * Helper method to format a value as array
+	 * 
+	 * @return object
+	 * @since 3.2.0
+	 */
+	private function formatToArray($value)
+	{
+		if (is_object($value))
+		{
+			return (array) $value;
+		}
+		if (!is_array($value) && !strlen($value))
+		{
+			return array();
+		}
+		return is_array($value) ? $value : array($value);
+	}
+
+
+	/**
+	 * Helper method to PARTLY bind LAYOUT and other ARRAY properties
+	 * so that any fields missing completely from the form can maintain their old values
+	 * 
+	 * @return object
+	 * @since 3.2.0
+	 */
+	function mergeAttributes(&$item, &$data, $properties, $options)
+	{
+		if (isset($options['params_fset']) && isset($options['layout_type']))
+		{
+			// Merge Layout parameters into parameters of the record
+			flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
+
+			// Unset layout data since these we handled above
+			unset($data[$options['params_fset']]['layouts']);
+		}
+
+
+		// Merge specified array properties by looping through them, thus any
+		// fields not present in the form will maintain their existing values
+		foreach($properties as $prop)
+		{
+			if (is_array($data[$prop]))
+			{
+				// Convert property string to Registry object
+				$item->$prop = new JRegistry($item->$prop);
+				// Merge the field values
+				foreach ($data[$prop] as $k => $v)
+				{
+					$item->$prop->set($k, $v);
+				}
+				// Convert property back to string
+				$item->$prop = $item->$prop->toString();
+			}
+		}
+	}
+
+
+	/**
+	 * Method to do some record / data preprocessing before call JTable::bind()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @since	3.2.0
+	 */
+	private function _prepareBind($record, & $data)
+	{
+	}
+
+
+	/**
+	 * Method to do some work after record has been stored
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @since	3.2.0
+	 */
+	private function _afterStore($record, & $data)
+	{
+	}
+
+
+	/**
+	 * Method to do some work after record has been loaded via JTable::load()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @since	3.2.0
+	 */
+	private function _afterLoad($record)
+	{
 	}
 }

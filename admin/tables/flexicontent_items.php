@@ -341,32 +341,37 @@ class flexicontent_items extends _flexicontent_items {
 	 */
 	public function bind($array, $ignore = '')
 	{
-		if (isset($array['images']) && is_array($array['images'])) {
+		if (isset($array['images']) && is_array($array['images']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['images']);
 			$array['images'] = (string)$registry;
 		}
 
-		if (isset($array['urls']) && is_array($array['urls'])) {
+		if (isset($array['urls']) && is_array($array['urls']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['urls']);
 			$array['urls'] = (string)$registry;
 		}
 		
-		if (isset($array['attribs']) && is_array($array['attribs'])) {
+		if (isset($array['attribs']) && is_array($array['attribs']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['attribs']);
 			$array['attribs'] = (string)$registry;
 		}
 
-		if (isset($array['metadata']) && is_array($array['metadata'])) {
+		if (isset($array['metadata']) && is_array($array['metadata']))
+		{
 			$registry = new JRegistry;
 			$registry->loadArray($array['metadata']);
 			$array['metadata'] = (string)$registry;
 		}
 
 		// Bind the rules.
-		if (isset($array['rules']) && is_array($array['rules'])) {
+		if (isset($array['rules']) && is_array($array['rules']))
+		{
 			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}

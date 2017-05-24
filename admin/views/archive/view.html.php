@@ -32,19 +32,20 @@ class FlexicontentViewArchive extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		//initialise variables
+		// initialise variables
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document	= JFactory::getDocument();
 		
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.archive.search', 			'search', 			'', 'string' );
+		$filter_order	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$search 			= $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search 			= $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
 		
