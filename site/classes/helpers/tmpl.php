@@ -477,4 +477,157 @@ class flexicontent_tmpl
 		}
 		return $templates[$folder][$type];
 	}
+
+
+	/**
+	 * Load XML file of the layout type and nameand filter / validate layout parameters
+	 * by creating a JForm object and loading in it the layout XML file
+	 *
+	 * @param array $data      This is an array of the form data that contains an array 'layouts'
+	 * @param object $layout   An object with layout options
+	 *   string $layout->type  Layout type : 'item' OR 'category'
+	 *   string $layout->name  Layout (template) name
+	 *   string $layout->fset  Layout 's fieldset name inside layout's XML file
+	 *
+	 * @access public
+	 * @return object
+	 */
+	static function validateLayoutData($data, $layout=array('type'=>'item', 'name'=>'default', 'fset'=>'attribs'))
+	{
+		$layout = !is_object($layout) ? (object) $layout : $layout;
+
+		$layout->path = !$layout->name ? '' : JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS. $layout->name .DS. $layout->type .'.xml');
+		if ($layout->path && !file_exists($layout->path))
+		{
+			$layout->path = '';
+		}
+
+		$layout_data = array();
+
+		if ( $layout->path && isset($data['layouts'][$layout->name]) )
+		{
+			// Attempt to parse the XML file
+			$xml = simplexml_load_file($layout->path);
+			if (!$xml)
+			{
+				JFactory::getApplication()->enqueueMessage('Error parsing layout file of "' . $layout->name . '". Layout parameters were not saved', 'warning');
+			}
+
+			else
+			{
+				// Create form object and load the relevant xml file
+				$jform = new JForm('com_flexicontent.template.' . $layout->type, array('control' => 'jform', 'load_data' => false));
+				$tmpl_params = $xml->asXML();
+				$jform->load($tmpl_params);
+
+				$layout_data[$layout->fset] = $data['layouts'][$layout->name];
+				//foreach ($jform->getGroup($layout->fset) as $field) echo $field->fieldname  . ' -- filter :: '. $field->getAttribute('filter', ' ... noHTML') . "<br/>";
+
+				// Filter and validate the resulting data
+				$layout_data = $jform->filter($layout_data);  //echo "<pre>"; print_r($layout_data); echo "</pre>"; exit();
+				$isValid = $jform->validate($layout_data, $layout->fset);
+				if (!$isValid)
+				{
+					JFactory::getApplication()->enqueueMessage('Error validating layout parameters. Layout parameters were not saved', 'warning');
+				}
+			}
+		}
+
+		return $layout_data;
+	}
+
+	static function mergeLayoutParams(&$item, &$data, $options)
+	{
+		$params_fset = $options['params_fset'];
+		if (!isset($data[$params_fset]))
+		{
+			return;
+		}
+
+		// Create Registry object from parameters string
+		$item->$params_fset = new JRegistry($item->$params_fset);
+
+		// Layout variables
+		$layout_type = $options['layout_type'];
+		$tmpl_type = $layout_type == 'item' ? 'items' : 'category';
+
+		$layout_param = $layout_type == 'item' ? 'ilayout' : 'clayout';
+		$new_layout = isset($data[$params_fset][$layout_param]) ? $data[$params_fset][$layout_param] : null;
+		$old_layout = $item->$params_fset->get($layout_param);
+
+
+		// Verify layout file exists
+		$layoutpath = !$new_layout ? '' : JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$new_layout.DS.$layout_type.'.xml');
+		if ($layoutpath && !file_exists($layoutpath))
+		{
+			$layoutpath = '';
+		}
+
+
+		// ***
+		// *** We will only clear old layout and new layout parameters, since
+		// *** clearing all layout in sites with many templates would be costly
+		// ***
+
+		$themes = flexicontent_tmpl::getTemplates();
+		$clear_arr = array();
+
+		// Clear parameters of old ilayout, to allow proper heritage from content type, parent categories / global layout parameters, when:
+		//  (a) non-NULL ** but empty new ilayout (aka use 'type default'), (b) old ilayout was non empty
+		// WARNING: ** NULL ilayout means layout was not present in the FORM, (user could not change it) aka do not clear parameters
+
+		//echo "<pre>"; var_dump($layoutpath); var_dump($new_layout); var_dump($old_layout);
+		if ($new_layout!==null && $new_layout=='' && !empty($old_layout) && isset($themes->$tmpl_type->$old_layout))
+		{
+			$clear_arr[$old_layout] = $themes->$tmpl_type->$old_layout;  //echo 'Clear old layout: ' . $old_layout . '<br/>';
+		}
+
+		// Detect that layout was changed to new value and clear new layout parameters
+		// This is useful in the case they were not added in the form,
+		// so that heritage from type's defaults / parent categories / global layout parameters will take effect
+		// (a) New ilayout non empty and (b) it is different than old ilayout, 
+		if ($layoutpath && $new_layout && $new_layout!=$old_layout && isset($themes->$tmpl_type->$new_layout))
+		{
+			$clear_arr[$new_layout] = $themes->$tmpl_type->$new_layout;  //echo 'Clear new layout: ' . $new_layout . '<br/>';
+		}
+
+		if ($clear_arr)
+		{
+			//JFactory::getApplication()->enqueueMessage('Layout changed, cleared old layout parameters', 'message');
+			foreach ($clear_arr as $tmpl_name => $tmpl)
+			{
+				$tmpl_params = $tmpl->params;
+				$jform = new JForm('com_flexicontent.template.' . $layout_type, array('control' => 'jform', 'load_data' => false));
+				$jform->load($tmpl_params);
+				foreach ($jform->getGroup('attribs') as $field)
+				{
+					// !! Do not call empty() on a variable created by magic __get function
+					if ( @ $field->fieldname )
+					{
+						$item->$params_fset->set($field->fieldname, null);  //echo "Clearing: " . $field->fieldname . " <br/>";
+					}
+				}
+			}
+		}
+
+
+		// ***
+		// *** Validate layout data
+		// ***
+		if ($new_layout)
+		{
+			$layout = (object) array('type'=>$layout_type, 'name'=>$new_layout, 'fset'=>'attribs');
+			$layout_data = flexicontent_tmpl::validateLayoutData($data[$params_fset], $layout);
+
+			// Merge the parameters of the selected layout (if not empty)
+			if ( !empty($layout_data[$layout->fset]) )
+			{
+				foreach ($layout_data[$layout->fset] as $k => $v)
+				{
+					$item->$params_fset->set($k, $v);  //echo "$k: $v <br/>";
+				}
+			}
+		}
+		$item->$params_fset = $item->$params_fset->toString();
+	}
 }
