@@ -2,15 +2,15 @@
 <form>
 	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="asset_id" type="hidden" filter="unset" />
-	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="label" />
-	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="label" />
-	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="label" class="btn-group btn-group-yesno">
+	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="" />
+	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="" />
+	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="" class="btn-group btn-group-yesno">
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
 	</field>
 	<field name="itemscreatable" type="multilist" subtype="radio" default="0" toggle_related="1" filter="int" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC"
 		inline_tip="FLEXI_PLEASE_SET_CREATE_ITEMS_ACL_IN_PERMS_TAB"  tip_class="create_items_using_acl"   tip_img="comments.png"  preview_img="lock.png" 
-		labelclass="label" class="btn-group group-fcmethod">
+		labelclass="" class="btn-group group-fcmethod">
 		<option value="0" show_list="" hide_list="create_items_using_acl">FLEXI_ANY_AUTHOR</option>
 		<option value="1" show_list="create_items_using_acl" hide_list="">FLEXI_USE_ACL_TO_HIDE</option>
 		<option value="2" show_list="create_items_using_acl" hide_list="">FLEXI_USE_ACL_TO_DISABLE</option>
@@ -18,7 +18,7 @@
 	
 	<field name="checked_out" type="hidden" filter="unset" />
 	<field name="checked_out_time" type="hidden" filter="unset" />	
-	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="JField_Access_Desc" class="inputbox" size="1" default="" labelclass="label" />
+	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="JField_Access_Desc" class="inputbox" size="1" default="" labelclass="" />
 	<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_DESC" description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules" component="com_flexicontent" section="type" />
 	
 	<fields name="attribs">
@@ -293,7 +293,7 @@
 			<field name="" type="separator" default="FLEXI_MAIN_CATEGORY" level="level1" />
 			<field name="catid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label-info" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label label-info" />
 			<field name="catid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -305,7 +305,7 @@
 			<field name="" type="separator" default="FLEXI_SECONDARY_CATEGORIES" level="level1" />
 			<field name="cid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label-info" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label label-info" />
 			<field name="cid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -315,7 +315,7 @@
 				default="" label="Default categories" description="Select the default secondary categories" />
 			
 			<field name="" type="separator" default="FLEXI_TEMPLATE_ITEM" level="level1" />
-			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label-info"/>
+			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label label-info"/>
 
 			<field name="" type="separator" default="Common tags (seleactable via checkboxes)" level="level1" />
 			<field name="quick_tags" type="tags" default="" multiple="true" label="FLEXI_TAGS" description="Tags selectable as checkboxes in item form (for quicker / easier selection)"/>
@@ -630,7 +630,7 @@
 			
 			<field name="item_form_fe_tab_layout" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" icon_class="icon-screen" level="tab_open" box_type="1" />
 
-			<field name="form_layout_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label-success">
+			<field name="form_layout_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label label-success">
 				<option value="">FLEXI_CUSTOMIZE</option>
 				<option value="1" fcconfigs="{
 					'form_tab_titles':'1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE',
@@ -784,8 +784,8 @@
 		</fieldset>
 		<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" />
-			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" />
+			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" class="use_select2_lib" labelclass="label label-warning" />
+			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label label-warning" />
 			
 		</fieldset>
 		

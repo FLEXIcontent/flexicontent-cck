@@ -103,8 +103,8 @@ class FlexicontentModelTypes extends JModelList
 		// **************
 		
 		// Various filters
-		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',   '', 'string' );   // we may check for '*', so string filter
-		$filter_access   = $fcform ? $jinput->get('filter_access',   '', 'int')     :  $app->getUserStateFromRequest( $p.'filter_access',   'filter_access',  '', 'int' );
+		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );   // we may check for '*', so string filter
+		$filter_access   = $fcform ? $jinput->get('filter_access',   '', 'int')     :  $app->getUserStateFromRequest( $p.'filter_access',   'filter_access',   '', 'int' );
 		
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
@@ -256,35 +256,71 @@ class FlexicontentModelTypes extends JModelList
 		return true;
 	}
 
+
 	/**
-	 * Method to check if we can remove a type
-	 * return false if there are items associated
+	 * Method to check if given records can not be deleted e.g. due to assignments or due to being a CORE record
 	 *
 	 * @access	public
-	 * @return	boolean	True on success
+	 * @return	boolean
 	 * @since	1.5
 	 */
-	function candelete($cid = array())
+	function candelete($cid, & $cid_noauth=array(), & $cid_wassocs=array())
 	{
-		$n		= count( $cid );
-		if (count( $cid ))
+		$cid_noauth = $cid_wassocs = array();
+
+		if (!count($cid))
 		{
-			for ($i = 0; $i < $n; $i++)
-			{
-			$query = 'SELECT COUNT( type_id )'
-			. ' FROM #__flexicontent_items_ext'
-			. ' WHERE type_id = '. (int) $cid[$i]
-			;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-			
-			if ($count > 0) {
-				return false;
-				}
-			}
-			return true;
+			return false;
 		}
+
+		// Find ACL disallowed
+		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanTypes ? array() : $cid;
+
+		// Find having assignments
+		$cid_wassocs = $this->filterByAssignments($cid);
+
+		return !count($cid_noauth) && !count($cid_wassocs);
 	}
+
+
+	/**
+	 * Method to check if given records can not be unpublished e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function canunpublish($cid, & $cid_noauth=array(), & $cid_wassocs=array())
+	{
+		$cid_noauth = $cid_wassocs = array();
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		// Find ACL disallowed
+		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanTypes ? array() : $cid;
+
+		// Find having assignments
+		$cid_wassocs = $this->filterByAssignments($cid);
+
+		return !count($cid_noauth) && !count($cid_wassocs);
+	}
+
+
+	// Find which records have assignments
+	function filterByAssignments($cid = array())
+	{
+		JArrayHelper::toInteger($cid);
+		$query = 'SELECT DISTINCT type_id'
+			. ' FROM #__flexicontent_items_ext'
+			. ' WHERE type_id IN ('. implode(',', $cid) .')'
+			;
+		$this->_db->setQuery( $query );
+		return $this->_db->loadColumn();
+	}
+
 
 	/**
 	 * Method to remove a type
@@ -335,7 +371,8 @@ class FlexicontentModelTypes extends JModelList
 	{
 		if (count( $cid ))
 		{
-			foreach ($cid as $id) {
+			foreach ($cid as $id)
+			{
 				$type = $this->getTable('flexicontent_types', '');
 				$type->load($id);
 				$type->id = 0;
@@ -350,7 +387,8 @@ class FlexicontentModelTypes extends JModelList
 				$this->_db->setQuery($query);
 				$rels = $this->_db->loadObjectList();
 				
-				foreach ($rels as $rel) {
+				foreach ($rels as $rel)
+				{
 					$query = 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`) VALUES(' . (int)$rel->field_id . ',' . $type->id . ',' . (int)$rel->ordering . ')';
 					$this->_db->setQuery($query);
 					$this->_db->execute();
