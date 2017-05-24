@@ -17,74 +17,53 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-?>
-<div class="flexicontent" id="flexicontent">
 
+$form = $this->form;
+?>
+
+<div class="flexicontent" id="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
 
+	<?php
+	$fieldSets = $this->form->getFieldsets();
+	foreach ($fieldSets as $name => $fieldSet) :
+
+		//$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
+		//echo '<h2>' . JText::_($label) . '</h2>';
+	?>
+
 	<table class="fc-form-tbl">
-		<tr>
-			<td class="key">
-				<label class="label">
-					<?php echo JText::_( 'FLEXI_ID' ); ?>
-				</label>
-			</td>
-			<td>
-				<span id="id" class=""><?php echo $this->row->id; ?></span>
-			</td>
-		</tr><tr>
-			<td class="key">
-				<label class="label" for="title">
-					<?php echo JText::_( 'FLEXI_TITLE' ); ?>
-				</label>
-			</td>
-			<td>
-				<input type="text" id="title" name="title" class="input-xxlarge required" value="<?php echo $this->row->title; ?>" size="200" maxlength="100" />
-			</td>
-		</tr><tr>
-			<td class="key">
-				<label class="label">
-					<?php echo JText::_( 'FLEXI_STATE' ); ?>
-				</label>
-			</td>
-			<td>
-				<fieldset class="radio btn-group btn-group-yesno" id="state">
-					<?php
-					$options = array( 0 => JText::_('FLEXI_NO'), 1 => JText::_('FLEXI_YES') );
-					$curvalue = $this->row->state;
-					$fieldname = 'state';
-					$n=0;
-					foreach ($options as $value => $label) {
-						$checked = $curvalue==$value ? ' checked="checked" ' : '';
-						echo '
-							<input type="radio" '.$checked.' value="'.$value.'" name="'.$fieldname.'" id="'.$fieldname.$n.'">
-							<label for="'.$fieldname.$n.'">'.$label.'</label>';
-						$n++;
-					}
-					?>
-				</fieldset>
-			</td>
-		</tr><tr>
-			<td class="key">
-				<label class="label" for="text">
-					<?php echo JText::_( 'FLEXI_TEXT' ); ?>
-				</label>
-			</td>
-			<td>
-				<textarea id="text" name="text" class="input-xxlarge required" rows="6" cols="120"><?php echo $this->row->text; ?></textarea>
-			</td>
-		</tr>
+
+		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+			<tr>
+				<td class="key">
+					<?php echo $field->label; ?>
+				</td>
+				<td>
+					<?php echo $field->input; ?>
+				</td>
+			</tr>
+			<?php endif; ?>
+		<?php endforeach; ?>
 	</table>
+
+	<?php endforeach; ?>
 
 	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
+	<?php echo $this->form->getInput('id'); ?>
 	<input type="hidden" name="controller" value="reviews" />
 	<input type="hidden" name="view" value="review" />
 	<input type="hidden" name="task" value="" />
 
 </form>
 </div>
+<div style="margin-bottom:24px;"></div>
 
 <?php
 //keep session alive while editing

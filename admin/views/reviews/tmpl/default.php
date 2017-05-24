@@ -185,7 +185,7 @@ function delAllFilters() {
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row  = & $this->rows[$i];
-			$link = 'index.php?option=com_flexicontent&amp;'.$edit_task.'edit&amp;cid='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;'.$edit_task.'edit&amp;view='.$this->view.'&amp;id='. $row->id;
 			$published	= JHTML::_('jgrid.published', $row->state, $i, 'reviews.' );
 
 			$canEdit    = 1;

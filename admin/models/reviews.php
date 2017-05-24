@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
+jimport('legacy.model.list');
 use Joomla\String\StringHelper;
 
 /**
@@ -29,19 +29,19 @@ use Joomla\String\StringHelper;
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelReviews extends JModelLegacy
+class FlexicontentModelReviews extends JModelList
 {
-	var $reviews_tbl = 'flexicontent_reviews_dev';
+	var $records_dbtbl = 'flexicontent_reviews_dev';
 
 	/**
-	 * Review data
+	 * Record rows
 	 *
-	 * @var object
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Review total
+	 * Rows total
 	 *
 	 * @var integer
 	 */
@@ -55,7 +55,7 @@ class FlexicontentModelReviews extends JModelLegacy
 	var $_pagination = null;
 
 	/**
-	 * Review id
+	 * Single record id (used in operations)
 	 *
 	 * @var int
 	 */
@@ -64,7 +64,7 @@ class FlexicontentModelReviews extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 3.2.0
 	 */
 	function __construct()
 	{
@@ -78,7 +78,25 @@ class FlexicontentModelReviews extends JModelLegacy
 		$p      = $option.'.'.$view.'.';
 		
 		
+		// **************
+		// view's Filters
+		// **************
 		
+		// Various filters
+		$filter_state     = $fcform ? $jinput->get('filter_state',     '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',      '', 'string' );    // we may check for '*', so string filter
+		
+		$this->setState('filter_state', $filter_state);
+		
+		$app->setUserState($p.'filter_state', $filter_state);
+		
+		
+		// Text search
+		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		$this->setState('search', $search);
+		$app->setUserState($p.'search', $search);
+
+
+
 		// ****************************************
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
@@ -97,25 +115,6 @@ class FlexicontentModelReviews extends JModelLegacy
 		
 		$app->setUserState($p.'filter_order', $filter_order);
 		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
-		
-		
-		
-		// **************
-		// view's Filters
-		// **************
-		
-		// Various filters
-		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );   // we may check for '*', so string filter
-		
-		$this->setState('filter_state', $filter_state);
-		
-		$app->setUserState($p.'filter_state', $filter_state);
-		
-		
-		// Text search
-		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
-		$this->setState('search', $search);
-		$app->setUserState($p.'search', $search);
 		
 		
 		
@@ -144,16 +143,36 @@ class FlexicontentModelReviews extends JModelLegacy
 
 
 	/**
-	 * Method to set the Review identifier
+	 * Method to set the Record identifier and clear record rows
 	 *
 	 * @access	public
-	 * @param	int Review identifier
+	 * @param	int Record identifier
 	 */
 	function setId($id)
 	{
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
+		$this->_total= null;
+	}
+
+
+	/**
+	 * Method to get a pagination object for the records
+	 *
+	 * @access public
+	 * @return integer
+	 */
+	function getPagination()
+	{
+		// Create pagination object if it doesn't already exist
+		if (empty($this->_pagination))
+		{
+			jimport('cms.pagination.pagination');
+			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+		}
+
+		return $this->_pagination;
 	}
 
 
@@ -198,24 +217,6 @@ class FlexicontentModelReviews extends JModelLegacy
 	}
 
 
-	/**
-	 * Method to get a pagination object for the reviews
-	 *
-	 * @access public
-	 * @return integer
-	 */
-	function getPagination()
-	{
-		// Create pagination object if it doesn't already exist
-		if (empty($this->_pagination))
-		{
-			jimport('cms.pagination.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
-		}
-
-		return $this->_pagination;
-	}
-
 
 	/**
 	 * Method to build the query for the reviews
@@ -234,7 +235,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		$filter_order     = $this->getState( 'filter_order' );
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS r.*, u.name AS editor'
-			. ' FROM #__'.$this->reviews_tbl.' AS r'
+			. ' FROM #__' . $this->records_dbtbl . ' AS r'
 			. ' LEFT JOIN #__users AS u ON u.id = r.checked_out'
 			. $where
 			. ' GROUP BY r.id'
@@ -247,7 +248,7 @@ class FlexicontentModelReviews extends JModelLegacy
 
 
 	/**
-	 * Method to build the orderby clause of the query for the reviews
+	 * Method to build the orderby clause of the query for the records
 	 *
 	 * @access private
 	 * @return string
@@ -265,7 +266,7 @@ class FlexicontentModelReviews extends JModelLegacy
 
 
 	/**
-	 * Method to build the where clause of the query for the reviews
+	 * Method to build the where clause of the query for the records
 	 *
 	 * @access private
 	 * @return string
@@ -275,13 +276,14 @@ class FlexicontentModelReviews extends JModelLegacy
 	{
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
+
+		// Various filters
+		$filter_state     = $this->getState( 'filter_state' );
 		
-		$filter_state	= $this->getState( 'filter_state' );
-		
-		// text search
-		$search  = $this->getState( 'search' );
-		$search  = StringHelper::trim( StringHelper::strtolower( $search ) );
-		
+		// Text search
+		$search = $this->getState( 'search' );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
+
 		$where = array();
 
 		if ( $filter_state ) {
@@ -319,7 +321,7 @@ class FlexicontentModelReviews extends JModelLegacy
 
 
 	/**
-	 * Method to (un)publish a review
+	 * Method to (un)publish a record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -333,11 +335,11 @@ class FlexicontentModelReviews extends JModelLegacy
 		{
 			$cids = implode( ',', $cid );
 
-			$query 	= 'UPDATE #__'.$this->reviews_tbl
-					. ' SET state = ' . (int) $publish
-					. ' WHERE id IN ('. $cids .')'
-					. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-					;
+			$query = 'UPDATE #__' . $this->records_dbtbl
+				. ' SET state = ' . (int) $publish
+				. ' WHERE id IN ('. $cids .')'
+				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+				;
 			$this->_db->setQuery( $query );
 			if (!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
@@ -346,8 +348,48 @@ class FlexicontentModelReviews extends JModelLegacy
 		}
 		return true;
 	}
-	
-	
+
+
+	/**
+	 * Method to check if given records can not be deleted e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function candelete($cid, & $cid_noauth=array(), & $cid_wassocs=array())
+	{
+		$cid_noauth = $cid_wassocs = array();
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Method to check if given records can not be unpublished e.g. due to assignments or due to being a CORE record
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @since	1.5
+	 */
+	function canunpublish($cid, & $cid_noauth=array(), & $cid_wassocs=array())
+	{
+		$cid_noauth = $cid_wassocs = array();
+
+		if (!count($cid))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
 	/**
 	 * Method to (un)approve a review
 	 *
@@ -363,7 +405,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		{
 			$cids = implode( ',', $cid );
 
-			$query 	= 'UPDATE #__'.$this->reviews_tbl
+			$query = 'UPDATE #__' . $this->records_dbtbl
 					. ' SET approved = ' . (int) $publish
 					. ' WHERE id IN ('. $cids .')'
 					. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
@@ -379,7 +421,7 @@ class FlexicontentModelReviews extends JModelLegacy
 
 
 	/**
-	 * Method to remove a review
+	 * Method to remove a record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -392,7 +434,7 @@ class FlexicontentModelReviews extends JModelLegacy
 		if (count( $cid ))
 		{
 			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__'.$this->reviews_tbl
+			$query = 'DELETE FROM #__' . $this->records_dbtbl
 					. ' WHERE id IN ('. $cids .')'
 					;
 

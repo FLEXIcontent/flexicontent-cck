@@ -31,20 +31,53 @@ class FlexicontentViewReview extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = JFactory::getApplication();
+		// ***
+		// *** Initialise variables
+		// ***
 
-		//initialise variables
-		$document	= JFactory::getDocument();
-		$user 		= JFactory::getUser();
-		$bar			= JToolBar::getInstance('toolbar');
-		$cparams	= JComponentHelper::getParams('com_flexicontent');
-		
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$tip_class = ' hasTooltip';
+
+		// Development check, TO-BE-REMOVED
 		flexicontent_html::__DEV_check_reviews_table();
-		
-		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
 
-		//add css to document
+
+
+		// ***
+		// *** Get record data, and check if record is already checked out
+		// ***
+		
+		// Get data from the model
+		$model = $this->getModel();
+		$row   = $this->get('Review');
+		$form  = $this->get('Form');
+		$isnew = ! $row->id;
+		$manager_view = $ctrl = 'reviews';
+		$js = '';
+
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
+
+
+
+		// ***
+		// *** Include needed files and add needed js / css files
+		// ***
+		
+		// Add css to document
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -54,57 +87,153 @@ class FlexicontentViewReview extends JViewLegacy
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('flexi-lib-form');
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
-		//Get data from the model
-		$model = $this->getModel();
-		$row   = $this->get( 'Review' );
+
+
+		// ***
+		// *** Create the toolbar
+		// ***
+		$toolbar = JToolBar::getInstance('toolbar');
+
+		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
+		$cancreate = true;
 		
-		//create the toolbar
-		if ( $cid ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_REVIEW' ), 'reviewedit' );
-			$base 			= str_replace('administrator/', '', JURI::base());
-			$autologin  = ''; // $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			
-			// Add a preview button
-			$review_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->content_id));
-			$review_link    = JRoute::_(JURI::root().$review_link, $xhtml=false)."#review_id_".$row->id;  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
-			$previewlink = $review_link . $autologin;
-			
-			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW').'</a>', 'preview' );
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_NEW_REVIEW' ), 'reviewadd' );
+		// SET toolbar title
+		!$isnew
+			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_REVIEW' ), 'reviewedit' )   // Editing existing review
+			: JToolBarHelper::title( JText::_( 'FLEXI_NEW_REVIEW' ), 'reviewadd' );    // Creating new review
+
+
+
+		// ***
+		// *** Apply buttons
+		// ***
+
+		// Apply button
+		$btn_arr = array();
+
+		// Add ajax apply only for existing records
+		if ( !$isnew )
+		{
+			$btn_name = 'apply_ajax';
+			$btn_task = $ctrl.'.apply_ajax';
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
 		}
+
+		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
+		$btn_name = 'apply';
+		$btn_task = $ctrl.'.apply';
+		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+
+		//JToolBarHelper::apply($btn_task, $btn_title, false);
+
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="right" title=""', $auto_add = 0);
+
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
+
+
+
+		// ***
+		// *** Save buttons
+		// ***
+		$btn_arr = array();
+
+		$btn_name = 'save';
+		$btn_task = $ctrl.'.save';
+
+		//JToolBarHelper::save($btn_task);  //JToolBarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 		
-		if (FLEXI_J16GE) {
-			JToolBarHelper::apply	('reviews.apply');
-			JToolBarHelper::save	('reviews.save');
-			JToolBarHelper::custom('reviews.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-			JToolBarHelper::cancel('reviews.cancel');
-		} else {
-			JToolBarHelper::apply();
-			JToolBarHelper::save();
-			JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-			JToolBarHelper::cancel();
-		}
-		
-		// fail if checked out not by 'me'
-		if ($row->id) {
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=reviews' );
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="bottom" title=""', $auto_add = 0);
+
+
+		// Add a save and new button, if user can create new records
+		if ($cancreate)
+		{
+			$btn_name = 'save2new';
+			$btn_task = $ctrl.'.save2new';
+
+			//JToolBarHelper::save2new($btn_task);  //JToolBarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
+
+			// Also if an existing item, can save to a copy
+			if (!$isnew)
+			{
+				$btn_name = 'save2copy';
+				$btn_task = $ctrl.'.save2copy';
+
+				//JToolBarHelper::save2copy($btn_task);  //JToolBarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+
+				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
+					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
+					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 			}
 		}
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
+
+
+		// Cancel button
+		$isnew
+			? JToolBarHelper::cancel($ctrl.'.cancel')
+			: JToolBarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+
+
+		// Preview button
+		if (!$isnew)
+		{
+			// Create preview link (with xhtml to false ... we will do it manually) (at least for the ampersand)
+			$record_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->content_id));
+			$previewlink = JRoute::_(JURI::root() . $record_link, $xhtml=false)
+				. "#review_id_".$row->id
+				;
+			$toolbar->appendButton( 'Custom', '
+				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');">
+					<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
+					'.JText::_('FLEXI_PREVIEW').'
+				</button>', 'preview'
+			);
+		}
+
+
+
+		// ***
+		// *** Add inline js to head
+		// ***
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
+		}
+
 
 		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+		// NOTE: we will use JForm to output fields so this is redundant
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
-		//assign data to template
-		$this->assignRef('row'      	, $row);
+		// Assign data to template
+		$this->row    = $row;
+		$this->form   = $form;
 
 		parent::display($tpl);
 	}

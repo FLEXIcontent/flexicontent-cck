@@ -32,15 +32,16 @@ class FlexicontentViewReviews extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		//initialise variables
+		// Initialise variables
 		$app      = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
-		
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
 		flexicontent_html::__DEV_check_reviews_table();
 		
 		// Get model
@@ -54,23 +55,23 @@ class FlexicontentViewReviews extends JViewLegacy
 		// ***********
 		// Get filters
 		// ***********
-		
+
 		$count_filters = 0;
-		
-		// Order and order direction
-		$filter_order      = $model->getState('filter_order');
-		$filter_order_Dir  = $model->getState('filter_order_Dir');
-		
-		// Get filter vars
-		$filter_state    = $model->getState('filter_state');
+
+		// Various filters
+		$filter_state     = $model->getState('filter_state');
+
 		if ($filter_state) $count_filters++;
 		
 		// Text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
-		
-		
+		// Order and order direction
+		$filter_order     = $model->getState('filter_order');
+		$filter_order_Dir = $model->getState('filter_order_Dir');
+
+
 		// ****************************
 		// Important usability messages
 		// ****************************
@@ -117,13 +118,17 @@ class FlexicontentViewReviews extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolBarHelper::title( $doc_title, 'reviews' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		// Create the toolbar
 		$js = "jQuery(document).ready(function(){";
-		
-		$contrl = FLEXI_J16GE ? "reviews." : "";
+
+		$contrl = "reviews.";
+		$contrl_singular = "review.";
 		$toolbar = JToolBar::getInstance('toolbar');
-		if ($perms->CanConfig) {
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		if ($perms->CanConfig)
+		{
 			$btn_task = '';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=reviews&layout=import&tmpl=component';
 			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
