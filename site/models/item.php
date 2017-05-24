@@ -54,7 +54,7 @@ class FlexicontentModelItem extends ParentClassItem
 	function _check_viewing_access($version=false)
 	{
 		// Sanity check
-		if	(	!$this->_item->id )  die('_check_viewing_access() should be called only on EXISTING items, item id is empty');
+		if	(	!$this->_record->id )  die('_check_viewing_access() should be called only on EXISTING items, item id is empty');
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 
 		global $globalcats;
@@ -64,15 +64,15 @@ class FlexicontentModelItem extends ParentClassItem
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
 		$cid	= $this->_cid;
-		$params = $this->_item->parameters;
+		$params = $this->_record->parameters;
 		$cparams = $this->_cparams;
 		
-		$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );      // a special url parameter, used by some SEF code
+		$fcreturn = serialize( array('id'=>@$this->_record->id, 'cid'=>$cid) );      // a special url parameter, used by some SEF code
 		$referer = @$_SERVER['HTTP_REFERER'];                                      // the previously viewed page (refer)
 		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base(); // Ignore it if potentially non safe URL, e.g. non-internal
 		
 		// a basic item title string
-		$title_str = "<br />". JText::_('FLEXI_TITLE').": ".$this->_item->title.'[id: '.$this->_item->id.']';
+		$title_str = "<br />". JText::_('FLEXI_TITLE').": ".$this->_record->title.'[id: '.$this->_record->id.']';
 
 
 
@@ -82,7 +82,7 @@ class FlexicontentModelItem extends ParentClassItem
 		//*************************************************************
 
 		// (a) Calculate if owned by current user
-		$isOwner = $this->_item->created_by== $user->get('id');
+		$isOwner = $this->_record->created_by== $user->get('id');
 
 		// (b) Calculate edit access ... 
 		// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
@@ -93,13 +93,13 @@ class FlexicontentModelItem extends ParentClassItem
 			// Item not editable, check if item is editable till logoff
 			if ( $session->has('rendered_uneditable', 'flexicontent') ) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$canedititem = isset($rendered_uneditable[$this->_item->id]);
+				$canedititem = isset($rendered_uneditable[$this->_record->id]);
 			}
 		}
 
 		// (c) Calculate read access ... also considering the access level of parent categories
-		$_cid_ = $cid ? $cid : $this->_item->catid;
-		if ( !isset($this->_item->ancestor_cats_accessible) )
+		$_cid_ = $cid ? $cid : $this->_record->catid;
+		if ( !isset($this->_record->ancestor_cats_accessible) )
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$allowed_levels = array_flip($aid_arr);
@@ -110,9 +110,9 @@ class FlexicontentModelItem extends ParentClassItem
 			$ancestor_cats_accessible = true;
 			foreach($parents as $parent) if ( !isset($allowed_levels[$parent->access]) )
 				{ $ancestor_cats_accessible = false; break; }
-			$this->_item->ancestor_cats_accessible = $ancestor_cats_accessible;
+			$this->_record->ancestor_cats_accessible = $ancestor_cats_accessible;
 		}
-		$canviewitem = $params->get('access-view') && $this->_item->ancestor_cats_accessible;
+		$canviewitem = $params->get('access-view') && $this->_record->ancestor_cats_accessible;
 
 
 		// *********************************************************************************************
@@ -120,25 +120,25 @@ class FlexicontentModelItem extends ParentClassItem
 		// FLAGS: item_is_published, item_is_scheduled, item_is_expired, ancestor_cats_published
 		// *********************************************************************************************
 
-		$item_is_published = $this->_item->state == 1 || $this->_item->state == -5 || $this->_item->state == (FLEXI_J16GE ? 2:-1);
-		$item_is_scheduled = $this->_item->publication_scheduled;
-		$item_is_expired   = $this->_item->publication_expired;
+		$item_is_published = $this->_record->state == 1 || $this->_record->state == -5 || $this->_record->state == (FLEXI_J16GE ? 2:-1);
+		$item_is_scheduled = $this->_record->publication_scheduled;
+		$item_is_expired   = $this->_record->publication_expired;
 		if ( $cid )
 		{
 			// cid is set, check state of current item category only
 			// NOTE:  J1.6+ all ancestor categories from current one to the root, for J1.5 only the current one ($cid)
-			if ( !isset($this->_item->ancestor_cats_published) ) {
+			if ( !isset($this->_record->ancestor_cats_published) ) {
 				$ancestor_cats_published = true;
 				foreach($globalcats[$cid]->ancestorsarray as $pcid)    $ancestor_cats_published = $ancestor_cats_published && ($globalcats[$pcid]->published==1);
-				$this->_item->ancestor_cats_published = $ancestor_cats_published;
+				$this->_record->ancestor_cats_published = $ancestor_cats_published;
 			}
-			$ancestor_cats_published = $this->_item->ancestor_cats_published;  //$this->_item->catpublished;
+			$ancestor_cats_published = $this->_record->ancestor_cats_published;  //$this->_record->catpublished;
 			$cats_np_err_mssg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
 		}
 		else
 		{
 			// cid is not set, we have no current category, the item is visible if it belongs to at one published category
-			$itemcats = $this->_item->categories;
+			$itemcats = $this->_record->categories;
 			$ancestor_cats_published = true;
 			foreach ($itemcats as $catid)
 			{
@@ -157,8 +157,8 @@ class FlexicontentModelItem extends ParentClassItem
 		$previewing_and_unlogged = ($version && $user->guest); // this is a flag indicates to redirect to login instead of 404 error
 		$ignore_publication   = $canedititem || $caneditstate || $isOwner || $previewing_and_unlogged;
 		$inactive_notice_set = false;
-		$item_state_pending   = $this->_item->state == -3;
-		$item_state_draft			= $this->_item->state == -4;
+		$item_state_pending   = $this->_record->state == -3;
+		$item_state_draft			= $this->_record->state == -4;
 
 
 		//***********************************************************************************************************************
@@ -237,7 +237,7 @@ class FlexicontentModelItem extends ParentClassItem
 			// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit permission
 			JError::raiseNotice(403, JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />". JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 			if ( $item_n_cat_active && $canviewitem ) {
-				$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug, 0, $this->_item)));
+				$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)));
 			} else {
 				$app->redirect($referer);  // Item not viewable OR no view access, redirect to refer page
 			}
@@ -285,9 +285,9 @@ class FlexicontentModelItem extends ParentClassItem
 				$app->redirect( $url );
 			} else {
 				$msg  = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
-				$msg .= $item->type_id && !$this->_item->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
-				$msg .= $item->catid   && !$this->_item->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
-				$msg .= $cid  && !$this->_item->ancestor_cats_accessible ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
+				$msg .= $item->type_id && !$this->_record->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
+				$msg .= $item->catid   && !$this->_record->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
+				$msg .= $cid  && !$this->_record->ancestor_cats_accessible ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
 				if ($cparams->get('unauthorized_page', '')) {
 					// (d) redirect unauthorized logged user to the unauthorized page (if this is set)
 					JError::raiseNotice( 403, $msg);
@@ -391,7 +391,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function _loadItemParams($force=false)
 	{
-		if (!$force && !empty($this->_item->parameters)) return;
+		if (!$force && !empty($this->_record->parameters)) return;
 		
 		$app = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
@@ -412,7 +412,7 @@ class FlexicontentModelItem extends ParentClassItem
 			$this->_db->setQuery($query);
 			$catData = $this->_db->loadObject();
 			$catParams = $catData->params;
-			$this->_item->category_title = $catData->title;
+			$this->_record->category_title = $catData->title;
 		}
 		$catParams = new JRegistry($catParams);
 		
@@ -421,20 +421,20 @@ class FlexicontentModelItem extends ParentClassItem
 		$typeParams = new JRegistry($typeParams);
 		
 		// Create item parameters
-		if ( !is_object($this->_item->attribs) )
+		if ( !is_object($this->_record->attribs) )
 		{
 			try
 			{
-				$itemParams = new JRegistry($this->_item->attribs);
+				$itemParams = new JRegistry($this->_record->attribs);
 			}
 			catch (Exception $e)
 			{
-				$itemParams = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $this->_item->id, $this->_item->attribs);
+				$itemParams = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $this->_record->id, $this->_record->attribs);
 			}
 		}
 		else
 		{
-			$itemParams = $this->_item->attribs;
+			$itemParams = $this->_record->attribs;
 		}
 		
 		// Retrieve Layout's parameters, also deciding the layout
@@ -504,7 +504,7 @@ class FlexicontentModelItem extends ParentClassItem
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
 			
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			$default_heading = empty($this->isForm) ? $this->_item->title :
+			$default_heading = empty($this->isForm) ? $this->_record->title :
 				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
 			
 			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
@@ -519,28 +519,28 @@ class FlexicontentModelItem extends ParentClassItem
 
 		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
 		if ( $params->get('show_title', 1) ) {
-			if ($params->get('page_heading') == $this->_item->title) $params->set('show_page_heading', 0);
-			if ($params->get('page_title')   == $this->_item->title) $params->set('show_page_title',   0);
+			if ($params->get('page_heading') == $this->_record->title) $params->set('show_page_heading', 0);
+			if ($params->get('page_title')   == $this->_record->title) $params->set('show_page_title',   0);
 		}
 
 		// Also convert metadata property string to registry object
 		try
 		{
-			$this->_item->metadata = new JRegistry($this->_item->metadata);
+			$this->_record->metadata = new JRegistry($this->_record->metadata);
 		}
 		catch (Exception $e)
 		{
-			$this->_item->metadata = flexicontent_db::check_fix_JSON_column('metadata', 'content', 'id', $this->_item->id);
+			$this->_record->metadata = flexicontent_db::check_fix_JSON_column('metadata', 'content', 'id', $this->_record->id);
 		}
 
 		// Manually apply metadata from type parameters ... currently only 'robots' makes sense to exist per type
-		if ( !$this->_item->metadata->get('robots') )   !$this->_item->metadata->set('robots', $typeParams->get('robots'));
+		if ( !$this->_record->metadata->get('robots') )   !$this->_record->metadata->set('robots', $typeParams->get('robots'));
 
 
 		// *********************************************
 		// Finally set 'parameters' property of the item
 		// *********************************************
-		$this->_item->parameters = $params;
+		$this->_record->parameters = $params;
 	}
 	
 
