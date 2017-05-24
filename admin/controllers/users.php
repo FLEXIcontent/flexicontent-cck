@@ -37,12 +37,12 @@ class FlexicontentControllerUsers extends FlexicontentController
 		parent::__construct($config);
 
 		// Register Extra tasks
-		$this->registerTask( 'add'  , 	'display'  );
-		$this->registerTask( 'edit'  , 	'display'  );
-		$this->registerTask( 'apply', 	'save'  );
-		$this->registerTask( 'saveandnew', 	'save' );
-		$this->registerTask( 'flogout', 'logout');
-		$this->registerTask( 'unblock', 'block' );
+		$this->registerTask( 'add',          'display' );
+		$this->registerTask( 'edit',         'display' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'save2new',     'save' );
+		$this->registerTask( 'flogout',      'logout' );
+		$this->registerTask( 'unblock',      'block' );
 	}
 
 
@@ -51,24 +51,24 @@ class FlexicontentControllerUsers extends FlexicontentController
 	 */
 	function display($cachable = false, $urlparams = false)
 	{
-		switch($this->getTask())
+		$task = $this->getTask();
+
+		// Force URL variables for add / edit task
+		if ($task == 'add' || $task == 'edit')
 		{
-			case 'add'     :
-			{	JRequest::setVar( 'hidemainmenu', 1 );
-				JRequest::setVar( 'layout', 'form'  );
-				JRequest::setVar( 'view', 'user' );
-				JRequest::setVar( 'edit', false );
-			} break;
-			case 'edit'    :
-			{
-				JRequest::setVar( 'hidemainmenu', 1 );
-				JRequest::setVar( 'layout', 'form'  );
-				JRequest::setVar( 'view', 'user' );
-				JRequest::setVar( 'edit', true );
-			} break;
+			$this->input->set('hidemainmenu', 1 ;
+			$this->input->set('layout', 'form');
+			$this->input->set('view', 'user');
+			$this->input->set('edit', $task=='edit');
 		}
 
-		if (JRequest::getVar('view','users')=='user') JRequest::setVar('layout', 'form');
+		$view = $this->input->get('view', 'users', 'cmd');
+
+		// Force 'form' layout if displaying singular view
+		if ($view == 'user')
+		{
+			$this->input->set('layout', 'form');
+		}
 
 		parent::display();
 	}
@@ -81,8 +81,6 @@ class FlexicontentControllerUsers extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-
-		$option = JRequest::getCmd( 'option');
 
 		// Initialize some variables
 		$app = JFactory::getApplication();
@@ -187,14 +185,14 @@ class FlexicontentControllerUsers extends FlexicontentController
 		
 		
 		$ctrl = 'users.';
-		switch ( $this->getTask() )
+		switch ($this->getTask())
 		{
 			case 'apply':
 				$msg = JText::sprintf( 'Successfully Saved changes to User', $user->get('name') );
 				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task='.$ctrl.'edit&cid[]='. $user->get('id'), $msg );
 				break;
 
-			case 'saveandnew':
+			case 'save2new':
 				$msg = JText::sprintf( 'Successfully Saved User', $user->get('name') );
 				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task='.$ctrl.'add', $msg );
 				break;
@@ -224,9 +222,10 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$cid = JRequest::getVar( 'cid', array(), '', 'array' );
 		JArrayHelper::toInteger( $cid );
 		
-		if (count( $cid ) < 1) {
+		if (count( $cid ) < 1)
+		{
 			$msg = JText::_( 'Select a User to delete' );
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			throw new Exception($msg, 500);
 		}
 		
 		$msg = '';
@@ -320,9 +319,10 @@ class FlexicontentControllerUsers extends FlexicontentController
 			$block = $check_task == 'block';
 		}
 		
-		if (count( $cid ) < 1) {
+		if (count( $cid ) < 1)
+		{
 			$msg = JText::_( 'Select a User to '.$this->getTask() );
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			throw new Exception($msg, 500);
 		}
 		
 		$msg = '';
@@ -398,7 +398,8 @@ class FlexicontentControllerUsers extends FlexicontentController
 			
 		JArrayHelper::toInteger($cids);
 
-		if ( count( $cids ) < 1 ) {
+		if ( count( $cids ) < 1 )
+		{
 			$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=users', JText::_( 'User Deleted' ) );
 			return false;
 		}

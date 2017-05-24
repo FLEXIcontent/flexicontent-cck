@@ -78,6 +78,9 @@ class FlexicontentViewItem extends JViewLegacy
 		$model = $this->getModel();
 		$item = $model->getItem();
 		$form = $this->get('Form');
+		$cid = $model->getId();
+		$isnew = ! $cid;
+		$manager_view = $ctrl = 'items';
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
@@ -103,9 +106,6 @@ class FlexicontentViewItem extends JViewLegacy
 		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
 
-		// Get item id and new flag
-		$cid = $model->getId();
-		$isnew = ! $cid;
 		
 		// Create and set a unique item id for plugins that needed it
 		if ($cid) {
@@ -211,9 +211,9 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Add js function for custom code used by FLEXIcontent item form
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
-		
-		
-		
+
+
+
 		// ******************
 		// Create the toolbar
 		// ******************
@@ -221,19 +221,12 @@ class FlexicontentViewItem extends JViewLegacy
 		$tip_class = ' hasTooltip';
 		
 		// SET toolbar title
-		if ( $cid )
-		{
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' );   // Editing existing item
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );     // Creating new item
-		}
-		
-		
-		
-		// **************
-		// Common Buttons
-		// **************
-		
+		$cid
+			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' )   // Editing existing item
+			: JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );    // Creating new item
+
+
+
 		// ***
 		// *** Apply buttons
 		// ***
@@ -244,14 +237,14 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			$btn_name = 'apply_ajax';
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('items.apply_ajax')", $msg_alert='', $msg_confirm='',
-				$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task=$ctrl.'.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
 				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
 		$btn_name = $item->type_id ? 'apply' : 'apply_type';
-		$btn_task = $item->type_id ? 'items.apply' : 'items.apply_type';
+		$btn_task = $item->type_id ? $ctrl.'.apply' : $ctrl.'.apply_type';
 		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE');
 
 		//JToolBarHelper::apply($btn_task, $btn_title, false);
@@ -270,31 +263,31 @@ class FlexicontentViewItem extends JViewLegacy
 		$btn_arr = array();
 		if (!$isnew || $item->version)
 		{
-			//JToolBarHelper::save('items.save');
-			//JToolBarHelper::save2new('group.save2new'); //JToolBarHelper::custom( 'items.save2new', 'save2new.png', 'save2new.png', 'FLEXI_SAVE_AND_NEW', false );
-			//JToolBarHelper::save2copy('group.save2copy'); //JToolBarHelper::custom( 'items.save2copy', 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+			//JToolBarHelper::save($ctrl.'.save');
+			//JToolBarHelper::save2new($ctrl.'.save2new'); //JToolBarHelper::custom( $ctrl.'.save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			//JToolBarHelper::save2copy($ctrl.'.save2copy'); //JToolBarHelper::custom( $ctrl.'.save2copy', 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
 
 			$btn_name = 'save';
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('items.save')", $msg_alert='', $msg_confirm='',
-				$btn_task='items.save', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+				$btn_task=$ctrl.'.save', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
 				'data-placement="bottom" title=""', $auto_add = 0);
 
 			$btn_name = 'save2new';
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('group.save2new')", $msg_alert='', $msg_confirm='',
-				$btn_task='group.save2new', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
+				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task=$ctrl.'.save2new', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
 				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
 
 			$btn_name = 'save2copy';
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('group.save2copy')", $msg_alert='', $msg_confirm='',
-				$btn_task='group.save2copy', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
+				'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
+				$btn_task=$ctrl.'.save2copy', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
 				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 		}
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
-		JToolBarHelper::cancel('items.cancel');
+		JToolBarHelper::cancel($ctrl.'.cancel');
 
 
 
@@ -353,21 +346,30 @@ class FlexicontentViewItem extends JViewLegacy
 
 				// Add a preview button for (currently) LOADED version of the item
 				$previewlink_loaded_ver = $previewlink .'&version='.$item->version;
-				//$toolbar->appendButton( 'Custom',
-				$btn_arr['preview_current'] = '<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</a>';
-				//, 'preview' );
+				$btn_arr['preview_current'] = '
+					<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank">
+						<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
+						'.JText::_('FLEXI_PREVIEW' /*'FLEXI_PREVIEW_FORM_LOADED_VERSION'*/).' ['.$item->version.']
+					</a>';
+				//$toolbar->appendButton( 'Custom', $btn_arr['preview_current'], 'preview_current' );
 
 				// Add a preview button for currently ACTIVE version of the item
 				$previewlink_active_ver = $previewlink .'&version='.$item->current_version;
-				//$toolbar->appendButton( 'Custom',
-				$btn_arr['preview_active'] = '<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_active_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</a>';
-				//, 'preview' );
+				$btn_arr['preview_active'] = '
+					<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_active_ver.'\');" target="_blank">
+						<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
+						'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']
+					</a>';
+				//$toolbar->appendButton( 'Custom', $btn_arr['preview_active'], 'preview_active' );
 
 				// Add a preview button for currently LATEST version of the item
 				$previewlink_last_ver = $previewlink; //'&version='.$item->last_version;
-				//$toolbar->appendButton( 'Custom',
-				$btn_arr['preview_latest'] = '<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_last_ver.'\');" target="_blank"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</a>';
-				//, 'preview' );
+				$btn_arr['preview_latest'] = '
+					<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_last_ver.'\');" target="_blank">
+						<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
+						'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']
+					</a>';
+				//$toolbar->appendButton( 'Custom', $btn_arr['preview_latest'], 'preview_latest' );
 
 				flexicontent_html::addToolBarDropMenu($btn_arr, 'preview_btns_group', null);
 			}

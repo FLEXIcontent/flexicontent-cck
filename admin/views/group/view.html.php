@@ -64,23 +64,26 @@ class FlexicontentViewGroup extends JViewLegacy
 
 		JToolBarHelper::title(JText::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'groupedit');
 
-		if ($canDo->get('core.edit')||$canDo->get('core.create')) {
+		if ($canDo->get('core.edit') || $canDo->get('core.create'))
+		{
 			JToolBarHelper::apply('group.apply');
 			JToolBarHelper::save('group.save');
 		}
-		if ($canDo->get('core.create')) {
+
+		if ($canDo->get('core.create'))
+		{
 			JToolBarHelper::save2new('group.save2new');
 		}
+
 		// If an existing item, can save to a copy.
-		if (!$isNew && $canDo->get('core.create')) {
+		if (!$isNew && $canDo->get('core.create'))
+		{
 			JToolBarHelper::save2copy('group.save2copy');
 		}
 
-		if (empty($this->item->id))  {
-			JToolBarHelper::cancel('group.cancel');
-		} else {
-			JToolBarHelper::cancel('group.cancel', 'JTOOLBAR_CLOSE');
-		}
+		empty($this->item->id)
+			? JToolBarHelper::cancel('group.cancel')
+			: JToolBarHelper::cancel('group.cancel', 'JTOOLBAR_CLOSE');
 
 		JToolBarHelper::divider();
 		JToolBarHelper::help('JHELP_USERS_GROUPS_EDIT');

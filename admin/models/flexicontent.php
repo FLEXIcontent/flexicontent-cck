@@ -871,6 +871,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				'value_integer'=>array('update'=>'CAST(value AS SIGNED)'),
 				'value_decimal'=>array('update'=>'CAST(value AS DECIMAL(65,15))'),
 				'value_datetime'=>array('update'=>'CAST(value AS DATETIME)'),
+				//'reference_1'=>0,
 				'PRIMARY'=>array(
 					'custom_drop'=>'DROP PRIMARY KEY',
 					'custom_add'=>'ADD PRIMARY KEY',

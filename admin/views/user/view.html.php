@@ -86,7 +86,7 @@ class FlexicontentViewUser extends JViewLegacy
 		$ctrl = 'users.';
 		JToolBarHelper::apply( $ctrl.'apply' );
 		JToolBarHelper::save( $ctrl.'save' );
-		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::custom( $ctrl.'save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		JToolBarHelper::help( 'screen.users.edit' );
 		

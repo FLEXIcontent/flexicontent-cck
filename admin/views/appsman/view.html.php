@@ -204,7 +204,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 		}
 		
 		// Configuration has been parsed, display a 'preview' layout:  (import_list.php)
-		else if ( JRequest::getVar( 'task' )=='importxml' || !empty($conf) )
+		else if ( $task=='importxml' || !empty($conf) )
 		{
 			$this->assignRef('conf', $conf);
 			$this->assignRef('cparams', $cparams);

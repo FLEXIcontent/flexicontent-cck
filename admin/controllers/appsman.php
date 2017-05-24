@@ -75,7 +75,6 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
-		$jinput   = $app->input;
 		
 		// Get/Create the model
 		$model = $this->getModel('appsman');
@@ -98,7 +97,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Security Concern: check for allowed tables
 		// ******************************************
 		
-		$table = strtolower($jinput->get('table', 'flexicontent_fields', 'cmd'));
+		$table = strtolower($this->input->get('table', 'flexicontent_fields', 'cmd'));
 		if ( !in_array($table, self::$allowed_tables) )
 		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' . ' Table: ' .$table. ' not in allowed tables' ) );
@@ -112,7 +111,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Get rows ids
 		// ************
 		
-		$cid = $jinput->get('cid', array(), 'array');
+		$cid = $this->input->get('cid', array(), 'array');
 		if ($ids_are_integers) JArrayHelper::toInteger($cid, array());
 		
 		$conf = $session->get('appsman_export', array(), 'flexicontent');	
@@ -186,14 +185,14 @@ class FlexicontentControllerAppsman extends FlexicontentController
 	
 	function import()
 	{
-		//JRequest::setVar( 'view', 'appsman' );
-		//JRequest::setVar( 'hidemainmenu', 1 );
-		
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
+
+		$this->input->set('view', 'appsman');
+		$this->input->set('hidemainmenu', 1);
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
@@ -390,6 +389,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			break;
 		}
 
+		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
 	}
 	
@@ -400,7 +400,9 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
-		$jinput   = $app->input;
+		
+		$this->input->set('view', 'appsman');
+		$this->input->set('hidemainmenu', 1);
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
@@ -430,15 +432,15 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$export_type = str_replace('export', '', $task);
 		
 		// Get optional filename of export file
-		$filename = $jinput->get('export_filename', '', 'cmd');
+		$filename = $this->input->get('export_filename', '', 'cmd');
 		
 		// When export type is given, we require that specific table and specific IDs are given too
 		if ( $export_type )
 		{
-			$table = strtolower($jinput->get('table', '', 'cmd'));
+			$table = strtolower($this->input->get('table', '', 'cmd'));
 			$ids_are_integers = $table!='flexicontent_templates';
 
-			$cid = $jinput->get('cid', array(), 'array');
+			$cid = $this->input->get('cid', array(), 'array');
 			if ($ids_are_integers) JArrayHelper::toInteger($cid, array());
 
 			if ( !$table )
@@ -533,14 +535,17 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		$filename = $filename ? $filename : 'dbdata';//str_replace('#__', '', $table);
 		$filename .= '.'.($export_type ? $export_type : 'xml');
-		
+
+
+		// Simple export from a string
 		if ( $export_type )
 		{
-			// Simple export from a string
 			$downloadname = $filename;
 			$downloadsize = strlen($content);
-		} else {
-			
+		}
+		
+		else
+		{
 			// *****************************
 			// Create temporary archive name
 			// *****************************
