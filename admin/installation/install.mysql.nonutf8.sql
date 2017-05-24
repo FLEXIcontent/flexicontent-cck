@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   `value_integer` bigint(20) NULL,
   `value_decimal` decimal(65,15) NULL,
   `value_datetime` datetime NULL,
+--  `reference_1` bigint(20) NULL,
   PRIMARY KEY  (`field_id`,`item_id`,`valueorder`,`suborder`),
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   KEY `value_integer` (`value_integer`),
   KEY `value_decimal` (`value_decimal`),
   KEY `value_datetime` (`value_datetime`)
+--  ,KEY `reference_1` (`value_integer`),
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (

@@ -899,6 +899,7 @@ class plgSystemFlexisystem extends JPlugin
 		$perms = FlexicontentHelperPerm::getPerm();
 		JFactory::getDocument()->addScriptDeclaration("
 			jQuery(document).ready(function(){
+				".(!$perms->CanReviews ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=reviews"]\').parent().remove();' : '')."
 				".(!$perms->CanCats    ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=categories"]\').parent().remove();' : '')."
 				".(!$perms->CanTypes   ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=types"]\').parent().remove();' : '')."
 				".(!$perms->CanFields  ? 'jQuery(\'#menu-com-flexicontent a[href="index.php?option=com_flexicontent&view=fields"]\').parent().remove();' : '')."
@@ -1903,6 +1904,17 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$jcookie = JFactory::getApplication()->input->cookie;
 		$jcookie->set( 'fc_uid', 'p', 0);
+	}
+
+
+
+	public function onContentBeforeSave($context, $item, $isNew, $data = array())
+	{
+		// ... Call backend 'flexicontent' controller to update flexicontent temporary data
+		if ($context != 'com_content.article')
+		{
+		}
+		return true;
 	}
 
 

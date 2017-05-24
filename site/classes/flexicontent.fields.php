@@ -2270,7 +2270,7 @@ class FlexicontentFields
 	
 	// Common method to create (insert) advanced search index DB records for various fields,
 	// this can be called by fields or copied inside the field to allow better customization
-	static function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
+	static function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func='strip_tags')
 	{
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=1);
 	}
@@ -2278,7 +2278,7 @@ class FlexicontentFields
 	
 	// Common method to create basic text search index for various fields (added as the property field->search),
 	// this can be called by fields or copied inside the field to allow better customization
-	static function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
+	static function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func='strip_tags')
 	{
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=0);
 	}
@@ -2383,7 +2383,7 @@ class FlexicontentFields
 	
 	
 	// Common method to create basic/advanced search index for various fields
-	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0)
+	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func='strip_tags', $for_advsearch=0)
 	{
 		$fi = FlexicontentFields::getPropertySupport($field->field_type, $field->iscore);
 		$db = JFactory::getDBO();
@@ -2588,10 +2588,12 @@ class FlexicontentFields
 				if (count($search_props) && !count($search_value)) continue;  // all search properties were empty, skip this value
 				$searchindex[$vi] = (count($search_props))  ?  implode($props_spacer, $search_value)  :  $v;
 
-				$searchindex[$vi] = flexicontent_html::striptagsandcut( $searchindex[$vi] );
-
-				// Do not rerun a strip_tags on the text, since this was done already above
-				if ($filter_func != 'strip_tags')
+				// Do a custom stripping of tags on the text
+				if ($filter_func == 'strip_tags')
+				{
+					$searchindex[$vi] = flexicontent_html::striptagsandcut( $searchindex[$vi] );
+				}
+				else
 				{
 					$searchindex[$vi] = $filter_func ? $filter_func($searchindex[$vi]) : $searchindex[$vi];
 				}
