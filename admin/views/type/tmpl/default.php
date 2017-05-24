@@ -215,7 +215,7 @@ $this->document->addScriptDeclaration($js);
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-				$item_layout = @$this->row->attribs['ilayout'];
+				$item_layout = $this->row->attribs->get('ilayout');
 				
 				foreach ($this->tmpls as $tmpl) :
 					
@@ -247,7 +247,7 @@ $this->document->addScriptDeclaration($js);
 							if ($field->getAttribute('cssprep')) continue;
 							
 							$fieldname = $field->fieldname;
-							//$value = $form_layout->getValue($fieldname, $groupname, @ $this->row->attribs[$fieldname]);
+							//$value = $form_layout->getValue($fieldname, $groupname, $this->row->attribs->get($fieldname));
 							
 							$input_only = !$field->label || $field->hidden;
 							echo
