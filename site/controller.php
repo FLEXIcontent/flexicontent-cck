@@ -48,6 +48,7 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'save2copy',      'save' );
 		$this->registerTask( 'download_tree',  'download' );
 
+		$this->input = empty($this->input) ? JFactory::getApplication()->input : $this->input;
 		$this->returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base();
 	}
 
@@ -65,10 +66,9 @@ class FlexicontentController extends JControllerLegacy
 		// Initialize variables
 		$app  = JFactory::getApplication();
 		$db   = JFactory::getDBO();
-		$jinput = $app->input;
 
-		$view = $jinput->get('view', '', 'cmd');
-		$cid  = $jinput->get('cid', 0, 'int');
+		$view = $this->input->get('view', '', 'cmd');
+		$cid  = $this->input->get('cid', 0, 'int');
 
 		if ($view=='category' && $cid)
 		{
@@ -94,12 +94,11 @@ class FlexicontentController extends JControllerLegacy
 	function remove()
 	{
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 
-		$cid = $jinput->get('id', array(), 'array');
+		$cid = $this->input->get('id', array(), 'array');
 		JArrayHelper::toInteger($cid, array());
 		
 		require_once(JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."models".DS."items.php");
@@ -173,7 +172,6 @@ class FlexicontentController extends JControllerLegacy
 	}
 
 
-
 	/**
 	 * Logic to save an item
 	 *
@@ -188,7 +186,6 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
@@ -204,9 +201,9 @@ class FlexicontentController extends JControllerLegacy
 		// *********************
 		
 		// Retrieve form data these are subject to basic filtering
-		$data   = $jinput->post->get('jform', array(), 'array');  // Unfiltered data, (Core Fields) validation will follow via jform
-		$custom = $jinput->post->get('custom', array(), 'array');  // Unfiltered data, (Custom Fields) validation will be done onBeforeSaveField() of every field
-		$jfdata = $jinput->post->get('jfdata', array(), 'array');  // Unfiltered data, (Core Fields) validation can be done via same jform as main data
+		$data   = $this->input->post->get('jform', array(), 'array');  // Unfiltered data, (Core Fields) validation will follow via jform
+		$custom = $this->input->post->get('custom', array(), 'array');  // Unfiltered data, (Custom Fields) validation will be done onBeforeSaveField() of every field
+		$jfdata = $this->input->post->get('jfdata', array(), 'array');  // Unfiltered data, (Core Fields) validation can be done via same jform as main data
 
 		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
 		$data_id = (int) $data['id'];
@@ -215,7 +212,7 @@ class FlexicontentController extends JControllerLegacy
 		// If new make sure that type id is set too, before creating the model
 		if ($isnew)
 		{
-			$typeid = $jinput->set('typeid', (int) @ $data['type_id']);
+			$typeid = $this->input->set('typeid', (int) @ $data['type_id']);
 		}
 
 		// Get the model
@@ -286,7 +283,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Unique id for new items, needed by some fields for temporary data
-		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
+		$unique_tmp_itemid = $this->input->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 
 		// Auto title for some content types
@@ -394,7 +391,7 @@ class FlexicontentController extends JControllerLegacy
 		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
-		$fc_doajax_submit = $jinput->get('fc_doajax_submit', 0, 'int');
+		$fc_doajax_submit = $this->input->get('fc_doajax_submit', 0, 'int');
 		
 		// *** MANUALLY CHECK CAPTCHA ***
 		$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
@@ -408,7 +405,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($c_plugin)
 			{
 				$c_name = 'captcha_response_field';
-				$c_value = $jinput->get($c_name, '', 'string');
+				$c_value = $this->input->get($c_name, '', 'string');
 				$c_id = $c_plugin=='recaptcha' ? 'dynamic_recaptcha_1' : 'fc_dynamic_captcha';
 				$c_namespace = 'fc_item_form';
 				
@@ -478,7 +475,6 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Some values need to be assigned after validation
-		$validated_data['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 		$validated_data['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform (validation will follow at each field)
 		$validated_data['jfdata']  = & $validated_jf;    // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform (validated above)
 		
@@ -488,13 +484,15 @@ class FlexicontentController extends JControllerLegacy
 			$ilayout = $data['attribs']['ilayout'];
 		else
 			$ilayout = @ $data['attribs']['ilayout'];
+
+		// Give UNVALIDATED data for the case of LAYOUTS to the MODEL. Model will load the
+		// XML file of the layout into a JForm object and do validation before merging them
 		if( $ilayout && !empty($data['layouts'][$ilayout]) )
 		{
 			$validated_data['attribs']['layouts'] = $data['layouts'];
-			//echo "<pre>"; print_r($validated_data['attribs']); exit;
 		}
 		
-		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)
+		// USEFULL FOR DEBUGING (do not remove commented code)
 		//$diff_arr = array_diff_assoc ( $data, $validated_data);
 		//echo "<pre>"; print_r($diff_arr); jexit();
 		
@@ -882,7 +880,7 @@ class FlexicontentController extends JControllerLegacy
 			
 				// Create the URL
 				global $globalcats;
-				$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
+				$Itemid = $this->input->get('Itemid', 0, 'int');  // maintain current menu item if this was given
 				$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug, $Itemid));
 				$link = $item_url
 					.(strstr($item_url, '?') ? '&' : '?').'task=edit'
@@ -890,7 +888,7 @@ class FlexicontentController extends JControllerLegacy
 			
 				// Important pass referer back to avoid making the form itself the referer
 				// but also check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise set referer to HOME page
-				$referer = $jinput->get('referer', JURI::base(), 'string');
+				$referer = $this->input->get('referer', JURI::base(), 'string');
 				if ( ! flexicontent_html::is_safe_url($referer) )
 				{
 					if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$referer, 'notice' );
@@ -922,7 +920,7 @@ class FlexicontentController extends JControllerLegacy
 					$msg = $newly_submitted_item ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
 				
 					// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
-					$link = $jinput->get('referer', JURI::base(), 'string');
+					$link = $this->input->get('referer', JURI::base(), 'string');
 					if ( ! flexicontent_html::is_safe_url($link) )
 					{
 						if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$link, 'notice' );
@@ -955,9 +953,8 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Initialize variables
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 
-		$cid  = $jinput->get('cid', 0, 'int');
+		$cid  = $this->input->get('cid', 0, 'int');
 		
 		if ( !$cid )
 		{
@@ -989,11 +986,10 @@ class FlexicontentController extends JControllerLegacy
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
 		$CLIENT_CACHEABLE_PUBLIC = 1; $CLIENT_CACHEABLE_PRIVATE = 2;
 		
-		$jinput = JFactory::getApplication()->input;
 		$userid = JFactory::getUser()->get('id');
-		$cc     = $jinput->get('cc', null);
-		$view   = $jinput->get('view', '', 'cmd');
-		$layout = $jinput->get('layout', '', 'cmd');
+		$cc     = $this->input->get('cc', null);
+		$view   = $this->input->get('view', '', 'cmd');
+		$layout = $this->input->get('layout', '', 'cmd');
 		
 		
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
@@ -1005,9 +1001,9 @@ class FlexicontentController extends JControllerLegacy
 		// ///////////////////////
 		
 		// Also a compatibility check: Layout is form and task is not set:  this is new item submit ...
-		if ( $jinput->get('layout', false) == "form" && !$jinput->get('task', false)) {
-			$jinput->set('browser_cachable', 0);
-			$jinput->set('task', 'add');
+		if ( $this->input->get('layout', false) == "form" && !$this->input->get('task', false)) {
+			$this->input->set('browser_cachable', 0);
+			$this->input->set('task', 'add');
 			$this->add();
 			return;
 		}
@@ -1027,7 +1023,7 @@ class FlexicontentController extends JControllerLegacy
 		if ($view=='favourites' || ($view=='category' && $layout=='favs')) $cachable = false;
 		
 		// AVOID MAKING TOO LARGE (case 1): search view or other view with TEXT search active
-		else if ($view=='search' || $jinput->get('filter', '', 'string')) $cachable = false;
+		else if ($view=='search' || $this->input->get('filter', '', 'string')) $cachable = false;
 				
 		// AVOID MAKING TOO LARGE: (case 2) some field filters are active
 		else {
@@ -1077,7 +1073,7 @@ class FlexicontentController extends JControllerLegacy
 		// having users seeing same page after login/logout when conservative caching is used
 		if ( $userid = JFactory::getUser()->get('id') )
 		{
-			$jinput->set('__fc_user_id__', $userid);
+			$this->input->set('__fc_user_id__', $userid);
 			$safeurlparams['__fc_user_id__'] = 'STRING';
 		}
 		
@@ -1092,7 +1088,7 @@ class FlexicontentController extends JControllerLegacy
 		$isTablet = $mobileDetector->isTablet();
 		if ( $use_mobile_layouts && $isMobile && (!$isTablet || !$tabletSameAsDesktop) )
 		{
-			$jinput->set('__fc_client__', 'Mobile' );
+			$this->input->set('__fc_client__', 'Mobile' );
 			$safeurlparams['__fc_client__'] = 'STRING';
 		}
 		
@@ -1103,7 +1099,7 @@ class FlexicontentController extends JControllerLegacy
 		// 1 means CACHEABLE, PUBLIC  content, proxies can cache: 'Cache-Control:public'
 		// 2 means CACHEABLE, PRIVATE (logged user) content, proxies must not cache: 'Cache-Control:private'
 		// null will let default (Joomla website) HTTP headers, e.g. re-validate
-		$jinput->set('browser_cachable', $browser_cachable);
+		$this->input->set('browser_cachable', $browser_cachable);
 		
 		//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
 		parent::display($cachable, $safeurlparams);
@@ -1186,7 +1182,6 @@ class FlexicontentController extends JControllerLegacy
 
 		// Initialize variables
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 		
 		// Initialize some variables
 		$user    = JFactory::getUser();
@@ -1214,7 +1209,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		// since the task is cancel, we go back to the form referer
-		$referer = $jinput->get('referer', JURI::base(), 'string');
+		$referer = $this->input->get('referer', JURI::base(), 'string');
 		
 		// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
 		if ( ! flexicontent_html::is_safe_url($referer) )
@@ -1237,11 +1232,10 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Initialize variables
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 
-		$id   = $jinput->get('id', 0, 'int');
-		$cid  = $jinput->get('cid', 0, 'int');
-		$url  = $jinput->get('url', '', 'string');
+		$id   = $this->input->get('id', 0, 'int');
+		$cid  = $this->input->get('cid', 0, 'int');
+		$url  = $this->input->get('url', '', 'string');
 
 		// Check that the given URL variable is 'safe' (allowed), e.g. not an offsite URL
 		if ( ! $url || ! flexicontent_html::is_safe_url($url) )
@@ -1252,12 +1246,12 @@ class FlexicontentController extends JControllerLegacy
 				if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
 			}
 			global $globalcats;
-			$Itemid = $jinput->get('Itemid', 0, 'int');  // maintain current menu item if this was given
+			$Itemid = $this->input->get('Itemid', 0, 'int');  // maintain current menu item if this was given
 			$url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, $globalcats[$cid]->slug, $Itemid));
 		}
 
 		// Finally store the vote
-		$jinput->set('no_ajax', 1);
+		$this->input->set('no_ajax', 1);
 		$this->ajaxvote();
 
 		$this->setRedirect($url);
@@ -1275,12 +1269,11 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput  = $app->input;
-		$jcookie = $jinput->cookie;
+		$jcookie = $this->input->cookie;
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		$id   = $jinput->get('id', 0, 'int');
-		$type = $jinput->get('type', 'item', 'cmd');
+		$id   = $this->input->get('id', 0, 'int');
+		$type = $this->input->get('type', 'item', 'cmd');
 
 		if ($type!='item' && $type!='category')
 		{
@@ -1365,11 +1358,10 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput  = $app->input;
 
-		$html_tagid  = $jinput->get('tagid', '', 'cmd');
-		$content_id  = $jinput->get('content_id', 0, 'int');
-		$review_type = $jinput->get('review_type', 'item', 'cmd');
+		$html_tagid  = $this->input->get('tagid', '', 'cmd');
+		$content_id  = $this->input->get('content_id', 0, 'int');
+		$review_type = $this->input->get('review_type', 'item', 'cmd');
 		
 		
 		// ******************************
@@ -1470,22 +1462,21 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput  = $app->input;
 
-		$review_id   = $jinput->get('review_id', 0, 'int');
-		$content_id  = $jinput->get('content_id', 0, 'int');
-		$review_type = $jinput->get('review_type', 'item', 'cmd');
+		$review_id   = $this->input->get('review_id', 0, 'int');
+		$content_id  = $this->input->get('content_id', 0, 'int');
+		$review_type = $this->input->get('review_type', 'item', 'cmd');
 
 		$error = false;
 
 		// Validate title
-		$title = flexicontent_html::dataFilter($jinput->get('title', '', 'string'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
+		$title = flexicontent_html::dataFilter($this->input->get('title', '', 'string'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
 		
 		// Validate email
-		$email = $user->id ? $user->email : flexicontent_html::dataFilter($jinput->get('email', '', 'string'), $maxlength=255, 'EMAIL', 0);  // Validate email
+		$email = $user->id ? $user->email : flexicontent_html::dataFilter($this->input->get('email', '', 'string'), $maxlength=255, 'EMAIL', 0);  // Validate email
 		
 		// Validate text
-		$text = flexicontent_html::dataFilter($jinput->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
+		$text = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
 		
 		
 		// ******************************
@@ -1612,19 +1603,18 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput  = $app->input;
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		$no_ajax     = $jinput->get('no_ajax', 0, 'int');
-		$user_rating = $jinput->get('user_rating', 0, 'int');
-		$cid = $jinput->get('cid', 0, 'int');
-		$xid = $jinput->get('xid', '', 'cmd');
+		$no_ajax     = $this->input->get('no_ajax', 0, 'int');
+		$user_rating = $this->input->get('user_rating', 0, 'int');
+		$cid = $this->input->get('cid', 0, 'int');
+		$xid = $this->input->get('xid', '', 'cmd');
 
 		// Compatibility in case the voting originates from joomla's voting plugin
 		if ($no_ajax && !$cid)
 		{
-			$cid = $jinput->get('id', 0, 'int');  // Joomla 's content plugin uses 'id' HTTP request variable
+			$cid = $this->input->get('id', 0, 'int');  // Joomla 's content plugin uses 'id' HTTP request variable
 		}
 
 
@@ -2040,10 +2030,9 @@ class FlexicontentController extends JControllerLegacy
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$app  = JFactory::getApplication();
-		$jinput = $app->input;
 
-		$name = $jinput->get('name', '', 'string');
-		$cid  = $jinput->get('id', array(0), 'array');
+		$name = $this->input->get('name', '', 'string');
+		$cid  = $this->input->get('id', array(0), 'array');
 		JArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
@@ -2127,10 +2116,9 @@ class FlexicontentController extends JControllerLegacy
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		$jinput  = $app->input;
 
-		$task   = $jinput->get('task', 'download', 'cmd');
-		$method = $jinput->get('method', 'download', 'cmd');
+		$task   = $this->input->get('task', 'download', 'cmd');
+		$method = $this->input->get('method', 'download', 'cmd');
 
 		if ($method!='view' && $method!='download') die('unknown download method:' . $method);
 
@@ -2142,11 +2130,11 @@ class FlexicontentController extends JControllerLegacy
 		if ($task == 'download_tree')
 		{
 			// TODO: maybe move this part in module
-			$cart_id = $jinput->get('cart_id', 0, 'int');
+			$cart_id = $this->input->get('cart_id', 0, 'int');
 			if (!$cart_id)
 			{
 				// Get zTree data and parse JSON string
-				$tree_var = $jinput->get('tree_var', '', 'string');
+				$tree_var = $this->input->get('tree_var', '', 'string');
 				if ($session->has($tree_var, 'flexicontent'))
 				{
 					$ztree_nodes_json = $session->get($tree_var, false, 'flexicontent');
@@ -2156,7 +2144,7 @@ class FlexicontentController extends JControllerLegacy
 
 			else
 			{
-				$cart_token = $jinput->get('cart_token', '', 'cmd');
+				$cart_token = $this->input->get('cart_token', '', 'cmd');
 				
 				$query = ' SELECT * FROM #__flexicontent_downloads_cart WHERE id='. $cart_id;
 				$db->setQuery( $query );
@@ -2196,12 +2184,12 @@ class FlexicontentController extends JControllerLegacy
 		else
 		{
 			$file_node = new stdClass();
-			$file_node->fieldid   = $jinput->get('fid', 0, 'int');
-			$file_node->contentid = $jinput->get('cid', 0, 'int');
-			$file_node->fileid    = $jinput->get('id', 0, 'int');
+			$file_node->fieldid   = $this->input->get('fid', 0, 'int');
+			$file_node->contentid = $this->input->get('cid', 0, 'int');
+			$file_node->fileid    = $this->input->get('id', 0, 'int');
 
-			$coupon_id    = $jinput->get('conid', 0, 'int');
-			$coupon_token = $jinput->get('contok', '', 'string');
+			$coupon_id    = $this->input->get('conid', 0, 'int');
+			$coupon_token = $this->input->get('contok', '', 'string');
 			
 			if ( $coupon_id )
 			{
@@ -2889,12 +2877,11 @@ class FlexicontentController extends JControllerLegacy
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		$jinput  = $app->input;
 
 		// Get HTTP REQUEST variables
-		$field_id   = $jinput->get('fid', 0, 'int');
-		$content_id = $jinput->get('cid', 0, 'int');
-		$order      = $jinput->get('ord', 0, 'int');
+		$field_id   = $this->input->get('fid', 0, 'int');
+		$content_id = $this->input->get('cid', 0, 'int');
+		$order      = $this->input->get('ord', 0, 'int');
 
 
 		// **************************************************
@@ -3020,7 +3007,6 @@ class FlexicontentController extends JControllerLegacy
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
 		$perms  = FlexicontentHelperPerm::getPerm();
 
 		@ob_end_clean();
@@ -3038,7 +3024,7 @@ class FlexicontentController extends JControllerLegacy
 		else
 		{
 			$model = $this->getModel('item');
-			$tagobjs = $model->gettags($jinput->get('q', '', 'string'));
+			$tagobjs = $model->gettags($this->input->get('q', '', 'string'));
 
 			$array = array();
 			if ($tagobjs) foreach($tagobjs as $tag)
@@ -3060,26 +3046,25 @@ class FlexicontentController extends JControllerLegacy
 	function search()
 	{
 		$app = JFactory::getApplication();
-		$jinput = $app->input;
 
 		// Strip characters that will cause errors
 		$badchars = array('#','>','<','\\'); 
-		$searchword = $jinput->get('q', '', 'string');
-		$searchword = $jinput->get('searchword', $searchword, 'string');
+		$searchword = $this->input->get('q', '', 'string');
+		$searchword = $this->input->get('searchword', $searchword, 'string');
 		$searchword = trim( str_replace($badchars, '', $searchword) );
 
 		// If searchword is enclosed in double quotes, then strip quotes and do exact phrase matching
 		if (substr($searchword,0,1) == '"' && substr($searchword, -1) == '"')
 		{
 			$searchword = substr($searchword,1,-1);
-			$jinput->set('p', 'exact');
-			$jinput->set('searchphrase', 'exact');
-			$jinput->set('q', $searchword);
-			$jinput->set('searchword', $searchword);
+			$this->input->set('p', 'exact');
+			$this->input->set('searchphrase', 'exact');
+			$this->input->set('q', $searchword);
+			$this->input->set('searchword', $searchword);
 		}
 		
 		// If no current menu itemid, then set it using the first menu item that points to the search view
-		$Itemid = $jinput->get('Itemid', 0, 'int');
+		$Itemid = $this->input->get('Itemid', 0, 'int');
 		if (!$Itemid)
 		{
 			$menus = JFactory::getApplication()->getMenu();
@@ -3087,12 +3072,12 @@ class FlexicontentController extends JControllerLegacy
 
 			if(isset($items[0]))
 			{
-				$jinput->set('Itemid', $items[0]->id);
+				$this->input->set('Itemid', $items[0]->id);
 			}
 		}
 
 		// Go through display task of this controller instead of parent class, so that cacheable and safeurlparams can be decided properly
-		$jinput->set('view', 'search');
+		$this->input->set('view', 'search');
 		$this->display();
 	}
 

@@ -423,6 +423,9 @@ dl#content-pane.tabs {
 	width: auto;
 	float: left;
 }
+.form-horizontal .chzn-container-single .chzn-single span {
+	margin-right: 36px;
+}
 .chzn-container-multi .chzn-choices li.search-field {
 	width: 100% !important;
 }

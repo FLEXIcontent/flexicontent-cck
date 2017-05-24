@@ -124,46 +124,78 @@ else
 // PREPARE Calling the controller task
 // ***********************************
 
-// a. Get view, task, controller REQUEST variables
+// Get view, task, controller REQUEST variables
 $view = $jinput->get('view', '', 'cmd');
 $task = $jinput->get('task', '', 'cmd');
 $controller = $jinput->get('controller', '', 'cmd');
 
-// b. In J1.6+ controller can be set via task variable ... split task from controller name
+
+// Controller can be set via task variable, split task from controller name
 $_ct = explode('.', $task);
 $task = $_ct[ count($_ct) - 1];
-if (count($_ct) > 1) $controller = $_ct[0];
+if (count($_ct) > 1)
+{
+	$controller = $_ct[0];
+}
 
 
-// c. Force variables: controller AND/OR task
-$forced_views = array('category'=>1);  // *** Cases that view variable must be ignored
+// Cases that view variable must be ignored, and instead use the controller name as view
+$forced_views = array
+(
+	'category' => 1
+);
 if ( isset($forced_views[$controller]) )
 {
 	$view = $controller;
 	$jinput->set('view', $view);
-	JRequest::setVar('view', $view);  // Compatibility for views still using JRequest
 }
 
-// FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
+
+
+// ***
+// *** Force variables: controller AND/OR task,
+// *** (thus ignoring controller set in HTTP REQUEST)
+// ***
+// *** Going through the controller makes sure that appropriate code and permission checking is always executed
+// *** Any views / layouts that can be called without a forced controller task,  must contain permission checking
+// ***
+
+// CASE 1: Use (if it exists) controller named as current view name
 if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
 {
 	$controller = $view;
 }
 
-// Singular views do not (usually) have a controller, instead the 'Plural' controller is used
+
+// CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
+else if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'s.php' ) )
+{
+	$controller = $view.'s';
+	$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty
+}
+
+
 else
 {
-	// Going through the controller makes sure that appropriate code is always executed
-	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
-	$view_to_ctrl = array(
-		'type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags',
-		'category'=>'categories', 'user'=>'users', 'file'=>'filemanager', 'group'=>'groups'
+	// CASE 3: Some 'Plural' controllers have special naming
+	$view_to_ctrl = array
+	(
+		'category' => 'categories', 'file' => 'filemanager'
 	);
-	if ( isset($view_to_ctrl[$view]) ) {
+
+	if ( isset($view_to_ctrl[$view]) )
+	{
 		$controller = $view_to_ctrl[$view];
-		if ( !$task ) $task = 'edit';  // default task for singular views is edit
+		$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty
+	}
+
+	// Direct URL to views, these views MUST CONTAIN permission checking
+	else 
+	{
 	}
 }
+
+
 //echo "$controller -- $task <br/>\n";
 
 
@@ -173,9 +205,6 @@ $controller_name = $controller;
 
 $jinput->set('controller', $controller_name);
 $jinput->set('task', $controller_task);
-
-JRequest::setVar('controller', $controller_name);  // Compatibility for views still using JRequest
-JRequest::setVar('task', $controller_task);        // Compatibility for views still using JRequest
 
 
 
@@ -213,7 +242,6 @@ if ($controller) {
 		require_once $base_controller;
 	} else {
 		$jinput->set('controller', $controller = '');
-		JRequest::setVar('controller', $controller = '');  // Compatibility for views still using JRequest
 	}
 }*/
 

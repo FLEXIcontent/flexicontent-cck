@@ -692,9 +692,9 @@
 				<option value="1">FLEXI_OUTSIDE</option>
 				<option value="2">FLEXI_INSIDE</option>
 			</field>
-			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="clayout_selector_on"/>
+			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label label-success" class="clayout_selector_on"/>
 			<field name="" type="separator" default="URL / Links" description="" level="level3" />
-			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="" />
+			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label label-success" class="" />
 
 
 	<field name="" type="separator" default="FLEXI_ITEMS_LIST" icon_class="icon-list" level="tab_open" box_type="1" remove_boxes="2" />
@@ -1346,7 +1346,7 @@
 
 		<field name="" type="separator" default="FLEXI_VERSIONING_CONF" icon_class="icon-stack" level="tab_open" box_type="1" remove_boxes="2" />
 			
-			<field name="use_versioning" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ENABLE_VERSIONING" description="FLEXI_ENABLE_VERSIONING_DESC" class="btn-group btn-group-yesno" labelclass="label-info">
+			<field name="use_versioning" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ENABLE_VERSIONING" description="FLEXI_ENABLE_VERSIONING_DESC" class="btn-group btn-group-yesno" labelclass="label label-info">
 				<option value="0" show_list="" hide_list="dispversioning">FLEXI_NO</option>
 				<option value="1" show_list="dispversioning" hide_list="">FLEXI_YES</option>
 			</field>
@@ -1646,7 +1646,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="pdfparser_path" type="text" size="50" default="" label="FLEXI_PATH_PDF_PARSER" description="FLEXI_PATH_PDF_PARSER_DESC" class="input-xxlarge" />
+			<field name="pdfparser_path" type="hidden" size="50" default="" label="FLEXI_PATH_PDF_PARSER" description="FLEXI_PATH_PDF_PARSER_DESC" class="input-xxlarge" />
+
+			<field name="" type="separator" default="FLEXI_FILES_CSV_HANDING" label="" level="level3" />
+			<field name="index_csv_files" type="radio" default="0" label="FLEXI_INDEX_CSV_FILES" description="FLEXI_INDEX_CSV_FILES_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_LIMITS" icon_class="icon-lock" level="tab_open" box_type="1" remove_boxes="2" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />

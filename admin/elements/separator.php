@@ -126,7 +126,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				var tr35 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(35)");
 				var tr39 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(39)");
 				var tr43 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(43)");
-				var tr44 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(44)");
+				var tr45 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(45)");
+				var tr46 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(46)");
 
 				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Component access</td></tr>");
 				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items / Categories (inherited via category-tree)</td></tr>");
@@ -139,8 +140,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)</td></tr>");
 				tr35.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Fields manager</td></tr>");
 				tr39.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Overridable in field\'s permissions</td></tr>");
-				tr43.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Files manager</td></tr>");
-				tr44.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Also used in <b>item form</b> e.g. <b>file</b> field</td></tr>");
+				tr43.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Reviews manager</td></tr>");
+				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Files manager</td></tr>");
+				tr46.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Also used in <b>item form</b> e.g. <b>file</b> field</td></tr>");
 			});
 		');
 	}

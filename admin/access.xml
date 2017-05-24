@@ -59,6 +59,10 @@
 		<action name="flexicontent.editfield" title="Edit field configuration" description="Allow users in the group to edit the configuration of fields" />
 		<action name="flexicontent.publishfield" title="Publish field" description="Allow users in the group to publish fields" />
 		<action name="flexicontent.deletefield" title="Delete field" description="Allow users in the group to delete fields" />
+
+		<!-- REVIEWS: management tab -->
+		<action name="flexicontent.managereviews" title="Access Reviews Manager" description="Allow users in the group to have FULL access to the Reviews Management" />
+		<action name="flexicontent.createreviews" title="Create new reviews" description="Allow users in the group to create reviews (in frontend / backend)" />
 		
 		<!-- FILEs: management tab -->
 		<action name="flexicontent.managefiles" title="Access Files Manager" description="Allow users in the group to have FULL access to the Files Management" />
