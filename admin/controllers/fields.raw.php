@@ -49,13 +49,12 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function getfieldspecificproperties()
 	{
-		JRequest::setVar( 'view', 'field' );    // set view to be field, if not already done in http request
-		JRequest::setVar( 'format', 'raw' );    // force raw format, if not already done in http request
-		//JRequest::setVar( 'hidemainmenu', 1 );
-		
+		$this->input->set('view', 'field');    // set view to be field, if not already done in http request
+		$this->input->set('format', 'raw');    // force raw format, if not already done in http request
+
 		// Import field to execute its constructor, e.g. needed for loading language file etc
-		JPluginHelper::importPlugin('flexicontent_fields', JRequest::getVar('field_type'));
-		
+		JPluginHelper::importPlugin('flexicontent_fields', $this->input->get('field_type', '', 'cmd'));
+
 		// Display the field parameters
 		parent::display();
 	}

@@ -52,24 +52,34 @@ class flexicontent_fields_item_relations extends JTable
 	var $suborder				= null;
 	
 	/**
+	 * Field value
 	 * @var text
 	 */
 	var $value					= null;
 
 	/**
+	 * An Integer index of the value
 	 * @var bigint
 	 */
 	var $value_integer  = null;
 
 	/**
+	 * A decimal index of the value
 	 * @var decimal(65,15)
 	 */
 	var $value_decimal  = null;
 
 	/**
+	 * A date-time index of the value
 	 * @var datetime
 	 */
 	var $value_datetime = null;
+
+	/**
+	 * A custom integer index of some value property
+	 * @var bigint
+	 */
+	//var $reference_1  = null;
 
 	function __construct(& $db) {
 		parent::__construct('#__flexicontent_fields_item_relations', 'item_id', $db);

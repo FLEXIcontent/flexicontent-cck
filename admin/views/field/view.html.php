@@ -31,14 +31,53 @@ class FlexicontentViewField extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		//initialise variables
+		// ***
+		// *** Initialise variables
+		// ***
+
 		$app      = JFactory::getApplication();
-		$option   = JRequest::getVar('option');
-		$document	= JFactory::getDocument();
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$jinput   = $app->input;
+		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$tip_class = ' hasTooltip';
+
+		//Import File system
+		jimport('joomla.filesystem.file');
+
+
+
+		// ***
+		// *** Get record data, and check if record is already checked out
+		// ***
 		
-		//add css to document
+		// Get data from the model
+		$model = $this->getModel();
+		$row   = $this->get('Field');
+		$form  = $this->get('Form');
+		$isnew = ! $row->id;
+		$manager_view = $ctrl = 'fields.';
+		$js = '';
+
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			JError::raiseWarning( 'SOME_ERROR_CODE', JText::_($row->label).' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
+
+
+
+		// ***
+		// *** Include needed files and add needed js / css files
+		// ***
+		
+		// Add css to document
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -54,44 +93,111 @@ class FlexicontentViewField extends JViewLegacy
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		//Import File system
-		jimport('joomla.filesystem.file');
-
-		//Get data from the model
-		$model  = $this->getModel();
-		$row    = $this->get('Field');
-		$form   = $this->get('Form');
-		$types				= $this->get( 'Typeslist' );
-		$typesselected= $this->get( 'Typesselected' );
-		$js = '';
 
 
 
-		// *** Fail if checked non-new record is checked out not by 'me'
-		if ($row->id && $model->isCheckedOut($user->get('id')))
-		{
-			JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
-		}
-
-
-
+		// ***
 		// *** Create the toolbar
-		$isnew  = !$row->id;
+		// ***
+		$toolbar = JToolBar::getInstance('toolbar');
+
+		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
+		$cancreate = true;
+		
+		// SET toolbar title
 		!$isnew
 			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' )
 			: JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
-		$ctrl = 'fields.';
 
-		JToolBarHelper::apply( $ctrl.'apply', 'FLEXI_APPLY_N_RELOAD' );
-		if ( !$isnew ) flexicontent_html::addToolBarButton(
-			'FLEXI_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('".$ctrl."apply_ajax')", $msg_alert='', $msg_confirm='',
-			$btn_task=$ctrl.'apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop"
-		);
-		JToolBarHelper::save( $ctrl.'save' );
-		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel( $ctrl.'cancel' );
+
+
+		// ***
+		// *** Apply buttons
+		// ***
+
+		// Apply button
+		$btn_arr = array();
+
+		// Add ajax apply only for existing records
+		if ( !$isnew )
+		{
+			$btn_name = 'apply_ajax';
+			$btn_task = $ctrl.'.apply_ajax';
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
+		}
+
+		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
+		$btn_name = 'apply';
+		$btn_task = $ctrl.'.apply';
+		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+
+		//JToolBarHelper::apply($btn_task, $btn_title, false);
+
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="right" title=""', $auto_add = 0);
+
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
+
+
+
+		// ***
+		// *** Save buttons
+		// ***
+		$btn_arr = array();
+
+		$btn_name = 'save';
+		$btn_task = $ctrl.'.save';
+
+		//JToolBarHelper::save($btn_task);  //JToolBarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+		
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="bottom" title=""', $auto_add = 0);
+
+
+		// Add a save and new button, if user can create new records
+		if ($cancreate)
+		{
+			$btn_name = 'save2new';
+			$btn_task = $ctrl.'.save2new';
+
+			//JToolBarHelper::save2new($btn_task);  //JToolBarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
+
+			// Also if an existing item, can save to a copy
+			if (!$isnew)
+			{
+				$btn_name = 'save2copy';
+				$btn_task = $ctrl.'.save2copy';
+
+				//JToolBarHelper::save2copy($btn_task);  //JToolBarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+
+				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
+					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
+					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
+			}
+		}
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
+
+
+		// Cancel button
+		$isnew
+			? JToolBarHelper::cancel($ctrl.'.cancel')
+			: JToolBarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+
+
 
 		if (!empty($model->helpURL))
 		{
@@ -106,7 +212,9 @@ class FlexicontentViewField extends JViewLegacy
 
 
 
-		// *** Display appropritate messages: import and check current field
+		// ***
+		// *** Display appropriate messages: import and check current field
+		// ***
 		
 		// Import Joomla plugin that implements the type of current field
 		$extfolder = 'flexicontent_fields';
@@ -151,7 +259,9 @@ class FlexicontentViewField extends JViewLegacy
 
 
 
+		// ***
 		// *** Check which properties are supported by current field
+		// ***
 		$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 		
 		$supportsearch          = $ft_support->supportsearch;
@@ -175,7 +285,9 @@ class FlexicontentViewField extends JViewLegacy
 
 
 
+		// ***
 		// *** Add JS for AJAX reloading field parameters after field type change
+		// ***
 		if (!$row->iscore)
 		{
 			$_field_id = 'jform_field_type';
@@ -204,15 +316,20 @@ class FlexicontentViewField extends JViewLegacy
 		}
 
 
+
+		// ***
 		// *** Build selectlists, (some of these are defined via XML file, but some are not, possibly we may add more re-usable form elements later)
+		// ***
 		$lists = array();
 
 		// Build field_type select list
 		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=true, $_usage=false, $_published=true);
 		$fftypes = array();
-		foreach ($fieldtypes as $field_group => $ft_types) {
+		foreach ($fieldtypes as $field_group => $ft_types)
+		{
 			$fftypes[] = $field_group;
-			foreach ($ft_types as $field_type => $ftdata) {
+			foreach ($ft_types as $field_type => $ftdata)
+			{
 				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>$ftdata->friendly);
 			}
 			$fftypes[] = '';
@@ -221,17 +338,18 @@ class FlexicontentViewField extends JViewLegacy
 		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fftypes, 'jform[field_type]', $row->field_type, ($_grouped ? 1 : 0), $_attribs);
 
 		// Build (content) type select list
+		$types = $this->get('Typeslist');
+		$typesselected = $this->get('Typesselected');
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';
 		$attribs .= $row->iscore ? ' disabled="disabled"' : '';
 		$types_fieldname = 'jform[tid][]';
 		$lists['tid'] = flexicontent_html::buildtypesselect($types, $types_fieldname, $typesselected, false, $attribs);
 
 
-		// *** Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );    // we use JForm to output fields so this is redundant
 
-
-		// *** Add js to head
+		// ***
+		// *** Add inline js to head
+		// ***
 		if ($js)
 		{
 			$document->addScriptDeclaration('jQuery(document).ready(function(){'
@@ -240,12 +358,16 @@ class FlexicontentViewField extends JViewLegacy
 		}
 
 
-		// *** Assign data to template
+		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		// NOTE: we will use JForm to output fields so this is redundant
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+
+		// Assign data to template
 		$this->permission = FlexicontentHelperPerm::getPerm();
 		$this->document    = $document;
-		$this->row         = $row;
-		$this->lists       = $lists;
-		$this->form        = $form;
+		$this->row    = $row;
+		$this->form   = $form;
+		$this->lists  = $lists;
 		$this->typesselected	 = $typesselected;
 		$this->supportsearch            = $supportsearch;
 		$this->supportadvsearch         = $supportadvsearch;
@@ -255,7 +377,7 @@ class FlexicontentViewField extends JViewLegacy
 		$this->supportvalueseditable    = $supportvalueseditable;
 		$this->supportformhidden        = $supportformhidden;
 		$this->supportedithelp          = $supportedithelp;
-		
+
 		parent::display($tpl);
 	}
 }
