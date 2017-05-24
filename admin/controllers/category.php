@@ -52,10 +52,10 @@ class FlexicontentControllerCategory extends JControllerForm
 			$this->extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
 		
-		$this->registerTask( 'apply'  ,		'save' );
-		$this->registerTask( 'apply_ajax','save' );
-		$this->registerTask( 'save2new',	'save' );
-		$this->registerTask( 'save2copy', 'save' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'apply_ajax',   'save' );
+		$this->registerTask( 'save2new',     'save' );
+		$this->registerTask( 'save2copy',    'save' );
 	}
 
 	function add()
@@ -65,15 +65,18 @@ class FlexicontentControllerCategory extends JControllerForm
 	
 	function edit($key = NULL, $urlVar = NULL)
 	{
-		$cid = JRequest::getVar('cid', array(), 'get', 'array');
-		if (count($cid)) JRequest::setVar('cid', $cid, 'post', 'array');
+		$cid = $this->input->get->get('cid', array(), 'array');
+		if (count($cid))
+		{
+			$this->input->post->set('cid', $cid);
+		}
 		parent::edit();
 	}
 
 	function save($key = NULL, $urlVar = NULL)
 	{
 		parent::save();
-		if ( JRequest::getVar('fc_doajax_submit') )
+		if ( $this->input->get('fc_doajax_submit') )
 		{
 			JFactory::getApplication()->enqueueMessage(JText::_( 'FLEXI_ITEM_SAVED' ), 'message');
 			echo flexicontent_html::get_system_messages_html();

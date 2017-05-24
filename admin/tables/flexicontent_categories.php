@@ -26,7 +26,8 @@ jimport('joomla.database.tablenested');
 jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 
-class _flexicontent_categories_common extends JTableNested {
+class _flexicontent_categories_common extends JTableNested
+{
 	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
 		// Initialise variables.
@@ -271,7 +272,7 @@ class flexicontent_categories extends _flexicontent_categories
 	/**
 	 * Overloaded bind function.
 	 *
-	 * @param   array   $array   named array
+	 * @param   array   $data    named array
 	 * @param   string  $ignore  An optional array or space separated list of properties
 	 *                           to ignore while binding.
 	 *
@@ -280,38 +281,34 @@ class flexicontent_categories extends _flexicontent_categories
 	 * @see     JTable:bind
 	 * @since   11.1
 	 */
-	public function bind($array, $ignore = '')
+	public function bind($data, $ignore = '')
 	{
 		$this->extension = 'com_content';
-		
-		if (isset($array['params']) && is_array($array['params'])) {
+
+		// Bind params
+		if (isset($data['params']) && is_array($data['params']))
+		{
 			$registry = new JRegistry;
-			$registry->loadArray($array['params']);
-			$array['params'] = (string)$registry;
+			$registry->loadArray($data['params']);
+			$data['params'] = (string)$registry;
 		}
 
-		if (isset($array['metadata']) && is_array($array['metadata'])) {
+		// Bind metadata
+		if (isset($data['metadata']) && is_array($data['metadata']))
+		{
 			$registry = new JRegistry;
-			$registry->loadArray($array['metadata']);
-			$array['metadata'] = (string)$registry;
+			$registry->loadArray($data['metadata']);
+			$data['metadata'] = (string)$registry;
 		}
 
 		// Bind the rules.
-		if (isset($array['rules']) && is_array($array['rules'])) {
-		
-			// Make sure that empty group ids (=inherit) are removed from actions, (not needed this should already be done)
-			foreach($array['rules'] as $action_name => $identities) {
-				foreach($identities as $grpid => $val) {
-					if ($val==="") {
-						unset($array['rules'][$action_name][$grpid]);
-					}
-				}
-			}
-			$rules = new JAccessRules($array['rules']);
+		if (isset($data['rules']) && is_array($data['rules']))
+		{
+			$rules = new JAccessRules($data['rules']);
 			$this->setRules($rules);
 		}
 		
-		return parent::bind($array, $ignore);
+		return parent::bind($data, $ignore);
 	}
 	
 	/**

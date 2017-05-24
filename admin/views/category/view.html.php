@@ -31,107 +31,129 @@ class FlexicontentViewCategory extends JViewLegacy
 {
 	function display($tpl = null)
 	{
+		// ***
+		// *** Initialise variables
+		// ***
+
 		global $globalcats;
 		$app      = JFactory::getApplication();
-		$user     = JFactory::getUser();
-		$document = JFactory::getDocument();
 		$jinput   = $app->input;
-		
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+
+		// Get url vars and some constants
+		$option     = $jinput->get('option', '', 'cmd');
+		$view       = $jinput->get('view', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
+		$tip_class = ' hasTooltip';
+
+		// Load Joomla 'com_categories' language files
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
 
 
-		// ***********************************************************
-		// Get category data, and check if item is already checked out
-		// ***********************************************************
+
+		// ***
+		// *** Get record data, and check if record is already checked out
+		// ***
 		
 		// Get data from the model
-		$model		= $this->getModel();
-		$row  = $this->get( 'Item' );
-		$form = $this->get( 'Form' );
-		
-		// Get category parameters and inherited parameters
-		$catparams = new JRegistry($row->params);
-		$iparams   = $this->get( 'InheritedParams' );
-		
-		$cid    =	$row->id;
-		$isnew  = !$cid;
+		$model = $this->getModel();
+		$row   = $this->get('Item');
+		$form  = $this->get('Form');
+		$isnew = ! $row->id;
+		$manager_view = 'categories';
+		$ctrl = 'category';
+		$js = '';
 
-		$view       = $jinput->get('view', '', 'cmd');
-		$controller = $jinput->get('controller', '', 'cmd');
-		
-		// Check category is checked out by different editor / administrator
-		if ( !$isnew && $model->isCheckedOut( $user->get('id') ) )
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
 			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
 
 
-		// ***************************************************************************
-		// Currently access checking for category add/edit form , it is done here, for
-		// most other views we force going though the controller and checking it there
-		// ***************************************************************************
+		// Get category parameters and inherited parameters
+		$catparams = new JRegistry($row->params);
+		$iparams   = $this->get( 'InheritedParams' );
 
 
-		// *********************************************************************************************
-		// Global Permssions checking (needed because this view can be called without a controller task)
-		// *********************************************************************************************
+
+		// ***
+		// *** Currently access checking for category add/edit form , it is done here, for
+		// *** most other views we force going though a controller task and checking it there
+		// ***
+
+
+		// ***
+		// *** Global permissions checking
+		// ***
 		
 		// Get global permissions
-		$perms = FlexicontentHelperPerm::getPerm();  // handles super admins correctly
+		$perms = FlexicontentHelperPerm::getPerm();
 		
 		// Check no access to categories management (Global permission)
-		if ( !$perms->CanCats ) {
+		if ( !$perms->CanCats )
+		{
 			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		// Check no privilege to create new category under any category
-		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) ) {
+		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) )
+		{
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
 
 
-		// ************************************************************************************
-		// Record Permissions (needed because this view can be called without a controller task)
-		// ************************************************************************************
+		// ***
+		// *** Record Permissions (needed because this view can be called without a controller task)
+		// ***
 				
 		// Get edit privilege for current category
-		if (!$isnew) {
+		if (!$isnew)
+		{
 			$isOwner = $row->get('created_by') == $user->id;
-			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $cid);
-			$canedit_cat   = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
+			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $row->id);
+			$canedit_cat = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
 		}
 		
 		// Get if we can create inside at least one (com_content) category
-		if ( $user->authorise('core.create', 'com_flexicontent') ) {
+		if ( $user->authorise('core.create', 'com_flexicontent') )
+		{
 			$cancreate_cat = true;
-		} else {
+		}
+		else
+		{
 			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
 				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
 			);
-			$cancreate_cat  = count($usercats) > 0;
+			$cancreate_cat = count($usercats) > 0;
 		}
 		
 		// Creating new category: Check if user can create inside any existing category
-		if ( $isnew && !$cancreate_cat ) {
+		if ( $isnew && !$cancreate_cat )
+		{
 			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? JText::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : ""); 
 			JError::raiseWarning( 403, $acc_msg);
 			$app->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 		
 		// Editing existing category: Check if user can edit existing (current) category
-		if ( !$isnew && !$canedit_cat ) {
+		if ( !$isnew && !$canedit_cat )
+		{
 			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". JText::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
 			JError::raiseWarning( 403, $acc_msg);
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 
 
-		// **************************************************
-		// Include needed files and add needed js / css files
-		// **************************************************
+		// ***
+		// *** Include needed files and add needed js / css files
+		// ***
 		
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
@@ -151,72 +173,129 @@ class FlexicontentViewCategory extends JViewLegacy
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
-		// ********************
-		// Initialise variables
-		// ********************
+
+		// ***
+		// *** Create the toolbar
+		// ***
+		$toolbar = JToolBar::getInstance('toolbar');
+
+		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
+		$cancreate = $cancreate_cat;
 		
-		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
-		$editor  = JFactory::getEditor($editor_name);
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$categories = $globalcats;
-		
-		$bar     = JToolBar::getInstance('toolbar');
-		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		// SET toolbar title
+		!$isnew
+			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' )   // Editing existing review
+			: JToolBarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );    // Creating new review
 
 
-		// ******************
-		// Create the toolbar
-		// ******************
-		
-		// Create Toolbar title and add the preview button
-		if ( !$isnew ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' );
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );
-		}
-		
-		// Add apply and save buttons
-		JToolBarHelper::apply('category.apply', 'FLEXI_APPLY_N_RELOAD');
-		if ( !$isnew ) flexicontent_html::addToolBarButton(
-			'FLEXI_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('category.apply_ajax')", $msg_alert='', $msg_confirm='',
-			$btn_task='category.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop");
-		JToolBarHelper::save('category.save');
-		
-		// Add a save and new button, if user can create inside at least one (com_content) category
-		if ( $cancreate_cat ) {
-			JToolBarHelper::save2new('category.save2new');
-		}
-		
-		// Add a save as copy button, if editing an existing category (J2.5 only)
-		if (!$isnew && $cancreate_cat) {
-			JToolBarHelper::save2copy('category.save2copy');
-		}
-		
-		// Add a cancel or close button
-		if ($isnew)  {
-			JToolBarHelper::cancel('category.cancel');
-		} else {
-			JToolBarHelper::cancel('category.cancel', 'JTOOLBAR_CLOSE');
+
+		// ***
+		// *** Apply buttons
+		// ***
+
+		// Apply button
+		$btn_arr = array();
+
+		// Add ajax apply only for existing records
+		if ( !$isnew )
+		{
+			$btn_name = 'apply_ajax';
+			$btn_task = $ctrl.'.apply_ajax';
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
 		}
 
+		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
+		$btn_name = 'apply';
+		$btn_task = $ctrl.'.apply';
+		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
 
-		// ******************
-		// Add preview button
-		// ******************
+		//JToolBarHelper::apply($btn_task, $btn_title, false);
+
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="right" title=""', $auto_add = 0);
+
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
+
+
+
+		// ***
+		// *** Save buttons
+		// ***
+		$btn_arr = array();
+
+		$btn_name = 'save';
+		$btn_task = $ctrl.'.save';
+
+		//JToolBarHelper::save($btn_task);  //JToolBarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 		
-		if ( !$isnew ) {
-			JToolBarHelper::divider();
-			
-			$autologin		= ''; //$cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			$previewlink 	= JRoute::_(JURI::root(). FlexicontentHelperRoute::getCategoryRoute($categories[$cid]->slug)) . $autologin;
-			// Add a preview button
-			$bar->appendButton( 'Custom', '<a class="preview btn btn-small btn-info spaced-btn" href="'.$previewlink.'" target="_blank" ><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW').'</a>', 'preview' );
+		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+			'data-placement="bottom" title=""', $auto_add = 0);
+
+
+		// Add a save and new button, if user can create new records
+		if ($cancreate)
+		{
+			$btn_name = 'save2new';
+			$btn_task = $ctrl.'.save2new';
+
+			//JToolBarHelper::save2new($btn_task);  //JToolBarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-new",
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
+
+			// Also if an existing item, can save to a copy
+			if (!$isnew)
+			{
+				$btn_name = 'save2copy';
+				$btn_task = $ctrl.'.save2copy';
+
+				//JToolBarHelper::save2copy($btn_task);  //JToolBarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+
+				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
+					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save-copy",
+					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
+			}
+		}
+		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
+
+
+		// Cancel button
+		$isnew
+			? JToolBarHelper::cancel($ctrl.'.cancel')
+			: JToolBarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+
+
+		// Preview button
+		if (!$isnew)
+		{
+			// Create preview link (with xhtml to false ... we will do it manually) (at least for the ampersand)
+			$record_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getCategoryRoute($globalcats[$row->id]->slug));
+			$previewlink = JRoute::_(JURI::root() . $record_link, $xhtml=false)
+				;
+			$toolbar->appendButton( 'Custom', '
+				<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');">
+					<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
+					'.JText::_('FLEXI_PREVIEW').'
+				</button>', 'preview'
+			);
 		}
 
 
-		// ************************
-		// Add modal layout editing
-		// ************************
+
+		// ***
+		// *** Add modal editing of template layout
+		// ***
 		
 		if (!$isnew && $perms->CanTemplates)
 		{
@@ -255,9 +334,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
-		// **********************************************************************************************************
-		// Get Layouts, load language of current selected template and apply Layout parameters values into the fields
-		// **********************************************************************************************************
+		// ***
+		// *** Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		// ***
 
 		// Load language file of currently selected template
 		$_clayout = $catparams->get('clayout');
@@ -286,14 +365,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		//build selectlists
 		$Lists = array();
 
+		// Build category selectors
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
 		$fieldname = 'jform[parent_id]';
-		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
+		$Lists['parent_id'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
 		$fieldname = 'jform[copycid]';
-		$Lists['copycid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false);
+		$Lists['copycid']    = flexicontent_cats::buildcatselect($globalcats, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false);
 		
 		$custom_options[''] = 'FLEXI_USE_GLOBAL';
 		$custom_options['0'] = 'FLEXI_COMPONENT_ONLY';
@@ -301,7 +381,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
 		$fieldname = 'jform[special][inheritcid]';
-		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
+		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
 
 		// check access level exists
@@ -312,11 +392,27 @@ class FlexicontentViewCategory extends JViewLegacy
 			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
 		}
 		
+
+
+		// ***
+		// *** Add inline js to head
+		// ***
+		if ($js)
+		{
+			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+				.$js.
+			'});');
+		}
 		
 		
-		// ************************
-		// Assign variables to view
-		// ************************
+		// Get editor instance
+		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
+		$editor  = JFactory::getEditor($editor_name);
+
+
+		// ***
+		// *** Assign variables to view
+		// ****
 		
 		$this->document = $document;
 		$this->Lists    = $Lists;
