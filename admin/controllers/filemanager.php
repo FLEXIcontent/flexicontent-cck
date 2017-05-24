@@ -23,6 +23,8 @@ use Joomla\String\StringHelper;
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');   // we use JPATH_BASE since parent controller exists in frontend too
 
+// Manually import in case used by frontend, then model will not be autoloaded correctly via getModel('name')
+require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 
 /**
  * FLEXIcontent Component Files Controller
@@ -33,13 +35,18 @@ JLoader::register('FlexicontentController', JPATH_BASE.DS.'components'.DS.'com_f
  */
 class FlexicontentControllerFilemanager extends FlexicontentController
 {
+	var $records_dbtbl  = 'flexicontent_files';
+	var $records_jtable = 'flexicontent_files';
+	var $record_name = 'file';
+	var $record_name_pl = 'filemanager';
+	var $_NAME = 'FILE';
+
 	var $runMode = 'standalone';
 
 	var $exitHttpHead = null;
 	var $exitMessages = array();
 	var $exitLogTexts = array();
 	var $exitSuccess  = true;
-
 
 	/**
 	 * Constructor
@@ -49,6 +56,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
+
+		// Register task aliases
 		$this->registerTask( 'uploads', 	'upload' );
 
 		$this->option = $this->input->get('option', '', 'cmd');
@@ -69,9 +78,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check return URL if empty or not safe and set a default one
 		if ( ! $this->returnURL || ! flexicontent_html::is_safe_url($this->returnURL) )
 		{
-			if ($this->view == 'filemanager')
+			if ($this->view == $this->record_name || $this->view == $this->record_name_pl)
 			{
-				$this->returnURL = 'index.php?option=com_flexicontent&view=filemanager';
+				$this->returnURL = 'index.php?option=com_flexicontent&view=' . $this->record_name_pl;
 			}
 			else if ( !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) )
 			{
@@ -94,10 +103,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
-		$db     = JFactory::getDBO();
+
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDBO();
 		$session = JFactory::getSession();
 
 		// Force interactive run mode, if given parameters
@@ -318,11 +327,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			//echo "\n"; print_r($file);
 		}
 		
-		if ($file_mode == 'folder_mode') {
-			$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
-			$path = $app->getUserState( $upload_path_var, '' ).DS;
-			if ($this->task!='uploads') $app->setUserState( $upload_path_var, '');  // Do not clear in multi-upload
-		} else {
+		if ($fieldid)
+		{
+			$path = $model->getFieldFolderPath($u_item_id, $fieldid, $_options=array('secure' => $secure));
+		}
+		else
+		{
 			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
 		}
 		
@@ -342,7 +352,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename
 		$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
 		$filename     = flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
-		$filepath 	  = JPath::clean($path.$filename);
+		$filepath 	  = JPath::clean($path . $filename);
 		
 		// Check if uploaded file is valid
 		if (!$upload_check)
@@ -408,7 +418,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if ($file_mode == 'db_mode')
 		{
 			// Insert file record in DB
-			$db->insertObject('#__flexicontent_files', $obj);
+			$db->insertObject('#__' . $this->records_dbtbl, $obj);
 
 			// Get id of new file record
 			$obj->id = $file_id = (int) $db->insertid();
@@ -525,7 +535,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$obj->uploaded    = JFactory::getDate('now')->toSql();
 		$obj->uploaded_by = $user->get('id');
 
-		$db->insertObject('#__flexicontent_files', $obj);
+		$db->insertObject('#__' . $this->records_dbtbl, $obj);
 
 		// Get id of new file record
 		$file_id = (int) $db->insertid();
@@ -683,7 +693,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					$obj->uploaded_by = $user->get('id');
 
 					// Add the record to the DB
-					$db->insertObject('#__flexicontent_files', $obj);
+					$db->insertObject('#__' . $this->records_dbtbl, $obj);
 					$file_ids[$filename] = $db->insertid();
 					
 					// Add file ID to files imported by import task
@@ -731,15 +741,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 * @since 1.0
 	 */
 	function edit()
-	{	
-		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
-
-		$app    = JFactory::getApplication();
-		$user		= JFactory::getUser();
+	{
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 
-		$this->input->set('view', 'file');
+		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
 
 		// Get/Create the view
@@ -749,28 +757,28 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 
 		// Get/Create the model
-		$model	= $this->getModel('file');
-		$file		= $model->getFile();
+		$model  = $this->getModel($this->record_name);
+		$record = $model->getItem();
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
 		$view->document = $document;
 
-		// calculate access
+		// Calculate access
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $record->uploaded_by == $user->get('id');
 		$is_authorised = $canedit || $caneditown;
 		
-		// check access
+		// Check access
 		if ( !$is_authorised )
 		{
 			$app->setHeader('status', '403 Forbidden', true);
 			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			return;
 		}
-		
+
 		// Check if record is checked out by other editor
-		if ( $model->isCheckedOut( $user->get('id') ) )
+		if ( $model->isCheckedOut($user->get('id')) )
 		{
 			$app->setHeader('status', '400 Bad Request', true);
 			$this->setRedirect($this->returnURL, JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
@@ -785,6 +793,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 
+		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
 	}
 	
@@ -800,7 +809,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		//require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
 		$db     = JFactory::getDBO();
@@ -815,6 +823,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			JArrayHelper::toInteger($cid, array()); // These are file ids, for DB-mode
 		}
+
 		if (!is_array( $cid ) || count( $cid ) < 1)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
@@ -883,7 +892,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$msg = '';
 
-		$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
+		$db->setQuery( 'SELECT * FROM #__' . $this->records_dbtbl . ' WHERE id IN ('.implode(',', $cid).')' );
 		$files = $db->loadObjectList('id');
 		$cid = array_keys($files);
 
@@ -960,7 +969,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
@@ -1045,7 +1053,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		else
 		{
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' ).' : '.$model->getError();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			throw new Exception($msg, 500);
 		}
 
 		$this->setRedirect($link, $msg);
@@ -1082,27 +1090,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		// Get/Create the model
-		$model	= $this->getModel('file');
-		$file		= $model->getFile();
-		$user   = JFactory::getUser();
-
-		// calculate access
-		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
-		$is_authorised = $canedit || $caneditown;
-
-		// check access
-		if ( !$is_authorised )
-		{
-			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect( $this->returnURL, '');
-			return;
-		}
-
-		$tbl = 'flexicontent_files';
-		$redirect_url = 'index.php?option=com_flexicontent&view=filemanager';
-		flexicontent_db::checkin($tbl, $redirect_url, $this);
+		$redirect_url = $this->returnURL;
+		flexicontent_db::checkin($this->records_jtable, $redirect_url, $this);
 	}
 
 
@@ -1144,7 +1133,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		//require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'file.php');
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();
@@ -1158,52 +1146,55 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if ( !$is_authorised )
 		{
 			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect( $this->returnURL, '');
+			$this->setRedirect($this->returnURL);
 			return;
 		}
 
 		$cid = $this->input->get('cid', array(), 'array');
 		JArrayHelper::toInteger($cid, array());
 
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
 			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
-		} else {
-			
-			$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
-			$files = $db->loadObjectList('id');
-			$cid = array_keys($files);
-			
-			$model = $this->getModel('filemanager');
-			
-			$msg = '';
-			$allowed_files = array();
-			$denied_files = array();
-			foreach($cid as $_id) {
-				if ( !isset($files[$_id]) ) continue;
-				$filename = $files[$_id]->filename_original ? $files[$_id]->filename_original : $files[$_id]->filename;
-				if ($canpublish || $files[$_id]->uploaded_by == $user->get('id'))
-					$allowed_files[$_id] = $filename;
-				else
-					$denied_files[$_id] = $filename;
-			}
-			if ( count($denied_files) ) {
-				$app->enqueueMessage(' You are not allowed to change state of files: '. implode(', ', $denied_files), 'warning');
-			}
-			$allowed_cid = array_keys($allowed_files);
-			
-			if (count($allowed_cid) && !$model->publish($allowed_cid, $state)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-			
-			if (count($allowed_cid)) $msg .= JText::_( $state ? 'FLEXI_PUBLISHED' : 'FLEXI_UNPUBLISHED' ) . ': '. implode(', ', $allowed_files);
-			
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
+			$this->setRedirect($this->returnURL);
+			return;
 		}
-		
-		$this->setRedirect( $this->returnURL, $msg);
+
+		$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
+		$files = $db->loadObjectList('id');
+		$cid = array_keys($files);
+
+		$model = $this->getModel('filemanager');
+
+		$msg = '';
+		$allowed_files = array();
+		$denied_files = array();
+		foreach($cid as $_id) {
+			if ( !isset($files[$_id]) ) continue;
+			$filename = $files[$_id]->filename_original ? $files[$_id]->filename_original : $files[$_id]->filename;
+			if ($canpublish || $files[$_id]->uploaded_by == $user->get('id'))
+				$allowed_files[$_id] = $filename;
+			else
+				$denied_files[$_id] = $filename;
+		}
+		if ( count($denied_files) )
+		{
+			$app->enqueueMessage(' You are not allowed to change state of files: '. implode(', ', $denied_files), 'warning');
+		}
+		$allowed_cid = array_keys($allowed_files);
+
+		if (count($allowed_cid) && !$model->publish($allowed_cid, $state))
+		{
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+			throw new Exception($msg, 500);
+		}
+
+		if (count($allowed_cid)) $msg .= JText::_( $state ? 'FLEXI_PUBLISHED' : 'FLEXI_UNPUBLISHED' ) . ': '. implode(', ', $allowed_files);
+
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+
+		$this->setRedirect($this->returnURL, $msg);
 	}
 	
 	
@@ -1224,7 +1215,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$cid = $this->input->get('cid', array(0), 'array');
 		JArrayHelper::toInteger($cid, array(0));
 		
-		$file_id = (int)$cid[0];
+		$file_id = (int) $cid[0];
 		$row = JTable::getInstance('flexicontent_files', '');
 		$row->load($file_id);
 		
@@ -1236,7 +1227,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if ( !$is_authorised )
 		{
 			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect( $this->returnURL, '');
+			$this->setRedirect($this->returnURL);
 			return;
 		}
 		
