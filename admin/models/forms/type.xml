@@ -2,15 +2,15 @@
 <form>
 	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="asset_id" type="hidden" filter="unset" />
-	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="" />
-	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="" />
-	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="" class="btn-group btn-group-yesno">
+	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="fc-prop-lbl" />
+	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="fc-prop-lbl" />
+	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
 	</field>
 	<field name="itemscreatable" type="multilist" subtype="radio" default="0" toggle_related="1" filter="int" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC"
 		inline_tip="FLEXI_PLEASE_SET_CREATE_ITEMS_ACL_IN_PERMS_TAB"  tip_class="create_items_using_acl"   tip_img="comments.png"  preview_img="lock.png" 
-		labelclass="" class="btn-group group-fcmethod">
+		labelclass="fc-prop-lbl" class="btn-group group-fcmethod">
 		<option value="0" show_list="" hide_list="create_items_using_acl">FLEXI_ANY_AUTHOR</option>
 		<option value="1" show_list="create_items_using_acl" hide_list="">FLEXI_USE_ACL_TO_HIDE</option>
 		<option value="2" show_list="create_items_using_acl" hide_list="">FLEXI_USE_ACL_TO_DISABLE</option>
@@ -18,7 +18,7 @@
 	
 	<field name="checked_out" type="hidden" filter="unset" />
 	<field name="checked_out_time" type="hidden" filter="unset" />	
-	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="JField_Access_Desc" class="inputbox" size="1" default="" labelclass="" />
+	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="JField_Access_Desc" class="inputbox" size="1" default="" labelclass="fc-prop-lbl" />
 	<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_DESC" description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules" component="com_flexicontent" section="type" />
 	
 	<fields name="attribs">

@@ -758,40 +758,6 @@ jQuery(document).ready(function(){
 		</tr>
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-		
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="margin: 0 auto !important; background-color: white;">
-				<table class="admintable" style="margin: 0 auto !important; background-color: white;">
-					<tr>
-						<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-						<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS', true ); ?>" /></td>
-						<td colspan="3"><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-					</tr><tr>
-						<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
-						<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_PENDING', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-						<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TO_WRITE', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-					</tr><tr>
-						<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_ARCHIVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-						<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
-						<td colspan="3"><?php echo JText::_( 'FLEXI_TRASHED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		
-	</tfoot>
-
 	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
 		$unpublishableFound = false;
@@ -1143,6 +1109,39 @@ jQuery(document).ready(function(){
 		JToolBarHelper::spacer();
 		?>
 	</tbody>
+
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+		
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="margin: 0 auto !important; background-color: white;">
+				<table class="admintable" style="margin: 0 auto !important; background-color: white;">
+					<tr>
+						<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+						<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS', true ); ?>" /></td>
+						<td colspan="3"><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+					</tr><tr>
+						<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
+						<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_PENDING', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TO_WRITE', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+					</tr><tr>
+						<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_ARCHIVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
+						<td colspan="3"><?php echo JText::_( 'FLEXI_TRASHED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</tfoot>
 
 	</table>
 

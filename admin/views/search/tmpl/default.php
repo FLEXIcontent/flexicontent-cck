@@ -192,15 +192,7 @@ function delAllFilters() {
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
-		
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-	
+
 	<tbody>
 		
 		<?php if (count($this->rows) == 0): ?>
@@ -272,6 +264,15 @@ function delAllFilters() {
 		<?php $i++; $o = ++$o % 2; ?>
 		<?php endforeach; ?>
 	</tbody>
+
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+	</tfoot>
+
 	</table>
 
 	<input type="hidden" name="boxchecked" value="0" />

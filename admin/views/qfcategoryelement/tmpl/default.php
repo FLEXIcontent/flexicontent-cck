@@ -132,14 +132,6 @@ function delAllFilters() {
 		</tr>
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="7">
-				<?php echo $this->pagination->getListFooter(); ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	<tbody>
 		<?php
 		$k = 0;
@@ -195,6 +187,14 @@ function delAllFilters() {
 		}
 		?>
 	</tbody>
+
+	<tfoot>
+		<tr>
+			<td colspan="7">
+				<?php echo $this->pagination->getListFooter(); ?>
+			</td>
+		</tr>
+	</tfoot>
 
 	</table>
 	<input type="hidden" name="task" value="" />

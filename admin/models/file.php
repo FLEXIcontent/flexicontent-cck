@@ -97,7 +97,7 @@ class FlexicontentModelFile extends JModelAdmin
 	 * @return	array
 	 * @since	1.0
 	 */
-	function & getItem()
+	function & getItem($pk = null)
 	{
 		if ($this->_loadRecord())
 		{

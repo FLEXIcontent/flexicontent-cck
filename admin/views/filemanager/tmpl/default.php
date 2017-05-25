@@ -66,7 +66,7 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 //$this->CanViewAllFiles = 0; // test
 
 // Calculate count of shown columns 
-$list_total_cols = 14;
+$list_total_cols = 16;
 if ($this->folder_mode) $list_total_cols -= 7;
 
 // Optional columns
@@ -686,31 +686,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 				</tr>
 			</thead>
-		
-		<?php if (!$this->folder_mode) : ?>
-			<tfoot>
 
-				<?php
-				$field_legend = array();
-				$this->assigned_fields_labels;
-				foreach($this->assigned_fields_labels as $field_type => $field_label) {
-					$icon_name = $this->assigned_fields_icons[$field_type];
-					$tip = $field_label;
-					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
-					$field_legend[$field_type] = $image. " ".$field_label;
-				}
-				?>
-
-				<tr>
-					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
-						<span class="label fc_legend_box <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_USAGE_LEGEND', 'FLEXI_FILE_USAGE_LEGEND_TIP', 1, 1); ?> " ><?php echo JText::_('FLEXI_FILE_USAGE_LEGEND'); ?></span> &nbsp; 
-						<?php echo implode(' &nbsp; &nbsp; | &nbsp; &nbsp; ', $field_legend); ?>
-					</td>
-				</tr>
-
-			</tfoot>
-		<?php endif; ?>
-		
 			<tbody>
 				<?php
 				$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
@@ -1002,6 +978,30 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				} 
 				?>
 			</tbody>
+
+		<?php if (!$this->folder_mode) : ?>
+			<tfoot>
+
+				<?php
+				$field_legend = array();
+				$this->assigned_fields_labels;
+				foreach($this->assigned_fields_labels as $field_type => $field_label) {
+					$icon_name = $this->assigned_fields_icons[$field_type];
+					$tip = $field_label;
+					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
+					$field_legend[$field_type] = $image. " ".$field_label;
+				}
+				?>
+
+				<tr>
+					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
+						<span class="label fc_legend_box <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_USAGE_LEGEND', 'FLEXI_FILE_USAGE_LEGEND_TIP', 1, 1); ?> " ><?php echo JText::_('FLEXI_FILE_USAGE_LEGEND'); ?></span> &nbsp; 
+						<?php echo implode(' &nbsp; &nbsp; | &nbsp; &nbsp; ', $field_legend); ?>
+					</td>
+				</tr>
+
+			</tfoot>
+		<?php endif; ?>
 			
 			</table>
 

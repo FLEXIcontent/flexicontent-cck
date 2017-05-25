@@ -145,13 +145,6 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 		
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
 	<tbody>
 	<?php foreach ($this->items as $i => $item) :
 		$canCreate	= $user->authorise('core.create',		'com_users');
@@ -203,6 +196,14 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 		</tr>
 		<?php endforeach; ?>
 	</tbody>
+
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+	</tfoot>
 
 	</table>
 

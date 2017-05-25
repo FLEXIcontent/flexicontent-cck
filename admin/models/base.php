@@ -120,7 +120,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Initialize using default naming if not already set
 		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->record_name . 's';
 		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->record_name . 's';
-		
+
 		$jinput = JFactory::getApplication()->input;
 
 		$id = $jinput->get('id', array(0), 'array');
@@ -133,11 +133,11 @@ abstract class FCModelAdmin extends JModelAdmin
 			JArrayHelper::toInteger($cid, array(0));
 			$pk = (int) $cid[0];
 		}
-		
+
 		if (!$pk)
 		{
 			$data = $jinput->get('jform', array('id'=>0), 'array');
-			$pk = (int) $data['id'];
+			$pk = isset($data['id']) ? (int) $data['id'] : 0;
 		}
 		$this->setId($pk);
 	}
@@ -913,7 +913,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 		$parent_id  = isset($data['parent_id']) ? $data['parent_id'] : null;
 		$alias_prop = isset($data['alias']) ? 'alias' : (isset($data['name']) ? 'name' : null);
-		$title_prop = isset($data['title']) ? 'title' : (isset($data['name']) ? 'name' : null);
+		$title_prop = isset($data['title']) ? 'title' : (isset($data['label']) ? 'label' : (isset($data['name']) ? 'name' : null));
 
 		// Alter the title for save as copy
 		if ($task == 'save2copy')

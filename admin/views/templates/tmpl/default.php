@@ -119,43 +119,6 @@ $list_total_cols = 8;
 		</tr>
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<table class="admintable" style="margin: 0 auto !important;">
-					<tr>
-						<td>
-						<?php echo $copyTmpl_icon; ?>
-						</td>
-						<td>
-						<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
-						</td>
-						<td>
-						<?php echo $editLayout_icon; ?>
-						</td>
-						<td>
-						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS' ); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-						<?php echo $delTmpl_icon; ?>
-						</td>
-						<td>
-						<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
-						</td>
-						<td>
-						<?php echo $noEditLayout_icon; ?>
-						</td>
-						<td>
-						<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</tfoot>
-	
 	<tbody>
 		<?php
 		$k = 0;
@@ -232,6 +195,43 @@ $list_total_cols = 8;
 		endforeach;
 		?>
 	</tbody>
+
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<table class="admintable" style="margin: 0 auto !important;">
+					<tr>
+						<td>
+						<?php echo $copyTmpl_icon; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
+						</td>
+						<td>
+						<?php echo $editLayout_icon; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS' ); ?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+						<?php echo $delTmpl_icon; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
+						</td>
+						<td>
+						<?php echo $noEditLayout_icon; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</tfoot>
 
 	</table>
 </div>

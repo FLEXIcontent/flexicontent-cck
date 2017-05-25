@@ -277,7 +277,7 @@ class FlexicontentModelField extends FCModelAdmin
 		// Alter the title & alias
 		$table = $this->getTable();
 
-		while ($table->load(array('name' => $alias)))
+		while ($table->load(array('name' => $alias, 'label' => $title)))
 		{
 			$title = StringHelper::increment($title);
 			$alias = StringHelper::increment($alias, 'dash');
@@ -399,7 +399,7 @@ class FlexicontentModelField extends FCModelAdmin
 	 */
 	protected function _afterLoad($record)
 	{
-		parent::afterLoad($record);
+		parent::_afterLoad($record);
 
 		// Convert field positions to an array
 		if (!is_array($record->positions))

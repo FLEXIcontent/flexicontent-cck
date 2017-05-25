@@ -300,14 +300,9 @@ function delAllFilters() {
 		</tr>
 		
 		</thead>
-		<tfoot>
-			<tr>
-				<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-					<?php echo $pagination_footer; ?>
-				</td>
-			</tr>
-		</tfoot>
+
 		<tbody>
+
 		<?php
 			$k = 0;
 			for ($i=0, $n=count( $this->rows ); $i < $n; $i++)
@@ -396,6 +391,15 @@ function delAllFilters() {
 				}
 			?>
 		</tbody>
+
+		<tfoot>
+			<tr>
+				<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+					<?php echo $pagination_footer; ?>
+				</td>
+			</tr>
+		</tfoot>
+
 	</table>
 
 	<input type="hidden" name="boxchecked" value="0" />

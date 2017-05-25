@@ -4607,7 +4607,7 @@ class flexicontent_html
 		  </button>').'
 			<ul class="dropdown-menu" role="menu">
 				<li>' . implode("</li>\n<li>", $btn_arr) . '</li>
-			<ul>
+			</ul>
 		</div>';
 
 		$toolbar->appendButton('Custom', $buttons_html, $btn_group_name);

@@ -31,6 +31,8 @@ class FlexicontentViewReview extends JViewLegacy
 {
 	function display($tpl = null)
 	{
+		flexicontent_html::__DEV_check_reviews_table();  // Development check, TO-BE-REMOVED
+
 		// ***
 		// *** Initialise variables
 		// ***
@@ -45,9 +47,6 @@ class FlexicontentViewReview extends JViewLegacy
 		$option     = $jinput->get('option', '', 'cmd');
 		$view       = $jinput->get('view', '', 'cmd');
 		$tip_class = ' hasTooltip';
-
-		// Development check, TO-BE-REMOVED
-		flexicontent_html::__DEV_check_reviews_table();
 
 
 

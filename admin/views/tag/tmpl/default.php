@@ -36,9 +36,9 @@ $form = $this->form;
 
 		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 			<?php if ($field->hidden): ?>
-				<span style="display:none !important;">
-					<?php echo $field->input; ?>
-				</span>
+				<tr style="display:none !important;">
+					<td colspan="2"><?php echo $field->input; ?></td>
+				</tr>
 			<?php else: ?>
 			<tr>
 				<td class="key">
@@ -56,7 +56,6 @@ $form = $this->form;
 
 	<?php echo JHTML::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<?php echo $this->form->getInput('id'); ?>
 	<input type="hidden" name="controller" value="tags" />
 	<input type="hidden" name="view" value="tag" />
 	<input type="hidden" name="task" value="" />

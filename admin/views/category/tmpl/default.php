@@ -388,12 +388,12 @@ $this->document->addScriptDeclaration($js);
 
 								foreach ($this->tmpls as $tmpl) :
 
-									echo $form_layout = $tmpl->params;
-									continue;
+									$form_layout = $tmpl->params;
 									$label = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 									echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 
 									if (!$cat_layout || $tmpl->name != $cat_layout) continue;
+									continue;
 
 									$fieldSets = $form_layout->getFieldsets($groupname);
 									foreach ($fieldSets as $fsname => $fieldSet) : ?>
