@@ -21,6 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.admin');
 use Joomla\String\StringHelper;
+require_once('base.php');
 
 /**
  * FLEXIcontent Component Category Model
@@ -29,7 +30,7 @@ use Joomla\String\StringHelper;
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelCategory extends JModelAdmin
+class FlexicontentModelCategory extends FCModelAdmin
 {
 	/**
 	 * Record name
@@ -58,7 +59,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @var int
 	 */
 	var $_id = null;
-	
+
 	/**
 	 * Record data
 	 *
@@ -82,11 +83,24 @@ class FlexicontentModelCategory extends JModelAdmin
 	var $plugins_group = 'content';
 
 	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $extension_proxy = 'com_content';
+
+	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $supports_associations = true;
+
+	/**
 	 * Various record specific properties
 	 *
 	 */
 	var $_inherited_params = null;  // @var object, Inherited parameters
-	var $extension_proxy = 'com_content';
 
 	/**
 	 * Constructor
@@ -96,117 +110,6 @@ class FlexicontentModelCategory extends JModelAdmin
 	function __construct()
 	{
 		parent::__construct();
-
-		// Initialize using default naming if not already set
-		$this->records_dbtbl  = $this->records_dbtbl  ?: 'flexicontent_' . $this->record_name . 's';
-		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->record_name . 's';
-		
-		$jinput = JFactory::getApplication()->input;
-
-		$id = $jinput->get('id', array(0), 'array');
-		JArrayHelper::toInteger($id, array(0));
-		$pk = (int) $id[0];
-
-		if (!$pk)
-		{
-			$cid = $jinput->get('cid', array(0), 'array');
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = (int) $cid[0];
-		}
-		
-		if (!$pk)
-		{
-			$data = $jinput->get('jform', array('id'=>0), 'array');
-			$pk = (int) $data['id'];
-		}
-		$this->setId($pk);
-
-		$this->populateState();
-	}
-
-
-	/**
-	 * Method to set the identifier
-	 *
-	 * @access	public
-	 * @param	int record identifier
-	 */
-	function setId($id)
-	{
-		// Set record id and wipe data
-		$this->_id     = (int) $id;
-		$this->_record = null;
-		$this->setState($this->getName() . '.id', $this->_id);
-	}
-
-
-	/**
-	 * Method to get the record identifier
-	 *
-	 * @access	public
-	 * @return	int record identifier
-	 */
-	function getId()
-	{
-		return $this->_id;
-	}
-
-
-	/**
-	 * Overridden get method to get properties from the record
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
-	 * @since	1.0
-	 */
-	function get($property, $default=null)
-	{
-		if ($this->_record || $this->_loadRecord())
-		{
-			if(isset($this->_record->$property))
-			{
-				return $this->_record->$property;
-			}
-		}
-		return $default;
-	}
-
-
-	/**
-	 * Overridden set method to pass properties on to the record
-	 *
-	 * @access	public
-	 * @param	  string	 $property	 The name of the property
-	 * @param	  mixed	   $value		   The value of the property to set
-	 * @return	boolean  True on success
-	 * @since	1.5
-	 */
-	function set($property, $value=null)
-	{
-		if ($this->_record || $this->_loadRecord())
-		{
-			$this->_record->$property = $value;
-			return true;
-		}
-
-		return false;
-	}
-
-
-	/**
-	 * Set method to pass properties on to the model object
-	 *
-	 * @access	public
-	 * @param	  string	 $property	 The name of the property
-	 * @param	  mixed	   $value		   The value of the property to set
-	 * @return	void
-	 * @since	3.2
-	 */
-	function setProperty($property, $value=null)
-	{
-		$this->$property = $value;
 	}
 
 
@@ -219,87 +122,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function &getCategory($pk = null)
 	{
-		if ($this->_loadRecord($pk))
-		{
-		}
-		else
-		{
-			$this->_initRecord();
-		}
-
-		// Extra steps after loading
-		$this->_afterLoad($this->_record);
-
-		return $this->_record;
-	}
-
-
-	/**
-	 * Method to load record data
-	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	private function _loadRecord($pk = null)
-	{
-		// Maybe we were given a name, try to use it if table has such a property
-		$name = $pk != (int) $pk ? $pk : null;
-		if ($name)
-		{
-			$table = $this->getTable($this->records_jtable, $_prefix='');
-			$name = property_exists($table, 'name') ? $name : null;
-		}
-
-		// If PK was provided and it is also not a name, then treat it as a primary key value
-		$pk = $pk && !$name ? (int) $pk : (int) $this->_id;
-
-		// Lets load the record if it doesn't already exist
-		if ( $this->_record===null )
-		{
-			$name_quoted = $name ? $this->_db->Quote($name) : null;
-			if (!$name_quoted && !$pk)
-			{
-				$this->_record = false;
-			}
-			else
-			{
-				$query = 'SELECT *'
-					. ' FROM #__' . $this->records_dbtbl
-					. ' WHERE '
-					. ( $name_quoted
-						? ' name='.$name_quoted
-						: ' id=' . (int) $pk
-					);
-				$this->_db->setQuery($query);
-				$this->_record = $this->_db->loadObject();
-			}
-
-			if ($this->_record)
-			{
-				$this->_id = $this->_record->id;
-			}
-		}
-
-		return (boolean) $this->_record;
-	}
-
-
-	/**
-	 * Method to get the last id
-	 *
-	 * @access	private
-	 * @return	int
-	 * @since	1.0
-	 */
-	private function _getLastId()
-	{
-		$query  = 'SELECT MAX(id)'
-			. ' FROM #__' . $this->records_dbtbl;
-		$this->_db->setQuery($query);
-		$lastid = $this->_db->loadResult();
-
-		return (int) $lastid;
+		return parent::getRecord($pk);
 	}
 
 
@@ -310,20 +133,11 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _initRecord($record = null)
+	private function _initRecord(&$record = null)
 	{
-		// Initialize a given record object
-		if ($record) ;
+		parent::_initRecord($record);
 
-		// Only initialize MEMBER property '_record' if it is not already an object
-		else if ( is_object($this->_record) ) return true;
-
-		else
-		{
-			// Load a JTable object with all db columns as properties, then customize some or all the properites
-			$record = $this->getTable($this->records_jtable, $_prefix='');
-		}
-
+		// Set record specific properties
 		$record->id							= 0;
 		$record->parent_id			= 0;
 		$record->title					= null;
@@ -346,84 +160,9 @@ class FlexicontentModelCategory extends JModelAdmin
 		return true;
 	}
 
-	/**
-	 * Method to checkin/unlock the record
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkin($pk = NULL)
-	{
-		if (!$pk) $pk = $this->_id;
-
-		if ($pk)
-		{
-			$tbl = $this->getTable($this->records_jtable, $_prefix='');
-			return $tbl->checkin($pk);
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Method to checkout/lock the record
-	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkout($pk = null)
-	{
-		// Make sure we have a record id to checkout the record with
-		if ( !$pk ) $pk = $this->_id;
-		if ( !$pk ) return true;
-		
-		// Get current user
-		$user	= JFactory::getUser();
-		$uid	= $user->get('id');
-		
-		// Lets get table record and checkout the it
-		$tbl = $this->getTable($this->records_jtable, $_prefix='');
-		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
-		// Reaching this points means checkout failed
-		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
-		return false;
-	}
-
 
 	/**
-	 * Tests if the record is checked out
-	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
-	 */
-	function isCheckedOut( $uid=0 )
-	{
-		if ($this->_id < 1)  return false;
-
-		if ($this->_loadRecord())
-		{
-			if ($uid) {
-				return ($this->_record->checked_out && $this->_record->checked_out != $uid);
-			} else {
-				return $this->_record->checked_out;
-			}
-		}
-		else
-		{
-			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
-			return false;
-		}
-	}
-
-
-	/**
-	 * Method to store the record
+	 * Method to save the record, an alias of store method
 	 *
 	 * @param   array  $data  The form data.
 	 *
@@ -433,148 +172,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	function save($data)
 	{
-		// Initialise variables;
-		$dispatcher = JEventDispatcher::getInstance();
-
-		// NOTE: 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
-		$record = $this->getTable($this->records_jtable, $_prefix='');
-		$pk = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
-		$isNew = true;
-
-		// Include the plugins for the on save events.
-		if ($this->plugins_group)
-		{
-			JPluginHelper::importPlugin($this->plugins_group);
-		}
-
-		// Load existing data to allow maintaining any not-set properties
-		if ($pk > 0)
-		{
-			$record->load($pk);
-			$isNew = false;
-		}
-
-
-		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
-		if( !empty($data['templates']) )
-		{
-			$data['params'] = array_merge($data['params'], $data['templates']);
-			unset($data['templates']);
-		}
-
-		// Merge other special parameters, e.g. 'inheritcid'
-		if( !empty($data['special']) )
-		{
-			$data['params'] = array_merge($data['params'], $data['special']);
-			unset($data['special']);
-		}
-
-		// Get RAW layout field values, validation will follow ...
-		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
-		$data['params']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
-
-
-		// ***
-		// *** Special handling of some FIELDSETs: e.g. 'attribs/params' and optionally for other fieldsets too, like: 'metadata'
-		// *** By doing partial merging of these arrays we support having only a sub-set of them inside the form
-		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
-		// ***
-		$mergeProperties = array('params');
-		$mergeOptions = array('params_fset' => 'params', 'layout_type' => 'category');
-		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
-
-		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
-		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
-		foreach($mergeProperties as $prop)
-		{
-			unset($data[$prop]);
-		}
-
-
-		// Set the new parent id if parent id not matched OR while New/Save as Copy .
-		if ($record->parent_id != $data['parent_id'] || $data['id'] == 0)
-		{
-			$record->setLocation($data['parent_id'], 'last-child');
-		}
-
-		// Extra steps after loading record, and before calling JTable::bind()
-		$this->_prepareBind($record, $data);
-
-		// Bind data to the jtable
-		if (!$record->bind($data))
-		{
-			$this->setError($record->getError());
-			return false;
-		}
-
-		// Put the new records in last position
-		if (!$record->id && property_exists($record, 'ordering') && !empty($this->useLastOrdering))
-		{
-			$record->ordering = $record->getNextOrder();
-		}
-
-		// Make sure the data is valid
-		if (!$record->check())
-		{
-			$this->setError($record->getError());
-			return false;
-		}
-
-		// Trigger the onContentBeforeSave event.
-		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew));
-		if (in_array(false, $result, true))
-		{
-			$this->setError($record->getError());
-			return false;
-		}
-
-		// Store data in the db
-		if (!$record->store())
-		{
-			$this->setError($record->getError());
-			return false;
-		}
-		
-		// Saving asset was handled by the JTable:store() of this CLASS model
-		// ...
-		
-		$this->_record = $record;			 // Get the new / updated record object
-		$this->_id     = $record->id;  // Get id of newly created records
-		$this->setState($this->getName() . '.id', $record->id);  // Set new id into state
-
-		// Update language Associations
-		$this->saveAssociations($record, $data);
-
-		// Trigger the onContentAfterSave event.
-		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
-
-		// Rebuild the path for the category:
-		if (!$record->rebuildPath($record->id))
-		{
-			$this->setError($record->getError());
-			return false;
-		}
-
-		// Rebuild the paths of the category's children:
-		if (!$record->rebuild($record->id, $record->lft, $record->level, $record->path))
-		{
-			$this->setError($record->getError());
-			return false;
-		}
-
-		// Restore extension property of the category to 'com_content'
-		if ($record->id)
-		{
-			$query 	= 'UPDATE #__categories'
-				. ' SET extension = "com_content" '
-				. ' WHERE id = ' . (int)$record->id
-				;
-		}
-
-		// Clear the cache
-		$this->cleanCache();
-
-		return true;
+		$this->store($data);
 	}
 
 
@@ -596,9 +194,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		parent::cleanCache('mod_articles_news');
 		parent::cleanCache('mod_articles_popular');
 	}
-	
-	
-	
+
+
 	/**
 	 * Method to load inherited parameters
 	 *
@@ -741,22 +338,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 
 	/**
-	 * Returns a Table object, always creating it
-	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 * @return	JTable	A database object
-	 * @since	1.6
-	*/
-	public function getTable($type = null, $prefix = '', $config = array())
-	{
-		$type = $type ?: $this->records_jtable;
-		return JTable::getInstance($type, $prefix, $config);
-	}
-
-
-	/**
 	 * Method to get the row form.
 	 *
 	 * @param   array    $data      An optional array of data for the form to interogate.
@@ -768,7 +349,7 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		$extension = $this->getState('category.extension');
+		$extension = $this->getState($this->getName().'.extension');
 		$jinput = JFactory::getApplication()->input;
 
 		// A workaround to get the extension and other data into the model for save requests.
@@ -777,11 +358,11 @@ class FlexicontentModelCategory extends JModelAdmin
 			$extension = $data['extension'];
 			$parts = explode('.', $extension);
 
-			$this->setState('category.extension', $extension);
-			$this->setState('category.component', $parts[0]);
-			$this->setState('category.section', @$parts[1]);
+			$this->setState($this->getName().'.extension', $extension);
+			$this->setState($this->getName().'.component', $parts[0]);
+			$this->setState($this->getName().'.section', @$parts[1]);
 		}
-		$this->setState('category.language', isset($data['language']) ? $data['language'] : null);
+		$this->setState($this->getName().'.language', isset($data['language']) ? $data['language'] : null);
 
 		// Get the form.
 		$form = $this->loadForm($this->option.'.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
@@ -790,6 +371,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		{
 			return false;
 		}
+		$form->option = $this->option;
+		$form->context = $this->getName();
 
 		// Modify the form based on Edit State access controls.
 		if (empty($data['extension']))
@@ -818,33 +401,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 
 	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return  mixed  The data for the form.
-	 *
-	 * @since   1.6
-	 */
-	protected function loadFormData()
-	{
-		// Check the session for previously entered form data.
-		$app = JFactory::getApplication();
-		$data = $app->getUserState($this->option.'.edit.'.$this->getName().'.data', array());
-
-		// Clear form data from session ?
-		$app->setUserState($this->option.'.edit.'.$this->getName().'.data', false);
-
-		if (empty($data))
-		{
-			$data = $this->getItem($this->_id);
-		}
-
-		$this->preprocessData($this->option.'.'.$this->getName(), $data);
-		
-		return $data;
-	}
-
-
-	/**
 	 * Method to get a record.
 	 *
 	 * @param	integer  $pk An optional id of the object to get, otherwise the id from the model state is used.
@@ -869,8 +425,8 @@ class FlexicontentModelCategory extends JModelAdmin
 			// Prime required properties.
 			if (empty($item->id))
 			{
-				$item->parent_id	= $this->getState('category.parent_id');
-				$item->extension	= $this->getState('category.extension');
+				$item->parent_id	= $this->getState($this->getName().'.parent_id');
+				$item->extension	= $this->getState($this->getName().'.extension');
 			}
 
 			// Convert the metadata field to an array.
@@ -947,8 +503,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		jimport('joomla.filesystem.path');
 
 		$lang = JFactory::getLanguage();
-		$component = $this->getState('category.component');
-		$section = $this->getState('category.section');
+		$component = $this->getState($this->getName().'.component');
+		$section = $this->getState($this->getName().'.section');
 		$extension = JFactory::getApplication()->input->get('extension', null);
 
 		// Get the component form if it exists
@@ -990,7 +546,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		if ($this->useAssociations())
 		{
 			$languages = JLanguageHelper::getContentLanguages(false, true, null, 'ordering', 'asc');
-			$data_language = !empty($data->language) ? $data->language : $this->getState('category.language');
+			$data_language = !empty($data->language) ? $data->language : $this->getState($this->getName().'.language');
 
 			if (count($languages) > 1)
 			{
@@ -1028,41 +584,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 
 	/**
-	 * Auto-populate the model state.
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @since	1.6
-	 */
-	protected function populateState()
-	{
-		$app = JFactory::getApplication('administrator');
-
-		$parentId = $app->input->getInt('parent_id');
-		$this->setState('category.parent_id', $parentId);
-
-		// Load the User state.
-		$pk = $this->_id ?: $app->input->getInt('id');
-		$this->_id = $pk;
-		$this->setState($this->getName() . '.id', $pk);
-
-		$extension = $app->input->getCmd('extension', FLEXI_CAT_EXTENSION);
-		$this->setState('category.extension', $extension);
-		$parts = explode('.', $extension);
-
-		// Extract the component name
-		$this->setState('category.component', $parts[0]);
-
-		// Extract the optional section name
-		$this->setState('category.section', (count($parts) > 1) ? $parts[1] : null);
-
-		// Load the parameters.
-		$params	= JComponentHelper::getParams('com_flexicontent');
-		$this->setState('params', $params);
-	}
-
-
-	/**
 	 * Method to get parameters of parent categories
 	 *
 	 * @access public
@@ -1089,161 +610,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 
 	/**
-	 * Method to change the title & alias.
-	 *
-	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
-	 * @param   string   $alias      The alias / name.
-	 * @param   string   $title      The title / label.
-	 *
-	 * @return  array    Contains the modified title and alias / name.
-	 *
-	 * @since   1.7
-	 */
-	protected function generateNewTitle($parent_id, $alias, $title)
-	{
-		// Alter the title & alias
-		$table = $this->getTable();
-
-		while ($table->load(array('alias' => $alias, 'parent_id' => $parent_id)))
-		{
-			$title = StringHelper::increment($title);
-			$alias = StringHelper::increment($alias, 'dash');
-		}
-
-		return array($title, $alias);
-	}
-
-	
-	/**
-	 * Method to save language associations
-	 *
-	 * @return  boolean True if successful
-	 */
-	function saveAssociations(&$item, &$data)
-	{
-		$item = $item ? $item: $this->_record;
-		$context = 'com_categories';
-		
-		return flexicontent_db::saveAssociations($item, $data, $context);
-	}
-
-
-	/**
-	 * Method to determine if J3.1+ associations should be used
-	 *
-	 * @return  boolean True if using J3 associations; false otherwise.
-	 */
-	public function useAssociations()
-	{
-		return flexicontent_db::useAssociations();
-	}
-
-
-	/**
-	 * Method to check if the user can edit the record
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	3.2.0
-	 */
-	function canEdit($record=null)
-	{
-		$record = $record ?: $this->_record;
-
-		return parent::canEdit($record);
-	}
-
-
-	/**
-	 * Method to check if the user can edit the record
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	3.2.0
-	 */
-	function canEditState($record=null)
-	{
-		$record = $record ?: $this->_record;
-
-		return parent::canEditState($record);
-	}
-
-
-	/**
-	 * Method to check if the user can edit the record
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	3.2.0
-	 */
-	function canDelete($record=null)
-	{
-		$record = $record ?: $this->_record;
-
-		return parent::canDelete($record);
-	}
-
-
-	/**
-	 * Helper method to format a value as array
-	 * 
-	 * @return object
-	 * @since 3.2.0
-	 */
-	private function formatToArray($value)
-	{
-		if (is_object($value))
-		{
-			return (array) $value;
-		}
-		if (!is_array($value) && !strlen($value))
-		{
-			return array();
-		}
-		return is_array($value) ? $value : array($value);
-	}
-
-
-	/**
-	 * Helper method to PARTLY bind LAYOUT and other ARRAY properties
-	 * so that any fields missing completely from the form can maintain their old values
-	 * 
-	 * @return object
-	 * @since 3.2.0
-	 */
-	function mergeAttributes(&$item, &$data, $properties, $options)
-	{
-		if (isset($options['params_fset']) && isset($options['layout_type']))
-		{
-			// Merge Layout parameters into parameters of the record
-			flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
-
-			// Unset layout data since these we handled above
-			unset($data[$options['params_fset']]['layouts']);
-		}
-
-
-		// Merge specified array properties by looping through them, thus any
-		// fields not present in the form will maintain their existing values
-		foreach($properties as $prop)
-		{
-			if (is_array($data[$prop]))
-			{
-				// Convert property string to Registry object
-				$item->$prop = new JRegistry($item->$prop);
-				// Merge the field values
-				foreach ($data[$prop] as $k => $v)
-				{
-					$item->$prop->set($k, $v);
-				}
-				// Convert property back to string
-				$item->$prop = $item->$prop->toString();
-			}
-		}
-	}
-
-
-	/**
 	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
@@ -1252,19 +618,51 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	private function _prepareBind($record, & $data)
 	{
-		// Handle data of the selected ilayout
-		$jinput = JFactory::getApplication()->input;
-
-		// Alter the title for save as copy
-		$task = $jinput->get('task', '', 'cmd');
-		if ($task == 'save2copy')
+		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
+		if( !empty($data['templates']) )
 		{
-			list($title, $alias) = $this->generateNewTitle($data['parent_id'], $data['alias'], $data['title']);
-			$data['title'] = $title;
-			$data['alias'] = $alias;
+			$data['params'] = array_merge($data['params'], $data['templates']);
+			unset($data['templates']);
 		}
 
-		// Optional copy parameters from another category
+		// Merge other special parameters, e.g. 'inheritcid'
+		if( !empty($data['special']) )
+		{
+			$data['params'] = array_merge($data['params'], $data['special']);
+			unset($data['special']);
+		}
+
+		// Get RAW layout field values, validation will follow ...
+		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
+		$data['params']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
+
+
+		// ***
+		// *** Special handling of some FIELDSETs: e.g. 'attribs/params' and optionally for other fieldsets too, like: 'metadata'
+		// *** By doing partial merging of these arrays we support having only a sub-set of them inside the form
+		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
+		// ***
+		$mergeProperties = array('params');
+		$mergeOptions = array('params_fset' => 'params', 'layout_type' => 'category', 'model_name' => $this->record_name);
+		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
+
+		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
+		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
+		foreach($mergeProperties as $prop)
+		{
+			unset($data[$prop]);
+		}
+
+
+		// Set the new parent id if parent id not matched OR while New/Save as Copy .
+		if ($record->parent_id != $data['parent_id'] || $data['id'] == 0)
+		{
+			$record->setLocation($data['parent_id'], 'last-child');
+		}
+
+		parent::_prepareBind($record, $data);
+
+		// Optionally copy parameters from another category
 		$copycid = (int) $data['copycid'];
 		if ($copycid)
 		{
@@ -1283,6 +681,30 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	private function _afterStore($record, & $data)
 	{
+		parent::_afterStore($record, $data);
+
+		// Rebuild the path for the category:
+		if (!$record->rebuildPath($record->id))
+		{
+			$this->setError($record->getError());
+			return false;
+		}
+
+		// Rebuild the paths of the category's children:
+		if (!$record->rebuild($record->id, $record->lft, $record->level, $record->path))
+		{
+			$this->setError($record->getError());
+			return false;
+		}
+
+		// Restore extension property of the category to 'com_content'
+		if ($record->id)
+		{
+			$query 	= 'UPDATE #__categories'
+				. ' SET extension = "com_content" '
+				. ' WHERE id = ' . (int)$record->id
+				;
+		}
 	}
 
 
@@ -1295,5 +717,6 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	private function _afterLoad($record)
 	{
+		parent::_afterLoad($record);
 	}
 }

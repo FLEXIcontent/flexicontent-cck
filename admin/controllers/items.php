@@ -478,7 +478,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get newly saved -latest- version (store task gets latest) of the item, and also calculate publish privelege
 		// ***********************************************************************************************************
 		$item = $model->getItem($validated_data['id'], $check_view_access=false, $no_cache=true, $force_version=-1);
-		$canPublish = $model->canEditState( $item, $check_cat_perm=true ) || $hasCoupon;
+		$canPublish = $model->canEditState( $item ) || $hasCoupon;
 		
 		
 		// ********************************************************************************************

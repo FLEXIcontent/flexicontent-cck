@@ -376,19 +376,31 @@ class FlexicontentHelperPerm
 	 */
 	static function checkTypeAccess($type_id, $rule, $type=null)
 	{
-		static $allowed;
-		if (!$type_id) return true;  // a not set type defaults to true
+		static $cache;
 		
-		if ( !isset($allowed[$rule][$type_id]) )
+		// no type ID, return true, (thus item form will show even if it has empty TYPE selector)
+		if (!$type_id)
 		{
-			if ($rule=='core.create')
-				$allowed[$rule][$type_id] = ($type ? ! $type->itemscreatable : true) || $user->authorise($rule, 'com_flexicontent.type.'.$type_id);
-			else
-				// featured not enabled yet
-				//$allowed[$rule][$type_id] = $user->authorise($rule, 'com_flexicontent.type.'.$type_id);
-				$allowed[$rule][$type_id] = true;
+			return true;
 		}
-		return $allowed[$rule][$type_id];
+
+		if ( !isset($cache[$rule][$type_id]) )
+		{
+			$asset = 'com_flexicontent.type.'.$type_id;
+
+			if ($rule=='core.create')
+			{
+				$cache[$rule][$type_id] = ($type ? ! $type->itemscreatable : true) || $user->authorise($rule, $asset);
+			}
+
+			// A non-implemented ACL (yet), just return TRUE
+			else
+			{
+				$cache[$rule][$type_id] = true;  // $user->authorise($rule, $asset);
+			}
+		}
+
+		return $cache[$rule][$type_id];
 	}
 
 
