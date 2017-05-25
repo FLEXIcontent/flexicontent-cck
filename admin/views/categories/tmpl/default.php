@@ -238,14 +238,6 @@ function delAllFilters() {
 		</tr>
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
-
 	<tbody>
 		<?php
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
@@ -473,6 +465,14 @@ function delAllFilters() {
 		} 
 		?>
 	</tbody>
+
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+	</tfoot>
 
 	</table>
 	

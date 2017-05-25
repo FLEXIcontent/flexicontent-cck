@@ -119,7 +119,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1); ?>">
-				<label class="label" for="stamp">
+				<label class="label" data-for="stamp">
 					<?php echo JText::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
 				</label>
 			</td>

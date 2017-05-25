@@ -17,7 +17,7 @@
 			<option value="2">JARCHIVED</option>
 			<option value="-2">JTRASHED</option>
 		</field>
-		<field name="approved" type="radio" default="1" label="FLEXI_REVIEW_APPROVED" description="FLEXI_REVIEW_APPROVED_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
+		<field name="approved" type="fcradio" default="1" label="FLEXI_REVIEW_APPROVED" description="FLEXI_REVIEW_APPROVED_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>

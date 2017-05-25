@@ -46,6 +46,8 @@ class FlexicontentViewTag extends JViewLegacy
 		$view       = $jinput->get('view', '', 'cmd');
 		$tip_class = ' hasTooltip';
 
+
+
 		// ***
 		// *** Get record data, and check if record is already checked out
 		// ***

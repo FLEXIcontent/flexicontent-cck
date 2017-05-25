@@ -2,15 +2,15 @@
 <form>
 
 	<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements" icon_class="icon-info-circle">
-		<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
-		<field name="name" type="text" label="FLEXI_TAG_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="" />
-		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="" />
-		<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="" class="btn-group btn-group-yesno">
+		<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="name" type="text" label="FLEXI_TAG_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="fc-prop-lbl" />
+		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="fc-prop-lbl" />
+		<field name="published" type="fcradio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl" >
 			<option value="1">JPUBLISHED</option>
 			<option value="0">JUNPUBLISHED</option>
 		</field>
-		<field name="checked_out" type="hidden" filter="unset" />
-		<field name="checked_out_time" type="hidden" filter="unset" />	
+		<field name="checked_out" type="hidden" filter="unset" labelclass="fc-prop-lbl" />
+		<field name="checked_out_time" type="hidden" filter="unset" labelclass="fc-prop-lbl" />	
 	</fieldset>
 
 </form>
