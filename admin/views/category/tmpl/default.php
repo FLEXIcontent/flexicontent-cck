@@ -388,7 +388,8 @@ $this->document->addScriptDeclaration($js);
 
 								foreach ($this->tmpls as $tmpl) :
 
-									$form_layout = $tmpl->params;
+									echo $form_layout = $tmpl->params;
+									continue;
 									$label = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 									echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 

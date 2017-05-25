@@ -122,11 +122,11 @@ class FlexicontentModelType extends FCModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null)
 	{
 		parent::_initRecord($record);
 
@@ -242,7 +242,7 @@ class FlexicontentModelType extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _prepareBind($record, & $data)
+	protected function _prepareBind($record, & $data)
 	{
 		// ***
 		// *** Special handling of some FIELDSETs: e.g. 'attribs/params' and optionally for other fieldsets too, like: 'metadata'
@@ -251,7 +251,7 @@ class FlexicontentModelType extends FCModelAdmin
 
 		// Get RAW layout field values, validation will follow ...
 		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
-		$data['params']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
+		$data['attribs']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
 
 		// We will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		$mergeProperties = array('attribs');
@@ -276,7 +276,7 @@ class FlexicontentModelType extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _afterStore($record, & $data)
+	protected function _afterStore($record, & $data)
 	{
 		parent::_afterStore($record, $data);
 
@@ -295,7 +295,7 @@ class FlexicontentModelType extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _afterLoad($record)
+	protected function _afterLoad($record)
 	{
 		parent::_afterLoad($record);
 	}

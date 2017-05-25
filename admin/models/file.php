@@ -122,11 +122,11 @@ class FlexicontentModelFile extends JModelAdmin
 	/**
 	 * Method to load file data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _loadRecord()
+	protected function _loadRecord()
 	{
 		// Lets load the file if it doesn't already exist
 		if (empty($this->_file))

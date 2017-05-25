@@ -298,7 +298,7 @@ class flexicontent_types extends _flexicontent_types
 		return true;
 	}*/
 	
-	private function _getLastId()
+	protected function _getLastId()
 	{
 		$query  = 'SELECT MAX(id)'
 			. ' FROM #__flexicontent_types'

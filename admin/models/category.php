@@ -129,11 +129,11 @@ class FlexicontentModelCategory extends FCModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null)
 	{
 		parent::_initRecord($record);
 
@@ -616,7 +616,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _prepareBind($record, & $data)
+	protected function _prepareBind($record, & $data)
 	{
 		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
 		if( !empty($data['templates']) )
@@ -679,7 +679,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _afterStore($record, & $data)
+	protected function _afterStore($record, & $data)
 	{
 		parent::_afterStore($record, $data);
 
@@ -715,7 +715,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _afterLoad($record)
+	protected function _afterLoad($record)
 	{
 		parent::_afterLoad($record);
 	}
