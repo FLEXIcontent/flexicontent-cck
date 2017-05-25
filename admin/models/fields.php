@@ -722,11 +722,11 @@ class FlexicontentModelFields extends JModelList
 	/**
 	 * Method to get the last id
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	int
 	 * @since	1.5
 	 */
-	private function _getLastId()
+	protected function _getLastId()
 	{
 		$query  = 'SELECT MAX(id)'
 				. ' FROM #__flexicontent_fields'

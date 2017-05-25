@@ -158,16 +158,17 @@ class ParentClassItem extends FCModelAdmin
 	function __construct()
 	{
 		parent::__construct();
+		$jinput  = JFactory::getApplication()->input;
 
 		// Set current category ID and current type ID only for new items
-		$curcatid = $pk
+		$curcatid = $this->_id
 			? 0
 			: $jinput->get('cid', 0, 'int');
-		$typeid = $pk
+		$typeid =  $this->_id
 			? 0
 			: $jinput->get('typeid', 0, 'int');
 
-		$this->setId($pk, $curcatid, $typeid);
+		$this->setId($this->_id, $curcatid, $typeid);
 	}
 
 
@@ -179,7 +180,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function setId($id, $currcatid=0, $typeid=0, $ilayout=null)
 	{
-		// Set record id and wipe data
+		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
 		{
 			$this->_record = null;
@@ -345,11 +346,11 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to load record data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _loadRecord( $no_cache=false, $force_version=0 )
+	protected function _loadRecord( $no_cache=false, $force_version=0 )
 	{
 		// This is ITEM cache. NOTE: only unversioned items are cached
 		static $items = array();
@@ -1420,11 +1421,11 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null)
 	{
 		parent::_initRecord($record);
 
@@ -4802,7 +4803,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @since	3.2.0
 	 */
 	// TODO add call of this method, currently unused
-	private function _prepareBind($record, & $data)
+	protected function _prepareBind($record, & $data)
 	{
 		parent::_prepareBind($record, $data);
 	}
@@ -4816,7 +4817,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @since	3.2.0
 	 */
 	// TODO add call of this method, currently unused
-	private function _afterStore($record, & $data)
+	protected function _afterStore($record, & $data)
 	{
 		parent::_afterStore($record, $data);
 	}
@@ -4830,7 +4831,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @since	3.2.0
 	 */
 	// TODO add call of this method, currently unused
-	private function _afterLoad($record)
+	protected function _afterLoad($record)
 	{
 		parent::_afterLoad($record);
 	}

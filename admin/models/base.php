@@ -151,10 +151,13 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function setId($id)
 	{
-		// Set record id and wipe data
-		$this->_id     = (int) $id;
-		$this->_record = null;
-		$this->setState($this->getName() . '.id', $this->_id);
+		// Set record id and wipe data, if setting a different ID
+		if ($this->_id != $id)
+		{
+			$this->_id     = (int) $id;
+			$this->_record = null;
+			$this->setState($this->getName() . '.id', $this->_id);
+		}
 	}
 
 
@@ -255,11 +258,11 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to load record data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _loadRecord($pk = null)
+	protected function _loadRecord($pk = null)
 	{
 		// Maybe we were given a name, try to use it if table has such a property
 		$name = $pk != (int) $pk ? $pk : null;
@@ -306,11 +309,11 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to get the last id
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	int
 	 * @since	1.0
 	 */
-	private function _getLastId()
+	protected function _getLastId()
 	{
 		$query  = 'SELECT MAX(id)'
 			. ' FROM #__' . $this->records_dbtbl;
@@ -324,11 +327,11 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to initialise the record data
 	 *
-	 * @access	private
+	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	private function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null)
 	{
 		// Initialize a given record object
 		if ($record) ;
@@ -818,7 +821,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * @return object
 	 * @since 3.2.0
 	 */
-	private function formatToArray($value)
+	function formatToArray($value)
 	{
 		if (is_object($value))
 		{
@@ -844,7 +847,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		if (isset($options['params_fset']) && isset($options['layout_type']))
 		{
 			// Merge Layout parameters into parameters of the record
-			flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
+			$layout_data = flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
 
 			// Unset layout data since these we handled above
 			unset($data[$options['params_fset']]['layouts']);
@@ -881,7 +884,12 @@ abstract class FCModelAdmin extends JModelAdmin
 				$item->$prop = new JRegistry();
 				$item->$prop->loadArray($db_data[$prop]);
 				$item->$prop->loadArray($data[$prop]);
-				//if ($prop=='metadata') { echo "<pre>" . print_r($item->$prop->toArray(), true) . "</pre>"; exit; }
+				
+				// Add the layout data too (validated above)
+				if (!empty($layout_data) && $prop == $options['params_fset'])
+				{
+					$item->$prop->loadArray($layout_data);
+				}
 
 				// Convert property back to string
 				$item->$prop = $item->$prop->toString();
@@ -897,7 +905,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _prepareBind($record, & $data)
+	protected function _prepareBind($record, & $data)
 	{
 		// Handle data of the selected ilayout
 		$jinput = JFactory::getApplication()->input;
@@ -935,7 +943,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _afterStore($record, & $data)
+	protected function _afterStore($record, & $data)
 	{
 	}
 
@@ -947,7 +955,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since	3.2.0
 	 */
-	private function _afterLoad($record)
+	protected function _afterLoad($record)
 	{
 		// Convert attributes to a JRegistry object
 		if (property_exists($record, 'attribs'))
