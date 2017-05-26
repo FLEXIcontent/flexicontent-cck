@@ -406,9 +406,12 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * Tests if the record is checked out
 	 *
 	 * @access	public
+	 *
 	 * @param	int	A user id
+	 *
 	 * @return	boolean	True if checked out
-	 * @since	1.0
+	 *
+	 * @since   3.2.0
 	 */
 	function isCheckedOut( $uid=0 )
 	{
@@ -429,15 +432,29 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 	}
 
-
 	/**
-	 * Method to store the record
+	 * Method to save the record, an alias of store method
 	 *
 	 * @param   array  $data  The form data.
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @since   1.6
+	 * @since   3.2.0
+	 */
+	function save($data)
+	{
+		return $this->store($data);
+	}
+
+
+	/**
+	 * Legacy method to store the record, use save() instead
+	 *
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   3.2.0
 	 */
 	function store($data)
 	{
@@ -472,12 +489,6 @@ abstract class FCModelAdmin extends JModelAdmin
 			return false;
 		}
 
-		// Put the new records in last position
-		if (!$record->id && property_exists($record, 'ordering') && !empty($this->useLastOrdering))
-		{
-			$record->ordering = $record->getNextOrder();
-		}
-
 		// Make sure the data is valid
 		if (!$record->check())
 		{
@@ -485,7 +496,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			return false;
 		}
 
-		// Trigger the onContentBeforeSave event.
+		// Trigger the before save event (typically: onContentBeforeSave)
 		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew));
 		if (in_array(false, $result, true))
 		{
@@ -510,7 +521,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Update language Associations
 		$this->saveAssociations($record, $data);
 
-		// Trigger the onContentAfterSave event.
+		// Trigger the after save event (typically: onContentBeforeSave)
 		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
 
 		// Extra steps after loading record, and before calling JTable::bind()
@@ -526,7 +537,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Custom clean the cache
 	 *
-	 * @since	1.6
+	 * @since   3.2.0
 	 */
 	protected function cleanCache($group = NULL, $client_id = -1)
 	{
@@ -541,8 +552,10 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * @param	type	The table type to instantiate
 	 * @param	string	A prefix for the table class name. Optional.
 	 * @param	array	Configuration array for model. Optional.
+	 *
 	 * @return	JTable	A database object
-	 * @since	1.6
+	 *
+	 * @since   3.2.0
 	*/
 	public function getTable($type = null, $prefix = '', $config = array())
 	{
@@ -889,6 +902,7 @@ abstract class FCModelAdmin extends JModelAdmin
 				if (!empty($layout_data) && $prop == $options['params_fset'])
 				{
 					$item->$prop->loadArray($layout_data);
+					//echo "<pre>" . print_r($item->$prop->toArray(), true) . "</pre>";
 				}
 
 				// Convert property back to string
@@ -907,6 +921,19 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _prepareBind($record, & $data)
 	{
+
+		// (For nested records) Set the new parent id if parent id not matched OR while New/Save as Copy .
+		if (property_exists($record, 'parent_id') && $record->parent_id != $data['parent_id'] || $data['id'] == 0)
+		{
+			$record->setLocation($data['parent_id'], 'last-child');
+		}
+
+		// Put the new records in last position
+		if (property_exists($record, 'ordering') && !$record->id && !empty($this->useLastOrdering))
+		{
+			$record->ordering = $record->getNextOrder();
+		}
+
 		// Handle data of the selected ilayout
 		$jinput = JFactory::getApplication()->input;
 		$task   = $jinput->get('task', '', 'cmd');

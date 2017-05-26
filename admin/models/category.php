@@ -162,21 +162,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 
 	/**
-	 * Method to save the record, an alias of store method
-	 *
-	 * @param   array  $data  The form data.
-	 *
-	 * @return  boolean  True on success.
-	 *
-	 * @since   1.6
-	 */
-	function save($data)
-	{
-		$this->store($data);
-	}
-
-
-	/**
 	 * Custom clean the cache
 	 *
 	 * @since	1.6
@@ -653,12 +638,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 			unset($data[$prop]);
 		}
 
-
-		// Set the new parent id if parent id not matched OR while New/Save as Copy .
-		if ($record->parent_id != $data['parent_id'] || $data['id'] == 0)
-		{
-			$record->setLocation($data['parent_id'], 'last-child');
-		}
 
 		parent::_prepareBind($record, $data);
 
