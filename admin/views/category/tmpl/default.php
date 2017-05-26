@@ -393,7 +393,6 @@ $this->document->addScriptDeclaration($js);
 									echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 
 									if (!$cat_layout || $tmpl->name != $cat_layout) continue;
-									continue;
 
 									$fieldSets = $form_layout->getFieldsets($groupname);
 									foreach ($fieldSets as $fsname => $fieldSet) : ?>

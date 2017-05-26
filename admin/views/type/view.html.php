@@ -60,10 +60,6 @@ class FlexicontentViewType extends JViewLegacy
 		$manager_view = $ctrl = 'types';
 		$js = '';
 
-		// Get item layouts
-		$themes = flexicontent_tmpl::getTemplates();
-		$tmpls  = $themes->items;
-
 
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
@@ -199,13 +195,22 @@ class FlexicontentViewType extends JViewLegacy
 			: JToolBarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
 
 
+
+		// ***
+		// *** Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		// ***
+
 		// Load language file of currently selected template
 		$_ilayout = $row->attribs->get('ilayout');
 		if ($_ilayout)
 		{
 			FLEXIUtilities::loadTemplateLanguageFile( $_ilayout );
 		}
-		
+
+		// Get item layouts
+		$themes = flexicontent_tmpl::getTemplates($_ilayout);
+		$tmpls  = $themes->items;
+
 		// Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{

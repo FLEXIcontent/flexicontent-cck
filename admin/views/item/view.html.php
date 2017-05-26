@@ -869,23 +869,33 @@ class FlexicontentViewItem extends JViewLegacy
 		$tmpls_all	= $themes->items;
 
 		// (d) Get allowed layouts adding default layout (unless all templates are already allowed ... array is empty)
-		if ( empty($allowed_tmpls) ) {
+		if ( empty($allowed_tmpls) )
+		{
 			$allowed_tmpls = array();
 		}
-		if ( ! is_array($allowed_tmpls) ) {
+		if ( ! is_array($allowed_tmpls) )
+		{
 			$allowed_tmpls = explode("|", $allowed_tmpls);
 		}
-		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
+		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) )
+		{
+			$allowed_tmpls[] = $type_default_layout;
+		}
 
 		// (e) Create array of template data according to the allowed templates for current content type
-		if ( count($allowed_tmpls) ) {
-			foreach ($tmpls_all as $tmpl) {
-				if (in_array($tmpl->name, $allowed_tmpls) ) {
+		if ( count($allowed_tmpls) )
+		{
+			foreach ($tmpls_all as $tmpl)
+			{
+				if (in_array($tmpl->name, $allowed_tmpls) )
+				{
 					$tmpls[]= $tmpl;
 				}
 			}
-		} else {
-			$tmpls= $tmpls_all;
+		}
+		else
+		{
+			$tmpls = $tmpls_all;
 		}
 
 		// (f) Create JForm for the layout and apply Layout parameters values into the fields

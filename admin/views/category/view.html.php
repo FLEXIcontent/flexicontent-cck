@@ -76,9 +76,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 
 
-		// Get category parameters and inherited parameters
-		$catparams = new JRegistry($row->params);
-		$iparams   = $this->get( 'InheritedParams' );
+		// Get category parameters NOTE: These are used for case that we DO NOT want inherited params
+		$catparams = & $row->params;
+
+		// Get category inherited parameters (Component + parent categories)
+		$iparams = $this->get('InheritedParams');
 
 
 
