@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('legacy.view.legacy');
 
 /**
- * View class for the FLEXIcontent category screen
+ * View class for the FLEXIcontent tag screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -228,8 +228,8 @@ class FlexicontentViewTag extends JViewLegacy
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 		// Assign data to template
-		$this->row    = $row;
-		$this->form   = $form;
+		$this->row      = $row;
+		$this->form     = $form;
 
 		parent::display($tpl);
 	}

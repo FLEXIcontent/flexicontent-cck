@@ -758,17 +758,20 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Get/Create the model
 		$model  = $this->getModel($this->record_name);
-		$record = $model->getItem();
+		$record = $model->getFile();
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
 		$view->document = $document;
 
 		// Calculate access
+		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $record->uploaded_by == $user->get('id');
-		$is_authorised = $canedit || $caneditown;
-		
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
+		$is_authorised = $record->id
+			? $canupload
+			: $canedit || $caneditown;
+
 		// Check access
 		if ( !$is_authorised )
 		{
@@ -788,8 +791,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Checkout the record and proceed to edit form
 		if ( !$model->checkout() )
 		{
-			$app->setHeader('status', '400 Bad Request', true);
-			$this->setRedirect($this->returnURL, $model->getError(), 'error');
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 			return;
 		}
 
@@ -920,14 +923,23 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$denied_files = array();
 		foreach($cid as $_id)
 		{
-			if ( !isset($files[$_id]) ) continue;
-			$filename = $files[$_id]->filename_original ? $files[$_id]->filename_original : $files[$_id]->filename;
+			if ( !isset($files[$_id]) )
+			{
+				continue;
+			}
+			$filename = $files[$_id]->filename_original
+				? $files[$_id]->filename_original
+				: $files[$_id]->filename;
 
 			// Note: component 'deleteownfile' was checked above
-			if ($candelete || $files[$_id]->uploaded_by == $user->get('id'))
+			if ($candelete || ($user->get('id') && $files[$_id]->uploaded_by == $user->get('id')))
+			{
 				$allowed_files[$_id] = $filename;
+			}
 			else
+			{
 				$denied_files[$_id] = $filename;
+			}
 		}
 		if (count($denied_files))
 		{
@@ -940,7 +952,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if (count($allowed_cid) && !$model->delete($allowed_cid))
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
-			$this->exitMessages = array( 0 => array('error' => JText::_('FLEXI_OPERATION_FAILED').' : '.$model->getError()) );
+			$this->exitMessages = array( 0 => array('error' => JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError()) );
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = false;
 
@@ -972,22 +984,25 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
-		$file		= $model->getFile();
+		$record	= $model->getFile();
 
 		$data = $this->input->post->getArray();  // Default filtering will remove HTML
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
 		$data['hits'] = (int) $data['hits'];
 
 		// calculate access
+		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
-		$is_authorised = $canedit || $caneditown;
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
+		$is_authorised = $record->id
+			? $canupload
+			: $canedit || $caneditown;
 
 		// check access
 		if ( !$is_authorised )
 		{
-			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			return;
 		}
 
@@ -1031,32 +1046,30 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Validate access level exists (set to public otherwise)
 		$data['access'] = flexicontent_html::dataFilter($data['access'], 11, 'ACCESSLEVEL', 0);
 
-		if ($model->store($data))
+		if (!$model->store($data))
 		{
-			switch ($this->task)
-			{
-				case 'apply' :
-					$edit_task = "task=filemanager.edit";
-					$link = 'index.php?option=com_flexicontent&'.$edit_task.'&cid[]='.(int) $model->get('id');
-					break;
-
-				default :
-					$link = 'index.php?option=com_flexicontent&view=filemanager';
-					break;
-			}
-			$msg = JText::_( 'FLEXI_FILE_SAVED' );
-			$model->checkin();
-			
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-		}
-		else
-		{
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' ).' : '.$model->getError();
-			throw new Exception($msg, 500);
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ERROR_SAVING_FILENAME') . ' : ' . $model->getError(), 'error');
+			return;
 		}
 
-		$this->setRedirect($link, $msg);
+		$model->checkin();
+
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+
+		switch ($this->task)
+		{
+			case 'apply' :
+				$edit_task = "task=filemanager.edit";
+				$link = 'index.php?option=com_flexicontent&'.$edit_task.'&cid[]='.(int) $model->get('id');
+				break;
+
+			default :
+				$link = 'index.php?option=com_flexicontent&view=filemanager';
+				break;
+		}
+		$this->setRedirect($link, JText::_('FLEXI_FILE_SAVED'));
 	}
 
 
@@ -1137,16 +1150,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();
 		
-		// calculate access
+		// Calculate access
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
 		$canpublishown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent');
 		$is_authorised = $canpublish || $canpublishown;
 		
-		// check access
+		// Check access
 		if ( !$is_authorised )
 		{
-			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect($this->returnURL);
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			return;
 		}
 
@@ -1155,8 +1168,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (!is_array( $cid ) || count( $cid ) < 1)
 		{
-			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
-			$this->setRedirect($this->returnURL);
+			$app->setHeader('status', '400 Bad Request', true);
+			$this->setRedirect($this->returnURL, JText::_($state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH'), 'error');
 			return;
 		}
 
@@ -1169,15 +1182,28 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$msg = '';
 		$allowed_files = array();
 		$denied_files = array();
-		foreach($cid as $_id) {
-			if ( !isset($files[$_id]) ) continue;
-			$filename = $files[$_id]->filename_original ? $files[$_id]->filename_original : $files[$_id]->filename;
-			if ($canpublish || $files[$_id]->uploaded_by == $user->get('id'))
+		foreach($cid as $_id)
+		{
+			if ( !isset($files[$_id]) )
+			{
+				continue;
+			}
+
+			$filename = $files[$_id]->filename_original
+				? $files[$_id]->filename_original
+				: $files[$_id]->filename;
+
+			if ($canpublish || ($user->get('id') && $files[$_id]->uploaded_by == $user->get('id')))
+			{
 				$allowed_files[$_id] = $filename;
+			}
 			else
+			{
 				$denied_files[$_id] = $filename;
+			}
 		}
-		if ( count($denied_files) )
+
+		if (count($denied_files))
 		{
 			$app->enqueueMessage(' You are not allowed to change state of files: '. implode(', ', $denied_files), 'warning');
 		}
@@ -1185,11 +1211,15 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (count($allowed_cid) && !$model->publish($allowed_cid, $state))
 		{
-			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-			throw new Exception($msg, 500);
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			return;
 		}
 
-		if (count($allowed_cid)) $msg .= JText::_( $state ? 'FLEXI_PUBLISHED' : 'FLEXI_UNPUBLISHED' ) . ': '. implode(', ', $allowed_files);
+		if (count($allowed_cid))
+		{
+			$msg .= JText::_( $state ? 'FLEXI_PUBLISHED' : 'FLEXI_UNPUBLISHED' ) . ': '. implode(', ', $allowed_files);
+		}
 
 		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
@@ -1210,6 +1240,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
+		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$model = $this->getModel('filemanager');
 		$cid = $this->input->get('cid', array(0), 'array');
@@ -1226,8 +1257,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// check access
 		if ( !$is_authorised )
 		{
-			JError::raiseWarning( 403, JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			$this->setRedirect($this->returnURL);
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			return;
 		}
 		
@@ -1235,16 +1266,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JArrayHelper::toInteger($accesses);
 		$access = $accesses[$file_id];
 		
-		if(!$model->saveaccess( $file_id, $access )) {
-			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
-			JError::raiseWarning( 500, $model->getError() );
-		} else {
-			$msg = '';
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
+		if (!$model->saveaccess($file_id, $access))
+		{
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			return;
 		}
-		
-		$this->setRedirect($this->returnURL, $msg);
+
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+
+		$this->setRedirect($this->returnURL);
 	}
 
 

@@ -32,34 +32,38 @@ class FlexicontentViewReviews extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		// Initialise variables
-		$app      = JFactory::getApplication();
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
-		$document = JFactory::getDocument();
+		flexicontent_html::__DEV_check_reviews_table();
+
+		// ***
+		// *** Initialise variables
+		// ***
+
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 
-		flexicontent_html::__DEV_check_reviews_table();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
 		
 		// Get model
 		$model = $this->getModel();
-		
+
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
-		
-		
-		// ***********
-		// Get filters
-		// ***********
+
+
+
+		// ***
+		// *** Get filters
+		// ***
 
 		$count_filters = 0;
 
 		// Various filters
-		$filter_state     = $model->getState('filter_state');
+		$filter_state     = $model->getState( 'filter_state' );
 
 		if ($filter_state) $count_filters++;
 		
@@ -72,19 +76,19 @@ class FlexicontentViewReviews extends JViewLegacy
 		$filter_order_Dir = $model->getState('filter_order_Dir');
 
 
-		// ****************************
-		// Important usability messages
-		// ****************************
-		
+		// ***
+		// *** Important usability messages
+		// ***
+
 		if ( $cparams->get('show_usability_messages', 1) )
 		{
 		}
 		
 		
 		
-		// **************************
-		// Add css and js to document
-		// **************************
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		flexicontent_html::loadFramework('select2');
 		//JHTML::_('behavior.tooltip');
@@ -95,21 +99,16 @@ class FlexicontentViewReviews extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+
+
+
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
 		
-		
-		
-		// *****************************
 		// Get user's global permissions
-		// *****************************
-		
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanReviews');
 		
@@ -131,39 +130,42 @@ class FlexicontentViewReviews extends JViewLegacy
 		{
 			$btn_task = '';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=reviews&layout=import&tmpl=component';
-			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-				$js .= "
-					jQuery('#toolbar-import a.toolbar, #toolbar-import button')
-						.attr('onclick', 'javascript:;')
-						.attr('href', '".$popup_load_url."')
-						.attr('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
-				";
-				JToolBarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
-				JHtml::_('behavior.modal', '#toolbar-import a.toolbar, #toolbar-import button');
-			} else {
-				$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
-			}
-			JToolBarHelper::divider();  JToolBarHelper::spacer();
+			//$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
+			$js .= "
+				jQuery('#toolbar-import a.toolbar, #toolbar-import button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
+			";
+			JToolBarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
+			JHtml::_('behavior.modal', '#toolbar-import a.toolbar, #toolbar-import button');
+			JToolBarHelper::divider();
 		}
-		
+
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
-		if ($perms->CanCreateReviews) {
+		if ($perms->CanCreateReviews)
+		{
 			JToolBarHelper::addNew($contrl.'add');
 		}
-		JToolBarHelper::editList($contrl.'edit');
-		
-		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML tag id)
-		$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
-		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
-		$btn_task    = $contrl.'remove';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-		
-		// Checkin
+
+		if (1)
+		{
+			JToolBarHelper::editList($contrl.'edit');
+		}
+
+		if (1)
+		{
+			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+
 		JToolbarHelper::checkin($contrl.'checkin');
 		
 		if ($perms->CanConfig) {
@@ -184,8 +186,8 @@ class FlexicontentViewReviews extends JViewLegacy
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$rows = $this->get( 'Data');
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
+
+
 		// Create pagination object
 		$pagination = $this->get( 'Pagination' );
 
@@ -214,12 +216,12 @@ class FlexicontentViewReviews extends JViewLegacy
 		
 		//assign data to template
 		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('lists'	, $lists);
-		$this->assignRef('rows'		, $rows);
-		$this->assignRef('pagination'	, $pagination);
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pagination = $pagination;
 		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
+		$this->option = $option;
+		$this->view = $view;
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

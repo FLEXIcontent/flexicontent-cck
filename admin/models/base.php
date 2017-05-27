@@ -427,25 +427,10 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 		else
 		{
-			JError::raiseWarning( 0, 'Unable to Load Data');
+			$this->setError('Unable to Load Data');
 			return false;
 		}
 	}
-
-	/**
-	 * Method to save the record, an alias of store method
-	 *
-	 * @param   array  $data  The form data.
-	 *
-	 * @return  boolean  True on success.
-	 *
-	 * @since   3.2.0
-	 */
-	function save($data)
-	{
-		return $this->store($data);
-	}
-
 
 	/**
 	 * Legacy method to store the record, use save() instead
@@ -457,6 +442,21 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * @since   3.2.0
 	 */
 	function store($data)
+	{
+		return $this->save($data);
+	}
+
+
+	/**
+	 * Method to save the record
+	 *
+	 * @param   array  $data  The form data.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   3.2.0
+	 */
+	function save($data)
 	{
 		// Initialise variables;
 		$dispatcher = JEventDispatcher::getInstance();

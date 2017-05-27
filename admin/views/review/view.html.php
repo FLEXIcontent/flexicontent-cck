@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('legacy.view.legacy');
 
 /**
- * View class for the FLEXIcontent category screen
+ * View class for the FLEXIcontent review screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent

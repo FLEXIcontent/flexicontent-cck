@@ -35,12 +35,12 @@ class FlexicontentViewFields extends JViewLegacy
 		// ********************
 		// Initialise variables
 		// ********************
-		
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
-		
+
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
@@ -51,42 +51,44 @@ class FlexicontentViewFields extends JViewLegacy
 
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
-		
+
+
+
 		// ***********
 		// Get filters
 		// ***********
-		
+
 		$count_filters = 0;
-		
-		// various filters
+
+		// Various filters
 		$filter_fieldtype = $model->getState( 'filter_fieldtype' );
 		$filter_assigned  = $model->getState( 'filter_assigned' );
 		$filter_type      = $model->getState( 'filter_type' );
-		$filter_state 		= $model->getState( 'filter_state' );
+		$filter_state     = $model->getState( 'filter_state' );
 		$filter_access    = $model->getState( 'filter_access' );
-		
-		if ($filter_assigned) $count_filters++; if ($filter_fieldtype) $count_filters++;
-		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
+
+		if ($filter_fieldtype) $count_filters++;
+		if ($filter_assigned) $count_filters++;
 		if ($filter_type) $count_filters++;
+		if ($filter_state) $count_filters++;
+		if ($filter_access) $count_filters++;
 		
-		// ordering filters
-		$filter_order     = $model->getState( 'filter_order' );
-		$filter_order_Dir	= $model->getState( 'filter_order_Dir' );
-		
-		// text search		
+		// Text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
-		
+		// Order and order direction
+		$filter_order     = $model->getState( 'filter_order' );
+		$filter_order_Dir = $model->getState( 'filter_order_Dir' );
+
+
 		// ****************************
 		// Important usability messages
 		// ****************************
-		
-		$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
-		
-		/*if ( $cparams->get('show_usability_messages', 1) )
+
+		if ( $cparams->get('show_usability_messages', 1) )
 		{
+			/*$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
 			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
 			if (!$notice_content_type_order)
 			{
@@ -95,8 +97,8 @@ class FlexicontentViewFields extends JViewLegacy
 				
 				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
 				$app->enqueueMessage(JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
-			}
-		}*/
+			}*/
+		}
 		
 		$this->minihelp = '
 			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
@@ -120,7 +122,6 @@ class FlexicontentViewFields extends JViewLegacy
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
-		$js = "jQuery(document).ready(function(){";
 		
 		
 		// *****************************
@@ -143,7 +144,12 @@ class FlexicontentViewFields extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolBarHelper::title( $doc_title, 'fields' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
+		// Create the toolbar
+		$js = "jQuery(document).ready(function(){";
+
+		$contrl = "fields.";
+
 		if ($perms->CanEditField)
 		{
 			$ctrl_task = '&task=fields.selectsearchflag';
@@ -166,23 +172,25 @@ class FlexicontentViewFields extends JViewLegacy
 			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		}
 		
-		$contrl = "fields.";
-		if ($perms->CanCopyFields) {
+		if ($perms->CanCopyFields)
+		{
 			JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 			JToolBarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
 			JToolBarHelper::divider();
 		}
+
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
 		if ($perms->CanAddField) {
 			JToolBarHelper::addNew($contrl.'add');
 		}
-		if ($perms->CanEditField) {
+		if ($perms->CanEditField)
+		{
 			JToolBarHelper::editList($contrl.'edit');
 		}
-		if ($perms->CanDeleteField) {
+		if ($perms->CanDeleteField)
+		{
 			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
 			$btn_task    = $contrl.'remove';
@@ -320,29 +328,26 @@ class FlexicontentViewFields extends JViewLegacy
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		if ($filter_type == '' || $filter_type == 0)
-		{
-			$ordering = ($lists['order'] == 't.ordering');
-		} else {
-			$ordering = ($lists['order'] == 'typeordering');
-		}
+		$ordering = ($filter_type == '' || $filter_type == 0)
+			? ($lists['order'] == 't.ordering')
+			: ($lists['order'] == 'typeordering');
 		
 		
 		//assign data to template
-		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('permission'		, $perms);
-		$this->assignRef('filter_type'	, $filter_type);
+		$this->count_filters = $count_filters;
+		$this->permission = $perms;
+		$this->filter_type = $filter_type;
+
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->allrows = $allrows;
+		$this->types = $types;
 		
-		$this->assignRef('lists'			, $lists);
-		$this->assignRef('rows'				, $rows);
-		$this->assignRef('allrows'		, $allrows);
-		$this->assignRef('types'				, $types);
+		$this->ordering = $ordering;
+		$this->pagination = $pagination;
 		
-		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('pagination'	, $pagination);
-		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
+		$this->option = $option;
+		$this->view = $view;
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
