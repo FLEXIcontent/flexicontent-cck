@@ -20,6 +20,8 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.admin');
+use Joomla\String\StringHelper;
+require_once('base.php');
 
 /**
  * FLEXIcontent Component File Model
@@ -28,14 +30,84 @@ jimport('legacy.model.admin');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelFile extends JModelAdmin
+class FlexicontentModelFile extends FCModelAdmin
 {
 	/**
-	 * File data
+	 * Record name
+	 *
+	 * @var string
+	 */
+	var $record_name = 'file';
+
+	/**
+	 * Record database table 
+	 *
+	 * @var string
+	 */
+	var $records_dbtbl = null;
+
+	/**
+	 * Record jtable name
+	 *
+	 * @var string
+	 */
+	var $records_jtable = null;
+
+	/**
+	 * Record primary key
+	 *
+	 * @var int
+	 */
+	var $_id = null;
+
+	/**
+	 * Record data
 	 *
 	 * @var object
 	 */
-	var $_file = null;
+	var $_record = null;
+
+	/**
+	 * Events context to use during model FORM events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = null;
+
+	/**
+	 * Flag to indicate adding new records with next available ordering (at the end),
+	 * this is ignored if this record DB model does not have 'ordering'
+	 *
+	 * @var boolean
+	 */
+	var $useLastOrdering = false;
+
+	/**
+	 * Plugin group used to trigger events
+	 *
+	 * @var boolean
+	 */
+	var $plugins_group = null;
+
+	/**
+	 * Records real extension
+	 *
+	 * @var string
+	 */
+	var $extension_proxy = null;
+
+	/**
+	 * Use language associations
+	 *
+	 * @var string
+	 */
+	var $supports_associations = false;
+
+	/**
+	 * Various record specific properties
+	 *
+	 */
+	// ...
 
 	/**
 	 * Constructor
@@ -45,247 +117,180 @@ class FlexicontentModelFile extends JModelAdmin
 	function __construct()
 	{
 		parent::__construct();
-
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		if ( !@$array[0] ) {
-			// Try id variable too (needed by J3.0+)
-			$array = JRequest::getVar('id',  0, '', 'array');
-		}
-		// Make sure id variable is set (needed by J3.0+ controller)
-		JRequest::setVar('id', (int)$array[0]);
-		$this->setId((int)$array[0]);
-	}
-
-	/**
-	 * Method to set the identifier
-	 *
-	 * @access	public
-	 * @param	int file identifier
-	 */
-	function setId($id)
-	{
-		// Set file id and wipe data
-		$this->_id	    = $id;
-		$this->_file	= null;
-	}
-	
-	/**
-	 * Overridden get method to get properties from the file
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
-	 * @since	1.0
-	 */
-	function get($property, $default=null)
-	{
-		if ($this->_loadRecord())
-		{
-			if(isset($this->_file->$property))
-			{
-				return $this->_file->$property;
-			}
-		}
-		return $default;
-	}
-
-	/**
-	 * Method to get record data
-	 *
-	 * @access	public
-	 * @return	array
-	 * @since	1.0
-	 */
-	function & getItem($pk = null)
-	{
-		if ($this->_loadRecord())
-		{
-		}
-		return $this->_file;
 	}
 
 
 	/**
-	 * Alias for legacy method to get the record
+	 * Legacy method to get the record
 	 *
 	 * @access	public
 	 * @return	object
 	 * @since	1.0
 	 */
-	function & getFile()
+	function & getFile($pk = null)
 	{
-		return $this->getItem();
+		return parent::getRecord($pk);
 	}
 
 
 	/**
-	 * Method to load file data
+	 * Method to initialise the record data
 	 *
 	 * @access	protected
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	protected function _loadRecord()
+	protected function _initRecord(&$record = null)
 	{
-		// Lets load the file if it doesn't already exist
-		if (empty($this->_file))
-		{
-			$query = 'SELECT *'
-					. ' FROM #__flexicontent_files'
-					. ' WHERE id = '.$this->_id
-					;
-			$this->_db->setQuery($query);
-			$this->_file = $this->_db->loadObject();
+		parent::_initRecord($record);
 
-			return (boolean) $this->_file;
-		}
+		// Set record specific properties
+		$record->id							= 0;
+		$record->checked_out		= 0;
+		$record->checked_out_time	= '';
+
+		$this->_record = $record;
+
 		return true;
 	}
-	
+
 
 	/**
-	 * Method to checkin/unlock the file
+	 * Method to store the record
 	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkin($pk = NULL)
-	{
-		if (!$pk) $pk = $this->_id;
-
-		if ($pk)
-		{
-			$tbl = JTable::getInstance('flexicontent_files', '');
-			return $tbl->checkin($pk);
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Method to checkout/lock the file
+	 * @param   array  $data  The form data.
 	 *
-	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function checkout($pk = null)
-	{
-		// Make sure we have a record id to checkout the record with
-		if ( !$pk ) $pk = $this->_id;
-		if ( !$pk ) return true;
-		
-		// Get current user
-		$user	= JFactory::getUser();
-		$uid	= $user->get('id');
-		
-		// Lets get table record and checkout the it
-		$tbl = JTable::getInstance('flexicontent_files', '');
-		if ( $tbl->checkout($uid, $this->_id) ) return true;
-		
-		// Reaching this points means checkout failed
-		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
-		return false;
-	}
-	
-	
-	/**
-	 * Tests if the category is checked out
+	 * @return  boolean  True on success.
 	 *
-	 * @access	public
-	 * @param	int	A user id
-	 * @return	boolean	True if checked out
-	 * @since	1.0
-	 */
-	function isCheckedOut( $uid=0 )
-	{
-		if ($this->_loadRecord())
-		{
-			if ($uid) {
-				return ($this->_file->checked_out && $this->_file->checked_out != $uid);
-			} else {
-				return $this->_file->checked_out;
-			}
-		} elseif ($this->_id < 1) {
-			return false;
-		} else {
-			JError::raiseWarning( 0, 'UNABLE LOAD DATA');
-			return false;
-		}
-	}
-
-	/**
-	 * Method to store the file information
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
+	 * @since   1.6
 	 */
 	function store($data)
 	{
-		$file = $this->getTable('flexicontent_files', '');
-
-		// bind it to the table
-		if (!$file->bind($data)) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		// Make sure the data is valid
-		if (!$file->check()) {
-			$this->setError( $file->getError() );
-			return false;
-		}
-
-		// Store it in the db
-		if (!$file->store()) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		$this->_file = & $file;
-
-		return true;
+		return parent::store($data);
 	}
-	
-	/**
-	 * Method to get the row form.
-	 *
-	 * @param	array	$data		Data for the form.
-	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
-	 * @return	mixed	A JForm object on success, false on failure
-	 * @since	1.6
-	 */
-	public function getForm($data = array(), $loadData = true) {
-		// Initialise variables.
-		$app = JFactory::getApplication();
 
-		// Get the form.
-		$form = $this->loadForm('com_flexicontent.file', 'file', array('control' => 'jform', 'load_data' => $loadData));
-		if (empty($form)) {
-			return false;
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
+	 *
+	 * @return  array    Contains the modified title and alias / name.
+	 *
+	 * @since   1.7
+	 */
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+
+		while ($table->load(array('filename' => $title)))
+		{
+			$title = StringHelper::increment($title);
 		}
 
-		return $form;
+		return array($title, null);
 	}
-	
+
+
 	/**
-	 * Method to get the data that should be injected in the form.
+	 * Method to check if the user can edit the record
 	 *
-	 * @return	mixed	The data for the form.
-	 * @since	1.6
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	3.2.0
 	 */
-	protected function loadFormData() {
-		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+	function canEdit($record=null)
+	{
+		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
 
-		if (empty($data)) {
-			$data = $this->getFile();
-		}
+		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
+		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
+		return !$record || !$record->id
+			? $canupload
+			: $canedit || $caneditown;
+	}
 
-		return $data;
+
+	/**
+	 * Method to check if the user can edit record 's state
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	3.2.0
+	 */
+	function canEditState($record=null)
+	{
+		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
+
+		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
+		$canpublishown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
+		return !$record || !$record->id
+			? false
+			: $canpublish || $canpublishown;
+	}
+
+
+	/**
+	 * Method to check if the user can delete the record
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	3.2.0
+	 */
+	function canDelete($record=null)
+	{
+		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
+
+		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
+		$candeleteown = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
+		return !$record || !$record->id
+			? false
+			: $candelete || $candeleteown;
+	}
+
+
+	/**
+	 * Method to do some record / data preprocessing before call JTable::bind()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _prepareBind($record, & $data)
+	{
+		parent::_prepareBind($record, $data);
+	}
+
+
+	/**
+	 * Method to do some work after record has been stored
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterStore($record, & $data)
+	{
+		parent::_afterStore($record, $data);
+	}
+
+
+	/**
+	 * Method to do some work after record has been loaded via JTable::load()
+	 *
+	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @since	3.2.0
+	 */
+	protected function _afterLoad($record)
+	{
+		parent::_afterLoad($record);
 	}
 }

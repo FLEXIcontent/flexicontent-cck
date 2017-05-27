@@ -848,7 +848,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 							<span class="icon-checkbox"></span><span class="icon-new"></span>'.$filename_cut.'
 						</a>
 						' : '
-						<a id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small isedit_link" href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid='.$row->id.'" title="'.$edit_entry.'">
+						<a id="file'.$row->id.'" class="fc_set_file_assignment '.$btn_class.' '.$tip_class.' btn-small isedit_link" href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;id='.$row->id.'" title="'.$edit_entry.'">
 							<span class="icon-pencil"></span>'.$filename_cut.'
 						</a>
 						'; ?>
