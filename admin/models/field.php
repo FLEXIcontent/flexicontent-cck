@@ -68,6 +68,13 @@ class FlexicontentModelField extends FCModelAdmin
 	var $_record = null;
 
 	/**
+	 * Events context to use during model FORM events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = null;
+
+	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
 	 * this is ignored if this record DB model does not have 'ordering'
 	 *
@@ -88,6 +95,13 @@ class FlexicontentModelField extends FCModelAdmin
 	 * @var string
 	 */
 	var $extension_proxy = null;
+
+	/**
+	 * Use language associations
+	 *
+	 * @var string
+	 */
+	var $supports_associations = false;
 
 	/**
 	 * Various record specific properties
@@ -297,10 +311,11 @@ class FlexicontentModelField extends FCModelAdmin
 	function canEdit($record=null)
 	{
 		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
 
 		return !$record || !$record->id
-			? JFactory::getUser()->authorise('flexicontent.createfield', 'com_flexicontent')
-			: JFactory::getUser()->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $record->id);
+			? $user->authorise('flexicontent.createfield', 'com_flexicontent')
+			: $user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $record->id);
 	}
 
 
@@ -314,8 +329,9 @@ class FlexicontentModelField extends FCModelAdmin
 	function canEditState($record=null)
 	{
 		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
 
-		return JFactory::getUser()->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $record->id);
+		return $user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $record->id);
 	}
 
 
@@ -329,8 +345,9 @@ class FlexicontentModelField extends FCModelAdmin
 	function canDelete($record=null)
 	{
 		$record = $record ?: $this->_record;
+		$user = JFactory::getUser();
 
-		return JFactory::getUser()->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $record->id);
+		return $user->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $record->id);
 	}
 
 

@@ -68,6 +68,13 @@ class FlexicontentModelType extends FCModelAdmin
 	var $_record = null;
 
 	/**
+	 * Events context to use during model FORM events triggering
+	 *
+	 * @var object
+	 */
+	var $events_context = null;
+
+	/**
 	 * Flag to indicate adding new records with next available ordering (at the end),
 	 * this is ignored if this record DB model does not have 'ordering'
 	 *
@@ -88,6 +95,13 @@ class FlexicontentModelType extends FCModelAdmin
 	 * @var string
 	 */
 	var $extension_proxy = null;
+
+	/**
+	 * Use language associations
+	 *
+	 * @var string
+	 */
+	var $supports_associations = false;
 
 	/**
 	 * Various record specific properties

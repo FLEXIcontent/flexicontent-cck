@@ -56,7 +56,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		// Force URL variables for add / edit task
 		if ($task == 'add' || $task == 'edit')
 		{
-			$this->input->set('hidemainmenu', 1 ;
+			$this->input->set('hidemainmenu', 1);
 			$this->input->set('layout', 'form');
 			$this->input->set('view', 'user');
 			$this->input->set('edit', $task=='edit');
