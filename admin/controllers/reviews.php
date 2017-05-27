@@ -186,7 +186,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 				$app->enqueueMessage($errors[$i] instanceof Exception ? $errors[$i]->getMessage() : $errors[$i], 'error');
 			}
 
-			// Set POST form date into the session, so that they get reloaded
+			// Set the POSTed form data into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 
 			// Redirect back to the edit form
@@ -523,7 +523,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		if ( !$model->checkout() )
 		{
 			$app->setHeader('status', '400 Bad Request', true);
-			$this->setRedirect($this->returnURL, $model->getError(), 'error');
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 			return;
 		}
 

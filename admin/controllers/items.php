@@ -278,7 +278,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$app->enqueueMessage($errors[$i] instanceof Exception ? $errors[$i]->getMessage() : $errors[$i], 'error');
 			}
 
-			// Set POST form date into the session, so that they get reloaded
+			// Set the POSTed form data into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session
 			$app->setUserState($form->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session
 			$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
@@ -431,22 +431,22 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ****************************************
 		// Try to store the form data into the item
 		// ****************************************
+
+		// If saving fails, do any needed cleanup, and then redirect back to item form
 		if ( ! $model->store($validated_data) )
 		{
-			// Set error message about saving failed, and also the reason (=model's error message)
-			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
-			JError::raiseWarning( 500, $msg .": " . $model->getError() );
-			
-			// Set POST form date into the session, so that they get reloaded
+			// Set the POSTed form data into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session
 			$app->setUserState($form->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session
 			$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
 			$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
-			// Saving has failed check-in and redirect back to the item form,
-			// Redirect back to the edit form reloading the posted data
+			// Check-in the record 
 			$model->checkin();
-			$this->setRedirect($this->returnURL);
+
+			// Set error message and the redirect URL (back to the item form)
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ERROR_STORING_ITEM') . ' : ' . $model->getError(), 'error');
 			
 			if ( $fc_doajax_submit )
 			{
@@ -1696,8 +1696,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Checkout the record and proceed to edit form
 		if ( !$model->checkout() )
 		{
-			JError::raiseWarning( 500, $model->getError() );
-			$this->setRedirect($this->returnURL);
+			$app->setHeader('status', '400 Bad Request', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 			return;
 		}
 

@@ -627,21 +627,24 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{ 
 			if (!JFolder::create($destpath))
 			{
-				JError::raiseWarning(100, JText::_('Error. Unable to create folders'));
-				return;
-			} 
+				$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
+				$this->exitMessages = array( 0 => array('error' => 'Error. Unable to create folders') );
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate($file_ids, $exitMessages);
+			}
 		}
-		
-		
+
 		// check if the form fields are not empty
 		if (!$filesdir)
 		{
-			JError::raiseNotice(1, JText::_( 'FLEXI_WARN_NO_FILE_DIR' ));
+			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARN_NO_FILE_DIR') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
 
-			if ($this->return)
-				$app->redirect($this->return ."&". JSession::getFormToken() ."=1");
-			else
-				return null;
+			return $this->terminate($file_ids, $exitMessages);
 		}
 		
 		$added = array();
@@ -758,7 +761,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Get/Create the model
 		$model  = $this->getModel($this->record_name);
-		$record = $model->getFile();
+		$record = $model->getItem();
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
@@ -768,7 +771,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
 		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
-		$is_authorised = $record->id
+		$is_authorised = !$record->id
 			? $canupload
 			: $canedit || $caneditown;
 
@@ -791,7 +794,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Checkout the record and proceed to edit form
 		if ( !$model->checkout() )
 		{
-			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->setHeader('status', '400 Bad Request', true);
 			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 			return;
 		}
@@ -799,7 +802,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
 	}
-	
+
+
 	/**
 	 * Logic to delete files
 	 *
@@ -984,7 +988,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app    = JFactory::getApplication();
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
-		$record	= $model->getFile();
+		$record	= $model->getItem();
 
 		$data = $this->input->post->getArray();  // Default filtering will remove HTML
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
@@ -994,7 +998,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
 		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
-		$is_authorised = $record->id
+		$is_authorised = !$record->id
 			? $canupload
 			: $canedit || $caneditown;
 

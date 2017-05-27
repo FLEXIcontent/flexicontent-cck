@@ -715,8 +715,12 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 
 			//Checkout the item
-			$model->checkout();
-			
+			if ( !$model->checkout() )
+			{
+				$app->setHeader('status', '400 Bad Request', true);
+				$app->redirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), JText::_('FLEXI_OPERATION_FAILED') . ' : Cannot checkout file for editing', 'error');
+			}
+
 			// Get edit access, this includes privileges edit and edit-own and the temporary EDIT flag ('rendered_uneditable')
 			$canEdit = $model->getItemAccess()->get('access-edit');
 			
