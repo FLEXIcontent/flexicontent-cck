@@ -62,7 +62,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
-				<label class="label" for="filename_original">
+				<label class="fc-prop-lbl" for="filename_original">
 					<?php echo JText::_( !$this->row->url ? 'FLEXI_FILENAME' : 'FLEXI_FILE_URL' ); ?>
 				</label>
 			</td>
@@ -73,7 +73,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
-				<label class="label" for="altname">
+				<label class="fc-prop-lbl" for="altname">
 					<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 				</label>
 			</td>
@@ -84,7 +84,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
-				<label class="label" for="file-desc">
+				<label class="fc-prop-lbl" for="file-desc">
 				<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 				</label>
 			</td>
@@ -95,7 +95,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-				<label class="label" for="language">
+				<label class="fc-prop-lbl" for="language">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</label>
 			</td>
@@ -108,7 +108,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
-				<label class="label" for="access">
+				<label class="fc-prop-lbl" for="access">
 					<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 				</label>
 			</td>
@@ -119,7 +119,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1); ?>">
-				<label class="label" data-for="stamp">
+				<label class="fc-prop-lbl" data-for="stamp">
 					<?php echo JText::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
 				</label>
 			</td>
@@ -130,7 +130,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_HITS', 'FLEXI_DOWNLOAD_HITS', 1, 1); ?>">
-				<label class="label" for="access">
+				<label class="fc-prop-lbl" for="access">
 					<?php echo JText::_( 'FLEXI_HITS' ); ?>
 				</label>
 			</td>
@@ -141,7 +141,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
-				<label class="label" for="mime_ext">
+				<label class="fc-prop-lbl" for="mime_ext">
 					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
 			</td>
@@ -801,11 +801,22 @@ if (!$this->row->url)
 
 		<?php if (!$this->row->url) : ?>
 
+		<tr><td colspan="2"></td></tr>
+
 		<tr>
-			<td colspan="2">
-				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span>
+			<td class="key">
+				<span class="label label-info"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
+			</td>
+			<td>
 				<?php echo file_exists($file_path) ? $file_size_str : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
-				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="key">
+				<span class="label label-info"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
+			</td>
+			<td>
 				<?php echo $file_path;?>
 			</td>
 		</tr>
@@ -814,7 +825,7 @@ if (!$this->row->url)
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>">
-				<label class="label" for="size">
+				<label class="fc-prop-lbl" for="size">
 					<?php echo JText::_( 'FLEXI_SIZE' ); ?>
 				</label>
 			</td>
