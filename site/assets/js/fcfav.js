@@ -54,8 +54,8 @@ function FCFav(id, type, add_counter)
 	
 	var favurl = live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id+'&type='+type
 
-	var onote_msg_box_start = '<div class="fc-mssg fc-note fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
-	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">';
+	var onote_msg_box_start = '<div class="fc-mssg fc-note fc-iblock fc-nobgimage fcfavs-result-mssg" style="position: relative; margin: 1px 2px;">';
+	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage fcfavs-result-mssg" style="z-index:1000; position: relative; margin: 1px 2px;">';
 	var _box_start = '<div class="fc-mssg fc-info fc-iblock fc-nobgimage';
 	
 	
@@ -93,19 +93,19 @@ function FCFav(id, type, add_counter)
 			{
 				//link='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
 				div = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
-				link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom; "></span>';
+				link='<span class="icon-heart fcfav_icon_on"></span>';
 			}
 			else if (response == 'removed')
 			{
 				//link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-				link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom;"></span>';
+				link='<span class="icon-heart fcfav_icon_off"></span>';
 				div = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
 			}
 			else if (response > 0)
 			{
 				var newtotal = Math.abs(response);
 				//link='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-				link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom;"></span>';
+				link='<span class="icon-heart fcfav_icon_on"></span>';
 				var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
 				div = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>'
 					+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
@@ -114,7 +114,7 @@ function FCFav(id, type, add_counter)
 			{
 				var newtotal = Math.abs(response);
 				//link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-				link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom;"></span>';
+				link='<span class="icon-heart fcfav_icon_off"></span>';
 				var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
 				div = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>'
 					+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
