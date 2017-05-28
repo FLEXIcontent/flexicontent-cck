@@ -980,34 +980,35 @@ class modFlexicontentHelper
 		}
 		
 		
-		// *****************************
-		// current user favourites scope
-		// *****************************
+		// ***
+		// *** Current user favourites scope, GUEST users have favourites via cookie
+		// *** 
+
 		// Favourites via cookie
-		$jcookie = JFactory::getApplication()->input->cookie;
-
-		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
-		try {
-			$fcfavs = json_decode($fcfavs);
-		}
-		catch (Exception $e) {
-			$jcookie->set('fcfavs', '{}');
-		}
-		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
-
+		$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
 		$curruserid = (int)$user->get('id');
-  	if ($method_curuserfavs == 1) { // exclude method  ---  exclude currently logged user favourites
+
+		// Exclude method
+  	if ($method_curuserfavs == 1)
+  	{
 			$join_favs  = ' LEFT OUTER JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND fav.userid = '.$curruserid;
 			$where .= ' AND (fav.itemid IS NULL '
 				. (empty($favs) ? '' : ' AND i.id NOT IN (' . implode(',', $favs) . ')')
 				. ')';
-		} else if ($method_curuserfavs == 2) { // include method  ---  include currently logged user favourites
+		}
+
+		// Include method
+		else if ($method_curuserfavs == 2)
+		{
 			$join_favs  = ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id';
 			$where .= ' AND (fav.userid = ' . $curruserid
 				. (empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')')
 				. ')';
-		} else {
-		  // All Items regardless of being favoured by current user
+		}
+
+		// All Items regardless of being favoured by current user
+		else
+		{
 		  $join_favs = '';
 		}
 		

@@ -441,7 +441,8 @@ class flexicontent_html
 	}
 
 
-	static function escape($str) {
+	static function escape($str)
+	{
 		return htmlspecialchars($str, ENT_COMPAT, 'UTF-8');
 	}
 
@@ -449,12 +450,14 @@ class flexicontent_html
 	static function get_basedomain($url)
 	{
 		$pieces = parse_url($url);
-		$domain = isset($pieces['host']) ? $pieces['host'] : '';   echo " ";
-		if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
+		$domain = isset($pieces['host']) ? $pieces['host'] : '';
+		if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs))
+		{
 			return $regs['domain'];
 		}
 		return false;
 	}
+
 
 	static function is_safe_url($url, $baseonly=false)
 	{
@@ -3533,7 +3536,11 @@ class flexicontent_html
 			$document	= JFactory::getDocument();
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-			$allow_guests_favs = $cparams->get('allow_guests_favs', 1);
+			// Get Favourites field configuration
+			$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+			$favs_field->parameters = new JRegistry($favs_field->attribs);
+			$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
+
 			$tooltip_class = ' hasTooltip';
 			$text 		= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
 			$overlib 	= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';

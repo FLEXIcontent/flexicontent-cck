@@ -1269,7 +1269,6 @@ class FlexicontentController extends JControllerLegacy
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jcookie = $this->input->cookie;
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$id   = $this->input->get('id', 0, 'int');
@@ -1280,67 +1279,46 @@ class FlexicontentController extends JControllerLegacy
 			jexit('Type: '. $type .' not supported');
 		}
 
-		// Guest user does not have DB data, instead use Cookie 
-		$allow_guests_favs = $cparams->get('allow_guests_favs', 1);
+		// Get Favourites field configuration
+		$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+		$favs_field->parameters = new JRegistry($favs_field->attribs);
+
+		$usercount = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
+		$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
+
+		// Guest user (and allowing favourites for guests via Cookie data is disabled)
 		if (!$user->id && !$allow_guests_favs)
 		{
 			echo 'login';
 		}
 
+		// Guest user does not have DB data, instead use Cookie data
 		else if (!$user->id)
 		{
-			$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
-
-			try {
-				$fcfavs = json_decode($fcfavs);
-			}
-			catch (Exception $e) {
-				$jcookie->set('fcfavs', '{}');
-			}
-
-			$favs = $fcfavs && isset($fcfavs->$type) ? $fcfavs->$type : array();
-
-			if (isset($favs[$id]))
-			{
-				unset($favs[$id]);
-				echo 'removed';
-			}
-			else
-			{
-				$favs[$id] = 1;
-				echo 'added';
-			}
-
-			$fcfavs->$type = $favs;
-			$jcookie->set('fcfavs', json_encode($fcfavs), time()+60*60*24*(365*5) );
+			// Output simple response without counter
+			echo flexicontent_favs::toggleCookieFav($type, $id) < 1
+				? 'removed'
+				: 'added';
+			flexicontent_favs::saveCookieFavs();
 		}
-
 
 		// Logged user, update DB, adding / removing given id as favoured
 		else
 		{
+			// Get model of the give type
 			$model = $this->getModel($type);
+
+			// Toggle favourite
 			$isfav = $model->getFavoured();
-			if ($isfav)
-			{
-				$model->removefav();
-				$favs = $model->getFavourites();
-				if ($favs == 0) {
-					echo 'removed';
-				} else {
-					echo '-'.$favs;
-				}
-			}
-			else
-			{
-				$model->addfav();
-				$favs = $model->getFavourites();
-				if ($favs == 0) {
-					echo 'added';
-				} else {
-					echo '+'.$favs;
-				}
-			}
+			$isfav
+				? $model->removefav()
+				: $model->addfav();
+
+			// Output response for counter (if this has been enabled)
+			$favs = $model->getFavourites();
+			echo $isfav
+				? ($favs && $usercount ? '-'.$favs : 'removed')
+				: ($favs && $usercount ? '+'.$favs : 'added');
 		}
 
 		jexit();

@@ -40,7 +40,6 @@ $format  = $jinput->get('format', 'html', 'cmd');
 /*if ( $format == 'pdf' )
 {
 	$jinput->set('format', $format='html');  
-	JRequest::setVar('format', $format='html');  // Compatibility for views still using JRequest
 }*/
 
 // Logging
@@ -136,7 +135,6 @@ if ( isset($forced_views[$controller]) )
 {
 	$view = $controller;
 	$jinput->set('view', $view);
-	JRequest::setVar('view', $view);  // Compatibility for views still using JRequest
 }
 
 // FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
@@ -166,9 +164,6 @@ $controller_name = $controller;
 $jinput->set('controller', $controller_name);
 $jinput->set('task', $controller_task);
 
-JRequest::setVar('controller', $controller_name);  // Compatibility for views still using JRequest
-JRequest::setVar('task', $controller_task);        // Compatibility for views still using JRequest
-
 
 
 // **************************************************************************
@@ -187,7 +182,6 @@ if ($controller) {
 		require_once $base_controller;
 	} else {
 		$jinput->set('controller', $controller = '');
-		JRequest::setVar('controller', $controller = '');  // Compatibility for views still using JRequest
 	}
 }*/
 
@@ -259,18 +253,11 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 
 
 
-// ****************************
-// Create a controller instance
-// ****************************
-
-$controller	= JControllerLegacy::getInstance('Flexicontent');
-
-
-
 // **************************
 // Perform the requested task
 // **************************
 
+$controller	= JControllerLegacy::getInstance('Flexicontent');
 $controller->execute( $task );
 
 // Redirect if set by the controller
