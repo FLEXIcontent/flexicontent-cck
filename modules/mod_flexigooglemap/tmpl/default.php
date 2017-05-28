@@ -18,6 +18,12 @@
 //blocage des accés directs sur ce script
 defined('_JEXEC') or die('Restricted access');
 
+// Check if having at least 1 location, otherwise skip showing the map
+if (empty($tMapTips))
+{
+	return;
+}
+
 JHtml::_('bootstrap.tooltip');
 JHTML::_('behavior.modal');
 $document = JFactory::getDocument();
@@ -84,8 +90,9 @@ if ($markermode==0 && $markerimage && $img_info = getimagesize(JPATH::clean(JPAT
 
 // Add google maps API
 flexicontent_html::loadFramework('google-maps', '', $params);
+
 ?>
-<?php if (!empty($tMapTips)): //no maps if no point?>
+
 <div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
 	<div id="map" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
 
@@ -146,10 +153,10 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 			})(marker, i));
 
 			google.maps.event.addDomListener(window, "resize", function() {
-   var center = map.getCenter();
-   google.maps.event.trigger(map, "resize");
-   map.setCenter(center);
-});
+				var center = map.getCenter();
+				google.maps.event.trigger(map, "resize");
+				map.setCenter(center);
+			});
 
 			iconCounter++;
 			// We only have a limited number of possible icon colors, so we may have to restart the counter
@@ -192,4 +199,3 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 
 	</script>
 </div>
-<?php endif;?>
