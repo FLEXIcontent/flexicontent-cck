@@ -46,18 +46,26 @@ class plgFlexicontent_fieldsCore extends FCField
 		static $tag_links = array();
 		static $cparams = null;
 		if ($cparams===null)
+		{
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		}
 		
 		if ( !is_array($_item) ) 
+		{
 			$items = array( & $_item );
+		}
 		else
+		{
 			$items = & $_item;
+		}
 		
 		// Prefix - Suffix - Separator parameters
-		// these parameters should be common so we will retrieve them from the first item instead of inside the loop
+		// These parameters should be common so we will retrieve them from the first item instead of inside the loop
 		$item = reset($items);
-		if (is_object($_field)) $field = $_field;
-		else $field = $item->fields[$_field];
+		$field = is_object($_field)
+			? $_field
+			: $item->fields[$_field];
+
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$_pretext = $field->parameters->get( 'pretext', '' );
 		$_posttext = $field->parameters->get( 'posttext', '' );
@@ -138,10 +146,9 @@ class plgFlexicontent_fieldsCore extends FCField
 					$viewlayout = $field->parameters->get('viewlayout', '');
 					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-					// Create created HTML
+					// Create field's HTML
 					$field->{$prop} = array();
-					include(self::getFormPath('core', $viewlayout, 'created'));
-					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+					include(self::getViewPath('core', $viewlayout, 'created'));
 					break;
 				
 				case 'createdby': // created by
@@ -160,10 +167,9 @@ class plgFlexicontent_fieldsCore extends FCField
 					$viewlayout = $field->parameters->get('viewlayout', '');
 					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-					// Create modified HTML
+					// Create field's HTML
 					$field->{$prop} = array();
-					include(self::getFormPath('core', $viewlayout, 'modified'));
-					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+					include(self::getViewPath('core', $viewlayout, 'modified'));
 					break;
 				
 				case 'modifiedby': // modified by
@@ -177,10 +183,9 @@ class plgFlexicontent_fieldsCore extends FCField
 					$viewlayout = $field->parameters->get('viewlayout', '');
 					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-					// Create title HTML
+					// Create field's HTML
 					$field->{$prop} = array();
-					include(self::getFormPath('core', $viewlayout, 'title'));
-					$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+					include(self::getViewPath('core', $viewlayout, 'title'));
 					break;
 	
 				case 'hits': // hits
@@ -204,33 +209,38 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 	
 				case 'voting': // voting button
-					/*if ($raw_values!==null) $vote = convert ... $raw_values;
-					else */if ($_vote===false) $vote = & $item->vote;
-					else $vote = & $_vote;
-					
-					$field->value[] = 'button'; // dummy value to force display
-					$field->{$prop} = $pretext.flexicontent_html::ItemVote( $field, 'all', $vote ).$posttext;
+					// TODO: if ($raw_values!==null) $vote = convert ... $raw_values;
+					$vote = $_vote===false
+						? $item->vote
+						: $_vote;
+
+					$field->value[] = 'button';  // A dummy value to force display
+
+					$viewlayout = $field->parameters->get('viewlayout', '');
+					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+
+					// Create field's HTML
+					$field->{$prop} = array();
+					include(self::getViewPath('core', $viewlayout, 'voting'));
 					break;
 	
 				case 'favourites': // favourites button
-					if ($_favourites===false) $favourites = & $item->favs;
-					else $favourites = & $_favourites;
-					if ($_favoured===false) $favoured = & $item->fav;
-					else $favoured = & $_favoured;
+					$favourites = $_favourites===false
+						? $item->favs
+						: $_favourites;
+
+					$favoured = $_favoured===false
+						? $item->fav
+						: $_favoured;
+
+					$viewlayout = $field->parameters->get('viewlayout', '');
+					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 					
-					$field->value[] = 'button'; // dummy value to force display
-					$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
-					$field->{$prop} = $pretext.'
-					<div class="fav-block">
-						'.flexicontent_html::favicon( $field, $favoured, $item ).'
-						<div id="fcfav-reponse_item_'.$item->id.'" class="fcfav-reponse-tip">
-							<div class="fc-mssg fc-info fc-iblock fc-nobgimage '.($favoured ? 'fcfavs-is-subscriber' : 'fcfavs-isnot-subscriber').'">
-								'.JText::_($favoured ? 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED' : 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE').'
-							</div>
-							'.$favs.'
-						</div>
-					</div>
-						'.$posttext;
+					$field->value[] = 'button';  // A dummy value to force display
+
+					// Create field's HTML
+					$field->{$prop} = array();
+					include(self::getViewPath('core', $viewlayout, 'favourites'));
 					break;
 	
 				case 'categories': // assigned categories
@@ -250,9 +260,9 @@ class plgFlexicontent_fieldsCore extends FCField
 						$viewlayout = $field->parameters->get('viewlayout', '');
 						$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-						// Create categories HTML
+						// Create field's HTML
 						$field->{$prop} = array();
-						include(self::getFormPath('core', $viewlayout, 'categories'));
+						include(self::getViewPath('core', $viewlayout, 'categories'));
 						$field->{$prop} = implode($separatorf, $field->{$prop});
 						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					endif;
@@ -272,9 +282,9 @@ class plgFlexicontent_fieldsCore extends FCField
 						$viewlayout = $field->parameters->get('viewlayout', '');
 						$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-						// Create tags HTML
+						// Create field's HTML
 						$field->{$prop} = array();
-						include(self::getFormPath('core', $viewlayout, 'tags'));
+						include(self::getViewPath('core', $viewlayout, 'tags'));
 						$field->{$prop} = implode($separatorf, $field->{$prop});
 						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					endif;

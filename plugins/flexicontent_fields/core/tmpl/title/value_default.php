@@ -1,5 +1,9 @@
 <?php
-$field->{$prop} = $pretext.$item->title.$posttext;
+// Add prefix / suffix
+$field->{$prop} =
+	$pretext
+		. $item->title .
+	$posttext;
 
 // Get ogp configuration
 $useogp     = $field->parameters->get('useogp', 1);
@@ -18,4 +22,10 @@ if ($useogp && $field->{$prop})
 
 // Add microdata property (currently no parameter in XML for this field)
 $itemprop = $field->parameters->get('microdata_itemprop', 'name');
-if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+if ($itemprop)
+{
+	$field->{$prop} = '
+		<div style="display:inline" itemprop="'.$itemprop.'" >
+			' . $field->{$prop} . '
+		</div>';
+}
