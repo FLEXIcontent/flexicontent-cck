@@ -528,21 +528,49 @@ div table.adminform td {
  * FLEXIcontent Favourites
  *************************/
 
-.fav-block {
-	display: inline-block;
-}
-.fcfav-reponse-tip {
-	display: inline-block;
-}
-.fav-block img {
-	vertical-align: middle;
-}
 .favlink {
 	outline: none;
 }
-.fcfav img {
-}
 
+.fav-block {
+	display: inline-block;
+
+	.fcfav-reponse-tip {
+		display: inline-block;
+	}
+	img {
+		vertical-align: middle;
+	}
+
+	[class^="fcfavs"], [class*=" fcfavs"] {
+		font-size: 14px;
+	}
+	[class^="fcfav_icon_"], [class*=" fcfav_icon_"] {
+		font-size: 1.4em;
+		margin: 0;
+		display: inline-block;
+		width: 1.4em;
+		height: unset;
+		padding: 0;
+		line-height: 1em;
+	}
+	[class^="fcfav_icon_"]:before, [class*=" fcfav_icon_"]:before {
+	}
+
+	.fcfav_icon_on:before {
+		color: darkgreen;
+	}
+	.fcfav_icon_off:before {
+		opacity: 1;
+		filter: alpha(opacity=100);
+		color: darkgray;
+	}
+	.fcfav_icon_disabled:before {
+		opacity: 0.4;
+		filter: alpha(opacity=40);
+		color: darkgray;
+	}
+}
 
 
 /***********

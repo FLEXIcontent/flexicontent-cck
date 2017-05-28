@@ -3513,46 +3513,48 @@ class flexicontent_html
 	 */
 	static function favicon($field, $favoured, $item, $type='item')
 	{
-		static $allow_guests_favs;
-		$users_counter = (int) $field->parameters->get('display_favoured_usercount', 0);
-
 		$user = JFactory::getUser();
-		$item_id = $item->id;  // avoid using $field, we also support favoured categories
+		$item_id = $item->id;
 		$item_title = $item->title;
+		$tooltip_class = 'hasTooltip';
+
+		static $tooltip_title, $icon_not_fav, $icon_is_fav, $icon_disabled_fav;  // Reusable Texts / HTML for creating FAVs Icon
+		static $allow_guests_favs, $users_counter;  // Favourites field configuration
 
 		static $js_and_css_added = false;
-		static $tooltip_class, $addremove_tip, $img_fav_add, $img_fav_delete;
-		if (!$img_fav_delete)
-		{
-			//$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL);
-    	$img_fav_delete = '<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom; "></span>';
-		}
-		if (!$img_fav_add)
-		{
-			//$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL);
-    	$img_fav_add = '<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom; "></span>';
-		}
-
 		if (!$js_and_css_added)
 		{
-			$document	= JFactory::getDocument();
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			$document = JFactory::getDocument();
+			$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
-			// Get Favourites field configuration
-			$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+			$icon_is_fav = $cparams->get('use_font_icons', 1)
+				? JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
+    		: '<span class="icon-heart fcfav_icon_on"></span>';
+			$icon_not_fav = $cparams->get('use_font_icons', 1)
+				? JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL)
+    		: '<span class="icon-heart fcfav_icon_off"></span>';
+
+			$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
+			$icon_disabled_fav = $cparams->get('use_font_icons', 1)
+				? JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs)
+				: '<span class="icon-heart fcfav_icon_disabled"></span>';
+
+			// Get Favourites field configuration (if FIELD is empty then retrieve it)
+			$favs_field = $field ?: reset(FlexicontentFields::getFieldsByIds(array(12)));
 			$favs_field->parameters = new JRegistry($favs_field->attribs);
-			$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
 
-			$tooltip_class = ' hasTooltip';
+			$allow_guests_favs = (int) $favs_field->parameters->get('allow_guests_favs', 1);
+			$users_counter     = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
+
 			$text 		= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
 			$overlib 	= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
-			$addremove_tip = flexicontent_html::getToolTip($text, $overlib, 1, 1);
+			$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 1, 1);
 
-			// Make sure mootools are loaded before our js
-			//JHtml::_('behavior.framework', true);
-
-			// Load tooltips JS
-			if ($cparams->get('add_tooltips', 1)) JHtml::_('bootstrap.tooltip');
+			// Load JS / CSS
+			if ($cparams->get('add_tooltips', 1))
+			{
+				JHtml::_('bootstrap.tooltip');
+			}
 
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');
@@ -3577,32 +3579,26 @@ class flexicontent_html
 			$js_and_css_added = true;
 		}
 
-		$output = "";
-
-		if ($user->id || $allow_guests_favs)
+		// Favs for guests disabled
+		if (!$user->id && !$allow_guests_favs)
 		{
-			$link_class = $favoured ? 'fcfav_delete' : 'fcfav_add';
-			$link_text  = $favoured ? $img_fav_delete : $img_fav_add;
-
-			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
-			$link 		= "javascript:void(null)";
-
-			$output		.=
-				 '<span class="'.$link_class.'">'
-				.' <a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$link_text.'</a>'
-				.' <span class="fav_item_id" style="display:none;">'.$item_id.'</span>'
-				.' <span class="fav_item_title" style="display:none;">'.$item_title.'</span>'
-				.'</span>';
-		}
-		else  // Favs for guests disabled
-		{
-			$attribs = 'class="btn '.$tooltip_class.'" title="'.$addremove_tip.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
-			$image = JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $attribs);
-
-			$output		= $image;
+			return $icon_disabled_fav;
 		}
 
-		return $output;
+		$link_class = $favoured ? 'fcfav_delete' : 'fcfav_add';
+		$link_text  = $favoured ? $icon_is_fav : $icon_not_fav;
+
+		$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
+		$link 		= "javascript:void(null)";
+
+		return '
+			<span class="'.$link_class.'">
+				<a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse '.$tooltip_class.'" title="'.$tooltip_title.'">
+					'.$link_text.'
+				</a>
+				<span class="fav_item_id" style="display:none;">'.$item_id.'</span>
+				<span class="fav_item_title" style="display:none;">'.$item_title.'</span>
+			</span>';
 	}
 
 

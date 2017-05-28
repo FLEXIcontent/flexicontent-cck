@@ -402,17 +402,44 @@ div table.adminform td {
 #flexicontent .fc_search_field_value {
 	display: inline-block;
 }
+.favlink {
+	outline: none;
+}
 .fav-block {
 	display: inline-block;
 }
-.fcfav-reponse-tip {
+.fav-block .fcfav-reponse-tip {
 	display: inline-block;
 }
 .fav-block img {
 	vertical-align: middle;
 }
-.favlink {
-	outline: none;
+.fav-block [class^="fcfavs"],
+.fav-block [class*=" fcfavs"] {
+	font-size: 14px;
+}
+.fav-block [class^="fcfav_icon_"],
+.fav-block [class*=" fcfav_icon_"] {
+	font-size: 1.4em;
+	margin: 0;
+	display: inline-block;
+	width: 1.4em;
+	height: unset;
+	padding: 0;
+	line-height: 1em;
+}
+.fav-block .fcfav_icon_on:before {
+	color: darkgreen;
+}
+.fav-block .fcfav_icon_off:before {
+	opacity: 1;
+	filter: alpha(opacity=100);
+	color: darkgray;
+}
+.fav-block .fcfav_icon_disabled:before {
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+	color: darkgray;
 }
 div.comments {
 	margin-top: 15px;
