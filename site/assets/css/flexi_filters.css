@@ -68,6 +68,9 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 .cid_loading > * {
 	vertical-align: middle;
 }
+.fc_filter_html .fc_icon_range {
+	margin: 0 1px 0 1px;
+}
 .fc_range {
 	background: url("../images/arrow_double.png") no-repeat scroll 0px 0px transparent;
 	width: 16px;

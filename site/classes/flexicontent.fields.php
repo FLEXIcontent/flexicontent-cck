@@ -2767,8 +2767,8 @@ class FlexicontentFields
 		$_search_prefix = $colname=='fs.search_index' ? $search_prefix : '';
 		
 		$db = JFactory::getDBO();
-		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
-		$filter_compare_type = $filter->parameters->get( 'filter_compare_type', 0 );
+		$display_filter_as = (int) $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
+		$filter_compare_type = (int) $filter->parameters->get( 'filter_compare_type', 0 );
 		
 		// Make sure the current filtering values match the field filter configuration to be single or multi-value
 		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {  // range or multi-value filter
@@ -3050,6 +3050,7 @@ class FlexicontentFields
 		$user = JFactory::getUser();
 		$cparams   = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
+		$use_font_icons = $cparams->get('use_font_icons', 1);
 		
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
@@ -3064,7 +3065,8 @@ class FlexicontentFields
 		
 		// Apply caching to filters regardless of cache setting ...
 		$apply_cache = FLEXI_CACHE;
-		if ($apply_cache) {
+		if ($apply_cache)
+		{
 			$itemcache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
 			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
@@ -3095,9 +3097,12 @@ class FlexicontentFields
 		}
 		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {
+		if ( in_array($display_filter_as, array(2,3,5,6,8)) )
+		{
 			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
-		} else {
+		}
+		else
+		{
 			if (is_array($value)) $value = @ $value[0];
 		}
 		
@@ -3112,6 +3117,11 @@ class FlexicontentFields
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		$hide_disabled_values = $filter->parameters->get( 'hide_disabled_values'.$_s, 0 );
 		$get_filter_vals = in_array($display_filter_as, array(0,2,4,5,6)) || ($isSlider && $slider_display_config==1);
+
+		$pretext_filter  = $filter->parameters->get( 'pretext_filter'.$_s, '' );
+		$posttext_filter = $filter->parameters->get( 'posttext_filter'.$_s, '' );
+		$opentag_filter  = $filter->parameters->get( 'opentag_filter'.$_s, '' );
+		$closetag_filter = $filter->parameters->get( 'closetag_filter'.$_s, '' );
 		
 		$filter_ffname = 'filter_'.$filter->id;
 		$filter_ffid   = $formName.'_'.$filter->id.'_val';
@@ -3137,9 +3147,13 @@ class FlexicontentFields
 			$text_search = '';
 			$view_total=0;
 			
+			// ***
 			// *** Limiting of displayed filter values according to current category filtering, but show all field values if filter is active
-			if ( $isCategoryView ) {
-				// category view, use parameter to decide if limitting filter values
+			// ***
+
+			// Category view, use parameter to decide if limitting filter values
+			if ( $isCategoryView )
+			{
 				global $fc_catview;
 				if ( $faceted_filter ) {
 					$view_join = @ $fc_catview['join_clauses'];
@@ -3149,8 +3163,11 @@ class FlexicontentFields
 					$text_search = $fc_catview['search'];
 					$view_total = isset($fc_catview['view_total']) ? $fc_catview['view_total'] : 0;
 				}
-			} else if ( $isSearchView ) {
-				// search view, use parameter to decide if limitting filter values
+			}
+
+			// Search view, use parameter to decide if limitting filter values
+			else if ( $isSearchView )
+			{
 				global $fc_searchview;
 				if ( empty($fc_searchview) ) return array();  // search view plugin disabled ?
 				if ( $faceted_filter ) {
@@ -3180,7 +3197,8 @@ class FlexicontentFields
 			
 			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
 			$faceted_max_item_limit = 10000;
-			if ( $faceted_filter==2 ) {
+			if ( $faceted_filter==2 )
+			{
 				if ($view_total <= $faceted_max_item_limit)
 				{
 					// DO NOT cache at this point the filter combinations are endless, so they will produce big amounts of cached data, that will be rarely used ...
@@ -3192,8 +3210,10 @@ class FlexicontentFields
 					else {
 						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join_n_text, $view_where, $filters_where, $indexed_elements, $search_prop);
 					}
-						
-				} else if ($faceted_overlimit_msg === null) {
+				}
+
+				else if ($faceted_overlimit_msg === null)
+				{
 					// Set a notice message about not counting item per filter values and instead showing item TOTAL of current category / view
 					$faceted_overlimit_msg = 1;
 					$filter_messages = JRequest::getVar('filter_message', array());
@@ -3225,16 +3245,32 @@ class FlexicontentFields
 				// 1. this overrides value usage calculated for page's configuration (faceted: 1)
 				// 2. we set zero if value was not found
 				else if ($update_found)
-					$results[$i]->found = (int) @ $results_active[$i]->found;
+					$results[$i]->found = isset($results_active[$i]->found) ? (int) $results_active[$i]->found : null;
 				
 				// FACETED: 1 or hiding unavailable values ... leave value unchanged (if it has been calculated)
 				else ;
 				
+				// Prepend prefix to value's label
+				if ($pretext_filter)
+				{
+					$results[$i]->text = $pretext_filter . ' ' . $results[$i]->text;
+				}
+
+				// Append suffix to value's label
+				if ($posttext_filter)
+				{
+					$results[$i]->text = $results[$i]->text . ' ' . $posttext_filter;
+				}
+
 				// Append value usage to value's label
 				if ($add_usage_counters && $results[$i]->found)
+				{
 					$results[$i]->text .= ' ('.$results[$i]->found.')';  // THESE for indexed fields should have been cloned, so it is ok to modify
+				}
 			}
-		} else {
+		}
+		else
+		{
 			$add_usage_counters = false;
 			$faceted_filter = 0; // clear faceted filter flag
 		}
@@ -3308,20 +3344,28 @@ class FlexicontentFields
 			}
 			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 			
-			if ($display_filter_as==6 && $combine_tip) {
+			if ($display_filter_as==6 && $combine_tip)
+			{
 				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 			}
-			if ($display_filter_as==0) {
+
+			if ($display_filter_as==0)
+			{
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid);
-			} else if ($display_filter_as==6) {
+			}
+			else if ($display_filter_as==6)
+			{
 				// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
 				$filter->html	.=
 					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
 					JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
-			} else {
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1');
-				$filter->html	.= '<span class="fc_range"></span>';
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
+			}
+			else
+			{
+				$filter->html	.=
+					JHTML::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1') . '
+						' . $opentag_filter . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . $closetag_filter .'
+					' . JHTML::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
 			}
 			break;
 		case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
@@ -3537,7 +3581,7 @@ class FlexicontentFields
 						<div class="fc_filter_element">
 							'.FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr).'
 						</div>
-						<span class="fc_range"></span>
+						' . $opentag_filter . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . $closetag_filter .'
 						<div class="fc_filter_element">
 							'.FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr).'
 						</div>';
@@ -3548,7 +3592,7 @@ class FlexicontentFields
 						<div class="fc_filter_element">
 							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[1], ENT_COMPAT, 'UTF-8').'" />
 						</div>
-						<span class="fc_range"></span>
+						' . $opentag_filter . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . $closetag_filter .'
 						<div class="fc_filter_element">
 							<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
 						</div>
@@ -3648,6 +3692,18 @@ class FlexicontentFields
 			$filter->html .= '</ul>';
 			$filter->html .= '</div>';
 			break;
+		}
+
+		// Prepend opening Text to filter's HTML
+		if ($opentag_filter)
+		{
+			$filter->html = $opentag_filter . ' ' . $filter->html;
+		}
+
+		// Append closing Text to filter's HTML
+		if ($closetag_filter)
+		{
+			$filter->html = $filter->html . ' ' . $closetag_filter;
 		}
 		
 		if ( $print_logging_info ) {
