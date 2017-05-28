@@ -64,6 +64,7 @@ JLoader::register('flexicontent_upload', JPATH_SITE.DS.'components'.DS.'com_flex
 JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
 JLoader::register('flexicontent_db', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'db.php');
 JLoader::register('flexicontent_ajax', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'ajax.php');
+JLoader::register('flexicontent_favs', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'favs.php');
 JLoader::register('flexicontent_images', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'images.php');
 JLoader::register('flexicontent_zip', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'zip.php');
 

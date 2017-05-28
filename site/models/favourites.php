@@ -378,17 +378,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$nullDate = $db->getNullDate();
 
 		// Favourites via cookie
-		$jcookie = JFactory::getApplication()->input->cookie;
-
-		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
-		try {
-			$fcfavs = json_decode($fcfavs);
-		}
-		catch (Exception $e) {
-			$jcookie->set('fcfavs', '{}');
-		}
-
-		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
+		$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
 
 		// First thing we need to do is to select only the requested FAVOURED items
 		$or_favs_via_cookie = empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')';

@@ -927,17 +927,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_layout=='favs')
 		{
 			// Favourites via cookie
-			$jcookie = JFactory::getApplication()->input->cookie;
-			$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
-
-			try {
-				$fcfavs = json_decode($fcfavs);
-			}
-			catch (Exception $e) {
-				$jcookie->set('fcfavs', '{}');
-			}
-
-			$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
+			$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
 
 			$or_favs_via_cookie = empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')';
 			$where .= ' AND (fav.userid = ' . $db->Quote($this->_uid) . $or_favs_via_cookie . ')';
@@ -1712,30 +1702,43 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Check for proper layout configuration and throw error
 		// *****************************************************
 		
-		if ($this->_layout) {
+		if ($this->_layout)
+		{
 			$err_mssg = $err_type = false;
 			
-			if ( !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) ) {
+			if ( !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
+			{
 				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
 				$err_type = 404;
 			}
-			else if ( $this->_layout=='author' && !$this->_authorid ) {
+			else if ( $this->_layout=='author' && !$this->_authorid )
+			{
 				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
 				$err_type = 404;
 			}
-			else if ( $this->_layout=='tags' && !$this->_tagid ) {
+			else if ( $this->_layout=='tags' && !$this->_tagid )
+			{
 				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
 				$err_type = 404;
 			}
-			else if ( $this->_layout=='myitems' && !$this->_authorid ) {
+			else if ( $this->_layout=='myitems' && !$this->_authorid )
+			{
 				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
 				$err_type = 403;
 				$login_redirect = true;
 			}
-			else if ( $this->_layout=='favs' && !$this->_uid ) {
-				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
-				$err_type = 403;
-				$login_redirect = true;
+			else if ( $this->_layout=='favs' && !$this->_uid )
+			{
+				// Get Favourites field configuration
+				$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+				$favs_field->parameters = new JRegistry($favs_field->attribs);
+				$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
+				if (!$allow_guests_favs)
+				{
+					$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
+					$err_type = 403;
+					$login_redirect = true;
+				}
 			}
 			
 			// Raise a notice and redirect
@@ -1748,14 +1751,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 					// redirect unlogged user to login
 					$uri		= JFactory::getURI();
 					$return	= $uri->toString();
-					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
-					$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
+					$url  = $cparams->get('login_page', 'index.php?option=com_users&view=login');
 					$return = strtr(base64_encode($return), '+/=', '-_,');
 					$url .= '&return='.$return; // '&return='.base64_encode($return);
 					$url .= '&isfcurl=1';
-					
-					JError::raiseWarning( $err_type, $err_mssg);
-					$app->redirect( $url );
+
+					$app->setHeader('status', $err_type, true);
+					$app->enqueueMessage($err_mssg, 'error');
+					$app->redirect($url);
 				}
 				else
 				{
@@ -1788,34 +1791,47 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$allowed_levels = array_flip($aid_arr);
 			$canread = isset($allowed_levels[$this->_category->access]);
 			
-			if ($canread) {
-				foreach($parents as $parent) if ( !isset($allowed_levels[$parent->access]) )
-					{ $canread = false; break; }
+			if ($canread)
+			{
+				foreach($parents as $parent)
+				{
+					if ( !isset($allowed_levels[$parent->access]) )
+					{
+						$canread = false;
+						break;
+					}
+				}
 			}
 		}
 		
 		// Handle unreadable category (issue 403 unauthorized error, redirecting unlogged users to login)
 		if ( $this->_id && !$canread )
 		{
-			if($user->guest) {
+			if ($user->guest)
+			{
 				// Redirect to login
 				$uri		= JFactory::getURI();
 				$return	= $uri->toString();
-				$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
-				$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
+				$url  = $cparams->get('login_page', 'index.php?option=com_users&view=login');
 				$return = strtr(base64_encode($return), '+/=', '-_,');
 				$url .= '&return='.$return; // '&return='.base64_encode($return);
 				$url .= '&isfcurl=1';
-				
-				JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
-				$app->redirect( $url );
-			} else {
-				if ($cparams->get('unauthorized_page', '')) {
-					$app->redirect($cparams->get('unauthorized_page'));				
-				} else {
-					JError::raiseWarning( 403, JText::_("FLEXI_ALERTNOTAUTH_VIEW"));
-					$app->redirect( 'index.php' );
-				}
+
+				$app->setHeader('status', 403, true);
+				$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
+				$app->redirect($url);
+			}
+
+			else if ($cparams->get('unauthorized_page', ''))
+			{
+				$app->redirect($cparams->get('unauthorized_page'));				
+			}
+
+			else
+			{
+				$app->setHeader('status', 403, true);
+				$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
+				$app->redirect('index.php');
 			}
 		}
 

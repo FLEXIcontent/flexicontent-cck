@@ -59,10 +59,10 @@ function FCFav(id, type, add_counter)
 	var _box_start = '<div class="fc-mssg fc-info fc-iblock fc-nobgimage';
 	
 	
-	var div = document.getElementById('fcfav-reponse_'+type+'_'+id);
-	if (div)
+	var divs = jQuery('#fcfav-reponse_'+type+'_'+id);
+	if (divs.length)
 	{
-		div.innerHTML = _box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>';
+		divs.html(_box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>');
 	}
 
 	jQuery.ajax({
@@ -72,45 +72,65 @@ function FCFav(id, type, add_counter)
 			lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
 		},
 		success: function( response ) {
-			var link = document.getElementById('favlink_'+type+'_'+id);
-			if (div) {
-				if(response=='login')  div.innerHTML = onote_msg_box_start + Joomla.JText._('FLEXI_YOU_NEED_TO_LOGIN') + '</div>';
-				else if(response>0 || response=='added')   div.innerHTML = osucc_msg_box_start + Joomla.JText._('FLEXI_ADDED_TO_YOUR_FAVOURITES') + '</div>';
-				else if(response<0 || response=='removed') div.innerHTML = osucc_msg_box_start + Joomla.JText._('FLEXI_REMOVED_FROM_YOUR_FAVOURITES') + '</div>';
-				else if ( isNaN(parseFloat(response)) )    div.innerHTML = onote_msg_box_start + response + '</div>'; // some custom text
-			}
-			setTimeout(function(){
-				if(response>0){
-					if (div) {
-						var newtotal = Math.abs(response);
-						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
-						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>'
-							+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
-					}
+			var links = jQuery('#favlink_'+type+'_'+id);
+			if (!divs) return;
+
+			response = response.trim();
+
+			var div, link;
+
+			if (response=='login')  div = onote_msg_box_start + Joomla.JText._('FLEXI_YOU_NEED_TO_LOGIN') + '</div>';
+			else if (response > 0 || response == 'added')   div = osucc_msg_box_start + Joomla.JText._('FLEXI_ADDED_TO_YOUR_FAVOURITES') + '</div>';
+			else if (response < 0 || response == 'removed') div = osucc_msg_box_start + Joomla.JText._('FLEXI_REMOVED_FROM_YOUR_FAVOURITES') + '</div>';
+			else if (isNaN(parseFloat(response)))           div = onote_msg_box_start + response + '</div>'; // some custom text
+
+			jQuery.each( divs, function( i, box)
+			{
+				jQuery(box).html(div);
+			});
+
+			setTimeout(function()
+			{
+				if (response == 'added')
+				{
+					//link='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+					div = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
+					link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom; "></span>';
 				}
-				else if(response<0){
-					if (div) {
-						var newtotal = Math.abs(response);
-						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
-						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>'
-							+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
-					}
+				else if (response == 'removed')
+				{
+					//link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+					link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom;"></span>';
+					div = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
 				}
-				else if(response=='added'){
-					if (div) {
-						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
-					}
+				else if (response > 0)
+				{
+					var newtotal = Math.abs(response);
+					//link='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+					link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom;"></span>';
+					var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
+					div = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>'
+						+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
 				}
-				else if(response=='removed'){
-					if (div) {
-						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
-					}
+				else if (response < 0)
+				{
+					var newtotal = Math.abs(response);
+					//link='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+					link='<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom;"></span>';
+					var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
+					div = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>'
+						+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
 				}
-			},2000);
+
+				jQuery.each( links, function( i, box )
+				{
+					jQuery(box).html(link);
+				});
+				jQuery.each( divs, function( i, box )
+				{
+					jQuery(box).html(div);
+				});
+			}, 2000);
 		},
 		error: function (xhr, ajaxOptions, thrownError) {
 			alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);

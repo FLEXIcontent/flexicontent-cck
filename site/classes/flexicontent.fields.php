@@ -1374,21 +1374,12 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$favourites = $db->loadObjectList('itemid');
 
-		// Favourites via cookie (Only current user is considered)
-		$jcookie = JFactory::getApplication()->input->cookie;
-		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+		// Also add favourites via cookie (Only current user is considered)
+		$favs = flexicontent_favs::getCookieFavs($view);
 
-		try {
-			$fcfavs = json_decode($fcfavs);
-		}
-		catch (Exception $e) {
-			$jcookie->set('fcfavs', '{}');
-		}
-
-		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
-		foreach($favs as $itemid)
+		foreach($favs as $itemid => $f)
 		{
-			$favoured[$itemid] = (object) array('itemid'=>$itemid, 'fav'=>1);
+			$favourites[(int)$itemid] = (object) array('itemid' => (int) $itemid, 'favs' => 1);
 		}
 
 		return $favourites;
@@ -1417,21 +1408,12 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$favoured = $db->loadObjectList('itemid');
 
-		// Favourites via cookie
-		$jcookie = JFactory::getApplication()->input->cookie;
-		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+		// Also add favourites via cookie
+		$favs = flexicontent_favs::getCookieFavs($view);
 
-		try {
-			$fcfavs = json_decode($fcfavs);
-		}
-		catch (Exception $e) {
-			$jcookie->set('fcfavs', '{}');
-		}
-
-		$favs = $fcfavs && isset($fcfavs->item) ? $fcfavs->item : array();
-		foreach($favs as $itemid)
+		foreach($favs as $itemid => $f)
 		{
-			$favoured[$itemid] = (object) array('itemid'=>$itemid, 'fav'=>1);
+			$favoured[(int)$itemid] = (object) array('itemid' => (int) $itemid, 'fav' => 1);
 		}
 
 		return $favoured;

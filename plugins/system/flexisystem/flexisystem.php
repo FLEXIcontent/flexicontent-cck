@@ -1847,6 +1847,8 @@ class plgSystemFlexisystem extends JPlugin
 	// AFTER LOGIN
 	public function onUserAfterLogin($options)
 	{
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
@@ -1857,16 +1859,9 @@ class plgSystemFlexisystem extends JPlugin
 		$jcookie->set( 'fc_uid', JUserHelper::getShortHashedUserAgent(), 0);
 
 		// Add favourites via cookie to the DB
-		$fcfavs = $jcookie->get('fcfavs', '{}', 'string');
+		$fcfavs = flexicontent_favs::getCookieFavs();
 
-		try {
-			$fcfavs = json_decode($fcfavs);
-		}
-		catch (Exception $e) {
-			$jcookie->set('fcfavs', '{}');
-		}
-		
-		$types = array('item'=>0, 'category'=>1);
+		$types = array('item' => 0, 'category' => 1);
 		foreach($types as $type => $type_id)
 		{
 			$favs = $fcfavs && isset($fcfavs->$type) ? $fcfavs->$type : array();
