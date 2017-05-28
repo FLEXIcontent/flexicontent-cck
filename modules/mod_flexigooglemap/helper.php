@@ -42,11 +42,11 @@ class modFlexigooglemapHelper
 			return null;
 		}
 
-		$treeinclude = $params->get('treeinclude', 1);  // by default include children categories
-		global $globalcats;
-		$catids = $params->get('catid');
+		// By default include children categories
+		$treeinclude = $params->get('treeinclude', 1);
 
 		// Make sure categories is an array
+		$catids = $params->get('catid');
 		$catids = is_array($catids) ? $catids : array($catids);
 
 		// Retrieve extra categories, such children or parent categories
@@ -60,19 +60,20 @@ class modFlexigooglemapHelper
 
 		$count = $params->get('count');
 		$forced_itemid = $params->get('forced_itemid', 0);
-		$methode = $params->get('catmethode', '1');       // 1 include or 0 exclude categories
-		$categoriesID = implode(',', $catids_arr);
-		if ($methode == 0) {
-			$catWheres = "rel.catid IN (".$categoriesID.")";
-		} else {
-			$catWheres = "rel.catid NOT IN (".$categoriesID.")";
-		}
+
+		// Include : 1 or Exclude : 0 categories
+		$method_category = $params->get('method_category', '1');
+
+		$catWheres = $method_category == 0
+			? ' rel.catid IN (' . implode(',', $catids_arr) . ')'
+			: ' rel.catid NOT IN (' . implode(',', $catids_arr) . ')';
+
 		$db = JFactory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
 			.' FROM #__content  AS a'
 			.' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
 			.' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
-			.' WHERE b.field_id = '.$fieldaddressid.' AND '.$catWheres.'  AND state = 1'
+			.' WHERE b.field_id = ' . $fieldaddressid.' AND ' . $catWheres . '  AND state = 1'
 			.' ORDER BY title '.$count
 			;
 		$db->setQuery( $queryLoc );

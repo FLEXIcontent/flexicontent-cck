@@ -70,7 +70,7 @@
 			</field>
 
 			<field
-				name="catmethode" type="radio" default="0"
+				name="method_category" type="radio" default="0"
 				label="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_LABEL" description="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_DESC" showon="catidmode:0"
 				class="btn-group btn-group-yesno"
 				>
