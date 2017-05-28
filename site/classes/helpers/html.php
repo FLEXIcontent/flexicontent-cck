@@ -3524,11 +3524,13 @@ class flexicontent_html
 		static $tooltip_class, $addremove_tip, $img_fav_add, $img_fav_delete;
 		if (!$img_fav_delete)
 		{
-			$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL);
+			//$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL);
+    	$img_fav_delete = '<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom; "></span>';
 		}
 		if (!$img_fav_add)
 		{
-			$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL);
+			//$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL);
+    	$img_fav_add = '<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom; "></span>';
 		}
 
 		if (!$js_and_css_added)
