@@ -3463,7 +3463,7 @@ class flexicontent_html
 	static function favoured_userlist(&$field, &$item,  $favourites)
 	{
 		ob_start();
-		include (JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'tmpl'.DS.'layouts'.DS.'userlist.php');
+		include (JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'tmpl'.DS.'favourites'.DS.'layouts'.DS.'userlist.php');
 		$html = ob_get_contents();
 		ob_end_clean();
 		return $html;
@@ -3478,7 +3478,7 @@ class flexicontent_html
 	static function favicon($field, $favoured, $item, $type='item')
 	{
 		ob_start();
-		include (JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'tmpl'.DS.'layouts'.DS.'favicon.php');
+		include (JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'tmpl'.DS.'favourites'.DS.'layouts'.DS.'favicon.php');
 		$html = ob_get_contents();
 		ob_end_clean();
 		return $html;
