@@ -3462,11 +3462,11 @@ class flexicontent_html
 	 */
 	static function favoured_userlist($field, $item, & $favourites, $type='item')
 	{
-		//ob_start();  include(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'layouts'.DS.'userlist.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
+		//ob_start();  include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts'.DS.'flexicontent_fields'.DS.'favourites'.DS.'userlist.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
 
-		$field_layouts_path = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+		$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
 
-		$layoutData = array(
+		$displayData = array(
 			'field' => $field,
 			'item' => $item,
 			//'favoured' => $favoured,
@@ -3474,7 +3474,7 @@ class flexicontent_html
 			'type' => 'item'
 		);
 
-		return JLayoutHelper::render('tmpl.favourites.layouts.userlist', $displayData, $basePath = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'));
+		return JLayoutHelper::render('flexicontent_fields.favourites.userlist', $displayData, $layouts_path);
 	}
 
 
@@ -3486,11 +3486,11 @@ class flexicontent_html
 	 */
 	static function favicon($field, & $favoured, $item, $type='item')
 	{
-		//ob_start();  include(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'layouts'.DS.'favicon.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
+		//ob_start();  include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts'.DS.'flexicontent_fields'.DS.'favourites'.DS.'favicon.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
 
-		$field_layouts_path = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+		$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
 
-		$layoutData = array(
+		$displayData = array(
 			'field' => $field,
 			'item' => $item,
 			'favoured' => $favoured,
@@ -3498,7 +3498,7 @@ class flexicontent_html
 			'type' => 'item'
 		);
 
-		return JLayoutHelper::render('tmpl.favourites.layouts.favicon', $displayData, $basePath = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'));
+		return JLayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path);
 	}
 
 

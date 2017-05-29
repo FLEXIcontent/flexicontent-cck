@@ -52,6 +52,7 @@
 		<folder>controllers</folder>
 		<folder>tasks</folder>
 		<folder>helpers</folder>
+		<folder>layouts</folder>
 		<folder>librairies</folder>
 		<folder>models</folder>
 		<folder>sef_ext</folder>
