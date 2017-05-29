@@ -3513,9 +3513,6 @@ class flexicontent_html
 	 */
 	static function favicon($field, $favoured, $item, $type='item')
 	{
-		$user = JFactory::getUser();
-		$item_id = $item->id;
-		$item_title = $item->title;
 		$tooltip_class = 'hasTooltip';
 
 		static $tooltip_title, $icon_not_fav, $icon_is_fav, $icon_disabled_fav;  // Reusable Texts / HTML for creating FAVs Icon
@@ -3526,16 +3523,17 @@ class flexicontent_html
 		{
 			$document = JFactory::getDocument();
 			$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+			$use_font = $cparams->get('use_font_icons', 1);
 
-			$icon_is_fav = $cparams->get('use_font_icons', 1)
+			$icon_is_fav = !$use_font
 				? JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
-    		: '<span class="icon-heart fcfav_icon_on"></span>';
-			$icon_not_fav = $cparams->get('use_font_icons', 1)
+				: '<span class="icon-heart fcfav_icon_on"></span>';
+			$icon_not_fav = !$use_font
 				? JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL)
-    		: '<span class="icon-heart fcfav_icon_off"></span>';
+				: '<span class="icon-heart fcfav_icon_off"></span>';
 
 			$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
-			$icon_disabled_fav = $cparams->get('use_font_icons', 1)
+			$icon_disabled_fav = !$use_font
 				? JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs)
 				: '<span class="icon-heart fcfav_icon_disabled"></span>';
 
@@ -3546,8 +3544,8 @@ class flexicontent_html
 			$allow_guests_favs = (int) $favs_field->parameters->get('allow_guests_favs', 1);
 			$users_counter     = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
 
-			$text 		= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
-			$overlib 	= $user->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
+			$text 		= JFactory::getUser()->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
+			$overlib 	= JFactory::getUser()->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
 			$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 1, 1);
 
 			// Load JS / CSS
@@ -3579,26 +3577,36 @@ class flexicontent_html
 			$js_and_css_added = true;
 		}
 
+		ob_start();
+
 		// Favs for guests disabled
-		if (!$user->id && !$allow_guests_favs)
+		if (!JFactory::getUser()->id && !$allow_guests_favs)
 		{
-			return $icon_disabled_fav;
+			echo $icon_disabled_fav;
 		}
 
-		$link_class = $favoured ? 'fcfav_delete' : 'fcfav_add';
-		$link_text  = $favoured ? $icon_is_fav : $icon_not_fav;
+		// Favs for logged user via DB, or guest user via COOKIE
+		else
+		{
+			$link_class = $favoured ? 'fcfav_delete' : 'fcfav_add';
+			$link_text  = $favoured ? $icon_is_fav : $icon_not_fav;
 
-		$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
-		$link 		= "javascript:void(null)";
+			$onclick 	= "javascript:FCFav(".$item->id.", '".$type."', ".$users_counter.")";
+			$link 		= "javascript:void(null)";
 
-		return '
-			<span class="'.$link_class.'">
-				<a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse '.$tooltip_class.'" title="'.$tooltip_title.'">
-					'.$link_text.'
-				</a>
-				<span class="fav_item_id" style="display:none;">'.$item_id.'</span>
-				<span class="fav_item_title" style="display:none;">'.$item_title.'</span>
-			</span>';
+			echo '
+				<span class="' . $link_class . '">
+					<a id="favlink_' . $type . '_' . $item->id . '" href="' . $link . '" onclick="' . $onclick . '" class="btn fcfav-reponse '.$tooltip_class.'" title="'.$tooltip_title.'">
+						' . $link_text . '
+					</a>
+					<span class="fav_item_id" style="display:none;">'.$item->id.'</span>
+					<span class="fav_item_title" style="display:none;">'.$item->title.'</span>
+				</span>';
+		}
+
+		$favs_html = ob_get_contents();
+		ob_end_clean();
+		return $favs_html;
 	}
 
 
