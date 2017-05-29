@@ -2887,7 +2887,7 @@ div.current ul.config-option-list li label {
 }
 .select2-container .select2-choice {
 	padding: 0 0 0 8px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 4px 0 0 !important;
 	font-weight: normal !important;
 	min-height: 26px;
 	height: auto !important;
