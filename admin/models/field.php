@@ -210,30 +210,11 @@ class FlexicontentModelField extends FCModelAdmin
 
 		// Try to load plugin file: /plugins/folder/element/element.xml
 		$pluginpath = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $this->field_type . DS . $this->field_type.'.xml';
-		if (!JFile::exists( $pluginpath ))
-		{
-			$pluginpath = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . 'core' . DS . 'core.xml';
-		}
-
-		if (!file_exists($pluginpath))
+		if (!JFile::exists($pluginpath))
 		{
 			throw new Exception(JText::sprintf('COM_PLUGINS_ERROR_FILE_NOT_FOUND', $this->field_type.'.xml'));
 			return false;
 		}
-
-		// Load the core and/or local language file(s).
-		/*	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, null, false, false)
-		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, null, false, false)
-		||	$lang->load('plg_'.$folder.'_'.$element, JPATH_ADMINISTRATOR, $lang->getDefault(), false, false)
-		||	$lang->load('plg_'.$folder.'_'.$element, $client->path.'/plugins/'.$folder.'/'.$element, $lang->getDefault(), false, false);
-		*/
-
-		// Get the plugin form.
-		if (!file_exists($pluginpath))
-		{
-			die('Plugin path not found:' . $pluginpath);
-		}
-
 
 		// *** Load form's XML file
 		// We will load the form's XML file into a string to be able to manipulate it, before it is loaded by the JForm
