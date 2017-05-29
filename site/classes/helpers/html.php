@@ -3460,14 +3460,23 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function favoured_userlist(&$field, &$item,  $favourites)
+	static function favoured_userlist($field, $item, & $favourites, $type='item')
 	{
-		ob_start();
-		include (JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'tmpl'.DS.'favourites'.DS.'layouts'.DS.'userlist.php');
-		$html = ob_get_contents();
-		ob_end_clean();
-		return $html;
+		//ob_start();  include(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'layouts'.DS.'userlist.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
+
+		$field_layouts_path = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+
+		$layoutData = array(
+			'field' => $field,
+			'item' => $item,
+			//'favoured' => $favoured,
+			'favourites' => $favourites,
+			'type' => 'item'
+		);
+
+		return JLayoutHelper::render('tmpl.favourites.layouts.userlist', $displayData, $basePath = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'));
 	}
+
 
 	/**
 	 * Creates the favourite icons
@@ -3475,13 +3484,21 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function favicon($field, $favoured, $item, $type='item')
+	static function favicon($field, & $favoured, $item, $type='item')
 	{
-		ob_start();
-		include (JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'tmpl'.DS.'favourites'.DS.'layouts'.DS.'favicon.php');
-		$html = ob_get_contents();
-		ob_end_clean();
-		return $html;
+		//ob_start();  include(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'.DS.'layouts'.DS.'favicon.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
+
+		$field_layouts_path = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+
+		$layoutData = array(
+			'field' => $field,
+			'item' => $item,
+			'favoured' => $favoured,
+			//'favourites' => $favourites,
+			'type' => 'item'
+		);
+
+		return JLayoutHelper::render('tmpl.favourites.layouts.favicon', $displayData, $basePath = realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core'));
 	}
 
 

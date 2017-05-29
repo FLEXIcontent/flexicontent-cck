@@ -1,5 +1,7 @@
 <?php
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('JPATH_BASE') or die;
+
+extract($displayData);
 
 $tooltip_class = 'hasTooltip';
 
@@ -64,8 +66,6 @@ if (!$js_and_css_added)
 
 	$js_and_css_added = true;
 }
-
-ob_start();
 
 // Favs for guests disabled
 if (!JFactory::getUser()->id && !$allow_guests_favs)

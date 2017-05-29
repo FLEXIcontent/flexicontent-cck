@@ -1,5 +1,7 @@
 <?php
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('JPATH_BASE') or die;
+
+extract($displayData);
 
 // Get Favourites field configuration (if FIELD is empty then retrieve it)
 $favs_field = $field ?: reset(FlexicontentFields::getFieldsByIds(array(12)));
