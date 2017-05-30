@@ -4,9 +4,13 @@ $field->{$prop} = array();
 $n = 0;
 foreach ($values as $value)
 {
-	if ( empty($value['addr']) && !$is_ingroup ) continue; // Skip empty if not in field group
-	if ( empty($value['addr']) ) {
-		$field->{$prop}[$n++]	= '';
+	// Skip empty value, adding an empty placeholder if field inside in field group
+	if ( empty($value['addr']) )
+	{
+		if ( $is_ingroup )
+		{
+			$field->{$prop}[$n++]	= '';
+		}
 		continue;
 	}
 	

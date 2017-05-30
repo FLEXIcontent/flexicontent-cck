@@ -34,7 +34,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
-			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
@@ -310,8 +310,8 @@
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_LABEL" level="level2" />
 			<field name="pretext_filter" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_filter" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<field name="opentag_filter" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag_filter" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			<field name="opentag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" icon_class="icon-list" level="tab_open" box_type="1" />
 			

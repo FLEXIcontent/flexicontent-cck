@@ -518,7 +518,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				if ($field) {
 					$field_description = $field->description ? $field->description :
 						JText::_($this->form->getField('type_id')->description);
-					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel'.(!$this->row->type_id ? ' label-warning' : '').'" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
+					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel'.(!$this->row->type_id ? ' label label-warning' : '').'" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 				}

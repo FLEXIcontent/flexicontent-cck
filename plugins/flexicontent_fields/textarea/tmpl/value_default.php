@@ -3,9 +3,13 @@
 $n = 0;
 foreach ($values as $value)
 {
-	if ( !strlen($value) && !$is_ingroup ) continue; // Skip empty if not in field group
-	if ( !strlen($value) ) {
-		$field->{$prop}[$n++]	= '';
+	// Skip empty value, adding an empty placeholder if field inside in field group
+	if ( !strlen($value) )
+	{
+		if ( $is_ingroup )
+		{
+			$field->{$prop}[$n++]	= '';
+		}
 		continue;
 	}
 

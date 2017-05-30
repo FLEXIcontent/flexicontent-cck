@@ -2,12 +2,14 @@
 
 // Optimization, do some stuff outside the loop
 $hits_icon_arr = array();
-if (($display_hits==1 || $display_hits==3))
+$hits_icon = '';
+
+if ( $display_hits==1 || $display_hits==3 )
 {
 	if ( !isset($hits_icon_arr[$field->id]) )
 	{
-		$_tip_class = $display_hits==1 ? ' '.$tooltip_class : '';
-		$_hits_tip  = $display_hits==1 ? ' title="'.flexicontent_html::getToolTip(null, '%s '.JText::_( 'FLEXI_HITS', true ), 0, 0).'" ' : '';
+		$_tip_class = $display_hits==1 ? ' ' . $tooltip_class : '';
+		$_hits_tip  = $display_hits==1 ? ' title="' . flexicontent_html::getToolTip(null, '%s '.JText::_( 'FLEXI_HITS', true ), 0, 0) . '" ' : '';
 		$hits_icon_arr[$field->id] = '<span class="fcweblink_icon icon-eye-open '.$_tip_class.'" '.$_hits_tip.'></span>';
 	}
 	$hits_icon = $hits_icon_arr[$field->id];
@@ -16,9 +18,13 @@ if (($display_hits==1 || $display_hits==3))
 $n = 0;
 foreach ($values as $value)
 {
-	if ( empty($value['link']) && !$is_ingroup ) continue; // Skip empty if not in field group
-	if ( empty($value['link']) ) {
-		$field->{$prop}[$n++]	= '';
+	// Skip empty value, adding an empty placeholder if field inside in field group
+	if ( empty($value['link']) )
+	{
+		if ( $is_ingroup )
+		{
+			$field->{$prop}[$n++]	= '';
+		}
 		continue;
 	}
 	
@@ -31,8 +37,8 @@ foreach ($values as $value)
 	$target   = ($usetarget && !empty($value['target'])  )  ?  $value['target']   : $default_target;
 	$hits     = (int) @ $value['hits'];
 	
-	$link_params  = $title  ? ' title="'.$title.'"'   : '';
-	$link_params .= $id     ? ' id="'   .$id.'"'      : '';
+	$link_params  = $title ? ' title="' . $title . '"' : '';
+	$link_params .= $id    ? ' id="'    . $id . '"'    : '';
 	if ($target == '_popup')
 	{
 		$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
@@ -45,39 +51,48 @@ foreach ($values as $value)
 	{
 		$link_params .= $target ? ' target="'.$target.'"' : '';
 	}
-	$link_params .= $class  ? ' class="'.$class.'"'   : '';
+	$link_params .= $class  ? ' class="' . $class . '"'   : '';
 	$link_params .= $rel_nofollow;
 	
+	// Direct access to the web-link, hits counting not possible
 	if ( $field->parameters->get('use_direct_link', 0) || $field->parameters->get('link_source', 0) ==-1 )
-		// Direct access to the web-link, hits counting not possible
+	{
 		$href = $value['link'];
-	else 
-		// Indirect access to the web-link, via calling FLEXIcontent component, thus counting hits too
+	}
+
+	// Indirect access to the web-link, via calling FLEXIcontent component, thus counting hits too
+	else
+	{
 		$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$item->id.'&ord='.($n+1).'&task=weblink' );
+	}
 	
+	// If linking text is  URL convert from Punycode to UTF8
+	if ( empty($linktext) )
+	{
+		$linktext = $title ? $title : $this->cleanurl( JStringPunycode::urlToUTF8($value['link']) );
+	}
+
 	// Create indirect link to web-link address with custom displayed text
-	if( empty($linktext) )
-		$linktext = $title ? $title : $this->cleanurl(
-			(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link'])    // If using URL convert from Punycode to UTF8
-		);
 	$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">' .$linktext. '</a>';
 	
 	// HITS: either as icon or as inline text or both
 	$hits_html = '';
 	if ($display_hits && $hits)
 	{
-		$hits_html = '<span class="fcweblink_hits">';
-		if ( $add_hits_img && @ $hits_icon ) {
-			$hits_html .= sprintf($hits_icon, $hits);
-		}
-		if ( $add_hits_txt ) {
-			$hits_html .= '('.$hits.'&nbsp;'.JTEXT::_('FLEXI_HITS').')';
-		}
-		$hits_html .= '</span>';
+		$hits_html = '
+			<span class="fcweblink_hits">
+				' . ( $add_hits_img && $hits_icon ? sprintf($hits_icon, $hits) : '') . '
+				' . ( $add_hits_txt ? '(' . $hits . '&nbsp;' . JTEXT::_('FLEXI_HITS') . ')' : '') . '
+			</span>';
+
 		if ($prop == 'display_hitsonly')
+		{
 			$html = $hits_html;
+		}
 		else
-			$html .= ' '. $hits_html;
+		{
+			$html .= ' ' . $hits_html;
+		}
 	}
 	
 	// Add prefix / suffix
