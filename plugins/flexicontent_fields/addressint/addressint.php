@@ -623,7 +623,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		
 		// Get choosen display layout
 		$viewlayout = $field->parameters->get('viewlayout', '');
-		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value';
+		$viewlayout = $viewlayout && $viewlayout!='value' ? 'value_'.$viewlayout : 'value';
 
 		// Create field's display
 		$this->displayFieldValue($prop, $viewlayout);
