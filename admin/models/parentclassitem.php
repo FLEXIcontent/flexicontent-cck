@@ -158,7 +158,8 @@ class ParentClassItem extends FCModelAdmin
 	function __construct()
 	{
 		parent::__construct();
-		$jinput  = JFactory::getApplication()->input;
+
+		$jinput = JFactory::getApplication()->input;
 
 		// Set current category ID and current type ID only for new items
 		$curcatid = $this->_id
@@ -277,13 +278,15 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Method to get item data
+	 * Method to get a record.
 	 *
-	 * @access	public
-	 * @return	array
-	 * @since	1.0
+	 * @param	integer  $pk An optional id of the object to get, otherwise the id from the model state is used.
+	 *
+	 * @return	mixed 	Record data object on success, false on failure.
+	 *
+	 * @since	1.6
 	 */
-	function &getItem($pk=null, $check_view_access=true, $no_cache=false, $force_version=0)
+	public function getItem($pk=null, $check_view_access=true, $no_cache=false, $force_version=0)
 	{
 		$app     = JFactory::getApplication();
 		$cparams = $this->_cparams;
@@ -303,7 +306,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
-		if ( $pk && $this->_loadRecord($no_cache, $force_version) )
+		if ( $pk && $this->_loadRecord($pk, $no_cache, $force_version) )
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			// Extra Steps for Frontend
@@ -341,8 +344,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $this->_record;
 	}
-	
-	
+
+
 	/**
 	 * Method to load record data
 	 *
@@ -350,18 +353,24 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	protected function _loadRecord( $no_cache=false, $force_version=0 )
+	protected function _loadRecord($pk = null, $no_cache=false, $force_version=0)
 	{
+		//echo 'force_version: '.$force_version ."<br/>";
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		
 		// This is ITEM cache. NOTE: only unversioned items are cached
 		static $items = array();
 		global $fc_list_items;    // Global item cache (unversioned items)
 		static $unapproved_version_notice;
 		
+		// If PK was provided and it is also not a name, then treat it as a primary key value
+		$pk = $pk ? (int) $pk : (int) $this->_id;
+
 		// Only try to load existing item
-		if (!$this->_id) return false;
-		
-		//echo 'force_version: '.$force_version ."<br/>";
-		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		if (!$pk)
+		{
+			return false;
+		}
 		
 		// -- To load a different item:
 		// a. use member function function setId($id, $currcatid=0) to change primary key and then call getItem()
@@ -370,13 +379,14 @@ class ParentClassItem extends FCModelAdmin
 		// Clear item to make sure it is reloaded
 		if ( $no_cache )
 		{
+			//echo "********************************<br/>\n CLEARING CACHE of ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
 			$this->_record = null;
 		}
 		
 		// Only retrieve item if not already, ZERO $force_version means unversioned data or maintain currently loaded version
 		else if ( isset($this->_record) && (!$force_version || $force_version==$this->_version) )
 		{
-			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$this->_id}<br/> ********************************<br/><br/><br/>";
+			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
 			return (boolean) $this->_record;
 		}
 		
@@ -397,8 +407,8 @@ class ParentClassItem extends FCModelAdmin
 		// *** Check if loading specific VERSION and generate version related messages
 		// ***
 		
-		$current_version = (int) FLEXIUtilities::getCurrentVersions($this->_id, true, $force=true); // Get current item version
-		$last_version    = (int) FLEXIUtilities::getLastVersions($this->_id, true, $force=true);    // Get last version (=latest one saved, highest version id)
+		$current_version = (int) FLEXIUtilities::getCurrentVersions($pk, true, $force=true); // Get current item version
+		$last_version    = (int) FLEXIUtilities::getLastVersions($pk, true, $force=true);    // Get last version (=latest one saved, highest version id)
 
 		// ***
 		// *** Decide the version to load: (a) the one specified or (b) UNversioned data (these should be same as current version data) or (c) the latest one
@@ -423,7 +433,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		// Check if item is alredy loaded and is of correct version
-		if ( $this->_version == $version && isset($this->_record) ) {
+		if ( $this->_version == $version && isset($this->_record) )
+		{
 			return (boolean) $this->_record;
 		}
 		$this->_version = $version; // Set number of loaded version
@@ -448,44 +459,38 @@ class ParentClassItem extends FCModelAdmin
 		
 		
 		// Only unversioned items are cached, use cache if no specific version was requested
-		if ( !$version && isset($items[$this->_id]) )
+		if ( !$version && isset($items[$pk]) )
 		{
-			//echo "********************************<br/>\n RETURNING CACHED item: {$this->_id}<br/> ********************************<br/><br/><br/>";
-			$this->_record = $items[$this->_id];
+			//echo "********************************<br/>\n RETURNING CACHED item: {$pk}<br/> ********************************<br/><br/><br/>";
+			$this->_record = $items[$pk];
 			return (boolean) $this->_record;
 		}
 		
-		//echo "**************************<br/>\n LOADING item id: {$this->_id}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
+		//echo "**************************<br/>\n LOADING item id: {$pk}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
 		
-		// *********************
-		// TRY TO LOAD ITEM DATA
-		// *********************
+		// ***
+		// *** TRY TO LOAD ITEM DATA
+		// ***
 		try
 		{
+			// ***
+			// *** Item Retrieval BACKEND
+			// ***
 			if ( $app->isAdmin() )
 			{
-				// **********************
-				// Item Retrieval BACKEND
-				// **********************
 				$item   = $this->getTable('flexicontent_items', '');
-				$result = $item->load($this->_id);  // try loading existing item data
+				$result = $item->load($pk);  // try loading existing item data
 				if ($result===false)
 				{
-					$this->_record = false;
-					if (!$version)
-					{
-						$items[$this->_id] = $this->_record;
-						$fc_list_items[$this->_id] = $this->_record;
-					}
-					return false; // item not found, return
+					throw new Exception('Record # ' . $pk . ' not found', 500);
 				}
 			}
+
+			// ***
+			// *** Item Retrieval FRONTEND
+			// ***
 			else
 			{
-				// ***********************
-				// Item Retrieval FRONTEND
-				// ***********************
-				
 				// Extra access columns for main category and content type (item access will be added as 'access')
 				$select_access = 'mc.access as category_access, ty.access as type_access';
 				
@@ -544,65 +549,35 @@ class ParentClassItem extends FCModelAdmin
 				$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
 				$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
 				
-				// HANDLE J1.6+ ancestor category being unpublished, when badcats.id is not null,
-				// then the item is inside in an unpublished ancestor category, thus inaccessible
-				/*$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
-				$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
-				$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
-				$subquery .= 'WHERE parent.extension = ' . $db->Quote('com_content');
-				$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
-				$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');*/
-				
-				// NOTE: version_id is used by field helper file to load the specified version,
-				// the reason for left join here is to verify that the version exists
+				// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
 				if ($version)
 				{
 					$query->join('LEFT', '#__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) );
 				}
-				
-				// Join on contact table, to get contact data of author
-				//$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'contact_details"';
-				//$db->setQuery($query);
-				//$contact_details_tbl_exists = (boolean) count($db->loadObjectList());
-				//if ( $contact_details_tbl_exists) {
-				//	$query->select('contact.id as contactid' ) ;
-				//	$query->join('LEFT','#__contact_details AS contact on contact.user_id = i.created_by');
-				//}
-				
-				// Join over the categories to get parent category titles
-				//$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
-				//$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
-				
-				$query->where('i.id = ' . (int) $this->_id);
-				//echo $db->replacePrefix($query);
 
+				$query->where('i.id = ' . (int) $pk);
+
+				$db->setQuery($query);  //echo $db->replacePrefix($query);
 				
-				$db->setQuery($query);
-				
+				// Do not translate, this is the Falang overridden method of a database extended Class
 				// Try to execute query directly and load the data as an object
-				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) ) {
+				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) )
+				{
 					$data = flexicontent_db::directQuery($query);
-					$data = @ $data[0];
-					//$data = $db->loadObject(null, false);   // do not, translate, this is the JoomFish overridden method of Database extended Class
-				} else {
-					$data = $db->loadObject();
+					$data = isset($data[0]) ? $data[0] : null;
 				}
-				
-				// Check for SQL error
-				if ( $db->getErrorNum() )  throw new Exception($db->getErrorMsg(), 500);
-				//print_r($data); exit;
-				
-				if (!$data) {
-					$this->_record = false;
-					$this->_typeid = 0;
-					if (!$version) {
-						$items[$this->_id] = $this->_record;
-						$fc_list_items[$this->_id] = $this->_record;
-					}
-					return false; // item not found, return
+				else
+				{
+					$data = $db->loadObject();  //print_r($data); exit;
 				}
-				
-				if ($version && !$data->version_id) {
+
+				if (!$data)
+				{
+					throw new Exception('Record # ' . $pk . ' not found', 500);
+				}
+
+				if ($version && !$data->version_id)
+				{
 					JError::raiseNotice(10, JText::sprintf('NOTICE: Requested item version %d was not found, loaded currently active version', $version));
 				}
 				
@@ -664,7 +639,7 @@ class ParentClassItem extends FCModelAdmin
 				// -- Try to retrieve all joomfish data for the current item
 				$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
 						." FROM #__".$nn_content_tbl." as jfc "
-						." WHERE jfc.reference_table='content' AND jfc.reference_id = {$this->_id} ";
+						." WHERE jfc.reference_table='content' AND jfc.reference_id = {$pk} ";
 				$db->setQuery($query);
 				$translated_fields = $db->loadObjectList();
 				
@@ -720,7 +695,7 @@ class ParentClassItem extends FCModelAdmin
 				$query = "SELECT f.id, f.name, f.field_type, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
 					." FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
-					." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$this->_id."'"
+					." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$pk."'"
 					." GROUP BY f.id";
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
@@ -809,7 +784,7 @@ class ParentClassItem extends FCModelAdmin
 			else
 			{
 				// Retrieve unversioned value
-				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
+				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$pk;
 				$db->setQuery($query);
 				$item->tags = $db->loadColumn();
 				$item->tags = array_reverse($item->tags);
@@ -827,7 +802,7 @@ class ParentClassItem extends FCModelAdmin
 			else
 			{
 				// Retrieve unversioned value
-				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
+				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$pk;
 				$db->setQuery($query);
 				$item->categories = $db->loadColumn();
 			}
@@ -885,7 +860,8 @@ class ParentClassItem extends FCModelAdmin
 			$item->category_access = $db->loadResult();
 			
 			// Typecast some properties in case LEFT JOIN produced nulls
-			if ( !isset($item->type_access) ) {
+			if ( !isset($item->type_access) )
+			{
 				$public_acclevel = 1;
 				$item->type_access = $public_acclevel;
 			}
@@ -930,21 +906,15 @@ class ParentClassItem extends FCModelAdmin
 			}
 			
 			// Clear modified Date, if it is an invalid "null" date
-			if ($item->modified == $db->getNulldate()) {
-				$item->modified = null;
-			}
-			
-			// Assign to the item data member variable and cache it if loaded an unversioned item data
-			$this->_record = & $item;
-			if (!$version)
+			if ($item->modified == $db->getNulldate())
 			{
-				$items[$this->_id] = $this->_record;
-				$fc_list_items[$this->_id] = $this->_record;
+				$item->modified = null;
 			}
 
 			// *** 
 			// *** Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
 			// *** 
+
 			if ( $use_versioning && $current_version > $last_version )
 			{
 				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'flexicontent.php');
@@ -952,11 +922,20 @@ class ParentClassItem extends FCModelAdmin
 				$fleximodel->addCurrentVersionData($item->id);
 				$item->last_version = $last_version = $current_version;
 			}
+
+			// Assign found record to the _record member property
+			$this->_record = & $item;
 		}
 		
 		catch (JException $e)
 		{
 			$this->_record = false;
+			$this->_typeid = 0;
+			if (!$version)
+			{
+				$items[$pk] = false;
+				$fc_list_items[$pk] = false;
+			}
 
 			if ($e->getCode() == 404)
 			{
@@ -968,37 +947,26 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 
-		// Add to cache if it is non-version data
+		// Add to record to cache if it is non-versioned data
 		if (!$version)
 		{
-			$items[$this->_id] = $this->_record;
-			$fc_list_items[$this->_id] = $this->_record;
+			$items[$pk] = $this->_record;
+			$fc_list_items[$pk] = $this->_record;
 		}
 
 		return (boolean) $this->_record;
 	}
-	
-	
+
+
 	/**
-	 * Returns a Table object, always creating it
+	 * Method to get the record form.
 	 *
-	 * @param	type	The table type to instantiate
-	 * @param	string	A prefix for the table class name. Optional.
-	 * @param	array	Configuration array for model. Optional.
-	 * @return	JTable	A database object
-	 * @since	1.6
-	*/
-	public function getTable($type = 'flexicontent_items', $prefix = '', $config = array()) {
-		return JTable::getInstance($type, $prefix, $config);
-	}
-	
-	/**
-	 * Method to get the row form.
+	 * @param   array    $data      Data for the form.
+	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @param	array	$data		Data for the form.
-	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
-	 * @return	mixed	A JForm object on success, false on failure
-	 * @since	1.6
+	 * @return  JForm|boolean  A JForm object on success, false on failure
+	 *
+	 * @since   1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
@@ -1118,8 +1086,8 @@ class ParentClassItem extends FCModelAdmin
 
 		return $form;
 	}
-	
-	
+
+
 	/**
 	 * Auto-populate the model state.
 	 *
@@ -1174,26 +1142,27 @@ class ParentClassItem extends FCModelAdmin
 
 		parent::preprocessForm($form, $data, $group);
 	}
-	
-	
+
+
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
-	 * @return	mixed	The data for the form.
-	 * @since	1.6
+	 * @return  mixed  The data for the form.
+	 *
+	 * @since   1.6
 	 */
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
 		$app = JFactory::getApplication();
-		$data = $app->getUserState($this->option.'.edit.item.data', array());
+		$data = $app->getUserState($this->option.'.edit.'.$this->getName().'.data', array());
 
 		// Clear form data from session
-		$app->setUserState($this->option.'.edit.item.data', false);
+		$app->setUserState($this->option.'.edit.'.$this->getName().'.data', false);
 
 		if (empty($data))
 		{
-			$data = $this->_record ? $this->_record : $this->getItem();
+			$data = $this->getItem();
 		}
 		else
 		{
@@ -1224,8 +1193,8 @@ class ParentClassItem extends FCModelAdmin
 
 		return $data;
 	}
-	
-	
+
+
 	/**
 	 * Method to calculate Item Access Permissions
 	 *
@@ -1388,8 +1357,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $allow;
 	}
-	
-	
+
+
 	/**
 	 * Method to check if the user can create items of the given type
 	 *
@@ -2249,8 +2218,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to save field values of the item in field versioning DB table or in ..._fields_item_relations DB table 
 	 *
@@ -2866,8 +2835,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to apply a NEW CURRENT version when saving an APPROVED item version
 	 *
@@ -2977,8 +2946,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to save Joomfish item translation data
 	 *
@@ -3067,8 +3036,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to fetch used tags IDs as an array when performing an edit action
 	 * 
@@ -3101,8 +3070,8 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Method to get the list of the used tags
 	 * 
@@ -3150,8 +3119,8 @@ class ParentClassItem extends FCModelAdmin
 	{
 		return $this->getTagsByIds($tagIds, $indexed);
 	}
-	
-	
+
+
 	/**
 	 * Method to get a list of all available tags Data
 	 * 
@@ -3166,8 +3135,8 @@ class ParentClassItem extends FCModelAdmin
 		$tags = $this->_db->loadObjectlist();
 		return $tags;
 	}
-	
-	
+
+
 	/**
 	 * Method to restore an old version
 	 * 
@@ -3217,8 +3186,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 		//$row->store();
 	}
-	
-	
+
+
 	/**
 	 * Method to fetch tags according to a given mask
 	 * 
@@ -3234,8 +3203,8 @@ class ParentClassItem extends FCModelAdmin
 		$tags = $this->_db->loadObjectlist();
 		return $tags;
 	}
-	
-	
+
+
 	/**
 	 * Method to reset hits
 	 * 
@@ -3272,8 +3241,8 @@ class ParentClassItem extends FCModelAdmin
 		$this->_db->setQuery($query);
 		$this->_db->execute();
 	}
-	
-	
+
+
 	/**
 	 * Method to get votes
 	 * 
@@ -3326,8 +3295,8 @@ class ParentClassItem extends FCModelAdmin
 
 		return $rating_resolution[$id];
 	}
-	
-	
+
+
 	/**
 	 * Method to get hits
 	 * 
@@ -3343,8 +3312,8 @@ class ParentClassItem extends FCModelAdmin
 		return $this->_db->loadResult();
 	}
 	
-	
-	
+
+
 	/**
 	 * Method to get subscriber count
 	 * 
@@ -3369,8 +3338,8 @@ class ParentClassItem extends FCModelAdmin
 		$subscribers[$id] = $this->_db->loadResult();
 		return $subscribers[$id];
 	}
-	
-	
+
+
 	/**
 	 * Decide item type id for existing or new item ... verifying that the type exists ...
 	 * NOTE: for new items the value of 'typeid' variable out of the JRequest array is used
@@ -3423,8 +3392,8 @@ class ParentClassItem extends FCModelAdmin
 		$typedata[$this->_typeid] = & $_typedata;
 		return $typedata[$this->_typeid];
 	}
-	
-	
+
+
 	/**
 	 * Method to get used categories when performing an edit action
 	 * 
@@ -3457,8 +3426,8 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Method to get the type parameters of an item
 	 * 
@@ -3493,8 +3462,8 @@ class ParentClassItem extends FCModelAdmin
 		$typeparams[$this->_typeid] = !empty($attribs) ? $attribs : '';
 		return $typeparams[$this->_typeid];
 	}
-	
-	
+
+
 	/**
 	 * Method to get the layout parameters of an item
 	 * 
@@ -3505,8 +3474,8 @@ class ParentClassItem extends FCModelAdmin
 	{
 		return $this->_ilayout ? flexicontent_tmpl::getLayoutparams('items', $this->_ilayout, '', $force) : '';
 	}
-	
-	
+
+
 	/**
 	 * Method to get types list
 	 * 
@@ -3517,8 +3486,8 @@ class ParentClassItem extends FCModelAdmin
 	{
 		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
-	
-	
+
+
 	/**
 	 * Method to retrieve the value of a core field for a specified item version
 	 * 
@@ -3600,8 +3569,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $field_value;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the values of an extrafield
 	 * 
@@ -3646,8 +3615,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $field_values[$item_id][$version];
 	}
-	
-	
+
+
 	/**
 	 * Method to get the FIELDs (configuration and values) belonging to the Content Type of:
 	 * (a) the current item or (b) the one specified in the URL (variable 'typeid')
@@ -3723,8 +3692,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $fields;
 	}
-	
-	
+
+
 	/**
 	 * Method to change the state of an item
 	 *
@@ -3824,8 +3793,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the versionlist which belongs to the item
 	 * 
@@ -3844,8 +3813,8 @@ class ParentClassItem extends FCModelAdmin
 		$this->_db->setQuery($query);
 		return $this->_db->loadObjectList();
 	}
-	
-	
+
+
 	/**
 	 * Method to count the number of versions that the item has 
 	 * 
@@ -4265,8 +4234,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 		return $send_result;
 	}
-	
-	
+
+
 	/**
 	 * Method to build an object with the items submitted to approval
 	 * it also verifies if the item state are correct (draft state is -4) 
@@ -4303,8 +4272,8 @@ class ParentClassItem extends FCModelAdmin
 
 		return $cids;
 	}
-	
-	
+
+
 	/**
 	 * Method to find reviewers of new item
 	 *
@@ -4324,8 +4293,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $validators;
 	}
-	
-	
+
+
 	/**
 	 * Logic to submit item to approval
 	 *
@@ -4467,8 +4436,8 @@ class ParentClassItem extends FCModelAdmin
 		
 		return $translations[$id];
 	}
-	
-	
+
+
 	/**
 	 * Method to toggle the featured setting of articles.
 	 *
@@ -4648,21 +4617,21 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	3.2.0
 	 */
-	function canEdit($item=null)
+	function canEdit($record=null)
 	{
-		$item = $item ?: $this->_record;
+		$record = $record ?: $this->_record;
 
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 
-		$isOwner = !empty($item->created_by) && ( $item->created_by == $user->get('id') );
+		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		$hasCoupon = false;
 		if ($session->has('rendered_uneditable', 'flexicontent'))
 		{
 			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-			$hasTmpEdit = !empty($item->id) && !empty($rendered_uneditable[$item->id]);  // editable temporarily
-			$hasCoupon = !empty($item->id) && !empty($rendered_uneditable[$item->id]) && $rendered_uneditable[$item->id] == 2;  // editable temporarily via coupon
+			$hasTmpEdit = !empty($record->id) && !empty($rendered_uneditable[$record->id]);  // editable temporarily
+			$hasCoupon = !empty($record->id) && !empty($rendered_uneditable[$record->id]) && $rendered_uneditable[$record->id] == 2;  // editable temporarily via coupon
 		}
 
 		if ($hasTmpEdit)
@@ -4671,14 +4640,14 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// Get "edit items" permission on the type of the item
-		$hasTypeEdit    = !$item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit');
-		$hasTypeEditOwn = !$item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.own');
+		$hasTypeEdit    = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit');
+		$hasTypeEditOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.own');
 		if (!$hasTypeEdit && !$hasTypeEditOwn) return false;
 		
-		if ( !empty($item->id) )
+		if ( !empty($record->id) )
 		{
 			// Existing item, use item specific permissions
-			$asset = 'com_content.article.' . $item->id;
+			$asset = 'com_content.article.' . $record->id;
 			$allowed =
 				($hasTypeEdit && $user->authorise('core.edit', $asset)) ||
 				($hasTypeEditOwn && $user->authorise('core.edit.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -4700,41 +4669,41 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	3.2.0
 	 */
-	function canEditState($item=null)
+	function canEditState($record=null)
 	{
-		$item = $item ?: $this->_record;
+		$record = $record ?: $this->_record;
 
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 
-		$isOwner = !empty($item->created_by) && ( $item->created_by == $user->get('id') );
+		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		$hasCoupon = false;
 		if ($session->has('rendered_uneditable', 'flexicontent'))
 		{
 			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-			$hasCoupon = !empty($item->id) && !empty($rendered_uneditable[$item->id]) && $rendered_uneditable[$item->id] == 2;  // editable temporarily via coupon
+			$hasCoupon = !empty($record->id) && !empty($rendered_uneditable[$record->id]) && $rendered_uneditable[$record->id] == 2;  // editable temporarily via coupon
 		}
 
 		// Get "edit items state" permission on the type of the item
-		$hasTypeEditState    = !$item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state');
-		$hasTypeEditStateOwn = !$item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state.own');
+		$hasTypeEditState    = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.state');
+		$hasTypeEditStateOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.state.own');
 		if (!$hasTypeEditState && !$hasTypeEditStateOwn) return false;
 		
 		// Existing item, use item specific permissions
-		if ( !empty($item->id) )
+		if ( !empty($record->id) )
 		{
-			$asset = 'com_content.article.' . $item->id;
+			$asset = 'com_content.article.' . $record->id;
 			$allowed =
 				($hasTypeEditState && $user->authorise('core.edit.state', $asset)) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
 		}
 
 		// *** New item *** (NOTE: VALIDATION should be done again during item creation !!)
-		elseif ( !empty($item->catid) )
+		elseif ( !empty($record->catid) )
 		{
 			// New item with main category set, use category ACL
-			$cat_asset = 'com_content.category.' . (int) $item->catid;
+			$cat_asset = 'com_content.category.' . (int) $record->catid;
 			$allowed =
 				($hasTypeEditState && $user->authorise('core.edit.state', $cat_asset)) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $cat_asset) && $isOwner);
@@ -4758,9 +4727,9 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	3.2.0
 	 */
-	function canView($item=null)
+	function canView($record=null)
 	{
-		$item = $item ?: $this->_record;
+		$record = $record ?: $this->_record;
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 		$isOwner = !empty($this->_record->created_by) && $this->_record->created_by == $user->get('id');
@@ -4774,24 +4743,24 @@ class ParentClassItem extends FCModelAdmin
 		// The access filter has not been set, we will set access flag(s) if not set already the layout takes some responsibility for display of limited information,
 		$groups = JAccess::getAuthorisedViewLevels($user->id);
 		
-		if ( !isset($item->has_item_access) )
+		if ( !isset($record->has_item_access) )
 		{
-			$item->has_item_access = in_array($item->access, $groups);
+			$record->has_item_access = in_array($record->access, $groups);
 		}
 
-		if ( !isset($item->has_mcat_access) )
+		if ( !isset($record->has_mcat_access) )
 		{
-			$no_mcat_info = $item->catid == 0 || !isset($item->category_access) || $item->category_access === null;
-			$item->has_mcat_access = $no_mcat_info || in_array($item->category_access, $groups);
+			$no_mcat_info = $record->catid == 0 || !isset($record->category_access) || $record->category_access === null;
+			$record->has_mcat_access = $no_mcat_info || in_array($record->category_access, $groups);
 		}
 
-		if ( !isset($item->has_type_access) )
+		if ( !isset($record->has_type_access) )
 		{
-			$no_type_info = $this->_typeid == 0 || !isset($item->type_access) || $item->type_access === null;
-			$item->has_type_access = $no_type_info || in_array($item->type_access, $groups);
+			$no_type_info = $this->_typeid == 0 || !isset($record->type_access) || $record->type_access === null;
+			$record->has_type_access = $no_type_info || in_array($record->type_access, $groups);
 		}
 
-		return $item->has_item_access && $item->has_mcat_access && $item->has_type_access;
+		return $record->has_item_access && $record->has_mcat_access && $record->has_type_access;
 	}
 
 

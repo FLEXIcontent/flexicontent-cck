@@ -268,8 +268,14 @@ abstract class FCModelAdmin extends JModelAdmin
 		$name = $pk != (int) $pk ? $pk : null;
 		if ($name)
 		{
+			// Check 'name' columns and then check 'alias' column exists, if none then clear $name
 			$table = $this->getTable($this->records_jtable, $_prefix='');
-			$name = property_exists($table, 'name') ? $name : null;
+			$name_property = property_exists($table, 'name')
+				? 'name'
+				: (property_exists($table, 'alias')
+					? 'alias'
+					: null);
+			$name = $name_property ? $name : null;
 		}
 
 		// If PK was provided and it is also not a name, then treat it as a primary key value
@@ -337,7 +343,11 @@ abstract class FCModelAdmin extends JModelAdmin
 		if ($record) ;
 
 		// Only initialize MEMBER property '_record' if it is not already an object
-		else if ( is_object($this->_record) ) return true;
+		else if ( is_object($this->_record) )
+		{
+			$record = $this->_record;
+			return true;
+		}
 
 		else
 		{
@@ -565,12 +575,12 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
-	 * Method to get the row form.
+	 * Method to get the record form.
 	 *
-	 * @param   array    $data      An optional array of data for the form to interogate.
+	 * @param   array    $data      Data for the form.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  mixed  A JForm object on success, false on failure
+	 * @return  JForm|boolean  A JForm object on success, false on failure
 	 *
 	 * @since   1.6
 	 */
@@ -604,17 +614,20 @@ abstract class FCModelAdmin extends JModelAdmin
 		$app = JFactory::getApplication();
 		$data = $app->getUserState($this->option.'.edit.'.$this->getName().'.data', array());
 
-		// Clear form data from session ?
+		// Clear form data from session
 		$app->setUserState($this->option.'.edit.'.$this->getName().'.data', false);
 
 		if (empty($data))
 		{
-			$data = $this->getItem($this->_id);
+			$data = $this->getItem();
+		}
+		else
+		{
 		}
 
 		$events_context = $this->events_context ?: $this->option.'.'.$this->getName();
 		$this->preprocessData($events_context, $data);
-		
+
 		return $data;
 	}
 
@@ -664,12 +677,16 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Extra steps after loading
 		$this->_afterLoad($this->_record);
 
-		// Before any other maniputlations and before other any other data,
+		// Before any other manipulations and before other any other data is added,
 		// convert our JTable record to a JObject coping only public properies
 		$_prop_arr = $table->getProperties($public_only = true);
 		$item = JArrayHelper::toObject($_prop_arr, 'JObject');
 
-		if ($pk) $items[$pk] = $item;
+		// Add to cache if not a new record
+		if ($pk)
+		{
+			$items[$pk] = $this->_record;
+		}
 		return $item;
 	}
 
