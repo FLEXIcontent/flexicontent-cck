@@ -900,6 +900,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					'custom_drop'=>'DROP PRIMARY KEY',
 					'custom_add'=>'ADD PRIMARY KEY',
 					'cols'=>array('id'=>0,'itemid'=>0, 'userid'=>0, 'type'=>0)
+				),
+				'unique_rec'=>array(
+					'custom_add'=>'ADD UNIQUE `unique_rec`',
+					'cols'=>array('itemid'=>0, 'userid'=>0, 'type'=>0)
 				)
 			),
 			'flexicontent_items_extravote'=>array(

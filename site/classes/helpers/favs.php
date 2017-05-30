@@ -80,7 +80,7 @@ class flexicontent_favs
 	 *
 	 * @since 3.2.0
 	 */
-	static function getCookieFavs($type)
+	static function getCookieFavs($type=null)
 	{
 		flexicontent_favs::loadCookieFavs();
 
