@@ -140,8 +140,11 @@ class FCField extends JPlugin
 		// Call before display method, for optionally work
 		$this->beforeDisplayField();
 		
+		$formlayout = $field->parameters->get('formlayout', '');
+		$formlayout = $formlayout ? 'field_'.$formlayout : 'field';
+
 		// Display the form field
-		$this->displayField();
+		$this->displayField($formlayout);
 	}
 	
 	
@@ -161,8 +164,12 @@ class FCField extends JPlugin
 		// Parse field values
 		$this->values = $this->parseValues($values);
 		
+		// Get choosen display layout
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value';
+
 		// Create field's display
-		$this->displayFieldValue($prop);
+		$this->displayFieldValue($prop, $viewlayout);
 	}
 	
 	
@@ -175,14 +182,16 @@ class FCField extends JPlugin
 	
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	public function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
 	
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
-	public function onBeforeDeleteField(&$field, &$item) {
+	public function onBeforeDeleteField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
@@ -194,7 +203,8 @@ class FCField extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	public function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm') {
+	public function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
@@ -203,7 +213,8 @@ class FCField extends JPlugin
 	
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	public function getFilteredSearch(&$field, $value) {
+	public function getFilteredSearch(&$field, $value)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
@@ -254,7 +265,8 @@ class FCField extends JPlugin
 		$template = JFactory::getApplication('site')->getTemplate();
 		$defaultLayout = $layout;
 
-		if (strpos($layout, ':') !== false) {
+		if (strpos($layout, ':') !== false)
+		{
 			// Get the template and file name from the string
 			$temp = explode(':', $layout);
 			$template = ($temp[0] == '_') ? $template : $temp[0];
@@ -285,12 +297,14 @@ class FCField extends JPlugin
 	
 	
 	// Get Layout paths for editing, this is a wrapper to getLayoutPath()
-	public function getFormPath($plg, $layout, $plg_subtype='') {
+	public function getFormPath($plg, $layout, $plg_subtype='')
+	{
 		return $this->getLayoutPath($plg, $layout, $plg_subtype);
 	}
 	
 	// Get Layout paths for viewing, this is a wrapper to getLayoutPath()
-	public function getViewPath($plg, $layout, $plg_subtype='') {
+	public function getViewPath($plg, $layout, $plg_subtype='')
+	{
 		return $this->getLayoutPath($plg, $layout, $plg_subtype);
 	}
 	

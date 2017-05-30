@@ -3,7 +3,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // get view
-$view = JRequest::getVar('view');
+$view = JFactory::getApplication()->input->get('view', '', 'CMD');
 
 // get parameters
 $google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
@@ -254,67 +254,18 @@ foreach ($this->values as $n => $value)
 			</div>
 			';
 		}
-		
-		static $addressint_view_js_added = null;
-		if ( $addressint_view_js_added === null && $map_embed_type == 'int' )
-		{
-			$addressint_view_js_added = true;
-			$js = '
-			function fc_addressint_initMap(mapBox)
-			{
-				var mapLatLon = eval("(" + mapBox.attr("data-maplatlon") + ")");
-				var mapZoom   = parseInt(mapBox.attr("data-mapzoom"));
-				var mapAddr   = mapBox.attr("data-mapaddr");
-				var mapType   = eval("(" + mapBox.attr("data-maptype") + ")");
-				var mapContent= eval("(" + mapBox.attr("data-mapcontent") + ")");
-				
-				var myMap = new google.maps.Map(document.getElementById(mapBox.attr("id")), {
-					center: mapLatLon,
-					scrollwheel: false,
-					zoom: mapZoom,
-					mapTypeId: mapType,
-					zoomControl: true,
-					mapTypeControl: false,
-					scaleControl: false,
-					streetViewControl: false,
-					rotateControl: false
-					'.($map_style ? ',styles: '.$map_style : '').'
-				});
 
-				mapBox.addClass("has_fc_google_maps_map");
-				mapBox.data("google_maps_ref", myMap);
-				
-				var myInfoWindow = new google.maps.InfoWindow({
-					content: mapContent
-				});
-				
-				var myMarker = new google.maps.Marker({
-					map: myMap,
-					position: mapLatLon,
-					title: mapAddr
-				});
-				
-				myMarker.addListener("click", function() {
-					myInfoWindow.open(myMap, myMarker);
-				});
-			}
-			
-			jQuery(document).ready(function(){
-				jQuery(".fc_addressint_map_canvas").each( function() {
-					fc_addressint_initMap( jQuery(this) );
-		  	});
-			});
-			';
-			
-			$document = JFactory::getDocument();
-
-			// Load google maps library
-			flexicontent_html::loadFramework('google-maps', '', $field->parameters);
-			$document->addScriptDeclaration($js);
-		}
 	}
-	
-	if ( empty($map) && empty($addr) ) continue;
+
+	// Skip empty value, adding an empty placeholder if field inside in field group
+	if ( empty($map) && empty($addr) )
+	{
+		if ( $is_ingroup )
+		{
+			$field->{$prop}[$n++]	= '';
+		}
+		continue;
+	}
 	
 	$field->{$prop}[$n] =
 		$field_prefix
@@ -326,4 +277,62 @@ foreach ($this->values as $n => $value)
 		.$field_suffix;
 	
 	$n++;
+}
+
+
+static $addressint_view_js_added = null;
+
+if ( $addressint_view_js_added === null && $map_embed_type == 'int' )
+{
+	$addressint_view_js_added = true;
+	$js = '
+	function fc_addressint_initMap(mapBox)
+	{
+		var mapLatLon = eval("(" + mapBox.attr("data-maplatlon") + ")");
+		var mapZoom   = parseInt(mapBox.attr("data-mapzoom"));
+		var mapAddr   = mapBox.attr("data-mapaddr");
+		var mapType   = eval("(" + mapBox.attr("data-maptype") + ")");
+		var mapContent= eval("(" + mapBox.attr("data-mapcontent") + ")");
+
+		var myMap = new google.maps.Map(document.getElementById(mapBox.attr("id")), {
+			center: mapLatLon,
+			scrollwheel: false,
+			zoom: mapZoom,
+			mapTypeId: mapType,
+			zoomControl: true,
+			mapTypeControl: false,
+			scaleControl: false,
+			streetViewControl: false,
+			rotateControl: false
+			'.($map_style ? ',styles: '.$map_style : '').'
+		});
+
+		mapBox.addClass("has_fc_google_maps_map");
+		mapBox.data("google_maps_ref", myMap);
+
+		var myInfoWindow = new google.maps.InfoWindow({
+			content: mapContent
+		});
+
+		var myMarker = new google.maps.Marker({
+			map: myMap,
+			position: mapLatLon,
+			title: mapAddr
+		});
+
+		myMarker.addListener("click", function() {
+			myInfoWindow.open(myMap, myMarker);
+		});
+	}
+
+	jQuery(document).ready(function(){
+		jQuery(".fc_addressint_map_canvas").each( function() {
+			fc_addressint_initMap( jQuery(this) );
+  	});
+	});
+	';
+
+	// Load google maps library
+	flexicontent_html::loadFramework('google-maps', '', $field->parameters);
+	JFactory::getDocument()->addScriptDeclaration($js);
 }

@@ -192,6 +192,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				";
@@ -535,6 +536,9 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
 		
+		// Microdata (classify the field values for search engines)
+		$itemprop    = $field->parameters->get('microdata_itemprop');
+		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
@@ -569,28 +573,13 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			break;
 		}
 		
-		// Create field's HTML
-		$field->{$prop} = array();
-		$n = 0;
-		foreach ($values as $value)
-		{
-			if ( !strlen($value['title']) && !$is_ingroup ) continue; // Skip empty if not in field group
-			if ( !strlen($value['title']) ) {
-				$field->{$prop}[$n++]	= '';
-				continue;
-			}
-			
-			$html = '
-				<label class="fc_termtitle label label-success">'.$value['title'].'</label>
-				<div class="fc_termdesc">'.$value['text'].'</div>';
-			
-			// Add prefix / suffix
-			$field->{$prop}[$n]	= $pretext . $html . $posttext;
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
+		// Create field's HTML, using layout file
+		$field->{$prop} = array();
+		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
@@ -601,8 +590,12 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
+				
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ( $itemprop )
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
 			}
 		}
 	}
