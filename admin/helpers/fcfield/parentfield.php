@@ -141,7 +141,7 @@ class FCField extends JPlugin
 		$this->beforeDisplayField();
 		
 		$formlayout = $field->parameters->get('formlayout', '');
-		$formlayout = $formlayout ? 'field_'.$formlayout : 'field';
+		$formlayout = $formlayout && $formlayout != 'field' ? 'field_'.$formlayout : 'field';
 
 		// Display the form field
 		$this->displayField($formlayout);
@@ -166,7 +166,7 @@ class FCField extends JPlugin
 		
 		// Get choosen display layout
 		$viewlayout = $field->parameters->get('viewlayout', '');
-		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value';
+		$viewlayout = $viewlayout && $viewlayout != 'value' ? 'value_'.$viewlayout : 'value';
 
 		// Create field's display
 		$this->displayFieldValue($prop, $viewlayout);
