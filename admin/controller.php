@@ -929,7 +929,7 @@ class FlexicontentController extends JControllerLegacy
 
 					foreach($index_cmds as $index_type => $index_clause)
 					{
-						$query  = "ALTER TABLE `#__".$tblname."` ";
+						$query  = "ALTER IGNORE TABLE `#__".$tblname."` ";
 						$query .= implode(', ', $index_clause);
 						$db->setQuery($query);
 
