@@ -193,7 +193,7 @@ class FlexicontentController extends JControllerLegacy
 		$session = JFactory::getSession();
 
 		$ctrl_task = 'task=items.';
-		$task = $this->getTask();
+		$real_task = $task = $this->getTask();
 		
 		
 		// *********************
@@ -212,7 +212,7 @@ class FlexicontentController extends JControllerLegacy
 		// If new make sure that type id is set too, before creating the model
 		if ($isnew)
 		{
-			$typeid = $this->input->set('typeid', (int) @ $data['type_id']);
+			$this->input->set('typeid', (int) @ $data['type_id']);
 		}
 
 		// Get the model
@@ -223,7 +223,7 @@ class FlexicontentController extends JControllerLegacy
 		if ($task == 'save2copy')
 		{
 			// Check-in the original row.
-			if ($model->checkin($data_id ) === false)
+			if ($model->checkin($data_id) === false)
 			{
 				// Check-in failed. Go back to the item and display a notice.
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
@@ -241,8 +241,11 @@ class FlexicontentController extends JControllerLegacy
 			$task = 'apply';
 
 			// Maybe existing model data are not needed ? possibly try to keep them
+			$this->input->set('id', 0);
+			$this->input->set('typeid', (int) @ $data['type_id'] ? (int) $data['type_id'] : $model->get('type_id'));
 			$model->set('id', 0);
 			$model->setProperty('_id', 0);
+			$model->setProperty('_typeid', (int) @ $data['type_id'] ? (int) $data['type_id'] : $model->get('type_id'));
 		}
 
 		
@@ -266,7 +269,8 @@ class FlexicontentController extends JControllerLegacy
 		$dolog = $params->get('print_logging_info');
 		
 		// Get submit configuration override
-		if ($isnew) {
+		if ($isnew && $real_task != 'save2copy')
+		{
 			$h = $data['submit_conf'];
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 			
@@ -275,7 +279,8 @@ class FlexicontentController extends JControllerLegacy
 			$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
 			$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
 		}
-		else {
+		else
+		{
 			$submit_conf      = false;
 			$allowunauthorize = false;
 			$autopublished    = false;

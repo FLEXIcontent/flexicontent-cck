@@ -57,7 +57,7 @@ class FlexicontentViewField extends JViewLegacy
 		
 		// Get data from the model
 		$model = $this->getModel();
-		$row   = $this->get('Field');
+		$row   = $this->get('Item');
 		$form  = $this->get('Form');
 		$isnew = ! $row->id;
 		$manager_view = $ctrl = 'fields.';

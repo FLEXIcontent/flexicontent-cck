@@ -11,7 +11,9 @@ if ($use_category_link)
 	$limit = $item_count;
 	$limit = $limit ? $limit : 10;
 	$start = floor($location / $limit)*$limit;
-	if (!empty($rows[$item->id]->categoryslug)) {
+
+	if (!empty($rows[$item->id]->categoryslug))
+	{
 		$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($category_label, $category->title, 0) .'"' : '';
 		$html .= '
 			<a class="fcpagenav-return btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)) . ($start ? '?start='.$start : '') . '">
@@ -40,7 +42,9 @@ if ($field->prev)
 			') : '').'
 		</a>
 	';
-} else {
+}
+else
+{
 	$html .= '
 		<span class="fcpagenav-prev btn disabled">
 			<i class="icon-previous"></i>
@@ -69,7 +73,9 @@ if ($field->next)
 			') : '').'
 		</a>
 	';
-} else {
+}
+else
+{
 	$html .= '
 		<span class="fcpagenav-next btn disabled">
 			<i class="icon-next"></i>

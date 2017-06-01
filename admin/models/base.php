@@ -248,9 +248,6 @@ abstract class FCModelAdmin extends JModelAdmin
 			$this->_initRecord();
 		}
 
-		// Extra steps after loading
-		$this->_afterLoad($this->_record);
-
 		return $this->_record;
 	}
 
@@ -269,7 +266,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		if ($name)
 		{
 			// Check 'name' columns and then check 'alias' column exists, if none then clear $name
-			$table = $this->getTable($this->records_jtable, $_prefix='');
+			$table = $this->getTable();
 			$name_property = property_exists($table, 'name')
 				? 'name'
 				: (property_exists($table, 'alias')
@@ -278,12 +275,12 @@ abstract class FCModelAdmin extends JModelAdmin
 			$name = $name_property ? $name : null;
 		}
 
-		// If PK was provided and it is also not a name, then treat it as a primary key value
-		$pk = $pk && !$name ? (int) $pk : (int) $this->_id;
-
 		// Lets load the record if it doesn't already exist
-		if ( $this->_record===null )
+		if ( $this->_record===null || ($name && $this->_record->$name_property != $name) || (!$name && $this->_record->id != $pk) )
 		{
+			// If PK was provided and it is also not a name, then treat it as a primary key value
+			$pk = $pk && !$name ? (int) $pk : (int) $this->_id;
+
 			$name_quoted = $name ? $this->_db->Quote($name) : null;
 			if (!$name_quoted && !$pk)
 			{
@@ -306,6 +303,9 @@ abstract class FCModelAdmin extends JModelAdmin
 			{
 				$this->_id = $this->_record->id;
 			}
+
+			// Extra steps after loading
+			$this->_afterLoad($this->_record);
 		}
 
 		return (boolean) $this->_record;
@@ -352,13 +352,15 @@ abstract class FCModelAdmin extends JModelAdmin
 		else
 		{
 			// Load a JTable object with all db columns as properties, then customize some or all the properites
-			$record = $this->getTable($this->records_jtable, $_prefix='');
+			$record = $this->getTable();
 		}
 
-		// Set record specific properties
+		// Set record specific properties and then assign to member property
 		// ...
-
 		$this->_record = $record;
+
+		// Extra steps after loading
+		$this->_afterLoad($this->_record);
 
 		return true;
 	}
@@ -377,7 +379,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 		if ($pk)
 		{
-			$tbl = $this->getTable($this->records_jtable, $_prefix='');
+			$tbl = $this->getTable();
 			return $tbl->checkin($pk);
 		}
 		return false;
@@ -403,7 +405,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		$uid	= $user->get('id');
 		
 		// Lets get table record and checkout the it
-		$tbl = $this->getTable($this->records_jtable, $_prefix='');
+		$tbl = $this->getTable();
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 		
 		// Reaching this points means checkout failed
@@ -472,7 +474,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// NOTE: 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
-		$record = $this->getTable($this->records_jtable, $_prefix='');
+		$record = $this->getTable();
 		$pk = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
 		$isNew = true;
 
@@ -650,7 +652,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		if ( $pk && isset($items[$pk]) ) return $items[$pk];
 		
 		// Instatiate the JTable
-		$table = $this->getTable($this->records_jtable, '');
+		$table = $this->getTable();
 
 		if ($pk > 0)
 		{
@@ -938,9 +940,8 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _prepareBind($record, & $data)
 	{
-
 		// (For nested records) Set the new parent id if parent id not matched OR while New/Save as Copy .
-		if (property_exists($record, 'parent_id') && $record->parent_id != $data['parent_id'] || $data['id'] == 0)
+		if (property_exists($record, 'parent_id') && ($record->parent_id != $data['parent_id'] || $data['id'] == 0))
 		{
 			$record->setLocation($data['parent_id'], 'last-child');
 		}
@@ -1002,13 +1003,13 @@ abstract class FCModelAdmin extends JModelAdmin
 	protected function _afterLoad($record)
 	{
 		// Convert attributes to a JRegistry object
-		if (property_exists($record, 'attribs'))
+		if (property_exists($record, 'attribs') && !is_object($record->attribs))
 		{
 			$record->attribs = new JRegistry($record->attribs);
 		}
 
 		// Convert parameters to a JRegistry object
-		if (property_exists($record, 'params'))
+		if (property_exists($record, 'params') && !is_object($record->params))
 		{
 			$record->params = new JRegistry($record->params);
 		}

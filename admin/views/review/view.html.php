@@ -56,7 +56,7 @@ class FlexicontentViewReview extends JViewLegacy
 		
 		// Get data from the model
 		$model = $this->getModel();
-		$row   = $this->get('Review');
+		$row   = $this->get('Item');
 		$form  = $this->get('Form');
 		$isnew = ! $row->id;
 		$manager_view = $ctrl = 'reviews';

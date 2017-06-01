@@ -208,38 +208,46 @@ class FlexicontentViewCategory extends JViewLegacy
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
 		// **********************************************************
-		
-		// Verify menu item points to current FLEXIcontent object
-		if ( $menu ) {
+
+		// Verify menu item points to correct view, and any others (significant) URL variables must match or be empty
+		if ( $menu )
+		{
 			$view_ok     = 'category' == @$menu->query['view'];
+
+			// These URL variables must match or be empty:
 			$cid_ok      = $cid       == (int) @$menu->query['cid'];
-			$layout_ok   = $layout    == @$menu->query['layout'];   // null is equal to empty string
-			$authorid_ok = ($layout!='author') || ($authorid  == (int) @$menu->query['authorid']); // null is equal to zero
-			$tagid_ok    = ($layout!='tags')   || ($tagid     == (int) @$menu->query['tagid']); // null is equal to zero
+			$layout_ok   = $layout    == @ $menu->query['layout'];
+			$authorid_ok = ($layout!='author') || ($authorid  == (int) @ $menu->query['authorid']);
+			$tagid_ok    = ($layout!='tags')   || ($tagid     == (int) @ $menu->query['tagid']);
+
 			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
-			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
-		} else {
+		}
+		else
+		{
 			$menu_matches = false;
 		}
-		
+
 		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
-		if ( $menu_matches ) {
-			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
-			
+		if ( $menu_matches )
+		{
+			$default_heading = $menu->title;
+
 			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
 			$params->def('page_heading', $params->get('page_title',   $default_heading));
 			$params->def('page_title',   $params->get('page_heading', $default_heading));
 		  $params->def('show_page_heading', $params->get('show_page_title',   0));
 		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
 		}
-		
+
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
-		else {
-			// Clear some menu parameters
+		else
+		{
+			// Also clear some other menu options
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-			
+
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			switch($layout) {
+			switch($layout)
+			{
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading = JText::_('FLEXI_MY_CONTENT');  break;
 				case 'author'  :  $default_heading = JText::_('FLEXI_CONTENT_BY_AUTHOR')  .': '. JFactory::getUser($authorid)->get('name');  break;
@@ -247,22 +255,24 @@ class FlexicontentViewCategory extends JViewLegacy
 				case 'favs'    :  $default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');  break;
 				default        :  $default_heading = JText::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
-			if ($layout && $cid) { // Non-single category listings, limited to a specific category
+			if ($layout && $cid)  // Non-single category listings, limited to a specific category
+			{
 				$default_heading .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;
 			}
-			
+
 			// Decide to show page heading (=J1.5 page title) only if a custom layout is used (=not a single category layout)
 			$show_default_heading = $layout ? 1 : 0;
-			
+
 			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
 			$params->set('page_title',   $default_heading);
 			$params->set('page_heading', $default_heading);
 		  $params->set('show_page_heading', $show_default_heading);
 			$params->set('show_page_title',   $show_default_heading);
 		}
-		
+
 		// Prevent showing the page heading if (a) IT IS same as category title and (b) category title is already configured to be shown
-		if ( $params->get('show_cat_title', 1) ) {
+		if ( $params->get('show_cat_title', 1) )
+		{
 			if ($params->get('page_heading') == $category->title) $params->set('show_page_heading', 0);
 			if ($params->get('page_title')   == $category->title) $params->set('show_page_title',   0);
 		}

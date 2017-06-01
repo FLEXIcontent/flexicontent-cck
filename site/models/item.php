@@ -40,8 +40,8 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		parent::__construct();
 	}
-	
-	
+
+
 	/**
 	 * Method to CHECK item's -VIEWING- ACCESS, this could be moved to the controller,
 	 * if we do this, then we must check the view variable, because DISPLAY() CONTROLLER TASK
@@ -303,8 +303,8 @@ class FlexicontentModelItem extends ParentClassItem
 		else {
 		}
 	}
-	
-	
+
+
 	/**
 	 * Method to build the WHERE clause of the query to select a content item
 	 *
@@ -322,8 +322,8 @@ class FlexicontentModelItem extends ParentClassItem
 		
 		return $where;
 	}
-	
-	
+
+
 	/**
 	 * Method to decide which item layout to use
 	 *
@@ -380,8 +380,8 @@ class FlexicontentModelItem extends ParentClassItem
 		$itemParams->set('ilayout', $ilayout);
 		JRequest::setVar('ilayout', $ilayout);
 	}
-	
-	
+
+
 	/**
 	 * Method to load content article parameters
 	 *
@@ -471,23 +471,32 @@ class FlexicontentModelItem extends ParentClassItem
 		$params->merge($accessperms);
 		
 		// d. Merge the active menu parameters, verify menu item points to current FLEXIcontent object
-		if ( $menu && !empty($this->mergeMenuParams) ) {
-			if (!empty($this->isForm)) {
+		if ( $menu && !empty($this->mergeMenuParams) )
+		{
+			if (!empty($this->isForm))
+			{
 				$this->menu_matches = false;
 				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
 				$this->menu_matches = $view_ok;
-			} else {
+			}
+			else
+			{
 				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
 				$cid_ok  = JRequest::getInt('cid') == (int) @$menu->query['cid'];
 				$id_ok   = JRequest::getInt('id')  == (int) @$menu->query['id'];
 				$this->menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
 			}
-		} else {
+		}
+
+		// Active menu did not match to current item
+		else
+		{
 			$this->menu_matches = false;
 		}
 		
 		// MENU ITEM matched, merge parameters and use its page heading (but use menu title if the former is not set)
-		if ( $this->menu_matches ) {
+		if ( $this->menu_matches )
+		{
 			$params->merge($menu->params);
 			$default_heading = $menu->title;
 			
@@ -499,7 +508,8 @@ class FlexicontentModelItem extends ParentClassItem
 		}
 		
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
-		else {
+		else
+		{
 			// Clear some menu parameters
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
 			
@@ -542,7 +552,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// *********************************************
 		$this->_record->parameters = $params;
 	}
-	
+
 
 	/**
 	 * Method to increment the hit counter for the item
@@ -551,17 +561,20 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function hit() {
-		if ( $this->_id )
+	function hit()
+	{
+		if ( !$this->_id )
 		{
-			$item = JTable::getInstance('flexicontent_items', '');
-			$item->hit($this->_id);
-			return true;
+			return false;
 		}
-		return false;
+
+		$item = JTable::getInstance('flexicontent_items', '');
+		$item->hit($this->_id);
+
+		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *
@@ -573,8 +586,8 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::getFavourites($type=0, $this->_id);
 	}
-	
-	
+
+
 	/**
 	 * Method to get the nr of favourites of an user
 	 *
@@ -587,8 +600,8 @@ class FlexicontentModelItem extends ParentClassItem
 		return flexicontent_db::getFavoured($type=0, $this->_id, JFactory::getUser()->id);
 	}
 	
-	
-	
+
+
 	/**
 	 * Method to remove a favourite
 	 *
@@ -600,8 +613,8 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::removefav($type=0, $this->_id, JFactory::getUser()->id);
 	}
-	
-	
+
+
 	/**
 	 * Method to add a favourite
 	 *

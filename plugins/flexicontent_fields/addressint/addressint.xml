@@ -228,7 +228,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="marker_color" type="list" default="red" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_COLOR" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_COLOR_DESC" depend_class="map-settings">
+			<field name="marker_color" type="list" default="red" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_COLOR" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_COLOR_DESC" depend_class="map-settings map-settings-img">
 				<option value="black">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BLACK</option>
 				<option value="brown">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BROWN</option>
 				<option value="green">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GREEN</option>
@@ -240,7 +240,7 @@
 				<option value="red">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_RED</option>
 				<option value="white">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_WHITE</option>
 			</field>
-			<field name="marker_size" type="radio" default="mid" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
+			<field name="marker_size" type="radio" default="mid" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE_DESC" depend_class="map-settings map-settings-img" class="btn-group group-fcinfo">
 				<option value="tiny">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TINY</option>
 				<option value="mid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MID</option>
 				<option value="small">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SMALL</option>
