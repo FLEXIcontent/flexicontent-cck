@@ -430,15 +430,24 @@ class modFlexicontentHelper
 						{
 							FlexicontentFields::getFieldDisplay($row, $mod_image_name, null, 'display_large_src', 'module');  // just makes sure thumbs are created by requesting a '*_src' display
 							$img_field = & $row->fields[$mod_image_name];
-							if ($mod_use_image_feat==1) {
-								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
-							} else {
-								$src = '';
-								$thumb = @ $img_field->thumbs_src[ $mod_use_image_feat ][0];
-								$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image_feat[0], 120) : 0;
-								$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
+
+							$src = '';
+							$thumb = '';
+							if (!empty($img_field->thumbs_src['large'][0]))
+							{
+								if ($mod_use_image_feat==1)
+								{
+									$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0]);
+								}
+								else
+								{
+									$thumb = @ $img_field->thumbs_src[ $mod_use_image_feat ][0];
+									$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image_feat[0], 120) : 0;
+									$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image_feat[0], 90) : 0;
+								}
 							}
-							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
+							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) )
+							{
 								$src = flexicontent_html::extractimagesrc($row);
 							}
 						}
@@ -574,16 +583,24 @@ class modFlexicontentHelper
 						{
 							FlexicontentFields::getFieldDisplay($row, $mod_image_name, null, 'display_large_src', 'module');  // just makes sure thumbs are created by requesting a '*_src' display
 							$img_field = & $row->fields[$mod_image_name];
-							
-							if ($mod_use_image==1) {
-								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
-							} else {
-								$src = '';
-								$thumb = @ $img_field->thumbs_src[ $mod_use_image ][0];
-								$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image[0], 120) : 0;
-								$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image[0], 90) : 0;
+
+							$src = '';
+							$thumb = '';
+							if (!empty($img_field->thumbs_src['large'][0]))
+							{
+								if ($mod_use_image==1)
+								{
+									$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
+								}
+								else
+								{
+									$thumb = @ $img_field->thumbs_src[ $mod_use_image ][0];
+									$_thumb_w = $thumb ? $img_field->parameters->get('w_'.$mod_use_image[0], 120) : 0;
+									$_thumb_h = $thumb ? $img_field->parameters->get('h_'.$mod_use_image[0], 90) : 0;
+								}
 							}
-							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
+							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) )
+							{
 								$src = flexicontent_html::extractimagesrc($row);
 							}
 						}

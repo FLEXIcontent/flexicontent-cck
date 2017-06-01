@@ -162,12 +162,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$pathway = $app->getPathWay();
 		
 		// Clear pathway, if automatic pathways are enabled
-		if ( $params->get('automatic_pathways', 0) ) {
+		if ( $params->get('automatic_pathways', 0) )
+		{
 			$pathway_arr = $pathway->getPathway();
 			$pathway->setPathway( array() );
-			//$pathway->set('_count', 0);  // not needed ??
 			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
-		} else {
+		}
+		else
+		{
 			$item_depth = $params->get('item_depth', 0);
 		}
 		
@@ -193,7 +195,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		// *******************************************************************************************************************
 		
-		if ($format != 'feed') {
+		if ($format != 'feed')
+		{
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 		
@@ -251,7 +254,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading = JText::_('FLEXI_MY_CONTENT');  break;
 				case 'author'  :  $default_heading = JText::_('FLEXI_CONTENT_BY_AUTHOR')  .': '. JFactory::getUser($authorid)->get('name');  break;
-				case 'tags'    :  $default_heading = JText::_('FLEXI_ITEMS_WITH_TAG') .': '. $tag->name;  break;
+				case 'tags'    :  $default_heading = JText::_('FLEXI_TAG' /*'FLEXI_ITEMS_WITH_TAG'*/) .': '. $tag->name;  break;
 				case 'favs'    :  $default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');  break;
 				default        :  $default_heading = JText::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
@@ -276,6 +279,21 @@ class FlexicontentViewCategory extends JViewLegacy
 			if ($params->get('page_heading') == $category->title) $params->set('show_page_heading', 0);
 			if ($params->get('page_title')   == $category->title) $params->set('show_page_title',   0);
 		}
+
+		switch($layout)
+		{
+			case ''        : break;
+			case 'myitems' : break;
+			case 'author'  : break;
+			case 'tags'    :
+				$pathway->addItem( JText::_('FLEXI_TAG' /*'FLEXI_ITEMS_WITH_TAG'*/) . ' : ' . $this->escape($tag->name), '' );
+				break;
+			case 'favs'    :
+				$pathway->addItem( JText::_('FLEXI_YOUR_FAVOURED_ITEMS'), '' );
+				break;
+			default        : ;
+		}
+
 		
 		
 		

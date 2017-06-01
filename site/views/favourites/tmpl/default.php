@@ -171,19 +171,23 @@ $items	= & $this->items;
 	<tbody>	
 	<?php
 	foreach ($items as $i => $item) :
-		if ($use_image) {
+		if ($use_image)
+		{
 			$src = '';
 			$thumb = '';
 			if ($image_source)
 			{
 				FlexicontentFields::getFieldDisplay($item, $img_field_name, null, 'display', 'module');
 				$img_field = $item->fields[$img_field_name];
-				if ( !$img_field_size ) {
-					$src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0] );
-				} else {
-					$thumb = $img_field->thumbs_src[ $img_field_size ][0];
+				if ( !empty($img_field->thumbs_src['large'][0]) )
+				{
+					!$img_field_size
+						? $src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0])
+						: $thumb = $img_field->thumbs_src[ $img_field_size ][0];
 				}
-			} else {
+			}
+			else
+			{
 				$src = flexicontent_html::extractimagesrc($item);
 			}
 			
