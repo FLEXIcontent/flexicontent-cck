@@ -681,7 +681,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			if (!$id) continue;
 
 			// Attempt to load the row.
-			$type	= JTable::getInstance($this->$records_jtable, $prefix='');
+			$type	= JTable::getInstance($this->records_jtable, $prefix='');
 			$type->load($id);
 
 			// Check for a table object error.
@@ -697,7 +697,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			$attribs->allow_jview = $attribs->allow_jview ? '0' : '1';  // toggle
 			$attribs = json_encode($attribs);
 
-			$query = 'UPDATE #__' . $this->$records_dbtbl . ' SET attribs=' . $db->Quote($attribs) . ' WHERE id = ' . (int) $id;
+			$query = 'UPDATE #__' . $this->records_dbtbl . ' SET attribs=' . $db->Quote($attribs) . ' WHERE id = ' . (int) $id;
 			$db->setQuery($query);
 			$result = $db->execute();
 			$toggle_count++;
