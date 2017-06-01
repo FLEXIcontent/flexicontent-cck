@@ -41,6 +41,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		$field->html = '';
 	}
 	
 	
@@ -54,9 +55,9 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$app  = JFactory::getApplication();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		$option = JRequest::getCmd('option');
-		$view   = JRequest::getString('view', FLEXI_ITEMVIEW);
-		$print  = JRequest::getCMD('print');
+		$option = $app->input->get('option', '', 'cmd');
+		$view   = $app->input->get('view', 'item', 'cmd');
+		$print  = $app->input->get('print', '', 'cmd');
 		$add_tooltips = JComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
 		
 		// No output if it is not FLEXIcontent item view or view is "print"
@@ -76,9 +77,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		
 		$field->{$prop} = null;
-		$cid = JRequest::getInt('cid');
-		$cid = !$cid || !isset($globalcats[$cid])  ?  (int)$item->catid  :  $cid;
-		
+		$cid = $app->input->get('cid', 0 , 'int');
+		$cid = !$cid || !isset($globalcats[$cid])
+			? (int) $item->catid
+			: $cid;
+
 		$item_count = $app->getUserState( $option.'.'.$cid.'nav_item_count', 0);
 		$loc_to_ids = $app->getUserState( $option.'.'.$cid.'nav_loc_to_ids', array());
 		$ids_to_loc = array_flip($loc_to_ids);
@@ -155,14 +158,16 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$rows = $this->getItemList($ids, $cid, $user->id);
 			
 			// previous content item
-			if ($prev_id) {
+			if ($prev_id)
+			{
 				$field->prev = $rows[$prev_id];
 				$field->prevtitle = $field->prev->title;
 				$field->prevurl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->prev->slug, $field->prev->categoryslug, 0, $field->prev));
 			}
 			
 			// next content item
-			if ($next_id) {
+			if ($next_id)
+			{
 				$field->next = $rows[$next_id];
 				$field->nexttitle = $field->next->title;
 				$field->nexturl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->next->slug, $field->next->categoryslug, 0, $field->next));
@@ -171,7 +176,10 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		
 		
 		// Check if displaying nothing and stop
-		if (!$field->prev && !$field->next && !$use_category_link) return;
+		if (!$field->prev && !$field->next && (!$use_category_link || empty($rows[$item->id]->categoryslug)))
+		{
+			return;
+		}
 		
 		// Get images
 		$items_arr = array();
@@ -312,55 +320,57 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	
 	function getItemList(&$ids=null, $cid=null, &$userid=0)
 	{
+		$app  = JFactory::getApplication();
 		$db = JFactory::getDBO();
 		
 		if ($ids===null)
 		{
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
-			
-			$saved_cid = JRequest::getVar('cid', '');   // save cid ...
-			$saved_layout = JRequest::getVar('layout'); // save layout ...
-			$saved_option = JRequest::getVar('option'); // save option ...
-			$saved_view = JRequest::getVar('view'); // save layout ...
-			
+
+			$saved_cid = $app->input->get('cid', '', 'string');   // save cid ...
+			$saved_layout = $app->input->get('layout', '', 'string'); // save layout ...
+			$saved_option = $app->input->get('option', '', 'string'); // save option ...
+			$saved_view = $app->input->get('view', '', 'string'); // save layout ...
+
 			//$target_layout = $mcats_selection || !$catid ? 'mcats' : '';
-			//JRequest::setVar('layout', $target_layout);
-			//JRequest::setVar($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
-			JRequest::setVar('layout', '');
-			JRequest::setVar('cid', $cid);
-			JRequest::setVar('option', 'com_flexicontent');
-			JRequest::setVar('view', 'category');
-			
-			// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
+			//$app->input->set('layout', $target_layout);
+			//$app->input->set($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
+			$app->input->set('layout', '');
+			$app->input->set('cid', $cid);
+			$app->input->set('option', 'com_flexicontent');
+			$app->input->set('view', 'category');
+
+			// Get/Create current category model ... according to configuration set above into the HTTP Request variables
 			$catmodel = new FlexicontentModelCategory();
 			$category = $catmodel->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
-			
+
 			$query = $catmodel->_buildQuery(false, $count_total=false);
 			$db->setQuery($query, 0, 50000);
 			$list = $db->loadColumn();
 			$list = is_array($list) ? $list : array();
-			
+
 			// Restore variables
-			JRequest::setVar('cid', $saved_cid); // restore cid
-			JRequest::setVar('layout', $saved_layout); // restore layout
-			JRequest::setVar('option', $saved_option); // restore option
-			JRequest::setVar('view', $saved_view); // restore view
+			$app->input->set('cid', $saved_cid); // restore cid
+			$app->input->set('layout', $saved_layout); // restore layout
+			$app->input->set('option', $saved_option); // restore option
+			$app->input->set('view', $saved_view); // restore view
 			
 			return $list;
 		}
-		
-		else {
-			// Retrieving specific item data
+
+		// Retrieving specific item data
+		else
+		{
 			$query 	= 'SELECT i.*, ie.*,'
-					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as slug,'
-					. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as categoryslug'
-					. ' FROM #__content AS i'
-					. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-					. ' JOIN #__categories AS cc ON cc.id = '. $cid
-					. ' WHERE i.id IN ('. implode(',', $ids) .')';
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as slug,'
+				. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as categoryslug'
+				. ' FROM #__content AS i'
+				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+				. ' JOIN #__categories AS cc ON cc.id = '. $cid
+				. ' WHERE i.id IN ('. implode(',', $ids) .')';
 			$db->setQuery($query);
-			
+
 			try {
 				$list = $db->loadObjectList('id');
 			}
@@ -368,7 +378,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				if ($db->getErrorNum()) JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
 				return array();
 			}
-			
+
 			$list = is_array($list) ? $list : array();
 			return $list;
 		}
@@ -395,7 +405,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
-		if (!$show_noauth) {
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
@@ -406,29 +417,44 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		foreach ($id_arr as $id)
 		{
 			$query_catids[$id] = 1;
-			if ( $display_subcats==2 && !empty($globalcats[$id]->descendantsarray) ) {
+			if ( $display_subcats==2 && !empty($globalcats[$id]->descendantsarray) )
+			{
 				foreach ($globalcats[$id]->descendantsarray as $subcatid) $query_catids[$subcatid] = 1;
 			}
 		}
 		$query_catids = array_keys($query_catids);
 		
 		// Items in featured categories
-		/*$cats_featured = $cparams->get('display_cats_featured', 0);
+		/*
+		$cats_featured = $cparams->get('display_cats_featured', 0);
 		$featured_cats_parent = $cparams->get('featured_cats_parent', 0);
 		$query_catids_exclude = array();
-		if ($cats_featured && $featured_cats_parent) {
+		if ($cats_featured && $featured_cats_parent)
+		{
 			foreach ($globalcats[$featured_cats_parent]->descendantsarray as $subcatid) $query_catids_exclude[$subcatid] = 1;
-		}*/
-		
-		// filter by depth level
-		if ($display_subcats==0) {
-			// Include categories
+		}
+		*/
+
+
+		// ***
+		// *** Filter by depth level
+		// *** 
+
+		// Include categories
+		if ($display_subcats==0)
+		{
 			$anddepth = ' AND c.id IN (' .implode(',', $query_catids). ')';
-		} else if ($display_subcats==1) {
-			// Include categories and their subcategories
+		}
+
+		// Include categories and their subcategories
+		else if ($display_subcats==1)
+		{
 			$anddepth  = ' AND ( c.parent_id IN (' .implode(',', $query_catids). ')  OR  c.id IN (' .implode(',', $query_catids). ') )';
-		} else {
-			// Include categories and their descendants
+		}
+
+		// Include categories and their descendants
+		else
+		{
 			$anddepth = ' AND c.id IN (' .implode(',', $query_catids). ')';
 		}
 		

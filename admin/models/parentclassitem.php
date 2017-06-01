@@ -310,9 +310,11 @@ class ParentClassItem extends FCModelAdmin
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			// Extra Steps for Frontend
-			if ( !$app->isAdmin() )  {
+			if ( !$app->isAdmin() )
+			{
 				// Load item parameters with heritage
 				$this->_loadItemParams($no_cache);
+
 				// Check item viewing access
 				if ( $check_view_access ) $this->_check_viewing_access($force_version);
 			}
@@ -478,7 +480,7 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 			if ( $app->isAdmin() )
 			{
-				$item   = $this->getTable('flexicontent_items', '');
+				$item   = $this->getTable();
 				$result = $item->load($pk);  // try loading existing item data
 				if ($result===false)
 				{
@@ -1162,7 +1164,7 @@ class ParentClassItem extends FCModelAdmin
 
 		if (empty($data))
 		{
-			$data = $this->getItem();
+			$data = $this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
 		}
 		else
 		{
@@ -1551,7 +1553,7 @@ class ParentClassItem extends FCModelAdmin
 		// *****************************************
 		
 		// Get an empty item model (with default values)
-		$item = $this->getTable('flexicontent_items', '');
+		$item = $this->getTable();
 		$item->_isnew = $isnew;  // Pass information, if item is new to the fields
 		
 		// Load existing item into the empty item model
@@ -3176,7 +3178,7 @@ class ParentClassItem extends FCModelAdmin
 		$this->_db->setQuery($query);
 		$this->_db->execute($query);
 		// handle the maintext not very elegant but functions properly
-		$row = $this->getTable('flexicontent_items', '');
+		$row = $this->getTable();
 		$row->load($id);
 
 		if (@$versionrecords[0]->value) {
@@ -3214,7 +3216,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function resetHits($id)
 	{
-		$row = $this->getTable('flexicontent_items', '');
+		$row = $this->getTable();
 		$row->load($id);
 		$row->hits = 0;
 		$row->store();

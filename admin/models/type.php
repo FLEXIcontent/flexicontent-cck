@@ -192,7 +192,7 @@ class FlexicontentModelType extends FCModelAdmin
 		// Alter the title & alias
 		$table = $this->getTable();
 
-		while ($table->load(array('name' => $alias)))
+		while ($table->load(array('name' => $title, 'alias' => $alias)))
 		{
 			$title = StringHelper::increment($title);
 			$alias = StringHelper::increment($alias, 'dash');

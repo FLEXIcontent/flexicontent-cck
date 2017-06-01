@@ -215,9 +215,9 @@ foreach ($this->values as $n => $value)
 	
 	// generate map (only if lat and lon available)
 	$map = '';
-	if($show_map && (!empty($value['lon']) || !empty($value['lat'])))
+	if ($show_map && (!empty($value['lon']) || !empty($value['lat'])))
 	{
-		if($map_embed_type == 'img')
+		if ($map_embed_type == 'img')
 		{
 			$map_url = "https://maps.google.com/maps/api/staticmap?center=".$value['lat'].",".$value['lon']
 				."&amp;zoom=".($value['zoom'] ? $value['zoom'] : $map_zoom)
@@ -227,16 +227,17 @@ foreach ($this->values as $n => $value)
 				."&amp;sensor=false"
 				.($google_maps_static_api_key ? '&amp;key=' . $google_maps_static_api_key : '');
 				
-			$map .= '<div class="map"><div class="image">';
-			
-			if($link_map == 1) $map .= '<a href="'.$map_link.'" target="_blank">';
-			$map .= '<img src="'.$map_url.'" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').' alt="Map" />';
-			if($link_map == 1) $map .= '</a>';
-			
-			$map .= '</div></div>';
+			$map .= '
+				<div class="map">
+					<div class="image">
+						' . ($link_map == 1 ? '<a href="'.$map_link.'" target="_blank">' : '') . '
+						<img src="'.$map_url.'" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').' alt="Map" />
+						' . ($link_map == 1 ? '</a>' : '') . '
+					</div>
+				</div>';
 		}
-		
-		if ( $map_embed_type == 'int' )
+
+		if ($map_embed_type == 'int')
 		{
 			$map .= '
 			<div class="fc_addressint_map">

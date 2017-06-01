@@ -54,7 +54,7 @@ class FlexicontentViewTag extends JViewLegacy
 		
 		// Get data from the model
 		$model = $this->getModel();
-		$row   = $this->get('Tag');
+		$row   = $this->get('Item');
 		$form  = $this->get('Form');
 		$isnew = ! $row->id;
 		$manager_view = $ctrl = 'tags';
