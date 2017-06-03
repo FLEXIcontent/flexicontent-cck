@@ -186,8 +186,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
-		$has_J2S = false;
-		foreach ($fields as $field)
+		$has_J2S = JPluginHelper::isEnabled('content', 'j2store');
+		if (!$has_J2S) foreach ($fields as $field)
 		{
 			$has_J2S = $has_J2S || $field->field_type == 'j2store';
 			if ($has_J2S) break;

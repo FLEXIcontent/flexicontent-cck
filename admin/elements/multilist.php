@@ -53,20 +53,17 @@ class JFormFieldMultiList extends JFormField
 
 	function getInput()
 	{
-		$node = & $this->element;
-		$attributes = get_object_vars($node->attributes());
-		$attributes = $attributes['@attributes'];
-		
-		$values = $this->value;
-		if ( ! is_array($values) )		$values = explode("|", $values);
-		
+		//$attributes = get_object_vars($this->element->attributes());
+		//$attributes = $attributes['@attributes'];
+
+		$values = is_array($this->value) ? $this->value : explode("|", $this->value);
+
 		$fieldname	= $this->name;
 		$element_id = $this->id;
-		
-		$name = $attributes['name'];
+
+		$name = $this->element['name'];
 		$control_name = str_replace($name, '', $element_id);
-		
-		//$attribs = ' style="float:left;" ';
+
 		$attribs = array(
 	    'id' => $element_id, // HTML id for select field
 	    'list.attr' => array( // additional HTML attributes for select field
@@ -77,31 +74,40 @@ class JFormFieldMultiList extends JFormField
 	    'option.attr'=>'attr', // key name for attr in data array
 	    'list.select'=>$values, // value of the SELECTED field
 		);
-		
-		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+
+
+		// ***
+		// *** HTML Tag parameters
+		// ***
+
+		$tooltip_class = 'hasTooltip';
+
+		if ($this->element['multiple']=='multiple' || $this->element['multiple']=='true' )
+		{
 			$attribs['list.attr']['multiple'] = 'multiple';
-			$attribs['list.attr']['size'] = @$attributes['size'] ? $attributes['size'] : "6";
+			$attribs['list.attr']['size'] = $this->element['size'] ? $this->element['size'] : "6";
 		}
-		
-		
-		// HTML Tag parameters
-		if ($onchange = @$attributes['onchange']) {
+
+		if ($onchange = $this->element['onchange'])
+		{
 			$onchange = str_replace('{control_name}', $control_name, $onchange);
 			$attribs['list.attr']['onchange'] = $onchange;
 		}
-		
-		$subtype = @$attributes['subtype'];
+
+		$subtype = $this->element['subtype'];
 
 		$attribs['list.attr']['class'] = array();
-		if ($subtype=='radio') {
+
+		if ($subtype=='radio')
+		{
 			$attribs['list.attr']['class'][] = 'radio';
 		}
-
-		if ($class = @$attributes['class']) {
+		if ($class = $this->element['class'])
+		{
 			$attribs['list.attr']['class'][] = $class;
 		}
 
-		if (@$attributes['sortable'] == 'true')
+		if ($this->element['sortable'] == 'true')
 		{
 			$d = array();
 			foreach($values as $v)
@@ -112,32 +118,39 @@ class JFormFieldMultiList extends JFormField
 			$attribs['list.attr']['class'][] = 'fc_select2_sortable';
 		}
 
-		if (@$attributes['fccustom_revert']) {
+		if ($this->element['fccustom_revert'])
+		{
 			$attribs['list.attr']['class'][] = 'fccustom_revert';
 		}
 		
-		if (@$attributes['toggle_related']) {
+		if ($this->element['toggle_related'])
+		{
 			$attribs['list.attr']['class'][] = 'fcform_toggler_element';
 		}
+
 		$attribs['list.attr']['class'] = implode(' ', $attribs['list.attr']['class']);
-		
-		// Construct an array of the HTML OPTION statements.
+
+
+		// ***
+		// *** Construct an array of the HTML OPTION statements.
+		// ***
+
 		$this->_options = array ();
 		$V2L = array();
-		foreach ($node->children() as $option)
+		foreach ($this->element->children() as $option)
 		{
-			$name = FLEXI_J30GE ? $option->getName() : $option->name();
-			//echo "<pre>"; print_r($option); echo "</pre>"; exit;
-			
+			$name = $option->getName();   //echo 'Name: ' . $name . '<pre>' . print_r($option, true) .'</pre>'; exit;
+
 			// Check for current option is a GROUP and add its START
 			if ($name=="group")  $this->_options[] = JHTML::_('select.optgroup', JText::_( $option->attributes()->label ) );
-			
+
 			// If current option is group then iterrate through its children, otherwise create single value array
 			$children = $name=="group" ? $option->children() : array( & $option );
-			
+
 			foreach ($children as $sub_option)
 			{
 				$attr_arr = array();
+
 				if (isset($sub_option->attributes()->seton_list))  $attr_arr['data-seton_list']  = $sub_option->attributes()->seton_list;
 				if (isset($sub_option->attributes()->setoff_list)) $attr_arr['data-setoff_list'] = $sub_option->attributes()->setoff_list;
 				if (isset($sub_option->attributes()->refsh_list))  $attr_arr['data-refsh_list']  = $sub_option->attributes()->refsh_list;
@@ -146,25 +159,26 @@ class JFormFieldMultiList extends JFormField
 				if (isset($sub_option->attributes()->hide_list))   $attr_arr['data-hide_list']   = $sub_option->attributes()->hide_list;
 				if (isset($sub_option->attributes()->fcconfigs))   $attr_arr['data-fcconfigs']   = $sub_option->attributes()->fcconfigs;
 				if (isset($sub_option->attributes()->fcreadonly))  $attr_arr['data-fcreadonly']  = $sub_option->attributes()->fcreadonly;
-				
+
 				if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
-				
-				$val  = (string)$sub_option->attributes()->value;
+
+				$val  = (string) $sub_option->attributes()->value;
 				$text = JText::_( (string) $sub_option );
+
 				//$this->_options[] = JHTML::_('select.option', $val, $text);
-				$this->_options[] = array(
+				$this->_options[] = (object) array(
 					'value' => $val,
 					'text'  => $text,
 					'attr'  => $attr_arr
 				);
 				$V2L[$val] = $text;
 			}
-			
+
 			// Check for current option is a GROUP and add its END
 			if ($name=="group") $this->_options[] = JHTML::_('select.optgroup', '' );
 		}
 		
-		/* support for parameter multi-value, multi-parameter dependencies in non-FLEXIcontent views */
+		// Support for parameter multi-value, flexicontent multi-parameter dependencies in non-FLEXIcontent views
 		if (self::$css_js_added === null)
 		{
 			self::$css_js_added = true;
@@ -183,24 +197,31 @@ class JFormFieldMultiList extends JFormField
 				JFactory::getDocument()->addScriptDeclaration($js);
 			}
 		}
-		
+
+
+		// ***
+		// *** SUBTYPE: radio
+		// ***
+
 		if ($subtype=='radio')
 		{
 			$_class = ' class ="'.$attribs['list.attr']['class'].'"';
 			$_id = ' id="'.$element_id.'"';
 			$html = '';
-			foreach($this->_options as $i => $option) {
-				$selected = count($values) && $values[0]==$option['value'] ? ' checked="checked"' : '';
+			foreach($this->_options as $i => $option)
+			{
+				$selected = count($values) && $values[0]==$option->value ? ' checked="checked"' : '';
 				$input_attribs = '';
 				$label_class = '';
-				foreach ($option['attr'] as $k => $v) {
+				foreach ($option->attr as $k => $v)
+				{
 					if ($k=='class') { $label_class = $v; continue; }
 					$input_attribs .= ' ' .$k. '="' .$v. '"';
 				}
 				$html .= '
-					<input id="'.$element_id.$i.'" type="radio" value="'.$option['value'].'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
+					<input id="'.$element_id.$i.'" type="radio" value="'.$option->value.'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
 					<label class="'.$label_class.'" for="'.$element_id.$i.'">
-						'.$option['text'].'
+						' . $option->text . '
 					</label>';
 			}
 			$html = '
@@ -209,7 +230,14 @@ class JFormFieldMultiList extends JFormField
 				</fieldset>
 				';
 		}
-		else {
+
+
+		// ***
+		// *** SUBTYPE: drop-down select
+		// ***
+
+		else
+		{
 			$lbl = reset($V2L);
 			$val = key($V2L);
 			if ( $val === '' && $this->_inherited!==null && !is_array($this->_inherited) && isset($V2L[$this->_inherited]) )
@@ -218,51 +246,70 @@ class JFormFieldMultiList extends JFormField
 			}
 			$html = JHTML::_('select.genericlist', $this->_options, $fieldname, $attribs);
 		}
-		
-		if ($inline_tip = @$attributes['inline_tip'])
+
+
+		// ***
+		// *** inline tooltips and texts
+		// ***
+
+		$tip_text = $tip_text2 = '';
+
+		if ($inline_tip = $this->element['inline_tip'])
 		{
-			$tip_img = @$attributes['tip_img'];
-			$tip_img = $tip_img ? $tip_img : 'comments.png';
-			$preview_img = @$attributes['preview_img'];
-			$preview_img = $preview_img ? $preview_img : '';
-			$tip_class = @$attributes['tip_class'];
-			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tip_img = $this->element['tip_img'] ? $this->element['tip_img'] : 'comments.png';
+			$preview_img = $this->element['preview_img'] ? $this->element['preview_img'] : '';
+			$tip_class = $this->element['tip_class'] . ' ' . $tooltip_class;
+
 			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
 			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
-			$tip_text = '<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+			$tip_text .= '
+				<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">
+					' . $hintmage.$previewimage . '
+				</span>';
 		}
 
-		if ($inline_text = @$attributes['inline_text'])
+		if ($inline_text = $this->element['inline_text'])
 		{
-			$text_class = @$attributes['text_class'];
+			$text_class = $this->element['text_class'];
 			$text_class .= ($text_class ? ' ' : '') . 'fc_toggle_current';
-			$tip_text = '<span class="'.$text_class.'" style="display: inline-block;">'.JText::_($inline_text).'</span>';
+			$tip_text .= '
+				<span class="'.$text_class.'" style="display: inline-block;">
+					' . JText::_($inline_text) . '
+				</span>';
 		}
-		
-		if ($inline_tip = @$attributes['inline_tip2'])
+
+		if ($inline_tip = $this->element['inline_tip2'])
 		{
-			$tip_img = @$attributes['tip_img2'];
-			$tip_img = $tip_img ? $tip_img : 'comments.png';
-			$preview_img = @$attributes['preview_img2'];
-			$preview_img = $preview_img ? $preview_img : '';
-			$tip_class = @$attributes['tip_class2'];
-			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tip_img = $this->element['tip_img2'] ? $this->element['tip_img2'] : 'comments.png';
+			$preview_img = $this->element['preview_img2'] ? $this->element['preview_img2'] : '';
+			$tip_class = $this->element['tip_class2'] . ' ' . $tooltip_class;
+
 			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
 			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
-			$tip_text2 = '<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+			$tip_text2 .= '
+				<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">
+					' . $hintmage.$previewimage . '
+				</span>';
 		}
-		
+
+
+		// ***
+		// *** Inherited value display
+		// ***
+
+		$inherited_info = '';
 		if ($subtype=='list' && $this->_inherited && is_array($this->_inherited))
 		{
-			$_vals = is_array($this->_inherited) ? $this->_inherited : array($this->_inherited);
-			$inherited_info = '';
+			$_vals = is_array($this->_inherited)
+				? $this->_inherited
+				: array($this->_inherited);
 			foreach ($_vals as $v)
 			{
 				if (isset($V2L[$v])) $inherited_info .= '<div class="fc-inherited-value">'.$V2L[$v].'</div>';
 			}
 		}
-		
-		return $html .@ $inherited_info .@ $tip_text .@ $tip_text2;
+
+		return $html . $inherited_info . $tip_text . $tip_text2;
 	}
 
 

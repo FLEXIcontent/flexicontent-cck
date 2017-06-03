@@ -98,53 +98,15 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function setId($id)
 	{
-		//$this->_id      = $id;  // not used by current view
+		// Wipe member variables and load parameters
 		$this->_data    = null;
 		$this->_total   = null;
 		$this->_pagination = null;
 		$this->_params  = null;
 		$this->_loadParams();
 	}
-	
-	
-	/**
-	 * Overridden get method to get properties from the tag
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return 	mixed 				The value of the property
-	 * @since	1.5
-	 */
-	function get($property, $default=null)
-	{
-		if ( $this->_tag || $this->_tag = $this->getTag() ) {
-			if(isset($this->_tag->$property)) {
-				return $this->_tag->$property;
-			}
-		}
-		return $default;
-	}
-	
-	/**
-	 * Overridden set method to pass properties on to the tag
-	 *
-	 * @access	public
-	 * @param	string	$property	The name of the property
-	 * @param	mixed	$value		The value of the property to set
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function set( $property, $value=null )
-	{
-		if ( $this->_tag || $this->_tag = $this->getTag() ) {
-			$this->_tag->$property = $value;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+
+
 	/**
 	 * Method to get Data
 	 *
@@ -159,6 +121,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 			// Query the content items
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+
 			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
 			flexicontent_db::getOriginalContentItemids($this->_data);
 		}
@@ -426,7 +389,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		if( strlen($text) )
 		{
 			$ts = 'ie';
-			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 			
 			switch ($phrase)
@@ -451,7 +414,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 					} else {
 						// speed optimization ... 2-level searching: first require ALL words, then require exact text
 						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->escape($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -466,7 +429,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->escape($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
@@ -480,7 +443,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
 					$newtext = implode( '* ', $words ) . '*';
-					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->escape($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
@@ -532,4 +495,3 @@ class FlexicontentModelFavourites extends JModelLegacy
 		return $this->_params;
 	}
 }
-?>

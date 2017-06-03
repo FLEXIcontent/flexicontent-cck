@@ -20,7 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.model.legacy');
-require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php');
+JLoader::register('ParentClassItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php');
 
 /**
  * FLEXIcontent Component Item Model
