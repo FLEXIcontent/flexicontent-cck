@@ -134,7 +134,9 @@ class FlexicontentControllerTags extends FlexicontentController
 			$obj->name = $name;
 			$obj->published	= 1;
 			$result = $model->store($obj);
-			echo  $result  ?  $model->_tag->id."|".$model->_tag->name :  "0|New tag was not created" ;
+			echo $result
+				? $model->get('id') . '|' . $model->get('name')
+				: '0|New tag was not created';
 		}
 		catch (Exception $e) {
 			echo "0|New tag creation failed";

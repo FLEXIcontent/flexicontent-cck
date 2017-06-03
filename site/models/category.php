@@ -1847,17 +1847,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getTag()
 	{
-		//get categories
 		$query = 'SELECT t.name, t.id,'
-				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
-				. ' FROM #__flexicontent_tags AS t'
-				. ' WHERE t.id = '.(int)$this->_tagid
-				//. ' AND t.published = 1'
-				;
-		
+			. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+			. ' FROM #__flexicontent_tags AS t'
+			. ' WHERE t.id = ' . (int) $this->_tagid;
 		$this->_db->setQuery($query);
 		$this->_tag = $this->_db->loadObject();       // Execute query to load tag properties
-		if ( $this->_tag ) {
+		if ($this->_tag)
+		{
 			$this->_tag->parameters = $this->_params;   // Assign tag parameters ( already load by setId() )
     }
     
@@ -2479,4 +2476,3 @@ class FlexicontentModelCategory extends JModelLegacy {
 		return flexicontent_db::addfav($type=1, $this->_id, JFactory::getUser()->id);
 	}
 }
-?>

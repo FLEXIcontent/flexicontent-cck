@@ -470,12 +470,19 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function save($data)
 	{
-		// Initialise variables;
+		// Initialise variables
 		$dispatcher = JEventDispatcher::getInstance();
 
-		// NOTE: 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
-		$record = $this->getTable();
-		$pk = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
+		// Note that 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
+		if (is_object($data))
+		{
+			$data = (array) $data;
+		}
+
+		// Get record 's primary key and set the 'isNew' Flag
+		$pk = !empty($data['id'])
+			? (int) $data['id']
+			: (int) $this->getState($this->getName() . '.id');
 		$isNew = true;
 
 		// Include the plugins for the on save events.
@@ -484,7 +491,10 @@ abstract class FCModelAdmin extends JModelAdmin
 			JPluginHelper::importPlugin($this->plugins_group);
 		}
 
-		// Load existing data to allow maintaining any not-set properties
+		// Get a JTable object
+		$record = $this->getTable();
+
+		// Load data of existing record to allow maintaining any not-set properties
 		if ($pk > 0)
 		{
 			$record->load($pk);
@@ -1002,6 +1012,12 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _afterLoad($record)
 	{
+		// Record was not found, nothing to do
+		if (!$record)
+		{
+			return;
+		}
+
 		// Convert attributes to a JRegistry object
 		if (property_exists($record, 'attribs') && !is_object($record->attribs))
 		{

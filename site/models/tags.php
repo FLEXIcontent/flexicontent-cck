@@ -105,17 +105,19 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function setId($id)
 	{
-		// Set new tag ID, wipe member variables and load parameters
+		// Set new tag ID / clear record
 		$this->_id      = $id;
 		$this->_tag     = null;
+
+		// Wipe member variables and load parameters
 		$this->_data    = null;
 		$this->_total   = null;
 		$this->_pagination = null;
 		$this->_params  = null;
 		$this->_loadParams();
 	}
-	
-	
+
+
 	/**
 	 * Overridden get method to get properties from the tag
 	 *
@@ -168,6 +170,7 @@ class FlexicontentModelTags extends JModelLegacy
 			// Query the content items
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+
 			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
 			flexicontent_db::getOriginalContentItemids($this->_data);
 		}
@@ -318,7 +321,7 @@ class FlexicontentModelTags extends JModelLegacy
 		if ( in_array('order', $order) ) {
 			$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 		}
-		
+
 		$query = 'SELECT i.id, i.*, ie.* '
 			. $orderby_col
 			. $select_access
@@ -385,7 +388,7 @@ class FlexicontentModelTags extends JModelLegacy
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
-		
+
 		// First thing we need to do is to select only the requested TAGGED items
 		$where = ' WHERE tag.tid = '.$this->_id;
 		
