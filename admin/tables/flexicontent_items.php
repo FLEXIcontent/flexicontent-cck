@@ -27,19 +27,20 @@ class _flexicontent_items_common extends JTable
 	{
 		// Initialise variables.
 		$assetId = null;
-		$db = $this->getDbo();
-	
+
 		// This is a article under a category.
-		if ($this->catid) {
+		if ($this->catid)
+		{
 			// Build the query to get the asset id for the parent category.
-			$query	= $db->getQuery(true);
-			$query->select('asset_id');
-			$query->from('#__categories');
-			$query->where('id = '.(int) $this->catid);
+			$query = $this->_db->getQuery(true)
+				->select('asset_id')
+				->from('#__categories')
+				->where('id = '.(int) $this->catid);
 
 			// Get the asset id from the database.
 			$this->_db->setQuery($query);
-			if ($result = $this->_db->loadResult()) {
+			if ($result = $this->_db->loadResult())
+			{
 				$assetId = (int) $result;
 			}
 		}
@@ -187,23 +188,6 @@ class flexicontent_items extends _flexicontent_items {
 	var $_frn_key_ext			= 'item_id';
 	
 	/**
-	 * Array of all properties from the join table added to this object
-	 *
-	 * @var	array
-	 * @access protected
-	 */
-	var $_join_prop_ext   = array(
-		'item_id',
-		'type_id',
-		'language',
-		'lang_parent_id',
-		'sub_items',
-		'sub_categories',
-		'related_items',
-		'search_index'
-	);
-	
-	/**
 	 * Name of the the items ext table
 	 *
 	 * @var	string
@@ -219,114 +203,217 @@ class flexicontent_items extends _flexicontent_items {
 	 * @access	protected
 	 */
 	var $_frn_key_tmp			= 'id';
-	
+
+
+
 	/**
-	 * Array of all properties from the join table added to this object
+	 * Constructor
 	 *
-	 * @var	array
-	 * @access protected
+	 * @param   JDatabaseDriver  $db  Database driver object.
+	 *
+	 * @since  11.1
 	 */
-	var $_join_prop_tmp		= array();
-	
-	
-	/**
-	* @param database A database connector object
-	*/
-	function __construct(&$db) {
-		static $tbl_fields = null;
-		if (!isset($tbl_fields))
-		{
-			$tbls = array($this->_tbl_join_tmp);
-			foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-		}
-		$this->_join_prop_tmp = array_keys($tbl_fields[$this->_tbl_join_tmp]);
-		
+	public function __construct($db)
+	{
 		parent::__construct('#__content', 'id', $db);
 	}
 
+
 	/**
 	 * Method to compute the default name of the asset.
-	 * The default name is in the form `table_name.id`
+	 * The default name is in the form `table_name.id` which we will override
 	 * where id is the value of the primary key of the table.
 	 *
 	 * @return	string
 	 * @since	1.6
 	 */
-	protected function _getAssetName() {
+	protected function _getAssetName()
+	{
 		$k = $this->_tbl_key;
 		return 'com_content.article.'.(int) $this->$k;
 	}
-	
-	
+
+
 	/**
-	 * Method to return the title to use for the asset table.
+	 * Get the columns from database table.
 	 *
-	 * @return  string
+	 * @param   bool  $reload  flag to reload cache
+	 *
+	 * @return  mixed  An array of the field names, or false if an error occurs.
 	 *
 	 * @since   11.1
+	 * @throws  UnexpectedValueException
 	 */
-	protected function _getAssetTitle()
+	public function getFields($reload = false)
 	{
-		return $this->title;
+		static $tbl_fields = null;
+
+		// Get the fields of the joined tables
+		if (!isset($tbl_fields))
+		{
+			$tbls = array(
+				$this->_tbl_join_ext,
+				$this->_tbl_join_tmp
+			);
+			foreach ($tbls as $tbl)
+			{
+				$tbl_fields[$tbl] = $this->_db->getTableColumns($tbl, false);
+			}
+		}
+		$this->tbl_fields = $tbl_fields;
+
+		// Now get and return fields of the main table
+		return parent::getFields($reload);
 	}
 
+
 	/**
-	 * Method to get the parent asset id for the record
+	 * Method to reset class properties to the defaults set in the class
+	 * definition. It will ignore the primary key as well as any private class
+	 * properties (except $_errors).
 	 *
-	 * @param   JTable   $table  A JTable object for the asset parent
-	 * @param   integer  $id
-	 *
-	 * @return  integer
+	 * @return  void
 	 *
 	 * @since   11.1
 	 */
-	// see (above) parent class method: _getAssetParentId($table = null, $id = null)
-	
-	
-	/**
-	 * Overloaded load function
-	 *
-	 * @access public
-	 * @return boolean
-	 * @since 1.5
-	 */
-	function load( $oid=null, $reset = true )
+	public function reset()
 	{
-		$k = $this->_tbl_key;
-
-		if ($oid !== null) {
-			$this->$k = $oid;
+		// Get the default values for the class from the table.
+		foreach ($this->getFields() as $k => $v)
+		{
+			// If the property is not the primary key or private, reset it.
+			if (!in_array($k, $this->_tbl_keys) && (strpos($k, '_') !== 0))
+			{
+				$this->$k = $v->Default;
+			}
 		}
 
-		$oid = $this->$k;
+		// Get the default values for the class from every joined table.
+		foreach ($this->tbl_fields as $tbl => $props_arr)
+		{
+			// Skip this table as it contains copies of the other tables , they do not have their own values
+			if ($tbl === $this->_tbl_join_tmp)
+			{
+				continue;
+			}
 
-		if ($oid === null) {
-			return false;
+			foreach ($props_arr as $k => $v)
+			{
+				// If the property is not the primary key or private, reset it.
+				if (!in_array($k, $this->_tbl_keys) && (strpos($k, '_') !== 0))
+				{
+					$this->$k = $v->Default;
+				}
+			}
 		}
-		$this->reset();
 
-		$db = $this->getDBO();
+		// Reset table errors
+		$this->_errors = array();
+	}
 
-		$query = 'SELECT *'
-		. ' FROM '.$this->_tbl
-		. ' LEFT JOIN '.$this->_tbl_join_ext
-		. ' ON '.$this->_tbl_key.' = '.$this->_frn_key_ext
-		//. ' LEFT JOIN '.$this->_tbl_join_tmp                        // same name and same data columns
-		//. ' ON '.$this->_tbl_key.' = '.$this->_frn_key_tmp          // ... so do not join
-		. ' WHERE '.$this->_tbl_key.' = '.$db->Quote($oid);
-		$db->setQuery( $query );
-		
-		if ($result = $db->loadAssoc( )) {
-		//dump($result,'bind');
-			return $this->bind($result);
+
+	/**
+	 * Method to load a row from the database by primary key and bind the fields to the JTable instance properties.
+	 *
+	 * @param   mixed    $keys   An optional primary key value to load the row by, or an array of fields to match.
+	 *                           If not set the instance property value is used.
+	 * @param   boolean  $reset  True to reset the default values before loading the new row.
+	 *
+	 * @return  boolean  True if successful. False if row not found.
+	 *
+	 * @since   11.1
+	 * @throws  InvalidArgumentException
+	 * @throws  RuntimeException
+	 * @throws  UnexpectedValueException
+	 */
+	public function load($keys = null, $reset = true)
+	{
+		// Implement JObservableInterface: Pre-processing by observers
+		$this->_observers->update('onBeforeLoad', array($keys, $reset));
+
+		if (empty($keys))
+		{
+			$empty = true;
+			$keys  = array();
+
+			// If empty, use the value of the current key
+			foreach ($this->_tbl_keys as $key)
+			{
+				$empty      = $empty && empty($this->$key);
+				$keys[$key] = $this->$key;
+			}
+
+			// If empty primary key there's is no need to load anything
+			if ($empty)
+			{
+				return true;
+			}
+		}
+		elseif (!is_array($keys))
+		{
+			// Load by primary key.
+			$keyCount = count($this->_tbl_keys);
+
+			if ($keyCount)
+			{
+				if ($keyCount > 1)
+				{
+					throw new InvalidArgumentException('Table has multiple primary keys specified, only one primary key value provided.');
+				}
+
+				$keys = array($this->getKeyName() => $keys);
+			}
+			else
+			{
+				throw new RuntimeException('No table keys defined.');
+			}
+		}
+
+		if ($reset)
+		{
+			$this->reset();
+		}
+
+		// Initialise the query.
+		$query = $this->_db->getQuery(true)
+			->select('*')
+			->from($this->_tbl);
+		$query->join('LEFT', $this->_tbl_join_ext . ' ON ' . $this->_tbl_key . ' = ' . $this->_frn_key_ext);
+		$fields = array_keys($this->getProperties());
+
+		foreach ($keys as $field => $value)
+		{
+			// Check that $field is in the table.
+			if (!in_array($field, $fields))
+			{
+				throw new UnexpectedValueException(sprintf('Missing field in database: %s &#160; %s.', get_class($this), $field));
+			}
+			// Add the search tuple to the query.
+			$query->where($this->_db->quoteName($field) . ' = ' . $this->_db->quote($value));
+		}
+
+		$this->_db->setQuery($query);
+
+		$row = $this->_db->loadAssoc();
+
+		// Check that we have a result.
+		if (empty($row))
+		{
+			$result = false;
 		}
 		else
 		{
-			$this->setError( $db->getErrorMsg() );
-			return false;
+			// Bind the object with the row and return.
+			$result = $this->bind($row);
 		}
+
+		// Implement JObservableInterface: Post-processing by observers
+		$this->_observers->update('onAfterLoad', array(&$result, $row));
+
+		return $result;
 	}
-	
+
+
 	/**
 	 * Overloaded bind function
 	 *
@@ -409,23 +496,27 @@ class flexicontent_items extends _flexicontent_items {
 		foreach ($this->getProperties() as $p => $v) {
 		
 			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
-			if (in_array($p, $this->_join_prop_tmp)) {
+			if (isset($this->tbl_fields[$this->_tbl_join_tmp][$p]))
+			{
 				$type_tmp->$p = $v;
 			}
 			
 			// If the property is in the join properties array we add it to the items_ext object
-			if (in_array($p, $this->_join_prop_ext)) {
+			if (isset($this->tbl_fields[$this->_tbl_join_ext][$p]))
+			{
 				$type_ext->$p = $v;
 				
 				// Catch case of new J1.6+ article language column
-				if (FLEXI_J16GE && $p == "language") {
+				if ($p == "language")
+				{
 					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('setting content language to' . $v,'message');
 					$type->$p = $v;
 				}
 			
 				// Catch case of master item for (translation groups) not being set
-				if ($p == "lang_parent_id" /*&& $v==0*/) {
+				if ($p == "lang_parent_id" /*&& $v==0*/)
+				{
 					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
 					$type_ext->$p = 0;//$type->id;
@@ -434,7 +525,8 @@ class flexicontent_items extends _flexicontent_items {
 			}
 				
 			// Else we add it to the core item properties
-			else {
+			else
+			{
 				$type->$p = $v;
 			}
 		}
@@ -651,39 +743,4 @@ class flexicontent_items extends _flexicontent_items {
 
 		return true;
 	}
-	
-	/**
-	* Converts record to XML
-	* @param boolean Map foreign keys to text values
-
-	function toXML( $mapKeysToText=false )
-	{
-		$db = JFactory::getDBO();
-
-		if ($mapKeysToText) {
-			$query = 'SELECT name'
-			. ' FROM #__sections'
-			. ' WHERE id = '. (int) $this->sectionid
-			;
-			$db->setQuery( $query );
-			$this->sectionid = $db->loadResult();
-
-			$query = 'SELECT name'
-			. ' FROM #__categories c'
-			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND id = '. (int) $this->catid
-			;
-			$db->setQuery( $query );
-			$this->catid = $db->loadResult();
-
-			$query = 'SELECT name'
-			. ' FROM #__users'
-			. ' WHERE id = ' . (int) $this->created_by
-			;
-			$db->setQuery( $query );
-			$this->created_by = $db->loadResult();
-		}
-
-		return parent::toXML( $mapKeysToText );
-	}
-	*/
 }

@@ -1641,8 +1641,8 @@ div.current ul.config-option-list li label {
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar {
 	float: left;
-	min-width: 120px;
-	margin-top: 1px;
+	min-width: 260px;
+	margin-top: 0px;
 	width: 100%;
 }
 #toolbar .buttons.btn-group > ul.dropdown-menu > li > .toolbar:hover {

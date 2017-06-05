@@ -500,6 +500,10 @@ abstract class FCModelAdmin extends JModelAdmin
 			$record->load($pk);
 			$isNew = false;
 		}
+		else
+		{
+			$record->reset();
+		}
 
 		// Extra steps after loading record, and before calling JTable::bind()
 		$this->_prepareBind($record, $data);
@@ -924,14 +928,16 @@ abstract class FCModelAdmin extends JModelAdmin
 
 				// Load existing data into a registry object, and then overwrite with new data
 				$item->$prop = new JRegistry();
-				$item->$prop->loadArray($db_data[$prop]);
+				if (is_array($db_data[$prop]))
+				{
+					$item->$prop->loadArray($db_data[$prop]);
+				}
 				$item->$prop->loadArray($data[$prop]);
 				
 				// Add the layout data too (validated above)
 				if (!empty($layout_data) && $prop == $options['params_fset'])
 				{
 					$item->$prop->loadArray($layout_data);
-					//echo "<pre>" . print_r($item->$prop->toArray(), true) . "</pre>";
 				}
 
 				// Convert property back to string

@@ -228,17 +228,41 @@ class FlexicontentViewItems extends JViewLegacy
 		$add_divider = false;
 		if ( $hasPublish )
 		{
-			$btn_task = '';
+			$add_divider = true;
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+
+			/*$btn_task = '';
 			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolBarHelper::publishList( $btn_task );
 			$js .= "
 				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\'}); return false;');
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
 			";
-			JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
-			$add_divider = true;
+			JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
+
+			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
+			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
+			$btn_task    = '';
+			$extra_js    = "";
+			$full_js     = "
+				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
+			";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_CHANGE_STATE', 'publish', $full_js, $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="",
+				$btn_icon="icon-publish", $attrs='', $auto_add = true, $tag_type='button');*/
+
+			$btn_arr = $this->getStateButtons();
+			$drop_btn = '
+				<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_CHANGE_STATE').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
 		}
-		
+
 		if ($hasDelete)
 		{
 			if ( $filter_state && in_array('T',$filter_state) ) {
@@ -252,7 +276,9 @@ class FlexicontentViewItems extends JViewLegacy
 				flexicontent_html::addToolBarButton(
 					'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning");
-			} else {
+			}
+			/*else
+			{
 				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH'));
 				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM').' '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
 				$btn_task    = 'items.changestate';
@@ -260,11 +286,12 @@ class FlexicontentViewItems extends JViewLegacy
 				flexicontent_html::addToolBarButton(
 					'FLEXI_TRASH', 'trash', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="");
-			}
+			}*/
 			$add_divider = true;
 		}
 		
-		if ($CanArchives && (!$filter_state || !in_array('A',$filter_state))) {
+		/*if ($CanArchives && (!$filter_state || !in_array('A',$filter_state)))
+		{
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE'));
 			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
 			$btn_task    = 'items.changestate';
@@ -273,7 +300,7 @@ class FlexicontentViewItems extends JViewLegacy
 				'FLEXI_ARCHIVE', 'archive', $full_js='', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 			$add_divider = true;
-		}
+		}*/
 		
 		if (
 			($CanArchives && $filter_state && in_array('A',$filter_state)) ||
@@ -798,5 +825,52 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		parent::display($tpl);
 	}
+
+
+
+	/**
+	 * Method to create state buttons for setting a new state for many items
+	 * 
+	 * @since 1.5
+	 */
+	function getStateButtons()
+	{
+		// Use general permissions since we do not have examine any specific item
+		$permission = FlexicontentHelperPerm::getPerm();
+		$auth_publish = $permission->CanPublish || $permission->CanPublishOwn || $permission->CanPublish==null || $permission->CanPublishOwn==null;
+		$auth_delete  = $permission->CanDelete  || $permission->CanDeleteOwn  || $permission->CanDelete==null  || $permission->CanDeleteOwn==null;
+		$auth_archive = $permission->CanArchives;
+		
+		if ($auth_publish)
+		{
+			$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'', 'btn_icon' => 'icon-publish', 'btn_class' => '_btn-success', 'btn_name'=>'publish' );
+			$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_IN_PROGRESS_SLIDER', 'btn_icon' => 'icon-checkmark-2', 'btn_class' => '_btn-success', 'btn_name'=>'inprogress' );
+			$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'', 'btn_icon' => 'icon-unpublish', 'btn_class' => '', 'btn_name'=>'unpublish' );
+			$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_PENDING_SLIDER', 'btn_icon' => 'icon-clock', 'btn_class' => '', 'btn_name'=>'pending' );
+			$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_DRAFT_SLIDER', 'btn_icon' => 'icon-pencil', 'btn_class' => '', 'btn_name'=>'draft' );
+		}
+		if ($auth_archive)
+		{
+			$state['A'] = array( 'name' =>'FLEXI_ARCHIVE', 'desc' =>'', 'btn_icon' => 'icon-archive', 'btn_class' => '_btn-info', 'btn_name'=>'archived' );
+		}
+		if ($auth_delete)
+		{
+			$state['T'] = array( 'name' =>'FLEXI_TRASH', 'desc' =>'', 'btn_icon' => 'icon-trash', 'btn_class' => '_btn-inverse', 'btn_name'=>'trashed' );
+		}
+
+		$tip_class = 'hasTooltip';
+		$btn_arr = array();
+		foreach($state as $shortname => $statedata)
+		{
+			$btn_name = $statedata['btn_name'];
+			$full_js="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'" . $shortname . "', 'task':'items.changestate'}, {'task':'items.changestate', 'is_list':true});";
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				$statedata['name'], $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = JText::_('FLEXI_ARE_YOU_SURE'),
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$statedata['btn_class'] . ' btn-fcaction ' . $tip_class, $statedata['btn_icon'],
+				'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($statedata['desc']), 2) . '"', $auto_add = 0, $tag_type='button');
+		}
+		return $btn_arr;
+	}
 }
-?>

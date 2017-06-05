@@ -1511,6 +1511,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function store($data)
 	{
+		global $fc_run_times;
+		$start_microtime = microtime(true);
+
 		// ****************************
 		// Initialize various variables
 		// ****************************
@@ -1531,12 +1534,7 @@ class ParentClassItem extends FCModelAdmin
 
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$print_logging_info = $cparams->get('print_logging_info');
-		
-		if ( $print_logging_info ) {
-			global $fc_run_times;
-			$start_microtime = microtime(true);
-		}
-		
+
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 		$site_zone = $app->getCfg('offset');
 		$user_zone = $user->getParam('timezone', $site_zone);
@@ -1545,7 +1543,7 @@ class ParentClassItem extends FCModelAdmin
 		// Sanitize id and approval flag as integers
 		$data['vstate'] = (int)$data['vstate'];
 		$data['id']     = (int)$data['id'];
-		$isnew = ! $data['id'];
+		$isNew = ! $data['id'];
 		
 		
 		// *****************************************
@@ -1554,10 +1552,10 @@ class ParentClassItem extends FCModelAdmin
 		
 		// Get an empty item model (with default values)
 		$item = $this->getTable();
-		$item->_isnew = $isnew;  // Pass information, if item is new to the fields
+		$item->_isnew = $isNew;  // Pass information, if item is new to the fields
 		
 		// Load existing item into the empty item model
-		if ( !$isnew )
+		if ( !$isNew )
 		{
 			$item->load( $data['id'] );
 
@@ -1588,7 +1586,9 @@ class ParentClassItem extends FCModelAdmin
 		// New ITEM: just set some properties since we have already created a new item only via DB TABLE object
 		else
 		{
-			// create default values for SOME properties that do not exist in the DB TABLE class, but are created by the ITEM model
+			$item->reset();
+
+			// Create default values for SOME properties that do not exist in the DB TABLE class, but are created by the ITEM model
 			$item->categories = array();
 			$item->tags = array();
 		}
@@ -1717,7 +1717,7 @@ class ParentClassItem extends FCModelAdmin
 		// *******************************************************
 		// Retrieve submit configuration for new items in frontend
 		// *******************************************************
-		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) )
+		if ( $app->isSite() && $isNew && !empty($data['submit_conf']) )
 		{
 			$h = $data['submit_conf'];
 			$session = JFactory::getSession();
@@ -1763,7 +1763,8 @@ class ParentClassItem extends FCModelAdmin
 		// Force main category if main category selector (maincatid_show:1) was disabled (and default main category was configured)
 		if ($overridecatperms && @ $submit_conf['maincatid_show'] == 1 && @ $submit_conf['maincatid']) $data['catid'] = $submit_conf['maincatid'];
 		
-		if ( !empty($allowed_cid) ) {
+		if ( !empty($allowed_cid) )
+		{
 			// Add existing item's categories into the user allowed categories
 			$allowed_cid = array_merge($allowed_cid, $item->categories);
 			
@@ -1775,7 +1776,7 @@ class ParentClassItem extends FCModelAdmin
 			
 			// Check multi category tampering
 			$postcats = isset($submit_conf['postcats']) ? $submit_conf['postcats'] : null;
-			if ( !$isnew || !$overridecatperms || $postcats==2 )
+			if ( !$isNew || !$overridecatperms || $postcats==2 )
 				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
 			else if ( $postcats==0 )
 				$data['categories'] = $allowed_cid;
@@ -1794,7 +1795,7 @@ class ParentClassItem extends FCModelAdmin
 		$old_created_by = $item->created_by;
 		$old_catid      = $item->catid;
 		
-		// New or Existing item must use the current user + new main category to calculate 'Edit State' privelege
+		// New or Existing item must use the current user + new main category to calculate 'Edit State' privilege
 		$item->created_by = $user->get('id');
 		$item->catid      = $data['catid'];
 		$item->type_id    = isset($data['type_id']) ? $data['type_id'] : $item->type_id;
@@ -1820,7 +1821,7 @@ class ParentClassItem extends FCModelAdmin
 			
 			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
 			
-			if (!$isnew) {
+			if (!$isNew) {
 				// Prevent changing state of existing items by users that cannot publish
 				$catid_changed = $old_catid != $data['catid'];
 				if ($catid_changed && !$use_versioning) {
@@ -1849,7 +1850,7 @@ class ParentClassItem extends FCModelAdmin
 		// Prevent frontend user from changing the item owner and creation date unless they are super admin
 		if ( $app->isSite() && !$isSuperAdmin )
 		{
-			if ($isnew)  $data['created_by'] = $user->get('id');
+			if ($isNew)  $data['created_by'] = $user->get('id');
 			else         unset( $data['created_by'] );
 			if ( !$user->authorise('flexicontent.editcreationdate', 'com_flexicontent') )
 				unset( $data['created'] );
@@ -1862,51 +1863,78 @@ class ParentClassItem extends FCModelAdmin
 		// ***********************************************************
 		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
-		if ( $allowed_langs && isset($data['language']) && !in_array($data['language'], $allowed_langs) ) {
+
+		if (!$isNew && $allowed_langs)
+		{
+			$allowed_langs[] = $item->language;
+		}
+
+		if ( $allowed_langs && isset($data['language']) && !in_array($data['language'], $allowed_langs) )
+		{
 			$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
 			unset($data['language']);
-			if ($isnew) return false;
+			if ($isNew) return false;
 		}
 		
-		if ( $app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']) ) {
+		if ( $app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']) )
+		{
 			$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
 			unset($data['language']);
-			if ($isnew) return false;
+			if ($isNew) return false;
 		}
-		
-		
+
+
+		// ***
+		// *** Prior to bind changes
+		// ***
+
+		// For new items get next available ordering number
+		if ($isNew)
+		{
+			$this->useLastOrdering = empty($item->ordering) || !$canEditState;
+		}
+
+		// Extra steps after loading record, and before calling JTable::bind()
+		$this->_prepareBind($item, $data);
+
+
 		// *************************************************************************
 		// Bind given (possibly modifed) item DATA and PARAMETERS to the item object
 		// *************************************************************************
-		
-		if ( !$item->bind($data) ) {
+
+		if ( !$item->bind($data) )
+		{
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-				
+
+
 		// *************************************************************************************
 		// Check and correct CORE item properties (some such work was done above before binding)
 		// *************************************************************************************
 			
 		// -- Modification Date and Modifier, (a) new item gets null modification date and (b) existing item get the current date
-		if ($isnew) {
+		if ($isNew)
+		{
 			$item->modified    = $nullDate;
 			$item->modified_by = 0;
-		} else {
+		}
+		else
+		{
 			$datenow = JFactory::getDate();
 			$item->modified    = $datenow->toSql();
 			$item->modified_by = $user->get('id');
 		}
 			
 		// -- Creator, if this is not already set, will be the current user or administrator if current user is not logged
-		if ( !$item->created_by ) {
-			$item->created_by = $user->get('id') ? $user->get('id') : JFactory::getUser( 'admin' )->get('id');
+		if ( !$item->created_by )
+		{
+			$item->created_by = $user->get('id') ?: JFactory::getUser('admin')->get('id');
 		}
-		
+
 		// -- Creation Date
-		if ($item->created && StringHelper::strlen(StringHelper::trim( $item->created )) <= 10) {
+		if ($item->created && StringHelper::strlen(StringHelper::trim( $item->created )) <= 10)
+		{
 			$item->created 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->created);
@@ -1914,7 +1942,8 @@ class ParentClassItem extends FCModelAdmin
 		$item->created = $date->toSql();
 			
 		// -- Publish UP Date
-		if ($item->publish_up && StringHelper::strlen(StringHelper::trim( $item->publish_up )) <= 10) {
+		if ($item->publish_up && StringHelper::strlen(StringHelper::trim( $item->publish_up )) <= 10)
+		{
 			$item->publish_up 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->publish_up);
@@ -1934,14 +1963,6 @@ class ParentClassItem extends FCModelAdmin
 			$date = JFactory::getDate($item->publish_down);
 			$date->setTimeZone( new DateTimeZone( $tz_offset ) );         // J2.5: Date from form field is in user's timezone
 			$item->publish_down = $date->toSql();
-		}
-		
-		// auto assign the section
-		if (!FLEXI_J16GE)  $item->sectionid = FLEXI_SECTION;
-		
-		// For new items get next available ordering number
-		if ($isnew) {
-			if ( empty($item->ordering) || !$canEditState ) $item->ordering = $item->getNextOrder();
 		}
 		
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
@@ -1967,14 +1988,14 @@ class ParentClassItem extends FCModelAdmin
 		// Decide new current version for the item, this depends if versioning is ON and if versioned is approved
 		if ( !$use_versioning ) {
 			// not using versioning, increment current version numbering
-			$item->version = $isnew ? 1 : $current_version+1;
+			$item->version = $isNew ? 1 : $current_version+1;
 		} else {
 			// using versioning, increment last version numbering, or keep current version number if new version was not approved
-			$item->version = $isnew ? 1 : ( $data['vstate']==2 ? $last_version+1 : $current_version);
+			$item->version = $isNew ? 1 : ( $data['vstate']==2 ? $last_version+1 : $current_version);
 		}
 		// *** Item version should be zero when form was loaded with no type id,
 		// *** thus next item form load will load default values of custom fields
-		$item->version = ($isnew && !empty($data['type_id_not_set']) ) ? 0 : $item->version;
+		$item->version = ($isNew && !empty($data['type_id_not_set']) ) ? 0 : $item->version;
 		
 		if ( $print_logging_info ) @$fc_run_times['item_store_prepare'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
@@ -1990,7 +2011,7 @@ class ParentClassItem extends FCModelAdmin
 		// Trigger Event 'onBeforeSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
 		// **************************************************************************************************
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
+		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isNew));
 		if((count($result)>0) && in_array(false, $result, true)) return false;   // cancel item save
 		if ( $print_logging_info ) $fc_run_times['onBeforeSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
@@ -2000,7 +2021,7 @@ class ParentClassItem extends FCModelAdmin
 		// ******************************************************************************************************
 		
 		// Some compatibility steps
-		if (!$isnew)
+		if (!$isNew)
 		{
 			$db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );
 			$db->execute();
@@ -2009,11 +2030,11 @@ class ParentClassItem extends FCModelAdmin
 		$jinput->set('option', 'com_content');
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
+		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew));
 		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Reverse compatibility steps
-		if (!$isnew)
+		if (!$isNew)
 		{
 			$db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );
 			$db->execute();
@@ -2029,7 +2050,7 @@ class ParentClassItem extends FCModelAdmin
 		// IF new item, create it before saving the fields (and constructing the search_index out of searchable fields)
 		// ************************************************************************************************************
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		if( $isnew )
+		if( $isNew )
 		{
 			// Only create the item not save the CUSTOM fields yet, no need to rebind this is already done above
 			$this->applyCurrentVersion($item, $data, $createonly=true);
@@ -2062,19 +2083,20 @@ class ParentClassItem extends FCModelAdmin
 			if ( $print_logging_info ) $start_microtime = microtime(true);
 			$files = JRequest::get( 'files', JREQUEST_ALLOWRAW );
 			$core_data_via_events = null;
-			$result = $this->saveFields($isnew, $item, $data, $files, $old_item, $core_data_via_events);
+			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events);
 			if ( $print_logging_info ) $fc_run_times['item_store_custom'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			
 			// Re-bind (possibly modified data) to the item
 			$this->splitText($core_data_via_events); // split text to introtext, fulltext
-			if ( !$item->bind($core_data_via_events) ) {
+			if ( !$item->bind($core_data_via_events) )
+			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
 		}
-		$version_approved = $isnew || $data['vstate']==2;
+		$version_approved = $isNew || $data['vstate']==2;
 		if( $result==='abort' ) {
-			if ($isnew) {
+			if ($isNew) {
 				$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
 				$db->execute();
 				$db->setQuery('DELETE FROM #__content WHERE id ='.$item->id);
@@ -2125,7 +2147,7 @@ class ParentClassItem extends FCModelAdmin
 			$jinput->set('view', 'article');
 			$jinput->set('option', 'com_content');
 
-			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew, $data));
+			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isNew, $data));
 
 			// Reverse compatibility steps
 			$jinput->set('view', $view);
@@ -2169,7 +2191,7 @@ class ParentClassItem extends FCModelAdmin
 		if ($use_versioning) {
 			$v = new stdClass();
 			$v->item_id			= (int)$item->id;
-			$v->version_id	= ($isnew && !empty($data['type_id_not_set']) ) ? 0 : (int)$last_version+1;
+			$v->version_id	= ($isNew && !empty($data['type_id_not_set']) ) ? 0 : (int)$last_version+1;
 			$v->created			= $item->created;
 			$v->created_by	= $item->created_by;
 			if ($item->modified != $nullDate) {
@@ -2229,7 +2251,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveFields($isnew, &$item, &$data, &$files, &$old_item=null, &$core_data_via_events=null)
+	function saveFields($isNew, &$item, &$data, &$files, &$old_item=null, &$core_data_via_events=null)
 	{
 		if (!$old_item) $old_item = & $item;
 		
@@ -2490,7 +2512,7 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$field_type = $field->iscore ? 'core' : $field->field_type;
 				
-				if ( $data['vstate']==2 || $isnew)    // update (regardless of state!!) search indexes if document version is approved OR item is new
+				if ( $data['vstate']==2 || $isNew)    // update (regardless of state!!) search indexes if document version is approved OR item is new
 				{
 					// Trigger plugin Event 'onIndexAdvSearch' to update field-item pair records in advanced search index
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexAdvSearch', array( &$field, &$postdata[$field->name], &$item ));
@@ -2662,7 +2684,7 @@ class ParentClassItem extends FCModelAdmin
 					//echo $field->field_type." - ".$field->name." - ".strlen(trim($obj->value))." ".$field->iscore."<br/>";
 					
 					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
-					if(	( $isnew || $data['vstate']==2 ) && !$field->iscore )
+					if(	( $isNew || $data['vstate']==2 ) && !$field->iscore )
 					{
 						// UNSET version it it used only verion data table, and insert only if value non-empty
 						unset($obj->version);
@@ -3496,10 +3518,10 @@ class ParentClassItem extends FCModelAdmin
 	 * @return array
 	 * @since 1.5
 	 */
-	function getCoreFieldValue(&$field, $version = 0, &$old_item=null)
+	function getCoreFieldValue($field, $version = 0, $old_item=null)
 	{
 		if ($old_item) {
-			$item = & $old_item;
+			$item = $old_item;
 		} else if (isset($this->_record)) {
 			$item = $this->_record;
 		} else {
@@ -3629,7 +3651,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @return object
 	 * @since 1.5
 	 */
-	function getExtrafields($force = false, $lang_parent_id = 0, &$old_item=null)
+	function getExtrafields($force = false, $lang_parent_id = 0, $old_item=null)
 	{
 		static $fields;
 		if ($fields && !$force) return $fields;
@@ -3973,7 +3995,7 @@ class ParentClassItem extends FCModelAdmin
 		$needs_version_reviewal     = $notify_vars->needs_version_reviewal;
 		$needs_publication_approval = $notify_vars->needs_publication_approval;
 		
-		$isnew         = $notify_vars->isnew;
+		$isNew         = $notify_vars->isnew;
 		$notify_emails = $notify_vars->notify_emails;
 		$notify_text   = $notify_vars->notify_text;
 		$before_cats   = $notify_vars->before_cats;
@@ -3988,14 +4010,18 @@ class ParentClassItem extends FCModelAdmin
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		
 		// Get category titles of categories add / removed from the item
-		if ( !$isnew ) {
+		$cats_added_titles = $cats_removed_titles = array();
+		if ( !$isNew )
+		{
 			$cats_added_ids = array_diff(array_keys($after_cats), array_keys($before_cats));
-			foreach($cats_added_ids as $cats_added_id) {
+			foreach($cats_added_ids as $cats_added_id)
+			{
 				$cats_added_titles[] = $after_cats[$cats_added_id]->title;
 			}
 			
 			$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
-			foreach($cats_removed_ids as $cats_removed_id) {
+			foreach($cats_removed_ids as $cats_removed_id)
+			{
 				$cats_removed_titles[] = $before_cats[$cats_removed_id]->title;
 			}
 			$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
@@ -4003,8 +4029,11 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		// Get category titles in the case of new item or categories unchanged
-		if ( $isnew || !$cats_altered) {
-			foreach($after_cats as $after_cat) {
+		$cats_titles = array();
+		if ( $isNew || !$cats_altered)
+		{
+			foreach($after_cats as $after_cat)
+			{
 				$cats_titles[] = $after_cat->title;
 			}
 		}
@@ -4020,19 +4049,19 @@ class ParentClassItem extends FCModelAdmin
 		if ( !$manual_approval_request ) {
 			
 			// (a) ADD INFO of being new or updated
-			$subject .= JText::_( $isnew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
+			$subject .= JText::_( $isNew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
 			
 			// (b) ADD INFO about editor's name and username (or being guest)
 			$subject .= !$user->id ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
 			
 			// (c) (new items) ADD INFO for content needing publication approval
-			if ($isnew) {
+			if ($isNew) {
 				$subject .= ": ";
 				$subject .= JText::_( $needs_publication_approval ? 'FLEXI_NF_NEEDS_PUBLICATION_APPROVAL' : 'FLEXI_NF_NO_APPROVAL_NEEDED');
 			}
 			
 			// (d) (existing items with versioning) ADD INFO for content needing version reviewal
-			if ( !$isnew && $use_versioning) {
+			if ( !$isNew && $use_versioning) {
 				$subject .= ": ";
 				$subject .= JText::_( $needs_version_reviewal ? 'FLEXI_NF_NEEDS_VERSION_REVIEWAL' : 'FLEXI_NF_NO_REVIEWAL_NEEDED');
 			}
@@ -4051,7 +4080,7 @@ class ParentClassItem extends FCModelAdmin
 		
 		// ADD INFO for item title
 		$body  = '<u>'.JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</u>: ";
-		if ( !$isnew ) {
+		if ( !$isNew ) {
 			$_changed = $oitem->title != $this->get('title');
 			$body .= " [ ". JText::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
 			$body .= !$_changed ? "" : $oitem->title . " &nbsp; ==> &nbsp; ";
@@ -4062,7 +4091,7 @@ class ParentClassItem extends FCModelAdmin
 		$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
 		
 		$body .= '<u>'.JText::_( 'FLEXI_NF_CONTENT_STATE' ) . "</u>: ";
-		if ( !$isnew ) {
+		if ( !$isNew ) {
 			$_changed = $oitem->state != $this->get('state');
 			$body .= " [ ". JText::_( $_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
 			$body .= !$_changed ? "" : JText::_( $state_names[$oitem->state] ) . " &nbsp; ==> &nbsp; ";
@@ -4073,14 +4102,14 @@ class ParentClassItem extends FCModelAdmin
 		if ( in_array('creator',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATOR_LONG' ) . "</u>: ";
-			if ( !$isnew ) {
+			if ( !$isNew ) {
 				$_changed = $oitem->created_by != $this->get('created_by');
 				$body .= " [ ". JText::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
 				$body .= !$_changed ? "" : $oitem->creator . " &nbsp; ==> &nbsp; ";
 			}
 			$body .= $this->get('creator'). "<br/>\r\n";
 		}
-		if ( in_array('modifier',$nf_extra_properties) && !$isnew )
+		if ( in_array('modifier',$nf_extra_properties) && !$isNew )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFIER_LONG' ) . "</u>: ";
 			$body .= $this->get('modifier'). "<br/>\r\n";
@@ -4104,38 +4133,45 @@ class ParentClassItem extends FCModelAdmin
 			$body .= $date_created->format($format = 'D, d M Y H:i:s', $local = true);
 			$body .= $tz_offset_str. "<br/>\r\n";
 		}
-		if ( in_array('modified',$nf_extra_properties) && !$isnew )
+		if ( in_array('modified',$nf_extra_properties) && !$isNew )
 		{
 			$date_modified = JFactory::getDate($this->get('modified'));
 			$date_modified->setTimezone($tz);
 			
-			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . "</u>: ";
-			$body .= $date_modified->format($format = 'D, d M Y H:i:s', $local = true);
-			$body .= $tz_offset_str. "<br/>\r\n";
+			$body .= '<u>' . JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . '</u>: '
+				. $date_modified->format($format = 'D, d M Y H:i:s', $local = true)
+				. $tz_offset_str. "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
 		
 		// ADD INFO about category assignments
 		$body .= '<u>'.JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS').'</u>';
-		if (!$isnew) {
-			$body .= " [ ". JText::_( $cats_altered ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
-		} else {
-			$body .= " : <br/>\r\n";
-		}
-		foreach ($cats_titles as $i => $cats_title) {
-			$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
-		}
-		
-		// ADD INFO for category assignments added or removed
-		if ( !empty($cats_added_titles) && count($cats_added_titles) ) {
-			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . "</u> : <br/>\r\n";
-			foreach ($cats_added_titles as $i => $cats_title) {
+		$body .= !$isNew
+			? " [ ". JText::_( $cats_altered ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n"
+			: " : <br/>\r\n";
+
+		if ( !empty($cats_titles) )
+		{
+			foreach ($cats_titles as $i => $cats_title)
+			{
 				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
 			}
 		}
-		if ( !empty($cats_removed_titles) &&  count($cats_removed_titles) ) {
+		
+		// ADD INFO for category assignments added or removed
+		if ( !empty($cats_added_titles) )
+		{
+			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . "</u> : <br/>\r\n";
+			foreach ($cats_added_titles as $i => $cats_title)
+			{
+				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
+			}
+		}
+		if ( !empty($cats_removed_titles) )
+		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . "</u> : <br/>\r\n";
-			foreach ($cats_removed_titles as $i => $cats_title) {
+			foreach ($cats_removed_titles as $i => $cats_title)
+			{
 				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
 			}
 		}
@@ -4763,6 +4799,32 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		return $record->has_item_access && $record->has_mcat_access && $record->has_type_access;
+	}
+
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $parent_id  If applicable, the id of the parent (e.g. assigned category)
+	 * @param   string   $alias      The alias / name.
+	 * @param   string   $title      The title / label.
+	 *
+	 * @return  array    Contains the modified title and alias / name.
+	 *
+	 * @since   1.7
+	 */
+	protected function generateNewTitle($parent_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+
+		while ($table->load(array('alias' => $alias)))
+		{
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
+		}
+
+		return array($title, $alias);
 	}
 
 

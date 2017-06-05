@@ -581,7 +581,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// *********************************************************************************************************************
 		// If there are emails to notify for current saving case, then send the notifications emails, but 
 		// *********************************************************************************************************************
-		if ( !empty($notify_emails) && count($notify_emails) ) {
+		if ( !empty($notify_emails) )
+		{
 			$notify_vars = new stdClass();
 			$notify_vars->needs_version_reviewal     = $needs_version_reviewal;
 			$notify_vars->needs_publication_approval = $needs_publication_approval;

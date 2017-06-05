@@ -1548,6 +1548,7 @@ class flexicontent_html
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				JText::script('FLEXI_LOADING_IMAGES',true);
 				JText::script('FLEXI_THUMBNAILS',true);
+				JText::script("FLEXI_NO_ITEMS_SELECTED", true);
 				break;
 
 			// Used only by content / configuration forms, that have form elements needing this
@@ -4444,8 +4445,8 @@ class flexicontent_html
 
 	// * Create a custom button inside Joomla Toolbar
 	static function addToolBarButton(
-		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask',
-		$extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true)
+		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='',
+		$list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true, $tag_type='a')
 	{
 		$toolbar = JToolBar::getInstance('toolbar');
 		$text  = JText::_($text);
@@ -4459,25 +4460,29 @@ class flexicontent_html
 			$confirm_msg = flexicontent_html::escapeJsText(strip_tags($confirm_msg), "d");
 
 			$full_js = $extra_js ."; submitbutton('$task');";
-			if ($confirm) {
+			if ($confirm)
+			{
 				$full_js = "if (confirm('".$confirm_msg."')) { ".$full_js." }";
 			}
-			if (!$menu) {
+			if (!$menu)
+			{
 				$full_js = "hideMainMenu(); " . $full_js;
 			}
-			if ($list) {
-				$full_js = "if (document.adminForm.boxchecked.value==0) { alert('".$err_msg."') ;} else { ".$full_js." }";
-			}
 		}
+
+		if ($list)
+		{
+			$full_js = "if (document.adminForm.boxchecked.value==0) { alert('".$err_msg."') ;} else { ".$full_js." }";
+		}
+
 		$full_js = "javascript: $full_js";
 
 		$button_html	= '
-		<a href="#" onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'" class="toolbar btn btn-small '.$btn_class.'" '.$attrs.'>
+		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : '').' onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'" class="toolbar btn btn-small '.$btn_class.'" '.$attrs.'>
 			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
 			'.$text.'
-		</a>
-		';
-		
+		</'.$tag_type.'>';
+
 		if (!$auto_add)
 		{
 			return $button_html;
