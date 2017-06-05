@@ -277,7 +277,7 @@ class flexicontent_cats
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
 		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
-		$disable_specific_cats = array(), $empty_errmsg = false
+		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = false
 	) {
 
 		// ***
@@ -428,9 +428,13 @@ class flexicontent_cats
 					isset( $usercats_indexed[$cat->id] );
 
 				// If not allowed then check to DISABLE OR SKIP if user not having the view access level of the category
-				if ( !$allowed && !$viewallcats && !isset($user_levels[$cat->access]) )
+				if ( !$allowed && !$viewallcats )
 				{
-					continue;
+					// Skip if category not viewable -OR- not showing viewable categories either
+					if ( !isset($user_levels[$cat->access]) || !$show_viewable )
+					{
+						continue;
+					}
 				}
 
 				// Check for DISABLED categories e.g. existing children subtree when selecting category's parent
