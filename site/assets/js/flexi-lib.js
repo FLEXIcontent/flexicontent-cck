@@ -1305,10 +1305,19 @@
 		// Attach select2 to specific to select elements having specific CSS class, for select-multiple show values as togglable checkboxes
 		s2_elems.each(function()
 		{
+			function fc_formatSel2Option(item)
+			{
+				var data_title = jQuery(item.element).attr('data-title');
+				return !data_title ? item.text : "<div title='Parent : " + data_title + "'>" + item.text + "</div>";
+			}
+
 			var sel_EL = jQuery(this);
-			
-			var sel2ops = { minimumResultsForSearch: 10 };
-			
+
+			var sel2ops = {
+				minimumResultsForSearch: 10,
+				formatResult: fc_formatSel2Option
+			};
+
 			if ( sel_EL.hasClass('fc_select2_noselect') )
 			{
 				sel2ops.formatNoMatches = function() { return ''; };
@@ -1851,4 +1860,43 @@
 			}
 		}
 		return result;
-	}	
+	}
+	
+
+	
+	// Submit a form in parent window from a jQuery modal
+	fc_parent_form_submit = function(container_id, form_id, fields, options)
+	{
+		var form = window.parent.document.getElementById(form_id);
+		var task = typeof options.task !== 'undefined'  ?  options.task  :  false;
+		var is_list = typeof options.is_list !== 'undefined'  ?  options.is_list  :  false;
+		var is_jform = typeof options.is_jform !== 'undefined'  ?  options.is_jform  :  false;
+
+		for (var field_name in fields)
+		{
+			form.elements[field_name].value = fields[field_name];
+		}
+
+		if (is_list && form.boxchecked.value==0)
+		{
+			alert(Joomla.JText._('FLEXI_NO_ITEMS_SELECTED'));
+			return;
+		}
+
+		// Close modal to allow click events to work on the parent window 's form
+		jQuery('#'+container_id).dialog('close');
+
+		// If it is a Joomla form
+		if (is_jform)
+		{
+			window.parent.Joomla.submitbutton(task);
+			return;
+		}
+
+		// For proper submit, append a hidden submit button to the form and click it, then remove it if submit was prevented
+		var button = document.createElement('input');
+		button.style.display = 'none';
+		button.type = 'submit';
+		form.appendChild(button).click();
+		form.removeChild(button);
+	}

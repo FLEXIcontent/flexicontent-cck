@@ -1263,17 +1263,28 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( empty($filter_state) ) {
 			$where[] = 'i.state <> -2';
 			$where[] = 'i.state <> 2';
-		} else {
-			$filter_state = empty($filter_state) ? array() :
-				(!is_array($filter_state) ? array($filter_state) : $filter_state);
-			
+		} else
+		{
+			$filter_state = empty($filter_state)
+				? array()
+				: (!is_array($filter_state) ? array($filter_state) : $filter_state);
+
 			$FS = array_flip($filter_state);
 			$states = array();
+
+			// No limitations, and clear any other flags in the array
 			if ( isset($FS['ALL']) )
-				; // no limitations
+			{
+				$filter_state = array('ALL');
+				$FS = array('ALL'=>0);
+				$filter_state = $this->setState('filter_state', $filter_state);
+			}
 			else if ( isset($FS['ORPHAN']) )
+			{
 				$where[] = 'i.state NOT IN(2,-2,1,0,-3,-4,-5)';
-			else {
+			}
+			else
+			{
 				if ( isset($FS['ALL_P']) )  array_push($states, 1,-5);
 				if ( isset($FS['ALL_U']) )  array_push($states, 0,-3,-4);
 				if ( isset($FS['P']) )      array_push($states, 1);

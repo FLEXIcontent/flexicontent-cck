@@ -48,19 +48,14 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 	{
 		if (task == 'groups.delete')
 		{
-			var f = document.adminForm;
-			var cb='';
-<?php foreach ($this->items as $i=>$item):?>
-<?php if ($item->user_count > 0):?>
-			cb = f['cb'+<?php echo $i;?>];
-			if (cb && cb.checked) {
-				if (confirm(Joomla.JText._('COM_USERS_GROUPS_CONFIRM_DELETE'))) {
+			if (document.adminForm.boxchecked.value != 0)
+			{
+				if (confirm(Joomla.JText._('COM_USERS_GROUPS_CONFIRM_DELETE')))
+				{
 					Joomla.submitform(task);
 				}
 				return;
 			}
-<?php endif;?>
-<?php endforeach;?>
 		}
 		Joomla.submitform(task);
 	}
