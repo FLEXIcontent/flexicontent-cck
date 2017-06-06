@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+jimport('joomla.filesystem.file');
 
 /**
  * View class for the FLEXIcontent field screen
@@ -44,10 +45,10 @@ class FlexicontentViewField extends JViewLegacy
 		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
 		$view       = $jinput->get('view', '', 'cmd');
-		$tip_class = ' hasTooltip';
 
-		//Import File system
-		jimport('joomla.filesystem.file');
+		$tip_class = ' hasTooltip';
+		$manager_view = $ctrl = 'fields.';
+		$js = '';
 
 
 
@@ -55,19 +56,23 @@ class FlexicontentViewField extends JViewLegacy
 		// *** Get record data, and check if record is already checked out
 		// ***
 		
-		// Get data from the model
+		// Get model and load the record data
 		$model = $this->getModel();
 		$row   = $this->get('Item');
-		$form  = $this->get('Form');
 		$isnew = ! $row->id;
-		$manager_view = $ctrl = 'fields.';
-		$js = '';
 
+		// Get JForm
+		$form  = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
 
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
-			JError::raiseWarning( 'SOME_ERROR_CODE', JText::_($row->label).' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
 
@@ -176,7 +181,7 @@ class FlexicontentViewField extends JViewLegacy
 				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
 
 			// Also if an existing item, can save to a copy
-			if (!$isnew)
+			if (!$isnew && !$row->iscore)
 			{
 				$btn_name = 'save2copy';
 				$btn_task = $ctrl.'.save2copy';
@@ -364,10 +369,10 @@ class FlexicontentViewField extends JViewLegacy
 
 		// Assign data to template
 		$this->permission = FlexicontentHelperPerm::getPerm();
-		$this->document    = $document;
-		$this->row    = $row;
-		$this->form   = $form;
-		$this->lists  = $lists;
+		$this->document = $document;
+		$this->row      = $row;
+		$this->form     = $form;
+		$this->lists    = $lists;
 		$this->typesselected	 = $typesselected;
 		$this->supportsearch            = $supportsearch;
 		$this->supportadvsearch         = $supportadvsearch;

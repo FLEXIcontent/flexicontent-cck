@@ -31,60 +31,45 @@ class FlexicontentViewField extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		//initialise variables
-		$app      = JFactory::getApplication();
-		$user     = JFactory::getUser();
-		
-		//JHTML::_('behavior.tooltip');
+		// ***
+		// *** Initialise variables
+		// ***
 
-		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
-		$field_type = JRequest::getVar( 'field_type', 0 );
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$user     = JFactory::getUser();
+
+		// Get url vars and some constants
+		$cid = $jinput->get('cid', 0, 'int');
+		$field_type = $jinput->get('field_type', '', 'cmd');
+
+
+
+		// ***
+		// *** Get record data, and check if record is already checked out
+		// ***
 		
-		//Get data from the model
-		$model  = $this->getModel();
-		$form   = $this->get('Form');
-		if (!FLEXI_J16GE) {
-			$row = & $this->get( 'Field' );
-			
-			//Import File system
-			jimport('joomla.filesystem.file');
-			
-			// Create the form
-			$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$field_type.'.xml';
-			if (JFile::exists( $pluginpath )) {
-				$form = new JParameter('', $pluginpath);
-			} else {
-				$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
-			}
-			$form->loadINI($row->attribs);
-		}
-		
-		$isnew = FLEXI_J16GE ? !$form->getValue('id') : !$row->id;
-		
-		// fail if checked out not by 'me'
-		if ( !$isnew ) {
-			if ($model->isCheckedOut( $user->get('id') )) {
-				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
-			}
-		}
-		
-		/*if ($field_type)
+		// Get model and load the record data
+		$model = $this->getModel();
+		$row   = $this->get('Item');
+		$isnew = ! $row->id;
+
+		// Get JForm
+		$form  = $this->get('Form');
+		if (!$form)
 		{
-			if (!FLEXI_J16GE) {
-				echo $form->render('params', 'group-' . $field_type );
-			} else {
-				foreach ($form->getFieldset('group-' . $field_type) as $field) {
-					echo '<fieldset class="panelform">' . $field->label . $field->input . '</fieldset>' . "\n";
-				}
-			}
-		} else {
-			echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
-		}*/
+			jexit($model->getError());
+		}
+
+		// Fail if an existing record is checked out by someone else
+		if ($row->id && $model->isCheckedOut($user->get('id')))
+		{
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
 		
 		?>
-			<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 			<?php
 			$fieldSets = $form->getFieldsets('attribs');
 			$prefix_len = strlen('group-'.$field_type.'-');
@@ -119,11 +104,8 @@ class FlexicontentViewField extends JViewLegacy
 						$i++;
 					} ?>
 				</div>
-		<?php endforeach; ?>
+			<?php endforeach; ?>
 		</div>
-		
 		<?php
-		//parent::display($tpl);
 	}
 }
-?>

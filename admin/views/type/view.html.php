@@ -44,7 +44,10 @@ class FlexicontentViewType extends JViewLegacy
 		// Get url vars and some constants
 		$option     = $jinput->get('option', '', 'cmd');
 		$view       = $jinput->get('view', '', 'cmd');
+
 		$tip_class = ' hasTooltip';
+		$manager_view = $ctrl = 'types';
+		$js = '';
 
 
 
@@ -52,19 +55,23 @@ class FlexicontentViewType extends JViewLegacy
 		// *** Get record data, and check if record is already checked out
 		// ***
 		
-		// Get data from the model
+		// Get model and load the record data
 		$model = $this->getModel();
 		$row   = $this->get('Item');
-		$form  = $this->get('Form');
 		$isnew = ! $row->id;
-		$manager_view = $ctrl = 'types';
-		$js = '';
 
+		// Get JForm
+		$form  = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
 
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
-			JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
 
