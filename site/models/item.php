@@ -407,7 +407,8 @@ class FlexicontentModelItem extends ParentClassItem
 		
 		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
 		$catParams = "";
-		if ( $this->_cid ) {
+		if ( $this->_cid )
+		{
 			$query = 'SELECT c.title, c.params FROM #__categories AS c WHERE c.id = ' . (int) $this->_cid;
 			$this->_db->setQuery($query);
 			$catData = $this->_db->loadObject();

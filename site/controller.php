@@ -186,14 +186,13 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
-
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
 
 		$ctrl_task = 'task=items.';
-		$real_task = $task = $this->getTask();
+		$original_task = $task = $this->getTask();
 		
 		
 		// *********************
@@ -206,8 +205,8 @@ class FlexicontentController extends JControllerLegacy
 		$jfdata = $this->input->post->get('jfdata', array(), 'array');  // Unfiltered data, (Core Fields) validation can be done via same jform as main data
 
 		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
-		$data_id = (int) $data['id'];
-		$isnew   = $data_id == 0;
+		$data['id'] = (int) $data['id'];
+		$isnew = $data['id'] == 0;
 
 		// If new make sure that type id is set too, before creating the model
 		if ($isnew)
@@ -217,13 +216,13 @@ class FlexicontentController extends JControllerLegacy
 
 		// Get the model
 		$model = $this->getModel('item');
-		$model->setId($data_id);  // Make sure id is correct
+		$model->setId($data['id']);  // Make sure id is correct
 
 		// The save2copy task needs to be handled slightly differently.
 		if ($task == 'save2copy')
 		{
 			// Check-in the original row.
-			if ($model->checkin($data_id) === false)
+			if ($model->checkin($data['id']) === false)
 			{
 				// Check-in failed. Go back to the item and display a notice.
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
@@ -237,55 +236,65 @@ class FlexicontentController extends JControllerLegacy
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
 			$isnew = 1;
 			$data['id'] = 0;
+			$data['type_id'] = $model->get('type_id') ?: (int) @ $data['type_id'];
 			$data['associations'] = array();
 			$task = 'apply';
 
-			// Maybe existing model data are not needed ? possibly try to keep them
+			// Set HTTP request Needed for Frontend Model, to-do remove
 			$this->input->set('id', 0);
-			$this->input->set('typeid', (int) @ $data['type_id'] ? (int) $data['type_id'] : $model->get('type_id'));
+			$this->input->set('typeid', $data['type_id']);   // Needed for FE, to do remove
+
+			// Keep existing model data (only clear ID)
 			$model->set('id', 0);
 			$model->setProperty('_id', 0);
-			$model->setProperty('_typeid', (int) @ $data['type_id'] ? (int) $data['type_id'] : $model->get('type_id'));
+			$model->setProperty('_typeid', $data['type_id']);
 		}
 
-		
 		// Get merged parameters: component, type, and (FE only) menu
 		$params = new JRegistry();
 		$model_params = $model->getComponentTypeParams();
 		$params->merge($model_params);
 
-		// Merge the active menu parameters
-		$menu = $app->getMenu()->getActive();
-		if ($menu)
+		// For frontend merge the active menu parameters
+		if ($app->isSite())
 		{
-			$params->merge($menu->params);
+			$menu = $app->getMenu()->getActive();
+			if ($menu)
+			{
+				$params->merge($menu->params);
+			}
+
+			// Get some needed parameters
+			$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
+			$dolog = $params->get('print_logging_info');
+
+			// Get submit configuration override
+			if ($isnew && $original_task != 'save2copy')
+			{
+				$h = $data['submit_conf'];
+				$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+			
+				$submit_conf      = @ $item_submit_conf[$h] ;
+				$allowunauthorize = $params->get('allowunauthorize', 0);
+				$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
+				$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
+			}
+			else
+			{
+				$submit_conf      = false;
+				$allowunauthorize = false;
+				$autopublished    = false;
+				$overridecatperms = false;
+			}
+
+			// We use some strings from administrator part, load english language file
+			// for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get some flags this will also trigger item loading if not already loaded
 		$isOwner = $model->get('created_by') == $user->get('id');
-
-		// Get some needed parameters
-		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
-		$dolog = $params->get('print_logging_info');
-		
-		// Get submit configuration override
-		if ($isnew && $real_task != 'save2copy')
-		{
-			$h = $data['submit_conf'];
-			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
-			
-			$submit_conf      = @ $item_submit_conf[$h] ;
-			$allowunauthorize = $params->get('allowunauthorize', 0);
-			$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
-			$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
-		}
-		else
-		{
-			$submit_conf      = false;
-			$allowunauthorize = false;
-			$autopublished    = false;
-			$overridecatperms = false;
-		}
 
 		// Unique id for new items, needed by some fields for temporary data
 		$unique_tmp_itemid = $this->input->get('unique_tmp_itemid', '', 'string');
@@ -293,14 +302,6 @@ class FlexicontentController extends JControllerLegacy
 
 		// Auto title for some content types
 		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
-		
-		if ( ! @ $data['rules'] ) $data['rules'] = array();
-		
-		
-		// We use some strings from administrator part, load english language file
-		// for 'com_flexicontent' component then override with current language file
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		
 		
 		
@@ -311,7 +312,7 @@ class FlexicontentController extends JControllerLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 		
 		// Per content type change category permissions
-		$current_type_id  = ($isnew || !$model->get('type_id')) ? (int) @ $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+		$current_type_id  = $model->get('type_id') ?: (int) @ $data['type_id'];
 		$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
 		$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
 		$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
@@ -340,7 +341,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$data['featured_cid'] = $featured_cid;
 		}
-		
+
 		// Enforce maintaining secondary categories if user is not allowed to changed
 		// or (FE only) if these were not submitted
 		// *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
@@ -397,7 +398,7 @@ class FlexicontentController extends JControllerLegacy
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
 		$fc_doajax_submit = $this->input->get('fc_doajax_submit', 0, 'int');
-		
+
 		// *** MANUALLY CHECK CAPTCHA ***
 		$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 		$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
@@ -440,7 +441,7 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
-		
+
 		// Validate Form data for core fields and for parameters
 		$validated_data = $model->validate($form, $data);
 
@@ -519,8 +520,8 @@ class FlexicontentController extends JControllerLegacy
 			// New item or existing item with Type is being ALTERED, check privilege to create items of this type
 			$canCreateType = $model->canCreateType( array($type_id), true, $types );
 		}
-		
-		
+
+
 		// *****************************************************************
 		// Calculate user's CREATE / EDIT privileges on current content item
 		// *****************************************************************
@@ -538,7 +539,8 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		else
+		// Special CASEs of overriding CREATE ACL in FrontEnd via menu item
+		else if ($app->isSite())
 		{
 			// Allow creating via submit menu OVERRIDE
 			if ( $allowunauthorize )
@@ -546,9 +548,11 @@ class FlexicontentController extends JControllerLegacy
 				$canAdd = true;
 				$canCreateType = true;
 			}
-			else {
-				// If category override is enabled then only check type and do not check category ACL
-				$canAdd = $canAdd ? $canAdd : ($overridecatperms && $canCreateType);
+
+			// If without create privelege and category override is enabled then only check type and do not check category ACL
+			else if (!$canAdd)
+			{
+				$canAdd = $overridecatperms && $canCreateType;
 			}
 		}
 		
@@ -579,7 +583,8 @@ class FlexicontentController extends JControllerLegacy
 			return;
 		}
 
-		if ( !$canCreateType ) {
+		if ( !$canCreateType )
+		{
 			$msg = isset($types[$type_id]) ?
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
@@ -621,13 +626,16 @@ class FlexicontentController extends JControllerLegacy
 			$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
 			$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
-			// Check-in the record 
-			$model->checkin();
-
 			// Set error message and the redirect URL (back to the item form)
 			$app->setHeader('status', '500 Internal Server Error', true);
 			$this->setRedirect($this->returnURL, JText::_('FLEXI_ERROR_STORING_ITEM') . ' : ' . $model->getError(), 'error');
 			
+			// Try to check-in the record, but ignore any new errors
+			try {
+				!isnew ? $model->checkin() : true;
+			}
+			catch (Exception $e) {}
+
 			if ( $fc_doajax_submit )
 			{
 				echo flexicontent_html::get_system_messages_html();
@@ -761,7 +769,8 @@ class FlexicontentController extends JControllerLegacy
 		// *********************************************************************************************************************
 		// If there are emails to notify for current saving case, then send the notifications emails, but 
 		// *********************************************************************************************************************
-		if ( !empty($notify_emails) && count($notify_emails) ) {
+		if ( !empty($notify_emails) )
+		{
 			$notify_vars = new stdClass();
 			$notify_vars->needs_version_reviewal     = $needs_version_reviewal;
 			$notify_vars->needs_publication_approval = $needs_publication_approval;
