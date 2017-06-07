@@ -135,7 +135,7 @@ class JFormFieldMultiList extends JFormField
 		// *** Construct an array of the HTML OPTION statements.
 		// ***
 
-		$this->_options = array ();
+		$this->_options = array();
 		$V2L = array();
 		foreach ($this->element->children() as $option)
 		{
@@ -242,7 +242,7 @@ class JFormFieldMultiList extends JFormField
 			$val = key($V2L);
 			if ( $val === '' && $this->_inherited!==null && !is_array($this->_inherited) && isset($V2L[$this->_inherited]) )
 			{
-				$this->_options[0]['text'] = StringHelper::strtoupper($this->_options[0]['text']). ' ... '. $V2L[$this->_inherited];
+				$this->_options[0]->text = StringHelper::strtoupper($this->_options[0]->text). ' ... '. $V2L[$this->_inherited];
 			}
 			$html = JHTML::_('select.genericlist', $this->_options, $fieldname, $attribs);
 		}

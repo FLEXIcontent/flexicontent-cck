@@ -170,7 +170,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		// -1 means both, but we will do both always
 		parent::cleanCache('com_flexicontent');
-		parent::cleanCache('com_flexicontent_cats');
 		parent::cleanCache('com_content');
 		parent::cleanCache('mod_articles_archive');
 		parent::cleanCache('mod_articles_categories');
@@ -178,6 +177,8 @@ class FlexicontentModelCategory extends FCModelAdmin
 		parent::cleanCache('mod_articles_latest');
 		parent::cleanCache('mod_articles_news');
 		parent::cleanCache('mod_articles_popular');
+
+		JFactory::getSession()->set('clear_cats_cache', 1, 'flexicontent');  //parent::cleanCache('com_flexicontent_cats');
 	}
 
 
