@@ -95,6 +95,9 @@ class FlexicontentControllerFields extends FlexicontentController
 				$this->returnURL = null;
 			}
 		}
+
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFields;
 	}
 
 
@@ -138,10 +141,11 @@ class FlexicontentControllerFields extends FlexicontentController
 			// Check-in the original row.
 			if ($model->checkin($data['id']) === false)
 			{
-				// Check-in failed. Go back to the item and display a notice.
+				// Check-in failed
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 				$this->setMessage($this->getError(), 'error');
 
+				// For errors, we redirect back to refer
 				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 
 				return false;
@@ -191,7 +195,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			// Set the POSTed form data into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 
-			// Redirect back to the edit form
+			// For errors, we redirect back to refer
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 
 			if ($this->input->get('fc_doajax_submit'))
@@ -201,38 +205,59 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 
 		// Extra custom step before model store
-		$this->_beforeModelStore($validated_data, $data);
-
-		if ( $model->store($validated_data) )
+		if ($this->_beforeModelStore($validated_data, $data) === false)
 		{
-			switch ($task)
+			$app->enqueueMessage($this->getError(), 'error');
+			$app->setHeader('status', 500, true);
+
+			if ($this->input->get('fc_doajax_submit'))
 			{
-				case 'apply' :
-					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name . '&id='.(int) $model->get('id');
-					break;
-
-				case 'save2new' :
-					$link = 'index.php?option=com_flexicontent&view=' . $this->record_name;
-					break;
-
-				default :
-					$link = $this->returnURL;
-					break;
+				jexit(flexicontent_html::get_system_messages_html());
 			}
-			$msg = JText::_( 'FLEXI_'. $this->_NAME .'_SAVED' );
 
-			// Clear dependent cache data
-			$this->_clearCache();
+			// For errors, we redirect back to refer
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return false;
 		}
-		else
+
+		if ( !$model->store($validated_data) )
 		{
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_'. $this->_NAME );
-			JError::raiseWarning( 500, $model->getError() );
-			$link = 'index.php?option=com_flexicontent&view=' . $this->record_name;
+			$app->enqueueMessage($model->getError() ?: JText::_( 'FLEXI_ERROR_SAVING_'. $this->_NAME ), 'error');
+			$app->setHeader('status', 500, true);
+
+			if ($this->input->get('fc_doajax_submit'))
+			{
+				jexit(flexicontent_html::get_system_messages_html());
+			}
+
+			// For errors, we redirect back to refer
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return false;
 		}
 
+		// Clear dependent cache data
+		$this->_clearCache();
+
+		// Checkin the record
 		$model->checkin();
-		JFactory::getApplication()->enqueueMessage($msg, 'message');
+
+		switch ($task)
+		{
+			case 'apply' :
+				$link = 'index.php?option=com_flexicontent&view=' . $this->record_name . '&id='.(int) $model->get('id');
+				break;
+
+			case 'save2new' :
+				$link = 'index.php?option=com_flexicontent&view=' . $this->record_name;
+				break;
+
+			default :
+				$link = $this->returnURL;
+				break;
+		}
+		$msg = JText::_( 'FLEXI_'. $this->_NAME .'_SAVED' );
+
+		$app->enqueueMessage($msg, 'message');
 		$this->setRedirect($link);
 
 		if ($this->input->get('fc_doajax_submit'))
@@ -282,16 +307,20 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 
 		// Calculate access
-		$noauth_cid = array();
-		foreach($cid as $i => $_id)
+		$cid_noauth = array();
+		$is_authorised = $this->canManage;
+		if ( $is_authorised )
 		{
-			if (!$user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $_id))
+			foreach($cid as $i => $_id)
 			{
-				$noauth_cid[] = $_id;
-				unset($cid[$i]);
+				if (!$user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $_id))
+				{
+					$cid_noauth[] = $_id;
+					unset($cid[$i]);
+				}
 			}
+			$is_authorised = count($cid);
 		}
-		$is_authorised = count($cid);
 
 		// Check access
 		if ( !$is_authorised )
@@ -301,9 +330,9 @@ class FlexicontentControllerFields extends FlexicontentController
 			$this->setRedirect($this->returnURL);
 			return;
 		}
-		else if (count($noauth_cid))
+		else if (count($cid_noauth))
 		{
-			$app->enqueueMessage("You cannot change state of records : ", implode(', ', $noauth_cid), 'warning');
+			$app->enqueueMessage("You cannot change state of records : ", implode(', ', $cid_noauth), 'warning');
 		}
 
 		// Publish the record(s)
@@ -349,27 +378,28 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 
 		// Calculate access
-		$cid_noauth = $cid_core = array();
-		$model->canunpublish($cid, $cid_noauth, $cid_core);
+		$cid_noauth = array();
+		$cid_locked = array();
+		$model->canunpublish($cid, $cid_noauth, $cid_locked);
+		$cid = array_diff($cid, $cid_noauth, $cid_locked);
+		$is_authorised = count($cid);
 
 		// Check access
-		$cid = array_diff($cid, $cid_noauth, $cid_core);
-		$is_authorised = count($cid);
 		if ( !$is_authorised )
 		{
-			count($cid_core)
+			count($cid_locked)
 				? $app->enqueueMessage(JText::_('FLEXI_YOU_CANNOT_UNPUBLISH_THESE_'. $this->_NAME .'S'), 'error')
-				:	$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 			return;
 		}
 
-		count($cid_core)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_BEING_OF_CORE_TYPE', count($cid_core), JText::_('FLEXI_TYPES')) . '<br/>', 'warning')
+		count($cid_locked)
+			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_BEING_OF_CORE_TYPE', count($cid_locked), JText::_('FLEXI_'. $this->_NAME .'S')) . '<br/>', 'warning')
 			: false;
 		count($cid_noauth)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_TYPES')) . '<br/>', 'warning')
+			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_'. $this->_NAME .'S')) . '<br/>', 'warning')
 			: false;
 
 		// Unpublish the record(s)
@@ -415,27 +445,28 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 
 		// Calculate access
-		$cid_noauth = $cid_core = array();
-		$model->canunpublish($cid, $cid_noauth, $cid_core);
+		$cid_noauth = array();
+		$cid_locked = array();
+		$model->candelete($cid, $cid_noauth, $cid_locked);
+		$cid = array_diff($cid, $cid_noauth, $cid_locked);
+		$is_authorised = count($cid);
 
 		// Check access
-		$cid = array_diff($cid, $cid_noauth, $cid_core);
-		$is_authorised = count($cid);
 		if ( !$is_authorised )
 		{
-			count($cid_core)
+			count($cid_locked)
 				? $app->enqueueMessage(JText::_('FLEXI_YOU_CANNOT_REMOVE_CORE_'. $this->_NAME .'S'), 'error')
-				:	$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+				: $app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 			return;
 		}
 
-		count($cid_core)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_BEING_OF_CORE_TYPE', count($cid_core), JText::_('FLEXI_TYPES')) . '<br/>', 'warning')
+		count($cid_locked)
+			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_BEING_OF_CORE_TYPE', count($cid_locked), JText::_('FLEXI_'. $this->_NAME .'S')) . '<br/>', 'warning')
 			: false;
 		count($cid_noauth)
-			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_TYPES')) . '<br/>', 'warning')
+			? $app->enqueueMessage(JText::sprintf('FLEXI_SKIPPED_RECORDS_NOT_AUTHORISED', count($cid_noauth), JText::_('FLEXI_'. $this->_NAME .'S')) . '<br/>', 'warning')
 			: false;
 
 		// Delete the record(s)
@@ -553,6 +584,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		$cache->clean();
 		$itemcache = JFactory::getCache('com_flexicontent_items');
 		$itemcache->clean();
+		$filtercache = JFactory::getCache('com_flexicontent_filters');
+		$filtercache->clean();
 	}
 
 
@@ -566,6 +599,12 @@ class FlexicontentControllerFields extends FlexicontentController
 	private function _beforeModelStore(& $validated_data, & $data)
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		if (!$validated_data['id'] && $validated_data['iscore'])
+		{
+			$this->setError('Field\'s "iscore" property is ON, but creating new fields as CORE is not allowed');
+			return false;
+		}
 	}
 
 
@@ -761,14 +800,14 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		// Remove core fields
-		$core_cid = array();
+		$cid_locked = array();
 		$non_core_cid = array();
 		
 		// Copying of core fields is not allowed
 		foreach ($cid as $id)
 		{
 			if ($id < 15) {
-				$core_cid[] = $id;
+				$cid_locked[] = $id;
 			} else {
 				$non_core_cid[] = $id;
 			}
@@ -804,8 +843,8 @@ class FlexicontentControllerFields extends FlexicontentController
 			if ( count($auth_cid)-count($ids_map) ) {
 				//$msg .= JText::sprintf('FLEXI_FIELDS_SKIPPED_DURING_COPY', count($auth_cid)-count($ids_map)) . ' ';
 			}
-			if (count($core_cid)) {
-				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($core_cid)) . ' ';
+			if (count($cid_locked)) {
+				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($cid_locked)) . ' ';
 			}
 			if (count($non_auth_cid)) {
 				$msg .= JText::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
@@ -849,12 +888,12 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 
 		// calculate access
-		$noauth_cid = array();
+		$cid_noauth = array();
 		foreach($cid as $i => $_id)
 		{
 			if (!$user->authorise('flexicontent.publishfield', 'com_flexicontent.field.' . $_id))
 			{
-				$noauth_cid[] = $_id;
+				$cid_noauth[] = $_id;
 				unset($cid[$i]);
 			}
 		}
@@ -867,9 +906,9 @@ class FlexicontentControllerFields extends FlexicontentController
 			$this->setRedirect($this->returnURL);
 			return;
 		}
-		else if (count($noauth_cid))
+		else if (count($cid_noauth))
 		{
-			$app->enqueueMessage("You cannot change state of fields : ", implode(', ', $noauth_cid));
+			$app->enqueueMessage("You cannot change state of fields : ", implode(', ', $cid_noauth));
 		}
 
 
