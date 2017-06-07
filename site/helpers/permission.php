@@ -115,7 +115,7 @@ class FlexicontentHelperPerm
 		
 		// REVIEWs: management tab and usage
 		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',	'com_flexicontent');
-		$permission->CanCreateReviews = 1; //$user->authorise('flexicontent.createreviews',	'com_flexicontent');
+		$permission->CanCreateReviews = $user->authorise('flexicontent.createreviews',	'com_flexicontent');
 		
 		// TAGS: management tab and usage
 		$permission->CanTags			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types

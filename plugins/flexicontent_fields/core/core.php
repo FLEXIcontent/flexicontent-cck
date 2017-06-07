@@ -19,6 +19,8 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 
 class plgFlexicontent_fieldsCore extends FCField
 {
+	static $cparams = null;
+
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -28,10 +30,15 @@ class plgFlexicontent_fieldsCore extends FCField
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
 		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
+
+		if (self::$cparams===null)
+		{
+			self::$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		}
 	}
-	
-	
-	
+
+
+
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
 	// *******************************************
@@ -44,28 +51,25 @@ class plgFlexicontent_fieldsCore extends FCField
 		
 		static $cat_links = array();
 		static $tag_links = array();
-		static $cparams = null;
-		if ($cparams===null)
-		{
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		}
-		
-		if ( !is_array($_item) ) 
-		{
-			$items = array( & $_item );
-		}
-		else
-		{
-			$items = & $_item;
-		}
-		
-		// Prefix - Suffix - Separator parameters
-		// These parameters should be common so we will retrieve them from the first item instead of inside the loop
+
+		$items = !is_array($_item)
+			? array( $_item )
+			: $_item;
+
 		$item = reset($items);
+
+		// Check field exists, normally this should not happen
+		if (!is_object($_field) && !isset($item->fields[$_field]))
+		{
+			return;
+		}
+
 		$field = is_object($_field)
 			? $_field
 			: $item->fields[$_field];
 
+		// Prefix - Suffix - Separator parameters
+		// These parameters should be common so we will retrieve them from the first item instead of inside the loop
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$_pretext = $field->parameters->get( 'pretext', '' );
 		$_posttext = $field->parameters->get( 'posttext', '' );
@@ -269,7 +273,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 	
 				case 'tags': // assigned tags
-					$use_catlinks = $cparams->get('tags_using_catview', 0);
+					$use_catlinks = self::$cparams->get('tags_using_catview', 0);
 					$field->{$prop} = '';
 					
 					/*if ($raw_values!==null) $tags = convert ... $raw_values;

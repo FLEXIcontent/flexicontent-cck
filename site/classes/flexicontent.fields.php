@@ -311,15 +311,14 @@ class FlexicontentFields
 			$typename  = isset($vars['typenames'][$item_id]) ? $vars['typenames'][$item_id]        : '';
 			$vote      = isset($vars['votes'][$item_id])     ? $vars['votes'][$item_id]            : '';
 			$custom    = isset($vars['custom'][$item_id])    ? $vars['custom'][$item_id]           : array();
-			
-			
-			// ONCE per Content Item Type
+
 			if ( empty($item->type_id) )
 			{
-				//echo '<div class="alert alert-warning fc-small">Item with id: ' .$item->id. ' has empty type</div>';
-				continue;
+				if (JDEBUG) JFactory::getApplication()->enqueueMessage('Item with id: ' .$item->id. ' has empty type, please edit it and set a type', 'warning');
 			}
-			else if ( !isset($type_fields[$item->type_id]) )
+
+			// ONCE per Content Item Type (skip this if item has no type)
+			else if ( $item->type_id && !isset($type_fields[$item->type_id]) )
 			{
 				// Field's has_access flag
 				$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
@@ -338,16 +337,16 @@ class FlexicontentFields
 				$type_fields[$item->type_id] = $db->loadObjectList('name');
 				//echo "<pre>";  print_r( array_keys($type_fields[$item->type_id]) ); exit;
 			}
-			
+
+			// Add custom fields, if these were found
 			$item->fields = array();
-			if ($type_fields[$item->type_id])
+			if (!empty($type_fields[$item->type_id]))
 			{
 				foreach($type_fields[$item->type_id] as $field_name => $field_data)
 				{
 					$item->fields[$field_name] = clone($field_data);
 				}
 			}
-			$item->fields	= $item->fields	? $item->fields	: array();
 			
 			if (!isset($item->parameters))
 			{
@@ -4202,20 +4201,24 @@ class FlexicontentFields
 	 */
 	static function setFilterValues( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="httpReq" )
 	{
+		$jinput = JFactory::getApplication()->input;
+
 		$field_filters = array();   // Used when set_method is 'array' instead of 'httpReq'
 		$is_persistent =            // Non-httpReq method does not have initial filters
 			$set_method!="httpReq" ? 1 : $is_persistent;
 			
 		// Get configuration parameter holding the custom field filtering and abort if empty
 		$mfilter_data = $cparams->get($mfilter_name, '');
-		if (!$mfilter_data) {
+		if (!$mfilter_data)
+		{
 			$cparams->set($mfilter_name, '');  // Set to empty string for J1.5 compatibility, otherwise this could be empty array too
 			return array();
 		}
 		
 		// Parse configuration parameter into individual fields
 		$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
-		if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
+		if ( empty($mfilter_arr[count($mfilter_arr)-1]) )
+		{
 			unset($mfilter_arr[count($mfilter_arr)-1]);
 		}
 		
@@ -4240,7 +4243,8 @@ class FlexicontentFields
 			if ( !$is_persistent && JRequest::getVar('filter_'.$filter_id, false) !== false ) continue;
 			
 			// CASE: range values:  value01---value02
-			if (strpos($filter_value, '---') !== false) {
+			if (strpos($filter_value, '---') !== false)
+			{
 				$filter_value = explode('---', $filter_value);
 				$filter_value[2] = $filter_value[1];
 				$filter_value[1] = $filter_value[0];
@@ -4248,7 +4252,8 @@ class FlexicontentFields
 			}
 			
 			// CASE: multiple values:  value01+++value02+++value03+++value04
-			else if (strpos($filter_value, '+++') !== false) {
+			else if (strpos($filter_value, '+++') !== false)
+			{
 				$filter_value = explode('+++', $filter_value);
 			}
 			
@@ -4257,17 +4262,22 @@ class FlexicontentFields
 			
 			// INDIRECT method of using field filter (via HTTP request)
 			if ($set_method=='httpReq')
-				JRequest::setVar('filter_'.$filter_id, $filter_value);
-			
+			{
+				$jinput->set('filter_'.$filter_id, $filter_value);
+			}
+
 			// DIRECT method of using field filter (via a returned array)
 			else
+			{
 				$field_filters[$filter_id] = $filter_value;
+			}
 		}
 		
 		// INDIRECT method of using field filter (via HTTP request),
 		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
 		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
-		if ($set_method=='httpReq') {
+		if ($set_method=='httpReq')
+		{
 			count($filter_ids) ?
 				$cparams->set($mfilter_name, $filter_ids) :
 				$cparams->set($mfilter_name, false );  // FALSE means do not retrieve ALL

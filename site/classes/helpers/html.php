@@ -87,13 +87,13 @@ class flexicontent_html
 <?php endif; ?>
 			<div id="fc_ajax_system_messages">
 			<?php if (is_array($msgsByType) && $msgsByType) : ?>
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
 				<?php foreach ($msgsByType as $type => $msgs) : ?>
 					<div class="alert <?php echo $alert_class[$type]; ?>">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
 						<h4 class="alert-heading"><?php echo JText::_($type); ?></h4>
 						<?php if ($msgs) : ?>
 							<?php foreach ($msgs as $msg) : ?>
-								<p><?php echo $msg; ?></p>
+								<div class="alert-<?php echo $type; ?>"><?php echo $msg; ?></div>
 							<?php endforeach; ?>
 						<?php endif; ?>
 					</div>
