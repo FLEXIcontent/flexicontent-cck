@@ -506,7 +506,11 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		// Extra steps after loading record, and before calling JTable::bind()
-		$this->_prepareBind($record, $data);
+		if ($this->_prepareBind($record, $data) === false)
+		{
+			// Just return, the error was set already
+			return false;
+		}
 
 		// Bind data to the jtable
 		if (!$record->bind($data))
@@ -928,7 +932,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 				// Load existing data into a registry object, and then overwrite with new data
 				$item->$prop = new JRegistry();
-				if (is_array($db_data[$prop]))
+				if (!empty($db_data[$prop]))
 				{
 					$item->$prop->loadArray($db_data[$prop]);
 				}
@@ -1018,7 +1022,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _afterLoad($record)
 	{
-		// Record was not found, nothing to do
+		// Record was not found / not created, nothing to do
 		if (!$record)
 		{
 			return;

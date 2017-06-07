@@ -108,6 +108,7 @@ class FlexicontentModelField extends FCModelAdmin
 	 *
 	 */
 	var $field_type = null;
+	var $plugin_name = null;
 
 	/**
 	 * Constructor
@@ -208,12 +209,17 @@ class FlexicontentModelField extends FCModelAdmin
 		// Initialise variables.
 		$client = JApplicationHelper::getClientInfo(0);
 
+		// Get plugin name from field type
+		$plugin_name = $data
+			? ($data->iscore ? 'core' : $data->field_type)
+			: ($this->plugin_name ?: 'text');
+		$plugin_name = JFactory::getApplication()->input->get('field_type', $plugin_name, 'cmd');
+
 		// Try to load plugin file: /plugins/folder/element/element.xml
-		$pluginpath = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $this->field_type . DS . $this->field_type.'.xml';
-		if (!JFile::exists($pluginpath))
+		$plugin_path = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml';
+		if (!JFile::exists($plugin_path))
 		{
-			throw new Exception(JText::sprintf('COM_PLUGINS_ERROR_FILE_NOT_FOUND', $this->field_type.'.xml'));
-			return false;
+			throw new Exception('Error field XML file for field type: - ' . $this->field_type . '- was not found');
 		}
 
 
@@ -222,8 +228,8 @@ class FlexicontentModelField extends FCModelAdmin
 		// ***
 
 		// We will load the form's XML file into a string to be able to manipulate it, before it is loaded by the JForm
-		$xml_string = str_replace(' type="radio"', ' type="fcradio"', file_get_contents($pluginpath));
-		$xml = simplexml_load_string($xml_string);  //simplexml_load_file($pluginpath);
+		$xml_string = str_replace(' type="radio"', ' type="fcradio"', file_get_contents($plugin_path));
+		$xml = simplexml_load_string($xml_string);  //simplexml_load_file($plugin_path);
 		if (!$xml)
 		{
 			throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
@@ -361,6 +367,12 @@ class FlexicontentModelField extends FCModelAdmin
 				if ($record->isadvfilter!=0) $data['isadvfilter'] = -1;
 			}
 		}
+
+		if (!$data['id'] && $data['iscore'])
+		{
+			$this->setError('Field\'s "iscore" property is ON, but creating new fields as CORE is not allowed');
+			return false;
+		}
 	}
 
 
@@ -394,6 +406,12 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		parent::_afterLoad($record);
 
+		// Record was not found / not created, nothing to do
+		if (!$record)
+		{
+			return;
+		}
+
 		// Convert field positions to an array
 		if (!is_array($record->positions))
 		{
@@ -404,7 +422,8 @@ class FlexicontentModelField extends FCModelAdmin
 		$record->tid = $this->getTypesselected($record->id);
 
 		// Needed during preprocessForm to load correct XML file
-		$this->field_type = JFactory::getApplication()->input->get('field_type', ($record->id ? $record->field_type : 'text'), 'cmd');
+		$this->field_type  = $record->field_type;
+		$this->plugin_name = $record->iscore ? 'core' : $record->field_type;
 	}
 
 

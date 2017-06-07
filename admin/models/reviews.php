@@ -361,12 +361,10 @@ class FlexicontentModelReviews extends JModelList
 	{
 		$cid_noauth = $cid_wassocs = array();
 
-		if (!count($cid))
-		{
-			return false;
-		}
+		// Find ACL disallowed
+		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanReviews ? array() : $cid;
 
-		return true;
+		return !count($cid_noauth) && !count($cid_wassocs);
 	}
 
 
@@ -381,12 +379,10 @@ class FlexicontentModelReviews extends JModelList
 	{
 		$cid_noauth = $cid_wassocs = array();
 
-		if (!count($cid))
-		{
-			return false;
-		}
+		// Find ACL disallowed
+		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanReviews ? array() : $cid;
 
-		return true;
+		return !count($cid_noauth) && !count($cid_wassocs);
 	}
 
 

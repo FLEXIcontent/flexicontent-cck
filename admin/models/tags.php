@@ -402,12 +402,10 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		$cid_noauth = $cid_wassocs = array();
 
-		if (!count($cid))
-		{
-			return false;
-		}
+		// Find ACL disallowed
+		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanTags ? array() : $cid;
 
-		return true;
+		return !count($cid_noauth) && !count($cid_wassocs);
 	}
 
 
@@ -422,12 +420,10 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		$cid_noauth = $cid_wassocs = array();
 
-		if (!count($cid))
-		{
-			return false;
-		}
+		// Find ACL disallowed
+		$cid_noauth = FlexicontentHelperPerm::getPerm()->CanTags ? array() : $cid;
 
-		return true;
+		return !count($cid_noauth) && !count($cid_wassocs);
 	}
 
 
