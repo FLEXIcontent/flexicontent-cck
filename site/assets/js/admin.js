@@ -260,12 +260,17 @@ Joomla.submitform = function(task, form, validate)
 	var task_field_exists = typeof form.task !== 'undefined' && typeof form.task.value !== 'undefined';
 	var form_task = task ? task : (task_field_exists  ?  form.task.value  :  '');
 
+	// Do not do add ajax submit or form validation if changing record type
+	var match_apply_ajax = new RegExp(/(.|^)apply_ajax$/);
+	var modifying_record_type = jQuery('#fc-change-warning').is(':visible');
+	form_task = match_apply_ajax.test(form_task) && modifying_record_type ? form_task.replace('apply_ajax', 'apply') : form_task;
+
 	// Do form validation if button task is not 'cancel'
 	var match_cancel = new RegExp(/(.*.|^)cancel$/);
 	var isCancel = match_cancel.test(form_task);
 
 	// For flexicontent views we will do validation too (FLAG: fc_validateOnSubmitForm), NOTE: for non-FC views this is done before the method is called
-	var doValidation = typeof window.fc_validateOnSubmitForm !== undefined ? window.fc_validateOnSubmitForm : 0;
+	var doValidation = !modifying_record_type && typeof window.fc_validateOnSubmitForm !== undefined ? window.fc_validateOnSubmitForm : 0;
 	if ( doValidation && document.formvalidator && !isCancel )
 	{
 		var isValid = document.formvalidator.isValid(form);
@@ -293,9 +298,10 @@ Joomla.submitform = function(task, form, validate)
 		}
 	}
 
-	// Modify form task after JS validation has run
-	if (task && task_field_exists) {
-		form.task.value = task;
+	// Modify form 's task field after JS validation has run
+	if (form_task && task_field_exists)
+	{
+		form.task.value = form_task;
 	}
 
 	// Suppress validateForm() of htm5fallback.js
