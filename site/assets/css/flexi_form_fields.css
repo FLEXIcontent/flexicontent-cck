@@ -1038,6 +1038,12 @@ table.fc_uploader_header_tbl td:last-child {
 	display: inline-block;
 	vertical-align: top;
 	border-width: 0px !important;
+	color: unset;
+	background: unset;
+	font-weight: unset;
+	text-align: right;
+	font-size: 110%;
+	font-family: times;
 }
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon {
 	padding: 4px 6px 4px 20px !important;

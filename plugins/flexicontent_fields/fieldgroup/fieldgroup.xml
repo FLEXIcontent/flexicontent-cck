@@ -44,7 +44,14 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS" description="" depend_class="" level="level2" />
+			<field name="form_empty_fields" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_DISPLAY" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_DISPLAY_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="form_empty_fields">FLEXI_NO</option>
+				<option value="1" show_list="form_empty_fields" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="form_empty_fields_text" type="text" default="FLEXI_NA" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT_DESC" depend_class="form_empty_fields"/>
+		
 			<field name="" type="separator" default="Compact editing" description="" depend_class="" level="level2" />
 			<field name="compact_edit_global" type="radio" default="0" label="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

@@ -436,11 +436,18 @@ class FlexicontentFields
 			return;
 		}
 
+		// Check field is assigned to current item type
+		else if (!isset($item->fields[$field->name]))
+		{
+			$field->html = null; //array('<span class="alert alert-info">' . JText::_('FLEXI_NOT_ASSIGNED'). ' ' . JText::_('FLEXI_TO') . ' ' . JText::_('FLEXI_TYPE') . '</span>');
+			return;
+		}
 
-		// ***************************************************************************************
-		// Create editing HTML of the field NOTE: this is DONE only for CUSTOM fields, since form
-		// field html is created by the form itself for all CORE fields, (except for 'text' field)
-		// ***************************************************************************************
+
+		// ***
+		// *** Create editing HTML of the field NOTE: this is DONE only for CUSTOM fields, since form
+		// *** field html is created by the form itself for all CORE fields, (except for 'text' field)
+		// ***
 
 		// Check for field configured to be inside a field group and skip it
 		if ($field->parameters->get('use_ingroup', 0) && empty($field->ingroup))
@@ -613,39 +620,47 @@ class FlexicontentFields
 	{
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
-		$request_view = JRequest::getVar('view');
-		
-		// field's source code, can use this JRequest variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
-		JRequest::setVar("flexi_callview", $view);
-		
+		$app = JFactory::getApplication();
+		$request_view = $app->input->get('view', '', 'cmd');
+
+		// Field's source code, can use this HTTP request variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
+		$app->input->set('flexi_callview', $view);
+
 		static $cparams = null;
-		if ($cparams === null) {
+		if ($cparams === null)
+		{
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		}
 		
 		static $aid;
-		if ($aid === null) {
-			$user = JFactory::getUser();
-			$aid = JAccess::getAuthorisedViewLevels($user->id);
+		if ($aid === null)
+		{
+			$aid = JAccess::getAuthorisedViewLevels(JFactory::getUser()->id);
 		}
 		
 		if (is_array($_item) && is_string($_field)) ;  // ok
 		else if (is_object($_item) && is_object($_field)) ; // ok
-		else {
-			echo "renderField() must be called with: renderField(array of items, 'field_name',...) or  renderField(item object, field object,...)<br/>";
-			exit;
+		else
+		{
+			$field->$method = '<div class="alert alert-warning">renderField() must be called with: renderField(array of items, field_name, ...) or renderField(item object, field object, ...)</div>';
+			return null;
 		}
-		
+
 		// If $method (e.g. display method) is already created,
 		// then return the field object without recreating the method
 		if ( is_object($_field) && isset($_field->{$method}) ) return $_field;
-		
-		// Handle multi-item call
-		if (!is_array($_item)) {
+
+		// Single item call
+		if (!is_array($_item))
+		{
 			$all_items = array( & $_item );
 			$field_name = $_field->name;
 			$first_item_field = & $_field;
-		} else {
+		}
+
+		// Multi-item call
+		else
+		{
 			$all_items = & $_item ;
 			$field_name = $_field;
 
@@ -697,11 +712,16 @@ class FlexicontentFields
 			
 			// CHECK IF only rendering single field object for a single item  -->  thus we need to use custom values if these were given !
 			// NOTE: values are overwritten by onDisplayCoreFieldValue() of CORE fields, and only used by onDisplayFieldValue() of CUSTOM fields
-			if ( is_object($_field) && $values!==null ) {
-				// CUSTOM VALUEs give for single field rendering, TODO (maybe): in future we may make values an array indexed by item ID
+
+			// CUSTOM VALUEs give for single field rendering, TODO (maybe): in future we may make values an array indexed by item ID
+			if ( is_object($_field) && $values!==null )
+			{
 				$field->value = $values;
-			} else {
-				// CUSTOM VALUEs not given or rendering multiple items
+			}
+
+			// CUSTOM VALUEs not given or rendering multiple items
+			else if (!isset($field->value))
+			{
 				$field->value = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 			}
 			
