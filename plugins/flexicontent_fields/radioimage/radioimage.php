@@ -93,8 +93,16 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
-		$default_values= array($default_value);
+		if (self::$valueIsArr)
+		{
+			$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
+			$default_values = preg_split("/\s*,\s*/u", $default_values);
+		}
+		else
+		{
+			$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
+			$default_values= array($default_value);
+		}
 		
 		
 		// *************************
@@ -184,10 +192,9 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// Initialise property with default value
 		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
 		{
-			if (self::$valueIsArr && !empty($field->ingroup))
-				$field->value = array($default_values);
-			else
-				$field->value = $default_values;
+			$field->value = self::$valueIsArr && !empty($field->ingroup)
+				? array($default_values)
+				: $default_values;
 		}
 		
 		// CSS classes of value container
@@ -245,7 +252,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			if ($use_jslib && $select2_added) $input_classes[] = 'use_select2_lib';
 			if ($required) $input_classes[] = 'required';
 
-			// Extra attributes multi-select field
+			// Attributes multi-select field
 			if (self::$valueIsArr)
 			{
 				$add_placeholder = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', 1 );
@@ -256,15 +263,23 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					. ($add_placeholder ? ' data-placeholder="'.$placeholder.'" ' : '');
 			}
 
-			// Extra attributes
+			// Attribute for default value(s)
 			if (!empty($default_values))
+			{
 				$attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
+			}
+
+			// Client-side Validation and sortable class
 			if (self::$valueIsArr)
 			{
 				if ($max_values || $min_values || $exact_values)
+				{
 					$input_classes[] = 'validate-sellimitations';
+				}
 				if ($sortable)
+				{
 					$input_classes[] = 'fc_select2_sortable';
+				}
 			}
 		}
 
@@ -286,14 +301,16 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			
 			if ( isset($byIds[$cascade_after]) )
 			{
+				$master_field = $byIds[$cascade_after];
 				$cascade_prompt = $field->parameters->get('cascade_prompt', '');
-				$cascade_prompt = $cascade_prompt ? JText::_($cascade_prompt) : JText::_('FLEXI_PLEASE_SELECT').': '.$byIds[$cascade_after]->label;
+				$cascade_prompt = $cascade_prompt ? JText::_($cascade_prompt) : JText::_('FLEXI_PLEASE_SELECT') . ': ' . $master_field->label;
 				
-				$srcELid = 'custom_'.$byIds[$cascade_after]->name;
+				$srcELid = 'custom_' . $master_field->name;
 				$trgELid = $elementid;
+				$single_master = ! $master_field->parameters->get('use_ingroup', 0) && !$master_field->parameters->get('multiple', 0);
 				
 				// Get values of cascade (on) source field
-				$field->valgrps = $byIds[$cascade_after]->value ? $byIds[$cascade_after]->value : array();
+				$field->valgrps = $master_field->value ? $master_field->value : array();
 				foreach($field->valgrps as & $vg)
 				{
 					if (!is_array($vg))
@@ -453,15 +470,21 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				";
 			
 			// Listen to the changes of depends-on-master field
-			if ($cascade_after) $js .= "
+			if ($cascade_after)
+			{
+				$mvno = $single_master ? "'0'" : "rowNo";
+				$js .= "
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
 					return function () {
-						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+rowNo+', input.".$srcELid."_'+rowNo, '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".self::$promptEnabled.", rowNo);
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+".$mvno."+', input.".$srcELid."_'+".$mvno.", '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".self::$promptEnabled.", rowNo);
 					}
 				}(uniqueRowNum".$field->id.");
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."]();
 				";
-			else {
+			}
+
+			else
+			{
 				$js .= "
 				jQuery('#".$elementid."_'+uniqueRowNum".$field->id.").each(function() {
 					var el = jQuery(this);
@@ -578,7 +601,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			}
 
 			// Skip empty if not in field group, and at least one value was added
-			if ( !count($value) && !$use_ingroup && $n)  continue;
+			if (!count($value) && !$use_ingroup && $n)  continue;
 
 			// Only if needed ...
 			if (!$ajax || !$display_as_select)
@@ -636,6 +659,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				$form_field = $opentag . implode($separator, $options) . $closetag;
 			}
 
+			// Rendering field during initial form loading (non-AJAX)
 			if (!$ajax)
 			{
 				// Set order of selected values for the case that field is sortable
@@ -668,16 +692,21 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				</div>
 				');
 				
-				// Listen to the changes of depends-on-master field
-				if ($cascade_after && !$ajax) $per_val_js .= "
-					fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
-						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".self::$promptEnabled.", ".$n.");
-					}
-					fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
-				";
+				// Listen to the changes of depends-on-master field (non-AJAX)
+				// NOTE: Add listening code only for value 0 if listening to single master value
+				if ($cascade_after)
+				{
+					$mvno = $single_master ? '0' : $n;
+					$per_val_js .= "
+						fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
+							fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".self::$promptEnabled.", ".$n.");
+						}
+						fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
+					";
+				}
 			}
 
-			// Non AJAX
+			// Rendering field via AJAX call
 			else
 			{
 				$field->html = !$display_as_select ? $form_field : JHTML::_('select.options', $options, 'value', 'text', $value, $translate = false);
@@ -756,7 +785,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 	}
 
 
-	function & getLimitedProps(&$field, &$item, $cascade_prompt=null, $ajax=false, $i=0, $row_values = array())
+	function & getLimitedProps($field, $item, $cascade_prompt=null, $ajax=false, $i=0, $row_values = array())
 	{
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
@@ -766,8 +795,29 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 
 		if ($cascade_after)
 		{
+			$_fields = FlexicontentFields::getFieldsByIds(array($cascade_after), array($item->id));
+			if (!isset($_fields[$cascade_after]))
+			{
+				return array('Master field not found');
+			}
+			$master_field = $_fields[$cascade_after];
+			FlexicontentFields::loadFieldConfig($master_field, $item);
+
 			$cascade_prompt = $cascade_prompt ?: JText::_('FLEXI_PLEASE_SELECT') . ' ' . JText::_('FLEXI_ABOVE');
-			$valgrps = $ajax ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
+
+			$single_master = ! $master_field->parameters->get('use_ingroup', 0) && !$master_field->parameters->get('multiple', 0);
+			$valgrps = $ajax || $single_master ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
+
+			// If using a multi-value per value field (checkbox / multi-select) then account for the fact that every of its values can be an array
+			if (self::$valueIsArr && $valgrps)
+			{
+				foreach($valgrps as $vg)
+				{
+					$_valgrps[] = is_array($vg) ? reset($vg) : $vg;
+				}
+				$valgrps = $_valgrps;
+			}
+
 			if (empty($valgrps))
 			{
 				$elements = array();
@@ -813,7 +863,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 				return $elements;
 			}
 		}
-		
+
 		else  // Elements mode
 		{
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
