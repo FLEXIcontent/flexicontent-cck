@@ -51,7 +51,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		$compact_edit = $field->parameters->get('compact_edit', 0);
-		
+		$form_empty_fields = $field->parameters->get('form_empty_fields', 1);
+		$form_empty_fields_text = JText::_($field->parameters->get('form_empty_fields_text', 'FLEXI_NA'));
+
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -310,7 +312,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 		
 		
-		if ($compact_edit) {
+		if ($compact_edit)
+		{
 			$compact_edit_excluded = $field->parameters->get('compact_edit_excluded', array());
 			if ( empty($compact_edit_excluded) )  $compact_edit_excluded = array();
 			if ( !is_array($compact_edit_excluded) )  $compact_edit_excluded = preg_split("/[\|,]/", $compact_edit_excluded);
@@ -342,11 +345,23 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
 				}
 
+				// Check for not-assigned to type fields, 
+				if (!isset($grouped_field->html[$n]))
+				{
+					if ($form_empty_fields)
+					{
+						$grouped_field->html[$n] = '<i>' . $form_empty_fields_text . '</i>';
+					}
+					else continue;
+				}
+
 				$lbl_class = 'flexi label sub_label';
 				$lbl_title = '';
-				// field has tooltip
+
+				// Field has tooltip
 				$edithelp = $grouped_field->edithelp ? $grouped_field->edithelp : 1;
-				if ( $grouped_field->description && ($edithelp==1 || $edithelp==2) ) {
+				if ( $grouped_field->description && ($edithelp==1 || $edithelp==2) )
+				{
 					 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon ' : ' ') .$tooltip_class;
 					 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $grouped_field->description, 0, 1);
 				}
@@ -355,8 +370,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'">
 					<label id="custom_'.$grouped_field->name.'_'.$n.'-lbl" class="'.$lbl_class.'" title="'.$lbl_title.'" data-for="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
 					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >
-						'.($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '').'
-						'.@ $grouped_field->html[$n].'
+						' . ($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '') . '
+						' . $grouped_field->html[$n] . '
 					</div>
 				</div>
 				';
@@ -430,10 +445,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		
+
 		// Use custom HTML display parameter
 		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
-		
+
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -441,24 +456,33 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-		
+
 		// Microdata (classify the field group values for search engines)
 		// we use itemtype and not itemprop as it is more appropriate for the a grouping field
 		$fieldgroup_itemtype      = $field->parameters->get('fieldgroup_itemtype');
 		$fieldgroup_itemtype_code = $fieldgroup_itemtype ? 'itemscope itemtype="http://schema.org/'.$fieldgroup_itemtype.'"' : '';
-		
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+
+		if ($pretext)
+		{
+			$pretext = $remove_space ? $pretext : $pretext . ' ';
+		}
+		if ($posttext)
+		{
+			$posttext = $remove_space ? $posttext : ' ' . $posttext;
+		}
+
 		if (!$pretext && !$posttext && !$display_mode)
 		{
 			$pretext = '<div class="fc-fieldgrp-value-box">';
 			$posttext = '</div>';
 		}
-		if ($fieldgroup_itemtype_code) {
+
+		if ($fieldgroup_itemtype_code)
+		{
 			$pretext = '<div '.$fieldgroup_itemtype_code.' style="display:inline-block;">'.$pretext;
 			$posttext = $posttext.'</div>';
 		}
-		
+
 		switch($separatorf)
 		{
 			case 0:
@@ -489,39 +513,47 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$separatorf = '&nbsp;';
 			break;
 		}
-		
-		
+
+
 		// Get fields belonging to this field group
 		$grouped_fields = $this->getGroupFields($field);
-		
+
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 0;
 		$this->getGroupFieldsValues($field, $item, $grouped_fields, $max_count);
-		
-		
-		// **********************************************
-		// Create a CUSTOMIZED display of the field group
-		// **********************************************
-		
+
+
+		// ***
+		// *** Create a CUSTOMIZED display of the field group
+		// ***
+
 		if ( $display_mode )
 		{
 			$custom_html = trim($field->parameters->get( 'custom_html', '' )) ;
 			$field->{$prop} = $this->_createDisplayHTML($field, $item, $grouped_fields, $custom_html, $max_count, $pretext, $posttext);
 		}
-		
-		
-		// *********************************************
-		// Create the DEFAULT display of the field group
-		// *********************************************
-		
-		else {
+
+
+		// ***
+		// *** Create the DEFAULT display of the field group
+		// ***
+
+		else
+		{
 			// Render HTML of fields in the group
 			$method = 'display';
-			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+			$app = JFactory::getApplication();
+			$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 			foreach($grouped_fields as $_grouped_field)
 			{
-				// Get item's field object, set 'value' and 'ingroup' properties
+				// Check field is assigned to current item type, and get item's field object
+				if (!isset($item->fields[$_grouped_field->name]))
+				{
+					continue;
+				}
 				$grouped_field = $item->fields[$_grouped_field->name];
+
+				// Set 'value' and 'ingroup' properties
 				$grouped_field->value = $_grouped_field->value;
 				$grouped_field->ingroup = 1;  // render as array
 				$_values = null;
@@ -550,22 +582,31 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					unset($grouped_field->{$method.'_non_arr'});
 				}
 			}
-			
+
 			// Get labels to hide on empty values
 			$hide_lbl_ifnoval = $this->getHideLabelsOnEmpty($field);
-			
+
 			// Render the list of groups
 			$field->{$prop} = array();
 
-			for($n=0; $n < $max_count; $n++)
+			for ($n=0; $n < $max_count; $n++)
 			{
 				$default_html = array();
 				foreach($grouped_fields as $_grouped_field)
 				{
+					// Check field is assigned to current item type, and get item's field object
+					if (!isset($item->fields[$_grouped_field->name]))
+					{
+						continue;
+					}
 					$grouped_field = $item->fields[$_grouped_field->name];
+
 					// Skip (hide) label for field without value (is such behaviour was configured)
-					if ( (!isset($grouped_field->{$method.'_arr'}[$n]) || !strlen($grouped_field->{$method.'_arr'}[$n]))  &&  isset($hide_lbl_ifnoval[$grouped_field->id]) ) continue;
-					
+					if ( (!isset($grouped_field->{$method.'_arr'}[$n]) || !strlen($grouped_field->{$method.'_arr'}[$n]))  &&  isset($hide_lbl_ifnoval[$grouped_field->id]) )
+					{
+						continue;
+					}
+
 					// Add field's HTML (optionally including label)
 					$default_html[] = '
 					<div class="fc-field-box">
@@ -636,7 +677,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$_rendered_fields = array();
 		if ( count($gf_names) )
 		{
-			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));;
+			$app = JFactory::getApplication();
+			$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 			$gf_props = array();
 			foreach($gf_names as $pos => $grp_field_name)
 			{
