@@ -64,17 +64,20 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 
 //$this->folder_mode = 1; // test
 //$this->CanViewAllFiles = 0; // test
+$isFilesElement = $this->view == 'fileselement';
 
 // Calculate count of shown columns 
-$list_total_cols = 16;
+$list_total_cols = $isFilesElement ? 14 : 16;
 if ($this->folder_mode) $list_total_cols -= 7;
 
 // Optional columns
-if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0) $list_total_cols -= (count($this->optional_cols) - count($this->cols));
+if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0)
+{
+	$list_total_cols -= (count($this->optional_cols) - count($this->cols));
+}
 
 
 // Calculated configuration values
-$isFilesElement = $this->view == 'fileselement';
 $isAdmin = $app->isAdmin();
 $dbFolder = !strlen($this->target_dir) || $this->target_dir==2  ?  ''  :  ($this->target_dir==0 ? 'M' : 'S');
 $_tmpl = $isFilesElement ? 'component' : '';
@@ -358,7 +361,7 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
+		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
 			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,
@@ -1002,7 +1005,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 			</tfoot>
 		<?php endif; ?>
-			
+
 			</table>
 
 			<div id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminthumbs fcmanthumbs fman_grid_element" style="display: none;">
@@ -1559,6 +1562,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 
 	<!-- File(s) from server Form -->
+<?php if (!$isFilesElement) : ?>
 	
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'filefromserver' );*/ ?>
 	<div class="tabbertab" id="server_tab" data-icon-class="icon-stack">
@@ -1675,24 +1679,26 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 	</div>
 
 
-			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_FILEMAN_INFO' ), 'fileinfo' );*/ ?>
-			<div class="tabbertab" id="fileman_info_tab" data-icon-class="icon-info">
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_INFO' ); ?> </h3>
-				<div id="why_box" class="info-box">
-					<h3>Why a DB-based filemanager ?</h3>
-					<ul>
-						<li>To keep track of <strong>file usage</strong> inside content (<strong>assigned</strong> items column in this page)</li>
-						<li>To <strong>prevent direct access</strong> to files, allowing only indirect access, thus also hiding file's real path (* <strong>file / image-gallery fields</strong>)</li>
-						<li>To add <strong>more control</strong> over the download <sup>1</sup>(<strong>file field</strong>) <br/>
-							&nbsp; &nbsp; a. gathering <strong>hits</strong> and other statistics <br/>
-							&nbsp; &nbsp; b. adding <strong>access</strong> control to the files, and more (e.g. download coupons <sup>1</sup>)</li>
-						<li>To better handle a <strong>SET of re-usable</strong> images <sup>2,3</sup>(<strong>image-gallery field</strong> in DB-mode)</li>
-					</ul>
-					<p class="well"><sup>1</sup> Each new version may add more statistics and/or more download control<br/>
-						<sup>2</sup> If images are <strong>not reusable</strong>, please do NOT use the DB-mode in image-gallery field, instead use <strong>'folder mode'</strong><br/>
-						<sup>3</sup> If user can not add extra images and/or you need filtering in item listings, then instead use <strong>checkbox-image or radio-image fields</strong></p>
-				</div>
-			</div>
+	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_FILEMAN_INFO' ), 'fileinfo' );*/ ?>
+	<div class="tabbertab" id="fileman_info_tab" data-icon-class="icon-info">
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_INFO' ); ?> </h3>
+		<div id="why_box" class="info-box">
+			<h3>Why a DB-based filemanager ?</h3>
+			<ul>
+				<li>To keep track of <strong>file usage</strong> inside content (<strong>assigned</strong> items column in this page)</li>
+				<li>To <strong>prevent direct access</strong> to files, allowing only indirect access, thus also hiding file's real path (* <strong>file / image-gallery fields</strong>)</li>
+				<li>To add <strong>more control</strong> over the download <sup>1</sup>(<strong>file field</strong>) <br/>
+					&nbsp; &nbsp; a. gathering <strong>hits</strong> and other statistics <br/>
+					&nbsp; &nbsp; b. adding <strong>access</strong> control to the files, and more (e.g. download coupons <sup>1</sup>)</li>
+				<li>To better handle a <strong>SET of re-usable</strong> images <sup>2,3</sup>(<strong>image-gallery field</strong> in DB-mode)</li>
+			</ul>
+			<p class="well"><sup>1</sup> Each new version may add more statistics and/or more download control<br/>
+				<sup>2</sup> If images are <strong>not reusable</strong>, please do NOT use the DB-mode in image-gallery field, instead use <strong>'folder mode'</strong><br/>
+				<sup>3</sup> If user can not add extra images and/or you need filtering in item listings, then instead use <strong>checkbox-image or radio-image fields</strong></p>
+		</div>
+	</div>
+
+<?php endif; ?>
 
 <?php /* echo JHtml::_('tabs.end'); */ ?>
 </div><!-- .fctabber end -->

@@ -392,9 +392,16 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			die(__FUNCTION__.'(): Field for field id:' . $fieldid . ' was not found');
 		}
 
+		// Load XML file of field
+		$plugin_path = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $field->field_type . DS . $field->field_type . '.xml';
+		$form = new JForm('com_flexicontent.field.' . $field->field_type, array('control' => 'jform', 'load_data' => false));
+		$form->load(file_get_contents($plugin_path), false, '/extension/config');
+
+		$image_source_exists = (bool) $form->getField('image_source', 'attribs');
+		$image_source = $image_source_exists ? (int) $field->parameters->get('image_source', 1) : null;
+
 		// Currently we only handle image_source '1'
-		$image_source = $field->parameters->get('image_source', 1);
-		if ($image_source==1)
+		if ($image_source===1)
 		{
 			$gallery_path_arr[] = 'item_' . $itemid;
 			$gallery_path_arr[] = 'field_' . $fieldid;
@@ -402,7 +409,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 				JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent')
 				. DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
 		}
-		else if ($image_source==0)
+		else if ($image_source===0 || $image_source===null)
 		{
 			$gallery_path = !empty($options['secure']) ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
 		}
