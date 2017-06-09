@@ -1773,11 +1773,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			$thumb_size = $field->parameters->get('thumbincatview',1);
 		else if ($view == FLEXI_ITEMVIEW)
 			$thumb_size = $field->parameters->get('thumbinitemview',2);
-		
-		
-		// ***************
-		// The values loop
-		// ***************
+
+		// Cutoff title to a max length
+		$alt_image_prefix = flexicontent_html::striptagsandcut($item->title, 60) . ' ' . JText::_('FLEXI_IMAGE') . ' ';
+
+
+		// ***
+		// *** The values loop
+		// ***
 
 		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
 		$i = -1;
@@ -1822,14 +1825,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			// ***
 
 			// Optional properties
-			$title	= ($usetitle && @$value['title']) ? $value['title'] : '';
-			$alt	= ($usealt && @$value['alt']) ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
-			$desc	= ($usedesc && @$value['desc']) ? $value['desc'] : '';
+			$title	= ($usetitle && isset($value['title'])) ? $value['title'] : '';
+			$alt	= ($usealt && isset($value['alt'])) ? $value['alt'] : $alt_image_prefix . ($n + 1);
+			$desc	= ($usedesc && isset($value['desc'])) ? $value['desc'] : '';
 			
 			// Optional custom properties
-			$cust1	= ($usecust1 && @$value['cust1']) ? $value['cust1'] : '';
+			$cust1	= ($usecust1 && isset($value['cust1'])) ? $value['cust1'] : '';
 			$desc .= $cust1 ? $cust1_label.': '.$cust1 : '';  // ... Append custom properties to description
-			$cust2	= ($usecust2 && @$value['cust2']) ? $value['cust2'] : '';
+			$cust2	= ($usecust2 && isset($value['cust2'])) ? $value['cust2'] : '';
 			$desc .= $cust2 ? $cust2_label.': '.$cust2 : '';  // ... Append custom properties to description
 			
 			// HTML encode output
@@ -1844,15 +1847,18 @@ class plgFlexicontent_fieldsImage extends FCField
 			$srco = (is_array($orig_urlpath) ? $orig_urlpath[$i] : $orig_urlpath)  . '/'   .$image_name;  // original image
 			
 			// Create a popup url link
-			$urllink = @$value['urllink'] ? $value['urllink'] : '';
+			$urllink = isset($value['urllink']) ? $value['urllink'] : '';
 			//if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 			
 			// Create a popup tooltip (legend)
 			$class = 'fc_field_image';
-			if ($uselegend && (!empty($title) || !empty($desc) ) ) {
+			if ($uselegend && (!empty($title) || !empty($desc)))
+			{
 				$class .= ' '.$tooltip_class;
 				$legend = ' title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
-			} else {
+			}
+			else
+			{
 				$legend = '';
 			}
 			
