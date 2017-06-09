@@ -155,10 +155,10 @@
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
-						
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_LABEL" level="level3" />
-			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="pretext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
@@ -236,8 +236,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="pretext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" filter="raw" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 
 			<field name="opentag_closetag_separatorf_disabled_ingroup" type="separator" label="" default="FLEXI_OPENTAG_CLOSETAG_SEPARATORF_DISABLED_INGROUP" description="" class="alert fcpadded" depend_class="fieldgroupon" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
@@ -437,8 +437,8 @@
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_LABEL" level="level2" />
 			<field name="pretext_filter_s" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_filter_s" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<field name="opentag_filter_s" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag_filter_s" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			<field name="opentag_filter_s" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag_filter_s" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_close" box_type="1" />
 		</fieldset>
