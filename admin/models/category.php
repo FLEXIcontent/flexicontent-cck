@@ -316,9 +316,8 @@ class FlexicontentModelCategory extends FCModelAdmin
 			. ' WHERE id = ' . (int)$id
 			;
 		$this->_db->setQuery($query);
-		if (!$this->_db->execute()) {
-			return false;
-		}
+		$this->_db->execute();
+
 		return true;
 	}
 

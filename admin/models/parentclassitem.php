@@ -4301,11 +4301,6 @@ class ParentClassItem extends FCModelAdmin
 					;
 			$this->_db->setQuery( $query );
 			$cids = $this->_db->loadObjectList();
-			
-			if (!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
 		}
 
 		return $cids;

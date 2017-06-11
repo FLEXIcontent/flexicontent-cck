@@ -412,10 +412,7 @@ class FlexicontentModelCategories extends JModelList
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			$this->_db->execute();
 		}
 		return $cid;
 	}

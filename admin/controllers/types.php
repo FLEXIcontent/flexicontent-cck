@@ -63,7 +63,6 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$this->registerTask( 'apply_ajax',   'save' );
 		$this->registerTask( 'save2new',     'save' );
 		$this->registerTask( 'save2copy',    'save' );
-		$this->registerTask( 'copy',         'copy' );
 
 		$this->option = $this->input->get('option', '', 'cmd');
 		$this->task   = $this->input->get('task', '', 'cmd');
@@ -112,7 +111,6 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$user  = JFactory::getUser();
 
 		// Retrieve form data these are subject to basic filtering
-		$task  = $this->getTask();
 		$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data, validation will follow via jform
 
 		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
@@ -131,7 +129,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$record = $model->getItem();
 
 		// The save2copy task needs to be handled slightly differently.
-		if ($task == 'save2copy')
+		if ($this->task == 'save2copy')
 		{
 			// Check-in the original row.
 			if ($model->checkin($data['id']) === false)
@@ -150,7 +148,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			$isnew = 1;
 			$data['id'] = 0;
 			$data['associations'] = array();
-			$task = 'apply';
+			$this->task = 'apply';
 
 			// Keep existing model data (only clear ID)
 			$model->set('id', 0);
@@ -236,7 +234,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		// Checkin the record
 		$model->checkin();
 
-		switch ($task)
+		switch ($this->task)
 		{
 			case 'apply' :
 				$link = 'index.php?option=com_flexicontent&view=' . $this->record_name . '&id='.(int) $model->get('id');
@@ -260,8 +258,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 			jexit(flexicontent_html::get_system_messages_html());
 		}
 	}
-	
-	
+
+
 	/**
 	 * Check in a record
 	 *
@@ -275,8 +273,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$redirect_url = $this->returnURL;
 		flexicontent_db::checkin($this->records_jtable, $redirect_url, $this);
 	}
-	
-	
+
+
 	/**
 	 * Logic to publish records
 	 *
@@ -633,7 +631,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 
 
 	/**
-	 * Logic to set the access level of the Types
+	 * Logic to duplicate a Type
 	 *
 	 * @access public
 	 * @return void
