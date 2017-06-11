@@ -651,12 +651,7 @@ class flexicontent_items extends _flexicontent_items {
 			$query->set('asset_id = '.(int) $this->asset_id);
 			$query->where( $this->_db->quoteName( $k ) .' = '.(int) $this->$k);
 			$this->_db->setQuery($query);
-
-			if (!$this->_db->execute()) {
-				$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
-				$this->setError($e);
-				return false;
-			}
+			$this->_db->execute();
 		}
 		return true;
 	}

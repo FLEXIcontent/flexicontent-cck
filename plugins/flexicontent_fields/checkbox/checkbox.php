@@ -809,7 +809,7 @@ class plgFlexicontent_fieldsCheckbox extends FCField
 			$valgrps = $ajax || $single_master ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
 
 			// If using a multi-value per value field (checkbox / multi-select) then account for the fact that every of its values can be an array
-			if (self::$valueIsArr && $valgrps)
+			if ($valgrps)
 			{
 				foreach($valgrps as $vg)
 				{

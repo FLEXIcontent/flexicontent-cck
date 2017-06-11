@@ -59,6 +59,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Register task aliases
 		$this->registerTask( 'uploads', 	'upload' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'apply_ajax',   'save' );
+		$this->registerTask( 'save2new',     'save' );
+		$this->registerTask( 'save2copy',    'save' );
 
 		$this->option = $this->input->get('option', '', 'cmd');
 		$this->task   = $this->input->get('task', '', 'cmd');
@@ -91,6 +95,214 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$this->returnURL = null;
 			}
 		}
+
+		// Can manage ACL
+		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
+	}
+
+
+	/**
+	 * Logic to save a record
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function save()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+
+		// Retrieve form data these are subject to basic filtering
+		$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data, validation will follow via jform
+
+		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
+		$data['id'] = $data ? (int) $data['id'] : $this->input->get('id', 0, 'int');
+		$isnew = $data['id'] == 0;
+
+		// Extra steps before creating the model
+		if ($isnew)
+		{
+			// Nothing needed
+		}
+
+		// Get the model
+		$model = $this->getModel($this->record_name);
+		$model->setId($data['id']);  // Make sure id is correct
+		$record = $model->getItem();
+
+		// The save2copy task needs to be handled slightly differently.
+		if ($this->task == 'save2copy')
+		{
+			// Check-in the original row.
+			if ($model->checkin($data['id']) === false)
+			{
+				// Check-in failed
+				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
+				$this->setMessage($this->getError(), 'error');
+
+				// For errors, we redirect back to refer
+				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+
+				return false;
+			}
+
+			// Reset the ID, the multilingual associations and then treat the request as for Apply.
+			$isnew = 1;
+			$data['id'] = 0;
+			$data['associations'] = array();
+			$this->task = 'apply';
+
+			// Keep existing model data (only clear ID)
+			$model->set('id', 0);
+			$model->setProperty('_id', 0);
+		}
+
+		// Calculate access
+		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
+		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
+		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
+		$is_authorised = !$record->id
+			? $canupload
+			: $canedit || $caneditown;
+
+		// Check access
+		if ( !$is_authorised )
+		{
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->setHeader('status', 403, true);
+			$this->setRedirect($this->returnURL);
+
+			if ($this->input->get('fc_doajax_submit'))
+				jexit(flexicontent_html::get_system_messages_html());
+			else
+				return false;
+		}
+
+		// Validation with JForm
+		$data = $this->input->post->getArray();  // Default filtering will remove HTML
+		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
+		$data['hits'] = (int) $data['hits'];
+		$data['secure'] = $data['secure'] ? 1 : 0;   // only allow 1 or 0
+		$data['stamp']  = $data['stamp']  ? 1 : 0;   // only allow 1 or 0
+		$data['url']    = $data['url']    ? 1 : 0;   // only allow 1 or 0
+
+		// CASE local file
+		if (!$data['url'])
+		{
+			$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+			$file_path = JPath::clean($path . $data['filename']);
+
+			// Get file size from filesystem (local file)
+			$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
+		}
+
+		// CASE file URL
+		else
+		{
+		  // Validate file URL
+			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
+
+			if ( empty($data['size']) )
+			{
+				$data['size'] = $this->get_file_size_from_url($data['filename_original']);
+				if ($data['size'] < 0 || empty($data['size']))
+				{
+					$data['size'] = 0;
+				}
+			}
+			else
+			{
+				// Get file size from submitted field (file URL), set to zero if no size unit specified
+				$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
+				$size_unit = (int) @ $arr_sizes[$data['size_unit']];
+				$data['size'] = ((int)$data['size']) * $size_unit;
+			}
+		}
+
+		// Validate access level exists (set to public otherwise)
+		$data['access'] = flexicontent_html::dataFilter($data['access'], 11, 'ACCESSLEVEL', 0);
+
+		if (!$model->store($data))
+		{
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$this->setRedirect($this->returnURL, JText::_('FLEXI_ERROR_SAVING_FILENAME') . ' : ' . $model->getError(), 'error');
+			return;
+		}
+
+		// Clear dependent cache data
+		$this->_clearCache();
+
+		// Checkin the record
+		$model->checkin();
+
+		switch ($this->task)
+		{
+			case 'apply' :
+				$link = 'index.php?option=com_flexicontent&view=' . $this->record_name . '&id='.(int) $model->get('id');
+				break;
+
+			case 'save2new' :
+				$link = 'index.php?option=com_flexicontent&view=' . $this->record_name;
+				break;
+
+			default :
+				$link = $this->returnURL;
+				break;
+		}
+		$msg = JText::_( 'FLEXI_'. $this->_NAME .'_SAVED' );
+
+		$app->enqueueMessage($msg, 'message');
+		$this->setRedirect($link);
+
+		if ($this->input->get('fc_doajax_submit'))
+		{
+			jexit(flexicontent_html::get_system_messages_html());
+		}
+	}
+
+
+	/**
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	function checkin()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		$redirect_url = $this->returnURL;
+		flexicontent_db::checkin($this->records_jtable, $redirect_url, $this);
+	}
+
+
+	/**
+	 * Logic to publish a file, this WRAPPER for changeState method
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function publish()
+	{
+		$this->changeState(1);   // Security checks are done by the called method
+	}
+
+
+	/**
+	 * Logic to unpublish a file, this WRAPPER for changeState method
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function unpublish()
+	{
+		$this->changeState(0);   // Security checks are done by the called method
 	}
 
 
@@ -737,7 +949,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 
 	/**
-	 * Logic for editing a file
+	 * Logic to create the view for record editing
 	 *
 	 * @access public
 	 * @return void
@@ -803,6 +1015,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$view->display();
 	}
 
+
+	/**
+	 * Method for clearing cache of data depending on records type
+	 *
+	 * return: string
+	 * 
+	 * @since 3.2.0
+	 */
+	private function _clearCache()
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+	}
 
 	/**
 	 * Logic to delete files
@@ -973,109 +1200,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	}
 
 
-	/**
-	 * Logic for saving altered file data
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function save()
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$app    = JFactory::getApplication();
-		$user		= JFactory::getUser();
-		$model	= $this->getModel('file');
-		$record	= $model->getItem();
-
-		$data = $this->input->post->getArray();  // Default filtering will remove HTML
-		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
-		$data['hits'] = (int) $data['hits'];
-
-		// calculate access
-		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
-		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
-		$caneditown = $user->authorise('flexicontent.editownfile', 'com_flexicontent') && $user->get('id') && $record->uploaded_by == $user->get('id');
-		$is_authorised = !$record->id
-			? $canupload
-			: $canedit || $caneditown;
-
-		// check access
-		if ( !$is_authorised )
-		{
-			$app->setHeader('status', '403 Forbidden', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
-			return;
-		}
-
-		$data['secure'] = $data['secure'] ? 1 : 0;   // only allow 1 or 0
-		$data['stamp']  = $data['stamp']  ? 1 : 0;   // only allow 1 or 0
-		$data['url']    = $data['url']    ? 1 : 0;   // only allow 1 or 0
-
-		// CASE local file
-		if (!$data['url'])
-		{
-			$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-			$file_path = JPath::clean($path . $data['filename']);
-
-			// Get file size from filesystem (local file)
-			$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
-		}
-
-		// CASE file URL
-		else
-		{
-		  // Validate file URL
-			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
-
-			if ( empty($data['size']) )
-			{
-				$data['size'] = $this->get_file_size_from_url($data['filename_original']);
-				if ($data['size'] < 0 || empty($data['size']))
-				{
-					$data['size'] = 0;
-				}
-			}
-			else
-			{
-				// Get file size from submitted field (file URL), set to zero if no size unit specified
-				$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
-				$size_unit = (int) @ $arr_sizes[$data['size_unit']];
-				$data['size'] = ((int)$data['size']) * $size_unit;
-			}
-		}
-
-		// Validate access level exists (set to public otherwise)
-		$data['access'] = flexicontent_html::dataFilter($data['access'], 11, 'ACCESSLEVEL', 0);
-
-		if (!$model->store($data))
-		{
-			$app->setHeader('status', '500 Internal Server Error', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_ERROR_SAVING_FILENAME') . ' : ' . $model->getError(), 'error');
-			return;
-		}
-
-		$model->checkin();
-
-		$cache = JFactory::getCache('com_flexicontent');
-		$cache->clean();
-
-		switch ($this->task)
-		{
-			case 'apply' :
-				$edit_task = "task=filemanager.edit";
-				$link = 'index.php?option=com_flexicontent&'.$edit_task.'&cid[]='.(int) $model->get('id');
-				break;
-
-			default :
-				$link = 'index.php?option=com_flexicontent&view=filemanager';
-				break;
-		}
-		$this->setRedirect($link, JText::_('FLEXI_FILE_SAVED'));
-	}
-
 
 	/**
 	 * logic for cancel an action
@@ -1094,47 +1218,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$this->input->set('cid', $id);
 
 		$this->checkin();
-	}
-
-
-	/**
-	 * Check in a record
-	 *
-	 * @since	1.5
-	 */
-	function checkin()
-	{
-		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-
-		$redirect_url = $this->returnURL;
-		flexicontent_db::checkin($this->records_jtable, $redirect_url, $this);
-	}
-
-
-	/**
-	 * Logic to publish a file, this WRAPPER for changeState method
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function publish()
-	{
-		$this->changeState(1);   // Security checks are done by the called method
-	}
-
-
-	/**
-	 * Logic to unpublish a file, this WRAPPER for changeState method
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function unpublish()
-	{
-		$this->changeState(0);   // Security checks are done by the called method
 	}
 
 

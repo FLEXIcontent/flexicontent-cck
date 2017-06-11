@@ -346,7 +346,8 @@ class flexicontent_categories extends _flexicontent_categories
 		}
 		
 		// NOT NEEDED handle by parent::store()
-		/*if (isset($this->asset_id)) {
+		/*if (isset($this->asset_id))
+		{
 			$asset	= JTable::getInstance('Asset');
 			if (!$asset->load($this->asset_id)) {
 				$name = $this->_getAssetName();
@@ -357,12 +358,7 @@ class flexicontent_categories extends _flexicontent_categories
 				$query->set('asset_id = '.(int)$asset->id);
 				$query->where('id = '.(int) $this->id);
 				$this->_db->setQuery($query);
-				
-				if (!$this->_db->execute()) {
-					$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
-					$this->setError($e);
-					return false;
-				}
+				$this->_db->execute();
 			}
 		}*/
 		
@@ -377,11 +373,6 @@ class flexicontent_categories extends _flexicontent_categories
 				;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
-			if (!$this->_db->execute()) {
-				$e = new JException(JText::sprintf($this->_db->getErrorMsg()));
-				$this->setError($e);
-				return false;
-			}
 		}
 		
 		return $result;

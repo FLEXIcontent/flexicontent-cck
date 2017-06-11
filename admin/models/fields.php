@@ -457,10 +457,7 @@ class FlexicontentModelFields extends JModelList
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 				;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			$this->_db->execute();
 		}
 		return true;
 	}
@@ -917,13 +914,7 @@ class FlexicontentModelFields extends JModelList
 				. ' AND type_id = ' . $filter_type
 				;
 				$this->_db->setQuery( $query );
-
-				if (!$this->_db->execute())
-				{
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
+				$this->_db->execute();
 
 				$query = 'UPDATE #__flexicontent_fields_type_relations'
 				. ' SET ordering = '.(int) $origin->ordering
@@ -931,13 +922,7 @@ class FlexicontentModelFields extends JModelList
 				. ' AND type_id = ' . $filter_type
 				;
 				$this->_db->setQuery( $query );
-	
-				if (!$this->_db->execute())
-				{
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
+				$this->_db->execute();
 
 				$origin->ordering = $row->ordering;
 			}
@@ -949,13 +934,7 @@ class FlexicontentModelFields extends JModelList
 				. ' AND type_id = ' . $filter_type
 				;
 				$this->_db->setQuery( $query );
-	
-				if (!$this->_db->execute())
-				{
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
+				$this->_db->execute();
 			}
 		return true;
 		}
@@ -1017,17 +996,12 @@ class FlexicontentModelFields extends JModelList
 					$rows[$cid[$i]]->ordering = $order[$i];
 					
 					$query = 'UPDATE #__flexicontent_fields_type_relations'
-							.' SET ordering=' . $order[$i]
-							.' WHERE type_id = ' . $filter_type
-							.' AND field_id = ' . $cid[$i]
-							;
-
+						. ' SET ordering=' . $order[$i]
+						. ' WHERE type_id = ' . $filter_type
+						. ' AND field_id = ' . $cid[$i]
+						;
 					$this->_db->setQuery($query);
-
-					if (!$this->_db->execute()) {
-						$this->setError($this->_db->getErrorMsg());
-						return false;
-					}
+					$this->_db->execute();
 				}
 			}
 

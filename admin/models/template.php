@@ -340,9 +340,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 			. '  AND position = ' . $this->_db->Quote($pos)
 			;
 		$this->_db->setQuery( $query );
-		if (!$this->_db->execute()) {
-			JError::raiseWarning( 500, $this->_db->getError() );
-		}
+		$this->_db->execute();
 	}
 	
 	/**

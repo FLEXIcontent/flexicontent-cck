@@ -63,5 +63,8 @@ site/librairies/cropper/
 
 site/librairies/phpthumb/phpThumb.config_OVERRIDE.php
 site/tasks/defines.php
-admin/assets/css/flexicontentbackend.css
-admin/assets/css/flexicontentbackend.css
+
+admin/models/forms/file.xml
+plugins/flexicontent_fields/currency/
+plugins/flexicontent_fields/mediaplayer/
+plugins/flexicontent_fields/qrcode/

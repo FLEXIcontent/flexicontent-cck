@@ -67,7 +67,7 @@ if (!$this->row->url)
 				</label>
 			</td>
 			<td>
-				<input type="text" id="filename_original" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge" maxlength="100" />
+				<input type="text" id="filename_original" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge required" maxlength="100" />
 			</td>
 		</tr>
 
