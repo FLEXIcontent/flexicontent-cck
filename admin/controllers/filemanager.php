@@ -120,7 +120,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data, validation will follow via jform
 
 		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
+<<<<<<< HEAD
 		$data['id'] = (int) $data['id'];
+=======
+		$data['id'] = $data ? (int) $data['id'] : $this->input->get('id', 0, 'int');
+>>>>>>> 1ef70877a... Fixed some issues with new features: fixed ajax apply button in file form, fixed master field updating all fieldgroup save fields broken when field type is changed in field configuration
 		$isnew = $data['id'] == 0;
 
 		// Extra steps before creating the model
