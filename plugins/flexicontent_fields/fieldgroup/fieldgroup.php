@@ -63,8 +63,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$isAdmin = $app->isAdmin();
 		
 		$tooltip_class = 'hasTooltip';
-		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
-		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$add_on_class    = 'btn'; //$cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = 'btn-group'; //$cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -288,14 +288,17 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-			$togglers = !$compact_edit ? '' : '
-				<span class="toggle_group_down '.$add_on_class.' btn btn-small btn-success" style="text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).next(), 1); return false;">
+			$_opener = !$compact_edit ? '' : '
+				<span class="toggle_group_down '.$add_on_class.' btn-success" style="vertical-align: top; text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 1); jQuery(this).prev().before(jQuery(this)); return false;">
 					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_EDIT_DETAILS' ). '
 				</span>
-				<span class="toggle_group_up   '.$add_on_class.' btn btn-small" style="text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); return false;">
+			';
+			$_closer = !$compact_edit ? '' : '
+				<span class="toggle_group_up   '.$add_on_class.'" style="vertical-align: top; text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); jQuery(this).prev().before(jQuery(this)); return false;">
 					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_DETAILS' ). '
 				</span>
 			';
+			$togglers = $compact_edit==1 ? $_opener . $_closer : $_closer . $_opener;
 		} else {
 			$remove_button = '';
 			$move2 = '';
