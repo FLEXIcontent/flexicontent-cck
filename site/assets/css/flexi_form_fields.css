@@ -1170,20 +1170,20 @@ table.fc_uploader_header_tbl td:last-child {
 	cursor: pointer;
 	background-color: white;
 }
-#flexicontent .fc-xpended-btns > .fcfield-expand-view:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-drag-handle:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-list-add:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-list-del:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-placement-h:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-placement-v:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-addvalue:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_after:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_before:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-delvalue:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-clearvalue:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-selectvalue:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-uploadvalue:not(.add-on):not(.input-group-addon),
-#flexicontent .fc-xpended-btns > .fcfield-button:not(.add-on):not(.input-group-addon),
+#flexicontent .fc-xpended-btns > .fcfield-expand-view:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-drag-handle:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-list-add:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-list-del:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-placement-h:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-placement-v:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-addvalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_after:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_before:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-delvalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-clearvalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-selectvalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-uploadvalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-button:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
 	float: none;
 	clear: none;
