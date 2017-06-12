@@ -75,10 +75,16 @@
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
-			<field name="" type="separator" default="Email" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
+			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="Email" level="level2" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
+			
 			<field name="inputmask" type="multilist" subtype="radio" default="" label="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_NO</option>
 				<option value="email">FLEXI_YES</option>
@@ -117,7 +123,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/email/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
-
+			
 			<field name="" type="separator" default="FLEXI_FIELD_EMAIL_RENDERING_OPTIONS" description="" level="level2" />
 			<field name="email_cloaking" type="radio" default="1" label="FLEXI_FIELD_EMAIL_CLOAKING" description="FLEXI_FIELD_EMAIL_CLOAKING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -173,6 +179,7 @@
 
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
+			
 		</fieldset>
 		<fieldset name="group-email-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			

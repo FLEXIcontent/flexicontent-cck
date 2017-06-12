@@ -40,7 +40,7 @@
 }
 
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded {
-	width: auto;
+	width: 100%;
 
 	.fc-field-props-box,
 	.fc-xpended-btns {
@@ -58,6 +58,9 @@
 			width: 600px;
 		}
 	}
+}
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded.floated {
+	width: auto;
 }
 
 #flexicontent .fcfield-expand-view-btn {
@@ -516,6 +519,10 @@
 	/* FIELDs: Maximize view space button */
 	.fcfield-expand-view {
 		background: url(../images/arrow-resize.png) 50% 50% no-repeat;
+		display: inline-block;
+		min-height: 16px;
+		min-width: 16px;
+		vertical-align: middle;
 	}
 	span.fcfield-expand-view.fcfont-icon:before {
 		content: "\68";

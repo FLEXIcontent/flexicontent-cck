@@ -35,7 +35,7 @@ foreach ($values as $value)
 		<tr>
 			<td>
 				<div class="'.$input_grp_class.' fc-xpended">
-					<label class="'.$add_on_class.' fc-lbl addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH' ).'</label>
+					<label class="' . $add_on_class . ' fc-lbl addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH' ).'</label>
 					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="input-xxlarge addrint_autocomplete" name="'.$fieldname_n.'[autocomplete]" type="text" />
 					<select id="'.$elementid_n.'_ac_type" class="addrint_ac_type" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(this.id.replace(\'_ac_type\', \'\'), \''.$field->name.'\');">
 						'.$ac_type_options.'

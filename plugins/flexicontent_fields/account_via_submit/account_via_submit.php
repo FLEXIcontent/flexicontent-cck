@@ -51,8 +51,10 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
-		
-		
+		$form_font_icons = $cparams->get('form_font_icons', 1);
+		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
+
+
 		// ****************
 		// Number of values
 		// ****************
@@ -137,8 +139,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 				$owner = JFactory::getUser($item->created_by);
 			  $field->html[] = '
 			  <div class="'.$input_grp_class.' fc-xpended">
-				  <span class="'.$add_on_class.' fc_acc_via_mail_item_owner">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_ITEM_OWNER' ).'</span>
-				  <span class="'.$add_on_class.'" style="font-weight: bold; background: #f7f7f7; padding-left: 32px; padding-right: 32px;">
+				  <span class="' . $add_on_class . ' fc_acc_via_mail_item_owner">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_ITEM_OWNER' ).'</span>
+				  <span class="' . $add_on_class . '" style="font-weight: bold; background: #f7f7f7; padding-left: 32px; padding-right: 32px;">
 				  	<span class="fc_acc_via_mail_owner_name">'.$owner->name.'</span>
 				  	<span class="fc_acc_via_mail_owner_uname">['.$owner->username.']</span>
 				  </span>
@@ -150,8 +152,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 			if ($field->parameters->get( 'display_when_logged', 0 ) ) {
 			  $field->html[] = '
 			  <div class="'.$input_grp_class.' fc-xpended">
-				  <span class="'.$add_on_class.' fc_acc_via_mail_logged_as">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_LOGGED_AS' ).'</span>
-				  <span class="'.$add_on_class.'" style="font-weight: bold; background: #f7f7f7; padding-left: 32px; padding-right: 32px;">
+				  <span class="' . $add_on_class . ' fc_acc_via_mail_logged_as">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_LOGGED_AS' ).'</span>
+				  <span class="' . $add_on_class . '" style="font-weight: bold; background: #f7f7f7; padding-left: 32px; padding-right: 32px;">
 			  		<span class="fc_acc_via_mail_owner_name">'.$user->name.'</span>
 			  		<span class="fc_acc_via_mail_owner_uname">['.$user->username.']</span>
 				  </span>
