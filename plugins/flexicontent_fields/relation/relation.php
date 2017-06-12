@@ -56,7 +56,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
-		
+		$form_font_icons = $cparams->get('form_font_icons', 1);
+		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
+
+
 		$field->html = '';
 
 		$fieldname = 'custom['.$field->name.']';
@@ -219,19 +222,19 @@ class plgFlexicontent_fieldsRelation extends FCField
 		<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 		
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-category-selector" '.$cat_selecor_box_style.'>
-				<label class="'.$add_on_class.' fc-lbl cats-selector-lbl" for="'.$elementid.'_cat_selector">'.JText::_( 'FLEXI_CATEGORY' ).'</label>
+				<label class="' . $add_on_class . ' fc-lbl cats-selector-lbl" for="'.$elementid.'_cat_selector">'.JText::_( 'FLEXI_CATEGORY' ).'</label>
 				'.$_cat_selector.'
 			</div>
 			
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-item-selector">
-				<label class="'.$add_on_class.' fc-lbl item-selector-lbl" for="'.$elementid.'_item_selector">'.JText::_( 'FLEXI_RIFLD_ITEMS' ).'</label>
+				<label class="' . $add_on_class . ' fc-lbl item-selector-lbl" for="'.$elementid.'_item_selector">'.JText::_( 'FLEXI_RIFLD_ITEMS' ).'</label>
 				<select id="'.$elementid.'_item_selector" name="'.$elementid.'_item_selector" class="use_select2_lib" onchange="return fcrelation_field_'.$elementid.'_add_related(this);">
 					<option value="">-</option>
 				</select>
 			</div>
 			
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-selected-items">
-				<label class="'.$add_on_class.' fc-lbl selected-items-lbl" for="'.$elementid.'">'.JText::_($selected_items_label).'</label>
+				<label class="' . $add_on_class . ' fc-lbl selected-items-lbl" for="'.$elementid.'">'.JText::_($selected_items_label).'</label>
 				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' >
 					'.$items_options_select.'
 				</select>

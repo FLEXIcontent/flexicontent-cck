@@ -31,7 +31,7 @@ abstract class JHtmlFcuploader
 	 */
 	public static function getUploader($field, $u_item_id, $up_tag_id=null, $n=0, $options=array())
 	{
-		$up_tag_id = $up_tag_id ?: 'custom_' . $field->name . '_uploader_';
+		$up_tag_id = $up_tag_id ?: 'custom_' . str_replace('-', '_', $field->name) . '_uploader_';
 		$up_css_class = isset($options['container_class']) ? $options['container_class'] : '';
 
 		// Toggle Uploader button

@@ -948,7 +948,7 @@ table.fc_uploader_header_tbl td:last-child {
 	float: none;
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded {
-	width: auto;
+	width: 100%;
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
@@ -963,6 +963,9 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box input.fcfield_textval {
 	width: 600px;
+}
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded.floated {
+	width: auto;
 }
 #flexicontent .fcfield-expand-view-btn {
 	margin: 0 4px 8px;
@@ -1342,6 +1345,10 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #flexicontent .fcfield-expand-view {
 	background: url(../images/arrow-resize.png) 50% 50% no-repeat;
+	display: inline-block;
+	min-height: 16px;
+	min-width: 16px;
+	vertical-align: middle;
 }
 #flexicontent span.fcfield-expand-view.fcfont-icon:before {
 	content: "\68";
