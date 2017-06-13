@@ -144,11 +144,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_active_search = null;
 	var $_active_ai     = null;
 	
-	
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	public function __construct()
 	{
@@ -156,18 +155,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$cid = JFactory::getApplication()->input->get('cid', 0, 'int');
 		$this->setId((int)$cid);  // This will set the category id and clear all member variables
 		parent::__construct();
-		
-		// Populate state data, if category id is changed this function must be called again
-		$this->populateCategoryState();
+
+		// Populate state data, if record id is changed this function must be called again
+		$this->populateRecordState();
 	}
-	
+
+
 	/**
 	 * Method to populate the category model state.
 	 *
 	 * return	void
 	 * @since	1.5
 	 */
-	protected function populateCategoryState($ordering = null, $direction = null)
+	protected function populateRecordState($ordering = null, $direction = null)
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
@@ -175,9 +175,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$p      = $option.'.'.$view.'.';
-		
+
 		$this->_layout = $app->input->get('layout', '', 'cmd');  // !! This should be empty for empty for 'category' layout
-		
+
 		// Force layout to be have proper value
 		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
 		{
@@ -185,38 +185,51 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_layout = '';
 			$app->input->set('layout', '');
 		}
-		
+
 		$this->_clayout = $jinput->get('clayout', '', 'cmd');  // !! This should be empty for using view's configured clayout (template)
-		
-		if ($this->_layout=='author') {
-			$this->_authorid = $jinput->get('authorid', 0, 'int');
+
+		switch ($this->_layout)
+		{
+			case 'author':
+				$this->_authorid = $jinput->get('authorid', 0, 'int');
+				break;
+
+			case 'myitems':
+				$this->_authorid = $user->id;
+				break;
+
+			case 'favs':
+				$this->_uid = $user->id;
+				break;
+
+			case 'tags':
+				$_tagid = $jinput->get('tagid', 0, 'int');
+				$this->_tagid = $_tagid;
+				break;
+
+			case 'mcats':
+				$_cids = $jinput->get('cids', '');
+				if ( !is_array($_cids) )
+				{
+					$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
+					$_cids = explode(',', $_cids);
+				}
+
+				$this->_ids = array();
+				foreach ($_cids as $i => $_id)
+				{
+					if ((int)$_id) $this->_ids[] = (int)$_id;
+				}
+
+				// Clear category id, it is not used by this layout
+				$this->_id = 0;
+				break;
+
+			default:
+				if (!$this->_id) {}
+				break;
 		}
-		else if ($this->_layout=='myitems') {
-			$this->_authorid = $user->id;
-		}
-		else if ($this->_layout=='favs') {
-			$this->_uid = $user->id;
-		}
-		else if ($this->_layout=='tags') {
-			$_tagid = $jinput->get('tagid', 0, 'int');
-			$this->_tagid = $_tagid;
-		}
-		else if ($this->_layout=='mcats') {
-			$_cids = $jinput->get('cids', '');
-			if ( !is_array($_cids) ) {
-				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
-				$_cids = explode(',', $_cids);
-			}
-			// make sure given data are integers ... !!
-			$this->_ids = array();
-			foreach ($_cids as $i => $_id)  if ((int)$_id) $this->_ids[] = (int)$_id;
-			
-			// Clear category id, it is not used by this layout
-			$this->_id = 0;
-		}
-		else if (!$this->_id) {
-		}
-		
+
 		// Set behaviour variables into state
 		$this->setState('layout', $this->_layout);
 		$this->setState('authorid', $this->_authorid);
@@ -235,28 +248,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_params->merge($cparams);
 		
 		
-		// ******************************************************************************
-		// Set state EXCEPT: limit and limitstart that will be calculated at getData()
-		// and after getCategory() has been called thus parameters have been loaded fully
-		// ******************************************************************************
+		// ***
+		// *** Set state EXCEPT: limit and limitstart that will be calculated at getData()
+		// *** and after getCategory() has been called thus parameters have been loaded fully
+		// ***
 
 		// Set filter order variables into state
 		$this->setState('filter_order', $jinput->get('filter_order', 'i.title', 'cmd'));
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 		
 		// Get minimum word search length
-		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
-			$db = JFactory::getDBO();
-			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
-			$_dbvariable = $db->loadObject();
-			$min_word_len = (int) @ $_dbvariable->Value;
-			$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-			$min_word_len = !$search_prefix ?  $min_word_len : 1;
-			$app->setUserState($option.'.min_word_len', $min_word_len);
-		//}
+		$db = JFactory::getDBO();
+		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
+		$_dbvariable = $db->loadObject();
+		$min_word_len = (int) @ $_dbvariable->Value;
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$min_word_len = !$search_prefix ?  $min_word_len : 1;
+		$app->setUserState($option.'.min_word_len', $min_word_len);
 	}
-	
-	
+
+
 	/**
 	 * Method to set the category id
 	 *
@@ -266,7 +277,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function setId($cid)
 	{
 		// Set new category ID and wipe data
-		if ($this->_id != $cid) {
+		if ($this->_id != $cid)
+		{
 			$this->_category  = null;
 			$this->_childs    = null;
 			$this->_data      = null;
@@ -276,6 +288,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_comments  = null;
 			$this->_clayout   = null;
 		}
+
 		$this->_id = $cid;
 	}
 	
@@ -303,16 +316,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		// Make sure category has been loaded (false means category view without current category)
 		if ( $this->_category === null) $this->getCategory();
-		
-		$app     = JFactory::getApplication();
-		$cparams = $this->_params;
-		
-		$print_logging_info = $cparams->get('print_logging_info');
+
+		$app = JFactory::getApplication();
+
+		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
+
+
+		// Get limit from http request OR use default category parameters
 		$this->_listall = $app->input->get('listall', 0, 'int');
-		
-		// Set the pagination variables into state (We get them from http request OR use default category parameters)
 		$this->_active_limit = strlen( $app->input->get('limit', '', 'string') );
 		$limit = $this->_active_limit ? $app->input->get('limit', 0, 'int') : $this->_params->get('limit');
 		$this->setState('limit', $limit);
@@ -323,95 +335,97 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$this->_data = array();
 		}
-		else if ( $this->_data===null )
-		{
-			if ( $print_logging_info )  $start_microtime = microtime(true);
-			// Load the content if it doesn't already exist
-			
-			// 1, create full query: filter, ordered, limited
-			$query = $this->_buildQuery();
-			
-			// Check if Text Search / Filters / AI are NOT active and special before FORM SUBMIT (per page) -limit- was configured
-			$use_limit_before = $app->getUserState('use_limit_before_search_filt', 0);
-			if ( $use_limit_before )
-			{
-				$limit_before = (int) $cparams->get('limit_before_search_filt', 0);
-				$limit = $use_limit_before  ?  $limit_before  :  $limit;
-				$app->input->set('limit', $limit);
-				$this->setState('limit', $limit);
-			}
-			
-			// Get limitstart, and in case limit has been changed, adjust it accordingly
-			$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
-			$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-			$this->setState('limitstart', $limitstart);
 
-			// Make sure it is limitstart is set
-			$app->input->set('limitstart', $limitstart);
-			$app->input->set('start', $limitstart);
-			
-			try {
-				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-				// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
-				$query_limited = $query . ' LIMIT '.$limit.' OFFSET '.$limitstart;
-				$rows = flexicontent_db::directQuery($query_limited);
-				$query_ids = array();
-				foreach ($rows as $row) $query_ids[] = $row->id;
-				//$this->_db->setQuery($query, $limitstart, $limit);
-				//$query_ids = $this->_db->loadColumn();
-				
-				// 3, get current items total for pagination
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
-			}
-			
-			catch (Exception $e) {
-				// 2, get items via normal joomla SQL layer
-				$this->_db->setQuery($query, $limitstart, $limit);
-				$query_ids = $this->_db->loadColumn();
-				if ($this->_db->getErrorNum())  $app->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-				
-				// 3, get current items total for pagination
-				if ( count($query_ids) ) {
-					if ( !$this->_total ) $this->getTotal();
-				} else {
-					$this->_total = 0;
-				}
-			}
-			// Assign total number of items found this will be used to decide whether to do item counting per filter value
-			global $fc_catview;
-			$fc_catview['view_total']  = $this->_total;
-			
-			// 4, get item data
-			if (count($query_ids)) $query = $this->_buildQuery($query_ids);
-			$_data = array();
-			if (count($query_ids)) {
-				$this->_db->setQuery($query);
-				$_data = $this->_db->loadObjectList('id');
-				if ($this->_db->getErrorNum())  $app->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-			}
-			
-			// 5, reorder items
-			$this->_data = array();
-			if ($_data) foreach($query_ids as $item_id) {
-				$this->_data[] = $_data[$item_id];
-			}
-			
-			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
-			flexicontent_db::getOriginalContentItemids($this->_data);
-			
-			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		// Load the content only if has not been loaded already
+		if ( $this->_data !== null )
+		{
+			return $this->_data;
 		}
-		
-		// maybe removed in the future, this is useful in places that item data need to be retrieved again because item object was not given
+
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+
+		// 1, create full query: filter, ordered, limited
+		$query = $this->_buildQuery();
+			
+		// Check if Text Search / Filters / AI are NOT active and special before FORM SUBMIT (per page) -limit- was configured
+		// NOTE: this must run AFTER _buildQuery() !
+		$use_limit_before = $app->getUserState('use_limit_before_search_filt', 0);
+		if ( $use_limit_before )
+		{
+			$limit_before = (int) $this->_params->get('limit_before_search_filt', 0);
+			$limit = $use_limit_before  ?  $limit_before  :  $limit;
+			$app->input->set('limit', $limit);
+			$this->setState('limit', $limit);
+		}
+			
+		// Get limitstart, and in case limit has been changed, adjust it accordingly
+		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$this->setState('limitstart', $limitstart);
+
+		// Make sure it is limitstart is set
+		$app->input->set('limitstart', $limitstart);
+		$app->input->set('start', $limitstart);
+
+		try {
+			// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
+			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
+			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+			$query_limited = $query . ' LIMIT '.$limit.' OFFSET '.$limitstart;
+			$rows = flexicontent_db::directQuery($query_limited);
+			$query_ids = array();
+			foreach ($rows as $row) $query_ids[] = $row->id;
+			//$this->_db->setQuery($query, $limitstart, $limit);
+			//$query_ids = $this->_db->loadColumn();
+				
+			// 3, get current items total for pagination
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $this->_db->loadResult();
+		}
+			
+		catch (Exception $e) {
+			// 2, get items via normal joomla SQL layer
+			$this->_db->setQuery($query, $limitstart, $limit);
+			$query_ids = $this->_db->loadColumn();
+				
+			// 3, get current items total for pagination
+			if ( count($query_ids) ) {
+				if ( !$this->_total ) $this->getTotal();
+			} else {
+				$this->_total = 0;
+			}
+		}
+
+
+		// Assign total number of items found this will be used to decide whether to do item counting per filter value
+		global $fc_catview;
+		$fc_catview['view_total']  = $this->_total;
+			
+		// 4, get item data
+		if (count($query_ids)) $query = $this->_buildQuery($query_ids);
+		$_data = array();
+		if (count($query_ids)) {
+			$this->_db->setQuery($query);
+			$_data = $this->_db->loadObjectList('id');
+		}
+			
+		// 5, reorder items
+		$this->_data = array();
+		if ($_data) foreach($query_ids as $item_id) {
+			$this->_data[] = $_data[$item_id];
+		}
+			
+		// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
+		flexicontent_db::getOriginalContentItemids($this->_data);
+			
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+		// This is used in places that item data need to be retrieved again because item object was not given
 		global $fc_list_items;
 		foreach ($this->_data as $_item) $fc_list_items[$_item->id] = $_item;
-		
-		// Remove search prefix from 'search_index' column
-		//$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-		//if ($search_prefix) foreach ($this->_data as $_item) $_item->search_index = preg_replace('/\b'.$search_prefix.'/u', '', $_item->search_index);
-		
+
 		return $this->_data;
 	}
 
@@ -691,17 +705,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $this->_data_cats!==null ) return $this->_data_cats;
 
 		global $globalcats;
-		$cparams  = $this->_params;
 		$user     = JFactory::getUser();
 		$ordering = 'c.lft ASC';
 
-		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items
-		$display_subcats = $cparams->get('display_subcategories_items', 2);   // include subcategory items
+		$show_noauth = $this->_params->get('show_noauth', 0);   // show unauthorized items
+		$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
 		
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
-		if (!$show_noauth) {
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
@@ -719,8 +733,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$query_catids = array_keys($query_catids);
 		
 		// Items in featured categories
-		/*$cats_featured = $cparams->get('display_cats_featured', 0);
-		$featured_cats_parent = $cparams->get('featured_cats_parent', 0);
+		/*$cats_featured = $this->_params->get('display_cats_featured', 0);
+		$featured_cats_parent = $this->_params->get('featured_cats_parent', 0);
 		$query_catids_exclude = array();
 		if ($cats_featured && $featured_cats_parent) {
 			foreach ($globalcats[$featured_cats_parent]->descendantsarray as $subcatid) $query_catids_exclude[$subcatid] = 1;
@@ -751,7 +765,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$this->_db->setQuery($query);
 		$this->_data_cats = $this->_db->loadColumn();
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		return $this->_data_cats;
 	}
@@ -767,15 +780,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildAccessSelect()
 	{
 		$user    = JFactory::getUser();
-		$cparams = $this->_params;
-		$show_noauth = $cparams->get('show_noauth', 0);
+		$show_noauth = $this->_params->get('show_noauth', 0);
 		
 		$select_access = '';
 		
 		// Extra access columns for main category and content type (item access will be added as 'access')
 		$select_access .= ', c.access as category_access, ty.access as type_access';
 		
-		if ($show_noauth) {
+		if ($show_noauth)
+		{
 			// Access Flags for: content type, main category, item
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
@@ -785,7 +798,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 				.'   c.access IN (0,'.$aid_list.') AND '
 				.'   i.access IN (0,'.$aid_list.') '
 				.' THEN 1 ELSE 0 END AS has_access';
-		} else {
+		}
+		else
+		{
 			$select_access .= ', 1 AS has_access';
 		}
 		
@@ -906,13 +921,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
-		$cparams = $this->_params;                      // Get the category parameters
-		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
-		$catlang = $cparams->get('language', '');         // Category language parameter, currently UNUSED
-		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
-		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
-		$show_owned = $cparams->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$use_tmp = $counting == true;
+
+		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
+		$catlang = $this->_params->get('language', '');         // Category language parameter, currently UNUSED
+		$filtercat  = $this->_params->get('filtercat', 0);      // Filter items using currently selected language
+
+		// Show special state items
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
+		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
+		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
 		
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1';
@@ -952,20 +970,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if (!$ignoreState)
 		{
-			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = '.$user->id : '';
-			//$OR_isModifier = $user->id ? ' OR i.modified_by = '.$user->id : '';
-			
+			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = ' . $user->id : '';
+			//$OR_isModifier = $user->id ? ' OR i.modified_by = ' . $user->id : '';
+
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) '.$OR_isOwner.')';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			
+			$where .= ' AND ( i.state IN (1, -5) ' . $OR_isOwner . ')';   // . $OR_isModifier
+
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) '.$OR_isOwner.')';       // $OR_isModifier
-			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) '.$OR_isOwner.')';   // $OR_isModifier
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
 		}
-		
+		else
+		{
+			// Include / Exclude trashed items for privileged users
+			$where .= $show_trashed ? ' AND ( i.state <> -2)' : '';
+		}
+
 		// Filter the category view with the active language
 		// But not language filter: favourites
-		if ($filtercat && $this->_layout!='favs') {
+		if ($filtercat && $this->_layout!='favs')
+		{
 			$lta = 'i';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
@@ -974,7 +998,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access levels
-		if (!$show_noauth && $this->_layout!='myitems') {
+		if (!$show_noauth && $this->_layout!='myitems')
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
@@ -989,11 +1014,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		
 		// All items / Normal only / Featured only
-		$flag_featured = (int) $cparams->get('display_flag_featured', 0);
+		$flag_featured = (int) $this->_params->get('display_flag_featured', 0);
 		
 		
 		// Check if doing a before FORM SUBMIT, "FEATURED ONLY" item list  --  then check if Text Search / Filters / AI are NOT active and LIST-ALL Flag not present
-		$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
+		$use_limit_before = (int) $this->_params->get('use_limit_before_search_filt', 0);
 		
 		$app->setUserState('use_limit_before_search_filt', 0);
 		if ( $use_limit_before )
@@ -1049,7 +1074,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $fc_catview;
 		$app      = JFactory::getApplication();
 		$option   = $this->getState('option');
-		$cparams  = $this->_params;
 		$db = $this->_db;
 		
 		static $text_search = null;
@@ -1064,7 +1088,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$text = $app->input->get('filter', $app->input->get('q', '', 'string'), 'string');
 		
 		// Check for LIKE %word% search, for languages without spaces
-		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
+		$filter_word_like_any = $this->_params->get('filter_word_like_any', 0);
 		
 		$phrase = $filter_word_like_any ?
 			$app->input->get('searchphrase', $app->input->get('p', 'any', 'word'), 'word') :
@@ -1072,7 +1096,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$si_tbl = 'flexicontent_items_ext';
 		
-		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		$words = preg_split('/\s\s*/u', $text);
 		
@@ -1165,15 +1189,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $fc_catview;
 		$app      = JFactory::getApplication();
 		$option   = $this->getState('option');
-		$cparams  = $this->_params;
 		$db = $this->_db;
 		
 		$filters_where = array();
 		
 		// Get filters these are EITHER (a) all filters (to do active only) OR (b) Locked filters
 		// USING all filters here to allow filtering via module, thus category view can be filtered even if 'use_filters' is OFF
-		$shown_filters  = FlexicontentFields::getFilters( 'filters', /*'use_filters'*/ '__ALL_FILTERS__', $cparams, $check_access=true );
-		$locked_filters = FlexicontentFields::getFilters( 'persistent_filters', 'use_persistent_filters', $cparams, $check_access=false );
+		$shown_filters  = FlexicontentFields::getFilters( 'filters', /*'use_filters'*/ '__ALL_FILTERS__', $this->_params, $check_access=true );
+		$locked_filters = FlexicontentFields::getFilters( 'persistent_filters', 'use_persistent_filters', $this->_params, $check_access=false );
 		$filters = array();
 		if ($shown_filters)  foreach($shown_filters  as $_filter) $filters[$_filter->id] = $_filter;
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
@@ -1190,8 +1213,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$_cids = array();
 			foreach ($f13_val as $i => $_id)  if ((int)$_id) $_cids[] = (int)$_id;
 
-			$cparams->set('txt_ac_cid', 'NA');
-			$cparams->set('txt_ac_cids', $_cids);
+			$this->_params->set('txt_ac_cid', 'NA');
+			$this->_params->set('txt_ac_cids', $_cids);
 		}
 		
 		// Get SQL clause for filtering via each field
@@ -1328,13 +1351,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildChildsQuery($id=0)
 	{
 		$user    = JFactory::getUser();
-		$cparams = $this->_params;
-		$show_noauth = $cparams->get('show_noauth', 0);
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 		
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
-		if (!$show_noauth) {
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
@@ -1380,7 +1403,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$db   = JFactory::getDBO();
 		
 		// Get the view's parameters
-		$params = $this->_params;
 		$use_tmp = true;
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -1393,10 +1415,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$nullDate = $db->getNullDate();
 	
 		// Get some parameters and other info
-		$catlang = $params->get('language', '');          // Category language (currently UNUSED)
+		$catlang = $this->_params->get('language', '');          // Category language (currently UNUSED)
 		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
-		$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
-		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
+		$filtercat  = $this->_params->get('filtercat', 0);       // Filter items using currently selected language
+
+		// Show special state items
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
+		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
+		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
 	
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1 ';
@@ -1404,7 +1430,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
 		
 		// Filter the category view with the current user language
-		if ($filtercat) {
+		if ($filtercat)
+		{
 			$lta = $use_tmp ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
 		}
@@ -1413,22 +1440,32 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
-		if (!$ignoreState) {
+		if (!$ignoreState)
+		{
+			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = ' . $user->id : '';
+			//$OR_isModifier = $user->id ? ' OR i.modified_by = ' . $user->id : '';
+
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			
+			$where .= ' AND ( i.state IN (1, -5) ' . $OR_isOwner . ')';   // . $OR_isModifier
+
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
 		}
-		
+		else
+		{
+			// Include / Exclude trashed items for privileged users
+			$where .= $show_trashed ? ' AND ( i.state <> -2)' : '';
+		}
+
 		// Count items according to full depth level !!!
 		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
 		$where .= ' AND rel.catid IN ('.$catlist.')';
 		
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
-		if (!$show_noauth) {
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
@@ -1449,10 +1486,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$db->setQuery($query);
 		$assigneditems = $db->loadResult();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		return $assigneditems;
 	}
+
 
 	/**
 	 * Method to return sub categories of the give category id
@@ -1463,9 +1500,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _getsubs($id)
 	{
-		$cparams = $this->_params;
-		$show_noauth	= $cparams->get('show_noauth', 0);
 		$user			= JFactory::getUser();
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 		
 		// Where
 		$where = ' WHERE c.published = 1';
@@ -1474,7 +1510,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
-		if (!$show_noauth) {
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
@@ -1513,12 +1550,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Make sure category has been loaded (false means category view without current category)
 		if ( $this->_category === null) $this->getCategory();
-		$cparams = $this->_params;
 		
-		$show_itemcount   = $cparams->get('show_itemcount', 1);
-		//$show_subcatcount = $cparams->get('show_subcatcount', 0);
+		$show_itemcount   = $this->_params->get('show_itemcount', 1);
+		//$show_subcatcount = $this->_params->get('show_subcatcount', 0);
 		
-		$print_logging_info = $cparams->get('print_logging_info');
+		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		$query = $this->_buildChildsQuery();
@@ -1561,12 +1597,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Make sure category has been loaded (false means category view without current category)
 		if ( $this->_category === null) $this->getCategory();
-		$cparams = $this->_params;
 		
-		$show_itemcount   = $cparams->get('show_itemcount_peercat', 1);
-		//$show_subcatcount = $cparams->get('show_subcatcount_peercat', 0);
+		$show_itemcount   = $this->_params->get('show_itemcount_peercat', 1);
+		//$show_subcatcount = $this->_params->get('show_subcatcount_peercat', 0);
 		
-		$print_logging_info = $cparams->get('print_logging_info');
+		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		$query = $this->_buildChildsQuery($this->_category->parent_id);
@@ -1607,7 +1642,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		
-		$cparams = $this->_params;
 		if ($pk) $this->_id = $pk;  // Set a specific id
 		
 		$cat_required = $this->_layout == '';
@@ -1640,7 +1674,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 					;
 				$this->_db->setQuery($query);
 				$_category = $this->_db->loadObject();   // False if not found or unpublished
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 			
 			else {
@@ -1751,7 +1784,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					// redirect unlogged user to login
 					$uri		= JFactory::getURI();
 					$return	= $uri->toString();
-					$url  = $cparams->get('login_page', 'index.php?option=com_users&view=login');
+					$url  = $this->_params->get('login_page', 'index.php?option=com_users&view=login');
 					$return = strtr(base64_encode($return), '+/=', '-_,');
 					$url .= '&return='.$return; // '&return='.base64_encode($return);
 					$url .= '&isfcurl=1';
@@ -1812,7 +1845,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				// Redirect to login
 				$uri		= JFactory::getURI();
 				$return	= $uri->toString();
-				$url  = $cparams->get('login_page', 'index.php?option=com_users&view=login');
+				$url  = $this->_params->get('login_page', 'index.php?option=com_users&view=login');
 				$return = strtr(base64_encode($return), '+/=', '-_,');
 				$url .= '&return='.$return; // '&return='.base64_encode($return);
 				$url .= '&isfcurl=1';
@@ -1822,9 +1855,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$app->redirect($url);
 			}
 
-			else if ($cparams->get('unauthorized_page', ''))
+			else if ($this->_params->get('unauthorized_page', ''))
 			{
-				$app->redirect($cparams->get('unauthorized_page'));				
+				$app->redirect($this->_params->get('unauthorized_page'));				
 			}
 
 			else
@@ -2054,7 +2087,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$view_ok      = @$menu->query['view']     == 'category';
 			$cid_ok       = @$menu->query['cid']      == $this->_id;
 			$layout_ok    = @$menu->query['layout']   == $this->_layout;
-			// Examine author only for author layout, !! thus ignoring empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateCategoryState() function)
+			// Examine author only for author layout, !! thus ignoring empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateRecordState() function)
 			$authorid_ok  = ($this->_layout!='author') || (@$menu->query['authorid'] == $this->_authorid);
 			// Examine tagid only for tags layout
 			$tagid_ok     = ($this->_layout!='tags')   || (@$menu->query['tagid'] == $this->_tagid);
@@ -2253,7 +2286,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$db = JFactory::getDBO();
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
-				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			}
 			else if ($return_sql===2) {
 				$db = JFactory::getDBO();
@@ -2326,9 +2358,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		// Make sure category has been loaded (false means category view without current category)
 		if ( $this->_category === null) $this->getCategory();
-		$cparams = $this->_params;
 		
-		$print_logging_info = $cparams->get('print_logging_info');
+		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
@@ -2346,9 +2377,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$alpha = $this->_db->loadColumn();
 		
 		if ( $print_logging_info ) @$fc_run_times['execute_alphaindex_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-		
+
 		return $alpha;
 	}
 	
@@ -2401,26 +2430,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Initialise variables.
 		$pk = !empty($pk) ? $pk : $this->_id;
 		if (!$pk) return;
-		
+
 		$db = $this->getDBO();
 		$query = $db->getQuery(true)
 			->update('#__categories')
 			->set('hits = hits + 1')
 			->where('id = ' . (int) $pk);
 		$db->setQuery($query);
-		
-		try {
-			$db->execute();
-			if ($db->getErrorNum()) {
-				$this->setError( nl2br($db->getErrorMsg()) );  // In case of error not throwing exception
-				return false;
-			}
-		}
-		catch (RuntimeException $e) {
-			$this->setError( $e->getMessage() );
-			return false;
-		}
-		
+		$db->execute();
+
 		return true;
 	}
 	
