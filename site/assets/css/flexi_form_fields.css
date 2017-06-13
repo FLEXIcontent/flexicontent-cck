@@ -1167,7 +1167,7 @@ table.fc_uploader_header_tbl td:last-child {
 #flexicontent .fc-xpended-btns > .fcfield-button-add a {
 	font-size: 12px;
 	text-shadow: unset;
-	padding: 4px 12px;
+	padding: 4px 16px;
 	line-height: 18px;
 	min-height: 18px;
 	cursor: pointer;
@@ -1197,21 +1197,21 @@ table.fc_uploader_header_tbl td:last-child {
 	vertical-align: top;
 	margin: 0px 2px 0px 6px;
 }
-#flexicontent .fc-xpended-btns .fcfield-expand-view:hover,
-#flexicontent .fc-xpended-btns .fcfield-drag-handle:hover,
-#flexicontent .fc-xpended-btns .fcfield-list-add:hover,
-#flexicontent .fc-xpended-btns .fcfield-list-del:hover,
-#flexicontent .fc-xpended-btns .fcfield-placement-h:hover,
-#flexicontent .fc-xpended-btns .fcfield-placement-v:hover,
-#flexicontent .fc-xpended-btns .fcfield-addvalue:hover,
-#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_after:hover,
-#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_before:hover,
-#flexicontent .fc-xpended-btns .fcfield-delvalue:hover,
-#flexicontent .fc-xpended-btns .fcfield-clearvalue:hover,
-#flexicontent .fc-xpended-btns .fcfield-selectvalue:hover,
-#flexicontent .fc-xpended-btns .fcfield-uploadvalue:hover,
-#flexicontent .fc-xpended-btns .fcfield-button:hover,
-#flexicontent .fc-xpended-btns .fcfield-button-add:hover a {
+#flexicontent .fc-xpended-btns .fcfield-expand-view:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-drag-handle:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-list-add:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-list-del:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-placement-h:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-placement-v:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-addvalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-delvalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-clearvalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-selectvalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-uploadvalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-button:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-button-add:not(.fcfont-icon):hover a {
 	background-color: #e0e0e0;
 }
 #flexicontent .fc-xpended-btns .fcfield-expand-view.fcfont-icon:hover,
@@ -1248,7 +1248,11 @@ table.fc_uploader_header_tbl td:last-child {
 #flexicontent span.fcfield-uploadvalue.fcfont-icon,
 #flexicontent span.fcfield-button.fcfont-icon,
 #flexicontent span.fcfield-button-add.fcfont-icon a {
+	padding: 4px 12px;
 	background-image: none;
+}
+#flexicontent span.fcfield-expand-view.fcfont-icon {
+	padding: 0px;
 }
 #flexicontent .fcfield-button-add {
 	vertical-align: top !important;
@@ -1274,8 +1278,11 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #flexicontent span.fcfield-addvalue {
 	margin: 0px 2px 6px 6px;
-	padding: 6px 12px 6px 28px;
-	background: url(../images/plus-button.png) 50% 50% no-repeat;
+	padding: 6px 28px;
+	background: url(../images/plus-button.png) 8% 50% no-repeat;
+}
+#flexicontent span.fcfield-addvalue:not(.fcfont-icon) {
+	padding: 6px 12px 6px 32px !important;
 }
 #flexicontent span.fcfield-addvalue.fcfont-icon:before {
 	padding: 0 6px 0 2px;
@@ -1419,7 +1426,6 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #flexicontent .fcfield-drag-handle {
 	cursor: move;
-	margin: 0px 0px 2px 0px;
 	background: url(../images/move2.png) 50% 50% no-repeat;
 }
 #flexicontent span.fcfield-drag-handle.fcfont-icon:before {

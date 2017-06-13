@@ -65,8 +65,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = 'btn'; //$cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = 'btn-group'; //$cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
-		
-		
+		$form_font_icons = $cparams->get('form_font_icons', 1);
+		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
+
+
 		// ****************
 		// Number of values
 		// ****************
@@ -413,7 +415,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$field->html = '';
 		}
 		if (!$add_position) $field->html .= '
-			<div class="input-append input-prepend fc-xpended-btns" style="margin-left: 8px !important;">
+			<div class="input-append input-prepend fc-xpended-btns">
 				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).parent().get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
 			</div>
 		';

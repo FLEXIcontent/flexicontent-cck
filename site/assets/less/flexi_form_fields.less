@@ -312,7 +312,7 @@
 		> .fcfield-button-add a {
 			font-size: 12px;
 			text-shadow: unset;
-			padding: 4px 12px;
+			padding: 4px 16px;
 			line-height: 18px;
 			min-height: 18px;
 			cursor: pointer;
@@ -348,21 +348,21 @@
 		}
 
 		/* Default hover background color if not using font icons */
-		.fcfield-expand-view:hover,
-		.fcfield-drag-handle:hover,
-		.fcfield-list-add:hover,
-		.fcfield-list-del:hover,
-		.fcfield-placement-h:hover,
-		.fcfield-placement-v:hover,
-		.fcfield-addvalue:hover,
-		.fcfield-insertvalue.fc_after:hover,
-		.fcfield-insertvalue.fc_before:hover,
-		.fcfield-delvalue:hover,
-		.fcfield-clearvalue:hover,
-		.fcfield-selectvalue:hover,
-		.fcfield-uploadvalue:hover,
-		.fcfield-button:hover,
-		.fcfield-button-add:hover a {
+		.fcfield-expand-view:not(.fcfont-icon):hover,
+		.fcfield-drag-handle:not(.fcfont-icon):hover,
+		.fcfield-list-add:not(.fcfont-icon):hover,
+		.fcfield-list-del:not(.fcfont-icon):hover,
+		.fcfield-placement-h:not(.fcfont-icon):hover,
+		.fcfield-placement-v:not(.fcfont-icon):hover,
+		.fcfield-addvalue:not(.fcfont-icon):hover,
+		.fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
+		.fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
+		.fcfield-delvalue:not(.fcfont-icon):hover,
+		.fcfield-clearvalue:not(.fcfont-icon):hover,
+		.fcfield-selectvalue:not(.fcfont-icon):hover,
+		.fcfield-uploadvalue:not(.fcfont-icon):hover,
+		.fcfield-button:not(.fcfont-icon):hover,
+		.fcfield-button-add:not(.fcfont-icon):hover a {
 			background-color: #e0e0e0;
 		}
 
@@ -405,7 +405,11 @@
 	span.fcfield-uploadvalue.fcfont-icon,
 	span.fcfield-button.fcfont-icon,
 	span.fcfield-button-add.fcfont-icon a {
+		padding: 4px 12px;
 		background-image: none;
+	}
+	span.fcfield-expand-view.fcfont-icon {
+		padding: 0px;
 	}
 
 
@@ -440,8 +444,11 @@
 	}
 	span.fcfield-addvalue {
 		margin: 0px 2px 6px 6px;
-		padding: 6px 12px 6px 28px;
-		background: url(../images/plus-button.png) 50% 50% no-repeat;
+		padding: 6px 28px;
+		background: url(../images/plus-button.png) 8% 50% no-repeat;
+	}
+	span.fcfield-addvalue:not(.fcfont-icon) {
+		padding: 6px 12px 6px 32px !important;
 	}
 	span.fcfield-addvalue.fcfont-icon:before {
 		padding: 0 6px 0 2px;
@@ -607,7 +614,6 @@
 	/* FIELDs: DRAG (sort) handle */
 	.fcfield-drag-handle {
 		cursor: move;
-		margin: 0px 0px 2px 0px;
 		background: url(../images/move2.png) 50% 50% no-repeat;
 	}
 	span.fcfield-drag-handle.fcfont-icon:before {
