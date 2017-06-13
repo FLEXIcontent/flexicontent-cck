@@ -723,7 +723,12 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_owned" type="fcradio" default="" label="FLEXI_OWNED_ITEMS" description="FLEXI_OWNED_ITEMS_DESC" class="btn-group btn-group-yesno">
+			<field name="show_owned" type="fcradio" default="" label="FLEXI_OWNED_ITEMS" description="FLEXI_SHOW_OWNED_ITEMS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_trashed" type="fcradio" default="" label="FLEXI_TRASHED_ITEMS" description="FLEXI_SHOW_TRASHED_ITEMS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>

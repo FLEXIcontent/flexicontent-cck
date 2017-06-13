@@ -70,33 +70,39 @@ class FlexicontentModelTags extends JModelLegacy
 	 *
 	 * @since 1.5
 	 */
-	function __construct()
+	public function __construct()
 	{
-		parent::__construct();
-		
-		// Set id and load parameters
-		$id = JRequest::getInt('id', 0);		
+		// Set record id and call constrcuctor
+		$id = JFactory::getApplication()->input->get('id', 0, 'int');
 		$this->setId((int)$id);
-		$cparams = & $this->_params;
-		
-		// Set the pagination variables into state (We get them from http request OR use view's parameters)
-		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
-		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
-		
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
-		JFactory::getApplication()->input->set('limitstart', $limitstart);
-		
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-		
-		// Set filter order variables into state
-		$this->setState('filter_order', JRequest::getCmd('filter_order', 'i.modified', 'default'));
-		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'DESC', 'default'));
+		parent::__construct();
+
+		// Populate state data, if record id is changed this function must be called again
+		$this->populateRecordState();
 	}
-	
-	
+
+
+	/**
+	 * Method to populate the category model state.
+	 *
+	 * return	void
+	 * @since	1.5
+	 */
+	protected function populateRecordState($ordering = null, $direction = null)
+	{
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$p      = $option.'.'.$view.'.';
+
+		// Set filter order variables into state
+		$this->setState('filter_order', $app->input->get('filter_order', 'i.modified', 'cmd'));
+		$this->setState('filter_order_Dir', $app->input->get('filter_order_Dir', 'DESC', 'cmd'));
+	}
+
+
 	/**
 	 * Method to set initialize data, setting an element id for the view
 	 *
@@ -164,17 +170,46 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function getData()
 	{
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_data))
-		{
-			// Query the content items
-			$query = $this->_buildQuery();
-			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+		// Get limit from http request OR use default category parameters
+		$this->_listall = $app->input->get('listall', 0, 'int');
+		$this->_active_limit = strlen( $app->input->get('limit', '', 'string') );
+		$limit = $this->_active_limit ? $app->input->get('limit', 0, 'int') : $this->_params->get('limit');
+		$this->setState('limit', $limit);
 
-			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
-			flexicontent_db::getOriginalContentItemids($this->_data);
+		// Lets load the content if it doesn't already exist
+		if ($this->_data !== null)
+		{
+			return $this->_data;
 		}
-		
+
+		// Query the content items
+		$query = $this->_buildQuery();
+
+		// Check if Text Search / Filters / AI are NOT active and special before FORM SUBMIT (per page) -limit- was configured
+		// NOTE: this must run AFTER _buildQuery() !
+		$use_limit_before = $app->getUserState('use_limit_before_search_filt', 0);
+		if ( $use_limit_before )
+		{
+			$limit_before = (int) $this->_params->get('limit_before_search_filt', 0);
+			$limit = $use_limit_before  ?  $limit_before  :  $limit;
+			$app->input->set('limit', $limit);
+			$this->setState('limit', $limit);
+		}
+
+		// Get limitstart, and in case limit has been changed, adjust it accordingly
+		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$this->setState('limitstart', $limitstart);
+
+		// Make sure it is limitstart is set
+		$app->input->set('limitstart', $limitstart);
+		$app->input->set('start', $limitstart);
+
+		$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+
+		// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
+		flexicontent_db::getOriginalContentItemids($this->_data);
+
 		return $this->_data;
 	}
 	
@@ -226,10 +261,9 @@ class FlexicontentModelTags extends JModelLegacy
 	function _buildQuery()
 	{   	
 		$user		= JFactory::getUser();
-		$cparams = & $this->_params;
-		
-		// show unauthorized items
-		$show_noauth = $cparams->get('show_noauth', 0);
+
+		// Show special state items
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 		
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess	 = '';
@@ -238,8 +272,10 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// Extra access columns for main category and content type (item access will be added as 'access')
 		$select_access .= ', c.access as category_access, ty.access as type_access';
-		
-		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
+
+		// User not allowed to LIST unauthorized items
+		if ( !$show_noauth )
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
@@ -247,8 +283,10 @@ class FlexicontentModelTags extends JModelLegacy
 			$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			$select_access .= ', 1 AS has_access';
 		}
-		else {
-			// Access Flags for: content type, main category, item
+
+		// Access Flags for: content type, main category, item
+		else
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
@@ -270,7 +308,7 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// Create JOIN for ordering items by a custom field (Level 1)
 		if ( 'field' == $order[1] ) {
-			$orderbycustomfieldid = (int)$cparams->get('orderbycustomfieldid', 0);
+			$orderbycustomfieldid = (int)$this->_params->get('orderbycustomfieldid', 0);
 			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 		}
 		if ( 'custom:' == substr($order[1], 0, 7) ) {
@@ -281,7 +319,7 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// Create JOIN for ordering items by a custom field (Level 2)
 		if ( 'field' == $order[2] ) {
-			$orderbycustomfieldid_2nd = (int)$cparams->get('orderbycustomfieldid'.'_2nd', 0);
+			$orderbycustomfieldid_2nd = (int)$this->_params->get('orderbycustomfieldid'.'_2nd', 0);
 			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 		}
 		if ( 'custom:' == substr($order[2], 0, 7) ) {
@@ -376,10 +414,10 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		
-		// Get the view's parameters
-		$cparams = $this->_params;
-		
+
+		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
+		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
+
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$app  = JFactory::getApplication();
@@ -394,7 +432,7 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// User current language
 		$lang = flexicontent_html::getUserCurrentLang();
-		$filtertag = $cparams->get('filtertag', 0);
+		$filtertag = $this->_params->get('filtertag', 0);
 		
 		// Filter the tag view with the active language
 		if ($filtertag)
@@ -402,35 +440,37 @@ class FlexicontentModelTags extends JModelLegacy
 			$lta = FLEXI_J16GE ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
-		
+
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
-		if (!$ignoreState) {
-			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			
-			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-		}
-		
-		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
+		if (!$ignoreState)
+		{
+			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = ' . $user->id : '';
+			//$OR_isModifier = $user->id ? ' OR i.modified_by = ' . $user->id : '';
 
-		/*
-		 * If we have a filter, and this is enabled... lets tack the AND clause
-		 * for the filter onto the WHERE clause of the item query.
-		 */
-		
-		// ****************************************
-		// Create WHERE clause part for Text Search 
-		// ****************************************
+			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
+			$where .= ' AND ( i.state IN (1, -5) ' . $OR_isOwner . ')';   // . $OR_isModifier
+
+			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) ' . $OR_isOwner . ')';   // . $OR_isModifier
+		}
+		else
+		{
+			// Include / Exclude trashed items for privileged users
+			$where .= $show_trashed ? ' AND ( i.state <> -2)' : '';
+		}
+
+		// ***
+		// *** Create WHERE clause part for Text Search 
+		// ***
 		
 		$text = JRequest::getString('filter', JRequest::getString('q', ''), 'default');
 		
 		// Check for LIKE %word% search, for languages without spaces
-		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
+		$filter_word_like_any = $this->_params->get('filter_word_like_any', 0);
 		
 		$phrase = $filter_word_like_any ?
 			JRequest::getWord('searchphrase', JRequest::getWord('p', 'any'),   'default') :
@@ -438,7 +478,7 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		$si_tbl = 'flexicontent_items_ext';
 		
-		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		$words = preg_split('/\s\s*/u', $text);
 		
@@ -556,7 +596,7 @@ class FlexicontentModelTags extends JModelLegacy
 				JError::raiseNotice ( 500, $module->getError() );
 			}
 		}
-		
+
 		$this->_params = $params;
 	}
 	
