@@ -45,22 +45,17 @@ class JFormFieldFcmethod extends JFormFieldRadio
 	function getInput()
 	{
 		$doc = JFactory::getDocument();
-		
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		$split_char = ",";
-		
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
 		$value = FLEXI_J16GE ? $this->value : $value;
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
-		//$disabled_ff = explode($split_char, @$attributes['disabled_ff']);
+		//$disabled_ff = explode(',', @$attributes['disabled_ff']);
 		$disabled_ff = @$attributes['disabled_ff'];
 		
 		if ($disabled_ff) {

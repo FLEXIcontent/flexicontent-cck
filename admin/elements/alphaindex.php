@@ -55,14 +55,11 @@ class JFormFieldAlphaindex extends JFormField
 	{
 		$doc  = JFactory::getDocument();
 		$db   = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
 		$options = array();
 		$i=-1;
 		if (@$attributes['use_global']) {
@@ -107,4 +104,3 @@ class JFormFieldAlphaindex extends JFormField
 		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }
-?>
