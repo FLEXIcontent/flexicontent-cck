@@ -263,8 +263,8 @@
 
 			<field name="" type="separator" default="FLEXI_CUSTOMIZE" level="level2" depend_class="stamp_pdfs_mode" />
 
-			<field name="pdf_header_text" type="textarea" cols="50" rows="2" default="" label="FLEXI_HEADER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
-			<field name="pdf_footer_text" type="textarea" cols="50" rows="2" default="" label="FLEXI_FOOTER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
+			<field name="pdf_header_text" type="textarea" filter="RAW" cols="50" rows="2" default="" label="FLEXI_HEADER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
+			<field name="pdf_footer_text" type="textarea" filter="RAW" cols="50" rows="2" default="" label="FLEXI_FOOTER" description="FLEXI_FIELD_FILE_PDF_THIS_TEXT_ADDED_ALL_PAGES" depend_class="stamp_pdfs_mode" />
 
 			<field name="" type="separator" default="FLEXI_HEADER" level="level3" depend_class="stamp_pdfs_mode" />
 			<field name="pdf_header_ffamily" type="list" default="Helvetica" label="Font family" depend_class="stamp_pdfs_mode" description="Select a font-family to for the header text">
@@ -488,7 +488,7 @@
 			</field>
 			<field name="notifications_step" type="text" default="20" size="10" label="Every N hits" depend_class="multivalue-mode12" description="Send email every N hits" />
 			
-			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_HITS%% __FILE_HITS__ &#10; %%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" depend_class="multivalue-mode12" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
+			<field name="notification_tmpl" type="textarea" filter="RAW" cols="50" rows="10" default="%%FLEXI_HITS%% __FILE_HITS__ &#10; %%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" depend_class="multivalue-mode12" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_SEND_TO" level="level3" />
 			<field name="send_all_to_email" type="text" default="" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />

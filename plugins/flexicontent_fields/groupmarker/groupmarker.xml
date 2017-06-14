@@ -46,7 +46,7 @@
 			<field name="cont_label"    type="text" size="24" default="" label="FLEXI_TABS_FIELDSET_LABEL"     description="FLEXI_TABS_FIELDSET_LABEL_DESC" depend_class="tfopen" />
 			
 			<field name="chtml_specific" type="separator" default="FLEXI_CUSTOM_HTML_SEP" level="level2" depend_class="chtml" />
-			<field name="custom_html_sep" type="textarea" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
+			<field name="custom_html_sep" type="textarea" filter="RAW" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
 			
 		</fieldset>
 	</fields>

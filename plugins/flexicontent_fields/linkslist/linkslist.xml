@@ -38,7 +38,7 @@
 				<option value="">FLEXI_CUSTOMIZE</option>
 				<option value="1" fcconfigs="{'list_class': 'list-group', 'field_elements':'Title1[id=\&amp;quot;tagid1\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link1\&amp;quot;] :: \nTitle2[id=\&amp;quot;tagid2\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link2\&amp;quot;] :: \nTitle3[id=\&amp;quot;tagid3\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link3\&amp;quot;]'}">FLEXI_LOAD_EXAMPLE</option>
 			</field>
-			<field name="field_elements" type="textarea" default="" class="required" rows="5" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
+			<field name="field_elements" type="textarea" filter="RAW" default="" class="required" rows="5" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
@@ -96,8 +96,8 @@
 			<field name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKSLIST_CUSTOM_CSS_JS" level="level1" />
-			<field name="js_code" type="textarea" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_JS_CODE" description="FLEXI_FIELD_LINKSLIST_JS_CODE_DESC" />			
-			<field name="css_code" type="textarea" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_CSS_CODE" description="FLEXI_FIELD_LINKSLIST_CSS_CODE_DESC" />			
+			<field name="js_code" type="textarea" filter="RAW" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_JS_CODE" description="FLEXI_FIELD_LINKSLIST_JS_CODE_DESC" />			
+			<field name="css_code" type="textarea" filter="RAW" default="" class="" rows="3" cols="21" label="FLEXI_FIELD_LINKSLIST_CSS_CODE" description="FLEXI_FIELD_LINKSLIST_CSS_CODE_DESC" />			
 
 		</fieldset>
 		

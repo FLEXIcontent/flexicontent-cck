@@ -300,8 +300,8 @@
 				<option value="1" show_list="" hide_list="filt-as-slider-custom">Found values</option>
 				<option value="2" show_list="filt-as-slider-custom" hide_list="">Custom values</option>
 			</field>
-			<field name="slider_custom_range"  type="textarea" default="'min': '', '25%': '2000', '50%': '2005', '75%': '2020', 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
-			<field name="slider_custom_labels" type="textarea" default="label_any ## label_2000 ## label_2005 ## label_2020 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
+			<field name="slider_custom_range"  type="textarea" filter="RAW" default="'min': '', '25%': '2000', '50%': '2005', '75%': '2020', 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
+			<field name="slider_custom_labels" type="textarea" filter="RAW" default="label_any ## label_2000 ## label_2005 ## label_2020 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
 			<field name="slider_custom_labels_jtext" type="radio" default="0" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING_DESC" depend_class="filt-as-slider filt-as-slider-custom" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -367,8 +367,8 @@
 				<option value="1" show_list="" hide_list="filt-as-slider-custom-s">Found values</option>
 				<option value="2" show_list="filt-as-slider-custom-s" hide_list="">Custom values</option>
 			</field>
-			<field name="slider_custom_range_s"  type="textarea" default="'min': '', '25%': 2000, '50%': 2005, '75%': 2020, 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
-			<field name="slider_custom_labels_s" type="textarea" default="label_any ## label_2000 ## label_2005 ## label_2020 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
+			<field name="slider_custom_range_s"  type="textarea" filter="RAW" default="'min': '', '25%': 2000, '50%': 2005, '75%': 2020, 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
+			<field name="slider_custom_labels_s" type="textarea" filter="RAW" default="label_any ## label_2000 ## label_2005 ## label_2020 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
 			<field name="slider_custom_labels_jtext_s" type="radio" default="0" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

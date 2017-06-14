@@ -127,7 +127,7 @@
 				<option value="0" hide_list="send_coupons" show_list="">FLEXI_NO</option>
 				<option value="1" hide_list="" show_list="send_coupons">FLEXI_YES</option>
 			</field>
-			<field name="coupon_desc" type="textarea" default="Add a custom message here" label="Edit coupoun email text" description="A text to be used as email body message when sending the item edit link" depend_class="send_coupons" />
+			<field name="coupon_desc" type="textarea" filter="RAW" default="Add a custom message here" label="Edit coupoun email text" description="A text to be used as email body message when sending the item edit link" depend_class="send_coupons" />
 			
 			<field name="initialized" type="hidden" default="0" label="Initialized" description="SQL tables initialized" />
 		</fieldset>

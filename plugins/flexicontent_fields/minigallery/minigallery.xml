@@ -237,7 +237,7 @@
 				<option value="in:out">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_INOUT</option>
 				<option value="out:in">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_OUTIN</option>
 			</field>
-			<field name="otheroptions" type="textarea" default="" cols="40" rows="3" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC" />
+			<field name="otheroptions" type="textarea" filter="RAW" default="" cols="40" rows="3" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC" />
 			
 		</fieldset>
 		
