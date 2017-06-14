@@ -28,7 +28,7 @@
 			<field name="modules" type="fcmodules" default="" label="FLEXI_FIELD_MODULE_MODULES_LIST" depend_class="module-mode" description="FLEXI_FIELD_MODULE_MODULES_LIST_DESC" />
 			<field name="position" type="fcpositions" default="" label="FLEXI_FIELD_MODULE_POSITIONS_LIST" depend_class="position-mode" description="FLEXI_FIELD_MODULE_POSITIONS_LIST_DESC" />
 			<field name="style" type="text" default="" label="FLEXI_FIELD_MODULE_STYLE" description="FLEXI_FIELD_MODULE_STYLE_DESC" />
-			<field name="mod_params" type="textarea" rows="8" cols="50" default="" label="FLEXI_CUSTOM_MODULE_PER_ITEM" depend_class="module-mode" description="FLEXI_CUSTOM_MODULE_PER_ITEM_DESC" />
+			<field name="mod_params" type="textarea" filter="RAW" rows="8" cols="50" default="" label="FLEXI_CUSTOM_MODULE_PER_ITEM" depend_class="module-mode" description="FLEXI_CUSTOM_MODULE_PER_ITEM_DESC" />
 		</fieldset>
 
 

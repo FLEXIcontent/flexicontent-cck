@@ -379,14 +379,14 @@ class FlexicontentViewItem  extends JViewLegacy
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('item' , 				$item);
-		$this->assignRef('user' , 				$user);
-		$this->assignRef('params' , 			$params);
-		$this->assignRef('print_link' , 	$print_link);
-		$this->assignRef('pageclass_sfx' ,$pageclass_sfx);
-		$this->assignRef('parentcat',			$parentcat);
-		$this->assignRef('fields',				$item->fields);
-		$this->assignRef('tmpl' ,					$tmpl);
+		$this->item = $item;
+		$this->user = $user;
+		$this->params = $params;
+		$this->print_link = $print_link;
+		$this->pageclass_sfx = $pageclass_sfx;
+		$this->parentcat = $parentcat;
+		$this->fields = $item->fields;
+		$this->tmpl   = $tmpl;
 		
 		
 		// NOTE: Moved decision of layout into the model, function decideLayout() layout variable should never be empty
@@ -607,7 +607,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *********************************************************************************************************
 		// Get language stuff, and also load Template-Specific language file to override or add new language strings
 		// *********************************************************************************************************
-		if ($useAssocs)  $langAssocs = $page_params->get('uselang_fe')==1 ? $this->get( 'LangAssocs' ) : false;
+		$langAssocs = $useAssocs && $page_params->get('uselang_fe')==1 ? $this->get( 'LangAssocs' ) : false;
 		$langs = FLEXIUtilities::getLanguages('code');
 		FLEXIUtilities::loadTemplateLanguageFile( $page_params->get('ilayout', 'default') );
 		
@@ -936,31 +936,35 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get pageclass suffix
 		$pageclass_sfx = htmlspecialchars($page_params->get('pageclass_sfx'));
 
-		$this->assign('action',			$uri->toString());
-		$this->assignRef('item',		$item);
-		$this->assignRef('form',		$form);  // most core field are created via calling methods of the form (J2.5)
-		
-		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
-		$this->assignRef('langs', $langs);
-		$this->assignRef('params',		$page_params);
-		$this->assignRef('lists',			$lists);
-		$this->assignRef('subscribers', $subscribers);
-		$this->assignRef('editor',		$editor);
-		$this->assignRef('user',			$user);
-		$this->assignRef('usedtagsdata'  , $usedtagsdata);
-		$this->assignRef('quicktagsdata' , $quicktagsdata);
-		$this->assignRef('fields',     $fields);
-		$this->assignRef('tparams',    $tparams);
-		$this->assignRef('perms',      $perms);
-		$this->assignRef('document',   $document);
-		$this->assignRef('nullDate',   $nullDate);
-		$this->assignRef('menuCats',   $menuCats);
-		$this->assignRef('submitConf', $submitConf);
-		$this->assignRef('placementConf', $placementConf);
-		$this->assignRef('itemlang',   $itemlang);
-		$this->assignRef('pageclass_sfx', $pageclass_sfx);
-		$this->assign('captcha_errmsg', @ $captcha_errmsg);
-		$this->assign('captcha_field',  @ $captcha_field);
+		$this->action = $uri->toString();
+		$this->item = $item;
+		$this->form = $form;  // most core field are created via calling JForm methods
+
+		$this->lang_assocs = $langAssocs;
+		$this->langs  = $langs;
+		$this->params = $page_params;
+		$this->lists  = 	$lists;
+
+		$this->subscribers = $subscribers;
+		$this->editor = $editor;
+		$this->user   = $user;
+
+		$this->usedtagsdata  = $usedtagsdata;
+		$this->quicktagsdata = $quicktagsdata;
+
+		$this->fields     = $fields;
+		$this->tparams    = $tparams;
+		$this->perms      = $perms;
+		$this->document   = $document;
+		$this->nullDate   = $nullDate;
+		$this->menuCats   = $menuCats;
+		$this->submitConf = $submitConf;
+		$this->placementConf = $placementConf;
+		$this->itemlang      = $itemlang;
+		$this->pageclass_sfx = $pageclass_sfx;
+
+		$this->captcha_errmsg = isset($captcha_errmsg) ? $captcha_errmsg : null;
+		$this->captcha_field  = isset($captcha_field)  ? $captcha_field  : null;
 		
 		
 		// ****************************************************************

@@ -102,7 +102,7 @@
 				<option value="0" show_list="" hide_list="custom-field-disp">Default HTML</option>
 				<option value="1" show_list="custom-field-disp" hide_list="">Custom HTML</option>
 			</field>
-			<field name="custom_html" type="textarea" cols="38" rows="5" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
+			<field name="custom_html" type="textarea" filter="RAW" cols="38" rows="5" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
 			
 			<field name="" type="separator" default="Fields WITHOUT value" level="level2" />
 			<field name="hide_lbl_ifnoval" type="filters" multiple="false" groupables="1" isfilter="*" default="" label="Skip field (Label/empty html code)" description="Select fields to hide labels if they have no value. NOTE: if using 'default HTML', then this will also skip fields that produced no HTML code" />

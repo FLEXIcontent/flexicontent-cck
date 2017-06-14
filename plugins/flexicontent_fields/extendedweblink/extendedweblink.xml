@@ -122,7 +122,7 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="class_choices" type="textarea" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="not_jurls hiddefield-mode4" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
+			<field name="class_choices" type="textarea" filter="RAW" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" depend_class="not_jurls hiddefield-mode4" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
 
 			<field name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" depend_class="not_jurls" />
 			<field name="use_id" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >

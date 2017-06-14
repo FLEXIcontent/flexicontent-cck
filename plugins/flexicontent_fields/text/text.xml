@@ -137,7 +137,7 @@
 				</group>
 			</field>
 			<field name="regexmask" type="text" default="" label="Regular Expression" depend_class="regexmask-mode" description="See PERL regular expression e.g. [0-9]{0-10}"  />
-			<field name="custommask" type="textarea" default="" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" depend_class="custommask-mode" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
+			<field name="custommask" type="textarea" filter="RAW" default="" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" depend_class="custommask-mode" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
 
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
@@ -214,7 +214,7 @@
 			<field name="decimal_thousands_sep" type="text" default="," label="FLEXI_FIELD_TEXT_DECIMAL_THOUSANDS_SEP" description="FLEXI_FIELD_TEXT_DECIMAL_THOUSANDS_SEP_DESC" depend_class="output-as-number"/>
 			<field name="output_prefix" type="text" default="" label="Prefix" description="" depend_class="output-custom"/>
 			<field name="output_suffix" type="text" default="" label="Suffix" description="" depend_class="output-custom"/>
-			<field name="output_custom_func" type="textarea" default="$value_length = mb_strlen($value, 'UTF-8');&#13;&#10;return 'Value length is: '. $value_length;" label="FLEXI_FIELD_TEXT_CUSTOM_OUTPUT_FUNC" description="FLEXI_FIELD_TEXT_CUSTOM_OUTPUT_FUNC_DESC" depend_class="output-custom-func"/>
+			<field name="output_custom_func" type="textarea" filter="RAW" default="$value_length = mb_strlen($value, 'UTF-8');&#13;&#10;return 'Value length is: '. $value_length;" label="FLEXI_FIELD_TEXT_CUSTOM_OUTPUT_FUNC" description="FLEXI_FIELD_TEXT_CUSTOM_OUTPUT_FUNC_DESC" depend_class="output-custom-func"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
 
@@ -366,8 +366,8 @@
 				<option value="1" show_list="" hide_list="filt-as-slider-custom">Found values</option>
 				<option value="2" show_list="filt-as-slider-custom" hide_list="">Custom values</option>
 			</field>
-			<field name="slider_custom_range"  type="textarea" default="'min': '', '25%': '50', '50%': '150', '75%': '600', 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
-			<field name="slider_custom_labels" type="textarea" default="label_any ## label_50 ## label_150 ## label_600 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
+			<field name="slider_custom_range"  type="textarea" filter="RAW" default="'min': '', '25%': '50', '50%': '150', '75%': '600', 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
+			<field name="slider_custom_labels" type="textarea" filter="RAW" default="label_any ## label_50 ## label_150 ## label_600 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
 			<field name="slider_custom_labels_jtext" type="radio" default="0" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING_DESC" depend_class="filt-as-slider filt-as-slider-custom" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -427,8 +427,8 @@
 				<option value="1" show_list="" hide_list="filt-as-slider-custom-s">Found values</option>
 				<option value="2" show_list="filt-as-slider-custom-s" hide_list="">Custom values</option>
 			</field>
-			<field name="slider_custom_range_s"  type="textarea" default="'min': '', '25%': 500, '50%': 2000, '75%': 10000, 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
-			<field name="slider_custom_labels_s" type="textarea" default="label_any ## label_500 ## label_2000 ## label_10000 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
+			<field name="slider_custom_range_s"  type="textarea" filter="RAW" default="'min': '', '25%': 500, '50%': 2000, '75%': 10000, 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
+			<field name="slider_custom_labels_s" type="textarea" filter="RAW" default="label_any ## label_500 ## label_2000 ## label_10000 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
 			<field name="slider_custom_labels_jtext_s" type="radio" default="0" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
