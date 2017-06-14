@@ -41,7 +41,7 @@ $this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicon
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
-		fc_bindFormDependencies('#flexicontent', 0, '');
+		fc_bindFormDependencies('#flexicontent', 2, '.control-group');
 	});
 ";
 $this->document->addScriptDeclaration($js);

@@ -59,16 +59,15 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput()
 	{
 		static $function_added = false;
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
-		$values			= FLEXI_J16GE ? $this->value : $value;
-		if ( !empty($attributes['joinwith']) ) {
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
+		$values = $this->value;
+
+		if ( !empty($attributes['joinwith']) )
+		{
 			$values = explode( $attributes['joinwith'],  $values );
 		}
 		if ( empty($values) )							$values = array();

@@ -118,12 +118,12 @@ class JFormFieldMultiList extends JFormField
 			$attribs['list.attr']['class'][] = 'fc_select2_sortable';
 		}
 
-		if ($this->element['fccustom_revert'])
+		if ( (int) $this->element['fccustom_revert'] )
 		{
 			$attribs['list.attr']['class'][] = 'fccustom_revert';
 		}
 		
-		if ($this->element['toggle_related'])
+		if ( (int) $this->element['toggle_related'] )
 		{
 			$attribs['list.attr']['class'][] = 'fcform_toggler_element';
 		}

@@ -46,15 +46,12 @@ class JFormFieldFcpositions extends JFormField
 	{
 		$doc = JFactory::getDocument();
 		$db  = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
-		
-		$values = FLEXI_J16GE ? $this->value : $value;
+
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+
+		$values = $this->value;
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
