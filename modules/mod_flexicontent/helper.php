@@ -38,10 +38,12 @@ class modFlexicontentHelper
 		$forced_itemid = $params->get('forced_itemid');
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		
+		$app  = JFactory::getApplication();
+
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
 		// Get IDs of user's access view levels
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		
@@ -364,7 +366,7 @@ class modFlexicontentHelper
 				JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 		}
 		
-		$id     = JRequest::getInt('id', 0);   // id of current item
+		$id = $jinput->get('id', 0, 'int');   // id of current item
 		
 		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
 		$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
@@ -729,8 +731,10 @@ class modFlexicontentHelper
 		$app = JFactory::getApplication();
 		
 		// For specific cache issues
-		if (empty($globalcats)) {
-			if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
+		if (empty($globalcats))
+		{
+			if (FLEXI_SECTION || FLEXI_CAT_EXTENSION)
+			{
 				JPluginHelper::importPlugin('system', 'flexisystem');
 				if (FLEXI_CACHE) {
 					// add the category tree to categories cache
@@ -745,10 +749,14 @@ class modFlexicontentHelper
 		}
 
 		// Initialize variables
-		$db				= JFactory::getDBO();
-		$user			= JFactory::getUser();
-		$view			= JRequest::getVar('view');
-		$option		= JRequest::getVar('option');
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		$app  = JFactory::getApplication();
+
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
 		$flexiparams 	= $app->getParams('com_flexicontent');
 		$show_noauth 	= $flexiparams->get('show_noauth', 0);
 		
@@ -905,12 +913,12 @@ class modFlexicontentHelper
 		// NON-STATIC behaviors that need current item information
 		// *******************************************************
 		
-		$id     = JRequest::getInt('id', 0);   // id of current item
-		$cid    = JRequest::getInt( ($option == 'com_content' ? 'id' : 'cid') );  // current category ID or category ID of current item
+		$id   = $jinput->get('id', 0, 'int');   // id of current item
+		$cid  = $jinput->get(($option == 'com_content' ? 'id' : 'cid'), 0, 'int');   // current category ID or category ID of current item
 		
 		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
 		$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
-		$isflexi_catview  = $is_content_ext && $view == 'category' && ( $cid || JRequest::getVar('cids') );
+		$isflexi_catview  = $is_content_ext && $view == 'category' && ( $cid || $jinput->get('cids', '', 'string') );
 		
 		$curritem_date_field_needed =
 			$behaviour_dates &&  // Dynamic
@@ -921,7 +929,7 @@ class modFlexicontentHelper
 		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $curritem_date_field_needed || $behaviour_filt) && $isflexi_itemview )
 		{
 			// initialize variables
-			$Itemid	= JRequest::getInt('Itemid');
+			$Itemid = $jinput->get('Itemid', 0, 'int');
 			
 			// NOTE: aborting execution if item view is required, but current view is not item view
 			// and also proper usage of current item, both of these will be handled by SCOPEs
@@ -973,7 +981,7 @@ class modFlexicontentHelper
 		// current item scope
 		// ******************
 		
-		$currid			= JRequest::getInt('id');
+		$currid = $jinput->get('id', 0, 'int');   // id of current item
   	if ($method_curitem == 1) { // exclude method  ---  exclude current item
 		  $where .=  ' AND i.id <> ' . $currid;
 		} else if ($method_curitem == 2) { // include method  ---  include current item ONLY
@@ -1147,22 +1155,24 @@ class modFlexicontentHelper
 			if ( !$currcat_valid_case ) {
 				return;  // current view is not item OR category view ... , nothing to display
 			}
-			
-			// IF $cid is not set then use the main category id of the (current) item
+
 			if ($isflexi_itemview)
 			{
+				// IF $cid is not set then use the main category id of the (current) item
 				$cid = $cid ? $cid : $curitem->catid;
 				
 				// Retrieve extra categories, such children or parent categories
 				$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, $curritemcats);
 			}
-			
+
 			else if ($isflexi_catview)
 			{
-				$cid = JRequest::getInt( ($option == 'com_content' ? 'id' : 'cid'), 0);
-				if (!$cid) {
-					$_cids = JRequest::getVar('cids', '');
-					if ( !is_array($_cids) ) {
+				$cid = $jinput->get(($option == 'com_content' ? 'id' : 'cid'), 0, 'int');   // current category ID or category ID of current item
+				if (!$cid)
+				{
+					$_cids = $jinput->get('cids', '', 'string');
+					if ( !is_array($_cids) )
+					{
 						$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
 						$_cids = explode(',', $_cids);
 					}
@@ -1173,8 +1183,12 @@ class modFlexicontentHelper
 					// Retrieve extra categories, such children or parent categories
 					$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, array());
 				}
-			} else {
-				return;  // nothing to display
+			}
+
+			// Nothing to display
+			else
+			{
+				return;
 			}
 			
 			// Retrieve extra categories, such children or parent categories
@@ -1965,17 +1979,19 @@ class modFlexicontentHelper
 	public static function getCategoryData(&$params)
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
-		
-		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
-		$view   = JRequest::getVar('view');
-		$option = JRequest::getVar('option');
-		
+
+		$db   = JFactory::getDBO();
+		$app  = JFactory::getApplication();
+
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
 		$currcat_custom_display = $params->get('currcat_custom_display', 0);
 		$currcat_source = $params->get('currcat_source', 0);  // 0 item view, 1 category view, 2 both
 		
-		$id     = JRequest::getInt('id', 0);   // id of current item
-		$cid    = JRequest::getInt( ($option == 'com_content' ? 'id' : 'cid') );  // current category ID or category ID of current item
+		$id   = $jinput->get('id', 0, 'int');   // id of current item
+		$cid  = $jinput->get(($option == 'com_content' ? 'id' : 'cid'), 0, 'int');   // current category ID or category ID of current item
 
 		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
 		$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
@@ -2140,7 +2156,7 @@ class modFlexicontentHelper
 		$menus = $app->getMenu();
 		$itemid_force	= (int)$params->get('itemid_force');
 		if ($itemid_force==1) {
-			$Itemid					= JRequest::getInt('Itemid');
+			$Itemid					= $jinput->get('Itemid', 0, 'int');
 			$menu						= $menus->getItem($Itemid);
 			$component			= @$menu->query['option'] ? $menu->query['option'] : '';
 			$forced_itemid	= $component=="com_flexicontent" ? $Itemid : 0;
@@ -2209,4 +2225,3 @@ class modFlexicontentHelper
 		return $comments;
 	}
 }
-?>

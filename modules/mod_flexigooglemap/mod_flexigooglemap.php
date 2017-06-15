@@ -15,27 +15,18 @@
 * GNU General Public License for more details.
 **/
 
-//blocage des accés directs sur ce script
+// no direct access
 defined('_JEXEC') or die('Restricted access');
-
-// Check if component is installed
-jimport( 'joomla.application.component.controller' );
-if ( !JComponentHelper::isEnabled( 'com_flexicontent', true) )
-{
-	echo '<div class="alert alert-warning">This module requires FLEXIcontent package to be installed</div>';
-	return;
-}
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 
 // Decide whether to show module contents
-$app    = JFactory::getApplication();
-$view   = JRequest::getVar('view');
-$option = JRequest::getVar('option');
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
+$option  = $jinput->get('option', '', 'cmd');
+$view    = $jinput->get('view', '', 'cmd');
 
-if ($option=='com_flexicontent')
-	$_view = ($view==FLEXI_ITEMVIEW) ? 'item' : $view;
-else
-	$_view = 'others';
+$_view   = $option=='com_flexicontent' ? $view : 'others';
 
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
@@ -57,13 +48,47 @@ if ( !$show_mod )  return;
 
 
 
+global $modfc_jprof;
+jimport('joomla.profiler.profiler');
+$modfc_jprof = new JProfiler();
+$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
+
+// Include helpers class file
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+static $mod_initialized = null;
+$modulename = 'mod_flexitagcloud';
+if ($mod_initialized === null)
+{
+	flexicontent_html::loadModuleLanguage($modulename);
+	$mod_initialized = true;
+}
+
 $moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx'));
 
-// Include helper file
-require_once dirname(__FILE__).'/helper.php';
+// initialize various variables
+$document = JFactory::getDocument();
+$caching 	= $app->getCfg('caching', 0);
+$flexiparams = JComponentHelper::getParams('com_flexicontent');
+
+// include the helper only once
+require_once (dirname(__FILE__).DS.'helper.php');
+
+// get module's basic display parameters
+$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
+$layout 				= $params->get('layout', 'default');
 
 $tMapTips = modFlexigooglemapHelper::renderMapLocations($params);
 $markerdisplay = modFlexigooglemapHelper::getMarkerURL($params);
 
-// Get Joomla Layout
-require JModuleHelper::getLayoutPath('mod_flexigooglemap', $params->get('layout', 'default'));
+// Render Layout
+require(JModuleHelper::getLayoutPath('mod_flexigooglemap', $layout));
+
+// append performance stats to global variable
+if ( $flexiparams->get('print_logging_info') )
+{
+	$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
+	$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+	global $fc_performance_msg;
+	$fc_performance_msg .= $msg;
+}

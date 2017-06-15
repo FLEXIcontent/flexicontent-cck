@@ -15,7 +15,7 @@ $show_filter_labels = $params->get('show_filter_labels', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
 $filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
-$text_search_val = JRequest::getString('filter', '', 'default');
+$text_search_val = JFactory::getApplication()->input->get('filter', '', 'string');
 
 // 4. Create (print) the form
 ?>

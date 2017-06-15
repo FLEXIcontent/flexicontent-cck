@@ -20,14 +20,12 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 
 // Decide whether to show module contents
-$app    = JFactory::getApplication();
-$view   = JRequest::getVar('view');
-$option = JRequest::getVar('option');
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
+$option  = $jinput->get('option', '', 'cmd');
+$view    = $jinput->get('view', '', 'cmd');
 
-if ($option=='com_flexicontent')
-	$_view = ($view==FLEXI_ITEMVIEW) ? 'item' : $view;
-else
-	$_view = 'others';
+$_view   = $option=='com_flexicontent' ? $view : 'others';
 
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
