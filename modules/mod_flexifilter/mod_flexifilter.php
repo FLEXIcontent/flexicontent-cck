@@ -19,14 +19,12 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 // Decide whether to show module contents
-$app    = JFactory::getApplication();
-$view   = JRequest::getVar('view');
-$option = JRequest::getVar('option');
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
+$option  = $jinput->get('option', '', 'cmd');
+$view    = $jinput->get('view', '', 'cmd');
 
-if ($option=='com_flexicontent')
-	$_view = ($view==FLEXI_ITEMVIEW) ? 'item' : $view;
-else
-	$_view = 'others';
+$_view   = $option=='com_flexicontent' ? $view : 'others';
 
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
@@ -93,7 +91,7 @@ $config_catid = (int)$params->get('catid', 0);
 // Current category ID (via any of: menu item / url / single category selector 'cid')
 $is_flexiview = $option=="com_flexicontent" && ($view=="category" || $view=="item");
 $catid_fieldname = 'cid';    // we could use a different name per module but that is an overkill and possible will lead to bugs, e.g. 'cid_mod_'.$module->id;
-$current_cid = $is_flexiview ? JRequest::getInt($catid_fieldname, 0) : 0;
+$current_cid = $is_flexiview ? $jinput->get($catid_fieldname, 0, 'int') : 0;
 
 // Decide to use specific category ID or use current category ID
 $force_specific_cid = !$display_cat_list && $config_catid;
@@ -121,8 +119,8 @@ if ( !empty($mcats_menu) )
 // Set category id / ids for TEXT autocomplete
 if ($display_cat_list && $mcats_selection)
 {
-	$cids_val = JRequest::getVar('cids', array());
-	
+	$cids_val = $jinput->get('cids', array(), 'array');
+
 	// CLEAR single category id, we will you cids from category selector
 	$params->set('txt_ac_cid', 'NA');
 	!empty($cids_val) ?
@@ -174,13 +172,15 @@ if ($display_cat_list)
 	$_fld_onchange = $_fld_multiple = '';
 	
 	// CASE 1: Multi-category selector, targeting multi-category view
-	if ($mcats_selection) {
+	if ($mcats_selection)
+	{
 		$_fld_size = " size='$catlistsize' ";
 		$_fld_multiple = ' multiple="multiple" ';
 		$_fld_name = 'cids[]';
 		
-		$mcats_list = JRequest::getVar('cids', '');
-		if ( !is_array($mcats_list) ) {
+		$mcats_list = $jinput->get('cids', '', 'string');
+		if ( !is_array($mcats_list) )
+		{
 			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
 			$mcats_list = explode(',', $mcats_list);
 		}
@@ -190,7 +190,8 @@ if ($display_cat_list)
 	}
 	
 	// CASE 2: Single category selector, targeting single category view
-	else {
+	else
+	{
 		$_fld_classes .= ' fc_autosubmit_exclude';  // exclude from autosubmit because we need to get single category SEF url before submitting, and then submit ...
 		$_fld_size = "";
 		$_fld_onchange = ' onchange="update_'.$form_name.'();" ';
@@ -216,18 +217,18 @@ $orderby_selector = flexicontent_html::orderby_selector( $params, $form_name, $a
 // 2. Get category, this is needed so that we get only the allowed filters of the category
 // allowed filters are set in the category options (configuration)
 
-$saved_cid = JRequest::getVar('cid', '');   // save cid ...
-$saved_layout = JRequest::getVar('layout'); // save layout ...
-$saved_option = JRequest::getVar('option'); // save option ...
-$saved_view = JRequest::getVar('view'); // save layout ...
+$saved_cid = $jinput->get('cid', '', 'string');   // save cid ...
+$saved_layout = $jinput->get('layout', '', 'string'); // save layout ...
+$saved_option = $option; // save option ...
+$saved_view   = $view; // save view ...
 
 $target_layout = $mcats_selection || !$catid ? 'mcats' : '';
-JRequest::setVar('layout', $target_layout);
-JRequest::setVar($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
-JRequest::setVar('option', 'com_flexicontent');
-JRequest::setVar('view', 'category');
+$jinput->set('layout', $target_layout);
+$jinput->set($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
+$jinput->set('option', 'com_flexicontent');
+$jinput->set('view', 'category');
 
-// Get/Create current category model ... according to configuration set above into the JRequest variables ...
+// Get/Create current category model ... according to configuration set above into the HTTP Request variables ...
 $cat_model = new FlexicontentModelCategory();
 $category = $cat_model->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
 
@@ -285,7 +286,7 @@ $display_subcats = (int) $view_params->get('display_subcategories_items', 2);   
 $params->set('txt_ac_usesubs', $display_subcats );
 
 // Override text search auto-complete category ids with those of filter 13
-$f13_val = JRequest::getVar('filter_13');
+$f13_val = $jinput->get('filter_13', '', 'string');
 if ( isset($filters['categories']) && !empty($f13_val) )
 {
 	$params->set('txt_ac_cid', 'NA');
@@ -298,10 +299,10 @@ if ( !empty($filters) ) {
 }
 
 // Restore variables
-JRequest::setVar('cid', $saved_cid); // restore cid
-JRequest::setVar('layout', $saved_layout); // restore layout
-JRequest::setVar('option', $saved_option); // restore option
-JRequest::setVar('view', $saved_view); // restore view
+$jinput->set('cid', $saved_cid); // restore cid
+$jinput->set('layout', $saved_layout); // restore layout
+$jinput->set('option', $saved_option); // restore option
+$jinput->set('view', $saved_view); // restore view
 
 // Load needed JS libs & CSS styles
 //JHtml::_('behavior.framework', true);

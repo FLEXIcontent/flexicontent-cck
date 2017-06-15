@@ -4,9 +4,12 @@
 	$show_cat_data = $catdata->conf->showtitle || $show_cat_image || !empty($catdata->description);
 	if ( !$show_cat_data  ) return;
 	
-	$view   = JRequest::getVar('view');
-	$option = JRequest::getVar('option');
-	$cid = JRequest::getInt('cid');
+	$app     = JFactory::getApplication();
+	$jinput  = $app->input;
+	$option  = $jinput->get('option', '', 'cmd');
+	$view    = $jinput->get('view', '', 'cmd');
+	$cid     = $jinput->get('cid', 0, 'int');
+
 	$is_active_cat = $cid == $catdata->id && $option == 'com_flexicontent';
 	$cat_classes  = 'catdata';
 	$cat_classes .= ($is_active_cat && $view == FLEXI_ITEMVIEW) ? ' fcitemcat_active' : '';
