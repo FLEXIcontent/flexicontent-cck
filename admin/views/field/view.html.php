@@ -319,6 +319,13 @@ class FlexicontentViewField extends JViewLegacy
 				});
 			";
 		}
+		
+		// Core field
+		else
+		{
+			// Set name property as readonly
+			$form->setFieldAttribute('name', 'readonly', 'true');
+		}
 
 
 
