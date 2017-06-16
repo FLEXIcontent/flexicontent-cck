@@ -253,6 +253,9 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				{
 					fc_field_dialog_handle_".$field->id.".dialog('close');
 				}
+
+				// Re-validate
+				jQuery(valcounter).trigger('blur');
 				return true;
 			}
 

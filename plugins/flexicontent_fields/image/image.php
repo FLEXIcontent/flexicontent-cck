@@ -621,6 +621,9 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					fc_field_dialog_handle_".$field->id.".dialog('close');
 				}
+
+				// Re-validate
+				jQuery(valcounter).trigger('blur');
 				//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 			}
 			
