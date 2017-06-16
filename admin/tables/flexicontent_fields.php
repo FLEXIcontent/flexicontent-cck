@@ -18,10 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-if (FLEXI_J16GE) {
-	jimport('joomla.access.rules');
-}
-
+jimport('joomla.access.rules');
 
 class _flexicontent_fields_common extends JTable {
 	/**
@@ -42,7 +39,8 @@ class _flexicontent_fields_common extends JTable {
 	}
 }
 
-if (FLEXI_J30GE) {  // This is not removed to be an example of how to workaround adding TYPE to method parameters of parent class
+// This code has not removed to be an example of how to workaround adding TYPE to method parameters of parent class
+if (FLEXI_J30GE) {
 	class _flexicontent_fields extends _flexicontent_fields_common {
 		protected function _getAssetParentId(JTable $table = null, $id = null) {
 			return parent::__getAssetParentId($table, $id);
@@ -68,95 +66,186 @@ else {
  */
 class flexicontent_fields extends _flexicontent_fields
 {
-	/** @var int */
-	var $id 					= null;
+	/**
+	 * Primary Key
+	 * @var int
+	 */
+	var $id						= null;
+
 	/** @var int */
 	var $asset_id 		= null;
-	/** @var int */
+
+	/** @var string */
 	var $field_type		= null;
+
 	/** @var string */
-	var $name					= '';
+	var $name					= null;
+
 	/** @var string */
-	var $label				= '';
+	var $label				= null;
+
 	/** @var string */
 	var $description	= '';
+
 	/** @var int */
 	var $iscore				= 0;
+
 	/** @var int */
 	var $issearch			= 1;
+
 	/** @var int */
 	var $isadvsearch	= 0;
+
 	/** @var int */
 	var $isfilter			= 0;
+
 	/** @var int */
 	var $isadvfilter	= 0;
+
 	/** @var int */
 	var $untranslatable	= 0;
+
 	/** @var int */
 	var $formhidden			= 0;
+
 	/** @var int */
 	var $valueseditable	= 0;
+
 	/** @var int */
 	var $edithelp			= 2;
+
 	/** @var string */
 	var $positions		= '';
+
 	/** @var string */
 	var $attribs	 		= null;
+
 	/** @var int */
-	var $published			= null;
+	var $published		= 0;
+
 	/** @var int */
-	var $checked_out		= 0;
+	var $checked_out	= 0;
+
 	/** @var date */
 	var $checked_out_time	= '';
+
 	/** @var int */
-	var $access 			= 0;
+	var $access 			= 1;  // Public access
+
 	/** @var int */
-	var $ordering 		= null;
+	var $ordering 		= 0;
+
 	/** @var boolean */
 	var $_trackAssets	= true;
 
-	function __construct(& $db) {
-		parent::__construct('#__flexicontent_fields', 'id', $db);
-	}
-	
-	// overloaded check function
-	function check()
+	// Non-table (private) properties
+	var $_record_name = 'field';
+	var $_title = 'label';
+	var $_alias = 'name';
+	var $_force_ascii_alias = true;
+
+	public function __construct(& $db)
 	{
-		// Not typed in a label?
-		if (trim( $this->label ) == '') {
-			$this->_error = JText::_( 'FLEXI_ADD_LABEL' );
-			JError::raiseWarning('SOME_ERROR_CODE', $this->_error );
+		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
+		$this->_records_jtable = 'flexicontent_' . $this->_record_name . 's';
+		$this->_NAME = strtoupper($this->_record_name);
+
+		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
+	}
+
+
+	// overloaded check function
+	public function check()
+	{
+		$title = $this->_title;
+		$alias = $this->_alias;
+
+		// Check if 'title' was not given
+		if (trim( $this->$title ) == '')
+		{
+			$msg = JText::_( 'FLEXI_ADD_' . strtoupper($title) );
+			JFactory::getApplication()->enqueueMessage($msg, 'error');
 			return false;
 		}
-		
-		//$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
 
-		$pattern = '/^[a-z_]+[a-z_0-9-]+$/i';
-		$matches = NULL;
-		$false = !preg_match($pattern, $this->name, $matches);
-		if((empty($this->name) || $false) && $this->iscore != 1 ) {
-			$name = $this->name;
-			$this->name = 'field' . ($this->id ? $this->id : $this->_getLastId()+1); //newname
-			$msg = JText::sprintf('FLEXI_WARN_FIELD_NAME_CORRECTED', $name, $this->name);
-			JError::raiseWarning(100, $msg);
+		if ($this->_force_ascii_alias)
+		{
+			$valid_pattern = '/^[a-z_]+[a-z_0-9-]+$/i';
+			$is_valid = $this->iscore;
+			$is_valid = $is_valid || preg_match($valid_pattern, $this->$alias);
+			if (!$is_valid)
+			{
+				$bad_alias = $this->$alias;
+				$this->$alias = null;
+			}
+		}
+
+		// Check for existing 'alias'
+		if (!empty($this->$alias))
+		{
+			$query = 'SELECT id'
+				. ' FROM #__' . $this->_records_dbtbl
+				. ' WHERE ' . $alias . ' = '.$this->_db->Quote($this->$alias);
+			$this->_db->setQuery($query);
+
+			$xid = intval($this->_db->loadResult());
+			if ($xid && $xid != intval($this->id))
+			{
+				$msg = JText::sprintf('FLEXI_THIS_' . $this->_NAME . '_' . strtoupper($alias) . '_ALREADY_EXIST', $this->name);
+				JFactory::getApplication()->enqueueMessage($msg, 'warning');
+				return false;
+			}
+		}
+
+		// Use 'title' as alias if 'alias' is empty
+		else
+		{
+			$this->$alias = $this->$title;
+		}
+
+		// FLAGs
+		$unicodeslugs = JFactory::getConfig()->get('unicodeslugs');
+
+		$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
+		$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
+
+		// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
+		$language = !empty($this->language) && $this->language != '*'
+			? $this->language
+			: JComponentHelper::getParams('com_languages')->get('site', '*');
+
+		// Workaround for old joomla versions (Joomla <=3.5.x) that do not allow to set transliteration language to be element's language
+		$this->_force_ascii_alias = $this->_force_ascii_alias || (!$unicodeslugs && !$supports_content_language_transliteration);
+
+		// Force ascii alias if current record type requires ascii-only alias
+		if ($this->_force_ascii_alias)
+		{
+			// Remove any '-' from the string since they will be used as concatenaters
+			$this->$alias = str_replace('-', ' ', $this->$alias);
+			
+			// Do the transliteration accorting to ELEMENT's language
+			$this->$alias = JLanguage::getInstance($language)->transliterate($this->$alias);
 		}
 		
-		/** check for existing name */
-		$query = 'SELECT id'
-				.' FROM #__flexicontent_fields'
-				.' WHERE name = '.$this->_db->Quote($this->name)
-				;
-		$this->_db->setQuery($query);
+		// Make alias safe and transliterate it
+		$this->$alias = JApplicationHelper::stringURLSafe($this->$alias, $language);
 
-		$xid = intval($this->_db->loadResult());
-		if ($xid && $xid != intval($this->id)) {
-			JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('FLEXI_THIS_FIELD_NAME_ALREADY_EXIST', $this->name));
-			return false;
+		// Check for empty alias and fallback to using current date
+		if (trim(str_replace('-', '', $this->$alias)) == '')
+		{
+			$this->$alias = JFactory::getDate()->format('Y-m-d-H-i-s');
 		}
-	
+
+		if (!empty($bad_alias))
+		{
+			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $_alias, $this->$alias);
+			JFactory::getApplication()->enqueueMessage($msg, 'notice');
+		}
+
 		return true;
 	}
-	
+
+
 	/**
 	 * Method to compute the default name of the asset.
 	 * The default name is in the form `table_name.id`
@@ -165,9 +254,10 @@ class flexicontent_fields extends _flexicontent_fields
 	 * @return	string
 	 * @since	1.6
 	 */
-	protected function _getAssetName() {
+	protected function _getAssetName()
+	{
 		$k = $this->_tbl_key;
-		return 'com_flexicontent.field.'.(int) $this->$k;
+		return 'com_flexicontent.' . $this->_record_name . '.' . (int) $this->$k;
 	}
 
 	/**
@@ -179,10 +269,10 @@ class flexicontent_fields extends _flexicontent_fields
 	 */
 	protected function _getAssetTitle()
 	{
-		return $this->label;
+		return $this->_title;
 	}
-	
-	
+
+
 	/**
 	 * Overloaded bind function.
 	 *
@@ -204,10 +294,13 @@ class flexicontent_fields extends _flexicontent_fields
 		}
 
 		// Bind the rules.
-		if (isset($array['rules']) && is_array($array['rules'])) {
-			// (a) prepare the rules, for some reason empty group id (=inherit), are not removed from action ACTIONS, we do it manually
-			foreach($array['rules'] as $action_name => $identities) {
-				foreach($identities as $grpid => $val) {
+		if (isset($array['rules']) && is_array($array['rules']))
+		{
+			// (a) prepare the rules, IF for some reason empty group id (=inherit), are not removed from action ACTIONS, we do it manually
+			foreach($array['rules'] as $action_name => $identities)
+			{
+				foreach($identities as $grpid => $val)
+				{
 					if ($val==="") {
 						unset($array['rules'][$action_name][$grpid]);
 					}
@@ -221,117 +314,4 @@ class flexicontent_fields extends _flexicontent_fields
 		
 		return parent::bind($array, $ignore);
 	}
-	
-	/**
-	 * Method to store a row in the database from the JTable instance properties.
-	 * If a primary key value is set the row with that primary key value will be
-	 * updated with the instance property values.  If no primary key value is set
-	 * a new row will be inserted into the database with the properties from the
-	 * JTable instance.
-	 *
-	 * @param   boolean  $updateNulls  True to update fields even if they are null.
-	 *
-	 * @return  boolean  True on success.
-	 *
-	 * @link	http://docs.joomla.org/JTable/store
-	 * @since   11.1
-	 */
-	/*public function store($updateNulls = false)
-	{
-		// Initialise variables.
-		$k = $this->_tbl_key;
-
-		// The asset id field is managed privately by this class.
-		if ($this->_trackAssets) {
-			unset($this->asset_id);
-		}
-
-		// If a primary key exists update the object, otherwise insert it.
-		if ($this->$k) {
-			$stored = $this->_db->updateObject($this->_tbl, $this, $this->_tbl_key, $updateNulls);
-		}
-		else {
-			$stored = $this->_db->insertObject($this->_tbl, $this, $this->_tbl_key);
-		}
-
-		// If the store failed return false.
-		if (!$stored) {
-			$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $this->_db->getErrorMsg()));
-			$this->setError($e);
-			return false;
-		}
-
-		// If the table is not set to track assets return true.
-		if (!$this->_trackAssets) {
-			return true;
-		}
-
-		if ($this->_locked) {
-			$this->_unlock();
-		}
-
-		//
-		// Asset Tracking
-		//
-
-		$parentId	= $this->_getAssetParentId();
-		$name		= $this->_getAssetName();
-		$title		= $this->_getAssetTitle();
-
-		$asset	= JTable::getInstance('Asset');
-		$asset->loadByName($name);
-
-		// Re-inject the asset id.
-		$this->asset_id = $asset->id;
-
-		// Check for an error.
-		if ($error = $asset->getError()) {
-			$this->setError($error);
-			return false;
-		}
-
-		// Specify how a new or moved node asset is inserted into the tree.
-		if (empty($this->asset_id) || $asset->parent_id != $parentId) {
-			$asset->setLocation($parentId, 'last-child');
-		}
-
-		// Prepare the asset to be stored.
-		$asset->parent_id	= $parentId;
-		$asset->name		= $name;
-		$asset->title		= $title;
-
-		if ($this->_rules instanceof JAccessRules) {
-			$asset->rules = (string) $this->_rules;
-		}
-
-		if (!$asset->check() || !$asset->store($updateNulls)) {
-			$this->setError($asset->getError());
-			return false;
-		}
-
-		if (empty($this->asset_id)) {
-			// Update the asset_id field in this table.
-			$this->asset_id = (int) $asset->id;
-
-			$query = $this->_db->getQuery(true);
-			$query->update($this->_db->quoteName($this->_tbl));
-			$query->set('asset_id = '.(int) $this->asset_id);
-			$query->where($this->_db->quoteName($k).' = '.(int) $this->$k);
-			$this->_db->setQuery($query);
-			$this->_db->execute();
-		}
-
-		return true;
-	}*/
-	
-	protected function _getLastId()
-	{
-		$query  = 'SELECT MAX(id)'
-			. ' FROM #__flexicontent_fields'
-			;
-		$this->_db->setQuery($query);
-		$lastid = $this->_db->loadResult();
-		return (int)$lastid;
-	}
 }
-?>

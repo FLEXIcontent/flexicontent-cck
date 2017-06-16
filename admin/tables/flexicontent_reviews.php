@@ -27,14 +27,24 @@ defined('_JEXEC') or die('Restricted access');
  */
 class flexicontent_reviews extends JTable
 {
-	function __construct(& $db)
+	// Non-table (private) properties
+	var $_record_name = 'review';
+	var $_title = 'title';
+	var $_alias = null;
+	var $_force_ascii_alias = false;
+
+	public function __construct(& $db)
 	{
-		parent::__construct('#__flexicontent_reviews_dev', 'id', $db);
+		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's' . '_dev';
+		$this->_records_jtable = 'flexicontent_' . $this->_record_name . 's';
+		$this->_NAME = strtoupper($this->_record_name);
+
+		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
 	}
 
 
 	// overloaded check function
-	function check()
+	public function check()
 	{
 		// Set submit date if it is empty
 		if ( !$this->submit_date )
@@ -49,8 +59,7 @@ class flexicontent_reviews extends JTable
 			$datenow = JFactory::getDate();
 			$this->update_date = $datenow->toSql();
 		}
-		
+
 		return true;
 	}
 }
-?>

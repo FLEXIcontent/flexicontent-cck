@@ -31,7 +31,7 @@ class flexicontent_files extends JTable
 	 * Primary Key
 	 * @var int
 	 */
-	var $id 				= null;
+	var $id						= null;
 
 	/** @var string */
 	var $filename			= '';
@@ -87,15 +87,24 @@ class flexicontent_files extends JTable
 	/** @var string */
 	var $attribs			= null;
 
+	// Non-table (private) properties
+	var $_record_name = 'file';
+	var $_title = 'filename';
+	var $_alias = null;
+	var $_force_ascii_alias = true;
 
-	function __construct(& $db)
+	public function __construct(& $db)
 	{
-		parent::__construct('#__flexicontent_files', 'id', $db);
+		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
+		$this->_records_jtable = 'flexicontent_' . $this->_record_name . 's';
+		$this->_NAME = strtoupper($this->_record_name);
+
+		parent::__construct('#__' . $this->_records_dbtbl, 'id', $db);
 	}
 
 
 	// overloaded check function
-	function check()
+	public function check()
 	{
 		return true;
 	}
