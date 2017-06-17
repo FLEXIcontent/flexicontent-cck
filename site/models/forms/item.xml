@@ -130,10 +130,11 @@
 	</fieldset>
 	
 	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
-		
+
 		<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level2" />
 		<field name="microdata_itemtype" type="microdatatype" label="FLEXI_MICRODATA_ITEMTYPE_ITEM_OVERRIDE" description="FLEXI_MICRODATA_ITEMTYPE_ITEM_OVERRIDE_DESC" />
-		
+
+		<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" />
 		<field name="override_title" type="fcradio" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
@@ -146,12 +147,14 @@
 			<option value="1">FLEXI_ON_LEFT</option>
 			<option value="2">FLEXI_ON_RIGHT</option>
 		</field>
+
+		<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2" />
 		<field name="add_canonical" type="fcradio" default="" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		
+
 	</fieldset>
 	
 	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">

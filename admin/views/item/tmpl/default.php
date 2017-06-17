@@ -1354,7 +1354,7 @@ if ($this->row->type_id) {
 			$fieldSets = $this->form->getFieldsets('attribs');
 			foreach ($fieldSets as $name => $fieldSet) :
 			
-				if (substr($name, 0, 7) != 'params-') continue;
+				if (substr($name, 0, 7) != 'params-' || $name == 'params-seoconf') continue;
 				
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
