@@ -253,9 +253,16 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Set item's META data: desc, keyword, title, author
 		if ($item->metadesc)		$document->setDescription( $item->metadesc );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		// ?? Deprecated <title> tag is used instead by search engines
-		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
-		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
+
+		// This has been deprecated, the <title> tag is used instead by search engines
+		if (0 && $app->getCfg('MetaTitle') == '1')
+		{
+			$document->setMetaData('title', $item->title);
+		}
+		if ($app->getCfg('MetaAuthor') == '1')
+		{
+			$document->setMetaData('author', $item->author);
+		}
 
 		// Set remaining META keys
 		$mdata = $item->metadata->toArray();
