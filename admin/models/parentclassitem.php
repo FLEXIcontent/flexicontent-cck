@@ -1702,8 +1702,8 @@ class ParentClassItem extends FCModelAdmin
 		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		// ***
 		$mergeProperties = array('attribs', 'metadata');
-		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_name' => $this->record_name);
-		$this->mergeAttributes($item, $data, $mergeProperties, $mergeOptions );
+		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array($this->option => $this->record_name, 'com_content' => 'article'));
+		$this->mergeAttributes($item, $data, $mergeProperties, $mergeOptions);
 
 
 		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
@@ -2030,7 +2030,7 @@ class ParentClassItem extends FCModelAdmin
 		$jinput->set('option', 'com_content');
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew));
+		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew, $data));
 		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Reverse compatibility steps

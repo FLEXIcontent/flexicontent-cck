@@ -503,10 +503,11 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Just put item's text (description field) inside property 'text' in case the events modify the given text,
 			$item->text = isset($item->fields['text']->display) ? $item->fields['text']->display : '';
 			
-			// Set the view and option to 'category' and 'com_content'  (actually view is already called category)
+			// Do some compatibility steps, Set option to 'com_content' (view is already called 'category')
+			// but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 			$jinput->set('option', 'com_content');
 			$jinput->set('isflexicontent', 'yes');
-			
+
 			// These events return text that could be displayed at appropriate positions by our templates
 			$item->event = new stdClass();
 			
@@ -520,7 +521,6 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 							
 			// Set the option back to 'com_flexicontent'
-			JRequest::setVar('option', 'com_flexicontent');
 			$jinput->set('option', 'com_flexicontent');
 			
 			// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility

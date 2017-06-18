@@ -527,7 +527,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		// Trigger the before save event (typically: onContentBeforeSave)
-		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew));
+		$result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$record, $isNew, $data));
 		if (in_array(false, $result, true))
 		{
 			$this->setError($record->getError());
@@ -894,58 +894,95 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function mergeAttributes(&$item, &$data, $properties, $options)
 	{
+		//***
+		//*** Filter layout parameters if the were given, and merge them into existing layout parameters (in DB)
+		//***
+
 		if (isset($options['params_fset']) && isset($options['layout_type']))
 		{
 			// Merge Layout parameters into parameters of the record
+			JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
 			$layout_data = flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
 
 			// Unset layout data since these we handled above
 			unset($data[$options['params_fset']]['layouts']);
 		}
 
-		$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'forms'.DS . $options['model_name'] . '.xml');
-		if (!file_exists($model_xml_filepath))
+
+		//***
+		//*** Create one Registry object for every existing data property
+		//***
+
+		$db_data_registry = array();
+		foreach($properties as $prop)
 		{
-			throw new Exception('Error reading model \'s form XML file : ' . $model_xml_filepath . ' file not found', 500);
+			$db_data_registry[$prop] = new JRegistry();
 		}
 
-		// Attempt to parse the XML file
-		$xml = simplexml_load_file($model_xml_filepath);
-		if (!$xml)
+
+		//***
+		//*** Filter via all given JForms
+		//***
+		
+		foreach($options['model_names'] as $extension_name => $model_name)
 		{
-			throw new Exception('Error parsing model \'s XML form file : ' . $model_xml_filepath, 500);
+			// Check XML file exists
+			$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
+			if (!file_exists($model_xml_filepath))
+			{
+				throw new Exception('Error reading model \'s form XML file : ' . $model_xml_filepath . ' file not found', 500);
+			}
+
+			// Attempt to parse the XML file
+			$xml = simplexml_load_file($model_xml_filepath);
+			if (!$xml)
+			{
+				throw new Exception('Error parsing model \'s XML form file : ' . $model_xml_filepath, 500);
+			}
+
+			// Create a JForm object to validate EXISTIND DB data according to the XML file of the model
+			$jform = new JForm($extension_name . '.' . $model_name, array('control' => 'jform', 'load_data' => false));
+			$xml_string = $xml->asXML();
+			$jform->load($xml_string);
+
+			foreach($properties as $prop)
+			{
+				if (is_array($data[$prop]))
+				{
+					// Filter the existing data with the current JForm
+					$db_data = new JRegistry($item->$prop);
+					$db_data = array($prop => $db_data->toArray());
+					$db_data = $jform->filter($db_data);
+
+					// Merge the above into the existing data Registry object of the corresponding property
+					if (!empty($db_data[$prop]))
+					{
+						$db_data_registry[$prop]->loadArray($db_data[$prop]);
+					}
+				}
+			}
 		}
 
-		// Create a form object to validate EXISTIND DB data according to the XML file of the model 
-		$jform = new JForm('com_flexicontent.' . $options['model_name'], array('control' => 'jform', 'load_data' => false));
-		$xml_string = $xml->asXML();
-		$jform->load($xml_string);
+
+		//***
+		//*** Add to existing data the new data and the layout data
+		//***
 
 		foreach($properties as $prop)
 		{
 			if (is_array($data[$prop]))
 			{
-				// Filter the existing data
-				$db_data = new JRegistry($item->$prop);
-				$db_data = array($prop => $db_data->toArray());
-				$db_data = $jform->filter($db_data);
+				// Overwrite existing data with new data
+				$db_data_registry[$prop]->loadArray($data[$prop]);
 
-				// Load existing data into a registry object, and then overwrite with new data
-				$item->$prop = new JRegistry();
-				if (!empty($db_data[$prop]))
-				{
-					$item->$prop->loadArray($db_data[$prop]);
-				}
-				$item->$prop->loadArray($data[$prop]);
-				
 				// Add the layout data too (validated above)
 				if (!empty($layout_data) && $prop == $options['params_fset'])
 				{
-					$item->$prop->loadArray($layout_data);
+					$db_data_registry[$prop]->loadArray($layout_data);
 				}
 
 				// Convert property back to string
-				$item->$prop = $item->$prop->toString();
+				$item->$prop = $db_data_registry[$prop]->toString();
 			}
 		}
 	}

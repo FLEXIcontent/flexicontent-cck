@@ -785,7 +785,7 @@ var JFormValidator = function()
 			{
 				if (!$el.closest('.fcfield_box.required_box').prev().hasClass('fc-field-invalid'))
 				{
-					jQuery('<span class="fc-field-invalid alert alert-error" style="font-weight: bold;">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
+					jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
 				}
 			}
 			else if ($el.parent().hasClass('fc-xpended-row'))

@@ -318,7 +318,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$suppress_arr = array('jcomments', 'jom_comment_bot');
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
 
-		// Do some compatibility steps, Set the view and option to 'article' and 'com_content'
+		// Do some compatibility steps, Set view and option to 'article' and 'com_content'
+		// but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 		$jinput->set('view', 'article');
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');
@@ -345,9 +346,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );
 
 		// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
-		if ( !empty($item->positions) ) {
-			foreach($item->positions as $pos_fields) {
-				foreach($pos_fields as $pos_field) {
+		if (!empty($item->positions))
+		{
+			foreach($item->positions as $pos_fields)
+			{
+				foreach($pos_fields as $pos_field)
+				{
 					if ($pos_field->name!=='text') continue;
 					$pos_field->display = & $item->text;
 				}
