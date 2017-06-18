@@ -334,16 +334,21 @@ class FlexicontentViewCategory extends JViewLegacy
 			// meta_params are always set if J1.6+ and category id is set
 			if ( $meta_params->get('robots') )  $document->setMetadata('robots', $meta_params->get('robots'));
 			
-			// ?? Deprecated <title> tag is used instead by search engines
-			if ($app->getCfg('MetaTitle') == '1') {
+			// This has been deprecated, the <title> tag is used instead by search engines
+			if (0 && $app->getCfg('MetaTitle') == '1')
+			{
 				$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
 				$document->setMetaData('title', $meta_title);
 			}
 			
-			if ($app->getCfg('MetaAuthor') == '1') {
-				if ( $meta_params->get('author') ) {
+			if ($app->getCfg('MetaAuthor') == '1')
+			{
+				if ( $meta_params->get('author') )
+				{
 					$meta_author = $meta_params->get('author');
-				} else {
+				}
+				else
+				{
 					$table = JUser::getTable();
 					$meta_author = $table->load( $category->created_user_id ) ? $table->name : '';
 				}
