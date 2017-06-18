@@ -651,9 +651,6 @@ body .fc-field-invalid {
 	display: inline-block;
 	margin: 2px 0;
 }
-.fc-field-invalid.alert.alert-warning {
-	font-weight: bold;
-}
 body .fc-mssg-inline.fc-note,
 body .fc-mssg.fc-note {
 	background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;

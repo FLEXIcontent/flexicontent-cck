@@ -867,7 +867,9 @@ class FlexicontentFields
 		static $_initialize = false;
 		static $_view, $_option, $limitstart;
 		static $dispatcher, $fcdispatcher;
-		
+
+		$jinput = JFactory::getApplication()->input;
+
 		//$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		//$print_logging_info = $flexiparams->get('print_logging_info');
 		// Log content plugin and other performance information
@@ -880,9 +882,9 @@ class FlexicontentFields
 			require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
 			
 			// some request and other variables
-			$_view   = JRequest::getVar('view');
-			$_option = JRequest::getVar('option');
-			$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
+			$_view   = $jinput->get('view', '', 'cmd');
+			$_option = $jinput->get('option', '', 'cmd');
+			$limitstart	= $jinput->get('limitstart', 0, 'int');
 			$_initialize = true;
 			
 			// ***********************************************************************
@@ -896,15 +898,17 @@ class FlexicontentFields
 		
 		// CASE: FLEXIcontent item view:
 		// Set triggering 'context' to 'com_content.article', (and also set the 'view' request variable)
-		if ($view == FLEXI_ITEMVIEW) {
-		  JRequest::setVar('view', 'article');
+		if ($view == 'item')
+		{
+			$jinput->set('view', 'article');
 		  $context = 'com_content.article';
 		}
-		
+
 		// ALL OTHER CASES: (FLEXIcontent category, FLEXIcontent module, etc),
 		// Set triggering 'context' to 'com_content.category', (and also set the 'view' request variable)
-		else {
-		  JRequest::setVar('view', 'category');
+		else
+		{
+			$jinput->set('view', 'category');
 		  $context = 'com_content.category';
 		}
 		
@@ -962,20 +966,19 @@ class FlexicontentFields
 		$field->type_id = $item->type_id;
 		
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
-		JRequest::setVar('option', 'com_content');
-		JRequest::setVar('isflexicontent', 'yes');
-		
+		$jinput->set('option', 'com_content');
+		$jinput->set('isflexicontent', 'yes');
+
 		// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-		if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$field, &$item->parameters, $limitstart), $plg_arr);
-		else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
-		
+		$results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$field, &$item->parameters, $limitstart), $plg_arr);
+
 		// Restore 'view' and 'option' request variables
-		JRequest::setVar('view', $_view);
-		JRequest::setVar('option', $_option);
-		
+		$jinput->set('view', $_view);
+		$jinput->set('option', $_option);
+
 		$field->id = $field->fieldid;
 		$field->{$method} = $field->text;
-		
+
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins( $suppress_arr,'restore' );
 	}

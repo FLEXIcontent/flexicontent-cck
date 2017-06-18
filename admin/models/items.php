@@ -198,7 +198,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$app->setUserState($p.'filter_author', $filter_author);
 		$app->setUserState($p.'filter_state', $filter_state);
 		$app->setUserState($p.'filter_access', $filter_access);
-
+		
 		
 		// Date filters
 		$date	 				= $fcform ? $jinput->get('date',      1,  'int')  :  $app->getUserStateFromRequest( $p.'date',      'date',      1,   'int' );
@@ -238,9 +238,6 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$app->setUserState($p.'scope', $scope);
 		$app->setUserState($p.'search', $search);
-		
-		// Get custom filters
-		$this->getCustomFilts();
 		
 		
 		
@@ -505,7 +502,9 @@ class FlexicontentModelItems extends JModelLegacy
 			
 			$item_instance = new stdClass();
 			$item_instance->type_id = $type->id;
-		} else {
+		}
+		else
+		{
 			$im_custom_filters = $this->cparams->get("items_manager_custom_filters");
 			$item_instance = null;
 		}
@@ -871,23 +870,32 @@ class FlexicontentModelItems extends JModelLegacy
 	{
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
-		
+
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
-		foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-		
+		foreach ($tbls as $tbl)
+		{
+			$tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		}
+
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
 		$tbl_fields_sel = array();
-		foreach ($tbl_fields as $tbl_field) {
-			if ( $tbl_field=='language' || $tbl_field=='type_id' || $tbl_field=='lang_parent_id')
-				$tbl_fields_sel[] = 'ie.'.$tbl_field;
-			else
-				$tbl_fields_sel[] = 'c.'.$tbl_field;
+		foreach ($tbl_fields as $tbl_field)
+		{
+			$tbl_fields_sel[] = $tbl_field=='language' || $tbl_field=='type_id' || $tbl_field=='lang_parent_id'
+				? 'ie.'.$tbl_field
+				: 'c.'.$tbl_field;
 		}
-		
+
+		$row_ids = array();
+		if (!empty($rows))
+		{
+			foreach ($rows as $row) $row_ids[] = $row->id;
+		}
+
 		// Copy data into it
-		$query 	= 'INSERT INTO '.$cache_tbl.' (';
+		$query 	= ($row_ids ? 'REPLACE' : 'INSERT') . ' INTO ' . $cache_tbl . ' (';
 		$query .= "`".implode("`, `", $tbl_fields)."`";
 		$query .= ") SELECT ";
 		
@@ -895,17 +903,13 @@ class FlexicontentModelItems extends JModelLegacy
 		$query .= implode(", ", $tbl_fields_sel);
 		$query .= " FROM #__content AS c";
 		$query .= " JOIN #__flexicontent_items_ext AS ie ON c.id=ie.item_id";
-		if ( !empty($rows) ) {
-			$row_ids = array();
-			foreach ($rows as $row) $row_ids[] = $row->id;
-			$query .= " WHERE c.id IN (".implode(',', $row_ids).")";
-		}
-		
+		$query .= $row_ids ? ' WHERE c.id IN (' . implode(',', $row_ids) . ')' : '';
+
 		$db->setQuery($query);
-		
+
 		try { $result = $db->execute(); } catch (Exception $e) { $result = false; }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
-		
+
 		return $result;
 	}
 	
@@ -984,10 +988,12 @@ class FlexicontentModelItems extends JModelLegacy
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
 		
-		if (!$query_ids) {
+		if (!$query_ids)
+		{
 			$customFilts = $this->getCustomFilts();
 			$customFiltsActive = array();
-			foreach($customFilts as $filter) {
+			foreach($customFilts as $filter)
+			{
 				if (!count($filter->value)) continue;
 				$customFiltsActive[$filter->id] = $filter->value;
 			}
@@ -1350,7 +1356,8 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$customFilts = $this->getCustomFilts();
 		$_filts_vals_clause =  array();
-		foreach($customFilts as $filter) {
+		foreach($customFilts as $filter)
+		{
 			if (!count($filter->value)) continue;
 			$_filts_vals_clause[] = ' (fi.field_id='.$filter->id.' AND fi.value='.$this->_db->Quote($filter->value[0]).')';
 		}
