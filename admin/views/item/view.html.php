@@ -58,13 +58,13 @@ class FlexicontentViewItem extends JViewLegacy
 		// We do not have item parameters yet, but we need to do some work before creating the item
 		
 		// Get the COMPONENT only parameter
-		$params  = new JRegistry();
+		$page_params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$params->merge($cparams);
+		$page_params->merge($cparams);
 		
 		// Some flags
 		$useAssocs = flexicontent_db::useAssociations();
-		$print_logging_info = $params->get('print_logging_info');
+		$print_logging_info = $page_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		
@@ -128,7 +128,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Get / calculate some version related variables
 		$versioncount    = $model->getVersionCount();
-		$versionsperpage = $params->get('versionsperpage', 10);
+		$versionsperpage = $page_params->get('versionsperpage', 10);
 		$pagecount = (int) ceil( $versioncount / $versionsperpage );
 		
 		// Data need by version panel: (a) current version page, (b) currently active version
@@ -161,7 +161,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Get and merge type parameters
 		$tparams = $this->get( 'Typeparams' );
 		$tparams = new JRegistry($tparams);
-		$params->merge($tparams);       // Apply type configuration if it type is set
+		$page_params->merge($tparams);       // Apply type configuration if it type is set
 		
 		// Get user allowed permissions on the item ... to be used by the form rendering
 		// Also hide parameters panel if user can not edit parameters
@@ -301,7 +301,7 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			// Domain URL and autologin vars
 			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-			$autologin = ''; //$params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$autologin = ''; //$page_params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			
 			// We use 'isAdmin' check so that we can copy later without change, e.g. to a plugin
 			$isAdmin = JFactory::getApplication()->isAdmin();
@@ -334,7 +334,7 @@ class FlexicontentViewItem extends JViewLegacy
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 			
 			// PREVIEW for latest version
-			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
+			if ( !$page_params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
 			{
 				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small btn-fcaction btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');"><span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>'.JText::_('FLEXI_PREVIEW').'</button>', 'preview' );
 			}
@@ -449,10 +449,10 @@ class FlexicontentViewItem extends JViewLegacy
 
 
 
-		// **************************************************************************
-		// Load any previous form, NOTE: Because of fieldgroup rendering other fields
-		// this step must be done in seperate loop, placed before FIELD HTML creation
-		// **************************************************************************
+		// ***
+		// *** Load any previous form, NOTE: Because of fieldgroup rendering other fields
+		// *** this step must be done in seperate loop, placed before FIELD HTML creation
+		// ***
 		
 		$jcustom = $app->getUserState($form->option.'.edit.item.custom');
 		foreach ($fields as $field)
@@ -467,10 +467,10 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		
-		// *****************************************************************************
-		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
-		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
-		// *****************************************************************************
+		// ***
+		// *** (a) Apply Content Type Customization to CORE fields (label, description, etc)
+		// *** (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
+		// ***
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
@@ -481,43 +481,51 @@ class FlexicontentViewItem extends JViewLegacy
 
 
 
-		// **************************************************
-		// Get tags used by the item and quick selection tags
-		// **************************************************
+		// ***
+		// *** Get tags used by the item and quick selection tags
+		// ***
 		
-		$usedtagsIds = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
+		$usedtagsIds  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		$usedtagsdata = $model->getTagsByIds($usedtagsIds, $_indexed = false);
 		
-		$quicktagsIds = $tparams->get('quick_tags', array());
+		$quicktagsIds = $page_params->get('quick_tags', array());
 		$quicktagsdata = !empty($quicktagsIds) ? $model->getTagsByIds($quicktagsIds, $_indexed = true) : array();
 		
 		
 		
-		// *******************************
-		// Get categories used by the item
-		// *******************************
+		// ***
+		// *** Get categories used by the item
+		// ***
 		
-		if ($isnew) {
+		if ($isnew)
+		{
 			// Case for preselected main category for new items
 			$maincat = $item->catid ? $item->catid : $jinput->get('maincat', 0, 'int');
-			if (!$maincat) {
+			if (!$maincat)
+			{
 				$maincat = $app->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 			}
-			if ($maincat) {
+			if ($maincat)
+			{
 				$selectedcats = array($maincat);
 				$item->catid = $maincat;
-			} else {
+			}
+			else
+			{
 				$selectedcats = array();
 			}
-			
-			if ( $tparams->get('cid_default') ) {
-				$selectedcats = $tparams->get('cid_default');
+
+			if ( $page_params->get('cid_default') )
+			{
+				$selectedcats = $page_params->get('cid_default');
 			}
-			if ( $tparams->get('catid_default') ) {
-				$item->catid = $tparams->get('catid_default');
+			if ( $page_params->get('catid_default') )
+			{
+				$item->catid = $page_params->get('catid_default');
 			}
-			
-		} else {
+		}
+		else
+		{
 			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
 			$selectedcats = $this->get( 'Catsselected' );
 		}
@@ -683,13 +691,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$actions_allowed = array('core.create');
 
 		// Featured categories form field
-		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats_parent = $page_params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 		$enable_featured_cid_selector = $perms['multicat'] && $perms['canchange_featcat'];
 		if ( $featured_cats_parent )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
-			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
+			$disabled_cats = $page_params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
 			
 			$featured_sel = array();
 			foreach($selectedcats as $item_cat) if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
@@ -719,10 +727,10 @@ class FlexicontentViewItem extends JViewLegacy
 		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
 		if ( 1 )
 		{
-			if ($tparams->get('cid_allowed_parent'))
+			if ($page_params->get('cid_allowed_parent'))
 			{
-				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('cid_allowed_parent'), $depth_limit=0);
-				$disabled_cats = $tparams->get('cid_allowed_parent_disable', 1) ? array($tparams->get('cid_allowed_parent')) : array();
+				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('cid_allowed_parent'), $depth_limit=0);
+				$disabled_cats = $page_params->get('cid_allowed_parent_disable', 1) ? array($page_params->get('cid_allowed_parent')) : array();
 			}
 			else
 			{
@@ -931,7 +939,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('versions'			, $versions);
 		$this->assignRef('ratings'			, $ratings);
 		$this->assignRef('pagecount'		, $pagecount);
-		$this->assignRef('params'				, $params);
+		$this->assignRef('params'				, $page_params);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'				, $tmpls);
 		$this->assignRef('usedtagsdata'  , $usedtagsdata);

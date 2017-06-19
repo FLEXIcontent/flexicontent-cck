@@ -343,7 +343,7 @@ var JFormValidator = function()
 					});
 				}
 			}
-		}, 5000);
+		}, 10000);
 	},
 	
 	attachToForm = function(form, container)

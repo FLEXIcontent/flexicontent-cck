@@ -396,7 +396,7 @@ $this->document->addScriptDeclaration($js);
 </div>
 
 
-		<div style="margin-bottom: 32px;" class="control_special_box">
+		<div style="margin-bottom: 32px;">
 		<?php
 			$fieldSet = $this->jform_authorbasic->getFieldset('author_override_cat_config');
 			

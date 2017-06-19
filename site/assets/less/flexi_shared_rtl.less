@@ -1233,8 +1233,8 @@ body .nowrap_box .label-fcouter,
 	width: unset;
 	max-width: unset;
 }
-body .nowrap_box .container_fcfield,
-#flexicontent .nowrap_box .container_fcfield {
+body .nowrap_box .container_fcfield:not(.controls),
+#flexicontent .nowrap_box .container_fcfield:not(.controls) {
 	float: none !important;
 }
 
@@ -1303,8 +1303,8 @@ body .span6 .label-fcouter,
 #flexicontent .span6 .label-fcouter {
 	width: 28% !important;
 }
-body .span6 .container_fcfield,
-#flexicontent .span6 .container_fcfield {
+body .span6 .container_fcfield:not(.controls),
+#flexicontent .span6 .container_fcfield:not(.controls) {
 	width: 71% !important;
 }
 
@@ -1493,7 +1493,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .container_fcfield .container_fcfield-inner {
 	width: 100%;
 }
-.container_fcfield {
+.container_fcfield:not(.controls) {
 	float: right !important;
 	padding: 0px !important;
 	margin: 2px 0% 3px 0% !important;
@@ -1857,7 +1857,7 @@ div.pane-sliders ul.adminformlist li fieldset {
 	margin: 0; padding: 0;
 }
 div.current ul.config-option-list li .fcsep_level3 {
-	right: 232px !important;
+	margin-right: 232px !important;
 }
 div.current ul.config-option-list li select {
 	margin-bottom: 0px;
@@ -1874,87 +1874,9 @@ div.current ul.config-option-list li fieldset {
  **************************************/
 
 /* .control-group */
-*:not(.form-vertical) > div.control-group {
-	margin-bottom: 2px;
-	clear: both;
-}
+*:not(.form-vertical) > div.control-group,
 fieldset.form-vertical div.control-group {
 	margin-bottom: 8px;
-}
-
-/* .control-group .control-label */
-*:not(.form-vertical) > div.control-group div.control-label,
-div.current ul.config-option-list li {
-	margin: 0 8px 0 0 !important;
-	padding: 0 !important;
-	max-width: 160px;
-	min-width: 120px;
-	width: 15%;
-	border:0;
-}
-
-/* .control-group .control-label label */
-:not(.form-vertical) > div.control-group div.control-label label,
-div.current ul.config-option-list li label {
-	text-align: left;
-	min-width: 90px;
-	width: 96%;
-	line-height: 150%;
-	float: left;
-	/*font-size: 12px;*/
-	/*text-shadow: 1px 1px 1px rgba(0,0,0,0.2);*/
-	
-	/* important for proper form placement, override ALL or NONE */
-	border-right: 0 !important; /* non-zero causes wrapping */
-	border-left: 0 !important; /* non-zero causes wrapping */
-	border-top: 0;
-	border-bottom: 0;
-	margin: 2px 4% 3px 0 !important;
-	/*padding: 6px !important;*/
-	box-sizing: border-box;
-	white-space: normal !important;
-	display: inline-block;
-	/*border-radius: 3px;*/
-}
-*:not(.form-vertical) > div.control-group div.control-label label:not(.label),
-div.current ul.config-option-list li label:not(.label) {
-	/*font-weight: bold; 
-	color: white;
-	background-color: #999;*/
-}
-
-
-/* .control-group .controls */
-*:not(.form-vertical) > div.control-group div.controls {
-	min-width: 60%;
-	max-width: 81%;
-	box-sizing: border-box;
-	display: inline-block;
-
-	line-height: unset;
-	height: unset;
-
-	padding: 0px !important;
-	margin: 0px !important;
-}
-
-
-/* control field labels */
-*:not(.form-vertical) > .control-label {
-	clear: right;
-	float: right;
-	min-width: 120px;
-	text-align: left;
-	padding: 4px 16px 4px 2px;
-}
-*:not(.form-vertical) > .control-label .label {
-	width: auto;
-	display: inline-block;
-}
-
-.control_special_box  .control-label {
-	max-width: 300px !important;
-	width: auto !important;
 }
 
 
