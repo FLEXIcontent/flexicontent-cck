@@ -883,6 +883,15 @@ class ParentClassItem extends FCModelAdmin
 				$item->rating       = !$rating_data ? 0 : $rating_data->rating_count;
 				$item->score        = !$rating_data ? 0 : $rating_data->score;
 			}
+
+			if (( !isset($item->typename) || !isset($item->typealias) && $item->type_id))
+			{
+				$query = 'SELECT name, alias FROM #__flexicontent_types WHERE id = '. (int) $item->type_id;
+				$db->setQuery($query);
+				$typedata = $db->loadObject();
+				$item->typename = $typedata->name;
+				$item->typealias = $typedata->alias;
+			}
 			$item->typename   = !empty($item->typename)  ? $item->typename  : '';
 			$item->typealias  = !empty($item->typealias) ? $item->typealias : '';
 			

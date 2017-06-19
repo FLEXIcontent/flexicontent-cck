@@ -52,7 +52,7 @@ abstract class JHtmlFcuploader
 				</span>
 			',
 			'thumbResizer' => (($resize_cfg = @ $options['resize_cfg']) ? '
-				<select id="'.$resize_cfg->slider_name.'-sel" class="fc_uploader_size_select" name="'.$resize_cfg->slider_name.'-sel" style="float: left; display: none;"></select>
+				<select id="'.$resize_cfg->slider_name.'-sel" class="fc_uploader_size_select fc_no_js_attach" name="'.$resize_cfg->slider_name.'-sel" style="float: left; display: none;"></select>
 				<div id="'.$resize_cfg->slider_name.'_nouislider" class="fc_uploader_size_slider"></div>
 				<div class="fc_slider_input_box">
 					<input id="'.$resize_cfg->slider_name.'-val" name="'.$resize_cfg->slider_name.'-val" type="text" size="12" value="140" />

@@ -1821,8 +1821,183 @@ class plgSystemFlexisystem extends JPlugin
 	public function onExtensionAfterSave($context, $table, $isNew)
 	{
 	}
-	
-	
+
+
+	/**
+	 * Prepare form.
+	 *
+	 * @param   JForm  $form  The form to be altered.
+	 * @param   mixed  $data  The associated data for the form.
+	 *
+	 * @return  boolean
+	 *
+	 * @since	2.5
+	 */
+	public function onContentPrepareForm($form, $data)
+	{
+		return true;
+		// Check we have a form.
+		if (!($form instanceof JForm))
+		{
+			$this->_subject->setError('JERROR_NOT_A_FORM');
+
+			return false;
+		}
+
+		$app        = JFactory::getApplication();
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+
+		// Check we are manipulating the languagecode plugin.
+		if (empty($data->id) || $form->getName() !== 'com_content.article' || JFactory::getApplication()->input->get('option', '', 'CMD')==='com_flexicontent')
+		{
+			return true;
+		}
+
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item'.'.php');
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+
+
+		// ***
+		// *** Load JS/CSS files
+		// ***
+		
+		// Add css to document
+		/*!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);*/
+		
+
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
+
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', FLEXI_VHASH);
+
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', FLEXI_VHASH);
+
+		// Fields common CSS
+		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+
+		// Add JS frameworks
+		$has_J2S = JPluginHelper::isEnabled('content', 'j2store');
+		if (!$has_J2S) foreach ($fields as $field)
+		{
+			$has_J2S = $has_J2S || $field->field_type == 'j2store';
+			if ($has_J2S) break;
+		}
+		$_params = new JRegistry();
+		$_params->set('load-ui-dialog', 1);
+		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
+		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
+		
+		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
+		flexicontent_html::loadFramework('flexi-lib-form');
+		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		
+		// Add js function for custom code used by FLEXIcontent item form
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
+
+
+		// ***
+		// *** Load item and its fields and its type parameters
+		// ***
+
+		$model = new FlexicontentModelItem();
+		$item = $model->getItem($data->id, $check_view_access=false);
+
+		$fields = $model->getExtrafields();
+		$item->fields = & $fields;
+
+		$tparams = $this->get( 'Typeparams' );
+		$tparams = new JRegistry($tparams);
+		$item->tparams = & $tparams;
+		
+		$item->params = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$item->params->merge($cparams);
+		$item->params->merge($item->tparams);
+
+
+		// ***
+		// *** Load any previous form, NOTE: Because of fieldgroup rendering other fields
+		// *** this step must be done in seperate loop, placed before FIELD HTML creation
+		// *** 
+
+		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');
+		foreach ($fields as $field)
+		{
+			if (!$field->iscore)
+			{
+				if ( isset($jcustom[$field->name]) ) {
+					$field->value = array();
+					foreach ($jcustom[$field->name] as $i => $_val)  $field->value[$i] = $_val;
+				}
+			}
+		}
+
+		// ***
+		// *** (a) Apply Content Type Customization to CORE fields (label, description, etc)
+		// *** (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
+		// ***
+
+		foreach ($fields as $field)
+		{
+			FlexicontentFields::getFieldFormDisplay($field, $item, $user);
+		}
+		
+		global $form_fcitem; // TODO remove this global
+		$form_fcitem = $item;
+
+		// Get site languages.
+		$form->load('
+			<form>
+				<fields name="attribs">
+					<fieldset
+						name="fcfields"
+						label="' .  JText::_('FLEXI_TYPE_NAME') . ' : ' . JText::_($item->typename) . '"
+						description=""
+						addfieldpath="/administrator/components/com_flexicontent/models/fields"
+					>
+						<field
+							name="fcfields"
+							type="fcfieldwrapper"
+							description="' . htmlspecialchars('TEST desc', ENT_COMPAT, 'UTF-8') . '"
+							translate_description="false"
+							label="fcfields"
+							translate_label="false"
+							filter="cmd"
+						/>
+					</fieldset>
+				</fields>
+			</form>
+		');
+
+		return true;
+	}
+
+
 	function renderFields($context, &$row, &$params, $page=0, $eventName='')
 	{
 		// This is meant for Joomla article view
@@ -1857,10 +2032,10 @@ class plgSystemFlexisystem extends JPlugin
 		$user = JFactory::getUser();
 		$aid = JAccess::getAuthorisedViewLevels($user->id);
 		
-		$itemmodel = new FlexicontentModelItem();
+		$model = new FlexicontentModelItem();
 		if ( !isset($items[$row->id]) )
 		{
-			$items[$row->id] = $itemmodel->getItem($row->id, $check_view_access=false);
+			$items[$row->id] = $model->getItem($row->id, $check_view_access=false);
 		}
 		$item = $items[$row->id];
 		if (!$item) return;  // Item retrieval failed avoid fatal error

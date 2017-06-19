@@ -845,12 +845,13 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 
 		}
-		
-		
-		// **************************************************************************
-		// Load any previous form, NOTE: Because of fieldgroup rendering other fields
-		// this step must be done in seperate loop, placed before FIELD HTML creation
-		// **************************************************************************
+
+
+
+		// ***
+		// *** Load any previous form, NOTE: Because of fieldgroup rendering other fields
+		// *** this step must be done in seperate loop, placed before FIELD HTML creation
+		// ***
 		
 		$jcustom = $app->getUserState($form->option.'.edit.item.custom');
 		foreach ($fields as $field)
@@ -865,10 +866,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
-		// *****************************************************************************
-		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
-		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
-		// *****************************************************************************
+		// ***
+		// *** (a) Apply Content Type Customization to CORE fields (label, description, etc)
+		// *** (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
+		// ***
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
@@ -879,11 +880,12 @@ class FlexicontentViewItem  extends JViewLegacy
 
 
 
-		// **************************************************
-		// Get tags used by the item and quick selection tags
-		// **************************************************
-		$usedtagsids  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
-		$usedtagsdata = $model->getUsedtagsData($usedtagsids);
+		// ***
+		// *** Get tags used by the item and quick selection tags
+		// ***
+		
+		$usedtagsIds  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
+		$usedtagsdata = $model->getTagsByIds($usedtagsIds, $_indexed = false);
 		
 		$quicktagsIds = $page_params->get('quick_tags', array());
 		$quicktagsdata = !empty($quicktagsIds) ? $model->getTagsByIds($quicktagsIds, $_indexed = true) : array();
@@ -1077,9 +1079,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		$subscribers   = $this->get( 'SubscribersCount' );
 		$isnew = !$item->id;
 
-		// *******************************
-		// Get categories used by the item
-		// *******************************
+
+		// ***
+		// *** Get categories used by the item
+		// ***
 		
 		if ($isnew)
 		{

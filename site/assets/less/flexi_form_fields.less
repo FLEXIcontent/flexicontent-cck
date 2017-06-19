@@ -11,7 +11,7 @@
 	display: inline-block;
 	list-style: none !important;
 	position: static;
-	float: left;
+	float: none;
 	padding: 0% !important;
 	margin: 0% !important;
 	box-sizing: border-box;
@@ -98,7 +98,7 @@
 #flexicontent div.fcfieldval_container.valuebox {
 }
 
-.toggle_all_values_buttons_box {
+div.container_fcfield div.toggle_all_values_buttons_box {
 	display: block;
 	margin: 0 0 6px 0;
 }
@@ -293,6 +293,10 @@
 		vertical-align: top;
 	}
 
+	.fc-xpended-btns.fc-bottom-btns
+	{
+		margin: 8px 0 0 0;
+	}
 	.fc-xpended-btns {
 
 		> .fcfield-expand-view,
@@ -345,6 +349,10 @@
 			border: 1px solid #d0d0d0;
 			vertical-align: top;
 			margin: 0px 2px 0px 6px;
+		}
+		
+		> .fcfield-addvalue:not(.add-on):not(.input-group-addon):not(.btn):only-child {
+			margin: 0;
 		}
 
 		/* Default hover background color if not using font icons */
