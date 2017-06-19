@@ -374,7 +374,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				$field->html[$n] .= '<div class="fcclear"></div>
 				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'">
 					<label id="custom_'.$grouped_field->name.'_'.$n.'-lbl" class="'.$lbl_class.'" title="'.$lbl_title.'" data-for="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
-					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >
+					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.'" >
 						' . ($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '') . '
 						' . $grouped_field->html[$n] . '
 					</div>
@@ -404,9 +404,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$list_classes  = "fcfield-sortables";
 		$list_classes .= " fcfield-group";
 		if (count($field->html)) {
-			$field->html = '<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.' container_fcfield_name_'.$field->name.'">'.
+			$field->html = '<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
 				implode(
-				'</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.' container_fcfield_name_'.$field->name.'">',
+				'</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">',
 					$field->html
 				).
 				'</li>';
@@ -416,7 +416,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		}
 		if (!$add_position) $field->html .= '
 			<div class="input-append input-prepend fc-xpended-btns">
-				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).parent().get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
+				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
 			</div>
 		';
 		

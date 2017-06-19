@@ -209,8 +209,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			$resize_cfg->slider_name = 'fcfield-'.$field->id.'-uploader-thumb-size';
 			$resize_cfg->element_selector = 'div.fcfield-'.$field->id.'-uploader-thumb-box';
 
-			$resize_cfg->elem_container_selector = '#container_fcfield_'.$field->id.' div.fc-box';
-			$resize_cfg->element_selector = '#container_fcfield_'.$field->id.' div.fc_file_uploader ul.plupload_filelist > li';
+			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' div.fc-box';
+			$resize_cfg->element_selector = '.fcfieldval_container_'.$field->id.' div.fc_file_uploader ul.plupload_filelist > li';
 
 			$resize_cfg->element_class_prefix = 'thumb_';
 			$resize_cfg->values = array(90, 120, 150, 200, 250);
@@ -1072,7 +1072,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
