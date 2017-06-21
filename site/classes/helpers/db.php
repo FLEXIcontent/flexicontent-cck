@@ -519,6 +519,10 @@ class flexicontent_db
 				break;
 
 			// NEW ADDED
+			case 'random_ppr':
+				$order_col	= 'RAND()';
+				$order_dir	= '';
+				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
 				$sid = JFactory::getSession()->getId();
@@ -529,7 +533,7 @@ class flexicontent_db
 				{
 					$seed = ($seed == null)  ?  hexdec($b)  :  ($seed ^ hexdec($b));
 				}
-				$order_col	= 'RAND(' . $seed . ')';  // 'RAND()';
+				$order_col	= 'RAND(' . $seed . ')';
 				$order_dir	= '';
 				break;
 			case 'commented':
