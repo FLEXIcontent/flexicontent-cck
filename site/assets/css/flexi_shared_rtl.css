@@ -1558,7 +1558,7 @@ div.pane-sliders ul.adminformlist li fieldset {
 	padding: 0;
 }
 div.current ul.config-option-list li .fcsep_level3 {
-	right: 232px !important;
+	margin-right: 232px !important;
 }
 div.current ul.config-option-list li select {
 	margin-bottom: 0px;
@@ -1719,4 +1719,15 @@ html[dir="rtl"] .select2-container .select2-choice {
 }
 .select2-drop .select2-results .select2-result.select2-selected-highlight div {
 	font-size: 11px !important;
+}
+fieldset legend .fc_legend_header_text {
+	background: none repeat scroll 0 0 transparent;
+	border: 1px solid lightgray;
+	border-radius: 6px;
+	display: inline-block;
+	line-height: 0.5em;
+	margin: 0 0 5px;
+	padding: 8px 10px;
+	position: relative;
+	top: 0;
 }

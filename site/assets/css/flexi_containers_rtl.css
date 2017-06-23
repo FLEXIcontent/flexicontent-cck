@@ -38,7 +38,7 @@ body .fc-mssg-inline {
 body .fc-field-invalid {
 	padding: 4px 8px;
 	display: inline-block;
-	margin: 2px 0;
+	margin: 2px 8px 0 4px;
 }
 body .fc-mssg-inline.fc-note,
 body .fc-mssg.fc-note {

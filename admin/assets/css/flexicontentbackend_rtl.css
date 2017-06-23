@@ -31,6 +31,10 @@ select.fc_is_selmultiple.use_select2_lib {
 body .fc_isselect.fc_ismobile {
 	min-width: 140px;
 }
+body .control-label > label {
+	max-width: 160px;
+	white-space: initial;
+}
 body label.fc-prop-lbl,
 body span.fc-prop-lbl,
 body #flexicontent label.fc-prop-lbl,
@@ -649,7 +653,7 @@ body .fc-mssg-inline {
 body .fc-field-invalid {
 	padding: 4px 8px;
 	display: inline-block;
-	margin: 2px 0;
+	margin: 2px 8px 0 4px;
 }
 body .fc-mssg-inline.fc-note,
 body .fc-mssg.fc-note {
@@ -2912,6 +2916,21 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-drop .select2-results .select2-result.select2-selected-highlight div {
 	font-size: 11px !important;
 }
+fieldset legend .fc_legend_header_text {
+	background: none repeat scroll 0 0 transparent;
+	border: 1px solid lightgray;
+	border-radius: 6px;
+	display: inline-block;
+	line-height: 0.5em;
+	margin: 0 0 5px;
+	padding: 8px 10px;
+	position: relative;
+	top: 0;
+}
+body .tooltip.in {
+	opacity: 0.90;
+	filter: alpha(opacity=90);
+}
 #flexicontent {
 	margin-bottom: 24px;
 }
@@ -3118,53 +3137,6 @@ td.col_template {
 }
 td.col_edit_layout {
 	text-align: left;
-}
-dl.tabs dt.user-details:not(.open),
-dl.tabs dt#user-details:not(.open),
-dl.tabs dt.user-account:not(.open),
-dl.tabs dt#user-account:not(.open),
-dl.tabs dt.user-groups:not(.open),
-dl.tabs dt#user-groups:not(.open) {
-	background-color: #3276B1 !important;
-}
-dl.tabs dt.user-contact:not(.open),
-dl.tabs dt#user-contact:not(.open) {
-	background-color: darkcyan !important;
-}
-dl.tabs dt.cat-params-handling:not(.open),
-dl.tabs dt#cat-params-handling:not(.open),
-dl.tabs dt.cat-params-common:not(.open),
-dl.tabs dt#cat-params-common:not(.open),
-dl.tabs dt.cat-params-template:not(.open),
-dl.tabs dt#cat-params-template:not(.open),
-dl.tabs dt.author_ext_config-options:not(.open),
-dl.tabs dt#author_ext_config-options:not(.open),
-dl.tabs dt.author-items-list:not(.open),
-dl.tabs dt#author-items-list:not(.open),
-dl.tabs dt.author-template-options:not(.open),
-dl.tabs dt#author-template-options:not(.open) {
-	background-color: darkgreen !important;
-}
-dl.tabs dt.cat-params-handling,
-dl.tabs dt#cat-params-handling {
-	margin-right: 16px !important;
-}
-dl.tabs dt.user-contact,
-dl.tabs dt#user-contact {
-	margin-right: 16px !important;
-	margin-left: 16px !important;
-}
-div.current dd .pane-sliders .panel {
-	margin: 16px 30px 30px;
-	max-width: 800px;
-}
-#flexicontent div.current dd .pane-sliders .panel .content table {
-	padding: 6px !important;
-	border: 0px !important;
-}
-#flexicontent div.current dd .pane-sliders .panel .content fieldset {
-	padding: 0px !important;
-	border: 0px !important;
 }
 table.adminlist.fcmanlist {
 	margin-top: 12px;
@@ -3642,21 +3614,6 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text {
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
 	color: gray;
 	font-style: italic;
-}
-legend .fc_legend_text {
-	background: none repeat scroll 0 0 transparent;
-	border: 1px solid lightgray;
-	border-radius: 6px;
-	display: inline-block;
-	line-height: 0.5em;
-	margin: 0 0 5px;
-	padding: 8px 10px;
-	position: relative;
-	top: 0;
-}
-body .tooltip.in {
-	opacity: 0.90;
-	filter: alpha(opacity=90);
 }
 .code_box {
 	width: 100%;

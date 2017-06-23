@@ -92,7 +92,7 @@ $this->document->addScriptDeclaration($js);
 </script>
 
 <div id="flexicontent">
-<form action="index.php?controller=users" method="post" name="adminForm" id="adminForm" autocomplete="off">
+<form action="index.php?controller=users" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" autocomplete="off">
 
 
 <div class="container-fluid" style="padding: 0px; margin-bottom: 24px;">

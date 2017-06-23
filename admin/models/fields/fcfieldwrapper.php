@@ -65,27 +65,13 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$control_name = str_replace($name, '', $element_id);
 
 		global $form_fcitem;
-		$form_fcitem->form_fields_html = $this->renderFieldsForm($form_fcitem);
-
-		$html = array();
-		/*foreach ($form_fcitem->fields as $field_name => $field)
-		{
-			if (isset($field->html))
-			{
-				$html[$field_name] = '
-				<div class="control-group">
-					<div class="control-label">
-						<label>' . $field->label . '</label>
-					</div>
-					<div class="controls">
-						' . $field->html . '
-					</div>
-				</div>
-				';
-			}
-		}*/
-		//return '</div></div><div class="flexicontent" id="flexicontent">' . implode('', $html) . '</div><div><div>';
-		return '</div></div><div class="flexicontent" id="flexicontent">' . $form_fcitem->form_fields_html . '</div><div><div>';
+		$html = $this->renderFieldsForm($form_fcitem);
+		$html = $html ?: '<span class="alert alert-info">' . JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
+		return '</div></div>
+		<div class="flexicontent" id="flexicontent">'
+			. $html . '
+		</div>
+		<div><div>';
 	}
 
 	function getLabel()

@@ -36,7 +36,7 @@ $this->document->addScriptDeclaration($js);
 ?>
 
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-horizontal">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 
 	<div class="container-fluid" style="padding: 0px !important; margin-bottom: 12px !important;">

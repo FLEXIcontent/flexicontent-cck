@@ -1865,18 +1865,9 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// ***
-		// *** Load JS/CSS files
+		// *** Load CSS files
 		// ***
 		
-		// Add css to document
-		/*!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);*/
-		
-
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
@@ -1892,7 +1883,10 @@ class plgSystemFlexisystem extends JPlugin
 		// Fields common CSS
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 
-		// Add JS frameworks
+		// ***
+		// *** Load JS libraries
+		// ***
+
 		$has_J2S = JPluginHelper::isEnabled('content', 'j2store');
 		if (!$has_J2S) foreach ($fields as $field)
 		{
@@ -1976,7 +1970,10 @@ class plgSystemFlexisystem extends JPlugin
 				<fields name="attribs">
 					<fieldset
 						name="fcfields"
-						label="' .  JText::_('FLEXI_TYPE_NAME') . ' : ' . JText::_($item->typename) . '"
+						label="' . ( $item->typename
+							? JText::_('FLEXI_TYPE_NAME') . ' : ' . JText::_($item->typename)
+							: JText::_('FLEXI_TYPE_NOT_DEFINED')
+						) . '"
 						description=""
 						addfieldpath="/administrator/components/com_flexicontent/models/fields"
 					>
