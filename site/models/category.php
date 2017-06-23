@@ -2276,18 +2276,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ( !isset($filter_query) )
 		{
-			if ( isset($filtered) ) {
+			if ( isset($filtered) )
+			{
 				// nothing to do
-			} else if ( !isset($query) ) {
+			}
+			else if ( !isset($query) )
+			{
 				$filtered = '';
 				//echo "Unhandled case for filter: ". $filter->name ." in 'FlexicontentModelCategory::getFiltered()', query variable not set<br/>\n";
-			} else if ( !$return_sql ) {
+			}
+			else if ( !$return_sql )
+			{
 				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
 				$db = JFactory::getDBO();
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
 			}
-			else if ($return_sql===2) {
+			else if ($return_sql===2)
+			{
 				$db = JFactory::getDBO();
 				static $iids_tblname  = array();
 				if ( !isset($iids_tblname[$filter->id]) ) {
@@ -2316,7 +2322,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 					//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 				}
-			} else {
+			}
+			else
+			{
 				//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 			}
 			
