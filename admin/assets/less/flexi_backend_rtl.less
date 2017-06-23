@@ -1,14 +1,14 @@
 @import 'include/config.less';
 
 #flexicontent {
-	margin-bottom: 24px;   /* needed because of Joomla's bottom info bar overlaping the content */
+	margin-bottom: 24px;   //*** needed because of Joomla's bottom info bar overlaping the content
 }
 
 
 
-/***********
-HEADER ICONS
-************/
+// ***
+// *** HEADER ICONS
+// ***
 
 .fc-layout-params-icon:before {
 	color: white !important;
@@ -226,68 +226,11 @@ td.col_edit_layout {
 	text-align: left;
 }
 
-/* CUSTOMIZE TABS in FORMS */
-dl.tabs dt.user-details:not(.open),
-dl.tabs dt#user-details:not(.open),
-dl.tabs dt.user-account:not(.open),
-dl.tabs dt#user-account:not(.open),
-dl.tabs dt.user-groups:not(.open),
-dl.tabs dt#user-groups:not(.open) {
-	background-color: #3276B1 !important;
-}
-dl.tabs dt.user-contact:not(.open),
-dl.tabs dt#user-contact:not(.open) {
-	background-color: darkcyan !important;
-}
-
-/* category */
-dl.tabs dt.cat-params-handling:not(.open),
-dl.tabs dt#cat-params-handling:not(.open),
-dl.tabs dt.cat-params-common:not(.open),
-dl.tabs dt#cat-params-common:not(.open),
-dl.tabs dt.cat-params-template:not(.open),
-dl.tabs dt#cat-params-template:not(.open),
-/* users, groups */
-dl.tabs dt.author_ext_config-options:not(.open),
-dl.tabs dt#author_ext_config-options:not(.open),
-dl.tabs dt.author-items-list:not(.open),
-dl.tabs dt#author-items-list:not(.open),
-dl.tabs dt.author-template-options:not(.open),
-dl.tabs dt#author-template-options:not(.open) {
-	background-color: darkgreen !important;
-}
-
-/* category */
-dl.tabs dt.cat-params-handling,
-dl.tabs dt#cat-params-handling {
-	margin-right: 16px !important;
-}
-
-/* author */
-dl.tabs dt.user-contact,
-dl.tabs dt#user-contact {
-	margin-right: 16px !important;
-	margin-left: 16px !important;
-}
-
-div.current dd .pane-sliders .panel {
-	margin: 16px 30px 30px;
-	max-width: 800px;
-}
-#flexicontent div.current dd .pane-sliders .panel .content table {
-	padding: 6px !important;
-	border: 0px !important;
-}
-#flexicontent div.current dd .pane-sliders .panel .content fieldset {
-	padding: 0px !important;
-	border: 0px !important;
-}
 
 
-
-/************************************
- * FLEXIcontent backend manager views
- ************************************/
+// ***
+// *** FLEXIcontent backend manager views
+// ***
 
 /* rows table */
 table.adminlist.fcmanlist {
@@ -317,9 +260,9 @@ div.adminthumbs.fcmanthumbs {
 
 
 
-/********************************************************
- * Filters header  (Text search / Buttons / Pagination) *
- ********************************************************/
+// ***
+// *** Filters header  (Text search / Buttons / Pagination)
+// ***
 
 .flexicontent #fc-filters-header #search {
 	margin: 0px !important;
@@ -343,9 +286,9 @@ div.adminthumbs.fcmanthumbs {
 
 
 
-/***************
- * Filters box *
- ***************/
+// ***
+// *** Filters box
+// ***
 
 /* Filters close button */
 .flexicontent #fc-filters-box #fc-filters-slide-btn {
@@ -358,9 +301,6 @@ div.adminthumbs.fcmanthumbs {
 	float: none;
 	clear: both;
 }
-
-
-
 
 /* Filter container */
 .flexicontent #fc-filters-box .fc-filter {
@@ -377,9 +317,10 @@ div.adminthumbs.fcmanthumbs {
 }
 
 
-/*************************
- * Specific Filter cases *
- *************************/
+
+// ***
+// *** Specific Filter cases
+// ***
 
 .flexicontent #fc-filters-box .fc-filter {
 	#s2id_date.select2-container.use_select2_lib.fc_skip_highlight .select2-choice {
@@ -410,9 +351,9 @@ div.adminthumbs.fcmanthumbs {
 
 
 
-/***********
- * Filters *
- ***********/
+// ***
+// *** Filters
+// ***
  
 /* First level childs */
 .flexicontent #fc-filters-box .fc-filter > * {
@@ -432,7 +373,6 @@ div.adminthumbs.fcmanthumbs {
 	padding: 4px 4px;
 	margin: 0px 4px;
 }
-
 
 
 /* Increase max height of select2 drop downs */
@@ -517,18 +457,16 @@ div.adminthumbs.fcmanthumbs {
 
 /* some icons customization */
 
-.flexicontent [class^="icon-"] {
-	/*font-size: 14px;*/
-}
 .flexicontent #fc-filters-box [class^="icon-arrow-"] {
 	vertical-align: middle;
 	font-size: 18px;
 }
 
 
-/*************************
- * Sortable rows handles *
- *************************/
+
+// ***
+// *** Sortable rows handles
+// ***
 
 .flexicontent .fc_drag_handle_none,
 .flexicontent .fc_drag_handle {
@@ -561,10 +499,9 @@ div.adminthumbs.fcmanthumbs {
 
 
 
-
-/************************
- * FLEXIcontent Dashboard
- ************************/
+// ***
+// *** FLEXIcontent Dashboard
+// ***
 
 /* dashboard buttons container / dashboard sliders / dashboard credits container */
 div#fc-dash-boardbtns,
@@ -765,8 +702,8 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 }
 
 
+// Dashboard button SET (a fieldset)
 
-/* Dashboard button SET (a fieldset) */
 #flexicontent fieldset.fc-board-set {
 	float: right;
 	width: auto;
@@ -788,7 +725,9 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 	background: none repeat scroll 0 0 #f5f5f5;
 }
 
-/* Dashboard button SET title (a fieldset lengend)*/
+
+// Dashboard button SET title (a fieldset lengend)
+
 #flexicontent .fc-board-header {
 	float: right;
 	border-radius: 3px;
@@ -807,7 +746,9 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 	padding: 0px 24px 0 20px;
 }
 
-/* Individual titles of dashboard button SETs, currently not added to the code */
+
+// Individual titles of dashboard button SETs, currently not added to the code
+
 .fc-board-header-content-editing {}
 .fc-board-header-type-fields {}
 .fc-board-header-content-viewing {}
@@ -816,7 +757,11 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 .fc-board-header-update-check {}
 
 
-/* Dashboard button */
+
+// ***
+// *** Dashboard button
+// ***
+
 div#fc-dash-boardbtns .fc-board-button_sep {
 	margin: 0px 12px 12px 0;
 	padding: 0px;
@@ -859,7 +804,9 @@ div#fc-dash-boardbtns .fc-board-button:hover {
 	margin: 0;
 }
 
-/* Dashboard button (inner) LINK, (contains the button image and the button text */
+
+// Dashboard button (inner) LINK, (contains the button image and the button text
+
 div#fc-dash-boardbtns .fc-board-button a {
 	text-decoration: none;
 	display: inline-block;
@@ -870,7 +817,9 @@ div#fc-dash-boardbtns .fc-board-button a {
 }
 div#fc-dash-boardbtns .fc-board-button:hover a {}
 
-/* Dashboard button image and text */
+
+// Dashboard button image and text
+
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-img {
 	width: 32px;
 	margin: 0 auto;
@@ -896,29 +845,11 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
 }
 
 
-/* forms */
-legend .fc_legend_text {
-	background: none repeat scroll 0 0 transparent;
-	border: 1px solid lightgray;
-	border-radius: 6px;
-	display: inline-block;
-	line-height: 0.5em;
-	margin: 0 0 5px;
-	padding: 8px 10px;
-	position: relative;
-	top: 0;
-}
 
-/* Some tooltips customization */
-body .tooltip.in {
-	opacity: 0.90;
-	filter: alpha(opacity=90);
-}
+// ***
+// *** FLEXIcontent Layout editor
+// ***
 
-
-/****************************
- * FLEXIcontent Layout editor
- ****************************/
 .code_box {
 	width: 100%;
 	margin-bottom: 8px;
@@ -931,9 +862,9 @@ body .tooltip.in {
 
 
 
-/*************
- * Import view
- *************/
+// ***
+// *** Import view
+// ***
 
 #flexicontent table label.fckey {
 	display: inline-block;
@@ -1037,9 +968,9 @@ ul.fcimport_field_value_list li {
 
 
 
-/****************************************
- * TASK SCREENS: e.g. post install screen
- ****************************************/
+// ***
+// *** TASK SCREENS: e.g. post install screen
+// ***
 
 table.postinstall-tbl td .install-task {
 	display: inline-block;
@@ -1059,7 +990,9 @@ table.postinstall-tbl td .ajax-loader {
 	padding: 0px;
 }
 
-/* Copy parameters */
+
+// Copy parameters
+
 .copyok {
 	background: url(../images/accept.png) 0% 50% no-repeat transparent;
 	padding: 1px 0 1px 20px;
@@ -1076,7 +1009,9 @@ table.postinstall-tbl td .ajax-loader {
 	margin: 5px 15px;
 }
 
-/* Task result */
+
+// Task result
+
 .install-ok {
 	background: url(../images/accept.png) 0% 50% no-repeat transparent;
 	padding: 0;
@@ -1098,9 +1033,9 @@ table.postinstall-tbl td .ajax-loader {
 
 
 
-/*****************
- * Import screen *
- ****************/
+// ***
+// *** Import screen
+// ***
  
 #import-log {
 	margin: 10px 10px 15px 10px;
@@ -1174,11 +1109,12 @@ ul.import-failed li {
 
 
 
-/********************
- * Backend listings *
- ********************/
+// ***
+// *** Backend listings
+// ***
 
-/* Some defaults for icons inside backend lists */
+// Some defaults for icons inside backend lists
+
 .fc-man-icon-s {
 	float: none;
 	min-width: 16px;
@@ -1207,7 +1143,8 @@ img.btn.btn-small.fc-man-icon-s {
 }
 
 
-/* Some defaults for buttons inside backend lists */
+// Some defaults for buttons inside backend lists
+
 .adminlist.fcmanlist :not(.btn-group) > .btn.btn-small {
 	padding: 2px 2px 1px 3px;
 	font-size: 14px;
@@ -1226,7 +1163,7 @@ img.btn.btn-small.fc-man-icon-s {
 }
 
 
-/* Last option not shown due to overlayed toolbar at the bottom */
+// Last option not shown due to overlayed toolbar at the bottom
 body .j-sidebar-container {
 	padding-bottom: 36px;
 }

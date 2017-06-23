@@ -31,6 +31,10 @@ select.fc_is_selmultiple.use_select2_lib {
 body .fc_isselect.fc_ismobile {
 	min-width: 140px;
 }
+body .control-label > label {
+	max-width: 160px;
+	white-space: initial;
+}
 body label.fc-prop-lbl,
 body span.fc-prop-lbl,
 body #flexicontent label.fc-prop-lbl,

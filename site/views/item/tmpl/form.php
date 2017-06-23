@@ -23,12 +23,13 @@ $user  = JFactory::getUser();
 $session = JFactory::getSession();
 
 // Create some variables
-$isnew = !$this->item->id;
-$typeid = $isnew ? JRequest::getInt('typeid') : $this->item->type_id;
+$this->row = & $this->item;
+$isnew = !$this->row->id;
+$typeid = $isnew ? JRequest::getInt('typeid') : $this->row->type_id;
 $this->menuCats = $isnew ? $this->menuCats : false;  // just make sure ...
 
 $newly_submitted = $session->get('newly_submitted', array(), 'flexicontent');
-$newly_submitted_item = @ $newly_submitted[$this->item->id];
+$newly_submitted_item = @ $newly_submitted[$this->row->id];
 $submit_redirect_url_fe = $this->params->get('submit_redirect_url_fe');
 $isredirected_after_submit = $newly_submitted_item && $submit_redirect_url_fe;
 $disable_langs = $this->params->get('disable_languages_fe', array());
@@ -155,7 +156,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 					var term = request.term;
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1',
+						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: request.term
@@ -236,7 +237,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 			}
 			
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, '".JURI::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
+			tag.addtag( id, tagname, '".JURI::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
 		}
 		
 		function deleteTag(obj)
@@ -372,7 +373,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 				<?php
 					$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+((screen.width-100) > 1360 ? 1360 : (screen.width-100))+\',top=20,height=\'+((screen.width-160) > 100 ? 1000 : (screen.width-160))+\',directories=no,location=no';
-					$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid, 0, $this->item).'&amp;preview=1');
+					$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->row->id.':'.$this->row->alias, $this->row->catid, 0, $this->row).'&amp;preview=1');
 				?>
 			
 				<?php if ( in_array( 'preview_latest', $allowbuttons_fe) && !$isredirected_after_submit && !$isnew ) : ?>
@@ -481,8 +482,8 @@ if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1
 	<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title" id="container_fcfield_6">
 		
 	<?php if ( $this->params->get('auto_title', 0) ): ?>
-		<?php echo '<span class="badge badge-info">'.($this->item->id ? $this->item->id : JText::_('FLEXI_AUTO')).'</span>'; ?>
-	<?php elseif ( isset($this->item->item_translations) ) :?>
+		<?php echo '<span class="badge badge-info">'.($this->row->id ? $this->row->id : JText::_('FLEXI_AUTO')).'</span>'; ?>
+	<?php elseif ( isset($this->row->item_translations) ) :?>
 		
 		<?php
 		array_push($tabSetStack, $tabSetCnt);
@@ -495,7 +496,7 @@ if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('title');?>
 			</div>
-			<?php foreach ($this->item->item_translations as $t): ?>
+			<?php foreach ($this->row->item_translations as $t): ?>
 				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
@@ -532,7 +533,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	</span>
 	
 	<div class="container_fcfield container_fcfield_name_alias">
-	<?php	if ( isset($this->item->item_translations) ) :?>
+	<?php	if ( isset($this->row->item_translations) ) :?>
 	
 		<?php
 		array_push($tabSetStack, $tabSetCnt);
@@ -545,7 +546,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('alias');?>
 			</div>
-			<?php foreach ($this->item->item_translations as $t): ?>
+			<?php foreach ($this->row->item_translations as $t): ?>
 				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
@@ -649,7 +650,7 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 				// Enable approval if versioning disabled, this make sense since if use can edit item THEN item should be updated !!!
 				$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
   		?>
-			<input type="hidden" id="state" name="jform[state]" value="<?php echo !$isnew ? $this->item->state : -4; ?>" />
+			<input type="hidden" id="state" name="jform[state]" value="<?php echo !$isnew ? $this->row->state : -4; ?>" />
 			<input type="hidden" id="vstate" name="jform[vstate]" value="<?php echo $item_vstate; ?>" />
 		</div>
 		<div class="fcclear"></div>
@@ -806,7 +807,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 					/>
 					<span id='input_new_tag' ></span>
 				</div>
-				<?php endif; ?>
+			<?php endif; ?>
 
 				<div class="fc_tagbox" id="fc_tagbox">
 					<ul id="ultagbox">
@@ -872,7 +873,7 @@ if ( ( !isset($all_tab_fields['lang']) && $captured['lang'] )  ||  ( flexiconten
 		
 		<div class="fcclear"></div>
 
-		<?php if ($this->item->language!='*'): ?>
+		<?php if ($this->row->language!='*'): ?>
 			<?php echo $this->loadTemplate('associations'); ?>
 		<?php else: ?>
 			<?php echo JText::_( 'FLEXI_ASSOC_NOT_POSSIBLE' ); ?>
@@ -913,69 +914,69 @@ if ( $this->perms['canright'] ) : ob_start(); // perms ?>
 
 if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_info, publication_details ?>
 
-	<?php ob_start(); ?>
-		<?php
-		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
-		$site_zone = JFactory::getApplication()->getCfg('offset');
-		$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-		
-		$tz = new DateTimeZone( $user_zone );
-		$tz_offset = $tz->getOffset(new JDate()) / 3600;
-		$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-		
-		$tz_info .= ' ('.$user_zone.')';
-		$msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-		echo sprintf( $alert_box, '', 'info', 'fc-nobgimage', $msg );
-		?>
-	<?php $captured['timezone_info'] = ob_get_clean(); ?>
-		
-	<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
-		<fieldset class="panelform">
-			<span class="label-fcouter" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by')); ?></span>
-			<div class="container_fcfield"><?php echo $this->perms['isSuperAdmin'] ? $this->form->getInput('created_by') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->author.'&nbsp;</span>'; ?></div>
-		</fieldset>
-	<?php $captured['created_by'] = ob_get_clean(); endif; ?>
-	
-	<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
-		<fieldset class="panelform">
-			<span class="label-fcouter" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></span>
-			<div class="container_fcfield"><?php echo $this->perms['editcreationdate'] ? $this->form->getInput('created') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->created.'&nbsp;</span>'; ?></div>
-		</fieldset>
-	<?php $captured['created'] = ob_get_clean(); endif; ?>
-	
-	<?php ob_start(); ?>
-		<fieldset class="panelform">
-			<span class="label-fcouter" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by_alias')); ?></span>
-			<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('created_by_alias') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->created_by_alias.'&nbsp;</span>'; ?></div>
-		</fieldset>
-	<?php $captured['created_by_alias'] = ob_get_clean(); ?>
-	
-	<?php ob_start(); ?>
-		<fieldset class="panelform">
-			<span class="label-fcouter" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></span>
-			<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_up') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->publish_up.'&nbsp;</span>'; ?></div>
-		</fieldset>
-	<?php $captured['publish_up'] = ob_get_clean(); ?>
-	
-	<?php ob_start(); ?>
-		<fieldset class="panelform">
-			<span class="label-fcouter" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></span>
-			<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_down') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->publish_down.'&nbsp;</span>'; ?></div>
-		</fieldset>
-	<?php $captured['publish_down'] = ob_get_clean(); ?>
-	
-	<?php ob_start(); ?>
-		<fieldset class="panelform">
-			<span class="label-fcouter" id="access-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('access')); ?></span>
-			<div class="container_fcfield"><?php echo $this->perms['canacclvl'] ? $this->form->getInput('access') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->access_level.'&nbsp;</span>'; ?></div>
-		</fieldset>
-	<?php $captured['access'] = ob_get_clean(); ?>
+		<?php ob_start(); ?>
+			<?php
+			// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
+			$site_zone = JFactory::getApplication()->getCfg('offset');
+			$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
+
+			$tz = new DateTimeZone( $user_zone );
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
+			$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+
+			$tz_info .= ' ('.$user_zone.')';
+			$msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+			echo sprintf( $alert_box, '', 'info', 'fc-nobgimage', $msg );
+			?>
+		<?php $captured['timezone_info'] = ob_get_clean(); ?>
+
+		<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by')); ?></span>
+				<div class="container_fcfield"><?php echo $this->perms['isSuperAdmin'] ? $this->form->getInput('created_by') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->author.'&nbsp;</span>'; ?></div>
+			</fieldset>
+		<?php $captured['created_by'] = ob_get_clean(); endif; ?>
+
+		<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></span>
+				<div class="container_fcfield"><?php echo $this->perms['editcreationdate'] ? $this->form->getInput('created') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->created.'&nbsp;</span>'; ?></div>
+			</fieldset>
+		<?php $captured['created'] = ob_get_clean(); endif; ?>
+
+		<?php ob_start(); ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by_alias')); ?></span>
+				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('created_by_alias') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->created_by_alias.'&nbsp;</span>'; ?></div>
+			</fieldset>
+		<?php $captured['created_by_alias'] = ob_get_clean(); ?>
+
+		<?php ob_start(); ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></span>
+				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_up') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->publish_up.'&nbsp;</span>'; ?></div>
+			</fieldset>
+		<?php $captured['publish_up'] = ob_get_clean(); ?>
+
+		<?php ob_start(); ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></span>
+				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_down') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->publish_down.'&nbsp;</span>'; ?></div>
+			</fieldset>
+		<?php $captured['publish_down'] = ob_get_clean(); ?>
+
+		<?php ob_start(); ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter" id="access-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('access')); ?></span>
+				<div class="container_fcfield"><?php echo $this->perms['canacclvl'] ? $this->form->getInput('access') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->access_level.'&nbsp;</span>'; ?></div>
+			</fieldset>
+		<?php $captured['access'] = ob_get_clean(); ?>
 <?php endif;
 
 
 
 if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metadata ?>
-	<fieldset class="panelform params_set">
+	<fieldset class="panelform">
 		<legend>
 			<?php echo JText::_( 'FLEXI_META' ); ?>
 		</legend>
@@ -983,10 +984,9 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 		<?php if ( $this->params->get('usemetadata_fe', 1) >= 1) : ?>
 			<div class="fcclear"></div>
 			<?php echo $this->form->getLabel('metadesc'); ?>
-				
+
 			<div class="container_fcfield">
-				<?php	if ( isset($this->item->item_translations) ) :?>
-					
+				<?php	if ( isset($this->row->item_translations) ) : ?>
 					<?php
 					array_push($tabSetStack, $tabSetCnt);
 					$tabSetCnt = ++$tabSetMax;
@@ -998,7 +998,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metadesc'); ?>
 						</div>
-						<?php foreach ($this->item->item_translations as $t): ?>
+						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
@@ -1019,13 +1019,12 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<?php endif; ?>
 				
 			</div>
-				
+
 			<div class="fcclear"></div>
 			<?php echo $this->form->getLabel('metakey'); ?>
 			
 			<div class="container_fcfield">
-				<?php	if ( isset($this->item->item_translations) ) :?>
-					
+				<?php	if ( isset($this->row->item_translations) ) :?>
 					<?php
 					array_push($tabSetStack, $tabSetCnt);
 					$tabSetCnt = ++$tabSetMax;
@@ -1037,7 +1036,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metakey'); ?>
 						</div>
-						<?php foreach ($this->item->item_translations as $t): ?>
+						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
@@ -1083,7 +1082,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 
 
 if ( $typeid && $this->params->get('useseoconf_fe', 0) ) : ob_start(); // seoconf ?>
-	<fieldset class="panelform params_set">
+	<fieldset class="panelform">
 		<legend>
 			<?php echo JText::_( 'FLEXI_SEO' ); ?>
 		</legend>
@@ -1110,7 +1109,7 @@ foreach ($fieldSets as $name => $fieldSet)
 }
 
 if ( $typeid && $this->params->get('usedisplaydetails_fe') || $has_custom_params ) : ob_start(); ?>
-<fieldset class="panelform params_set">
+<fieldset class="panelform">
 	<legend>
 		<?php echo JText::_( 'FLEXI_DISPLAYING' ); ?>
 	</legend>
@@ -1184,12 +1183,12 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 		
 		
 		if ( $this->params->get('selecttheme_fe') >= 2 ) : ob_start(); ?>
-		
-			<div class="fc-sliders-plain">
+
+			<div class="fc-sliders-plain-outer">
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-				$item_layout = $this->item->itemparams->get('ilayout');
+				$item_layout = $this->row->itemparams->get('ilayout');
 				
 				foreach ($this->tmpls as $tmpl) :
 					
@@ -1197,11 +1196,11 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
 					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
 					
-					if ($tmpl->name != $item_layout) continue;
+					if (!$item_layout || $tmpl->name != $item_layout) continue;
 					
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
-						<fieldset class="panelform params_set">
+						<fieldset class="panelform">
 						
 						<?php
 						if (isset($fieldSet->label) && trim($fieldSet->label)) :
@@ -1217,14 +1216,15 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 							if ($field->getAttribute('cssprep')) continue;
 							
 							$fieldname = $field->fieldname;
-							//$value = $form_layout->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
+							//$value = $form_layout->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
 							
 							$input_only = !$field->label || $field->hidden;
 							echo
 								($input_only ? '' :
-								str_replace(' for="', ' data-for="',
-									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-										$form_layout->getLabel($fieldname, $groupname))).'
+								str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ',
+									str_replace(' for="', ' data-for="',
+										str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+											$form_layout->getLabel($fieldname, $groupname)))).'
 								<div class="container_fcfield">
 								').
 								
@@ -1389,7 +1389,7 @@ if ($this->fields && $typeid) :
 				<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
 				
 			<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
-			if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
+			if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
 				
 				<?php
 				array_push($tabSetStack, $tabSetCnt);
@@ -1406,7 +1406,7 @@ if ($this->fields && $typeid) :
 							echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
 						?>
 					</div>
-					<?php foreach ($this->item->item_translations as $t): ?>
+					<?php foreach ($this->row->item_translations as $t): ?>
 						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 							<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 								<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
@@ -1473,11 +1473,11 @@ if ($this->fields && $typeid) :
 
 <?php else : /* NO TYPE SELECTED */ ?>
 
-	<?php if ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
+	<?php if ( $typeid == 0) : // type_id is not set (user allowed to select item type) ?>
 		<input name="jform[type_id_not_set]" value="1" type="hidden" />
-		<?php echo sprintf( $alert_box, '', 'note', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
+		<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
 	<?php else : // existing item that has no custom fields, warn the user ?>
-		<?php echo sprintf( $alert_box, '', 'warning', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
+		<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
 	<?php	endif; ?>
 	
 <?php	endif;

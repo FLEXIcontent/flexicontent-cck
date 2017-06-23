@@ -2740,10 +2740,11 @@ class FlexicontentFields
 			$item_id_col = @$field->field_item_id_col ? $field->field_item_id_col : ' fi.item_id ';
 			$groupby     = @$field->field_groupby ? $field->field_groupby .', '.$item_id_col : ' GROUP BY fi.value, '.$item_id_col;
 			
-			$valuesfrom = @$field->field_valuesfrom ? $field->field_valuesfrom :
-				' FROM #__flexicontent_fields_item_relations as fi ' .
-				' JOIN #__content as i ON i.id=fi.item_id ';
-			
+			$valuesfrom = !empty($field->field_valuesfrom)
+				? $field->field_valuesfrom
+				:	' FROM #__flexicontent_fields_item_relations as fi ' .
+					' JOIN #__content as i ON i.id=fi.item_id ';
+
 			$query = 'SELECT '.$valuesselect.', '.$item_id_col.' AS itemid'
 				. $valuesfrom 
 				. $valuesjoin
@@ -2791,47 +2792,75 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		$display_filter_as = (int) $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
 		$filter_compare_type = (int) $filter->parameters->get( 'filter_compare_type', 0 );
-		
-		// Make sure the current filtering values match the field filter configuration to be single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {  // range or multi-value filter
+
+
+		// ***
+		// *** Make sure the current filtering values match the field filter configuration to be single or multi-value
+		// ***
+
+		// Range or Multi-value filter
+		if ( in_array($display_filter_as, array(2,3,5,6,8)) )
+		{
 			if (!is_array($value)) $value = array( $value );
-		} else {
-			if (is_array($value)) $value = array ( @ $value[0] );
-			else $value = array ( $value );
 		}
-		
+
+		// Single value filter
+		else
+		{
+			$value = is_array($value)
+				? array ( @ $value[0] )
+				: array ( $value );
+		}
+
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$require_all_param : 0;
+		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_param
+			: 0;
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
+
+		// ***
+		// *** Filter out zero-length values
+		// ***
 		$_value = array();
-		foreach ($value as $i => $v) {
+		foreach ($value as $i => $v)
+		{
 			$v = trim($v);
-			if ( strlen($v) ) $_value[$i] = $v;
+			if (strlen($v)) $_value[$i] = $v;
 		}
 		$value = $_value;
+
+		// No values were given
 		if ( !count($value) ) return '';
 		
 		// For text input format the strings, if this was requested by the filter
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
-		if ($istext_input && isset($filter->filter_valueformat)) {
-			foreach($value as $i => $val) {
-				if ( !$filter_compare_type ) $typecasted_val = $db->Quote($value[$i]);
-				else $typecasted_val = $filter_compare_type==1 ? intval($value[$i]) : floatval($value[$i]);
+		if ($istext_input && isset($filter->filter_valueformat))
+		{
+			foreach($value as $i => $val)
+			{
+				$typecasted_val = !$filter_compare_type
+					? $db->Quote($value[$i])
+					: ($filter_compare_type==1 ? intval($value[$i]) : floatval($value[$i]));
 				$value[$i] = str_replace('__filtervalue__', $typecasted_val, $filter->filter_valueformat);
 			}
 			$quoted=true;
 		}
+		//print_r($value);
 		
 		$valueswhere = '';
 		switch ($display_filter_as) {
 		// RANGE cases
 		case 2: case 3: case 8:
-			if ( ! @ $quoted ) foreach($value as $i => $v) {
-				if ( !$filter_compare_type ) $value[$i] = $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $v) );
-				else $value[$i] = $filter_compare_type==1 ? intval( $v ) : floatval( $v );
+			if ( empty($quoted) )
+			{
+				foreach($value as $i => $v)
+				{
+					$value[$i] = !$filter_compare_type
+						? $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $v) )
+						: ($filter_compare_type==1 ? intval($v) : floatval($v));
+				}
 			}
 			$reverse_values = $filter->parameters->get( 'reverse_filter_order', 0) && $display_filter_as == 8;
 			$value1 = $reverse_values ? @$value[2] : @$value[1];
@@ -2842,25 +2871,39 @@ class FlexicontentFields
 			break;
 		// SINGLE TEXT select value cases
 		case 1:
-			// DO NOT put % in front of the value since this will force a full table scan instead of indexed column scan
-			$_value_like = preg_replace('(\w+)', $_search_prefix.'$0'.($is_full_text ? '*' : '%'), $value[0]);
-			if (empty($quoted))  $_value_like = $db->Quote($_value_like);
-			if ($is_full_text)
-				$valueswhere .= ' AND  MATCH (_v_) AGAINST ('.$_value_like.' IN BOOLEAN MODE)';
+			if ($filter->filter_valueexact)
+			{
+				$valueswhere .= ' AND _v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $value[0]) );
+			}
 			else
-				$valueswhere .= ' AND _v_ LIKE ' . $_value_like;
+			{
+				// DO NOT put % in front of the value since this will force a full table scan instead of indexed column scan
+				$_value_like = preg_replace('(\w+)', $_search_prefix.'$0'.($is_full_text ? '*' : '%'), $value[0]);
+				if (empty($quoted))
+				{
+					$_value_like = $db->Quote($_value_like);
+				}
+				$valueswhere .= $is_full_text
+					? ' AND  MATCH (_v_) AGAINST ('.$_value_like.' IN BOOLEAN MODE)'
+					: ' AND _v_ LIKE ' . $_value_like;
+			}
 			break;
 		// EXACT value cases
 		case 0: case 4: case 5: case 6: case 7: default:
 			$value_clauses = array();
 			
-			if ( ! $require_all ) {
-				foreach ($value as $val) {
+			if ( ! $require_all )
+			{
+				foreach ($value as $val)
+				{
 					$value_clauses[] = '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
 				}
 				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
-			} else {
-				foreach ($value as $val) {
+			}
+			else
+			{
+				foreach ($value as $val)
+				{
 					$value_clauses[] = $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
 				}
 				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
@@ -2877,65 +2920,79 @@ class FlexicontentFields
 	static function getFiltered( &$filter, $value, $return_sql=true )
 	{
 		$db = JFactory::getDBO();
-		
+
 		// Check if field type supports advanced search
 		$support = FlexicontentFields::getPropertySupport($filter->field_type, $filter->iscore);
 		if ( ! $support->supportfilter )  return null;
-		
+
 		$valueswhere = FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=0, $is_search=0);
-		if ( !$valueswhere ) { return; }
-		
-		$colname     = @$filter->filter_colname ? $filter->filter_colname : 'value';
+		if ( !$valueswhere )  return;
+
+		$colname = !empty($filter->filter_colname)
+			? $filter->filter_colname
+			: 'value';
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
-		$valuesjoin  = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' JOIN #__flexicontent_fields_item_relations rel ON rel.item_id=c.id AND rel.field_id = ' . $filter->id;
-		
+		$valuesjoin  = !empty($filter->filter_valuesjoin)
+			? $filter->filter_valuesjoin
+			: null;
+
 		// Decide to require all values
 		$display_filter_as = $filter->parameters->get('display_filter_as', 0 );
-		
+
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$require_all_param : 0;
-		
-		if ( @$filter->filter_valuesjoin ) {
+		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_param
+			: 0;
+
+		if ($valuesjoin)
+		{
 			$query = 'SELECT '.($require_all ? 'c.id' : 'DISTINCT c.id')
-				.' FROM #__content c'
-				.$filter->filter_valuesjoin
-				.' WHERE 1'
+				. ' FROM #__content c'
+				. $filter->filter_valuesjoin
+				. ' WHERE 1'
 				. $valueswhere ;
-				if ($require_all) {
-					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
-					// e.g. HAVING COUNT(DISTINCT colname) = ...
-					// Instead the field code should make sure that no duplicate values are saved in the DB !!
-					$query .=
-						' GROUP BY c.id ' .' HAVING COUNT(*) >= '.count($value).
-						' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
-				}
-		} else {
+			if ($require_all && count($value) > 1)
+			{
+				// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+				// e.g. HAVING COUNT(DISTINCT colname) = ...
+				// Instead the field code should make sure that no duplicate values are saved in the DB !!
+				$query .= ''
+					. ' GROUP BY c.id ' . ' HAVING COUNT(*) >= ' . count($value)
+					. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
+			}
+		}
+		else
+		{
 			$query = 'SELECT '.($require_all ? 'rel.item_id' : 'DISTINCT rel.item_id')
-				.' FROM #__flexicontent_fields_item_relations as rel'
-				.' WHERE rel.field_id=' . $filter->id
+				. ' FROM #__flexicontent_fields_item_relations as rel'
+				. ' WHERE rel.field_id=' . $filter->id
 				. $valueswhere ;
-				if ($require_all) {
-					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
-					// e.g. HAVING COUNT(DISTINCT colname) = ...
-					// Instead the field code should make sure that no duplicate values are saved in the DB !!
-					$query .=
-						' GROUP BY rel.item_id ' .' HAVING COUNT(*) >= '.count($value).
-						' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
-				}
+			if ($require_all && count($value) > 1)
+			{
+				// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+				// e.g. HAVING COUNT(DISTINCT colname) = ...
+				// Instead the field code should make sure that no duplicate values are saved in the DB !!
+				$query .= ''
+					. ' GROUP BY rel.item_id ' . ' HAVING COUNT(*) >= ' . count($value)
+					. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
+			}
 		}
 		//$query .= ' GROUP BY id';   // BAD PERFORMANCE ?
 		
-		if ( !$return_sql ) {
+		if ( !$return_sql )
+		{
 			//echo "<br>GET FILTERED Items (helper func) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
 			$db->setQuery($query);
 			$filtered = $db->loadColumn();
 			return $filtered;
 		}
-		else if ($return_sql===2) {
+
+		else if ($return_sql===2)
+		{
 			static $iids_tblname  = array();
-			if ( !isset($iids_tblname[$filter->id]) ) {
+			if ( !isset($iids_tblname[$filter->id]) )
+			{
 				$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
 			}
 			$tmp_tbl = $iids_tblname[$filter->id];
@@ -2962,7 +3019,9 @@ class FlexicontentFields
 				//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 				//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 			}
-		} else {
+		}
+		else
+		{
 			//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 		}
 		return ' AND i.id IN ('. $query .')';
@@ -2985,15 +3044,16 @@ class FlexicontentFields
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$require_all_param : 0;
+		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_param
+			: 0;
 		
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
 		$colname = (@ $filter->isindexed && !$istext_input) || $isDate ? 'fs.value_id' : 'fs.search_index';
 		
 		// Create where clause for matching the filter's values
 		$valueswhere = FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=1, $is_search=1, $colname);
-		if ( !$valueswhere ) { return; }
+		if ( !$valueswhere )  return;
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
@@ -3007,13 +3067,14 @@ class FlexicontentFields
 			.' FROM #__'.$field_tbl.' AS fs'
 			.' WHERE fs.field_id=' . $filter->id
 			. $valueswhere ;
-		if ($require_all) {
+		if ($require_all && count($value) > 1)
+		{
 			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
 			// e.g. HAVING COUNT(DISTINCT colname) = ...
 			// Instead the field code should make sure that no duplicate values are saved in the DB !!
-			$query .=
-				' GROUP BY fs.item_id ' .' HAVING COUNT(*) >= '.count($value).
-				' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
+			$query .= ''
+				. ' GROUP BY fs.item_id ' . ' HAVING COUNT(*) >= ' . count($value)
+				. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
 		}
 		//echo 'Filter ['. $filter->label .']: '. $query."<br/><br/>\n";
 		
@@ -3130,8 +3191,9 @@ class FlexicontentFields
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$require_all_param : 0;
+		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_param
+			: 0;
 		
 		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
 		
@@ -3966,15 +4028,29 @@ class FlexicontentFields
 		//echo "filter_where_curr : ". $filter_where_curr ."<br/>";
 		
 		// partial SQL clauses
-		$valuesselect = @$filter->filter_valuesselect ? $filter->filter_valuesselect : ' fi.value AS value, fi.value AS text';
-		$valuesfrom   = @$filter->filter_valuesfrom   ? $filter->filter_valuesfrom   : (($filter->iscore || $filter->field_type=='coreprops') ? ' FROM #__content AS i' : ' FROM #__flexicontent_fields_item_relations AS fi ');
-		$valuesjoin   = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' ';
-		$valueswhere  = @$filter->filter_valueswhere  ? $filter->filter_valueswhere  : ' AND fi.field_id ='.$filter->id;
+		$valuesselect = !empty($filter->filter_valuesselect)
+			? $filter->filter_valuesselect
+			: ' fi.value AS value, fi.value AS text';
+
+		$valuesfrom = !empty($filter->filter_valuesfrom)
+			? $filter->filter_valuesfrom
+			: ($filter->iscore || $filter->field_type=='coreprops' ? ' FROM #__content AS i' : ' FROM #__flexicontent_fields_item_relations AS fi ');
+
+		$valuesjoin = !empty($filter->filter_valuesjoin)
+			? $filter->filter_valuesjoin
+			: ' ';
+
+		$valueswhere = !empty($filter->filter_valueswhere)
+			? $filter->filter_valueswhere
+			: ' AND fi.field_id ='.$filter->id;
+
 		// full SQL clauses
-		$groupby = @$filter->filter_groupby ? $filter->filter_groupby : ' GROUP BY value ';
-		$having  = @$filter->filter_having  ? $filter->filter_having  : '';
-		$orderby = @$filter->filter_orderby ? $filter->filter_orderby : '';
-		if ($filter->parameters->get( 'reverse_filter_order', 0) && $orderby) {
+		$groupby = !empty($filter->filter_groupby) ? $filter->filter_groupby : ' GROUP BY value ';
+		$having  = !empty($filter->filter_having)  ? $filter->filter_having  : '';
+		$orderby = !empty($filter->filter_orderby) ? $filter->filter_orderby : '';
+
+		if ($filter->parameters->get( 'reverse_filter_order', 0) && $orderby)
+		{
 			$replace_count = null;
 			$orderby = str_ireplace( ' ASC', ' DESC', $orderby, $replace_count);
 			if (!$replace_count) $orderby .= ' DESC';
@@ -3995,15 +4071,19 @@ class FlexicontentFields
 			. $view_join."\n"
 			. $view_where."\n"
 			;
-		if ( !isset($iids_tblname[$view_n_text]) ) {
+		if ( !isset($iids_tblname[$view_n_text]) )
+		{
 			$iids_tblname[$view_n_text] = 'fc_view_iids_'.count($iids_tblname);
 		}
 		$tmp_tbl = $iids_tblname[$view_n_text];
 		
+		// Find items belonging to current view
 		if ( $faceted_filter > 1 )
 		{
-			// Find items belonging to current view
-			if ( !isset($iids_subquery[$view_n_text]) && empty($view_where) )  $iids_subquery[$view_n_text] = '';  // current view has not limits in where clause
+			if ( !isset($iids_subquery[$view_n_text]) && empty($view_where) )
+			{
+				$iids_subquery[$view_n_text] = '';  // current view has not limits in where clause
+			}
 			
 			if ( !isset($iids_subquery[$view_n_text]) )
 			{
@@ -4034,9 +4114,9 @@ class FlexicontentFields
 			}
 			//if ($filter->id==NN) echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
 			
-			$item_id_col = !empty($filter->filter_item_id_col) ?
-				$filter->filter_item_id_col :
-				($filter->iscore || $filter->field_type=='coreprops') ? 'i.id' : 'fi.item_id' ;
+			$item_id_col = !empty($filter->filter_item_id_col)
+				? $filter->filter_item_id_col
+				: ($filter->iscore || $filter->field_type=='coreprops' ? 'i.id' : 'fi.item_id');
 			
 			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', $item_id_col, $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"

@@ -884,7 +884,7 @@ class ParentClassItem extends FCModelAdmin
 				$item->score        = !$rating_data ? 0 : $rating_data->score;
 			}
 
-			if (( !isset($item->typename) || !isset($item->typealias) && $item->type_id))
+			if ( (!isset($item->typename) || !isset($item->typealias)) && $item->type_id )
 			{
 				$query = 'SELECT name, alias FROM #__flexicontent_types WHERE id = '. (int) $item->type_id;
 				$db->setQuery($query);
