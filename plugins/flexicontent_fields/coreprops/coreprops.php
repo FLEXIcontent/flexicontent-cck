@@ -89,18 +89,20 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		switch($props_type)
 		{
 			case 'language':
-				if ($all_langs===null) {
+				if ($all_langs===null)
+				{
 					$all_langs= FLEXIUtilities::getLanguages($hash='code');
 				}
 				$lang_data = $all_langs->{$item->language};
 				
-				$field->{$prop} = @$lang_data->title_native ? $lang_data->title_native : $lang_data->name;
+				$field->{$prop} = $lang_data && $lang_data->title_native ? $lang_data->title_native : $lang_data->name;
 				break;
-			
+
+			case 'id':
 			case 'alias':
 				$field->{$prop} = $item->{$props_type};
 				break;
-			
+
 			case 'category':
 				$link_maincat = $field->parameters->get('link_maincat', 1);
 				if ($link_maincat)
@@ -112,20 +114,22 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 						$cat_links[$maincatid] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($maincat_slug));
 					}
 				}
-				
+
 				$maincat_title =  !empty($item->maincat_title) ? $item->maincat_title : 'catid: '.$item->catid;
-				$field->{$prop} = $link_maincat ?
-					'<a class="fc_coreprop fc_maincat link_' .$field->name. '" href="' . $cat_links[$maincatid] . '">' . $maincat_title . '</a>' :
-					$maincat_title;
+				$field->{$prop} = $link_maincat
+					? '<a class="fc_coreprop fc_maincat link_' .$field->name. '" href="' . $cat_links[$maincatid] . '">' . $maincat_title . '</a>'
+					: $maincat_title;
 				break;
-			
+
 			case 'access':
-				if ($acclvl_names===null) {
+				if ($acclvl_names===null)
+				{
 					$acclvl_names = flexicontent_db::getAccessNames();
 				}
 				$field->{$prop} = isset($acclvl_names[$item->access])  ?  $acclvl_names[$item->access]  :  'unknown access level id: '.$item->access;
 				break;
-			
+
+			// Indicate NOT IMPLEMENTED by using property name as field DISPLAY ?
 			default:
 				$field->{$prop} = $props_type;
 				break;
@@ -135,10 +139,12 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			$field->{$prop} = $opentag.$pretext. $field->{$prop} .$posttext.$closetag;
 		}
 	}
-	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
+
+
+
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
 	
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
@@ -186,23 +192,42 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
+			case 'id':
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
+				// partial SQL clauses
+				$filter->filter_valuesselect = ' i.id AS value, i.id as text';
+				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
+				$filter->filter_valuesjoin   = ' ';  // null indicates to use default (join with field values TABLE), space is use empty
+				$filter->filter_valueswhere  = ' ';  // empty, NOTE: this extra to the always used 'value' = ...
+				// full SQL clauses
+				$filter->filter_groupby = ' GROUP BY i.id ';    // use empty, since 'id' is unique, and query should not produce duplicate rows
+				$filter->filter_having  = null;   // use default, null indicates to use default, space is use empty
+				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
+
+				FlexicontentFields::createFilter($filter, $value, $formName);
+			break;
+
 			case 'language':
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' i.language AS value, CASE WHEN CHAR_LENGTH(lg.title_native) THEN lg.title_native ELSE lg.title END as text';
+				$filter->filter_valuesselect =
+					'CASE WHEN i.language IS NULL THEN ' . $db->Quote('*') . ' ELSE i.language END AS value, ' .
+					'CASE WHEN CHAR_LENGTH(lg.title_native) THEN lg.title_native ELSE ' .
+						'(CASE WHEN lg.title IS NULL THEN ' . $db->Quote(JText::_('JALL')) . ' ELSE lg.title END) ' .
+					'END as text';
 				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
 				$filter->filter_valuesjoin   =
-					' JOIN #__languages AS lg ON i.language = lg.lang_code'.
+					' LEFT JOIN #__languages AS lg ON i.language = lg.lang_code'.
 					' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id';
-				$filter->filter_valueswhere  = ' AND lg.published <> 0';
+				$filter->filter_valueswhere  = ' AND (lg.published <> 0 OR i.language = ' . $db->Quote('*') . ')';  // NOTE: this extra to the always used 'value' = ...
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.language ';
-				$filter->filter_having  = null;   // this indicates to use default, space is use empty
+				$filter->filter_having  = null;   // use default, null indicates to use default, space is use empty
 				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
-			
+
 			default:
 				$filter->html	.= 'CORE property field of type: '.$props_type.' can not be used as search filter';
 			break;
@@ -282,30 +307,45 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
+		$db = JFactory::getDBO();
+		$value_quoted = array();
+		foreach ($value as $i => $v)
+		{
+			$value_quoted[$i] = $db->Quote($v);
+		}
+
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
+			case 'id':
 			case 'language':
-				$filter->filter_colname    = 'language';
-				$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
-				$filter->filter_valueformat = ' ';
-				
-				$query = FlexicontentFields::getFiltered($filter, $value, $return_sql);
+				if ($props_type=='id')
+				{
+					JArrayHelper::toInteger($value);  // Sanitize filter values as integers
+				}
+
+				$filter->filter_colname     = $props_type;
+				$filter->filter_valuesjoin  = ' ';   // ... a space, (indicates not needed)
+				$filter->filter_valueexact = true;  // Match exactly even if field display is text input
+
+				//$query = ' AND i.' . $props_type . ' IN (' . implode(',', $value_quoted) . ')';
+				return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 				break;
+
 			default:
 				return $return_sql ? ' AND i.id IN (0) ' : array(0);
 				break;
 		}
-		if ( !$return_sql ) {
-			//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
-			$db = JFactory::getDBO();
-			$db->setQuery($query);
-			$filtered = $db->loadColumn();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			return $filtered;
-		} else {
+
+		if ($return_sql)
+		{
 			return $query;
 		}
+
+		//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
+		$db->setQuery($query);
+		$filtered = $db->loadColumn();
+		return $filtered;
 	}
 	
 	
@@ -314,29 +354,38 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
-		
+
+		$db = JFactory::getDBO();
+		$value_quoted = array();
+		foreach ($value as $i => $v)
+		{
+			$value_quoted[$i] = $db->Quote($v);
+		}
+
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
+			case 'id':
 			case 'language':
-				$query = " SELECT DISTINCT c.id "
-					." FROM #__content AS c "
-					." WHERE c.language='".implode('',$value)."' ";
+				$query = 'SELECT DISTINCT c.id '
+					. ' FROM #__content AS c '
+					. ' WHERE c.' . $props_type . ' IN (' . implode(',', $value_quoted) . ')';
 				break;
+
 			default:
 				return $return_sql ? ' AND i.id IN (0) ' : array(0);
 				break;
 		}
-		if ( !$return_sql ) {
-			//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
-			$db = JFactory::getDBO();
-			$db->setQuery($query);
-			$filtered = $db->loadColumn();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			return $filtered;
-		} else {
+
+		if ($return_sql)
+		{
 			return ' AND i.id IN ('. $query .')';
 		}
+
+		//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
+		$db->setQuery($query);
+		$filtered = $db->loadColumn();
+		return $filtered;
 	}
 }
 ?>
