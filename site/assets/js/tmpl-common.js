@@ -64,19 +64,21 @@
 	}
 	
 	
-	function adminFormPrepare(form, postprep, task) {
+	function adminFormPrepare(form, postprep, task)
+	{
 		var extra_action = '';
 		var fcform = jQuery(form);
 		
 		var fcform_action = fcform.attr('data-fcform_action');
-		if ( typeof fcform_action === "undefined" || fcform_action === null ) {
+		if ( typeof fcform_action === "undefined" || fcform_action === null )
+		{
 			fcform_action = fcform.attr('action');
 			fcform.attr('data-fcform_action', fcform_action);
 		}
 		
 		var var_sep = fcform_action.match(/\?/) ? '&' : '?';
 		
-		for(i=0; i<form.elements.length; i++)
+		for (i=0; i<form.elements.length; i++)
 		{
 			var element = form.elements[i];
 			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
@@ -88,7 +90,8 @@
 			var matches = element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|orderby_2nd|listall|q|searchword|p|searchphrase|areas\[\]|contenttypes\[\]|txtflds|o|ordering)$/);
 			if (!matches || element.value == '') continue;
 
-			if ( (element.type=='radio' || element.type=='checkbox') ) {
+			if ( (element.type=='radio' || element.type=='checkbox') )
+			{
 				if ( !element.checked ) continue;
 				if ( jQuery(element).attr('data-is-default-value') == '1' )
 				{
@@ -96,22 +99,29 @@
 					continue;
 				}
 			}
-			if ( element.type=='select-one' ) {
-				if ( jQuery(element).find('option:selected').attr('data-is-default-value') ) {
+			if ( element.type=='select-one' )
+			{
+				if ( jQuery(element).find('option:selected').attr('data-is-default-value') )
+				{
 					if (postprep==2) jQuery(element).attr('disabled', 'disabled');
 					continue;
 				}
 			}
 			
-			if ( element.type=='select-multiple' ) {
-				for (var p=0; p < element.length; p++) {
+			if ( element.type=='select-multiple' )
+			{
+				for (var p=0; p < element.length; p++)
+				{
 					if ( ! element.options[p].selected ) continue;
 					extra_action += var_sep + element.name.replace("[]","") + '[' + ']=' + encodeURIComponent(element.options[p].value);
 					var_sep = '&';
 				}
-			} else {
+			}
+			else
+			{
 				element_value = element.value;
-				if ( jQuery(element).hasClass('fc_iscalendar') ) {
+				if ( jQuery(element).hasClass('fc_iscalendar') && typeof JoomlaCalendar !== 'function' )
+				{
 					var frmt = '%Y-%m-%d';
 					var date = Date.parseDate(element.value || element.innerHTML, frmt);
 					if (postprep==2) element.value = date.print(frmt, true);
@@ -121,38 +131,47 @@
 				var_sep = '&';
 			}
 		}
-		
+
 		var fc_uid = fc_getCookie('fc_uid');
-		if (fc_uid!='') {
+		if (fc_uid != '')
+		{
 			extra_action += var_sep + 'cc' + '=' +fc_uid;
 		}
 		form.action = fcform_action + extra_action;  //alert(form.action);
 		
-		if (typeof postprep !== "undefined" && postprep !== null && postprep!=0) {
-			if (postprep==2) {
+		if (typeof postprep !== "undefined" && postprep !== null && postprep!=0)
+		{
+			if (postprep==2)
+			{
 				var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
 				form.submit( task );
-				if (fc_filter_form_blocker) {
+				if (fc_filter_form_blocker)
+				{
 					fc_filter_form_blocker.css("display", "block");
 					fc_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
 				}
-			} else if (postprep==1) {
+			}
+			else if (postprep==1)
+			{
 				var form_id = jQuery(form).attr('id');
 				jQuery('#'+form_id+'_submitWarn').css("display", "inline-block");
 			}
 		}
 	}
 	
-	function adminFormClearFilters (form) {
-		for(i=0; i<form.elements.length; i++) {
+	function adminFormClearFilters (form)
+	{
+		for(i=0; i<form.elements.length; i++)
+		{
 			var element = form.elements[i];
 			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
-			
+
 			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
 			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
-			
+
 			var matches = element.name.match(/(filter[.]*|letter)/);
-			if (matches) {
+			if (matches)
+			{
 				if (jQuery(element).data('select2')) {
 					jQuery(element).select2('val', '');
 				} else {
@@ -309,15 +328,42 @@ jQuery(document).ready(function() {
 			el.css("opacity", "0.5");
 		}
 	});
-	
+
 	// handle calender fields being changed by popup calendar
 	jQuery('input + button .icon-calendar').parent().bind('click', function() {
+		var newCalendar = typeof JoomlaCalendar === 'function';
 		var el = jQuery(this).prev();
 		el.attr('data-previous_value', el.val());
-		Calendar.prototype.__currentCalendarInput = el;   // Set a singular variable for the current input field
-		//el.focus(); // Effectivle sets: document.activeElement so that close handler of calendar 'callCloseHandler' will find it
+
+		// Set a singular variable for the current input field
+		if (!newCalendar)
+		{
+			Calendar.prototype.__currentCalendarInput = el;
+		}
+		else
+		{
+			JoomlaCalendar.prototype.__currentCalendarInput = el;
+		}
+		//el.focus(); // Set document.activeElement so that close handler of calendar will find it
 	});
-	
+
+
+	if (typeof JoomlaCalendar !== "undefined")
+	{
+		var oldFunc = JoomlaCalendar.prototype.close;
+		JoomlaCalendar.prototype.close = function()
+		{
+			var oldFuncResult = oldFunc.apply(this, arguments);
+			var el = JoomlaCalendar.prototype.__currentCalendarInput; //jQuery(document.activeElement);
+			var previous_value = el.attr('data-previous_value');
+			if ( typeof previous_value !== "undefined" && previous_value != el.val())
+			{
+				el.trigger('change');
+			}
+			return oldFuncResult;
+		}
+	}
+
 	if (typeof Calendar !== "undefined" && typeof Calendar.prototype.callCloseHandler === 'function')
 	{
 		var oldFunc = Calendar.prototype.callCloseHandler;
@@ -326,7 +372,8 @@ jQuery(document).ready(function() {
 			var oldFuncResult = oldFunc.apply(this, arguments);
 			var el = Calendar.prototype.__currentCalendarInput; //jQuery(document.activeElement);
 			var previous_value = el.attr('data-previous_value');
-			if ( typeof previous_value !== "undefined" && previous_value != el.val())  {
+			if ( typeof previous_value !== "undefined" && previous_value != el.val())
+			{
 				el.trigger('change');
 			}
 			return oldFuncResult;

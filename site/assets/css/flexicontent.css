@@ -2014,8 +2014,8 @@ body input.fc_hidden_value {
 	display: inline-block;
 	box-sizing: border-box !important;
 }
-#flexicontent form div fieldset.panelform > div,
-form div.container_fcfield > div {
+#flexicontent form div fieldset.panelform > div:not(.alert):not([class^="fcsep_"]):not([class*=" fcsep_"]),
+form div.container_fcfield > div:not(.alert):not([class^="fcsep_"]):not([class*=" fcsep_"]) {
 	margin: 0;
 }
 #flexicontent form div fieldset.panelform > fieldset,
