@@ -308,6 +308,11 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 
 
 	/* RTL BOF */
+
+	// Files in frontend assets folder
+	$path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
+
 	$less_files = array(
 		'less/flexi_form_rtl.less',
 		'less/flexi_containers_rtl.less',
@@ -333,6 +338,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 
 	$less_files = array('less/j3x_rtl.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+
 	/* RTL EOF */
 
 

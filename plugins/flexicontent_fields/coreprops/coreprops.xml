@@ -21,13 +21,8 @@
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
 		
-		<fieldset name="group-coreprops-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_CORE_PROPS_DESCRIPTION" level="level2 alert alert-info fcpadded"/>
-			<field name="" type="separator" default="Frontend Item Form only" level="level1"/>
-			
-			<field name="" type="separator" default="Custom place this selected CORE property via field manager ordering" level="level4 alert alert-info"/>
-			
+		<fieldset name="group-coreprops-source" repeat="1" icon_class="icon-wrench" label="FLEXI_COREPRPS_PROPRI" addfieldpath="/administrator/components/com_flexicontent/elements">
+
 			<field name="props_type" type="multilist" toggle_related="1" default="" label="FLEXI_COREPRPS_PROPRI" description="FLEXI_COREPRPS_PROPRI_DESC">
 				<group label="FLEXI_BASIC_SINGLE_PROPS">
 					<option value="id"                show_list="" hide_list="maincat_conf">FLEXI_ID</option>
@@ -55,8 +50,16 @@
 					<option value="layout_params"     show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LAYOUT_PARAMS</option>
 				</group>
 			</field>
-			
+
 		</fieldset>
+
+		<fieldset name="group-coreprops-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_COREPROPS_EDITING_FE" level="level2 fc-mssg fc-info"/>
+			<field name="" type="separator" default="FLEXI_CORE_PROPS_DESCRIPTION" level="level2 fc-mssg fc-warning"/>
+
+		</fieldset>
+
 		<fieldset name="group-coreprops-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
