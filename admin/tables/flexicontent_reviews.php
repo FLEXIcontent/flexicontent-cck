@@ -32,6 +32,7 @@ class flexicontent_reviews extends JTable
 	var $_title = 'title';
 	var $_alias = null;
 	var $_force_ascii_alias = false;
+	var $_allow_underscore = false;
 
 	public function __construct(& $db)
 	{
@@ -62,4 +63,37 @@ class flexicontent_reviews extends JTable
 
 		return true;
 	}
+
+
+	/**
+	 * Make given string safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true 
+	 *
+	 * @param   string   $string       The string to make safe
+	 * @param   string   $language     The language of the string
+	 * @param   boolean  $force_ascii  Whether to force transliteration
+	 *
+	 * @return  string   A safe string, possibly transliterated
+	 *
+	 * @see     JTable:bind
+	 * @since   11.1
+	 */
+	public function stringURLSafe($string, $language = '', $force_ascii)
+	{
+		if (JFactory::getConfig()->get('unicodeslugs') == 1 && !$force_ascii)
+		{
+			$output = JFilterOutput::stringURLUnicodeSlug($string);
+		}
+		else
+		{
+			if ($language === '*' || $language === '')
+			{
+				$languageParams = JComponentHelper::getParams('com_languages');
+				$language = $languageParams->get('site');
+			}
+			$output = JFilterOutput::stringURLSafe($string, $language);
+		}
+
+		return $output;
+	}
+
 }
