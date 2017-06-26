@@ -210,6 +210,12 @@ class flexicontent_fields extends _flexicontent_fields
 			}
 		}
 
+		// Force dash instead of underscore (if such configuration)
+		if (!$this->_allow_underscore)
+		{
+			$this->$alias = str_replace('_', '-', $this->$alias);
+		}
+
 
 		// ***
 		// *** Make alias unique
@@ -228,7 +234,7 @@ class flexicontent_fields extends _flexicontent_fields
 			if ($xid && $xid != intval($this->id))
 			{
 				$bad_original_alias = $original_alias;
-				$possible_alias = $this->$alias . '_' . (++$n);
+				$possible_alias = $this->$alias . '-' . (++$n);
 				continue;
 			}
 			break;
