@@ -905,10 +905,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ( $image_subpath )
 			{
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
-				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="1" />';
+				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="text" class="fc_hidden_value hasvalue '.($use_ingroup ? $required_class : '').'" value="1" />';
 			} else {
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="" />';
-				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
+				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="text" class="fc_hidden_value hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
 			}
 
 
@@ -1015,8 +1015,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				</div>
 			</div>
 			' : '') . '
-			<div class="fcclear"></div>
 			'.$originalname.'
+			<div class="fcclear"></div>
 			'.$existingname.'
 			<div class="fcclear"></div>
 			
@@ -1081,7 +1081,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 		
 		// This is field HTML that is created regardless of values
-		$non_value_html = '<input id="'.$elementid.'" class="'.($use_ingroup ? '' : $required_class).' fc_hidden_value" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		$non_value_html = '<input id="'.$elementid.'" class="fc_hidden_value '.($use_ingroup ? '' : $required_class).'" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		if ($use_ingroup) {
 			$field->html[-1] = $non_value_html;
 			if ($use_inline_uploaders && $uploader_html->thumbResizer)
