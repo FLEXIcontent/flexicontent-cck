@@ -97,7 +97,7 @@ class FCIndexedField extends FCField
 		{
 			$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
 			$default_values = preg_split("/\s*,\s*/u", $default_values);
-			if ( !strlen($default_values[0]) ) unset($default_values[0]);
+			if ( !strlen($default_values[0]) ) $default_values[0] = '_field_null_value_';
 		}
 		else
 		{
@@ -304,7 +304,7 @@ class FCIndexedField extends FCField
 			{
 				$master_field = $byIds[$cascade_after];
 				$cascade_prompt = $field->parameters->get('cascade_prompt', '');
-				$cascade_prompt = $cascade_prompt ? JText::_($cascade_prompt) : JText::_('FLEXI_PLEASE_SELECT') . ': ' . $master_field->label;
+				$cascade_prompt = $cascade_prompt ? JText::_($cascade_prompt) : JText::_('FLEXI_PLEASE_SELECT') . ': ' . JText::_($master_field->label);
 				
 				$srcELid = 'custom_' . $master_field->name;
 				$trgELid = $elementid;
@@ -822,6 +822,10 @@ class FCIndexedField extends FCField
 				{
 					$_valgrps[] = is_array($vg) ? reset($vg) : $vg;
 				}
+				if ($_valgrps && $_valgrps[0] == '_field_null_value_')
+				{
+					unset($_valgrps[0]);
+				}
 				$valgrps = $_valgrps;
 			}
 
@@ -831,7 +835,12 @@ class FCIndexedField extends FCField
 				if (!$ajax)
 				{
 					//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
-					$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+					$prompt = (object) array(
+						'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
+						'text' => $cascade_prompt,
+						'disable' => (static::$valueIsArr ? true : null),
+						'isprompt' => 'fc-mssg fc-nobgimage fc-info'
+					);
 					$elements = array('_field_selection_prompt_' => $prompt);
 				}
 				return $elements;
@@ -865,7 +874,12 @@ class FCIndexedField extends FCField
 			if ( !is_array($elements) )
 			{
 				//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				$prompt = (object) array(
+					'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
+					'text' => JText::_('FLEXI_FIELD_INVALID_QUERY'),
+					'disable' => (static::$valueIsArr ? true : null),
+					'isprompt' => 'fc-mssg fc-nobgimage fc-important'
+				);
 				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
 			}
@@ -877,7 +891,12 @@ class FCIndexedField extends FCField
 			if ( !is_array($elements) )
 			{
 				//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				$prompt = (object) array(
+					'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
+					'text' => JText::_('FLEXI_FIELD_INVALID_ELEMENTS'),
+					'disable' => (static::$valueIsArr ? true : null),
+					'isprompt' => 'fc-mssg fc-nobgimage fc-important'
+				);
 				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
 			}
@@ -934,12 +953,17 @@ class FCIndexedField extends FCField
 
 
 		// ***
-		// *** Terminate if no usuable values found
+		// *** Terminate if no useable values found
 		// ***
 		if (empty($elements))
 		{
 			//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
-			$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
+			$prompt = (object) array(
+				'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
+				'text' => JText::_('FLEXI_FIELD_NO_DATA_FOUND'),
+				'disable' => (static::$valueIsArr ? true : null),
+				'isprompt' => 'fc-mssg fc-nobgimage fc-warning'
+			);
 			$elements = array('_field_selection_prompt_' => $prompt);
 			return $elements;
 		}
@@ -955,7 +979,12 @@ class FCIndexedField extends FCField
 		if ($usefirstoption)   // Add selection prompt
 		{
 			//prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
-			$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+			$prompt = (object) array(
+				'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
+				'text' => $firstoptiontext,
+				'disable' => (static::$valueIsArr ? true : null),
+				'isprompt' => 'fc-mssg fc-nobgimage fc-info'
+			);
 			$elements = array('_field_selection_prompt_' => $prompt) + $elements;
 		}
 
