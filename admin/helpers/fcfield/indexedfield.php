@@ -19,8 +19,7 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 class FCIndexedField extends FCField
 {
 	var $task_callable = array('getCascadedField');
-	
-	static $field_types = array();
+
 	static $extra_props = array();
 	static $valueIsArr = 0;
 	static $isDropDown = 0;
@@ -70,7 +69,7 @@ class FCIndexedField extends FCField
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$cascade_after  = (int) $field->parameters->get('cascade_after', 0);
-		$sortable       = self::$valueIsArr && (int) $field->parameters->get('sortable', 0);
+		$sortable       = static::$valueIsArr && (int) $field->parameters->get('sortable', 0);
 		
 		
 		// ****************
@@ -78,13 +77,13 @@ class FCIndexedField extends FCField
 		// ****************
 		$multiple     = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$required     = $field->parameters->get( 'required', 0 ) ;
-		$min_values   = $use_ingroup || !self::$valueIsArr ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
+		$min_values   = $use_ingroup || !static::$valueIsArr ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$exact_values	= $use_ingroup || !self::$valueIsArr ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
+		$exact_values	= $use_ingroup || !static::$valueIsArr ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 
 		// Sanitize limitations
-		if ($required && !$min_values && self::$valueIsArr) $min_values = 1;  // Comment this to allow simpler 'required' validation
+		if ($required && !$min_values && static::$valueIsArr) $min_values = 1;  // Comment this to allow simpler 'required' validation
 		if ($exact_values) $max_values = $min_values = $exact_values;
 		
 		
@@ -94,7 +93,7 @@ class FCIndexedField extends FCField
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		if (self::$valueIsArr)
+		if (static::$valueIsArr)
 		{
 			$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
 			$default_values = preg_split("/\s*,\s*/u", $default_values);
@@ -112,7 +111,7 @@ class FCIndexedField extends FCField
 		// *************************
 
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
-		$display_as_select = self::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
+		$display_as_select = static::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
 
 		if ($display_as_select)
 		{
@@ -141,7 +140,7 @@ class FCIndexedField extends FCField
 			$use_prettycheckable = $use_jslib==2;
 			static $prettycheckable_added = null;
 		  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-			$placeInsideLabel = self::$usesImages && !($use_prettycheckable && $prettycheckable_added);
+			$placeInsideLabel = static::$usesImages && !($use_prettycheckable && $prettycheckable_added);
 		}
 
 
@@ -152,10 +151,10 @@ class FCIndexedField extends FCField
 		// For radio /checkbox display
 		if (!$display_as_select)
 		{
-			$fftype = self::$valueIsArr ? 'checkbox' : 'radio';
+			$fftype = static::$valueIsArr ? 'checkbox' : 'radio';
 
 			// Applicable only for radioimage/checkboximage fields, it allows a more compact display in item form
-			$form_vals_display = self::$usesImages ? (int) $field->parameters->get( 'form_vals_display', 1 ) : 0 ;  // 0: label, 1: image, 2: both
+			$form_vals_display = static::$usesImages ? (int) $field->parameters->get( 'form_vals_display', 1 ) : 0 ;  // 0: label, 1: image, 2: both
 
 			// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
 			$pretext   = $field->parameters->get( 'pretext_form', '' ) ;
@@ -194,7 +193,7 @@ class FCIndexedField extends FCField
 		// Initialise property with default value
 		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
 		{
-			$field->value = self::$valueIsArr && !empty($field->ingroup)
+			$field->value = static::$valueIsArr && !empty($field->ingroup)
 				? array($default_values)
 				: $default_values;
 		}
@@ -213,7 +212,7 @@ class FCIndexedField extends FCField
 		$attribs = '';
 
 		// Extra attributes for multi-value field
-		if (self::$valueIsArr)
+		if (static::$valueIsArr)
 		{
 			if ($exact_values)
 				$attribs .= ' data-exact_values="'.$exact_values.'" ';
@@ -230,9 +229,9 @@ class FCIndexedField extends FCField
 			if ($use_prettycheckable && $prettycheckable_added)
 			{
 				$input_classes[] = 'use_prettycheckable';
-				$attribs .= self::$usesImages ? ' data-customClass="fcradiocheckimage"' : ' data-customClass="fcradiocheck"';
+				$attribs .= static::$usesImages ? ' data-customClass="fcradiocheckimage"' : ' data-customClass="fcradiocheck"';
 			}
-			if (self::$valueIsArr)
+			if (static::$valueIsArr)
 			{
 				if ($max_values || $min_values || $exact_values)
 					$input_classes[] = 'validate-cboxlimitations';
@@ -244,7 +243,7 @@ class FCIndexedField extends FCField
 
 			// Attributes for input-labels
 			$label_class = 'fccheckradio_lbl ' . ($form_vals_display==1 ? $tooltip_class : '');
-			$label_style = self::$usesImages ? 'vertical-align: unset!important;' : '';  // fix for image placement inside label
+			$label_style = static::$usesImages ? 'vertical-align: unset!important;' : '';  // fix for image placement inside label
 		}
 
 		// Attributes if displaying as select
@@ -255,7 +254,7 @@ class FCIndexedField extends FCField
 			if ($required) $input_classes[] = 'required';
 
 			// Attributes multi-select field
-			if (self::$valueIsArr)
+			if (static::$valueIsArr)
 			{
 				$add_placeholder = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', 1 );
 				$placeholder = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
@@ -272,7 +271,7 @@ class FCIndexedField extends FCField
 			}
 
 			// Client-side Validation and sortable class
-			if (self::$valueIsArr)
+			if (static::$valueIsArr)
 			{
 				if ($max_values || $min_values || $exact_values)
 				{
@@ -406,7 +405,7 @@ class FCIndexedField extends FCField
 				var nr = 0;
 				theSet.each(function() {
 					var elem = jQuery(this);
-					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
+					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(static::$valueIsArr ? '[]' : '')."');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
 					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + ' " . $input_classes . "');
 					elem.attr('data-is-defval') ?
@@ -444,7 +443,7 @@ class FCIndexedField extends FCField
 					});
 				}
 				else elem.val('');
-				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
+				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(static::$valueIsArr ? '[]' : '')."');
 				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
 				
@@ -478,7 +477,7 @@ class FCIndexedField extends FCField
 				$js .= "
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
 					return function () {
-						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+".$mvno."+', input.".$srcELid."_'+".$mvno.", '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".self::$promptEnabled.", rowNo);
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+".$mvno."+', input.".$srcELid."_'+".$mvno.", '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".static::$promptEnabled.", rowNo);
 					}
 				}(uniqueRowNum".$field->id.");
 				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."]();
@@ -575,7 +574,7 @@ class FCIndexedField extends FCField
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
 		$is_array_already = is_array($field->value) ? is_array(reset($field->value)) : false;
-		$values = self::$valueIsArr && !$multiple && !$is_array_already ? array($field->value) : $field->value;
+		$values = static::$valueIsArr && !$multiple && !$is_array_already ? array($field->value) : $field->value;
 		
 		
 		// *****************************************
@@ -588,7 +587,7 @@ class FCIndexedField extends FCField
 		foreach ($values as $value)
 		{
 			// Compatibility for serialized values
-			if ( self::$valueIsArr )
+			if ( static::$valueIsArr )
 			{
 				if (!is_array($value))
 				{
@@ -608,7 +607,7 @@ class FCIndexedField extends FCField
 			// Only if needed ...
 			if (!$ajax || !$display_as_select)
 			{
-				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
+				$fieldname_n = $fieldname.'['.$n.']'. (static::$valueIsArr ? '[]' : '');
 				$elementid_n = $elementid.'_'.$n;
 			}
 
@@ -701,7 +700,7 @@ class FCIndexedField extends FCField
 					$mvno = $single_master ? '0' : $n;
 					$per_val_js .= "
 						fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
-							fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".self::$promptEnabled.", ".$n.");
+							fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".static::$promptEnabled.", ".$n.");
 						}
 						fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
 					";
@@ -746,7 +745,7 @@ class FCIndexedField extends FCField
 
 
 		// For multi-value fields add configured limits
-		if (self::$valueIsArr)
+		if (static::$valueIsArr)
 		{
 			// Add message box about allowed # values
 			if ($exact_values) {
@@ -798,7 +797,7 @@ class FCIndexedField extends FCField
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$cascade_after  = (int)$field->parameters->get('cascade_after', 0);
-		$display_as_select = self::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
+		$display_as_select = static::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
 
 		if ($cascade_after)
 		{
@@ -831,8 +830,8 @@ class FCIndexedField extends FCField
 				$elements = array();
 				if (!$ajax)
 				{
-					//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-					$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+					//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+					$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 					$elements = array('_field_selection_prompt_' => $prompt);
 				}
 				return $elements;
@@ -862,11 +861,11 @@ class FCIndexedField extends FCField
 			}
 
 			$item_pros = true;
-			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
+			$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props, $item_pros, false, $and_clause);
 			if ( !is_array($elements) )
 			{
-				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
 				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
 			}
@@ -874,11 +873,11 @@ class FCIndexedField extends FCField
 
 		else  // Elements mode
 		{
-			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+			$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 			if ( !is_array($elements) )
 			{
-				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
 				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
 			}
@@ -939,8 +938,8 @@ class FCIndexedField extends FCField
 		// ***
 		if (empty($elements))
 		{
-			//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
+			//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+			$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
 			$elements = array('_field_selection_prompt_' => $prompt);
 			return $elements;
 		}
@@ -955,8 +954,8 @@ class FCIndexedField extends FCField
 
 		if ($usefirstoption)   // Add selection prompt
 		{
-			//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+			//prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+			$prompt = (object) array( 'value'=>(static::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(static::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 			$elements = array('_field_selection_prompt_' => $prompt) + $elements;
 		}
 
@@ -964,7 +963,7 @@ class FCIndexedField extends FCField
 		// ***
 		// *** Handle fields that use images, like radioimage / checkboximage
 		// ***
-		if (self::$usesImages)
+		if (static::$usesImages)
 		{
 			// image specific variables
 			$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
@@ -1082,11 +1081,11 @@ class FCIndexedField extends FCField
 		// Value creation
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$text_or_value  = (int) $field->parameters->get( 'text_or_value', (self::$usesImages ? 2 : 1) ) ;
+		$text_or_value  = (int) $field->parameters->get( 'text_or_value', (static::$usesImages ? 2 : 1) ) ;
 		$tooltip_class = 'hasTooltip';
 
 		// image specific or image related variables
-		if (self::$usesImages)
+		if (static::$usesImages)
 		{
 			$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 			$imgpath  = JURI::root(true) .'/'. $imagedir;
@@ -1130,7 +1129,7 @@ class FCIndexedField extends FCField
 		
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
 				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_QUERY');
@@ -1151,7 +1150,7 @@ class FCIndexedField extends FCField
 			$v = reset($values);
 			$is_2lvl_arr = is_array($v);
 		}
-		$values = ($multiple && self::$valueIsArr) || $is_2lvl_arr ? $values : array($values);
+		$values = ($multiple && static::$valueIsArr) || $is_2lvl_arr ? $values : array($values);
 		if ( !$values ) $values = array();
 		
 		
@@ -1177,7 +1176,7 @@ class FCIndexedField extends FCField
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
-			if ($multiple && self::$valueIsArr) {
+			if ($multiple && static::$valueIsArr) {
 				// Values separator, field 's opening / closing texts, were already applied for every array of values
 				$sep = $prop!='csv_export' ? '' : ' -- ';
 				$field->{$prop} = implode($sep, $field->{$prop});
@@ -1213,13 +1212,13 @@ class FCIndexedField extends FCField
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$is_importcsv = JFactory::getApplication()->get('task', '', 'cmd') == 'importcsv';
-		$field->use_suborder = $multiple && self::$valueIsArr;
+		$field->use_suborder = $multiple && static::$valueIsArr;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 
 		// Make sure every value is an array (for multi-value per value fields)
-		if (self::$valueIsArr)
+		if (static::$valueIsArr)
 		{
 			$v = reset($post);  // Get first value to examine it below (by attempting unserialize) and forcing an array
 			if (!is_array($v))
@@ -1233,7 +1232,7 @@ class FCIndexedField extends FCField
 		// Account for fact that ARRAY form elements are not submitted if they do not have a value
 		if ( $use_ingroup )
 		{
-			$empty_value = self::$valueIsArr ? array() : null;
+			$empty_value = static::$valueIsArr ? array() : null;
 			$custom = JFactory::getApplication()->input->get('custom', array(), 'array');
 			if ( isset($custom['_fcfield_valueholder_'][$field->name]) ) 
 			{
@@ -1247,12 +1246,12 @@ class FCIndexedField extends FCField
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 		
 		foreach ($post as $n => $v)
 		{
 			// Non multi-value per value fields, have only 1 value, convert it to single record array to use same code below
-			if (!self::$valueIsArr)
+			if (!static::$valueIsArr)
 			{
 				$v = array($v);
 			}
@@ -1273,22 +1272,22 @@ class FCIndexedField extends FCField
 			// Skip empty value, but if in group increment the value position
 			if (!count($vals))
 			{
-				if ($use_ingroup) $newpost[$new++] = self::$valueIsArr ? array() : null;
+				if ($use_ingroup) $newpost[$new++] = static::$valueIsArr ? array() : null;
 				continue;
 			}
 			
 			// If multiple disabled, use 1st value ARRAY only (for multi-value per value fields)
-			if (self::$valueIsArr && !$multiple)
+			if (static::$valueIsArr && !$multiple)
 			{
 				$newpost = $vals;
 				break;
 			}
 			
-			$newpost[$new] = self::$valueIsArr ? $vals : reset($vals);
+			$newpost[$new] = static::$valueIsArr ? $vals : reset($vals);
 			$new++;
 			
 			// If multiple disabled, do not add more values
-			if (!self::$valueIsArr && !$multiple) break;
+			if (!static::$valueIsArr && !$multiple) break;
 			
 			// max values limitation (*if in group, this was zeroed above)
 			if ($max_values && $new >= $max_values) continue;
@@ -1332,13 +1331,13 @@ class FCIndexedField extends FCField
 		
 		// Get indexed element values
 		$item_pros = false;
-		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros, $create_filter=true);
+		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, static::$extra_props, $item_pros, $create_filter=true);
 		
 
 		// ***
 		// *** Handle display for fields that use images, like radioimage / checkboximage
 		// ***
-		if (self::$usesImages)
+		if (static::$usesImages)
 		{
 			$_s = $isSearchView ? '_s' : '';
 			$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
@@ -1406,7 +1405,7 @@ class FCIndexedField extends FCField
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		$field->isindexed = true;
-		$field->extra_props = self::$extra_props;
+		$field->extra_props = static::$extra_props;
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -1419,7 +1418,7 @@ class FCIndexedField extends FCField
 		if ( !$field->issearch ) return;
 		
 		$field->isindexed = true;
-		$field->extra_props = self::$extra_props;
+		$field->extra_props = static::$extra_props;
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}

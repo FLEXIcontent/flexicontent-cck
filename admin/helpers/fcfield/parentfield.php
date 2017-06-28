@@ -42,7 +42,7 @@ class FCField extends JPlugin
 	{
 		parent::__construct( $subject, $params );
 
-		if (!$this->fieldtypes)
+		if (empty($this->fieldtypes))
 		{
 			$this->fieldtypes = self::$field_types;
 		}
