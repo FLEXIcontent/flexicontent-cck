@@ -1009,7 +1009,7 @@ class flexicontent_db
 	static function unserialize_array($v, $force_array=false, $force_value = true)
 	{
 		static $pattern_obj_inner = '/o:\d+:"[a-z0-9_]+":\d+:{.*?}/i';
-		static $pattern_array_outer = '/^a:\d+:{.*?}$/i';
+		static $pattern_array_outer = '/^a:\d+:{.*?}$/is';
 
 		// ***
 		// *** SANITY CHECKs
