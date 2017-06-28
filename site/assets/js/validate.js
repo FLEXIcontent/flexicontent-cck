@@ -740,11 +740,11 @@ var JFormValidator = function()
 			var fieldgroup_box = fieldval_box.parent().parent();
 			if (fieldgroup_box.is(":hidden"))
 			{
-				fieldgroup_box.prev().find('.show_vals_btn').data('fc_noeffect', 1).trigger('click');
+				fieldgroup_box.prev().find('.fc-show-vals-btn').data('fc_noeffect', 1).trigger('click');
 			}
 
 			// Performance concern ... only do for first invalid field  --  Check if it is part of a field group and make sure the fied group is expanded
-			fieldval_box.find(".toggle_group_down").filter(":visible").data('fc_noeffect', 1).trigger('click');   // Only if is drop down button is visible = valuebox is hidden
+			fieldval_box.find(".fc-toggle-group-down").filter(":visible").data('fc_noeffect', 1).trigger('click');   // Only if is drop down button is visible = valuebox is hidden
 		}
 		
  		// Get the label

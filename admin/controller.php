@@ -928,13 +928,12 @@ class FlexicontentController extends JControllerLegacy
 					}
 
 					// Allow dropping of duplicate rows using ALTER IGNORE TABLE
-					$query  = "SET session old_alter_table=1";
-					$db->setQuery($query);
-					$db->execute();
+					//$db->setQuery('SET session old_alter_table=1');
+					//$db->execute();
 
 					foreach($index_cmds as $index_type => $index_clause)
 					{
-						$query  = "ALTER IGNORE TABLE `#__".$tblname."` ";
+						$query  = 'ALTER TABLE #__' . $tblname . ' ';  //'ALTER IGNORE TABLE #__' . $tblname . ' ';
 						$query .= implode(', ', $index_clause);
 						$db->setQuery($query);
 

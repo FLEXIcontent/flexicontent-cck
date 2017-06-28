@@ -57,7 +57,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			<h3 class="tabberheading"><?php echo JText::_("FLEXI_IMPORT");?></h3>
 			<br/>
 			
-			<form action="index.php" method="post" name="adminForm_appsman_import" id="adminForm_appsman_import" class="form-validate" enctype="multipart/form-data" >
+			<form action="index.php" method="post" name="adminForm_appsman_import" id="adminForm_appsman_import" class="form-validate form-horizontal" enctype="multipart/form-data" >
 				
 				<button class="btn btn-success" onclick="this.form.elements['task'].value='appsman.initxml'; this.form.submit();">
 					<span class="icon-import"></span><?php echo JText::_('FLEXI_IMPORT_PREPARE_TASK'); ?>
@@ -101,7 +101,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-home-2">
 			<h3 class="tabberheading"><?php echo JText::_("FLEXI_EXPORT");?></h3>
 			
-			<form action="index.php" method="post" name="adminForm_appsman_export" id="adminForm_appsman_export" class="form-validate" enctype="multipart/form-data" >
+			<form action="index.php" method="post" name="adminForm_appsman_export" id="adminForm_appsman_export" class="form-validate form-horizontal" enctype="multipart/form-data" >
 				
 				<br/>
 				<button class="btn btn-success" onclick="this.form.elements['task'].value='appsman.export'; this.form.submit();">

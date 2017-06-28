@@ -326,7 +326,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	else if ( ! is_array($allowlangmods_fe) )	$allowlangmods_fe = !FLEXI_J16GE ? array($allowlangmods_fe) : explode("|", $allowlangmods_fe);
 	?>
 
-	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
+	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data">
 		
 		<?php ob_start();  ?>
 		
@@ -1274,7 +1274,7 @@ if ($this->fields && $typeid) :
 		<?php
 
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
-		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 		$row_k = 0;
 
 		foreach ($this->fields as $field_name => $field)

@@ -86,7 +86,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 	*/
 	function renderFieldsForm($item)
 	{
-		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$row_k = 0;
 

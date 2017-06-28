@@ -37,7 +37,7 @@ $alert_box = '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>';  // '<d
 $btn_class = 'btn';  // 'fc_button';
 $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class_be', '');
-$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
 $hint_image = '<i class="icon-info"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $warn_image = '<i class="icon-warning"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
@@ -301,7 +301,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 <div id="flexicontent" class="flexi_edit full_body_box flexicontent" >
 
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data" >
 	
 	<div class="container-fluid" style="padding:0px!important;">
 	<?php /*<fieldset class="basicfields_set">

@@ -463,8 +463,8 @@ class FlexicontentFields
 			if ($field->untranslatable)
 			{
 				$msg = !isset($field->html) ?
-					'<div class="alert alert-info fc-warning fc-iblock" style="margin:0 4px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>' :
-					'<div class="alert alert-info fc-small fc-iblock" style="margin:0 4px 6px 2px; max-width: unset;">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>' ;
+					'<div class="alert alert-info fc-warning fc-iblock" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>' :
+					'<div class="alert alert-info fc-small fc-iblock" style="margin:0 2px 6px 2px; max-width: unset;">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>' ;
 
 				if (!is_array($field->html))
 				{

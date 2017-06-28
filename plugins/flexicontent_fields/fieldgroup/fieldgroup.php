@@ -128,8 +128,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			";
 			$js .= "
 			jQuery(document).ready(function(){"
-				.($compact_edit==2 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_down').data('fc_noeffect', 1).trigger('click');" : "")
-				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_up').data('fc_noeffect', 1).trigger('click');" : "")
+				.($compact_edit==2 ? "jQuery('#sortables_".$field->id."').find('.fc-toggle-group-down').data('fc_noeffect', 1).trigger('click');" : "")
+				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.fc-toggle-group-up').data('fc_noeffect', 1).trigger('click');" : "")
 			."});
 			";
 			
@@ -291,12 +291,12 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 			$_opener = !$compact_edit ? '' : '
-				<span class="toggle_group_down ' . $add_on_class . ' btn-success" style="vertical-align: top; text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 1); jQuery(this).prev().before(jQuery(this)); return false;">
+				<span class="fc-toggle-group-down ' . $add_on_class . ' btn-success" style="vertical-align: top; text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 1); jQuery(this).prev().before(jQuery(this)); return false;">
 					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_EDIT_DETAILS' ). '
 				</span>
 			';
 			$_closer = !$compact_edit ? '' : '
-				<span class="toggle_group_up   ' . $add_on_class . '" style="vertical-align: top; text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); jQuery(this).prev().before(jQuery(this)); return false;">
+				<span class="fc-toggle-group-up ' . $add_on_class . '" style="vertical-align: top; text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); jQuery(this).prev().before(jQuery(this)); return false;">
 					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_DETAILS' ). '
 				</span>
 			';
@@ -416,7 +416,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		}
 		if (!$add_position) $field->html .= '
 			<div class="input-append input-prepend fc-xpended-btns">
-				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.show_vals_btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
+				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.fc-show-vals-btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
 			</div>
 		';
 		
@@ -434,10 +434,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				</span>' : '').*/
 			($field->parameters->get('compact_edit_global', 0) ? '
 			<div class="toggle_all_values_buttons_box">
-				<span id="sortables_'.$field->id.'_hide_vals_btn" class="btn hide_vals_btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">
+				<span id="sortables_'.$field->id.'_hide_vals_btn" class="btn fc-hide-vals-btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">
 					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_VALUES' ).'
 				</span>
-				<span id="sortables_'.$field->id.'_show_vals_btn" class="btn btn-success show_vals_btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).prev(), 1); return false;" style="display:none;">
+				<span id="sortables_'.$field->id.'_show_vals_btn" class="btn btn-success fc-show-vals-btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).prev(), 1); return false;" style="display:none;">
 					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_SHOW_VALUES' ).'
 				</span>
 			</div>

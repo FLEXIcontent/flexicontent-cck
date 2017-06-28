@@ -579,3 +579,10 @@ body .btn-group.fc-group > div.statetoggler.btn.btn-small {
 .fc-box.thumb_250 {
 	width: 252px;
 }
+#flexicontent .fc-hide-vals-btn,
+#flexicontent .fc-show-vals-btn {
+	box-sizing: border-box;
+	width: 100%;
+	margin: 0 0 8px 0;
+	text-align: right;
+}

@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$date_source_str = sprintf($date_source_str, ($date_source == 1) ? '<b>start</b>' :  '<b>end</b>');
 			$_value = $date_source == 1 ? $item->publish_up : $item->publish_down;
 			$field->html =
-				 '<div style="float:left">'
+				 '<div class="fc-iblock">'
 				.' <div class="alert alert-info fc-small fc-iblock">'.$date_source_str.'</div><div class="fcclear"></div>'
 				. $_value
 				.'</div>';

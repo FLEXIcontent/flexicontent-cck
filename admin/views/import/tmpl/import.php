@@ -35,7 +35,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 ?>
 
 <div class="flexicontent" id="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data" >
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -550,7 +550,7 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 			<tr>
-				<td style="vertical-align:top; font-family:tahoma; font-size:12px;">
+				<td style="vertical-align:top;">
 					<br/>
 					<fieldset>
 						<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT_EXPLANATION' ); ?></legend>
@@ -570,32 +570,56 @@ $tabCnt[$tabSetCnt] = 0;
 								<b>Supported fields:</b><br/><br/>
 								<ol type="a">
 									<li>
-										<b>basic fields</b>: title, description, text fields, <br/>
+										<span class="fc-mssg-inline fc-info fc-nobgimage">Item properties</span>
+										<br/> - title, description, alias, access, language, 
+										<br/> - created_by (user id), modified_by (user id),
+										<br/> - created (date), modified (date), publish_up (date), publish_down (date)
+										<br/> - etc
 									</li>
 									<li>
-										<b>single-value fields</b>: select, radio, radioimage, <br/>
+										<span class="fc-mssg-inline fc-info fc-nobgimage">Indexable fields</span>
+										<br/> select, radio, radioimage (single value)
+										<br/> selectmultiple, selectmultple, checkbox, checkboximage (multi-value)
+										<br/> <b>Note</b>:
+										<br/>  - use their "value" and not their label
+										<br/>  - separate multiple values with %%
+										<br/> e.g. 4%%2%%5
 									</li>
 									<li>
-										<b>multi-value fields</b>: selectmultiple, selectmultple, checkbox, checkboximage, email, weblink, <b>separate multiple values with %%</b><br/>
+										<span class="fc-mssg-inline fc-info fc-nobgimage">Multi-value fields</span>
+										<br/> text, date, email, weblink, ... etc
+										<br/> <b>Usage</b>: separate multiple values with <span class="badge">%%</span>
 									</li>
 									<li>
-										<b>multi-property per value fields</b>: e.g. email fields & weblink fields,
-										<br/> <u>either enter like</u>: <b>usera@somedomain.com</b>,
-										<br/> <u>or enter like</u>: <b>[-propertyname-]=propertyvalue</b>, and <b>separate</b> mutliple properties with !!
+										<span class="fc-mssg-inline fc-info fc-nobgimage">Multi-property per value fields</span>
+										<br/> email, weblink, international address, termlist, etc
+										<br/> <b>Usage</b>: <span class="badge">[-propertyname-]=propertyvalue</span>, and <b>separate</b> mutliple properties with <span class="badge">!!</span>
 										<br/> - <b>email field</b> properties: addr, text
 										<br/> - <b>weblink field</b> properties: link, title, hits
-										<br/> - <b>extendedweblink field</b> properties: link, title, linktext, class, id
+										<br/> - <b>extended weblink field</b> properties: link, title, linktext, class, id
+										<br/> - <b>international address field</b> properties: name, addr1, addr2, addr3, city, province, state, country, zip, zip_suffix,lat, lon, url, zoom
+										<br/> - <b>termlist field</b> properties: title, text
 										<br/> - ... etc
+										<br/> <b>Note</b>: Some support special "shorthand" formats: e.g. email and weblink allow (respectively) to enter 
+										<br/>  - just email: <u>usera@somedomain.com</u>
+										<br/>  - just url: <u>www.some-address-some-where.com</u>
 										<br/>
 									</li>
 									<li>
-										<b>image/gallery</b> must contain the file name (<b>new file</b>),
-										<br/> <b>NOTE:</b> NEW files must be placed inside media folder,
-										<br/> <b>NOTE:</b> It can be the name of an existing image name (if image field is in DB-mode)
-										<br/> <b>NOTE:</b> since image field is multi-property / multi-value it can use format of these fields too,
-										<br/> properties are: originalname, alt, title, desc, urllink <br/>
-										<li><b>file</b> field, must contain the file name (<b>new file</b>), OR it can be the id of an existing document (filemanager 's file ID)
-										<br/> <b>NOTE:</b> NEW files must be placed inside the document folder<br/>
+										<span class="fc-mssg-inline fc-info fc-nobgimage">Related items field</span> , use item ids, e.g. to add items 451 , 567, 321 as related items use:
+										<br/> <u>451%%567%%321</u>
+									</li>
+									<li>
+										<span class="fc-mssg-inline fc-info fc-nobgimage">Image / gallery field</span> must contain the file name (<b>new file</b>)
+										<br/> <b>Note</b>:
+										<br/>  - new files must be placed inside media folder
+										<br/>  - it can be the name of an existing image name (if image field is in DB-mode)
+										<br/>  - since image field is multi-property / multi-value it can use format of these fields too, <b>properties</b> are: originalname, alt, title, desc, urllink
+									</li>
+									<li>
+										<span class="fc-mssg-inline fc-info fc-nobgimage">File field</span> must contain the file name (<b>new file</b>), OR it can be the id of an existing document (filemanager 's file ID)
+										<br/> <b>Note:</b>
+										<br/>  - new files must be placed inside the document folder<br/>
 									</li>
 								</ol>
 							</li>

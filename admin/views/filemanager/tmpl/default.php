@@ -1456,7 +1456,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 	<div class="tabbertab" id="fileurl_tab" data-icon-class="icon-link">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_URL' ); ?> </h3>
 
-		<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
+		<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post">
 			<fieldset class="filemanager-tab" >
 				<fieldset class="actions" id="filemanager-3">
 					
@@ -1568,7 +1568,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 	<div class="tabbertab" id="server_tab" data-icon-class="icon-stack">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?> </h3>
 		
-		<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo JSession::getFormToken() . '=1'; ?>" class="form-validate" name="addFileForm" id="addFileForm" method="post">
+		<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo JSession::getFormToken() . '=1'; ?>" class="form-validate form-horizontal" name="addFileForm" id="addFileForm" method="post">
 			<fieldset class="filemanager-tab" >
 				<fieldset class="actions" id="filemanager-4">
 	
