@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate">
+<form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<div class="container-fluid" style="padding: 0px; margin-bottom: 24px; max-width: 1200px;">
 

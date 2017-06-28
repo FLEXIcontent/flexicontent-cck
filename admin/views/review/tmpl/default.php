@@ -22,7 +22,7 @@ $form = $this->form;
 ?>
 
 <div class="flexicontent" id="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<?php
 	$fieldSets = $this->form->getFieldsets();

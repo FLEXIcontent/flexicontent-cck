@@ -243,7 +243,7 @@ class flexicontent_fields extends _flexicontent_fields
 			JFactory::getApplication()->enqueueMessage($msg, 'notice');
 		}
 
-		else if ($bad_original_alias)
+		else if (!empty($bad_original_alias))
 		{
 			$msg = JText::sprintf('FLEXI_THIS_' . $this->_NAME . '_' . strtoupper($alias) . '_ALREADY_EXIST', $this->name);
 			JFactory::getApplication()->enqueueMessage($msg, 'warning');

@@ -783,7 +783,7 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
     display: inline-block !important;
 }
 .select2-container-multi .select2-choices .select2-search-choice {
-    padding: 3px 5px 3px 24px !important;
+    padding: 3px 24px 3px 5px !important;
     margin: 2px !important;
     position: relative !important;
 
@@ -813,4 +813,27 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
     background-image: -webkit-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eee 100%)!important;
     background-image: -moz-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eee 100%)!important;
     background-image: linear-gradient(to bottom, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eee 100%)!important;
+}
+
+html[dir="rtl"] .select2-container-multi .select2-choices .select2-search-choice {
+    padding: 3px 5px 3px 24px !important;
+}
+
+.select2-search-choice-close {
+    left: auto !important;
+    right: 3px !important;
+}
+html[dir="rtl"] .select2-search-choice-close {
+    right: auto !important;
+    left: 3px !important;
+}
+
+.select2-container-multi .select2-search-choice-close {
+    left: auto !important;
+    right: 3px !important;
+}
+
+html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
+    right: auto !important;
+    left: 3px !important;
 }

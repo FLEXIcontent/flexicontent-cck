@@ -141,6 +141,10 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 	cursor: pointer !important;
 	color: #333;
 }
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label {
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
 div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
@@ -1194,6 +1198,13 @@ body .btn-group.fc-group > div.statetoggler.btn.btn-small {
 .fc-box.thumb_250 {
 	width: 252px;
 }
+#flexicontent .fc-hide-vals-btn,
+#flexicontent .fc-show-vals-btn {
+	box-sizing: border-box;
+	width: 100%;
+	margin: 0 0 8px 0;
+	text-align: right;
+}
 input.fc-inherited-value + label {
 	font-weight: bold !important;
 	text-decoration: underline !important;
@@ -1686,26 +1697,30 @@ ul#ultagbox > li {
 	display: block;
 	float: right;
 	margin: 2px;
+	padding: 6px;
 	line-height: 100%;
+	height: 16px;
 	border-radius: 3px;
-}
-ul#ultagbox > li.tagitem.plain {
 	border: 1px solid silver;
-	padding: 6px 6px 5px 24px;
-	background: url(../images/tag_blue.png) transparent no-repeat 4px 4px;
 }
-ul#ultagbox > li.tagitem {
-	border: 1px solid silver;
-	padding: 6px 6px 0px 6px;
-	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat 4px 50%;
-}
-ul#ultagbox > li.tagitem .deletetag {
-	display: block;
-	width: 18px;
-	height: 18px;
+ul#ultagbox > li.tagitem > span {
+	padding: 2px;
+	font-size: 1em;
+	display: inline-block;
 	float: right;
-	margin: -6px 0 0 -4px;
-	padding: 4px;
+}
+ul#ultagbox > li.tagitem.plain > span {
+	padding: 2px 2px 2px 24px;
+	background: url(../images/tag_blue.png) transparent no-repeat 0% 50%;
+}
+ul#ultagbox > li.tagitem > a.deletetag {
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat 100% 100%;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	line-height: 100%;
+	margin: -2px 0 0 0;
+	padding: 2px 8px 0 0;
 	outline: none;
 	background-color: transparent;
 }
@@ -1724,7 +1739,7 @@ div#tags #input_new_tag {
 	margin: 6px 6px 0 6px;
 	width: 16px;
 	height: 16px;
-	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat 100% 50%;
+	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat 0% 50%;
 }
 #fc_tagbox {
 	display: block;
@@ -2184,7 +2199,7 @@ body .label-fcouter,
 	min-width: 90px;
 	max-width: 150px;
 	float: right;
-	margin: 2px 1% 3px 0% !important;
+	margin: 2px 0% 3px 1% !important;
 	padding: 0 !important;
 }
 body .label-fcouter > label,
@@ -2609,10 +2624,10 @@ table.fc-form-tbl.keytop td.key {
 }
 table.fc-form-tbl td {
 	vertical-align: middle;
-	padding: 2px 24px 6px 0px;
+	padding: 2px 0px 6px 24px;
 }
 table.fc-form-tbl.fccompact td {
-	padding: 0px 8px 4px 0px;
+	padding: 0px 0px 4px 8px;
 }
 table.fc-form-tbl td.key {
 	vertical-align: top;
@@ -2823,10 +2838,10 @@ fieldset.form-vertical div.control-group {
 .prettyradio.fcradiocheckimage,
 .prettycheckbox.fcradiocheck,
 .prettyradio.fcradiocheck {
-	float: right !important;
-	display: block !important;
-	clear: none !important;
-	margin: -2px 12px 0px 0px !important;
+	float: none !important;
+	display: inline-block !important;
+	vertical-align: top !important;
+	margin: -2px 10px 0px 2px !important;
 }
 .prettyradio input,
 .prettycheckbox input {
@@ -2909,9 +2924,8 @@ html[dir="rtl"] .select2-container .select2-choice {
 	cursor: pointer !important;
 }
 .select2-container-multi .select2-search-choice-close {
-	right: 0px !important;
-	margin: -1px 0 0 !important;
-	padding: 0 0 0 8px !important;
+	margin: -1px 0 0 0 !important;
+	padding: 0 2px 0 2px !important;
 }
 .select2-drop .select2-results .select2-result.select2-selected-highlight div {
 	font-size: 11px !important;

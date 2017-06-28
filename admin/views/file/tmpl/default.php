@@ -56,7 +56,7 @@ if (!$this->row->url)
 
 
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<table class="fc-form-tbl">
 

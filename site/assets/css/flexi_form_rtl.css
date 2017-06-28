@@ -141,6 +141,10 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 	cursor: pointer !important;
 	color: #333;
 }
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label {
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
 div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),

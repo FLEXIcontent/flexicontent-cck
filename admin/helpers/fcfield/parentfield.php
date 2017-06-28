@@ -17,6 +17,8 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport('cms.plugin.plugin');
+
 if (!defined('_FC_CONTINUE_'))  define('_FC_CONTINUE_', 0);
 if (!defined('_FC_BREAK_'))     define('_FC_BREAK_', -1);
 
