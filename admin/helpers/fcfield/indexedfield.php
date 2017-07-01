@@ -1,19 +1,15 @@
 <?php
 /**
- * @version 1.0
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.indexedfield
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
-defined( '_JEXEC' ) or die( 'Restricted access' );
 
+defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class FCIndexedField extends FCField
@@ -25,16 +21,19 @@ class FCIndexedField extends FCField
 	static $isDropDown = 0;
 	static $promptEnabled = 0;
 	static $usesImages = 0;
-	
-	
+
+	static $cascaded_values = array();
+
 	// ***********
 	// CONSTRUCTOR
 	// ***********
 	
 	function __construct( &$subject, $params )
 	{
+		$fieldtype = str_replace('plgflexicontent_fields', '', strtolower(get_class($this)));
+		static::$field_types = array($fieldtype);
+
 		parent::__construct( $subject, $params );
-		//JPlugin::loadLanguage('plg_flexicontent_fields_indexed', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -46,7 +45,7 @@ class FCIndexedField extends FCField
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -85,30 +84,19 @@ class FCIndexedField extends FCField
 		// Sanitize limitations
 		if ($required && !$min_values && static::$valueIsArr) $min_values = 1;  // Comment this to allow simpler 'required' validation
 		if ($exact_values) $max_values = $min_values = $exact_values;
-		
-		
-		// **************
-		// Value handling
-		// **************
-		
+
+
+		// ***
+		// *** Value handling
+		// ***
+
 		// Default value
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		if (static::$valueIsArr)
-		{
-			$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
-			$default_values = preg_split("/\s*,\s*/u", $default_values);
-			if ( !strlen($default_values[0]) ) $default_values[0] = '_field_null_value_';
-		}
-		else
-		{
-			$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
-			$default_values= array($default_value);
-		}
-		
-		
-		// *************************
-		// Input field configuration
-		// *************************
+		$default_values = !$ajax ? $this->getFormDefaultValues($field, $item) : array('');
+
+
+		// ***
+		// *** Input field configuration
+		// ***
 
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
 		$display_as_select = static::$isDropDown || (int) $field->parameters->get( 'display_as_select', 0 );
@@ -293,6 +281,7 @@ class FCIndexedField extends FCField
 		// Handle adding the needed JS code to CASCADE (listen to) changes of the dependent master field
 		// *********************************************************************************************
 
+		JText::script('FLEXI_PLEASE_WAIT',true);
 		$js = "";
 		$css = "";
 
@@ -311,7 +300,11 @@ class FCIndexedField extends FCField
 				$single_master = ! $master_field->parameters->get('use_ingroup', 0) && !$master_field->parameters->get('multiple', 0);
 				
 				// Get values of cascade (on) source field
-				$field->valgrps = $master_field->value ? $master_field->value : array();
+				$field->valgrps = $master_field->value ?:
+					(isset(static::$cascaded_values[$master_field->id]) ? static::$cascaded_values[$master_field->id] : array());
+					// array();
+					// $this->getFormDefaultValues($master_field, $item);
+				//echo ' SLAVE: ' . $field->label . ' with master values : ' . print_r($field->valgrps, true) . '<br/>';
 				foreach($field->valgrps as & $vg)
 				{
 					if (!is_array($vg))
@@ -331,17 +324,17 @@ class FCIndexedField extends FCField
 				return;
 			}
 		}
-		
+
 		else if ($cascade_after && $ajax)
 		{
 			$field->valgrps = isset($field->valgrps) ? $field->valgrps : array();
 			$field->valgrps = is_array($field->valgrps) ? $field->valgrps : preg_split("/\s*,\s*/u", trim($field->valgrps));
 		}
-		
-		
-		// ***********************
-		// Handle multiple records
-		// ***********************
+
+
+		// ***
+		// *** Handle multiple records
+		// ***
 		
 		if ($multiple && !$ajax)
 		{
@@ -822,7 +815,7 @@ class FCIndexedField extends FCField
 				{
 					$_valgrps[] = is_array($vg) ? reset($vg) : $vg;
 				}
-				if ($_valgrps && $_valgrps[0] == '_field_null_value_')
+				if ($_valgrps && !strlen($_valgrps[0]))
 				{
 					unset($_valgrps[0]);
 				}
@@ -839,7 +832,7 @@ class FCIndexedField extends FCField
 						'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 						'text' => $cascade_prompt,
 						'disable' => (static::$valueIsArr ? true : null),
-						'isprompt' => 'fc-mssg fc-nobgimage fc-info'
+						'isprompt' => 'fcpadded alert alert-info'
 					);
 					$elements = array('_field_selection_prompt_' => $prompt);
 				}
@@ -878,7 +871,7 @@ class FCIndexedField extends FCField
 					'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 					'text' => JText::_('FLEXI_FIELD_INVALID_QUERY'),
 					'disable' => (static::$valueIsArr ? true : null),
-					'isprompt' => 'fc-mssg fc-nobgimage fc-important'
+					'isprompt' => 'fcpadded alert alert-important'
 				);
 				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
@@ -895,7 +888,7 @@ class FCIndexedField extends FCField
 					'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 					'text' => JText::_('FLEXI_FIELD_INVALID_ELEMENTS'),
 					'disable' => (static::$valueIsArr ? true : null),
-					'isprompt' => 'fc-mssg fc-nobgimage fc-important'
+					'isprompt' => 'fcpadded alert alert-important'
 				);
 				$elements = array('_field_selection_prompt_' => $prompt);
 				return $elements;
@@ -907,9 +900,22 @@ class FCIndexedField extends FCField
 				$_valgrps = array_flip($valgrps);
 				foreach($elements as $element)
 				{
-					if (isset($_valgrps[$element->valgrp]))  $_elements[$element->value] = $element;
+					if (isset($_valgrps[$element->valgrp]))
+					{
+						$_elements[$element->value] = $element;
+					}
 				}
 				$elements = $_elements;
+			}
+		}
+
+		// Filter field values according to visible elements and store them to calculate the "default" cascaded values
+		foreach($field->value as $v)
+		{
+			$v = is_array($v) ? reset($v) : $v;
+			if (isset($elements[$v]))
+			{
+				static::$cascaded_values[$field->id][] = $v;
 			}
 		}
 
@@ -962,7 +968,7 @@ class FCIndexedField extends FCField
 				'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 				'text' => JText::_('FLEXI_FIELD_NO_DATA_FOUND'),
 				'disable' => (static::$valueIsArr ? true : null),
-				'isprompt' => 'fc-mssg fc-nobgimage fc-warning'
+				'isprompt' => 'fcpadded alert alert-warning'
 			);
 			$elements = array('_field_selection_prompt_' => $prompt);
 			return $elements;
@@ -983,7 +989,7 @@ class FCIndexedField extends FCField
 				'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 				'text' => $firstoptiontext,
 				'disable' => (static::$valueIsArr ? true : null),
-				'isprompt' => 'fc-mssg fc-nobgimage fc-info'
+				'isprompt' => 'fcpadded alert alert-info'
 			);
 			$elements = array('_field_selection_prompt_' => $prompt) + $elements;
 		}
@@ -1068,7 +1074,7 @@ class FCIndexedField extends FCField
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -1233,7 +1239,7 @@ class FCIndexedField extends FCField
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
@@ -1347,7 +1353,7 @@ class FCIndexedField extends FCField
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
@@ -1356,7 +1362,7 @@ class FCIndexedField extends FCField
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		// Get indexed element values
 		$item_pros = false;
@@ -1405,7 +1411,7 @@ class FCIndexedField extends FCField
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
@@ -1415,7 +1421,7 @@ class FCIndexedField extends FCField
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$filter->isindexed = true;
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
@@ -1430,7 +1436,7 @@ class FCIndexedField extends FCField
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		$field->isindexed = true;
@@ -1443,7 +1449,7 @@ class FCIndexedField extends FCField
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		$field->isindexed = true;
@@ -1451,5 +1457,34 @@ class FCIndexedField extends FCField
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
+
+
+
+	// ***
+	// *** VARIOUS HELPER METHODS
+	// ***
 	
+	// Method to get default values of an indexed field
+	function getFormDefaultValues($field, $item)
+	{
+		$class_name = 'plgflexicontent_fields' . ucfirst($field->field_type);
+		if (!class_exists($class_name))
+		{
+			JPluginHelper::getPlugin('flexicontent_fields', $field->field_type);
+		}
+
+		$value_usage = $field->parameters->get( 'default_value_use', 0 ) ;
+		if ($class_name::$valueIsArr)
+		{
+			$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
+			$default_values = preg_split("/\s*,\s*/u", $default_values);
+		}
+		else
+		{
+			$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
+			$default_values= array($default_value);
+		}
+
+		return $default_values;
+	}
 }

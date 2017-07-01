@@ -61,7 +61,7 @@ class flexicontent_ajax
 		}
 
 		// Security concern, only 'confirmed' methods will be callable
-		if ( !in_array($extfunc, $obj->task_callable) )
+		if ( empty($obj->task_callable) || !in_array($extfunc, $obj->task_callable) )
 		{
 			jexit("non-allowed method called");
 		}

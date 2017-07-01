@@ -1,50 +1,43 @@
 <?php
 /**
- * @version 1.0 $Id: relation.php
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.relation
- * @copyright (C) 2011 ggppdk
- * @license GNU/GPL v2
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
-jimport('cms.plugin.plugin');
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsRelation extends FCField
 {
-	var $task_callable = array('getCategoryItems');
-	
-	static $field_types = array('relation');
-	
-	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
-	
+	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
+	var $task_callable = null;  // Field's methods allowed to be called via AJAX
+
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_relation', JPATH_ADMINISTRATOR);
 	}
 	
 	
 	
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
 		// Initialize framework objects and other variables
@@ -386,7 +379,7 @@ jQuery(document).ready(function()
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		$field->{$prop} = '';
@@ -561,14 +554,14 @@ jQuery(document).ready(function()
 
 
 
-	// **************************************************************
-	// METHODS HANDLING before & after saving / deleting field events
-	// **************************************************************
-	
+	// ***
+	// *** METHODS HANDLING before & after saving / deleting field events
+	// ***
+
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 	}
 
@@ -584,14 +577,14 @@ jQuery(document).ready(function()
 
 
 
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
+
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		// No special SQL query, default query is enough since index data were formed as desired, during indexing
 		$indexed_elements = true;
@@ -601,7 +594,7 @@ jQuery(document).ready(function()
 	
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
 		// Create order clause dynamically based on the field settings
 		$order = $filter->parameters->get( 'orderby', 'alpha' );
@@ -632,7 +625,7 @@ jQuery(document).ready(function()
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		// execute the code only if the field type match the plugin type
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$filter->filter_colname     = ' rel.value_integer';
 		$filter->filter_valuesjoin  = null;   // use default
@@ -646,7 +639,7 @@ jQuery(document).ready(function()
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$filter->isindexed = true;
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
@@ -654,14 +647,14 @@ jQuery(document).ready(function()
 	
 	
 	
-	// *************************
-	// SEARCH / INDEXING METHODS
-	// *************************
-	
+	// ***
+	// *** SEARCH / INDEXING METHODS
+	// ***
+
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		if ($post===null) {
@@ -688,7 +681,7 @@ jQuery(document).ready(function()
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		if ($post===null) {

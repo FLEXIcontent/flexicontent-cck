@@ -733,8 +733,9 @@
 		var trgEL = jQuery('#'+trgID);
 		trgEL.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
 		
-		fcCascadedField_clear(trgEL, 'Please wait', prompt_enabled);
-		
+		fcCascadedField_clear(trgEL, Joomla.JText._('FLEXI_PLEASE_WAIT'), prompt_enabled);
+		trgEL.removeAttr('data-defvals');  // Remove default values of select2 JS
+
 		jQuery.ajax({
 			type: 'POST',
 			url: 'index.php?option=com_flexicontent&tmpl=component&format=raw',
@@ -756,15 +757,19 @@
 			trgEL.parent().find('.field_cascade_loading').html('');
 			data = data.trim();
 			
-			if (data!='') {
+			if (data!='')
+			{
 				trgEL.empty().append(data).val('');
 				var trgTagName = trgEL.prop("tagName");
-				if (fc_cascade_field_funcs.hasOwnProperty(trgID) && trgTagName!='SELECT') {
-					//window.console.log ('Reading cascade function for source ID:' + trgID);
+
+				// Special case 0: Re-attach cascade function to the updated HTML of radio/checkbox set
+				if (fc_cascade_field_funcs.hasOwnProperty(trgID) && trgTagName!='SELECT')
+				{
+					window.console.log ('Re-attach cascade function for new HTML source for tag ID:' + trgID);
 					fc_cascade_field_funcs[trgID]();
 				}
 				
-				// Add prettyCheckable to new radio set (if having appropriate CSS class)
+				// Special case 1: Re-apply prettyCheckable to the updated HTML of radio/checkbox set
 				trgEL.find('.use_prettycheckable').each(function() {
 					var elem = jQuery(this);
 					var lbl = elem.next('label');
@@ -775,7 +780,9 @@
 						label: lbl_html
 					});
 				});
-			} else {
+			}
+			else
+			{
 				trgEL.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
 			}
 			trgEL.trigger('change');  // Retrigger change event to update select2 display
@@ -785,12 +792,15 @@
 	function fcCascadedField_clear(el, prompt, prompt_enabled)
 	{
 		var trgTagName = el.prop("tagName");
-		if (trgTagName=='SELECT') {
-			el.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+prompt+'</option>');
+		if (trgTagName=='SELECT')
+		{
+			el.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+(prompt_enabled ? prompt : '-')+'</option>');
 			el.trigger('change', [{elementClear:1}]);
-		} else {
+		}
+		else
+		{
 			el.find('input').first().trigger('change', [{elementClear:1}]);
-			el.empty().append('<span class="badge badge-info">'+prompt+'</span>');
+			el.empty().append('<span class="fcpadded alert alert-info">'+prompt+'</span>');
 		}
 	}
 	
@@ -802,7 +812,7 @@
 		
 		var srcEL = isSel2 ? onEL2 : onEL;
 		var trgEL = jQuery('#'+trgID);
-		//window.console.log ('fcCascadedField FOR source SELECTOR: ' + srcSelector + ' target ID: ' + trgID + ' , valindex: ' + valindex);
+		//window.console.log ('ATTACHING fcCascadedField() FOR source SELECTOR: ' + srcSelector + ' to UPDATE element with ID: ' + trgID + ' , valindex: ' + valindex);
 		
 		srcEL.on('change', function(e, data){
 			var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
@@ -818,7 +828,8 @@
 			}
 			
 			//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' , isCHECKED: ' + srcEL.is(':checked') + ' type: '+srcEL.attr('type'));
-			if ( !elementClear && !! elVal ) {
+			if ( !elementClear && !! elVal )
+			{
 				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Updating:' + trgEL.attr('id') + ' for VALGRP: -' + elVal + '-  value of 1st element: ' + srcEL.val() + ' type: '+srcEL.attr('type'));
 				fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex);
 			} else {
@@ -831,7 +842,8 @@
 	
 	
 	// *** Check that a variable is not null and is defined (has a value)
-	function js_isset (variable) {
+	function js_isset (variable)
+	{
 		if (variable==null) return false;
 		if (typeof variable == "undefined") return false;
 		return true;

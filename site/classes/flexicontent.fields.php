@@ -234,25 +234,30 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		JArrayHelper::toInteger($field_ids);
 		JArrayHelper::toInteger($item_ids);
-		
+
 		$query = 'SELECT item_id, field_id, value, valueorder, suborder'
-				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
-				.' WHERE item_id IN ('.implode(",", $item_ids).') '
-				.($field_ids ? ' AND field_id IN ('.implode(",", $field_ids).') ' : '')
-				.( $version ? ' AND version=' . (int)$version:'')
-				.' AND value > "" '
-				.' ORDER BY field_id, valueorder, suborder'
-				;
+			. ($version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
+			. ' WHERE item_id IN ('.implode(",", $item_ids).') '
+			. ($field_ids ? ' AND field_id IN ('.implode(",", $field_ids).') ' : '')
+			. ($version ? ' AND version=' . (int)$version:'')
+			. ' AND value > "" '
+			. ' ORDER BY field_id, valueorder, suborder'
+			;
 		$db->setQuery($query);
 		$values = $db->loadObjectList();
-		
+
 		$fieldvalues = array();
-		if ($values) foreach ($values as $v) {
+		if ($values) foreach ($values as $v)
+		{
 			$fieldvalues[$v->item_id][$v->field_id][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
-		foreach ($fieldvalues as & $iv) {
-			foreach ($iv as & $fv) {
-				foreach ($fv as & $ov) {
+
+		foreach ($fieldvalues as & $iv)
+		{
+			foreach ($iv as & $fv)
+			{
+				foreach ($fv as & $ov)
+				{
 					if (count($ov) == 1) $ov = reset($ov);
 				}
 				unset($ov);
@@ -260,7 +265,7 @@ class FlexicontentFields
 			unset($fv);
 		}
 		unset($iv);
-		
+
 		return $fieldvalues;
 	}
 	
@@ -1907,12 +1912,20 @@ class FlexicontentFields
 	static function indexedField_getValues(&$field, &$elements, $value_indexes, $prepost_prop='text')
 	{
 		// Check for empty values
-		if ( !is_array($value_indexes) && !strlen($value_indexes) ) return array();
+		if ( !is_array($value_indexes) && !strlen($value_indexes) )
+		{
+			return array();
+		}
+
 		// Make sure indexes is an array 
-		$value_indexes = !is_array($value_indexes) ? array($value_indexes) : $value_indexes;
-		
-		$pretext=''; $posttext='';
-		if ( $prepost_prop ) {
+		$value_indexes = !is_array($value_indexes)
+			? array($value_indexes)
+			: $value_indexes;
+
+		$pretext='';
+		$posttext='';
+		if ( $prepost_prop )
+		{
 			$pretext  = $field->parameters->get( 'pretext', '' ) ;
 			$posttext = $field->parameters->get( 'posttext', '' ) ;
 			$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -1920,9 +1933,10 @@ class FlexicontentFields
 			$pretext 	= $remove_space ? $pretext  : $pretext . ' ';
 			$posttext	= $remove_space ? $posttext : ' ' . $posttext;
 		}
-		
+
 		// Handle multiple sub-values per value
-		if (is_array(reset($value_indexes))) {
+		if (is_array(reset($value_indexes)))
+		{
 			$_v = array();
 			foreach($value_indexes as $v) $_v[] = $v;
 			$value_indexes = $v;
@@ -1930,16 +1944,18 @@ class FlexicontentFields
 		
 		// Get the labels of used values in an display[] array
 		$values = array();
-		foreach($value_indexes as $val_index) {
+		foreach($value_indexes as $val_index)
+		{
 			if ( !strlen($val_index) ) continue;
 			if ( !isset($elements[$val_index]) ) continue;
+
 			$values[$val_index] = get_object_vars($elements[$val_index] );
-			//print_r($values[$val_index]); echo "<br/>\n";
-			if ($prepost_prop) {
+			if ($prepost_prop)
+			{
 				$values[$val_index][$prepost_prop] = $pretext . $values[$val_index][$prepost_prop] . $posttext;
 			}
 		}
-		
+
 		return $values;
 	}
 	
@@ -1947,36 +1963,58 @@ class FlexicontentFields
 	// Helper method to replace item properties for the SQL value mode for various fields
 	static function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, &$canCache=null)
 	{
-		// replace item properties
+		// ***
+		// *** Replace item properties
+		// ***
+
 		preg_match_all("/{item->[^}]+}/", $query, $matches);
+
 		$canCache = count($matches[0]) == 0;
-		if ( !$item_pros && count($matches[0]) ) { $item_pros = count($matches[0]); return ''; }
+		if ( !$item_pros && count($matches[0]) )
+		{
+			$item_pros = count($matches[0]);
+			return '';
+		}
 		
 		// If needed replace item properties, loading the item if not already loaded
-		if (count($matches[0]) && !$item) {
-			if ( !@$field->item_id ) { echo __FUNCTION__."(): field->item_id is not set"; return; }
+		if (count($matches[0]) && !$item)
+		{
+			if ( empty($field->item_id) ) return;
+
 			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
 			$item->load( $field->item_id );
 		}
-		foreach ($matches[0] as $replacement_tag) {
+
+		foreach ($matches[0] as $replacement_tag)
+		{
 			$replacement_value = '$'.substr($replacement_tag, 1, -1);
 			eval ("\$replacement_value = \"$replacement_value\";");
 			$query = str_replace($replacement_tag, $replacement_value, $query);
 		}
-		
-		// replace field properties
-		if ($field) {
+
+
+		// ***
+		// *** Replace field properties
+		// ***
+
+		if ($field)
+		{
 			preg_match_all("/{field->[^}]+}/", $query, $matches);
-			foreach ($matches[0] as $replacement_tag) {
+			foreach ($matches[0] as $replacement_tag)
+			{
 				$replacement_value = '$'.substr($replacement_tag, 1, -1);
 				eval ("\$replacement_value = \" $replacement_value\";");
 				$query = str_replace($replacement_tag, $replacement_value, $query);
 			}
 		}
-		
-		// replace current user language
+
+		// ***
+		// *** Other replacements: current user language
+		// ***
+
 		$query = str_replace("{curr_userlang_shorttag}", flexicontent_html::getUserCurrentLang($short_tag=true), $query);
 		$query = str_replace("{curr_userlang_fulltag}", flexicontent_html::getUserCurrentLang($short_tag=false), $query);
+
 		return $query;
 	}
 	
@@ -4897,12 +4935,16 @@ class FlexicontentFields
 			
 			// c. Replace HTML display of various item fields
 			$err_mssg = 'Cannot replace field: "%s" because it is of not allowed field type: "%s", which can cause loop or other problem';
-			foreach($custom_field_names as $i => $custom_field_name) {
+			foreach($custom_field_names as $i => $custom_field_name)
+			{
 				$_field = @ $result->fields[$custom_field_name];
 				$custom_field_display = '';
-				if ($is_disallowed_field = isset($disallowed_fieldnames[$custom_field_name])) {
+				if ($is_disallowed_field = isset($disallowed_fieldnames[$custom_field_name]))
+				{
 					$custom_field_display .= sprintf($err_mssg, $custom_field_name, @ $_field->field_type);
-				} else {
+				}
+				else
+				{
 					$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
 					$custom_field_display .= @ $_field->{$display_var};
 				}

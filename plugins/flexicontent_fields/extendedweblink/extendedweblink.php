@@ -1,46 +1,41 @@
 <?php
 /**
- * @version 1.0 $Id: extendedweblink.php 1863 2014-03-07 18:32:13Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.extendedweblink
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
-defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
+defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsExtendedWeblink extends FCField
 {
-	static $field_types = array('extendedweblink');
-	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
-	
+	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
+	var $task_callable = null;  // Field's methods allowed to be called via AJAX
+
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_extendedweblink', JPATH_ADMINISTRATOR);
 	}
-	
-	
-	
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+
+
+
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -566,7 +561,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		// Get isMobile / isTablet Flags
 		static $isMobile = null;
@@ -790,14 +785,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	
 	
 	
-	// **************************************************************
-	// METHODS HANDLING before & after saving / deleting field events
-	// **************************************************************
-	
+	// ***
+	// *** METHODS HANDLING before & after saving / deleting field events
+	// ***
+
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
@@ -890,14 +885,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	
 	
 	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
+
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		FlexicontentFields::createFilter($filter, $value, $formName);
@@ -908,7 +903,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
@@ -916,14 +911,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	
 	
 	
-	// *************************
-	// SEARCH / INDEXING METHODS
-	// *************************
-	
+	// ***
+	// *** SEARCH / INDEXING METHODS
+	// ***
+
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
@@ -943,7 +938,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
@@ -955,12 +950,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
-	
-	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
+
+
+
+	// ***
+	// *** VARIOUS HELPER METHODS
+	// ***
 	
 	// Get a url without the protocol
 	function cleanurl($url)

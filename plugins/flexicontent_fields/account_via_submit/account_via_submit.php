@@ -1,46 +1,42 @@
 <?php
 /**
- * @version 1.0 $Id: account_via_submit.php 1883 2014-04-09 17:49:21Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.account_via_submit
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-jimport('cms.plugin.plugin');
-
-class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
+class plgFlexicontent_fieldsAccount_via_submit extends FCField
 {
-	static $field_types = array('account_via_submit');
 	//static $prior_to_version = "3.2";  // Display message for non free plugin
+	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
+	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
-	
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_account_via_submit', JPATH_ADMINISTRATOR);
 	}
 	
 	
 	
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -226,7 +222,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		//$field->{$prop} = $field->label . " : this field is not meant to be used for display, only meant for item form";
@@ -234,14 +230,14 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 	
 	
 	
-	// **************************************************************
-	// METHODS HANDLING before & after saving / deleting field events
-	// **************************************************************
-	
+	// ***
+	// *** METHODS HANDLING before & after saving / deleting field events
+	// ***
+
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		// Check if item is an existing item, being modified, if so then nothing to do
 		$isnew = $item->_isnew;
@@ -375,12 +371,12 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
-	
-	
-	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
+
+
+
+	// ***
+	// *** VARIOUS HELPER METHODS
+	// ***
 	
 	function initialize(&$field)
 	{
