@@ -1,60 +1,50 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1990 2014-10-14 02:17:49Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @version         3.2
  * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('cms.plugin.plugin');
 
-if (!defined('_FC_CONTINUE_'))  define('_FC_CONTINUE_', 0);
-if (!defined('_FC_BREAK_'))     define('_FC_BREAK_', -1);
-
 class FCField extends JPlugin
 {
-	// ***********
-	// ATTRIBUTES
-	// ***********
-	static $field_types = array('fcfield');
+	// ***
+	// *** ATTRIBUTES
+	// ***
+
 	protected $fieldtypes = null;
 	protected $field = null;
 	protected $item = null;
 	protected $vars = null;
 	protected $autoloadLanguage = false;
-	
-	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
+
+
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	public function __construct(&$subject, $params)
 	{
 		parent::__construct( $subject, $params );
 
-		if (empty($this->fieldtypes))
-		{
-			$this->fieldtypes = self::$field_types;
-		}
-
 		$class = strtolower(get_class($this));
 		$fieldtype = str_replace('plgflexicontent_fields', '', $class);
 
-		self::$field_types = array_merge(array($fieldtype), self::$field_types);
-		$this->fieldtypes = array_merge(array($fieldtype), $this->fieldtypes);
+		static::$field_types = static::$field_types ?: array($fieldtype);
+		if (empty($this->fieldtypes))
+		{
+			$this->fieldtypes = static::$field_types;
+		}
 
+		// Load extra field types and their language files if these have not be loaded already
 		static $initialized = array();
-		foreach($this->fieldtypes as $ft)
+		foreach(static::$field_types as $ft)
 		{
 			if ( isset($initialized[$ft]) ) continue;
 			$initialized[$ft] = true;
@@ -63,16 +53,22 @@ class FCField extends JPlugin
 			// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
 			$extension_name = 'plg_flexicontent_fields_'.$ft;
 			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
-			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
-			//JPlugin::loadLanguage('plg_flexicontent_fields_'.$fieldtype, JPATH_ADMINISTRATOR);
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
+
+			// Import field type if not already imported
+			$class_name = 'plgFlexicontent_fields' . ucfirst($ft);
+			if (! class_exists($class_name))
+			{
+				JPluginHelper::importPlugin('flexicontent_fields', $ft);
+			}
 		}
 	}
-	
-	
-	
-	// ******************
-	// Accessor functions
-	// ******************
+
+
+
+	// ***
+	// *** Accessor functions
+	// ***
 	
 	public function setField(&$field) { $this->field = $field; }
 	public function setItem(&$item)   { $this->item = $item; }
@@ -126,7 +122,7 @@ class FCField extends JPlugin
 	// Method to create field's HTML display for item form
 	public function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
 		// Set field and item objects
@@ -153,7 +149,7 @@ class FCField extends JPlugin
 	// Method to create field's HTML display for frontend views
 	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
 		// Set field and item objects
@@ -178,7 +174,7 @@ class FCField extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
 	
@@ -186,7 +182,7 @@ class FCField extends JPlugin
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	public function onAfterSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
 	
@@ -194,7 +190,7 @@ class FCField extends JPlugin
 	// Method called just before the item is deleted to remove custom item data related to the field
 	public function onBeforeDeleteField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
 	
@@ -207,7 +203,7 @@ class FCField extends JPlugin
 	// Method to display a search filter for the advanced search view
 	public function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		FlexicontentFields::createFilter($filter, $value, $formName);
@@ -217,7 +213,7 @@ class FCField extends JPlugin
 	// This is for search view
 	public function getFilteredSearch(&$field, $value)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
@@ -232,7 +228,7 @@ class FCField extends JPlugin
 	// Method to create (insert) advanced search index DB records for the field values
 	public function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
@@ -243,7 +239,7 @@ class FCField extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	public function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);

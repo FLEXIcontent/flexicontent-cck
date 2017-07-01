@@ -1,33 +1,31 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-jimport('cms.plugin.plugin');
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsSharedmedia extends FCField
 {
-	static $field_types = array('sharedmedia');
+	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
+	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
-	// ***********
-	// CONSTRUCTOR
-	// ***********
+	// ***
+	// *** CONSTRUCTOR
+	// ***
 
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_sharedmedia', JPATH_ADMINISTRATOR);
 	}
 
 
 
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
 
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -801,7 +799,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
 
 		// Get field values
@@ -1007,7 +1005,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
@@ -1083,7 +1081,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 
 		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
@@ -1103,7 +1101,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
 
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)

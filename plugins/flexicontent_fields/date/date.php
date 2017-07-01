@@ -1,46 +1,41 @@
 <?php
 /**
- * @version 1.0 $Id: date.php 1904 2014-05-20 12:21:09Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.date
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
-defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
+defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsDate extends FCField
 {
-	static $field_types = array('date');
-	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
-	
+	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
+	var $task_callable = null;  // Field's methods allowed to be called via AJAX
+
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_date', JPATH_ADMINISTRATOR);
 	}
-	
-	
-	
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+
+
+
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -427,7 +422,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -565,14 +560,14 @@ class plgFlexicontent_fieldsDate extends FCField
 	
 	
 	
-	// **************************************************************
-	// METHODS HANDLING before & after saving / deleting field events
-	// **************************************************************
-	
+	// ***
+	// *** METHODS HANDLING before & after saving / deleting field events
+	// ***
+
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		$date_source = $field->parameters->get('date_source', 0);
 		
@@ -674,25 +669,25 @@ class plgFlexicontent_fieldsDate extends FCField
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 	
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
 	
 	
 	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
+
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
@@ -701,7 +696,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$_s = $isSearchView ? '_s' : '';
 		$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
@@ -764,7 +759,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
 		if ($date_filter_group=='year') { $date_valformat='%Y'; }
@@ -794,7 +789,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$date_source = $filter->parameters->get('date_source', 0);
 		/*if ( $date_source==1 || $date_source==2 ) {
@@ -807,14 +802,14 @@ class plgFlexicontent_fieldsDate extends FCField
 	
 	
 	
-	// *************************
-	// SEARCH / INDEXING METHODS
-	// *************************
-	
+	// ***
+	// *** SEARCH / INDEXING METHODS
+	// ***
+
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		$values = $this->_prepareForSearchIndexing($field, $item, $post, $for_advsearch=1);
@@ -836,7 +831,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		$values = $this->_prepareForSearchIndexing($field, $item, $post, $for_advsearch=0);
@@ -850,12 +845,12 @@ class plgFlexicontent_fieldsDate extends FCField
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
-	
-	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
+
+
+
+	// ***
+	// *** VARIOUS HELPER METHODS
+	// ***
 	
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
 	function _prepareForSearchIndexing(&$field, &$item, &$post, $for_advsearch=0)

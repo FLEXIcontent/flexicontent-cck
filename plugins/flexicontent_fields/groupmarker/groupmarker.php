@@ -1,30 +1,41 @@
 <?php
-defined("_JEXEC") or die("Restricted Access");
+/**
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
 
-class plgFlexicontent_fieldsGroupmarker extends JPlugin
+defined( '_JEXEC' ) or die( 'Restricted access' );
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+
+class plgFlexicontent_fieldsGroupmarker extends FCField
 {
-	static $field_types = array('groupmarker');
-	
-	// ***********
-	// CONSTRUCTOR
-	// ***********
-	
+	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
+	var $task_callable = null;  // Field's methods allowed to be called via AJAX
+
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_groupmarker', JPATH_ADMINISTRATOR);
 	}
-	
-	
-	
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+
+
+
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
 		static $tabsetStack = array();
 		

@@ -1,30 +1,28 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 1881 2014-03-31 01:48:58Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @subpackage plugin.textarea
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @package         FLEXIcontent
+ * @version         3.2
+ * 
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
-defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
+defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsCore extends FCField
 {
 	static $cparams = null;
 
-	// ***********
-	// CONSTRUCTOR
-	// ***********
+	static $field_types = null;
+	var $task_callable = null;
 	
+	// ***
+	// *** CONSTRUCTOR
+	// ***
+
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
@@ -39,10 +37,10 @@ class plgFlexicontent_fieldsCore extends FCField
 
 
 
-	// *******************************************
-	// DISPLAY methods, item form & frontend views
-	// *******************************************
-	
+	// ***
+	// *** DISPLAY methods, item form & frontend views
+	// ***
+
 	// Method to create field's HTML display for item form
 	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $raw_values=null, $prop='display' )
 	{
@@ -361,38 +359,41 @@ class plgFlexicontent_fieldsCore extends FCField
 	
 	
 	
-	// **************************************************************
-	// METHODS HANDLING before & after saving / deleting field events
-	// **************************************************************
-	
+	// ***
+	// *** METHODS HANDLING before & after saving / deleting field events
+	// ***
+
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if($field->iscore != 1) return;
 		if(!is_array($post) && !strlen($post)) return;
 		
-		if ($field->field_type == 'maintext') {
-			// field_type is not changed textarea so that field can handle this field type
+		if ($field->field_type == 'maintext')
+		{
+			// Field_type is not changed textarea so that field can handle this field type
 			FLEXIUtilities::call_FC_Field_Func('textarea', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 		}
 	}
 	
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
-	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+	function onAfterSaveField( &$field, &$post, &$file, &$item )
+	{
 	}
 	
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
+	function onBeforeDeleteField(&$field, &$item)
+	{
 	}
 	
 	
 	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
+
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
@@ -784,10 +785,10 @@ class plgFlexicontent_fieldsCore extends FCField
 	
 	
 	
-	// *************************
-	// SEARCH / INDEXING METHODS
-	// *************************
-	
+	// ***
+	// *** SEARCH / INDEXING METHODS
+	// ***
+
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
@@ -819,12 +820,12 @@ class plgFlexicontent_fieldsCore extends FCField
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
-	
-	
-	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
+
+
+
+	// ***
+	// *** VARIOUS HELPER METHODS
+	// ***
 	
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
 	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)

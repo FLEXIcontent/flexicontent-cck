@@ -3128,7 +3128,7 @@ icon-typeadd:before,
 	vertical-align: middle !important;
 }
 .flexicontent #adminForm table.adminlist {
-	width: auto !important;
+	width: 100% !important;
 }
 html body#minwidth-body {
 	min-width: 760px;
