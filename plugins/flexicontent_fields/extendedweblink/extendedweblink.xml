@@ -67,20 +67,15 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-				<option value="2">FLEXI_USER_CAN_SELECT</option>
+			<field name="allow_relative_addrs" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
+				<option value="0" show_list="" hide_list="only_abs_urls">FLEXI_NO</option>
+				<option value="1" show_list="only_abs_urls" hide_list="">FLEXI_YES</option>
+				<option value="2" show_list="only_abs_urls" hide_list="">FLEXI_USER_CAN_SELECT</option>
 			</field>
 
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 			
-			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/extendedweblink/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" depend_class="not_jurls"/>
@@ -99,7 +94,7 @@
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" depend_class="not_jurls" />
 			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" depend_class="not_jurls" />
 
-			<field name="inputmask" type="multilist" subtype="radio" default="" label="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" class="btn-group btn-group-yesno">
+			<field name="inputmask" type="multilist" subtype="radio" default="" label="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" class="btn-group btn-group-yesno" depend_class="only_abs_urls">
 				<option value="">FLEXI_NO</option>
 				<option value="url">FLEXI_YES</option>
 			</field>
