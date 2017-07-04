@@ -84,7 +84,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
-		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
+		$inputmask	= $allow_relative_addrs ? '' : $field->parameters->get( 'inputmask', '' ) ;
 		
 		// create extra HTML TAG parameters for the form field
 		$link_attribs = $field->parameters->get( 'extra_attributes', '' )
