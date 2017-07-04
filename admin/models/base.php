@@ -100,7 +100,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @var string
 	 */
-	var $supports_associations = false;
+	var $associations_context = false;
 
 	/**
 	 * Various record specific properties
@@ -802,10 +802,10 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	function saveAssociations(&$record, &$data)
 	{
-		if( !$this->supports_associations ) return true;
+		if( !$this->associations_context ) return true;
 
 		$record = $record ? $record: $this->_record;
-		return flexicontent_db::saveAssociations($record, $data, $this->records_dbtbl);
+		return flexicontent_db::saveAssociations($record, $data, $this->associations_context);
 	}
 
 
