@@ -94,7 +94,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $supports_associations = true;
+	var $associations_context = 'com_categories.item';
 
 	/**
 	 * Various record specific properties

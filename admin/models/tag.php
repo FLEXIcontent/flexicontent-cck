@@ -101,7 +101,7 @@ class FlexicontentModelTag extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $supports_associations = false;
+	var $associations_context = false;
 
 	/**
 	 * Various record specific properties

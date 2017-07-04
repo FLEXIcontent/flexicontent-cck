@@ -101,7 +101,7 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $supports_associations = true;
+	var $associations_context = 'com_content.item';
 
 	/**
 	 * Various record specific properties

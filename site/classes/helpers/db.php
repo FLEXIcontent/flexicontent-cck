@@ -890,11 +890,10 @@ class flexicontent_db
 	{
 		$assoc = flexicontent_db::useAssociations();
 		if (!$assoc) return true;
-		
-		
-		// **********************************
-		// Prepare / check associations array
-		// **********************************
+
+		// ***
+		// *** Prepare / check associations array
+		// ***
 		
 		// Unset empty associations from associations array, to avoid save them in the associations table
 		$associations = isset($data['associations']) ? $data['associations'] : array();
@@ -917,14 +916,14 @@ class flexicontent_db
 		JArrayHelper::toInteger($associations);
 		
 		
-		// ***********************
-		// Delete old associations
-		// ***********************
+		// ***
+		// *** Delete old associations
+		// ***
 		
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->delete('#__associations')
-			->where($db->quoteName('context') . ' = ' . $db->quote($context.'.item'))
+			->where($db->quoteName('context') . ' = ' . $db->quote($context))
 			->where($db->quoteName('id') . ' IN (' . implode(',', $associations) . ')');
 		$db->setQuery($query);
 		$db->execute();
@@ -949,7 +948,7 @@ class flexicontent_db
 		
 		foreach ($associations as $id)
 		{
-			$query->values($id . ',' . $db->quote($context.'.item') . ',' . $db->quote($key));
+			$query->values($id . ',' . $db->quote($context) . ',' . $db->quote($key));
 		}
 		
 		$db->setQuery($query);
