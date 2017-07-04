@@ -1311,8 +1311,12 @@ class flexicontent_html
 							}
 						});
 
-						jQuery('input.has_inputmask').inputmask();
-						jQuery('input.inputmask-regex').inputmask('Regex');
+						jQuery('input.has_inputmask').each(function() {
+							jQuery(this).inputmask();
+						});
+						jQuery('input.inputmask-regex').each(function() {
+							jQuery(this).inputmask('Regex');
+						});
 					});
 				";
 				break;

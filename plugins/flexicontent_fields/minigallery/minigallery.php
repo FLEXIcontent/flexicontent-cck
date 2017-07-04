@@ -18,7 +18,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 {
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
-	
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -27,9 +27,9 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	{
 		parent::__construct( $subject, $params );
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** DISPLAY methods, item form & frontend views
 	// ***
@@ -58,11 +58,11 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$tip_class     = $tooltip_class;  // Compatibility with older custom templates
-		
+
 		// Get a unique id to use as item id if current item is new
 		$u_item_id = $item->id ? $item->id : substr(JFactory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
-		
-		
+
+
 		// ****************
 		// Number of values
 		// ****************
@@ -303,9 +303,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					return 'cancel';
 				}
 				
-				// inline mode
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				var theInput = newField.find('input.inlinefile-del').first();
 				theInput.removeAttr('checked');
@@ -437,7 +438,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				// Attach form validation on new element
 				fc_validationAttach(newField);
@@ -525,7 +527,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
-		foreach($field->html as &$_html) {
+		foreach($field->html as &$_html)
+		{
 			$_html = '
 				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
@@ -564,7 +567,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\').find(\'ul.fcfield-sortables\'));" data-expandedFieldState="0">
+			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));" data-expandedFieldState="0">
 				<span class="fcfield-expand-view ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'"></span> &nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
 			</span>
 			' . $field->html;

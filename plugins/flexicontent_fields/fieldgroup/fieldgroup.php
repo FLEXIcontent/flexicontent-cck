@@ -197,6 +197,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().find('ul.fcfield-sortables').children().last();
 				var newField  = lastField.clone();
+				newField.find('.fc-has-value').removeClass('fc-has-value');
 				
 				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
 				var theSet = newField.find('input, select');
@@ -238,7 +239,8 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only

@@ -43,7 +43,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
-		// initialize framework objects and other variables
+		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		
@@ -54,13 +54,16 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ****************
-		// Number of values
-		// ****************
+		// ***
+		// *** Number of values
+		// ***
+
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+
+		$required = $field->parameters->get('required', 0);
+		$required_class = $required ? ' required' : '';
+
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 		$link_source = (int) $field->parameters->get('link_source', 0);   // 0: is normal editing, 1: is editing of Joomla article links
@@ -69,7 +72,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 
 
 		// ***
-		// URL
+		// *** URL
 		// ***
 		
 		// Default value
@@ -78,10 +81,35 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$default_link = $default_link ? JText::_($default_link) : '';
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		
+		// Form fields display parameters
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
+		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
 		
-		// *********************************************************
-		// URL title, linking text, CSS class, HTML tag id (optional)
-		// **********************************************************
+		// create extra HTML TAG parameters for the form field
+		$link_attribs = $field->parameters->get( 'extra_attributes', '' )
+			. ' maxlength="' . $maxlength . '" '
+			. ' size="' . $size . '" ';
+
+		static $inputmask_added = false;
+	  if ($inputmask && !$inputmask_added)
+		{
+			$inputmask_added = true;
+			flexicontent_html::loadFramework('inputmask');
+		}
+
+		$link_classes = $required_class;
+		if ($inputmask)
+		{
+			$link_attribs .= " data-inputmask=\" 'alias': '" . $inputmask . "' \" ";
+			$link_classes .= ' has_inputmask';
+		}
+		$link_classes .= ' validate-url';
+
+
+		// ***
+		// *** URL title, linking text, CSS class, HTML tag id (optional)
+		// ***
 
 		// Default value
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
@@ -90,9 +118,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$default_title = $default_title ? JText::_($default_title) : '';
 
 
-		// *****************************
-		// URL other optional properties
-		// *****************************
+		// ***
+		// *** URL other optional properties
+		// ***
 
 		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
@@ -112,11 +140,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$default_id = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
 		$default_id = $default_id ? JText::_($default_id) : '';
 
-		$usetarget      = $field->parameters->get( 'use_target', 0 ) ;
+		$usetarget  = $field->parameters->get( 'use_target', 0 ) ;
 		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
 
-		// Form fields display parameters
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -196,6 +222,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				newField.find('.fc-has-value').removeClass('fc-has-value');
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -206,6 +233,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
+				
+				// Update inputmask
+				var has_inputmask = newField.find('input.has_inputmask').length != 0;
+				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
 			
 			if ($allow_relative_addrs==2) $js .= "
@@ -300,7 +331,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				// Attach form validation on new element
 				fc_validationAttach(newField);
@@ -358,176 +390,25 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		
-		
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
-		
-		$field->html = array();
-		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
-		foreach ($field->value as $value)
-		{
-			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
-			if ( !is_array($value) )
-			{
-				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
-				$value = $array ?: array(
-					'link' => $value, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
-				);
-			}
-			if ( empty($value['link']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
-			
-			$fieldname_n = $fieldname.'['.$n.']';
-			$elementid_n = $elementid.'_'.$n;
-			
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
-			$value['link'] = htmlspecialchars( JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8' );
-			$link = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl urllink-lbl" for="'.$elementid_n.'_link">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
-					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" size="'.$size.'" value="'.$value['link'].'" />
-				</div>';
-			
-			$autoprefix = '';
-			if ($allow_relative_addrs==2)
-			{
-				$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_EXTWL_IS_RELATIVE_DESC', 1, 1);
-				$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
-				$autoprefix = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ).'</label>
-					<fieldset class="radio btn-group group-fcinfo">
-						<input class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
-						<label class="' . $add_on_class . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
-						<input class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
-						<label class="' . $add_on_class . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
-					</fieldset>
-				</div>
-				';
-			}
-			
-			$title = '';
-			if ($usetitle)
-			{
-				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
-				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
-				$title = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_EXTWL_URLTITLE' ).'</label>
-					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
-				</div>';
-			}
-			
-			$linktext = '';
-			if ($usetext)
-			{
-				$value['linktext'] = !empty($value['linktext']) ? $value['linktext'] : $default_text;
-				$value['linktext'] = htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8');
-				$linktext = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.JText::_( 'FLEXI_EXTWL_URLLINK_TEXT' ).'</label>
-					<input class="urllinktext fcfield_textval" name="'.$fieldname_n.'[linktext]" id="'.$elementid_n.'_linktext" type="text" size="'.$size.'" value="'.$value['linktext'].'" />
-				</div>';
-			}
-			
-			$class = '';
-			if ($useclass)
-			{
-				$value['class'] = !empty($value['class']) ? $value['class'] : $default_class;
-				$value['class'] = htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8');
-			}
 
-			if ($useclass==1)
-			{
-				$class = '
-					<div class="'.$input_grp_class.' fc-xpended-row">
-						<label class="' . $add_on_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
-						<input class="urlclass fcfield_textval" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.$value['class'].'" />
-					</div>';
-			}
-			else if ($useclass==2)
-			{
-				$class_attribs = ' class="urlclass use_select2_lib" ';
-				$class = '
-					<div class="'.$input_grp_class.' fc-xpended-row">
-						<label class="' . $add_on_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
-						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $elementid_n.'_class').'
-					</div>';
-			}
-			
-			$id = '';
-			if ($useid)
-			{
-				$value['id'] = !empty($value['id']) ? $value['id'] : $default_id;
-				$value['id'] = htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8');
-				$id = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLID' ).'</label>
-					<input class="urlid fcfield_textval" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.$value['id'].'" />
-				</div>';
-			}
-			
-			$target = '';
-			if ($usetarget)
-			{
-				// Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time ...
-				$value['target'] = !empty($value['target']) ? $value['target'] : '';
-				$value['target'] = htmlspecialchars($value['target'], ENT_COMPAT, 'UTF-8');
-				$target_attribs = ' class="urltarget use_select2_lib" ';
-				$target_options = array(
-					(object) array('value'=>'', 'text'=>JText::_('FLEXI_DEFAULT')),
-					(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_EXTWL_NEW_WIN_TAB')),
-					(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_EXTWL_PARENT_FRM')),
-					(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_EXTWL_SAME_FRM_WIN_TAB')),
-					(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_EXTWL_TOP_FRM')),
-					(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_EXTWL_MODAL_POPUP_WIN'))
-				);
-				$target = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl ulrtarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLTARGET' ).'</label>
-					'.JHTML::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
-				</div>';
-			}
-			
-			$hits = '';
-			if ($usehits) {
-				$hits = (int) @ $value['hits'];
-				$hits = '
-					<div class="'.$input_grp_class.' fc-xpended-row">
-						<label class="' . $add_on_class . ' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_EXTWL_POPULARITY' ).'</label>
-						<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />
-						<span class="' . $add_on_class . ' hitcount" style="font-style: italic; min-width:64px;">'.$hits.' '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
-					</div>
-					';
-			}
-			
-			$field->html[] = '
-				'.($use_ingroup || !$multiple ? '' : '
-				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
-				</div>
-				').'
-				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
-				<div class="fc-field-props-box">
-				'.$link.'
-				'.$autoprefix.'
-				'.$title.'
-				'.$linktext.'
-				'.$target.'
-				'.$class.'
-				'.$id.'
-				'.$hits.'
-				</div>
-				';
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+
+
+		// ***
+		// *** Create field's HTML display for item form
+		// ***
+
+		$field->html = array();  // Make sure this is an array
+
+		$formlayout = $field->parameters->get('formlayout', '');
+		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
+		$simple_form_layout = $field->parameters->get('simple_form_layout', 0);
+
+		//$this->setField($field);
+		//$this->setItem($item);
+		//$this->displayField( $formlayout );
+
+		include(self::getFormPath($this->fieldtypes[0], $formlayout));
+
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
@@ -547,10 +428,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		}
 
 		// Add toggle button for: Compact values view (= multiple values per row)
+		$show_values_expand_btn = $formlayout === 'field_InlineBoxes' ? $show_values_expand_btn : 0;
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\').find(\'ul.fcfield-sortables\'));" data-expandedFieldState="0">
+			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));" data-expandedFieldState="0">
 				<span class="fcfield-expand-view ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'"></span> &nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
 			</span>
 			' . $field->html;
@@ -592,12 +474,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		// some parameter shortcuts
 		$tooltip_class = 'hasTooltip';
 
+		// Target window
 		$usetarget      = $field->parameters->get( 'use_target', 0 ) ;
-		
-		// Needed by legacy layouts that make use of 'target_param'
-		$default_target = $field->parameters->get( 'target', '' );
+		$default_target = $field->parameters->get( 'target', '' );   // Needed by legacy layouts that make use of 'target_param'
 		$target_param = $default_target ? ' target="'.$default_target.'"' : '';
 
+		// Hits
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
@@ -801,6 +683,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$host = JURI::getInstance('SERVER')->gethost();
 		
+		// Server side validation
+		//$validation = $field->parameters->get( 'validation', 'URL' ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
+		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
@@ -819,14 +705,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 
 
-			// ***********************************************************
-			// Validate URL, skipping URLs that are empty after validation
-			// ***********************************************************
+			// ***
+			// *** Validate data, skipping values that are empty after validation
+			// ***
 			
-			$link = flexicontent_html::dataFilter($v['link'], 4000, 'URL', 0);  // Clean bad text/html
+			$link = flexicontent_html::dataFilter($v['link'], $maxlength, 'URL', 0);  // Clean bad text/html
 			
 			// Skip empty value, but if in group increment the value position
-			if (empty($link))
+			if (!strlen($link))
 			{
 				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
@@ -834,7 +720,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			// Sanitize the URL as absolute or relative
 			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int) @$v['autoprefix']);
-			
+
 			// Has protocol nothing to do
 			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
 			// Has current domain but no protocol just add http://
@@ -864,7 +750,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		
 		// Serialize multi-property data before storing them into the DB,
 		// null indicates to increment valueorder without adding a value
-		foreach($post as $i => $v) {
+		foreach($post as $i => $v)
+		{
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {

@@ -39,7 +39,7 @@ body label.fc-prop-lbl,
 body span.fc-prop-lbl,
 body #flexicontent label.fc-prop-lbl,
 body #flexicontent span.fc-prop-lbl {
-	font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
 	font-size: 13px;
 	color: #040507;
 }
@@ -617,6 +617,77 @@ body .nowrap_hidden {
 	top: -4px;
 	right: -4px;
 }
+#flexicontent .fc-floated-labels-box.fc-lbl-external-box {
+	padding-top: 18px;
+}
+#flexicontent .fc-floated-labels-box {
+	position: relative;
+	margin: 0px 0px 20px 4px;
+}
+#flexicontent .fc-floated-labels-box > div.use_select2_lib {
+	width: 100% !important;
+}
+#flexicontent .fc-floated-labels-box > div.use_select2_lib .select2-choice {
+	border-radius: 0 !important;
+	border: 1px solid transparent;
+	border-bottom: 1px solid gray;
+	padding: 0 0 0 0px !important;
+}
+#flexicontent .fc-floated-labels-box > div.use_select2_lib .select2-choice .select2-arrow {
+	border-radius: 0 !important;
+	background: transparent !important;
+	border: 0 !important;
+}
+#flexicontent .fc-floated-labels-box select,
+#flexicontent .fc-floated-labels-box > div.use_select2_lib:not(.select2-container-active) {
+	width: 100% !important;
+}
+#flexicontent .fc-floated-labels-box select .select2-choice,
+#flexicontent .fc-floated-labels-box > div.use_select2_lib:not(.select2-container-active) .select2-choice {
+	background: transparent !important;
+	box-shadow: unset !important;
+}
+#flexicontent .fc-floated-labels-box > input.fc-floated-lbl-input {
+	font-size: 14px;
+	width: 200px;
+	height: 16px;
+	line-height: 16px;
+	padding: 16px 0px 4px 0px;
+	border-radius: 0;
+	border: 1px solid transparent;
+	border-bottom: 1px solid gray;
+}
+#flexicontent .fc-floated-labels-box > label.fc-floated-lbl {
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+	position: absolute;
+	pointer-events: none;
+	top: 10px;
+	right: 2px;
+	transition: 0.2s ease all;
+	z-index: 1;
+	color: gray;
+	opacity: 0.7;
+}
+#flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value {
+	top: -6px;
+	right: 2px;
+	font-size: 11px;
+	opacity: 1;
+}
+#flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-lbl-external {
+	top: -4px;
+	right: 2px;
+	font-size: 11px;
+	opacity: 1;
+}
+#flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value.invalid {
+	top: -3px;
+	right: 4px;
+}
+#flexicontent .fc-floated-labels-box > input.fc-floated-lbl-input.invalid {
+	border-left: 1px solid transparent !important;
+	border-right: 1px solid transparent !important;
+}
 body .fc-close {
 	color: #000000;
 	float: left;
@@ -974,6 +1045,7 @@ body .fc-nowrap-box,
 	display: inline-block;
 	float: right;
 	margin-left: 4px;
+	position: relative;
 }
 #flexicontent .fc-xpended {
 	margin: 0 4px 4px 0 !important;
@@ -2679,7 +2751,6 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
 	color: black;
-	font-size: 11px;
 }
 .select2-container .select2-choice.fc_highlight_disabled span,
 .fc_highlight_disabled {
@@ -2778,10 +2849,6 @@ div.current ul.config-option-list li select {
 div.current ul.config-option-list li fieldset {
 	margin: 0;
 	padding: 0;
-}
-*:not(.form-vertical) > div.control-group,
-fieldset.form-vertical div.control-group {
-	margin-bottom: 8px;
 }
 #toolbar .buttons.btn-group .toolbar {
 	text-align: right;

@@ -55,36 +55,56 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+
+			<field name="link_source" type="multilist" subtype="list" default="0" toggle_related="1" label="FLEXI_EXTWL_LINK_SRC_MODE" description="FLEXI_EXTWL_LINK_SRC_MODE_DESC" labelclass="label label-info">
+				<option value="-1" show_list="" hide_list="not_jurls">FLEXI_EXTWL_JOOMLA_ARTICLE_LINKS</option>
+				<option value="0"  show_list="not_jurls" hide_list="">FLEXI_FIELD_EXTENDED_WEBLINK</option>
+			</field>
 			
-			<field name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" />
-			<field name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC">
+			<field name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" depend_class="not_jurls" />
+			<field name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC" depend_class="not_jurls" >
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC" class="btn-group btn-group-yesno">
+			<field name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_USER_CAN_SELECT</option>
 			</field>
-			
 
 
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 			
-			<field name="link_source" type="multilist" subtype="list" default="0" toggle_related="1" label="FLEXI_EXTWL_LINK_SRC_MODE" description="FLEXI_EXTWL_LINK_SRC_MODE_DESC" labelclass="label label-warning">
-				<option value="-1" show_list="" hide_list="not_jurls">FLEXI_EXTWL_JOOMLA_ARTICLE_LINKS</option>
-				<option value="0"  show_list="not_jurls" hide_list="">FLEXI_FIELD_EXTENDED_WEBLINK</option>
+			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
+
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/extendedweblink/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label label-warning" depend_class="not_jurls"/>
+
 			<field name="show_values_expand_btn" type="radio" default="1" label="FLEXI_FIELD_EDIT_EXPAND_VALUES" description="FLEXI_FIELD_EDIT_EXPAND_VALUES_DESC" class="btn-group btn-group-yesno" depend_class="fieldgroupoff not_jurls">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="simple_form_layout" type="radio" default="0" label="FLEXI_FIELD_SIMPLE_FORM_DESIGN" description="FLEXI_FIELD_SIMPLE_FORM_DESIGN_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_EXTWL_LINK" level="level2" depend_class="not_jurls" />
+			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="not_jurls" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" depend_class="not_jurls" />
+			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" depend_class="not_jurls" />
 
-			<!--field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" depend_class="not_jurls" /-->
+			<field name="inputmask" type="multilist" subtype="radio" default="" label="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_NO</option>
+				<option value="url">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" depend_class="not_jurls" />
 
 			<field name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level2" depend_class="not_jurls" />
 			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" toggle_related="1" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno" depend_class="not_jurls" >

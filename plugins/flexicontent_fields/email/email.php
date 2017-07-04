@@ -43,7 +43,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
-		// initialize framework objects and other variables
+		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		
@@ -54,21 +54,24 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ****************
-		// Number of values
-		// ****************
+		// ***
+		// *** Number of values
+		// ***
+
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+
+		$required = $field->parameters->get('required', 0);
+		$required_class = $required ? ' required' : '';
+
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
-		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 1);
+		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 0);
 
 
-		// *************
-		// Email address
-		// *************
+		// ***
+		// *** Email address
+		// ***
 		
 		// Default value
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
@@ -77,31 +80,34 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
-		$inputmask	= $field->parameters->get( 'inputmask', 'email' ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
+		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
 		
 		// create extra HTML TAG parameters for the form field
-		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
-		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
-		$attribs .= ' size="'.$size.'" ';
-		$classes = $required;
-		
+		$addr_attribs = $field->parameters->get( 'extra_attributes', '' )
+			. ' maxlength="' . $maxlength . '" '
+			. ' size="' . $size . '" ';
+
 		static $inputmask_added = false;
-	  if ($inputmask && !$inputmask_added) {
+	  if ($inputmask && !$inputmask_added)
+		{
 			$inputmask_added = true;
 			flexicontent_html::loadFramework('inputmask');
 		}
-		if ($inputmask) {
-			$attribs .= " data-inputmask=\" 'alias': 'email' \" ";
-			$classes .= ' has_inputmask';
+
+		$addr_classes = $required_class;
+		if ($inputmask)
+		{
+			$addr_attribs .= " data-inputmask=\" 'alias': '" . $inputmask . "' \" ";
+			$addr_classes .= ' has_inputmask';
 		}
-		$classes .= ' validate-email';
-		
-		
-		// *************************************
-		// Email title & linking text (optional)
-		// *************************************
-		
+		$addr_classes .= ' validate-email';
+
+
+		// ***
+		// *** Email title & linking text (optional)
+		// ***
+
 		// Default value
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
@@ -124,7 +130,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
 		$js = "";
 		$css = "";
 		
@@ -171,6 +177,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				newField.find('.fc-has-value').removeClass('fc-has-value');
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -181,6 +188,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
 				newField.find('.emailaddr-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
+				
+				// Update inputmask
+				var has_inputmask = newField.find('input.has_inputmask').length != 0;
+				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
 			
 			// Update the new email linking text
@@ -190,10 +201,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				newField.find('.emailtext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-				
-				// Update inputmask
-				var has_inputmask = newField.find('input.has_inputmask').length != 0;
-				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
 			
 			// Add new field to DOM
@@ -216,10 +223,14 @@ class plgFlexicontent_fieldsEmail extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				// Attach form validation on new element
 				fc_validationAttach(newField);
+				
+				// Attach bootstrap event on new element
+				fc_bootstrapAttach(newField);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -271,67 +282,25 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		
-		
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
-		
-		$field->html = array();
-		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
-		foreach ($field->value as $value)
-		{
-			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
-			if ( !is_array($value) )
-			{
-				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
-				$value = $array ?: array(
-					'addr' => $value, 'text' => ''
-				);
-			}
-			if ( empty($value['addr']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
-			
-			$fieldname_n = $fieldname.'['.$n.']';
-			$elementid_n = $elementid.'_'.$n;
-			
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$value['addr'] = !empty($value['addr']) ? $value['addr'] : '';
-			$value['addr'] = htmlspecialchars( JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8' );
-			$addr = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
-					<input class="emailaddr fcfield_textval '.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.$value['addr'].'" '.$attribs.' />
-				</div>';
-			
-			$text = '';
-			if ($usetitle) {
-				$value['text'] = !empty($value['text']) ? $value['text'] : $default_title;
-				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
-				$text = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
-					<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]"  id="'.$elementid_n.'_text" type="text" size="'.$size.'" value="'.$value['text'].'" />
-				</div>';
-			}
-			
-			$field->html[] = '
-				'.($use_ingroup || !$multiple ? '' : '
-				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
-				</div>
-				').'
-				<div class="fc-field-props-box">
-				'.$addr.'
-				'.$text.'
-				</div>
-				';
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+
+
+
+		// ***
+		// *** Create field's HTML display for item form
+		// ***
+
+		$field->html = array();  // Make sure this is an array
+
+		$formlayout = $field->parameters->get('formlayout', '');
+		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
+		$simple_form_layout = $field->parameters->get('simple_form_layout', 0);
+
+		//$this->setField($field);
+		//$this->setItem($item);
+		//$this->displayField( $formlayout );
+
+		include(self::getFormPath($this->fieldtypes[0], $formlayout));
+
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
@@ -351,10 +320,11 @@ class plgFlexicontent_fieldsEmail extends FCField
 		}
 
 		// Add toggle button for: Compact values view (= multiple values per row)
+		$show_values_expand_btn = $formlayout === 'field_InlineBoxes' ? $show_values_expand_btn : 0;
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\').find(\'ul.fcfield-sortables\'));" data-expandedFieldState="0">
+			<span class="fcfield-expand-view-btn btn btn-small" onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));" data-expandedFieldState="0">
 				<span class="fcfield-expand-view ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'"></span> &nbsp;'.JText::_( 'FLEXI_EXPAND_VALUES', true ).'
 			</span>
 			' . $field->html;
@@ -373,7 +343,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$format = JRequest::getCmd('format', null);
 		
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
@@ -510,7 +479,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// Server side validation
 		//$validation = $field->parameters->get( 'validation', 'EMAIL' ) ;
-		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -530,16 +499,16 @@ class plgFlexicontent_fieldsEmail extends FCField
 			}
 
 
-			// **************************************************************
-			// Validate data, skipping values that are empty after validation
-			// **************************************************************
+			// ***
+			// *** Validate data, skipping values that are empty after validation
+			// ***
 			
 			$addr = flexicontent_html::dataFilter($v['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
 			
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($addr))
 			{
-				if ($use_ingroup) $newpost[$new++] = array();
+				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
 			}
 			
