@@ -215,7 +215,8 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 				\"+str+\"\\
 				</table>\\
 				\");
-				jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#version_tbl')});
+				jQuery('#version_tbl').find('.hasTooltip').tooltip({html: true, container: jQuery('#version_tbl')});
+				jQuery('#version_tbl').find('.hasPopover').popover({html: true, container: jQuery('#version_tbl'), trigger : 'hover focus'});
 				
 				// Attach click event to version compare links of the newly created page
 				jQuery(this).find('a.modal-versions').each(function(index, value) {

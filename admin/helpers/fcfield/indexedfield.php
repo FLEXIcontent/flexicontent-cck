@@ -501,7 +501,8 @@ class FCIndexedField extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				// Attach form validation on new element
 				fc_validationAttach(newField);

@@ -209,7 +209,8 @@ function ilayout_loadPanel(element)
 			success: function(str)
 			{
 				panel.addClass('fc_layout_loaded').html(str);
-				jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+				panel.find('.hasTooltip').tooltip({html: true, container: panel});
+				panel.find('.hasPopover').popover({html: true, container: panel, trigger : 'hover focus'});
 
 				//tabberAutomatic(tabberOptions, panel_id);
 				fc_bindFormDependencies('#'+panel_id, 0, '');

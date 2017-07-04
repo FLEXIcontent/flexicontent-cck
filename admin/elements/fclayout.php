@@ -309,7 +309,8 @@ function fc_getLayout(el)
 			panel_header.html('<a href=\"javascript:void(0);\"><span>Layout: '+layout_name+'</span></a>');
 		 	panel_header.parent().css('display', '');
 			panel.html(str);
-			jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+			panel.find('.hasTooltip').tooltip({html: true, container: panel});
+			panel.find('.hasPopover').popover({html: true, container: panel, trigger : 'hover focus'});
 
 			//tabberAutomatic(tabberOptions, panel_id);
 			fc_bindFormDependencies('#'+panel_id, 0, '');

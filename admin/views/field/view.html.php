@@ -306,7 +306,8 @@ class FlexicontentViewField extends JViewLegacy
 						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
 						success: function(str) {
 							jQuery('#fieldspecificproperties').html(str);
-							jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
+							jQuery('#fieldspecificproperties').find('.hasTooltip').tooltip({html: true, container: jQuery('#fieldspecificproperties')});
+							jQuery('#fieldspecificproperties').find('.hasPopover').popover({html: true, container: jQuery('#fieldspecificproperties'), trigger : 'hover focus'});
 
 							tabberAutomatic(tabberOptions, 'fieldspecificproperties');
 							fc_bindFormDependencies('#fieldspecificproperties', 0, '');
