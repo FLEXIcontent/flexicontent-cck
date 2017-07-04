@@ -29,10 +29,12 @@ foreach ($values as $value)
 	
 	// Create field's display
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
-	if($format != 'feed' && $email_cloaking) {
+	if($format != 'feed' && $email_cloaking)
+	{
 		$html = JHTML::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
 	}
-	else {
+	else
+	{
 		$html = $mailto_link ? 
 			'<a href="mailto:' . $addr . '" target="_blank" itemprop="email">' . $text . '</a>' :
 			$text;
