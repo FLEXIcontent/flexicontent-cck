@@ -46,7 +46,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -361,6 +361,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Rendering options
 		$email_cloaking = $field->parameters->get( 'email_cloaking', 1 ) ;
 		$mailto_link    = $field->parameters->get( 'mailto_link', 1 ) ;
+		$format = JFactory::getApplication()->input->$jinput->get('format', 'html', 'cmd');
 				
 		// Get field values
 		$values = $values ? $values : $field->value;
