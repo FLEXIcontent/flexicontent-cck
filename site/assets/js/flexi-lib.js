@@ -632,7 +632,7 @@
 	{
 		btn_class = btn_class || 'btn-info';
 		// Get field value containers
-		var rows = field_values_box.find('> li');
+		var rows = field_values_box.find('.fcfieldval_container.valuebox');
 		var el = jQuery(el);
 
 		// Set expanding flag and expand or compact properties
@@ -732,8 +732,9 @@
 	{
 		var trgEL = jQuery('#'+trgID);
 		trgEL.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
-		
-		fcCascadedField_clear(trgEL, Joomla.JText._('FLEXI_PLEASE_WAIT'), prompt_enabled);
+
+		var loading_prompt = '';  // Joomla.JText._('FLEXI_PLEASE_WAIT')
+		fcCascadedField_clear(trgEL, loading_prompt, prompt_enabled);
 		trgEL.removeAttr('data-defvals');  // Remove default values of select2 JS
 
 		jQuery.ajax({
@@ -794,13 +795,15 @@
 		var trgTagName = el.prop("tagName");
 		if (trgTagName=='SELECT')
 		{
-			el.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+(prompt_enabled ? prompt : '-')+'</option>');
+			el.empty();
+			if (prompt) el.append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>' + prompt + '</option>');
 			el.trigger('change', [{elementClear:1}]);
 		}
 		else
 		{
 			el.find('input').first().trigger('change', [{elementClear:1}]);
-			el.empty().append('<span class="fcpadded alert alert-info">'+prompt+'</span>');
+			el.empty();
+			if (prompt) el.append('<span class="fcpadded alert alert-info">'+prompt+'</span>');
 		}
 	}
 	

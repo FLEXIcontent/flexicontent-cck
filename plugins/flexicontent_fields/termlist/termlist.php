@@ -192,6 +192,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				newField.find('.fc-has-value').removeClass('fc-has-value');
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
@@ -297,7 +298,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only

@@ -355,6 +355,7 @@ body .fc-nowrap-box,
 	display: inline-block;
 	float: right;
 	margin-left: 4px;
+	position: relative;
 }
 #flexicontent .fc-xpended {
 	margin: 0 4px 4px 0 !important;

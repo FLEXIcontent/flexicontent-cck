@@ -947,23 +947,30 @@ table.fc_uploader_header_tbl td:last-child {
 	clear: both;
 	float: none;
 }
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded {
 	width: 100%;
 }
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
 	float: left;
 	clear: both;
 }
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box {
 	width: auto;
 }
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box textarea.fcfield_textareaval,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box textarea.fcfield_textareaval {
 	width: 608px;
 }
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box input.fcfield_textval,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-field-props-box input.fcfield_textval {
 	width: 600px;
 }
+#flexicontent div.fcfieldval_container.valuebox.fc-expanded.floated,
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded.floated {
 	width: auto;
 }

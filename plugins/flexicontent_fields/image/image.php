@@ -343,6 +343,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				newField.find('.fc-has-value').removeClass('fc-has-value');
 				
 			".( $image_source == 0 ? "
 				var has_select2     = newField.find('div.select2-container').length != 0;
@@ -460,7 +461,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;Selected image.&lt;/strong&gt;&lt;br /&gt;&lt;div id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview_empty&quot; style=&quot;display:none&quot;&gt;No image selected.&lt;/div&gt;&lt;div id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;Selected image.&quot; id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/div&gt;\"><i class=\"icon-eye\"></i></span>');
 				
 				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				newField.find('.hasTooltip').tooltip({html: true, container: newField});
+				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
 				// Attach form validation on new element
 				fc_validationAttach(newField);

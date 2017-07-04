@@ -56,7 +56,7 @@ body label.fc-prop-lbl,
 body span.fc-prop-lbl,
 body #flexicontent label.fc-prop-lbl,
 body #flexicontent span.fc-prop-lbl {
-	font-family: "Trebuchet MS", Verdana, Halvetica, Arial;
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
 	font-size: 13px;
 	color: #040507;
 }
@@ -181,7 +181,6 @@ div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-resu
 	width: 100% !important;
 	box-sizing: border-box !important;
 }
-
 
 div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 
@@ -750,4 +749,92 @@ body .nowrap_hidden {
 	position: relative;
 	top: -4px;
 	right: -4px;
+}
+
+
+
+// ***
+// *** Floating labels
+// ***
+
+#flexicontent .fc-floated-labels-box.fc-lbl-external-box {
+	padding-top: 18px;
+}
+
+#flexicontent .fc-floated-labels-box {
+  position: relative;
+	margin: 0px 0px 20px 4px;
+
+	> div.use_select2_lib {
+		width: 100% !important;
+		.select2-choice {
+			border-radius: 0 !important;
+			border: 1px solid transparent;
+			border-bottom: 1px solid gray;
+			padding: 0 0 0 0px !important;
+
+			.select2-arrow {
+				border-radius: 0 !important;
+				background: transparent !important;
+				border: 0 !important;
+			}
+		}
+	}
+
+	select,
+	> div.use_select2_lib:not(.select2-container-active) {
+		width: 100% !important;
+
+		.select2-choice {
+			background: transparent !important;
+			box-shadow: unset !important;
+		}
+	}
+
+	> input.fc-floated-lbl-input {
+		font-size: 14px;
+		width: 200px;
+		height: 16px;
+		line-height: 16px;
+		padding: 16px 0px 4px 0px;
+		border-radius: 0;
+		border: 1px solid transparent;
+		border-bottom: 1px solid gray;
+	}
+
+	> label.fc-floated-lbl {
+		font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+		position: absolute;
+		pointer-events: none;
+		top: 10px;
+		right: 2px;
+		transition: 0.2s ease all;
+		z-index: 1;
+		color: gray;
+		opacity: 0.7;
+	}
+
+	> label.fc-floated-lbl.fc-has-value {
+		top: -6px;
+		right: 2px;
+		font-size: 11px;
+		opacity: 1;
+	}
+
+	> label.fc-floated-lbl.fc-lbl-external {
+		top: -4px;
+		right: 2px;
+		font-size: 11px;
+		opacity: 1;
+	}
+
+	> label.fc-floated-lbl.fc-has-value.invalid {
+		top: -3px;
+		right: 4px;
+	}
+
+	> input.fc-floated-lbl-input.invalid {
+		border-left: 1px solid transparent !important;
+		border-right: 1px solid transparent !important;
+	}
 }
