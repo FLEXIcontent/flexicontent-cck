@@ -161,8 +161,9 @@ function clayout_loadPanel(element)
 			success: function(str)
 			{
 				panel.addClass('fc_layout_loaded').html(str);
-				
-				jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+				panel.find('.hasTooltip').tooltip({html: true, container: panel});
+				panel.find('.hasPopover').popover({html: true, container: panel, trigger : 'hover focus'});
+
 				fc_bindFormDependencies('#'+panel_id, 0, '');
 				fc_bootstrapAttach('#'+panel_id);
 				if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#'+panel_id);
