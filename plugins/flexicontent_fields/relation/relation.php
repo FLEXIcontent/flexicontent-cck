@@ -59,9 +59,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$elementid = 'custom_'.$field->name;
 
 
-		// ************************
-		// Case of autorelated item
-		// ************************
+		// ***
+		// *** Case of autorelated item
+		// ***
 
 		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$field->id, 0, 'int');
 
@@ -72,9 +72,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		// ************************************************************************
-		// Initialise values and split them into: (a) item ids and (b) category ids
-		// ************************************************************************
+		// ***
+		// *** Initialise values and split them into: (a) item ids and (b) category ids
+		// ***
+
 		if (!$field->value)
 		{
 			$field->value = array();
@@ -106,9 +107,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		// ******************
-		// EDITING PARAMETERS
-		// ******************
+		// ***
+		// *** EDITING PARAMETERS
+		// ***
 		
 		// some parameters shortcuts
 		$size				= $field->parameters->get( 'size', 12 ) ;
@@ -121,9 +122,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$selected_items_sortable = $field->parameters->get( 'selected_items_sortable', 0 ) ;
 
 
-		// *****************************************************
-		// Item retrieving query ... put together and execute it
-		// *****************************************************
+		// ***
+		// *** Item retrieving query ... put together and execute it
+		// ***
+
 		if ( count($_itemids) )
 		{
 			$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
@@ -137,9 +139,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		else $items_arr = array();
 		
 		
-		// *******************************************************
-		// Create category tree to use for selecting related items
-		// *******************************************************
+		// ***
+		// *** Create category tree to use for selecting related items
+		// ***
 
 		// Get categories without filtering
 		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
@@ -172,9 +174,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		);
 
 
-		// *************************************************************
-    // Create the selected items field (items selected as 'related')
-		// *************************************************************
+		// ***
+		// *** Create the selected items field (items selected as 'related')
+		// ***
 
 		$items_options_select = '';
 		$state_shortname = array(1=>'P', 0=>'U', -1=>'A', -3=>'PE', -4=>'OQ', -5=>'IP');
@@ -206,9 +208,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
+		// ***
+		// *** Create field's HTML display for item form
+		// ***
 
 		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . $required . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$field->html .= '
@@ -396,9 +398,9 @@ jQuery(document).ready(function()
 		$total_show_list     = $field->parameters->get('total_show_list', 0);
 
 
-		// *******************************************
-		// Check for special display : total info only
-		// *******************************************
+		// ***
+		// *** Check for special display : total info only
+		// ***
 		
 		if ($prop=='display_total')
 		{
@@ -421,9 +423,9 @@ jQuery(document).ready(function()
 		}
 
 
-		// ***********************************************************
-		// Create total info and terminate if not adding the item list
-		// ***********************************************************
+		// ***
+		// *** Create total info and terminate if not adding the item list
+		// ***
 		
 		if ($display_total)
 		{
@@ -435,13 +437,16 @@ jQuery(document).ready(function()
 			
 			// Override the item list HTML parameter ...
 			$total_relitem_html = $field->parameters->get('total_relitem_html', '');
-			if ($total_relitem_html) $field->parameters->set('relitem_html', $total_relitem_html );
+			if ($total_relitem_html)
+			{
+				$field->parameters->set('relitem_html', $total_relitem_html);
+			}
 		}
 
 
-		// ***********************************************************
-		// Prepare item list data for rendering the related items list
-		// ***********************************************************
+		// ***
+		// *** Prepare item list data for rendering the related items list
+		// ***
 
 		$reverse_field_id = $field->parameters->get('reverse_field', 0);
 
@@ -488,9 +493,9 @@ jQuery(document).ready(function()
 		}
 
 
-		// **********************************************
-		// Create the submit button for auto related item
-		// **********************************************
+		// ***
+		// *** Create the submit button for auto related item
+		// ***
 
 		$auto_relate_curritem = $field->parameters->get( 'auto_relate_curritem', 0);
 		$auto_relate_menu_itemid = $field->parameters->get( 'auto_relate_menu_itemid', 0);
@@ -522,9 +527,9 @@ jQuery(document).ready(function()
 		}
 
 
-		// *************************************************************************
-		// Finally, create and add the item list if user has the needed access level
-		// *************************************************************************
+		// ***
+		// *** Finally, create and add the item list if user has the needed access level
+		// ***
 
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		$acclvl = (int) $field->parameters->get('itemslist_acclvl', 1);
@@ -722,17 +727,17 @@ jQuery(document).ready(function()
 		else if ( ! is_array($catids) )		$catids = !FLEXI_J16GE ? array($catids) : explode("|", $catids);
 
 
-		// ***********************************************
-		// Get & check Global category related permissions
-		// ***********************************************
+		// ***
+		// *** Get & check Global category related permissions
+		// ***
 		
 		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
 		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
 		
 		
-		// ****************************************************
-		// Calculate categories to use for retrieving the items
-		// ****************************************************
+		// ***
+		// *** Calculate categories to use for retrieving the items
+		// ***
 		
 		$allowed_cats = $disallowed_cats = false;
 		
@@ -755,9 +760,9 @@ jQuery(document).ready(function()
 		}
 
 
-		// ****************************************************************
-		// Decided allowed categories according to method of CATEGORY SCOPE
-		// ****************************************************************
+		// ***
+		// *** Decided allowed categories according to method of CATEGORY SCOPE
+		// ***
 		
 		// Include method
 		if ( $method_cat == 3 )
@@ -817,9 +822,9 @@ jQuery(document).ready(function()
 		
 		
 		
-		// ********************
-		// Load and check field
-		// ********************
+		// ***
+		// *** Load and check field
+		// ***
 		
 		$field = JTable::getInstance( $_type = 'flexicontent_fields', $_prefix = '', $_config = array() );
 		
@@ -833,9 +838,9 @@ jQuery(document).ready(function()
 		}
 		
 		
-		// *******************
-		// Load and check item
-		// *******************
+		// ***
+		// *** Load and check item
+		// ***
 		
 		$item = JTable::getInstance( $_type = 'flexicontent_items', $_prefix = '', $_config = array() );
 		if ( !$item_id )
@@ -863,9 +868,9 @@ jQuery(document).ready(function()
 		}
 		
 		
-		// ************************
-		// Load field configuration
-		// ************************
+		// ***
+		// *** Load field configuration
+		// ***
 		
 		FlexicontentFields::loadFieldConfig($field, $item);
 		$field->item_id = $item_id;
@@ -874,9 +879,9 @@ jQuery(document).ready(function()
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
 
 
-		// ****************
-		// SCOPE PARAMETERS
-		// ****************
+		// ***
+		// *** SCOPE PARAMETERS
+		// ***
 
 		// NOTE: categories scope parameters ... not used here, since category scope is checked by calling getAllowedCategories()
 
@@ -893,9 +898,9 @@ jQuery(document).ready(function()
 		$ownedbyuser   = $field->parameters->get( 'ownedbyuser', 0 );
 		
 		
-		// *********************************************
-		// Item retrieving query ... CREATE WHERE CLAUSE
-		// *********************************************
+		// ***
+		// *** Item retrieving query ... CREATE WHERE CLAUSE
+		// ***
 		$where = array();
 
 
@@ -950,9 +955,10 @@ jQuery(document).ready(function()
 		$where = !count($where) ? "" : " WHERE " . implode(" AND ", $where);
 		
 		
-		// ***********************************************
-		// Item retrieving query ... CREATE ORDERBY CLAUSE
-		// ***********************************************
+		// ***
+		// *** Item retrieving query ... CREATE ORDERBY CLAUSE
+		// ***
+
 		$order = $field->parameters->get( 'orderby_form', 'alpha' );;   // TODO: add more orderings: commented, rated
 		$orderby = flexicontent_db::buildItemOrderBy(
 			$field->parameters,
@@ -962,14 +968,16 @@ jQuery(document).ready(function()
 		);
 		
 		// Create JOIN for ordering items by a most rated
-		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+		if ( in_array('author', $order) || in_array('rauthor', $order) )
+		{
 			$orderby_join = ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 		}
 		
 		
-		// *****************************************************
-		// Item retrieving query ... put together and execute it
-		// *****************************************************
+		// ***
+		// *** Item retrieving query ... put together and execute it
+		// ***
+
 		$db = JFactory::getDBO();
 		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
 			.", GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist"
@@ -990,7 +998,8 @@ jQuery(document).ready(function()
 		foreach($items_arr as $itemdata)
 		{
 			$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
-			if (0 && $prepend_item_state) {
+			if (0 && $prepend_item_state)
+			{
 				$statestr = "[". @$state_shortname[$itemdata->state]."] ";
 				$itemtitle = $statestr.$itemtitle." ";
 			}
@@ -999,12 +1008,9 @@ jQuery(document).ready(function()
 			
 			$response['options'][] = array('item_id'=>$itemid, 'item_title'=>$itemtitle);
 		}
-		
-		/*echo "<pre>";
-		print_r($response);
-		echo "</pre>";
-		exit;*/
-		
+
+		// echo "<pre>"; print_r($response); echo "</pre>"; exit;
+
 		// Output the field
 		echo json_encode($response);
 		exit;
