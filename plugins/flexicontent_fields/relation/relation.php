@@ -17,7 +17,7 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 class plgFlexicontent_fieldsRelation extends FCField
 {
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
-	var $task_callable = null;  // Field's methods allowed to be called via AJAX
+	var $task_callable = array('getCategoryItems');  // Field's methods allowed to be called via AJAX
 
 	// ***
 	// *** CONSTRUCTOR
