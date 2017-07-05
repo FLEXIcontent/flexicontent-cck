@@ -361,7 +361,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Rendering options
 		$email_cloaking = $field->parameters->get( 'email_cloaking', 1 ) ;
 		$mailto_link    = $field->parameters->get( 'mailto_link', 1 ) ;
-		$format = JFactory::getApplication()->input->$jinput->get('format', 'html', 'cmd');
+		$format = JFactory::getApplication()->input->get('format', 'html', 'cmd');
 				
 		// Get field values
 		$values = $values ? $values : $field->value;
