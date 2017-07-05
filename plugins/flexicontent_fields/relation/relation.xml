@@ -223,10 +223,11 @@
 				<option value="3">FLEXI_DATE</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_ITEM_HTML" icon_class="icon-cog" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="FLEXI_ITEM_HTML_DESC" level="level3" class="alert alert-info fcpadded" />			
+			<field name="" type="separator" default="FLEXI_FIELD_ITEM_HTML" icon_class="icon-cog" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_ITEM_HTML_DESC" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY_OVERRIDE_INFO" level="level4" class="alert alert-info fcpadded" />
 
-			<field name="relitem_html" type="textarea" filter="RAW" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
+			<field name="relitem_html" type="textarea" filter="RAW" cols="38" rows="5" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" />
 			<field name="displayway" type="list" default="1" label="FLEXI_RELATED_DISPLAY_TEXT" description="FLEXI_RELATED_DISPLAY_TEXT_DESC">
@@ -242,7 +243,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -308,7 +309,7 @@
 				<option value="1" show_list="total_item_list" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FIELD_OVERRIDE_DEFAULT" level="level3" depend_class="viewing-total-mode total_item_list" />
-			<field name="total_relitem_html" type="textarea" filter="RAW" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
+			<field name="total_relitem_html" type="textarea" filter="RAW" cols="38" rows="5" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
 
 
 			<field name="" type="separator" default="FLEXI_RIFLD_SUBMIT_RELATED_BUTTON" icon_class="icon-new" level="tab_open" box_type="1" />

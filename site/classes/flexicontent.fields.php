@@ -2034,21 +2034,27 @@ class FlexicontentFields
 			$parsed[$field->id][$varname] = true;
 			
 			$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([0-9]+)?(##)?([a-zA-Z_0-9]+)?\}\}/", $variable, $field_matches);
-			if ($result) {
+			if ($result)
+			{
 				$d[$field->id][$varname]['fulltxt']   = $field_matches[0];
 				$d[$field->id][$varname]['fieldname'] = $field_matches[1];
 				$d[$field->id][$varname]['valueno']   = $field_matches[3];
 				$d[$field->id][$varname]['propname']  = $field_matches[5];
-			} else {
+			}
+			else
+			{
 				$d[$field->id][$varname]['fulltxt']   = array();
 				$d[$field->id][$varname]['valueno']   = false;
 			}
 			
 			$result = preg_match_all("/\{\{(item->)([a-zA-Z_0-9]+)\}\}/", $variable, $field_matches);
-			if ($result) {
+			if ($result)
+			{
 				$c[$field->id][$varname]['fulltxt']   = $field_matches[0];
 				$c[$field->id][$varname]['propname']  = $field_matches[2];
-			} else {
+			}
+			else
+			{
 				$c[$field->id][$varname]['fulltxt']   = array();
 			}
 			
@@ -2056,66 +2062,87 @@ class FlexicontentFields
 				$cacheable = true;
 			}
 		}
-		
-		// Replace variable
+
+
+		// ***
+		// *** Replace field values / field properties
+		// ***
+
 		foreach($d[$field->id][$varname]['fulltxt'] as $i => $fulltxt)
 		{
 			$fieldname = $d[$field->id][$varname]['fieldname'][$i];
 			$valueno   = $d[$field->id][$varname]['valueno'][$i] ? (int) $d[$field->id][$varname]['valueno'][$i] : 0;
 			$propname  = $d[$field->id][$varname]['propname'][$i] ? $d[$field->id][$varname]['propname'][$i] : '';
-			
+
 			$fieldid = @ $item->fields[$fieldname]->id;
 			$value   = @ $item->fieldvalues[$fieldid][$valueno];
-			
-			if ( !$fieldid ) {
+
+			if ( !$fieldid )
+			{
 				$value = 'Field with name: '.$fieldname.' not found';
 				$variable = str_replace($fulltxt, $value, $variable);
 				continue;
 			}
-			
+
 			$is_indexable = $propname && preg_match("/^_([a-zA-Z_0-9]+)_$/", $propname, $prop_matches) && ($propname = $prop_matches[1]);
-			if ($fieldid <= 14 ) {
-				if ($fieldid==13) {
+			if ($fieldid <= 14 )
+			{
+				if ($fieldid==13)
+				{
 					$value = @ $item->categories[$valueno]->{$propname};
-				} else if ($fieldid==14) {
+				}
+				else if ($fieldid==14)
+				{
 					$value = @ $item->tags[$valueno]->{$propname};
 				}
-			} else if ( $is_indexable ) {
+			}
+
+			else if ( $is_indexable )
+			{
 				if ( $propname!='value' ) // no need for value to retrieve custom elements
 				{
 					$extra_props = $propname!='text' ? array($propname) : array();  // this will work only if field has a single extra property
 					$extra_props = array();
-					if ( !isset($item->fields[$fieldname]->parameters) ) {
+					if ( !isset($item->fields[$fieldname]->parameters) )
+					{
 						FlexicontentFields::loadFieldConfig($item->fields[$fieldname], $item);
 					}
 					$elements = FlexicontentFields::indexedField_getElements( $item->fields[$fieldname], $item, $extra_props );
 					$value = @ $elements[$value]->{$propname};
 				}
-			} else if ( $propname ) {
-				$value = @ unserialize ( $value );
-				$value = @ $value[$propname];
 			}
+
+			else if ( $propname )
+			{
+				$value = flexicontent_db::unserialize_array($value, $force_array=false, $force_value=false);
+				$value = $value && isset($value[$propname]) ? $value[$propname] : '';
+			}
+
 			$variable = str_replace($fulltxt, $value, $variable);
 			//echo "<pre>"; print_r($item->fieldvalues[$fieldid]); echo "</pre>"; echo "Replaced $fulltxt with ITEM field VALUE: $value <br>";
 		}
-		
-		
-		// Replace variable
+
+
+		// ***
+		// *** Replace item properties
+		// ***
+
 		foreach($c[$field->id][$varname]['fulltxt'] as $i => $fulltxt)
 		{
 			$propname = $c[$field->id][$varname]['propname'][$i];
-			
-			if ( !isset($item->{$propname}) ) {
+
+			if ( !isset($item->{$propname}) )
+			{
 				$value = 'Item property with name: '.$propname.' not found';
 				$variable = str_replace($fulltxt, $value, $variable);
 				continue;
 			}
 			$value = $item->{$propname};
-			
+
 			$variable = str_replace($fulltxt, $value, $variable);
 			//echo "<pre>"; echo "</pre>"; echo "Replaced $fulltxt with ITEM property VALUE: $value <br>";
 		}
-		
+
 		// Return variable after all replacements
 		return $variable;
 	}
@@ -4782,17 +4809,18 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		global $globalcats, $globalnoroute, $fc_run_times;
 		if (!is_array($globalnoroute)) $globalnoroute = array();
-		
+
 		// Get fields of type relation
 		static $disallowed_fieldnames = null;
 		$disallowed_fields = array('relation', 'relation_reverse');
-		if ($disallowed_fieldnames===null) {
+		if ($disallowed_fieldnames===null)
+		{
 			$query = "SELECT name FROM #__flexicontent_fields WHERE field_type IN ('". implode("','", $disallowed_fields) ."')";
 			$db->setQuery($query);
 			$field_name_col = $db->loadColumn();
 			$disallowed_fieldnames = !$field_name_col ? array() : array_flip($field_name_col);
 		}
-		
+
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space	= $params->get( 'remove_space', 0 ) ;
 		$pretext			= $params->get( $isform ? 'pretext_form' : 'pretext', '' ) ;
@@ -4800,10 +4828,10 @@ class FlexicontentFields
 		$separatorf		= $params->get( $isform ? 'separator' : 'separatorf' ) ;
 		$opentag			= $params->get( $isform ? 'opentag_form' : 'opentag', '' ) ;
 		$closetag			= $params->get( $isform ? 'closetag_form' : 'closetag', '' ) ;
-		
+
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
+
 		switch($separatorf)
 		{
 			case 0:
@@ -4834,105 +4862,131 @@ class FlexicontentFields
 			$separatorf = '&nbsp;';
 			break;
 		}
-		
+
 		// some parameter shortcuts
 		$relitem_html = $params->get( $isform ? 'relitem_html_form' : 'relitem_html', '__display_text__' ) ;
 		$displayway		= $params->get( $isform ? 'displayway_form' : 'displayway', 1 ) ;
 		$addlink 			= $params->get( $isform ? 'addlink_form' : 'addlink', 1 ) ;
 		$addtooltip		= $params->get( $isform ? 'addtooltip_form' : 'addtooltip', 1 ) ;
-		
+
 		// Parse and identify custom fields
 		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $relitem_html, $field_matches);
 		$custom_field_reps    = $result ? $field_matches[0] : array();
 		$custom_field_names   = $result ? $field_matches[1] : array();
 		$custom_field_methods = $result ? $field_matches[3] : array();
-		
-		/*foreach ($custom_field_names as $i => $custom_field_name)
+
+		/*
+		foreach ($custom_field_names as $i => $custom_field_name)
+		{
 			$parsed_fields[] = $custom_field_names[$i] . ($custom_field_methods[$i] ? "->". $custom_field_methods[$i] : "");
-		echo "$relitem_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";*/
-		
-		// Parse and identify language strings and then make language replacements
+		}
+		echo "$relitem_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";
+		*/
+
+		// ***
+		// *** Parse and identify language strings and then make language replacements
+		// ***
+
 		$result = preg_match_all("/\%\%([^%]+)\%\%/", $relitem_html, $translate_matches);
 		$translate_strings = $result ? $translate_matches[1] : array('FLEXI_READ_MORE_ABOUT');
 		foreach ($translate_strings as $translate_string)
 		{
 			$relitem_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $relitem_html);
 		}
-		
+
 		foreach($item_list as $result)
 		{
 			$itemslug = $result->id.":".$result->alias;
 			$catslug = "";
 			
-			// Check if removed from category or inside a noRoute category or inside a non-published category
-			// and use main category slug or other routable & published category slug
-			$catid_arr = explode(",", $result->catidlist);
-			$catalias_arr = explode(",", $result->cataliaslist);
-			for($i=0; $i<count($catid_arr); $i++) {
+			// Check if removed from category or inside a noRoute category or inside a non-published category and use main category slug or other routable & published category slug
+			$catid_arr = explode(',', $result->catidlist);
+			$catalias_arr = explode(',', $result->cataliaslist);
+
+			for($i=0; $i<count($catid_arr); $i++)
+			{
 				$itemcataliases[$catid_arr[$i]] = $catalias_arr[$i];
 			}
+
 			$rel_itemid = $result->id;
 			$rel_catid = !empty($result->rel_catid) ? $result->rel_catid : $result->catid;
-			if ( isset($itemcataliases[$rel_catid]) && !in_array($rel_catid, $globalnoroute) && $globalcats[$rel_catid]->published) {
+
+			if ( isset($itemcataliases[$rel_catid]) && !in_array($rel_catid, $globalnoroute) && $globalcats[$rel_catid]->published)
+			{
 				$catslug = $rel_catid.":".$itemcataliases[$rel_catid];
-			} else if (!in_array($result->catid, $globalnoroute) && $globalcats[$result->catid]->published ) {
+			}
+
+			else if (!in_array($result->catid, $globalnoroute) && $globalcats[$result->catid]->published )
+			{
 				$catslug = $globalcats[$result->catid]->slug;
-			} else {
-				foreach ($catid_arr as $catid) {
-					if ( !in_array($catid, $globalnoroute) && $globalcats[$catid]->published) {
+			}
+
+			else
+			{
+				foreach ($catid_arr as $catid)
+				{
+					if ( !in_array($catid, $globalnoroute) && $globalcats[$catid]->published)
+					{
 						$catslug = $globalcats[$catid]->slug;
 						break;
 					}
 				}
 			}
+
 			$result->slug = $itemslug;
 			$result->categoryslug = $catslug;
 		}
-		
-		// Perform field's display replacements
-		if ( $i_slave = $parentfield ? $parentitem->id."_".$parentfield->id : '' ) {
+
+
+		// ***
+		// *** Perform field's display replacements
+		// ***
+
+		if ( $i_slave = $parentfield ? $parentitem->id."_".$parentfield->id : '' )
+		{
 			$fc_run_times['render_subfields'][$i_slave] = 0;
 		}
+
 		foreach($custom_field_names as $i => $custom_field_name)
 		{
 			if ( isset($disallowed_fieldnames[$custom_field_name]) ) continue;
 			if ( $custom_field_methods[$i] == 'label' ) continue;
-			
+
 			if ($i_slave) $start_microtime = microtime(true);
-			
+
 			$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
 			FlexicontentFields::getFieldDisplay($item_list, $custom_field_name, $custom_field_values=null, $display_var);
-			
+
 			if ($i_slave) $fc_run_times['render_subfields'][$i_slave] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
-		
-		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+
+		$tooltip_class = ' hasTooltip';
 		$display = array();
 		foreach($item_list as $result)
 		{
 			$url_read_more = JText::_( isset($_item_data->url_read_more) ? $_item_data->url_read_more : 'FLEXI_READ_MORE_ABOUT' , 1);
 			$url_class = (isset($_item_data->url_class) ? $_item_data->url_class : 'relateditem');
-			
+
 			// a. Replace some custom made strings
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));
 			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
-			
+
 			$tooltip_title = flexicontent_html::getToolTip($url_read_more, $item_title_escaped, $translate=0, $escape=0);
 			$item_tooltip = ' class="'.$url_class.$tooltip_class.'" title="'.$tooltip_title.'" ';
-						
+
 			$display_text = $displayway ? $result->title : $result->id;
 			$display_text = !$addlink ? $display_text : '<a href="'.$item_url.'"'.($addtooltip ? $item_tooltip : '').' >' .$display_text. '</a>';
-			
+
 			$curr_relitem_html = $relitem_html;
 			$curr_relitem_html = str_replace('__item_url__', $item_url, $curr_relitem_html);
 			$curr_relitem_html = str_replace('__item_title_escaped__', $item_title_escaped, $curr_relitem_html);
 			$curr_relitem_html = str_replace('__item_tooltip__', $item_tooltip, $curr_relitem_html);
 			$curr_relitem_html = str_replace('__display_text__', $display_text, $curr_relitem_html);
-			
+
 			// b. Replace item properties, e.g. {item->id}, (item->title}, etc
 			$null_field = null;
 			FlexicontentFields::doQueryReplacements($curr_relitem_html, $null_field, $result);
-			
+
 			// c. Replace HTML display of various item fields
 			$err_mssg = 'Cannot replace field: "%s" because it is of not allowed field type: "%s", which can cause loop or other problem';
 			foreach($custom_field_names as $i => $custom_field_name)
