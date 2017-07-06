@@ -167,7 +167,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ) .' / '. JText::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -191,7 +191,7 @@ function delAllFilters() {
 			$row = & $this->rows[$i];
 			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;view=type&amp;id='. $row->id;
 			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
-			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
+			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')" class="use_select2_lib fc_skip_highlight"');
 
 			$fields_url = 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
 			$items_url  = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
@@ -249,12 +249,17 @@ function delAllFilters() {
 				?>
 			</td>
 			<td class="col_redirect hidden-tablet hidden-phone">
-				<span style="cursor:pointer;"
-					<?php
-					echo ' class="'.$btn_class.' btn-small" onclick="return listItemTask(\'cb'.$i.'\',\'types.toggle_jview\');">';
-					echo JText::_($row->config->get("allow_jview") ? 'FLEXI_ALLOWED' : 'FLEXI_ROUTE_TO_ITEM_VIEW');
-					?>
-				</span>
+				<?php
+					$jarticle_url_handling_txts = array(0 => 'FLEXI_ROUTE_TO_ITEM_VIEW', 1 => 'FLEXI_ALLOWED', '2' => 'FLEXI_REDIRECT_TO_ITEM_VIEW');
+					$allow_jview = $row->config->get("allow_jview");
+
+					$jview_ops = array();
+					$jview_ops[] = JHTML::_('select.option', '1', 'FLEXI_ALLOWED');
+					$jview_ops[] = JHTML::_('select.option', '0', 'FLEXI_ROUTE_TO_ITEM_VIEW');
+					$jview_ops[] = JHTML::_('select.option', '2', 'FLEXI_REDIRECT_TO_ITEM_VIEW');
+
+					echo JHTML::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="listItemTask(\'cb'.$i.'\',\'types.toggle_jview\'); Joomla.submitform()"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
+				?>
 			</td>
 			
 			<td class="hidden-phone col_edit_layout">
