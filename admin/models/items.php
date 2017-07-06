@@ -151,7 +151,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// view's Filters
 		// **************
 		
-		// Category filtering
+		// Category / featured filtering
 		$filter_cats        = $fcform ? $jinput->get('filter_cats',        '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_cats',        'filter_cats',       '',  'int' );
 		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
 		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
@@ -160,16 +160,19 @@ class FlexicontentModelItems extends JModelLegacy
 			$jinput->set( 'filter_subcats',	0 );
 			$filter_subcats = 0;
 		}
+		$filter_featured    = $fcform ? $jinput->get('filter_featured',    '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_featured',    'filter_featured',   '',  'int' );
 		
 		$this->setState('filter_cats', $filter_cats);
 		$this->setState('filter_subcats', $filter_subcats);
 		$this->setState('filter_catsinstate', $filter_catsinstate);
+		$this->setState('filter_featured', $filter_featured);
 		
 		$app->setUserState($p.'filter_cats', $filter_cats);
 		$app->setUserState($p.'filter_subcats', $filter_subcats);
 		$app->setUserState($p.'filter_catsinstate', $filter_catsinstate);
-		
-		
+		$app->setUserState($p.'filter_featured', $filter_featured);
+
+
 		// Various filters
 		$filter_tag    = $fcform ? $jinput->get('filter_tag',    false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_tag',    'filter_tag',    false, 'array');
 		$filter_lang	 = $fcform ? $jinput->get('filter_lang',   false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_lang',   'filter_lang',   false, 'array');
@@ -1039,7 +1042,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. (in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
-				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
+				.    ($filter_cats && $filter_subcats ? ' AND rel.catid='.$filter_cats : '')
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'   // left join and not inner join, needed to INCLUDE items without type !!
 				. ($use_tmp ? '' : ' LEFT JOIN #__users AS u ON u.id = i.checked_out')  // left join and not inner join, needed to INCLUDE items without an owner (e.g. was deleted) !!
 				. ' LEFT JOIN #__viewlevels AS level ON level.id=i.access'
@@ -1109,45 +1112,48 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere(& $extra_joins = "")
+	function _buildContentWhere(& $extra_joins = '')
 	{
 		$session = JFactory::getSession();
 		$user    = JFactory::getUser();
 		$perms   = FlexicontentHelperPerm::getPerm();
-		
-		
-		// ***********************************
-		// FLAGs to decide which items to list
-		// ***********************************
-		
+
+
+		// ***
+		// *** FLAGs to decide which items to list
+		// ***
+
 		$allitems	= $perms->DisplayAllItems;
 		$viewable_items = $this->cparams->get('iman_viewable_items', 1);
 		$editable_items = $this->cparams->get('iman_editable_items', 0);
-		
-		
-		// ************************************************************************
-		// SPECIAL item listing CASES, item ids are already calculated and provided,
-		// in such a case WHERE clause limits to the given item ids
-		// ************************************************************************
-		
+
+
+		// ***
+		// *** SPECIAL item listing CASES, item ids are already calculated and provided,
+		// *** in such a case WHERE clause limits to the given item ids
+		// ***
+
 		// CASE 1: listing items using a file
 		$filter_fileid = $this->getState( 'filter_fileid' );
 		if ($filter_fileid)
 		{
 			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 			$itemids =  $fileid_to_itemids[$filter_fileid];
-			if ( empty($itemids) ) {
+			if ( empty($itemids) )
+			{
 				return ' WHERE 0 ';
-			} else {
+			}
+			else
+			{
 				return ' WHERE i.id IN ('. implode(',', $itemids) .') ';
 			}
 		}
-		
 
-		// *********************
-		// Get item list filters
-		// *********************
-		
+
+		// ***
+		// *** Get item list filters
+		// ***
+
 		// various filters (mostly multi-value)
 		$filter_tag 		= $this->getState( 'filter_tag' );
 		$filter_lang    = $this->getState( 'filter_lang' );
@@ -1155,46 +1161,48 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_author	= $this->getState( 'filter_author' );
 		$filter_state   = $this->getState( 'filter_state' );
 		$filter_access  = $this->getState( 'filter_access' );
-		
+
 		// category related filters
 		$filter_cats        = $this->getState( 'filter_cats' );
 		$filter_subcats     = $this->getState( 'filter_subcats' );
 		$filter_catsinstate = $this->getState( 'filter_catsinstate' );
-		
+		$filter_featured    = $this->getState( 'filter_featured' );
+
 		// filter id
 		$filter_id = $this->getState( 'filter_id' );
-		
+
 		// text search and search scope
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
 		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
-		
+
 		// date filters
 		$date      = $this->getState( 'date' );
 		$startdate = $this->getState( 'startdate' );
 		$enddate   = $this->getState( 'enddate' );
-		
+
 		$startdate = StringHelper::trim( StringHelper::strtolower( $startdate ) );
 		$enddate   = StringHelper::trim( StringHelper::strtolower( $enddate ) );
-		
-		
-		// ********************************************
-		// Start building the AND parts of where clause
-		// ********************************************
-		
+
+
+		// ***
+		// *** Start building the AND parts of where clause
+		// ***
+
 		$where = array();
-		
+
 		// Limit items to the children of the FLEXI_CATEGORY, currently FLEXI_CATEGORY is root category (id:1) ...
 		//$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
 		//$where[] = ' cat.extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION);
-		
-		
-		// *************************************
-		// IF items viewable: default is enabled
-		// *************************************
-		
-		$joinaccess = "";
-		if (!$allitems && $viewable_items) {
+
+
+		// ***
+		// *** IF items viewable: default is enabled
+		// ***
+
+		$joinaccess = '';
+		if (!$allitems && $viewable_items)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where[] = ' t.access IN (0,'.$aid_list.')';
@@ -1202,12 +1210,12 @@ class FlexicontentModelItems extends JModelLegacy
 			$where[] = ' i.access IN (0,'.$aid_list.')';
 		}
 		$extra_joins .= $joinaccess;
-		
-		
-		// ************************************************************
-		// IF items in an editable (main) category: default is disabled
-		// ************************************************************
-		
+
+
+		// ***
+		// *** IF items in an editable (main) category: default is disabled
+		// ***
+
 		$allowedcats = false;
 		$allowedcats_own = false;
 		if (!$allitems && $editable_items)
@@ -1229,47 +1237,73 @@ class FlexicontentModelItems extends JModelLegacy
 				$where[] = $_edit_where .' )';
 			}
 		}
+
+
+		// ***
+		// *** Limit using the category filter
+		// ***
 		
-		
-		// *******************************
-		// Limit using the category filter
-		// *******************************
-		
-		if ( $filter_cats ) {
+		if ( $filter_cats )
+		{
 			// CURRENTLY in main or secondary category.  -TODO-  maybe add limiting by main category, if ... needed
 			$cat_type = 'rel.catid';  // $filter_maincat ? 'i.catid' : 'rel.catid';
 			
-			if ( $filter_subcats ) {
+			if ( $filter_subcats )
+			{
 				global $globalcats;
 				
 				$_sub_cids = array();
-				if ($filter_catsinstate == 99) {
+				if ($filter_catsinstate == 99)
+				{
 					$_sub_cids = $globalcats[$filter_cats]->descendantsarray;
-				} else {
-					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid) {
+				}
+				else
+				{
+					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid)
+					{
 						if ($globalcats[$_dcatid]->published==$filter_catsinstate) $_sub_cids[] = $_dcatid;
 					}
 				}
 				if ( empty ($_sub_cids) ) $where[] = ' FALSE  ';
 				else $where[] = '('.$cat_type.' IN (' . implode( ', ', $_sub_cids ) . ')' .' OR '. 'c.id IN (' . implode( ', ', $_sub_cids ) . '))';
 				
-			} else {
+			}
+			else
+			{
 				$where[] = $cat_type.' = ' . $filter_cats;
 			}
-		} else {
-			if ($filter_catsinstate != 99) { // if not showing items in any category state
+
+		}
+
+		else
+		{
+			if ($filter_catsinstate != 99)  // if not showing items in any category state
+			{
 				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published='.$filter_catsinstate.' )' .' OR '. 'c.published = '.$filter_catsinstate.')';
 			}
 		}
-		
-		
-		// ************************************************************
-		// Limit using state or group of states (e.g. published states)
-		// ************************************************************
-		if ( empty($filter_state) ) {
+
+
+		// ***
+		// *** Limit using the featured filter
+		// ***
+		if (strlen($filter_featured))
+		{
+			$where[] = 'i.featured = ' . $filter_featured;
+		}
+
+
+		// ***
+		// *** Limit using state or group of states (e.g. published states)
+		// ***
+
+		if ( empty($filter_state) )
+		{
 			$where[] = 'i.state <> -2';
 			$where[] = 'i.state <> 2';
-		} else
+		}
+
+		else
 		{
 			$filter_state = empty($filter_state)
 				? array()
@@ -1303,36 +1337,40 @@ class FlexicontentModelItems extends JModelLegacy
 				if ( isset($FS['T']) )      array_push($states, -2);
 				$states = array_unique($states, SORT_REGULAR);
 				if (!empty($states))
+				{
 					$where[] = 'i.state IN ('.implode(',', $states).')';
+				}
 			}
 		}
-		
-		
-		// *******************************************************************************
-		// Limit using simpler filtering, (item) type, author, (item) id, language, access
-		// *******************************************************************************
-		
+
+
+		// ***
+		// *** Limit using simpler filtering, (item) type, author, (item) id, language, access
+		// ***
+
 		if ( !empty($filter_tag) )
 		{
 			JArrayHelper::toInteger($filter_tag, null);
 			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
 		}
-		
+
 		if ( !empty($filter_type) )
 		{
 			JArrayHelper::toInteger($filter_type, null);
 			$where[] = 'i.type_id IN (' . implode( ',', $filter_type) .')';
 		}
-		
+
 		if ( !empty($filter_author) )
 		{
 			JArrayHelper::toInteger($filter_author, null);
 			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
 		}
-		
+
 		if ( $filter_id )
+		{
 			$where[] = 'i.id = ' . $filter_id;
-		
+		}
+
 		if ( !empty($filter_lang) )
 		{
 			if ( !is_array($filter_lang) )
@@ -1342,18 +1380,18 @@ class FlexicontentModelItems extends JModelLegacy
 			
 			$where[] = 'i.language IN (' . implode( ',', $filter_langs) .')';
 		}
-		
+
 		if ( !empty($filter_access) )
 		{
 			JArrayHelper::toInteger($filter_access, null);
 			$where[] = 'i.access IN (' . implode( ',', $filter_access) .')';
 		}
-		
-		
-		// **************
-		// CUSTON filters
-		// **************
-		
+
+
+		// ***
+		// *** CUSTON filters
+		// ***
+
 		$customFilts = $this->getCustomFilts();
 		$_filts_vals_clause =  array();
 		foreach($customFilts as $filter)
@@ -1365,11 +1403,12 @@ class FlexicontentModelItems extends JModelLegacy
 		{
 			$where[] = ' (' . implode(' OR ', $_filts_vals_clause).' )';
 		}
-		
-		
-		// *********************
-		// TEXT search filtering	
-		// *********************
+
+
+		// ***
+		// *** TEXT search filtering	
+		// ***
+
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		
 		if ($search)
@@ -1390,10 +1429,10 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 
-		// ***************************************************
-		// Date range filtering (creation and/or modification)
-		// ***************************************************
-		
+		// ***
+		// *** Date range filtering (creation and/or modification)
+		// ***
+
 		$nullDate = $this->_db->getNullDate();
 		
 		if ($startdate || $enddate)
@@ -1427,10 +1466,10 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 
-		// *************************************************
-		// Finally create the AND clause of the WHERE clause
-		// *************************************************
-		
+		// ***
+		// *** Finally create the AND clause of the WHERE clause
+		// ***
+
 		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		return $where;
 	}
