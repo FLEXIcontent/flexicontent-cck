@@ -177,7 +177,7 @@ fc_plupload = function(options)
 					if (up.getOption('refresh_on_complete'))
 					{
 						window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
-						window.location.reload(true);  //window.location.replace(window.location.href);
+						window.location.reload(false);  //window.location.replace(window.location.href);
 					}
 					var _this = $(up).data('fc_plupload_instance');
 					$.each(files, function(i, file) {

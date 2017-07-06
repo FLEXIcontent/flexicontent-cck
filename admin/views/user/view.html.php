@@ -96,14 +96,16 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		JText::script("FLEXI_UPDATING_CONTENTS", true);
 		$document->addScriptDeclaration('
-			function fc_edit_juser_modal_load( container ) {
+			function fc_edit_juser_modal_load( container )
+			{
 				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
 				{
 					container.dialog("close");
 				}
 			}
-			function fc_edit_juser_modal_close() {
-				window.location.reload();
+			function fc_edit_juser_modal_close()
+			{
+				window.location.reload(false);
 				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
 			}
 		');

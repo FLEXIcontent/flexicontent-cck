@@ -375,45 +375,52 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		if (count( $cid ))
+		if (!count($cid))
 		{
-			$user = JFactory::getUser();
-			
-			// Add all children to the list
-			if ($publish!=1)  foreach ($cid as $id)  $this->_addCategories($id, $cid);
-			// Add all parents to the list
-			if ($publish==1)  foreach ($cid as $id)  $this->_addCategories($id, $cid, 'parents');
-			
-			// Get the owner of all categories
-			$query = 'SELECT id, created_user_id'
-					. ' FROM #__categories as c'
-					. ' WHERE'.(!FLEXI_J16GE ? ' c.section = '.FLEXI_SECTION : ' c.extension="'.FLEXI_CAT_EXTENSION.'" ');
-			$this->_db->setQuery( $query );
-			$cats = $this->_db->loadObjectList('id');
-
-			// Check access to change state of categories
-			foreach ($cid as $catid) {
-				$hasEditState			= $user->authorise('core.edit.state', 'com_content.category.'.$catid);
-				$hasEditStateOwn	= $user->authorise('core.edit.state.own', 'com_content.category.'.$catid) && $cats[$catid]->created_user_id==$user->get('id');
-				if (!$hasEditState && !$hasEditStateOwn) {
-					$this->setError(
-						'You are not authorised to change state of category with id: '. $catid
-						.'<br />NOTE: when publishing a category the parent categories will get published'
-						.'<br />NOTE: when unpublishing a category the children categories will get unpublished'
-					);
-					return false;
-				}
-			}
-			$cids = implode( ',', $cid );
-
-			$query = 'UPDATE #__categories'
-				. ' SET published = ' . (int) $publish
-				. ' WHERE id IN ('. $cids .')'
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-			;
-			$this->_db->setQuery( $query );
-			$this->_db->execute();
+			return array();
 		}
+
+		$user = JFactory::getUser();
+
+		// Add all children to the list
+		if ($publish!=1)  foreach ($cid as $id)  $this->_addCategories($id, $cid);
+
+		// Add all parents to the list
+		if ($publish==1)  foreach ($cid as $id)  $this->_addCategories($id, $cid, 'parents');
+
+		// Get the owner of all categories
+		$query = 'SELECT id, created_user_id'
+			. ' FROM #__categories as c'
+			. ' WHERE c.extension=\'com_content\' '
+			;
+		$this->_db->setQuery( $query );
+		$cats = $this->_db->loadObjectList('id');
+
+		// Check access to change state of categories
+		foreach ($cid as $catid)
+		{
+			$hasEditState			= $user->authorise('core.edit.state', 'com_content.category.'.$catid);
+			$hasEditStateOwn	= $user->authorise('core.edit.state.own', 'com_content.category.'.$catid) && $cats[$catid]->created_user_id==$user->get('id');
+			if (!$hasEditState && !$hasEditStateOwn)
+			{
+				$this->setError(
+					'You are not authorised to change state of category with id: '. $catid
+					.'<br />NOTE: when publishing a category the parent categories will get published'
+					.'<br />NOTE: when unpublishing a category the children categories will get unpublished'
+				);
+				return false;
+			}
+		}
+		$cids = implode( ',', $cid );
+
+		$query = 'UPDATE #__categories'
+			. ' SET published = ' . (int) $publish
+			. ' WHERE id IN ('. $cids .')'
+			. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+		;
+		$this->_db->setQuery( $query );
+		$this->_db->execute();
+
 		return $cid;
 	}
 
@@ -673,7 +680,8 @@ class FlexicontentModelCategories extends JModelList
 		}
 		return true;
 	}
-	
+
+
 	/**
 	 * Method to add children/parents to a specific category
 	 *
@@ -688,47 +696,38 @@ class FlexicontentModelCategories extends JModelList
 	{
 		// Initialize variables
 		$return = true;
-		
-		if ($type == 'children') {
-			$get = 'id';
-			$source = 'parent_id';
-		} else {
-			$get = 'parent_id';
-			$source = 'id';
-		}
+
+		$get = $type == 'children' ? 'id' : 'parent_id';
+		$source = $type == 'children' ? 'parent_id' : 'id';
 
 		// Get all rows with parent of $id
-		$query = 'SELECT '.$get
-				. ' FROM #__categories as c'
-				. ' WHERE'.(!FLEXI_J16GE ? ' c.section = '.FLEXI_SECTION : ' c.extension="'.FLEXI_CAT_EXTENSION.'" ')
-				. ' AND '.$source.' = '.(int) $id;
+		$query = 'SELECT ' . $get
+			. ' FROM #__categories as c'
+			. ' WHERE c.extension=\'com_content\' '
+			. ' AND ' . $source . ' = ' . (int) $id . ' AND ' . $get . ' <> 1';
 		$this->_db->setQuery( $query );
 		$rows = $this->_db->loadObjectList();
 
-		// Make sure there aren't any errors
-		if ($this->_db->getErrorNum()) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		
 		// Recursively iterate through all children
 		foreach ($rows as $row)
 		{
 			$found = false;
 			foreach ($list as $idx)
 			{
-				if ($idx == $row->$get) {
+				if ($idx == $row->$get)
+				{
 					$found = true;
 					break;
 				}
 			}
-			if (!$found) {
+			if (!$found)
+			{
 				$list[] = $row->$get;
 			}
 			$return = $this->_addCategories($row->$get, $list, $type);
 		}
+
 		return $return;
 	}
 
 }
-?>

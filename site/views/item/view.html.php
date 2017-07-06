@@ -545,6 +545,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Most core field are created via calling methods of the form (J2.5)
 		$form = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base();
+			$app->redirect( $returnURL );
+		}
 		
 		// is new item and ownership Flags
 		$isnew = !$item->id;

@@ -186,7 +186,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				$js .= "
 					jQuery('#toolbar-download a.toolbar, #toolbar-download button').attr('href', '".$popup_load_url."')
 						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 500, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
+							.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
 				";
 				JToolBarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
 			}

@@ -1896,7 +1896,7 @@ class flexicontent_html
 	 * @return void
 	 * @since 1.0
 	 */
-	static function setitemstate($controller_obj, $type = 'html')
+	static function setitemstate($controller_obj, $type = 'html', $record_type = 'item')
 	{
 		$app = JFactory::getApplication();
 		$jinput = $app->input;
@@ -1904,20 +1904,34 @@ class flexicontent_html
 		$id = $jinput->get('id', 0, 'int');
 		$jinput->set('cid', $id);
 
-		$model = $controller_obj->getModel('item');
+		$model = $controller_obj->getModel($record_type);
 		$user = JFactory::getUser();
 		$state = $jinput->get('state', 0, 'int');
 
-		// Get owner and other item data
-		$db = JFactory::getDBO();
-		$q = "SELECT id, created_by, catid FROM #__content WHERE id =".$id;
-		$db->setQuery($q);
-		$item = $db->loadObject();
-
 		// Determine priveleges of the current user on the given item
-		$asset = 'com_content.article.' . $item->id;
-		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-		$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+		switch ($record_type)
+		{
+			case 'item':
+				$q = 'SELECT id, created_by, catid FROM #__content WHERE id =' . $id;
+				$asset = 'com_content.article.' . $id;
+				break;
+			case 'category':
+				$q = 'SELECT id, created_user_id as created_by, parent_id as catid FROM #__categories WHERE id =' . $id;
+				$asset = 'com_content.category.' . $id;
+				break;
+			default:
+				die('flexicontent_html::statebutton() , unknown type: ' . $record_type);
+				break;
+		}
+
+		// Get owner and other record data
+		$db = JFactory::getDBO();
+		$db->setQuery($q);
+		$record = $db->loadObject();
+
+		// Determine privileges of the current user on the given item
+		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $record->created_by == $user->get('id'));
+		$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $record->created_by == $user->get('id'));
 		// ...
 		$permission = FlexicontentHelperPerm::getPerm();
 		$has_archive    = $permission->CanArchives;
@@ -1938,8 +1952,14 @@ class flexicontent_html
 		// Set new item state (model will also handle cache cleaning)
 		if (!$model->setitemstate($id, $state))
 		{
-			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE');
-			echo $msg . ": " .$model->getError();
+			$msg = JText::_('FLEXI_ERROR_SETTING_THE_ITEM_STATE') . ' : ' . $model->getError();
+			if ($type == 'json')
+			{
+				$app->enqueueMessage($msg, 'warning');
+				$data = array('error'=>flexicontent_html::get_system_messages_html(), 'html'=>'---', 'title'=>JText::_('Aborted'));
+				echo json_encode($data);
+			}
+			else	echo $msg;
 			return;
 		}
 
@@ -2379,7 +2399,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, $params=null, $addToggler=true, $tooltip_place = null, $class=null )
+	static function statebutton( $item, $params=null, $addToggler=true, $tooltip_place = null, $class=null, $ops = array('controller'=>'items', 'state_propname'=>'state') )
 	{
 		// Some static variables
 		static $user;
@@ -2409,10 +2429,25 @@ class flexicontent_html
 		if ( !$isAdmin && ($params && !$params->get('show_state_icon', 1) || $isPrint) ) return;
 
 		// Determine edit state, delete privileges of the current user on the given item, NOTE: currently we ignore canCheckin in frontend
-		$asset = 'com_content.article.' . $item->id;
+		switch ($ops['controller'])
+		{
+			case 'items':
+				$asset = 'com_content.article.' . $item->id;
+				$created_by = $item->created_by;
+				$refresh_on_success = 'false';
+				break;
+			case 'categories':
+				$asset = 'com_content.category.' . $item->id;
+				$created_by = $item->created_user_id;
+				$refresh_on_success = 'true';
+				break;
+			default:
+				die('flexicontent_html::statebutton() , unknown type: ' . $ops['controller']);
+				break;
+		}
 		$item->canCheckin   = isset($item->canCheckin)   ? $item->canCheckin   : $has_checkin || $item->checked_out == 0 || $item->checked_out == $user->id;
-		$item->canEditState = isset($item->canEditState) ? $item->canEditState : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.edit.state', $asset) || ($item->created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset)));
-		$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.delete', $asset)     || ($item->created_by == $user->get('id') && $user->authorise('core.delete.own', $asset)));
+		$item->canEditState = isset($item->canEditState) ? $item->canEditState : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.edit.state', $asset) || ($created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset)));
+		$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.delete', $asset)     || ($created_by == $user->get('id') && $user->authorise('core.delete.own', $asset)));
 
 		// Display state toggler if it can do any of state change
 		$canChangeState = $item->canEditState || $item->canDelete || $has_archive;
@@ -2423,20 +2458,24 @@ class flexicontent_html
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
 			JText::script('FLEXI_ACTION', true);
+			if ($ops['controller'] === 'items')
+			{
+				JText::script('FLEXI_SET_STATE_AS_IN_PROGRESS', true);
+				JText::script('FLEXI_SET_STATE_AS_PENDING', true);
+				JText::script('FLEXI_SET_STATE_AS_TO_WRITE', true);
+			}
 			JText::script('FLEXI_PUBLISH_THIS_ITEM', true);
-			JText::script('FLEXI_SET_STATE_AS_IN_PROGRESS', true);
 			JText::script('FLEXI_UNPUBLISH_THIS_ITEM', true);
-			JText::script('FLEXI_SET_STATE_AS_PENDING', true);
-			JText::script('FLEXI_SET_STATE_AS_TO_WRITE', true);
 			JText::script('FLEXI_ARCHIVE_THIS_ITEM', true);
 			JText::script('FLEXI_TRASH_THIS_ITEM', true);
 			$doc = JFactory::getDocument();
 			$doc->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
-					task: '. json_encode($isAdmin ? 'items.setitemstate' : 'setitemstate') .',
-					img_path: '.json_encode($img_path).',
-					font_icons: '.($use_font_icons ? 'true' : 'false').'
+					task: ' . json_encode($isAdmin ? $ops['controller'] . '.setitemstate' : 'setitemstate') . ',
+					img_path: ' . json_encode($img_path) . ',
+					font_icons: ' . ($use_font_icons ? 'true' : 'false') . ',
+					refresh_on_success: ' . $refresh_on_success . '
 				});
 			';
 			$doc->addScriptDeclaration($js);
@@ -2463,7 +2502,8 @@ class flexicontent_html
 			$tooltip_class = ' hasTooltip';
 			$state_tips = array();
 			$title_header = '';//JText::_( 'FLEXI_ACTION' );
-			foreach ($state_names as $state_id => $i) {
+			foreach ($state_names as $state_id => $i)
+			{
 				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0, 1);
 			}
 
@@ -2489,32 +2529,29 @@ class flexicontent_html
 		}
 
 		// Create state icon
-		$state = $item->state;
+		$state = $item->{$ops['state_propname']};
 		if ( !isset($state_names[$state]) ) $state = 'u';
 		$state_text ='';
 		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text);
-
 
 		$tz_string = JFactory::getApplication()->getCfg('offset');
 		$tz = new DateTimeZone( $tz_string );
 		$tz_offset = $tz->getOffset(new JDate()) / 3600;
 
-		// Calculate common variables used to produce output
-		$publish_up = JFactory::getDate($item->publish_up);
-		$publish_down = JFactory::getDate($item->publish_down);
-		$publish_up->setTimezone($tz);
-		$publish_down->setTimezone($tz);
-
 		// Create publish information
 		$publish_info = array();
 		if (isset($item->publish_up))
 		{
+			$publish_up = JFactory::getDate($item->publish_up);
+			$publish_up->setTimezone($tz);
 			$publish_info[] = $item->publish_up == $nullDate
 				? $jtext['start_always']
 				: $jtext['start'] .": ". JHTML::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 		}
 		if (isset($item->publish_down))
 		{
+			$publish_down = JFactory::getDate($item->publish_down);
+			$publish_down->setTimezone($tz);
 			$publish_info[] = $item->publish_down == $nullDate
 				? $jtext['finish_no_expiry']
 				: $jtext['finish'] .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
@@ -2525,9 +2562,14 @@ class flexicontent_html
 		if ( $canChangeState && $addToggler )
 		{
 			// Only add user's permitted states on the current item
-			if ($item->canEditState) $state_ids   = array(1, -5, 0, -3, -4);
-			if ($has_archive)    $state_ids[] = 2;
-			if ($item->canDelete)     $state_ids[] = -2;
+			if ($item->canEditState)
+			{
+				$state_ids = $ops['controller'] === 'items'
+					? array(1, -5, 0, -3, -4)
+					: array(1, 0);
+			}
+			if ($has_archive)      $state_ids[] = 2;
+			if ($item->canDelete)  $state_ids[] = -2;
 
 			if ($tooltip_place === 'top') $tooltip_place = '';
 			else if ( $tooltip_place ) ;

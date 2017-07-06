@@ -403,10 +403,9 @@ class FlexicontentViewItems extends JViewLegacy
 		$categories = $globalcats ? $globalcats : array();
 		
 		
-		$limit = $pagination->limit;
 		$inline_ss_max = 50000;
 		$drag_reorder_max = 150;
-		if ( $limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
+		if ( $pagination->limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
 		
 		
 		// ******************************************
@@ -418,14 +417,14 @@ class FlexicontentViewItems extends JViewLegacy
 		if ( $cparams->get('show_usability_messages', 1)  && !$unassociated && !$badcatitems)     // Important usability messages
 		{
 			$notice_iss_disabled = $app->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
-			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
+			if (!$notice_iss_disabled && $pagination->limit > $inline_ss_max) {
 				$app->setUserState( $option.'.items.notice_iss_disabled', 1 );
 				$app->enqueueMessage(JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max), 'notice');
 				$show_turn_off_notice = 1;
 			}
 			
 			$notice_drag_reorder_disabled = $app->getUserStateFromRequest( $option.'.items.notice_drag_reorder_disabled',	'notice_drag_reorder_disabled',	0, 'int' );
-			if (!$notice_drag_reorder_disabled && $limit > $drag_reorder_max) {
+			if (!$notice_drag_reorder_disabled && $pagination->limit > $drag_reorder_max) {
 				$app->setUserState( $option.'.items.notice_drag_reorder_disabled', 1 );
 				$app->enqueueMessage(JText::sprintf('FLEXI_DRAG_REORDER_DISABLED', $drag_reorder_max), 'notice');
 				$show_turn_off_notice = 1;
