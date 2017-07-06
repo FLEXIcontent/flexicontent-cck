@@ -19,7 +19,7 @@ JHtml::_('bootstrap.tooltip');
 abstract class JHtmlFcitems
 {
 	/**
-	 * Show the feature/unfeature links
+	 * Create the feature/unfeature links
 	 *
 	 * @param   int      $value      The state value
 	 * @param   int      $i          Row number
@@ -57,7 +57,7 @@ abstract class JHtmlFcitems
 
 
 	/**
-	 * Create the feature/unfeature links
+	 * Create the checkin link, also showing if a record is checkedout
 	 *
 	 * @param   int      $row        The row
 	 * @param   int      $user       The user

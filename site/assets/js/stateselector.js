@@ -42,7 +42,8 @@ var fc_statehandler = function(options)
 		script_url: 'index.php?option=com_flexicontent&format=raw',
 		task: '',
 		state: '',
-		font_icons: true
+		font_icons: true,
+		refresh_on_success: false
 	};
 	
 	if( typeof options !== 'undefined') for (var key in options)
@@ -56,6 +57,7 @@ var fc_statehandler = function(options)
 	{
 		var row = jQuery('#row' + id);
 		var toggler = row.closest('.statetoggler');
+		var options = this.options;
 
 		row.empty().addClass('ajax-loader');
 
@@ -69,6 +71,19 @@ var fc_statehandler = function(options)
 			{
 				row.removeClass('ajax-loader').html(data.html);
 				toggler.attr('data-original-title', data.title);
+
+				if (typeof data.error !== 'undefined')
+				{
+					jQuery('#system-message-container').html(data.error);
+				}
+				else
+				{
+					if (options.refresh_on_success)
+					{
+						window.document.body.innerHTML = '<span class="fc_loading_msg">Reloading ... please wait</span>';
+						window.location.reload(false);  //window.location.replace(window.location.href);
+					}
+				}
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);

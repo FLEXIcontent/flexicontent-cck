@@ -146,7 +146,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$js .= "
 			jQuery('#toolbar-params a.toolbar, #toolbar-params button').attr('href', '".$popup_load_url."')
 				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 600, 440, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-					.$loading_msg."</span>\'; window.location.reload(true)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_COPY_PARAMS'), 2)."\'}); return false;');
+					.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_COPY_PARAMS'), 2)."\'}); return false;');
 		";
 		JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 
@@ -268,7 +268,9 @@ class FlexicontentViewCategories extends JViewLegacy
 		unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
 		
 		$pagination 	= $this->get( 'Pagination' );
-		
+		$inline_ss_max = 50000;
+		$drag_reorder_max = 150;
+
 		$categories = & $globalcats;
 		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="use_select2_lib"', false, true, $actions_allowed=array('core.edit'));
 		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="use_select2_lib" size="10" multiple="true"', false, true, $actions_allowed=array('core.edit'));
@@ -333,6 +335,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$this->assignRef('pagination'	, $pagination);
 		$this->assignRef('user'				, $user);
 		
+		$this->assignRef('inline_ss_max'	, $inline_ss_max);
 		$this->assignRef('option', $option);
 		$this->assignRef('view', $view);
 		

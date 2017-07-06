@@ -1237,12 +1237,16 @@ body .btn-group.fc-group > .btn.btn-small [class^="icon-"],
 body .btn-group.fc-group > .btn.btn-small [class*=" icon-"] {
 	font-size: 14px;
 }
+body .btn-group.fc-group > .fc-rss-list-btn.btn.btn-small,
 body .btn-group.fc-group > .fc-preview-btn.btn.btn-small,
-body .btn-group.fc-group > div.statetoggler_disabled.btn.btn-small,
-body .btn-group.fc-group > div.statetoggler.btn.btn-small {
+body .btn-group.fc-group > .statetoggler_disabled.btn.btn-small,
+body .btn-group.fc-group > .statetoggler.btn.btn-small {
 	padding: 4px 8px;
 }
-.fc-items .icon-screen:before {
+.fc-preview-btn .icon-screen:before {
+	color: darkorange;
+}
+.fc-preview-btn .icon-screen:before {
 	color: darkcyan;
 }
 #flexicontent .fc-box,

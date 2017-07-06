@@ -45,7 +45,6 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
-$limit = $this->pagination->limit;
 $ctrl  = 'items.';
 $items_task = 'task=items.';
 $cats_task  = 'task=category.';
@@ -858,7 +857,7 @@ jQuery(document).ready(function(){
 					$item_url = JRoute::_(JURI::root().$item_url, $xhtml=false); // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 					$previewlink = $item_url .'&amp;preview=1' .$autologin;
 
-					echo flexicontent_html::statebutton( $row, null, $addToggler = ($limit <= $this->inline_ss_max), 'top', 'btn btn-small' );
+					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small' );
 					echo JHtml::_('fcitems.featured', $row->featured, $i, $row->canEditState);
 					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 					?>

@@ -98,4 +98,17 @@ class FlexicontentControllerCategories extends FlexicontentController
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_SOURCE' ).'</div>';
 		}
 	}
+
+	/**
+	 * Logic to change the state of a category
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function setitemstate()
+	{
+		flexicontent_html::setitemstate($this, 'json', $_record_type = 'category');
+	}
+
 }

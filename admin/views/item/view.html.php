@@ -77,7 +77,15 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		$model = $this->getModel();
 		$item = $model->getItem();
+
 		$form = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base();
+			$app->redirect( $returnURL );
+		}
+
 		$cid = $model->getId();
 		$isnew = ! $cid;
 		$manager_view = $ctrl = 'items';

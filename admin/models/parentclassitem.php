@@ -3728,7 +3728,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Method to change the state of an item
+	 * Method to change the state of a record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -3753,33 +3753,28 @@ class ParentClassItem extends FCModelAdmin
 			$v = FLEXIUtilities::getCurrentVersions((int)$id);
 			
 			$query = 'UPDATE #__content'
-				. ' SET state = ' . (int)$state
-				. ' WHERE id = '.(int)$id
-				//. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+				. ' SET state = ' . (int) $state
+				. ' WHERE id = ' . (int) $id
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->execute();
-			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 			
 			$query = 'UPDATE #__flexicontent_items_tmp'
-				. ' SET state = ' . (int)$state
-				. ' WHERE id = '.(int)$id
-				//. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+				. ' SET state = ' . (int) $state
+				. ' WHERE id = ' . (int) $id
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->execute();
-			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 			
 			$query = 'UPDATE #__flexicontent_items_versions'
-				. ' SET value = ' . (int)$state
-				. ' WHERE item_id = '.(int)$id
+				. ' SET value = ' . (int) $state
+				. ' WHERE item_id = ' . (int) $id
 				. ' AND valueorder = 1'
 				. ' AND field_id = 10'
-				. ' AND version = ' .(int)$v['version']
+				. ' AND version = ' . (int) $v['version']
 				;
 			$this->_db->setQuery( $query );
 			$this->_db->execute();
-			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 		}
 		
 		
@@ -3807,14 +3802,14 @@ class ParentClassItem extends FCModelAdmin
 		$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
 		
 		// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
-		// besides the event_change_state using plugin should have updated DB state value anyway
+		// besides the plugins using the change state event, should have updated DB state value anyway
 		$jinput->set('view', $view);
 		$jinput->set('option', $option);
 		if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
 		
 		if (in_array(false, $result, true) && !$event_failed_notice_added)
 		{
-			JError::raiseNotice(10, JText::_('One of plugin event handler for onContentChangeState failed') );
+			$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
 			$event_failed_notice_added = true;
 			return false;
 		}

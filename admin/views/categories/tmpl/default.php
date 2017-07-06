@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 $tip_class = ' hasTooltip';
 $btn_class = 'btn';  //'fc_button fcsimple';
@@ -38,7 +39,7 @@ $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$list_total_cols = 17;
+$list_total_cols = 15;
 
 
 // *********************
@@ -55,11 +56,16 @@ $edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'
 
 $fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
 $attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-$attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED_RSS', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
-$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
-$image_rsslist = JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
+$image_preview = 0
+	? JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
+	: '<span class="icon-screen"></span>';
+$image_rsslist = 0
+	? JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"')
+	: '<span class="icon-feed"></span>';
+
 $image_editlayout = 0 ?
 	JHTML::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
@@ -200,30 +206,27 @@ function delAllFilters() {
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
-
-			<th>&nbsp;</th>
-			<th>&nbsp;</th>
+			<th class="left hideOnDemandClass"><?php echo JText::_('FLEXI_STATUS'); ?></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" width="1%">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" width="1%">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" width="1%">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" width="1%">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -254,14 +257,12 @@ function delAllFilters() {
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		foreach ($this->rows as $row)
 		{
-			$canEdit		= $user->authorise('core.edit', $extension.'.category.'.$row->id);
-			$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
-			$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
-			$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
+			$row->canEdit    = $user->authorise('core.edit', $extension.'.category.'.$row->id);
+			$row->canEditOwn = $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
+			$row->canEditState    = $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
+			$row->canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
 			$recordAvailable	= ($canCheckinRecords && $row->checked_out == $user->id) || !$row->checked_out;
-			$canChange  = ($canEditState || $canEditStateOwn ) && $recordAvailable;
-			
-			$published = JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
+			$canChange  = ($row->canEditState || $row->canEditStateOwn ) && $recordAvailable;
 			
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid='. $row->id;
@@ -299,7 +300,7 @@ function delAllFilters() {
 			
 			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_clayout;
 			
-			if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
+			if (($row->canEdit || $row->canEditOwn) && $this->perms->CanAccLvl) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
 			} else {
 				$access = $this->escape($row->access_level);
@@ -316,20 +317,26 @@ function delAllFilters() {
 				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
-			<td>
-				<?php
-				$cat_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getCategoryRoute($row->id));
-				$cat_link    = JRoute::_(JURI::root().$cat_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
-				$previewlink = $cat_link . $autologin;
-				echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
-				?>
+
+			<td class="col_state" style="padding-right: 8px;">
+				<div class="btn-group fc-group fc-cats">
+					<?php
+					$cat_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getCategoryRoute($row->id));
+					$cat_link    = JRoute::_(JURI::root().$cat_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+
+					//echo JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange);
+					//echo JHtml::_('fccats.published', $row->published, $i, $canChange);
+					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small', array('controller'=>'categories', 'state_propname'=>'published') );
+
+					$rsslink     = $cat_link . '&amp;format=feed&amp;type=rss';
+					echo '<a '.$attribs_rsslist.' href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
+
+					$previewlink = $cat_link . $autologin;
+					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+					?>
+				</div>
 			</td>
-			<td>
-				<?php
-				$rsslink     = $cat_link . '&amp;format=feed&amp;type=rss';
-				echo '<a '.$attribs_rsslist.' href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
-				?>
-			</td>
+
 			<td style="text-align:left;" class="col_title">
 				<?php
 				if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
@@ -358,7 +365,7 @@ function delAllFilters() {
 				}
 				
 				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
-				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
+				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$row->canEdit && !$row->canEditOwn ) ) {
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 				
 				// Display title with edit link ... (row editable and not checked out)
@@ -424,10 +431,6 @@ function delAllFilters() {
 				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
 					<span class="badge"><?php $c = (int)@$row->byStateTotals[-2]; echo $c ? $c : '.'; ?></span>
 				</a>
-			</td>
-			
-			<td class="center">
-				<?php echo $published; ?>
 			</td>
 			<td>
 				<?php echo $access; ?>
