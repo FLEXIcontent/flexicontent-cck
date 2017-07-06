@@ -96,9 +96,13 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_cats        = $model->getState('filter_cats');
 		$filter_subcats     = $model->getState('filter_subcats');
 		$filter_catsinstate = $model->getState('filter_catsinstate');
+		$filter_featured    = $model->getState('filter_featured');
+
 		if ($filter_cats) $count_filters++;
 		if ($filter_subcats!=1) $count_filters++;
 		if ($filter_catsinstate!=1) $count_filters++;
+		if (strlen($filter_featured)) $count_filters++;
+		
 		
 		// Other filters
 		$filter_tag    = $model->getState('filter_tag');
@@ -508,10 +512,14 @@ class FlexicontentViewItems extends JViewLegacy
 		// build the include subcats boolean list
 		
 		// build the include non-published cats boolean list
-		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) ) {
+		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) )
+		{
 			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />';
 			$lists['filter_subcats'] = $ordering_tip;
-		} else {
+		}
+
+		else
+		{
 			//$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_subcats );
 			$subcats = array();
 			//$subcats[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_NO' ) );
@@ -522,8 +530,18 @@ class FlexicontentViewItems extends JViewLegacy
 				<label id="filter_subcats-lbl" for="filter_subcats" style="margin-left: 12px!important;"></label>
 			';
 		}
+
 		$lists['filter_subcats'] = ($filter_subcats || 1 ? '<div class="add-on">'.JText::_('FLEXI_SUBCATEGORIES').'</div>' : '').$lists['filter_subcats'];
-		
+
+		// build the order type boolean list
+		$featured_ops = array();
+		$featured_ops[] = JHTML::_('select.option', '', '-');
+		$featured_ops[] = JHTML::_('select.option', '1', JText::_('FLEXI_NO'));
+		$featured_ops[] = JHTML::_('select.option', '1', JText::_('FLEXI_YES'));
+
+		$lists['filter_featured'] = JHTML::_('select.genericlist', $featured_ops, 'filter_featured', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_featured, 'filter_featured', $translate=true );
+		$lists['filter_featured'] = ($filter_featured || 1 ? '<div class="add-on">'.JText::_('FLEXI_FEATURED').'</div>' : '').$lists['filter_featured'];
+
 		// build the include non-published cats boolean list
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
 		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
@@ -531,7 +549,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED' );
 		$catsinstate[-2] = JText::_( 'FLEXI_TRASHED' );
 		$_catsinstate = array();
-		foreach ($catsinstate as $i => $v) {
+		foreach ($catsinstate as $i => $v)
+		{
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
 		}
 

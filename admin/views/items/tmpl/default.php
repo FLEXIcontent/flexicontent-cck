@@ -251,7 +251,8 @@ function delFilter(name)
 function delAllFilters() {
 	jQuery('.fc_field_filter').val('');
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
-	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
+	delFilter('filter_cats'); delFilter('filter_featured');
+	delFilter('filter_author'); delFilter('filter_id');
 	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
 	delFilter('filter_tag'); delFilter('filter_access');
 	delFilter('filter_fileid');
@@ -519,7 +520,13 @@ jQuery(document).ready(function(){
 				<?php echo $this->lists['filter_subcats']; ?>
 			</div>
 		</div>
-
+		
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_featured']; ?>
+			</div>
+		</div>
+		
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_catsinstate']; ?>
