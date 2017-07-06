@@ -357,9 +357,12 @@ class plgSearchFlexisearch extends JPlugin
 					$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
 					
 					// If joomla article view is allowed allowed and then search view may optional create Joomla article links
-					if( $typeData[$item->type_id]->params->get('allow_jview', 0) && $typeData[$item->type_id]->params->get('search_jlinks', 1) ) {
+					if( $typeData[$item->type_id]->params->get('allow_jview', 0) == 1 && $typeData[$item->type_id]->params->get('search_jlinks', 1) )
+					{
 						$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language));
-					} else {
+					}
+					else
+					{
 						$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item));
 					}
 					

@@ -491,7 +491,7 @@ class plgSystemFlexisystem extends JPlugin
 			}
 
 			// Allow viewing by Joomla article view, if so configured
-			$in_limits = $type_params && $type_params->get('allow_jview') == 0;
+			$in_limits = $type_params && $type_params->get('allow_jview') != 1;   // allow_jview, 0: Reroute, 1: Allow, 2: Redirect
 		}
 
 
@@ -505,7 +505,8 @@ class plgSystemFlexisystem extends JPlugin
 		// *** Do re-routing (no page reloading)
 		// ***
 
-		if ($this->params->get('redirect_method_fe', 1) == 1)
+		//if ($this->params->get('redirect_method_fe', 1) == 1)
+		if ( $type_params->get('allow_jview') == 0 ) // 0: Reroute, 1: Allow, 2: Redirect
 		{
 			// Set new request variables
 			// NOTE: we only need to set HTTP request variable that must be changed, but setting any other variables to same value will not hurt
@@ -1997,6 +1998,8 @@ class plgSystemFlexisystem extends JPlugin
 
 	function renderFields($context, &$row, &$params, $page=0, $eventName='')
 	{
+		return true;
+
 		// This is meant for Joomla article view
 		if ( $context!='com_content.article' ) return;
 		
@@ -2045,7 +2048,7 @@ class plgSystemFlexisystem extends JPlugin
 		$allow_jview = $item->parameters->get('allow_jview', 0);
 		$placement = $item->parameters->get('jview_fields_placement', 1);
 		
-		if ( !$allow_jview || !$placement || !isset($placements_arr[$placement]) ) return;   //Disabled
+		if ( $allow_jview != 1 || !$placement || !isset($placements_arr[$placement]) ) return;   //Disabled
 		if ( $placements_arr[$placement] != $eventName ) return;  // Not current event
 		
 		$fields_added[$row->id] = true; // Only add once

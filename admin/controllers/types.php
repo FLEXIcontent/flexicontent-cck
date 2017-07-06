@@ -701,6 +701,9 @@ class FlexicontentControllerTypes extends FlexicontentController
 			return;
 		}
 
+		// Get new value(s) for 'allow_jview'
+		$allow_jview_arr = $this->input->get('allow_jview', array(0), 'array');
+
 		foreach($cid as $id)
 		{
 			if (!$id) continue;
@@ -719,7 +722,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			}
 
 			$attribs = json_decode($type->get('attribs'));
-			$attribs->allow_jview = $attribs->allow_jview ? '0' : '1';  // toggle
+			$attribs->allow_jview = $allow_jview_arr[$id];
 			$attribs = json_encode($attribs);
 
 			$query = 'UPDATE #__' . $this->records_dbtbl . ' SET attribs=' . $db->Quote($attribs) . ' WHERE id = ' . (int) $id;
