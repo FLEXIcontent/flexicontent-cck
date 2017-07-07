@@ -667,10 +667,10 @@ jQuery(document).ready(function(){
 
 		<?php if ( $useAssocs ) : ?>
 			<th class="left hideOnDemandClass">
-				<?php echo JText::_('FLEXI_ASSOCIATIONS'); /*JHTML::_('grid.sort', 'Translation Group', 'i.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] );*/ ?>
+				<?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?>
 			</th>
 		<?php endif; ?>
-			
+
 			<th class="left hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
@@ -888,10 +888,6 @@ jQuery(document).ready(function(){
 				// Display title with edit link ... (row editable and not checked out)
 				else
 				{
-					if ($useAssocs)
-					{
-						if ($this->lists['order']=='i.lang_parent_id' && $row->lang_parent_id && $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
-					}
 					echo '<a href="'.$edit_link.'" title="'.$edit_item_title.'">'.htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8').'</a>';
 				}
 				?>
@@ -920,15 +916,18 @@ jQuery(document).ready(function(){
 					
 					foreach($this->lang_assocs[$row->id] as $assoc_item)
 					{
-						if ($assoc_item->id==$row->id) continue;
+						// Joomla article manager show also current item, so we will not skip it
+						$is_current = $assoc_item->id == $row->id;
 
 						$assoc_modified = strtotime($assoc_item->modified);
-						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
-						
+						if (!$assoc_modified)
+						{
+							$assoc_modified = strtotime($assoc_item->created);
+						}
+
 						$_link  = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $assoc_item->id;
 						$_title = flexicontent_html::getToolTip(
-							JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS'),
-							//JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION').
+							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
 							( !empty($this->langs->{$assoc_item->lang}->imgsrc) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
 							($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$assoc_item->lang}->name).' <br/> '.
 							$assoc_item->title, 0, 1

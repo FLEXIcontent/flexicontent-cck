@@ -8,6 +8,16 @@ class flexicontent_ajax
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 
+		// Prevent the url from being indexed
+		$app->setHeader('X-Robots-Tag', 'noindex');
+
+		// Set content type if format is JSON
+		$format = $jinput->get('format', '', 'cmd');
+		if ($format === 'json')
+		{
+			$app->setHeader('Content-Type', 'application/json');
+		}
+
 		$exttype = $jinput->get('exttype', 'modules', 'cmd');
 		$extname = $jinput->get('extname', '', 'cmd');
 		$extfunc = $jinput->get('extfunc', '', 'cmd');
