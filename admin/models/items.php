@@ -151,7 +151,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// view's Filters
 		// **************
 		
-		// Category / featured filtering
+		// Category filtering
 		$filter_cats        = $fcform ? $jinput->get('filter_cats',        '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_cats',        'filter_cats',       '',  'int' );
 		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
 		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
@@ -160,7 +160,14 @@ class FlexicontentModelItems extends JModelLegacy
 			$jinput->set( 'filter_subcats',	0 );
 			$filter_subcats = 0;
 		}
-		$filter_featured    = $fcform ? $jinput->get('filter_featured',    '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_featured',    'filter_featured',   '',  'int' );
+
+		// Featured filtering, get as string to detect empty
+		$filter_featured    = $fcform ? $jinput->get('filter_featured',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_featured',    'filter_featured',   '',  'string' );
+		if (strlen($filter_featured))
+		{
+			$filter_featured = (int) $filter_featured ? 1 : 0;
+		}
+		
 		
 		$this->setState('filter_cats', $filter_cats);
 		$this->setState('filter_subcats', $filter_subcats);

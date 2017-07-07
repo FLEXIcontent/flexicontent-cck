@@ -536,7 +536,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// build the order type boolean list
 		$featured_ops = array();
 		$featured_ops[] = JHTML::_('select.option', '', '-');
-		$featured_ops[] = JHTML::_('select.option', '1', JText::_('FLEXI_NO'));
+		$featured_ops[] = JHTML::_('select.option', '0', JText::_('FLEXI_NO'));
 		$featured_ops[] = JHTML::_('select.option', '1', JText::_('FLEXI_YES'));
 
 		$lists['filter_featured'] = JHTML::_('select.genericlist', $featured_ops, 'filter_featured', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_featured, 'filter_featured', $translate=true );
