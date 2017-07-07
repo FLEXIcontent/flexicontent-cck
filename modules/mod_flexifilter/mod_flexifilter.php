@@ -100,25 +100,27 @@ $catid = $force_specific_cid || $empty_current_cid ? $config_catid : $current_ci
 
 // TARGET VIEW / Get target menu item for multi-category view case
 $mcats_selection = $display_cat_list ? $params->get('mcats_selection', 0) : 0;
-$mcats_itemid    = $mcats_selection  ? $params->get('mcats_itemid', 0)    : 0;
-
-if ($mcats_itemid)
-{
-	$menus = JFactory::getApplication()->getMenu('site', array());
-	$mcats_menu = $menus->getItem( $mcats_itemid );
-	if (!$mcats_menu) $mcats_itemid = 0;
-}
-
-if ( !empty($mcats_menu) )
-{
-	$menu_params = new JRegistry();   // Empty parameters object
-	$menu_params->merge( JComponentHelper::getComponent('com_flexicontent')->params );   // Merge component parameters
-	$menu_params->merge($mcats_menu->params);   // Merge menu parameters
-}
 
 // Set category id / ids for TEXT autocomplete
-if ($display_cat_list && $mcats_selection)
+if ($mcats_selection)
 {
+	$cat_itemid   = 0;
+	$mcats_itemid = $params->get('mcats_itemid', 0);
+
+	if ($mcats_itemid)
+	{
+		$menus = JFactory::getApplication()->getMenu('site', array());
+		$mcats_menu = $menus->getItem( $mcats_itemid );
+		if (!$mcats_menu) $mcats_itemid = 0;
+
+		if ( !empty($mcats_menu) )
+		{
+			$menu_params = new JRegistry();   // Empty parameters object
+			$menu_params->merge( JComponentHelper::getComponent('com_flexicontent')->params );   // Merge component parameters
+			$menu_params->merge($mcats_menu->params);   // Merge menu parameters
+		}
+	}
+
 	$cids_val = $jinput->get('cids', array(), 'array');
 
 	// CLEAR single category id, we will you cids from category selector
@@ -127,8 +129,13 @@ if ($display_cat_list && $mcats_selection)
 		$params->set('txt_ac_cids', is_array($cids_val) ? $cids_val : array((string) $cids_val) ) :  // Use current 'cids' (selected in category selector)
 		$params->set('txt_ac_cids', $display_cat_list==1 ? $catids : array() );   // Category selector is empty, use the 'include' categories configured for the selector (include: display_cat_list==1)
 }
-else {
-	// Specific or current category (single selector uses name 'cid' which is same name as categor id via menu item or viaitem/category URLs)
+
+// Specific or current category (single selector uses name 'cid' which is same name as category id via menu item or viaitem/category URLs)
+else
+{
+	$cat_itemid = $catid && $config_catid == $catid ? $params->get('cat_itemid', 0) : 0;  // Use the category menu item , only if a specific category is forced or it is default category is same as current category
+	$mcats_itemid = 0;
+
 	$params->set('txt_ac_cid',  $catid);
 	$params->set('txt_ac_cids', array());
 }
@@ -207,7 +214,8 @@ if ($display_cat_list)
 
 
 // CASE 3: Hidden single category selector, targeting specific category or current category
-else if ($catid) {
+else if ($catid)
+{
 	$cat_hidden_field = '<input type="hidden" name="cid" value="'.$catid.'"/>';
 }
 
@@ -240,7 +248,8 @@ $cat_model->_buildItemFromJoin($counting=true);
 $view_params = !empty($mcats_menu) ? $menu_params : $cat_params;
 
 // ALL filters
-if ($display_filter_list==0) {
+if ($display_filter_list==0)
+{
 	// WARNING: this CASE is supposed to get ALL filters regardless category,
 	// but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
 	// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
@@ -248,19 +257,22 @@ if ($display_filter_list==0) {
 }
 
 // Filter selected in category configuration
-else if ($display_filter_list==1) {
+else if ($display_filter_list==1)
+{
 	// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
 	$filters = FlexicontentFields::getFilters('filters', 'use_filters', $view_params);
 }
 
 // Filters selected in module
-else if ($display_filter_list==2) {
+else if ($display_filter_list==2)
+{
 	$params->set('filters_order', 1); // respect filters ordering
 	$filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
 }
 
 // Filters selected in module and intersect with current category
-else if ($display_filter_list) {  // ==3
+else if ($display_filter_list)  // ==3
+{
 	$params->set('filters_order', 1); // respect filters ordering
 	$cat_filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
 	
@@ -313,7 +325,8 @@ flexicontent_html::loadFramework('flexi_tmpl_common');
 if ($add_tooltips) JHtml::_('bootstrap.tooltip');
 
 // Add css
-if ($add_ccs && $layout) {
+if ($add_ccs && $layout)
+{
 	// Work around for extension that capture module's HTML 
 	if ($add_ccs==2)
 	{
@@ -356,24 +369,25 @@ if ($add_ccs && $layout) {
 }
 
 $form_target = '';
-$default_target = $mcats_itemid ? 
-	JRoute::_('index.php?Itemid='.$mcats_itemid) :
-	JURI::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats'
-	;
+$default_mcats_target = $mcats_itemid
+	? JRoute::_('index.php?Itemid='.$mcats_itemid)
+	: JURI::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats';
 
 // !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
-if ( ($display_cat_list && $mcats_selection) || !$catid) {
-	$form_target = $default_target;
+if ( ($display_cat_list && $mcats_selection) || !$catid)
+{
+	$form_target = $default_mcats_target;
 }
 
 // !! target (single) category view when selecting single category a category is currently selected
-else if ($catid) {
+else if ($catid)
+{
 	$db = JFactory::getDBO();
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );
 	$categoryslug = $db->loadResult();
-	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
+	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), $cat_itemid);
 }
 
 // Render Layout
@@ -391,13 +405,15 @@ $js = "";
 $document = JFactory::getDocument();
 $document->addScriptDeclaration($js);*/
 
-if ($display_cat_list && !$mcats_selection) {
+if ($display_cat_list && !$mcats_selection)
+{
 	$js .= '
-		function update_'.$form_name.'() {
+		function update_'.$form_name.'()
+		{
 			form=document.getElementById("'.$form_name.'");
 			cid_val=form.'.$catid_fieldname.'.value;
-			/*if ( cid_val.length == 0 ) { jQuery("#'.$form_name.'_filter_box").css("display", "none"); return; } */
-			if ( cid_val.length == 0 ) {
+			if ( cid_val.length == 0 )
+			{
 				var fcform = jQuery(form);
 				var _action = fcform.attr("data-fcform_default_action"); 
 				fcform.attr("action", _action);
@@ -405,7 +421,7 @@ if ($display_cat_list && !$mcats_selection) {
 				adminFormPrepare(form, 1);
 				return;
 			}
-			getSEFurl("cid_loading_'.$module->id.'",	"'.$loader_html.'", form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.', "'.$default_target.'");
+			getSEFurl("cid_loading_'.$module->id.'",	"'.$loader_html.'", form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.', "'.$default_mcats_target.'");
 			/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
 		}
 	';

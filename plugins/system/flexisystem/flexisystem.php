@@ -1998,8 +1998,6 @@ class plgSystemFlexisystem extends JPlugin
 
 	function renderFields($context, &$row, &$params, $page=0, $eventName='')
 	{
-		return true;
-
 		// This is meant for Joomla article view
 		if ( $context!='com_content.article' ) return;
 		
