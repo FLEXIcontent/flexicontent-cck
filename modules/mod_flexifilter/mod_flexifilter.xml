@@ -34,16 +34,21 @@
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" />
-			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" />
+
+			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" class="alert alert-info fcpadded" />
 			<field name="catid" type="qfcategory" paramset="params" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
-			
+			<field name="cat_itemid" type="fcmenuitem" default="" component="com_flexicontent" link_filters="view=category%%cid=" label="FLEXI_FILTER_MOD_SPECIFIC_CAT_MENU_ITEMID" description="FLEXI_FILTER_MOD_SPECIFIC_CAT_MENU_ITEMID_DESC">
+				<option value="">FLEXI_SELECT</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR_SMUL" level="level2" />
-			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR_SMUL_INFO" level="level3" />
+			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR_SMUL_INFO" level="level3" class="alert alert-info fcpadded" />
 			<field name="display_cat_list" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FILTER_SHOW_CAT_SELECTOR" description="FLEXI_FILTER_SHOW_CAT_SELECTOR_DESC" >
 				<option value="0" show_list="" hide_list="disp_catselector">FLEXI_FILTER_NO_USE_SINGLE_CAT_OR_CURR_CAT</option>
 				<option value="1" show_list="disp_catselector" hide_list="">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
 				<option value="2" show_list="disp_catselector" hide_list="">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
 			</field>
+
 			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_SELECTOR_CATS" description="FLEXI_FILTER_SELECTOR_CATS_DESC" class="disp_catselector" />
 			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC" class="btn-group btn-group-yesno disp_catselector">
 				<option value="0">FLEXI_NO</option>
@@ -56,8 +61,9 @@
 				<option value="0" show_list="" hide_list="mcats_menuid">FLEXI_FILTER_TARGET_CAT_VIEW</option>
 				<option value="1" show_list="mcats_menuid" hide_list="">FLEXI_FILTER_TARGET_MCATS_VIEW</option>
 			</field>
+
 			<!-- TODO allow selecting layouts: myitems / favs / tags as a target -->
-			<field name="mcats_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="FLEXI_FILTER_MCATS_VIEW_ITEMID" description="FLEXI_FILTER_MCATS_VIEW_ITEMID_DESC" class="mcats_menuid disp_catselector">
+			<field name="mcats_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="FLEXI_FILTER_MCATS_VIEW_ITEM" description="FLEXI_FILTER_MCATS_VIEW_ITEM_DESC" class="mcats_menuid disp_catselector">
 				<option value="">FLEXI_SELECT</option>
 			</field>
 						

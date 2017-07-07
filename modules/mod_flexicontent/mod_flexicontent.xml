@@ -50,7 +50,7 @@
 				<option value="1" show_list="" hide_list="specific_itemid">FLEXI_MOD_CURRENT</option>
 				<option value="2" show_list="specific_itemid" hide_list="">FLEXI_MOD_SPECIFIC</option>
 			</field>
-			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_SPECIFIC_MENU_ITEMID" description="FLEXI_MOD_SPECIFIC_MENU_ITEMID_DESC" class="specific_itemid" />
+			<field name="itemid_force_value" type="fcmenuitem" default="" component="com_flexicontent" label="FLEXI_MOD_SPECIFIC_MENU_ITEMID" description="FLEXI_MOD_SPECIFIC_MENU_ITEMID_DESC" class="specific_itemid" />
 			
 		</fieldset>
 		
