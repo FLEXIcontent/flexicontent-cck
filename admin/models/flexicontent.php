@@ -1870,7 +1870,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
 			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
 			$added_actions   =  array_diff($file_action_names, $db_action_names  );
-			
+			foreach($added_actions as $i => $action_name)
+			{
+				if (substr($action_name, 0, 5) === 'core.') unset($added_actions[$i]);
+			}
+
 			$comp_section = ! ( count($deleted_actions) || count($added_actions) );  // false if deleted or addeded actions exist
 			if ($debug_initial_perms) { echo "Deleted actions: "; print_r($deleted_actions); echo "<br> Added actions: "; print_r($added_actions); echo "<br>"; }
 		}
@@ -1963,7 +1967,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$asset->rules = (string) $component_rules;
 			
 			// Save the asset into the DB
-			if (!$asset->check() || !$asset->store()) {
+			if (!$asset->check() || !$asset->store())
+			{
 				echo $asset->getError();
 				$this->setError($asset->getError());
 				return false;
@@ -1985,6 +1990,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			foreach ($component_actions as $action)         $file_action_names[] = $action->name;
 			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
 			$added_actions   =  array_diff($file_action_names, $db_action_names  );
+			foreach($added_actions as $i => $action_name)
+			{
+				if (substr($action_name, 0, 5) === 'core.') unset($added_actions[$i]);
+			}
 			
 			if ( count($deleted_actions) || count($added_actions) )
 			{
@@ -1999,7 +2008,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				if ($deleted_actions)
 				{
 					$rules_data = $component_rules->getData();
-					foreach($deleted_actions as $action_name) {
+					foreach($deleted_actions as $action_name)
+					{
 						unset($rules_data[$action_name]);
 					}
 					$component_rules = new JAccessRules($rules_data);
@@ -2009,7 +2019,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$asset->rules = (string) $component_rules;
 				
 				// Save the asset
-				if (!$asset->check() || !$asset->store()) {
+				if (!$asset->check() || !$asset->store())
+				{
 					echo $asset->getError();
 					$this->setError($asset->getError());
 					return false;
@@ -2319,43 +2330,46 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	protected function _createComponentRules($component, $added_actions=false)
 	{
-		// **************************
-		// Get com_flexicontent asset
-		// **************************
+		// ***
+		// *** Get com_flexicontent asset
+		// ***
 
 		$comp_asset = JTable::getInstance('asset');
-		if ( $comp_asset->loadByName('com_flexicontent') )
-			$existing_rules = !empty($comp_asset->rules) ? json_decode($comp_asset->rules, true) : array();
-		else
-			$existing_rules = array();
+		$existing_rules = $comp_asset->loadByName('com_flexicontent') && !empty($comp_asset->rules)
+			? json_decode($comp_asset->rules, true)
+			: array();
 		$asset_is_empty = !count($existing_rules);
 
 
-		// *****************************
-		// Get flexicontent ACTION names
-		// *****************************
+		// ***
+		// *** Get flexicontent ACTION names
+		// ***
 
-		$flexi_actions	= JAccess::getActions($component, 'component');
+		$flexi_actions = JAccess::getActions($component, 'component');
 		foreach($flexi_actions as $action)
 		{
 			$flexi_action_names[$action->name] = 1;
 		}
-		
+
 		// We will either populate all action names or just those that were given (new actions)
-		$new_actions = is_array($added_actions) ? array_flip($added_actions) : $flexi_action_names;
-		
+		$new_actions = is_array($added_actions)
+			? array_flip($added_actions)
+			: $flexi_action_names;
+
 		// Initialize non-existing flexicontent ACL rules to empty
 		$flexi_rules = array();
 		foreach($new_actions as $action_name => $_i)
 		{
 			// * WE NEED THIS (even if it remains empty array), because we will compare COMPONENT actions in DB when checking initial permissions
-			$flexi_rules[$action_name] = !isset($flexi_rules[$action_name])  ?  array()  :  $flexi_rules[$action_name];
+			$flexi_rules[$action_name] = !isset($flexi_rules[$action_name])
+				? array()
+				: $flexi_rules[$action_name];
 		}
 
 
-		// ****************************************
-		// Get com_content asset and its rule names
-		// ****************************************
+		// ***
+		// *** Get com_content asset and its rule names
+		// ***
 
 		$com_content_asset = JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
@@ -2368,57 +2382,76 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		//echo "<pre>"; print_r($com_content_rules); echo "</pre>"; exit;
 
 
-		// *******************************************************************************************
-		// If com_flexicontent ASSET was empty then copy rules from com_content asset and set defaults
-		// *******************************************************************************************
+		// ***
+		// *** If com_flexicontent ASSET was empty then copy rules from com_content asset
+		// ***
 
 		if ( $asset_is_empty )
 		{
 			// Handle some special case of custom-added ACTIONs
 			// e.g. Grant --OWNED-- actions if they have the corresponding --GENERAL-- actions
 			if ( !isset($com_content_rules['core.delete.own']) )
+			{
 				$com_content_rules['core.delete.own'] = isset($com_content_rules['core.delete']) ? $com_content_rules['core.delete'] : array();
+			}
 			if ( !isset($com_content_rules['core.edit.state.own']) )
+			{
 				$com_content_rules['core.edit.state.own'] = isset($com_content_rules['core.edit.state']) ? $com_content_rules['core.edit.state'] : array();
-			
+			}
+
 			// Copy rules from com_content asset
 			foreach ($com_content_rules as $action_name => $data)
 			{
 				$flexi_rules[$action_name] = $data;
 			}
-			
+
 			// Save the asset into the DB
 			$com_content_asset->rules = json_encode($com_content_rules);
 			if (!$com_content_asset->check() || !$com_content_asset->store())
 			{
 				die($com_content_asset->getError());
 			}
-			
+
 			// By default DO NOT SET the edit field values privilege, because we have another parameter "allow any editor" and also to allow easier configuration via SOFT DENY
 			//$flexi_rules['flexicontent.editfieldvalues'] = $flexi_rules['core.edit'];  // can EditFieldValues
 		}
 
 
-		// Grant FLEXIcontent specific rules to user having GLOBAL "core.manage"
+		// ***
+		// *** Grant FLEXIcontent specific rules to user having GLOBAL "core.manage"
+		// ***
+
 		$groups = $this->_getUserGroups();
+		$added = false;
+
 		foreach($groups as $group)
 		{
 			// This unlike JUser::authorize will not return true for super-user, (we don't need to set anything for super-user group, because its users will be authorized by default)
 			if ( JAccess::checkGroup($group->id, 'core.manage') ) foreach($new_actions as $action_name => $_i)
 			{
-				// Skip Joomla STANDARD rules allowing them to inherit (these were copied on initial component installation from com_content asset)
-				if ( isset($joomla_action_names[$action_name]) ) continue;
-				
 				// Set flexicontent specific rule
 				$flexi_rules[$action_name][$group->id] = 1;
+				$added = true;
 			}
 		}
 
+		if (!$added) foreach($groups as $group)
+		{
+			// This unlike JUser::authorize will not return true for super-user, (we don't need to set anything for super-user group, because its users will be authorized by default)
+			if ( JAccess::checkGroup($group->id, 'core.create') ) foreach($new_actions as $action_name => $_i)
+			{
+				// Set flexicontent specific rule
+				$flexi_rules[$action_name][$group->id] = 1;
+				$added = true;
+			}
+		}
+		//echo "<pre>"; print_r($flexi_rules); $component_rules = new JAccessRules($flexi_rules); echo $asset_rules = (string) $component_rules; echo "</pre>"; exit;
 
-		// ************************************************************************************************
-		// Rules that should be allowed by default, give these to the "Public" and "Registered" user groups
-		// ************************************************************************************************
-		
+
+		// ***
+		// *** Rules that should be allowed by default, give these to the "Public" and "Registered" user groups
+		// ***
+
 		$grant_to_all = array('flexicontent.change.cat', 'flexicontent.change.cat.sec', 'flexicontent.change.cat.feat', 'flexicontent.uploadfiles', 'flexicontent.editownfile', 'flexicontent.publishownfile', 'flexicontent.deleteownfile');
 		foreach($grant_to_all as $_name)
 		{
@@ -2426,7 +2459,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$flexi_rules[$_name][1] = $flexi_rules[$_name][2] = 1;
 		}
 		//echo "<pre>"; print_r($flexi_rules); echo "</pre>"; exit;
-		
+
 		return $flexi_rules;
 	}
 	

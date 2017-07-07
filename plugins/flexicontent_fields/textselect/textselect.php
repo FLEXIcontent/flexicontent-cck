@@ -11,6 +11,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+JLoader::register('plgFlexicontent_fieldsText', JPATH_SITE . '/plugins/flexicontent_fields/text/text.php');
+JLoader::register('plgFlexicontent_fieldsSelect', JPATH_SITE . '/plugins/flexicontent_fields/select/select.php');
 
 class plgFlexicontent_fieldsTextselect extends FCField
 {
