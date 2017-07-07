@@ -247,20 +247,28 @@ class JFormFieldFcFileList extends JFormFieldList
 						continue;
 					}
 				}
+
+				$text = $value = $file;
 				
 				// If the extension is to be stripped, do it.
 				if ($this->stripPrefix)
 				{
-					$file = str_replace($this->stripPrefix, '', $file);
+					$text = $value = str_replace($this->stripPrefix, '', $value);
 				}
 				
 				// If the extension is to be stripped, do it.
 				if ($this->stripExt)
 				{
-					$file = JFile::stripExt($file);
+					$text = $value = JFile::stripExt($value);
 				}
 
-				$options[] = JHtml::_('select.option', $file, $file);
+				// Handle case of (default) file name being exact the stripPrefix
+				if ($this->stripPrefix && $text == rtrim($this->stripPrefix, '_'))
+				{
+					$text = 'Default';
+				}
+
+				$options[] = JHtml::_('select.option', $value, $text);
 			}
 		}
 

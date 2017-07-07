@@ -640,7 +640,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 	
 	
 	// Method to create field's HTML display for frontend views
-	/*public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
@@ -657,9 +657,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		
 		// Get choosen display layout
 		$viewlayout = $field->parameters->get('viewlayout', '');
-		$viewlayout = $viewlayout && $viewlayout!='value' ? 'value_'.$viewlayout : 'value';
+		$viewlayout = $viewlayout && $viewlayout != 'value' ? 'value_'.$viewlayout : 'value';
 
 		// Create field's display
 		$this->displayFieldValue($prop, $viewlayout);
-	}*/
+	}
 }
