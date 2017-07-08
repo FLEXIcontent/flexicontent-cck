@@ -336,7 +336,10 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_CUSTOMIZE" description="" level="level2" depend_class="button-relation-mode" />
-			<field name="auto_relate_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" disable="separator,test" state="1" published="1" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode" />
+			<field name="auto_relate_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" disable="separator,test" state="1" published="1" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode">
+				<option value="">FLEXI_SELECT</option>
+			</field>
+
 			<field name="auto_relate_submit_title" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" depend_class="button-relation-mode" />
 			<field name="auto_relate_submit_mssg" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT_DESC" depend_class="button-relation-mode" />

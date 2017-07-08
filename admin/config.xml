@@ -281,7 +281,7 @@
 				<option value="1" show_list="disp_addbtn" hide_list="">FLEXI_SHOW</option>
 			</field>
 			<field name="addbutton_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" label="FLEXI_ADD_NEW_ITEM_SUBMIT_MENU_ITEM" description="FLEXI_ADD_NEW_ITEM_SUBMIT_MENU_ITEM_DESC" class="disp_addbtn">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 
 		<field name="" type="separator" default="FLEXI_PARAMS_CAT_INFORMATION" icon_class="icon-info-circle" level="tab_open" box_type="1" remove_boxes="2" />
@@ -1060,21 +1060,21 @@
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" label="" level="level2"/>
 			<field name="cat_tags_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=tags%%tagid=0%%cid=0" default="" disable="separator" state="1" published="1" label="Tagged items" description="FLEXI_CATEGORY_BASED_VIEWS">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 			<field name="cat_author_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=author%%cid=0" default="" disable="separator" state="1" published="1" label="Authored items" description="FLEXI_CATEGORY_BASED_VIEWS">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_OPTIONAL" label="" level="level3"/>
 			<field name="cat_favs_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=favs%%cid=0" default="" disable="separator" state="1" published="1" label="Favoured items" description="FLEXI_CATEGORY_BASED_VIEWS">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 			<field name="cat_myitems_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=myitems%%cid=0" default="" disable="separator" state="1" published="1" label="My items" description="FLEXI_CATEGORY_BASED_VIEWS">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 			<field name="cat_mcats_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="Multi category" description="FLEXI_CATEGORY_BASED_VIEWS">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_LEGACY_VIEWS" label="" level="level2" />
@@ -1082,7 +1082,7 @@
 			
 			<!--field name="" type="separator" default="FLEXI_TAGS_VIEW_CONF" label="" level="level3" /-->
 			<field name="tags_view_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=tags%%id=0" default="" disable="separator" state="1" published="1" label="FLEXI_TAGGED_ITEMS" description="FLEXI_TAGS_DEFAULT_MENU_ITEMID_DESC">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 			<field name="filtertag" type="fcradio" default="1" label="FLEXI_FILTER_TAG_VIEWS" description="FLEXI_FILTER_TAG_VIEWS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -1091,13 +1091,13 @@
 			
 			<!--field name="" type="separator" default="FLEXI_FAVS_VIEW_CONF" label="" level="level3" /-->
 			<field name="favs_view_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=favourites" default="" disable="separator" state="1" published="1" label="FLEXI_FAVOURED_ITEMS" description="FLEXI_FAVS_DEFAULT_MENU_ITEMID_DESC">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_OTHER_VIEWS_CONF" label="" level="level2" />
 			<!--field name="" type="separator" default="FLEXI_SEARCH_VIEW_CONF" label="" level="level2" /-->
 			<field name="search_view_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=search" default="" disable="separator" state="1" published="1" label="FLEXI_SEARCH" description="FLEXI_SEARCH_DEFAULT_MENU_ITEMID_DESC">
-				<option value="">FLEXI_NONE</option>
+				<option value="">FLEXI_SELECT</option>
 			</field>
 
 
