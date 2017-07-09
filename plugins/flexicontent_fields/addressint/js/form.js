@@ -24,7 +24,8 @@
 
 		fcfield_addrint.autoComplete[elementid_n] = new google.maps.places.Autocomplete( ac_input, ac_options );
 
-		fcfield_addrint.gmapslistener[elementid_n] = google.maps.event.addListener(fcfield_addrint.autoComplete[elementid_n], 'place_changed', function() {
+		fcfield_addrint.gmapslistener[elementid_n] = google.maps.event.addListener(fcfield_addrint.autoComplete[elementid_n], 'place_changed', function()
+		{
 			jQuery('#' + elementid_n + '_messages').html('').hide();
 			fcfield_addrint.fillInAddress(elementid_n, false, config_name);
 		});
@@ -49,6 +50,8 @@
 
 	fcfield_addrint.initMap = function(elementid_n, config_name)
 	{
+		jQuery('#map_canvas_' + elementid_n).addClass('has_fc_google_maps_map');
+
 		jQuery('#' + elementid_n + '_addressint_map').show();  // Show map container
 		
 		fcfield_addrint.google_maps[elementid_n] = new google.maps.Map(document.getElementById('map_canvas_' + elementid_n), {
@@ -63,7 +66,6 @@
 			rotateControl: false,
 		});
 
-		jQuery('#map_canvas_' + elementid_n).addClass('has_fc_google_maps_map');
 		jQuery('#map_canvas_' + elementid_n).data('google_maps_ref', fcfield_addrint.google_maps[elementid_n]);
 		
 		myMarker = new google.maps.Marker({
@@ -73,12 +75,14 @@
 			position: fcfield_addrint.LatLon[elementid_n]
 		});
 		
-		google.maps.event.addListener(fcfield_addrint.google_maps[elementid_n], "zoom_changed", function() {
+		google.maps.event.addListener(fcfield_addrint.google_maps[elementid_n], "zoom_changed", function()
+		{
 			jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.google_maps[elementid_n].getZoom());
 			jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.google_maps[elementid_n].getZoom());
 		});
 		
-		google.maps.event.addListener(myMarker, "dragend", function (event) {
+		google.maps.event.addListener(myMarker, "dragend", function (event)
+		{
 			fcfield_addrint.geocodePosition(elementid_n, this.getPosition(), myMarker, config_name);
 		});
 	}
@@ -97,19 +101,23 @@
 				if (status == google.maps.GeocoderStatus.OK)
 				{
 					var tolerance = parseInt( jQuery('#' + elementid_n + '_marker_tolerance').val() );
-					if ( !tolerance || tolerance < 1 ) {
+					if ( !tolerance || tolerance < 1 )
+					{
 						tolerance = 50;
 						jQuery('#' + elementid_n + '_marker_tolerance').val(tolerance);
 					}
 					
 					var distance = Math.round( parseInt( google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location, pos) ) );
-					if (distance > tolerance) {
+					if (distance > tolerance)
+					{
 						jQuery('#' + elementid_n + '_lat').val(pos.lat);
 						jQuery('#' + elementid_n + '_lon').val(pos.lng);
 						jQuery('#' + elementid_n + '_messages')
 							.removeClass('alert-success').removeClass('alert-warning').addClass('alert-info')
 							.html( Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE').replace("%s", tolerance) + "<br/> -" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT') ).show();
-					} else {
+					}
+					else
+					{
 						jQuery('#' + elementid_n + '_messages').html('');
 						fcfield_addrint.fillInAddress(elementid_n,  results[0], config_name);
 						marker.setPosition( results[0].geometry.location );
@@ -159,12 +167,18 @@
 				selected_country = o.long_name;
 				for(var i=0; i<fcfield_addrint.allowed_countries[config_name].length; i++)
 				{
-					if (o.short_name == fcfield_addrint.allowed_countries[config_name][i]) { country_valid = true; break; }
+					if (o.short_name == fcfield_addrint.allowed_countries[config_name][i])
+					{
+						country_valid = true;
+						break;
+					}
 				}
 				if (country_valid) break;
 			}
 		}
-		if (!country_valid) {
+
+		if (!country_valid)
+		{
 			jQuery('#' + elementid_n + '_messages').removeClass('alert-success').removeClass('alert-info').addClass('alert-warning').html(
 				Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING') + ': <b>'
 				+ selected_country + '</b><br/>'
@@ -174,7 +188,9 @@
 			return false;
 		}
 		else
+		{
 			jQuery('#' + elementid_n + '_messages').html('').hide();
+		}
 		
 		
 		// Empty all fields in case they are not set to a new value
@@ -184,7 +200,7 @@
 			'#' + elementid_n + '_addr1, #' + elementid_n + '_addr2, #' + elementid_n + '_addr3,' +
 			'#' + elementid_n + '_city, #' + elementid_n + '_state, #' + elementid_n + '_province, #' + elementid_n + '_country,' +
 			'#' + elementid_n + '_zip, #' + elementid_n + '_zip_suffix, #' + elementid_n + '_lat, #' + elementid_n + '_lon'
-		).val('').trigger('change');
+		).val('');
 		
 		// load city, country code, postal code
 		var country_long_name = "";
@@ -228,7 +244,7 @@
 		else if (typeof place.adr_address != 'undefined')
 			street_address = place.adr_address;
 
-		window.console.log(street_address);
+		//window.console.log(street_address);
 
 		// Strip tags
 		div.innerHTML = street_address;
@@ -294,5 +310,33 @@
 		if (redrawMap)
 		{
 			fcfield_addrint.initMap(elementid_n, config_name);
+		}
+
+		// Trigger 'change' and 'blur' events on all fields in case they were not set to a new value, so that validation will work
+		jQuery('' +
+			'#' + elementid_n + '_autocomplete, #' + elementid_n + '_name, #' + elementid_n + '_url,' +
+			'#' + elementid_n + '_addr_display, #' + elementid_n + '_addr_formatted,' +
+			'#' + elementid_n + '_addr1, #' + elementid_n + '_addr2, #' + elementid_n + '_addr3,' +
+			'#' + elementid_n + '_city, #' + elementid_n + '_state, #' + elementid_n + '_province, #' + elementid_n + '_country,' +
+			'#' + elementid_n + '_zip, #' + elementid_n + '_zip_suffix, #' + elementid_n + '_lat, #' + elementid_n + '_lon'
+		).trigger('change').trigger('blur');
+	}
+
+
+	// Hide / show and disable / enable US state property
+	fcfield_addrint.toggle_USA_state = function(el)
+	{
+		var country = jQuery(el);
+		var usstate_row = country.closest('table').find('.fc_gm_usstate_row');
+		if (country.val()=='US')
+		{
+			usstate_row.show(600);
+			usstate_row.find('.fc_gm_usstate').removeAttr('disabled');
+		}
+		else
+		{
+			usstate_row.hide(600);
+			usstate_row.find('.fc_gm_usstate').attr('disabled', 'disabled');
+			usstate_row.find('.invalid').removeClass('invalid').removeAttr('aria-invalid');
 		}
 	}

@@ -430,11 +430,11 @@ class FCField extends JPlugin
 		
 		foreach($values as $value)
 		{
-			$v = !empty($value) ? @unserialize($value) : false;
-			if ( $v !== false || $v === 'b:0;' ) {
-				$vals[] = $v;
-			} else {
-				$vals[] = $value;
+			// Compatibility for non-serialized values or for NULL values in a field group
+			if ( !is_array($value) )
+			{
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$vals[] = $array ?: array();
 			}
 		}
 		return $vals;

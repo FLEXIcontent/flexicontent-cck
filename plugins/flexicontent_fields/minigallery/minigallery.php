@@ -287,10 +287,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
 				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
@@ -506,7 +502,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			$js .= '';
 			$css .= '';
 		}
-		
+
+
+		// Added field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		flexicontent_html::loadFramework('flexi-lib');

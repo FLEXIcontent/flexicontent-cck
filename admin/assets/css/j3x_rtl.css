@@ -148,8 +148,8 @@ div.toolbar-box {
 	margin-top: -1px;
 	padding: 4px 16px;
 }
-select {
-	width: auto !important;
+#flexicontent select {
+	width: auto;
 }
 #user-groups legend + .control-group,
 #user-groups .control-group {

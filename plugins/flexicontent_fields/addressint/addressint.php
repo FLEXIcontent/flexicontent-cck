@@ -59,39 +59,39 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// ****************
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+		$required = (int) $field->parameters->get('required', 0);
+		$required_class = $required ? 'required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 
 
 		// Initialise value property
 		$values = $this->parseValues($field->value);
-		if (empty($values)) {
-			$values[0]['autocomplete'] = '';
-			$values[0]['addr_display'] = '';
-			$values[0]['addr_formatted'] = '';
-			$values[0]['name'] = '';
-			$values[0]['addr1'] = '';
-			$values[0]['addr2'] = '';
-			$values[0]['addr3'] = '';
-			$values[0]['city'] = '';
-			$values[0]['state'] = '';
-			$values[0]['province'] = '';
-			$values[0]['zip'] = '';
-			$values[0]['zip_suffix'] = '';
-			$values[0]['country'] = '';
-			$values[0]['lat'] = '';
-			$values[0]['lon'] = '';
-			$values[0]['url'] = '';
-			$values[0]['zoom'] = '';
+		if (empty($values))
+		{
+			$field->value = array();
+			$field->value[0]['autocomplete'] = '';
+			$field->value[0]['addr_display'] = '';
+			$field->value[0]['addr_formatted'] = '';
+			$field->value[0]['name'] = '';
+			$field->value[0]['addr1'] = '';
+			$field->value[0]['addr2'] = '';
+			$field->value[0]['addr3'] = '';
+			$field->value[0]['city'] = '';
+			$field->value[0]['state'] = '';
+			$field->value[0]['province'] = '';
+			$field->value[0]['zip'] = '';
+			$field->value[0]['zip_suffix'] = '';
+			$field->value[0]['country'] = '';
+			$field->value[0]['lat'] = '';
+			$field->value[0]['lon'] = '';
+			$field->value[0]['url'] = '';
+			$field->value[0]['zoom'] = '';
+			$values = $field->value;
 		}
 		$this->values = & $values;
 
 
 		// Some parameter shortcuts
-		$required = $field->parameters->get('required', 0);
-		$required_class = $required ? 'required' : '';
-
 		$addr_edit_mode = $field->parameters->get('addr_edit_mode', 'plaintext');
 		$edit_latlon  = (int) $field->parameters->get('edit_latlon',  1);
 		$use_name     = (int) $field->parameters->get('use_name',     1);
@@ -146,9 +146,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 		//echo $ac_country_options; exit;
 
-		$countries_attribs = ' class="use_select2_lib fc_gm_country '.$required_class.'"'
+		$countries_attribs = ''
 			. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
-			. ' onchange="var country=jQuery(this); var usstate_row = country.closest(\'table\').find(\'.fc_gm_usstate_row\'); country.val()==\'US\' ? usstate_row.show(600) : usstate_row.hide(600); " ';
+			. ' onchange="fcfield_addrint.toggle_USA_state(this);" ';
 
 
 		// CREATE AC SEARCH TYPE OPTIONS
@@ -203,10 +203,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
 				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
@@ -337,7 +333,10 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][zip_suffix]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_zip_suffix');
-				" : "")."
+				" : "");
+
+			// Update map header information
+			$js .= "
 				theInput = newField.find('.addrint_marker_tolerance').first();
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][marker_tolerance]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_marker_tolerance');
@@ -354,12 +353,19 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_messages');
 				";
 			
-			// Clear canvas container and attach search auto-complete
+			// Clear canvas container and hide outer container of map
 			$js .= "
 				theDiv = newField.find('div.addrint_map_canvas');
-				theDiv.html('');
+				theDiv.html('').removeClass('has_fc_google_maps_map');
 				theDiv.attr('id','map_canvas_".$elementid."_'+uniqueRowNum".$field->id.");
+
+				theDiv = newField.find('div.fcfield_addressint_map');
+				theDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addressint_map');
+				theDiv.hide();
+				";
 				
+			// Attach search auto-complete
+			$js .= "
 				theInput = newField.find('.addrint_autocomplete').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autocomplete]');
@@ -426,10 +432,35 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					row.find('.fcfield-expand-view').remove();
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
+					row.find('.fcfield-enablevalue').remove();
+					row.find('.fcfield-disablevalue').remove();
 					// Do hide effect then remove from DOM
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
+			}
+
+			function enableField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+
+				row.find('.fcfield-enablevalue').parent().hide();
+				row.find('.fcfield-disablevalue').parent().show();
+
+				row.find('.fc-field-prop-disabled').removeAttr('disabled').prop('disabled', false).removeClass('fc-field-prop-disabled');
+				row.find('.fc-field-value-properties-box').removeClass('fc-field-value-disabled');
+			}
+			function disableField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+
+				row.find('.fcfield-enablevalue').parent().show();
+				row.find('.fcfield-disablevalue').parent().hide();
+
+				row.find(':enabled').attr('disabled', 'disabled').prop('disabled', true).addClass('fc-field-prop-disabled');
+				row.find('.fc-field-value-properties-box').addClass('fc-field-value-disabled');
 			}
 			";
 			
@@ -448,6 +479,15 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$css .= '';
 		}
 
+		$enable_disable_btns = $required ? '' : '
+			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
+				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_ENABLE_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_ENABLE_VALUE' ).'</span>
+			</div>
+			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
+				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_SKIP_VALUE' ).'</span>
+			</div>
+		';
+
 
 		// Add needed JS/CSS
 		static $js_added = null;
@@ -465,6 +505,14 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			// Load google maps library
 			flexicontent_html::loadFramework('google-maps', '', $field->parameters);
 		}
+
+
+		// Added field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 
@@ -485,7 +533,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
-		foreach($field->html as &$_html_) {
+		foreach($field->html as $n => & $_html_)
+		{
 			$_html_ = '
 				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
@@ -493,6 +542,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here).'
 				</div>
+				' . ($enable_disable_btns ? sprintf($enable_disable_btns, !$field->fc_form_data[$n]->value_disabled ? 'display:none' : '',  $field->fc_form_data[$n]->value_disabled ? 'display:none' : '') : '') . '
 				<div class="fcclear"></div>
 				').'
 				'.$_html_;
@@ -591,16 +641,15 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			// Skip value if non-allowed country was passed
 			if ( $use_country && @ $v['country'] && count($ac_country_allowed_list) && !isset($ac_country_allowed_list[$v['country']]) ) $continue;
 			
-			$newpost[$new]['autocomplete']  = flexicontent_html::dataFilter($v['autocomplete'],   4000, 'STRING', '');
-			$newpost[$new]['addr_display']  = flexicontent_html::dataFilter($v['addr_display'],   4000, 'STRING', '');
-			$newpost[$new]['addr_formatted']= flexicontent_html::dataFilter($v['addr_formatted'], 4000, 'STRING', '');
-			$newpost[$new]['addr1'] = flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', '');
-			$newpost[$new]['city']  = flexicontent_html::dataFilter($v['city'],   4000, 'STRING', '');
-			$newpost[$new]['zip']   = flexicontent_html::dataFilter($v['zip'],    10,   'STRING', '');
-			$newpost[$new]['lat']   = flexicontent_html::dataFilter(str_replace(',', '.', $v['lat']),  100, 'DOUBLE', 0);
-			$newpost[$new]['lon']   = flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
-			$newpost[$new]['url']   = flexicontent_html::dataFilter($v['url'],    4000,   'URL', '');
-			$newpost[$new]['zoom']  = flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', $map_zoom);
+			$newpost[$new]['addr_display']  = !isset($v['addr_display']) ? '' : flexicontent_html::dataFilter($v['addr_display'],   4000, 'STRING', '');
+			$newpost[$new]['addr_formatted']= !isset($v['addr_formatted']) ? '' : flexicontent_html::dataFilter($v['addr_formatted'], 4000, 'STRING', '');
+			$newpost[$new]['addr1'] = !isset($v['addr1']) ? '' : flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', '');
+			$newpost[$new]['city']  = !isset($v['city']) ? '' : flexicontent_html::dataFilter($v['city'],   4000, 'STRING', '');
+			$newpost[$new]['zip']   = !isset($v['zip']) ? '' : flexicontent_html::dataFilter($v['zip'],    10,   'STRING', '');
+			$newpost[$new]['lat']   = !isset($v['lat']) ? '' : flexicontent_html::dataFilter(str_replace(',', '.', $v['lat']),  100, 'DOUBLE', 0);
+			$newpost[$new]['lon']   = !isset($v['lon']) ? '' : flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
+			$newpost[$new]['url']   = !isset($v['url']) ? '' : flexicontent_html::dataFilter($v['url'],    4000,   'URL', '');
+			$newpost[$new]['zoom']  = !isset($v['zoom']) ? '' : flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', $map_zoom);
 			
 			$newpost[$new]['lat']   = $newpost[$new]['lat'] ? $newpost[$new]['lat'] : '';  // clear if zero
 			$newpost[$new]['lon']   = $newpost[$new]['lon'] ? $newpost[$new]['lon'] : '';  // clear if zero

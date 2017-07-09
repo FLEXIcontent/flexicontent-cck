@@ -167,7 +167,7 @@
 
 <fields name="images" label="Images" description="">
 		
-		<field name="" type="separator" default="FLEXI_IMAGES_COMP_INTROIMG" description="FLEXI_IMAGES_COMP_INTROIMG_DESC" level="level3" />
+		<field name="" type="separator" default="FLEXI_IMAGES_COMP_INTROIMG" description="FLEXI_IMAGES_COMP_INTROIMG_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="image_intro" type="fcmedia" label="COM_CONTENT_FIELD_INTRO_LABEL" description="COM_CONTENT_FIELD_INTRO_DESC" labelclass="fc-prop-lbl" />
 		<field name="float_intro" type="fcradio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
@@ -178,7 +178,7 @@
 		<field name="image_intro_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="image_intro_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" labelclass="fc-prop-lbl" class="" />
 		
-		<field name="" type="separator" default="FLEXI_IMAGES_COMP_FULLIMG" description="FLEXI_IMAGES_COMP_FULLIMG_DESC" level="level3" />
+		<field name="" type="separator" default="FLEXI_IMAGES_COMP_FULLIMG" description="FLEXI_IMAGES_COMP_FULLIMG_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="image_fulltext" type="fcmedia" label="COM_CONTENT_FIELD_FULL_LABEL" description="COM_CONTENT_FIELD_FULL_DESC" labelclass="fc-prop-lbl" />
 		<field name="float_fulltext" type="fcradio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
@@ -193,7 +193,7 @@
 
 <fields name="urls" label="Links" description="">
 		
-		<field name="" type="separator" default="FLEXI_URLS_LINK_A" description="FLEXI_URLS_LINK_A_DESC" level="level3" />
+		<field name="" type="separator" default="FLEXI_URLS_LINK_A" description="FLEXI_URLS_LINK_A_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="urla" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLA_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
 		<field name="urlatext" type="text" label="COM_CONTENT_FIELD_URLA_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="targeta" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="">
@@ -204,7 +204,7 @@
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
 		
-		<field name="" type="separator" default="FLEXI_URLS_LINK_B" description="FLEXI_URLS_LINK_B_DESC" level="level3" />
+		<field name="" type="separator" default="FLEXI_URLS_LINK_B" description="FLEXI_URLS_LINK_B_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="urlb" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLB_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
 		<field name="urlbtext" type="text" label="COM_CONTENT_FIELD_URLB_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="targetb" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="">
@@ -215,7 +215,7 @@
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
 
-		<field name="" type="separator" default="FLEXI_URLS_LINK_C" description="FLEXI_URLS_LINK_C_DESC" level="level3" />
+		<field name="" type="separator" default="FLEXI_URLS_LINK_C" description="FLEXI_URLS_LINK_C_DESC" level="_" class="alert alert-info fcpadded" />
 		<field name="urlc" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLC_LABEL" description="COM_CONTENT_FIELD_URL_DESC" labelclass="fc-prop-lbl" />
 		<field name="urlctext" type="text" label="COM_CONTENT_FIELD_URLC_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" labelclass="fc-prop-lbl" class="" />
 		<field name="targetc" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" labelclass="fc-prop-lbl" class="">

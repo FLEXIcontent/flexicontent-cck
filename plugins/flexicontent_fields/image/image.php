@@ -1052,7 +1052,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		$js .= "
+		// Added field's custom CSS / JS
+		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
@@ -1077,16 +1078,19 @@ class plgFlexicontent_fieldsImage extends FCField
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
-		
+
 		// This is field HTML that is created regardless of values
 		$non_value_html = '<input id="'.$elementid.'" class="fc_hidden_value '.($use_ingroup ? '' : $required_class).'" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
-		if ($use_ingroup) {
+		if ($use_ingroup)
+		{
 			$field->html[-1] = $non_value_html;
 			if ($use_inline_uploaders && $uploader_html->thumbResizer)
 			{
 				$field->html[-1] = $uploader_html->thumbResizer . ' ' . $field->html[-1];
 			}
-		} else {
+		}
+		else
+		{
 			$field->html .= $non_value_html;
 			if ($use_inline_uploaders && $uploader_html->thumbResizer)
 			{

@@ -72,7 +72,6 @@
 			<field name="ac_country_default" type="fccountries" subtype="singular" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY_DESC" />
 			<field name="ac_country_allowed_list" type="fccountries" subtype="sortable" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES_DESC" />
 
-
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
@@ -84,7 +83,7 @@
 			
 			
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
-			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" hide_none="1" hide_default="" defaultlabel="Table" labelclass="" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" stripprefix="field_" hide_none="1" hide_default="" defaultlabel="Table (Default)" labelclass="" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORM_SETTINGS" description="" level="level2" />
 			<field name="edit_latlon" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_EDIT_LATLON" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_EDIT_LATLON_DESC" class="btn-group btn-group-yesno">
@@ -92,10 +91,29 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="addr_edit_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE_DESC" toggle_related="1" class="btn-group group-fcmethod" labelclass="label label-info">
-				<option value="plaintext" show_list="" hide_list="addr-formatted-mode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLAINTEXT_MODE</option>
-				<option value="formatted" show_list="addr-formatted-mode" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
+			<field name="addr_edit_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE_DESC" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="plaintext" show_list="addr-plaintext-mode" hide_list="addr-formatted-mode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLAINTEXT_MODE</option>
+				<option value="formatted" show_list="addr-formatted-mode" hide_list="addr-plaintext-mode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_ENABLE_SKIP_VALUE_INFO" description="" level="level3" class="alert alert-info fcpadded" />
+			<field name="required_props_plaintext" type="list" multiple="multiple" default="" label="FLEXI_FIELD_REQUIRED_PROPERTIES" description="FLEXI_FIELD_REQUIRED_PROPERTIES_DESC" class="use_select2_lib" depend_class="addr-plaintext-mode" >
+				<option value="address">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS</option>
+				<option value="latitude">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE</option>
+				<option value="longitude">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE</option>
+			</field>
+			<field name="required_props" type="list" multiple="multiple" default="" label="FLEXI_FIELD_REQUIRED_PROPERTIES" description="FLEXI_FIELD_REQUIRED_PROPERTIES_DESC" class="use_select2_lib" depend_class="addr-formatted-mode" >
+				<option value="business_location">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BUSINESS_LOCATION</option>
+				<option value="street_address">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS</option>
+				<option value="city">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY</option>
+				<option value="us_state">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE</option>
+				<option value="non_us_state_province">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE</option>
+				<option value="zip_postal_code">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE</option>
+				<option value="country">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY</option>
+				<option value="latitude">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE</option>
+				<option value="longitude">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="" level="level3" depend_class="addr-formatted-mode" />
 			<field name="use_name" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_BUSINESS_LOCATION_NAME" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_BUSINESS_LOCATION_NAME_DESC" class="btn-group btn-group-yesno" depend_class="addr-formatted-mode">
 				<option value="0">FLEXI_HIDE</option>
@@ -125,6 +143,10 @@
 				<option value="0" show_list="country-selection-off" hide_list="">FLEXI_HIDE</option>
 				<option value="1" show_list="" hide_list="country-selection-off">FLEXI_SHOW</option>
 			</field>
+
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_CONFIGURATION" description="" level="level3" />
+			<field name="map_width_form" type="text" default="350" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH_DESC" />
+			<field name="map_height_form" type="text" default="250" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT_DESC" />
 			
 
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
@@ -148,7 +170,7 @@
 			</field>
 
 			<field name="" type="separator" default="Values Layout" description="" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="value*" exclude="value.php" stripext="1" stripprefix="value_" hide_none="1" hide_default="" defaultlabel="Boxed (Default)" labelclass="label label-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			

@@ -228,7 +228,7 @@ class JFormFieldFcFileList extends JFormFieldList
 
 		if (!$this->hideDefault)
 		{
-			$options[] = JHtml::_('select.option', '', ($this->defaultLabel ? $this->defaultLabel : JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname))));
+			$options[] = JHtml::_('select.option', '', ($this->defaultLabel ? JText::_($this->defaultLabel) : JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname))));
 		}
 
 		// Get a list of files in the search path with the given filter.
@@ -265,7 +265,7 @@ class JFormFieldFcFileList extends JFormFieldList
 				// Handle case of (default) file name being exact the stripPrefix
 				if ($this->stripPrefix && $text == rtrim($this->stripPrefix, '_'))
 				{
-					$text = 'Default';
+					$text = '- ' . JText::_('FLEXI_DEFAULT') . ' -';
 				}
 
 				$options[] = JHtml::_('select.option', $value, $text);
