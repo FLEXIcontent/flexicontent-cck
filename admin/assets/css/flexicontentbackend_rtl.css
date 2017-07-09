@@ -1072,6 +1072,10 @@ body .fc-nowrap-box,
 	padding-right: 4px;
 	padding-left: 4px;
 }
+#flexicontent .fc-xpended .add-on.fc-lbl-short,
+#flexicontent .fc-xpended-row .add-on.fc-lbl-short {
+	min-width: unset;
+}
 #flexicontent [class^="fc-xpended"] > div.select2-container,
 #flexicontent [class^="fc-xpended"] > div.select2-container,
 #flexicontent [class*="fc-xpended"] > div.select2-container,
@@ -2701,6 +2705,9 @@ table.fc-form-tbl.keytop td.key {
 table.fc-form-tbl td {
 	vertical-align: middle;
 	padding: 2px 0px 6px 24px;
+}
+table.fc-form-tbl td.fc-nopad-h-cell {
+	padding: 2px 0px 6px 0px;
 }
 table.fc-form-tbl.fccompact td {
 	padding: 0px 0px 4px 8px;

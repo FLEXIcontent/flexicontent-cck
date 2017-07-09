@@ -2437,8 +2437,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		if (!$added) foreach($groups as $group)
 		{
-			// This unlike JUser::authorize will not return true for super-user, (we don't need to set anything for super-user group, because its users will be authorized by default)
-			if ( JAccess::checkGroup($group->id, 'core.create') ) foreach($new_actions as $action_name => $_i)
+			// Since there is none User Group with core.manage, we will have to grant these to superadmins so that they are not empty ...
+			if ( JAccess::checkGroup($group->id, 'core.admin') ) foreach($new_actions as $action_name => $_i)
 			{
 				// Set flexicontent specific rule
 				$flexi_rules[$action_name][$group->id] = 1;

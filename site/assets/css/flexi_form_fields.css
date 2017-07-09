@@ -1170,6 +1170,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_after,
 #flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_before,
 #flexicontent .fc-xpended-btns > .fcfield-delvalue,
+#flexicontent .fc-xpended-btns > .fcfield-enablevalue,
+#flexicontent .fc-xpended-btns > .fcfield-disablevalue,
 #flexicontent .fc-xpended-btns > .fcfield-clearvalue,
 #flexicontent .fc-xpended-btns > .fcfield-selectvalue,
 #flexicontent .fc-xpended-btns > .fcfield-uploadvalue,
@@ -1193,6 +1195,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_after:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-insertvalue.fc_before:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-delvalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-enablevalue:not(.add-on):not(.input-group-addon):not(.btn),
+#flexicontent .fc-xpended-btns > .fcfield-disablevalue:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-clearvalue:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-selectvalue:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-uploadvalue:not(.add-on):not(.input-group-addon):not(.btn),
@@ -1220,6 +1224,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
 #flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
 #flexicontent .fc-xpended-btns .fcfield-delvalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-enablevalue:not(.fcfont-icon):hover,
+#flexicontent .fc-xpended-btns .fcfield-disablevalue:not(.fcfont-icon):hover,
 #flexicontent .fc-xpended-btns .fcfield-clearvalue:not(.fcfont-icon):hover,
 #flexicontent .fc-xpended-btns .fcfield-selectvalue:not(.fcfont-icon):hover,
 #flexicontent .fc-xpended-btns .fcfield-uploadvalue:not(.fcfont-icon):hover,
@@ -1237,6 +1243,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_after.fcfont-icon:hover,
 #flexicontent .fc-xpended-btns .fcfield-insertvalue.fc_before.fcfont-icon:hover,
 #flexicontent .fc-xpended-btns .fcfield-delvalue.fcfont-icon:hover,
+#flexicontent .fc-xpended-btns .fcfield-enablevalue.fcfont-icon:hover,
+#flexicontent .fc-xpended-btns .fcfield-disablevalue.fcfont-icon:hover,
 #flexicontent .fc-xpended-btns .fcfield-clearvalue.fcfont-icon:hover,
 #flexicontent .fc-xpended-btns .fcfield-selectvalue.fcfont-icon:hover,
 #flexicontent .fc-xpended-btns .fcfield-uploadvalue.fcfont-icon:hover,
@@ -1256,6 +1264,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent span.fcfield-insertvalue.fc_after.fcfont-icon,
 #flexicontent span.fcfield-insertvalue.fc_before.fcfont-icon,
 #flexicontent span.fcfield-delvalue.fcfont-icon,
+#flexicontent span.fcfield-enablevalue.fcfont-icon,
+#flexicontent span.fcfield-disablevalue.fcfont-icon,
 #flexicontent span.fcfield-clearvalue.fcfont-icon,
 #flexicontent span.fcfield-selectvalue.fcfont-icon,
 #flexicontent span.fcfield-uploadvalue.fcfont-icon,
@@ -1384,6 +1394,32 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent span.fcfield-delvalue:before {
 	color: FireBrick;
+}
+#flexicontent .fcfield-enablevalue {
+	margin: 0px 0px 2px 0px;
+	background: url(../images/page_single_edit.png) 8px 50% no-repeat;
+}
+#flexicontent .fcfield-enablevalue:not(.fcfont-icon) {
+	padding: 4px 4px 4px 32px !important;
+}
+#flexicontent span.fcfield-enablevalue.fcfont-icon:before {
+	content: "\2b";
+}
+#flexicontent span.fcfield-enablevalue:before {
+	color: darkgreen;
+}
+#flexicontent .fcfield-disablevalue {
+	margin: 0px 0px 2px 0px;
+	background: url(../images/publish_r.png) 8px 50% no-repeat;
+}
+#flexicontent .fcfield-disablevalue:not(.fcfont-icon) {
+	padding: 4px 4px 4px 32px !important;
+}
+#flexicontent span.fcfield-disablevalue.fcfont-icon:before {
+	content: "\49";
+}
+#flexicontent span.fcfield-disablevalue:before {
+	color: darkorange;
 }
 #flexicontent .fcfield-clearvalue {
 	margin: 0px 0px 2px 0px;
@@ -1583,10 +1619,10 @@ div.fcimg_value_props {
 	display: inline !important;
 	background-color: white;
 }
-.fcfield_field_data_box table.fc-form-tbl .fcfield_textareaval:not(.inlineval),
-.fcfield_field_data_box table.fc-form-tbl .fcfield_textval:not(.inlineval) {
-	box-sizing: border-box !important;
-	width: 100% !important;
+#flexicontent .fcfield_field_data_box table.fc-form-tbl .fcfield_textareaval:not(.inlineval),
+#flexicontent .fcfield_field_data_box table.fc-form-tbl .fcfield_textval:not(.inlineval) {
+	box-sizing: border-box;
+	width: 100%;
 }
 .fcfield_field_data_box {
 	float: left;
@@ -1656,6 +1692,16 @@ div.fcimg_value_props {
 .fcfield_addressint_canvas_outer {
 	width: 100%;
 	min-width: 400px;
+	max-width: 600px;
+}
+#flexicontent .has_fc_google_maps_map {
+	margin: 8px 0 0 0;
+}
+#flexicontent input.addrint_autocomplete {
+	width: 318px;
+}
+#flexicontent select.addrint_ac_type {
+	width: 160px;
 }
 iframe.sharedmedia {
 	max-height: 420px;
@@ -1682,4 +1728,7 @@ iframe.sharedmedia {
 }
 .fc_select2_sortable.select2-container-multi .select2-choices .select2-search-choice > div {
 	white-space: nowrap !important;
+}
+.fc-field-value-properties-box.fc-field-value-disabled {
+	display: none;
 }

@@ -382,6 +382,10 @@ body .fc-nowrap-box,
 	padding-left: 4px;
 	padding-right: 4px;
 }
+#flexicontent .fc-xpended .add-on.fc-lbl-short,
+#flexicontent .fc-xpended-row .add-on.fc-lbl-short {
+	min-width: unset;
+}
 #flexicontent [class^="fc-xpended"] > div.select2-container,
 #flexicontent [class^="fc-xpended"] > div.select2-container,
 #flexicontent [class*="fc-xpended"] > div.select2-container,

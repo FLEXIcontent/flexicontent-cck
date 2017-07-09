@@ -311,6 +311,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		> .fcfield-insertvalue.fc_after,
 		> .fcfield-insertvalue.fc_before,
 		> .fcfield-delvalue,
+		> .fcfield-enablevalue,
+		> .fcfield-disablevalue,
 		> .fcfield-clearvalue,
 		> .fcfield-selectvalue,
 		> .fcfield-uploadvalue,
@@ -335,6 +337,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		> .fcfield-insertvalue.fc_after:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-insertvalue.fc_before:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-delvalue:not(.add-on):not(.input-group-addon):not(.btn),
+		> .fcfield-enablevalue:not(.add-on):not(.input-group-addon):not(.btn),
+		> .fcfield-disablevalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-clearvalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-selectvalue:not(.add-on):not(.input-group-addon):not(.btn),
 		> .fcfield-uploadvalue:not(.add-on):not(.input-group-addon):not(.btn),
@@ -368,6 +372,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		.fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
 		.fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
 		.fcfield-delvalue:not(.fcfont-icon):hover,
+		.fcfield-enablevalue:not(.fcfont-icon):hover,
+		.fcfield-disablevalue:not(.fcfont-icon):hover,
 		.fcfield-clearvalue:not(.fcfont-icon):hover,
 		.fcfield-selectvalue:not(.fcfont-icon):hover,
 		.fcfield-uploadvalue:not(.fcfont-icon):hover,
@@ -387,6 +393,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		.fcfield-insertvalue.fc_after.fcfont-icon:hover,
 		.fcfield-insertvalue.fc_before.fcfont-icon:hover,
 		.fcfield-delvalue.fcfont-icon:hover,
+		.fcfield-enablevalue.fcfont-icon:hover,
+		.fcfield-disablevalue.fcfont-icon:hover,
 		.fcfield-clearvalue.fcfont-icon:hover,
 		.fcfield-selectvalue.fcfont-icon:hover,
 		.fcfield-uploadvalue.fcfont-icon:hover,
@@ -410,6 +418,8 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	span.fcfield-insertvalue.fc_after.fcfont-icon,
 	span.fcfield-insertvalue.fc_before.fcfont-icon,
 	span.fcfield-delvalue.fcfont-icon,
+	span.fcfield-enablevalue.fcfont-icon,
+	span.fcfield-disablevalue.fcfont-icon,
 	span.fcfield-clearvalue.fcfont-icon,
 	span.fcfield-selectvalue.fcfont-icon,
 	span.fcfield-uploadvalue.fcfont-icon,
@@ -558,6 +568,37 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	span.fcfield-delvalue:before {
 		color: FireBrick;
 	}
+
+	/* FIELDs: Enable value button */
+	.fcfield-enablevalue {
+		margin: 0px 0px 2px 0px;
+		background: url(../images/page_single_edit.png) 8px 50% no-repeat;
+	}
+	.fcfield-enablevalue:not(.fcfont-icon) {
+		padding: 4px 4px 4px 32px !important;
+	}
+	span.fcfield-enablevalue.fcfont-icon:before {
+		content: "\2b";
+	}
+	span.fcfield-enablevalue:before {
+		color: darkgreen;
+	}
+
+	/* FIELDs: Delete value button */
+	.fcfield-disablevalue {
+		margin: 0px 0px 2px 0px;
+		background: url(../images/publish_r.png) 8px 50% no-repeat;
+	}
+	.fcfield-disablevalue:not(.fcfont-icon) {
+		padding: 4px 4px 4px 32px !important;
+	}
+	span.fcfield-disablevalue.fcfont-icon:before {
+		content: "\49";
+	}
+	span.fcfield-disablevalue:before {
+		color: darkorange;
+	}
+
 
 	/* FIELDs: Clear value button */
 	.fcfield-clearvalue {
@@ -808,10 +849,10 @@ div.fcimg_value_props {
 
 /* FIELDs with data and preview (sharemedia, addressint, etc) */
 /* force 100% width, if not having 'inlineval' class */
-.fcfield_field_data_box table.fc-form-tbl .fcfield_textareaval:not(.inlineval),
-.fcfield_field_data_box table.fc-form-tbl .fcfield_textval:not(.inlineval) {
-	box-sizing: border-box !important;
-	width: 100% !important;
+#flexicontent .fcfield_field_data_box table.fc-form-tbl .fcfield_textareaval:not(.inlineval),
+#flexicontent .fcfield_field_data_box table.fc-form-tbl .fcfield_textval:not(.inlineval) {
+	box-sizing: border-box;
+	width: 100%;
 }
 .fcfield_field_data_box {
 	float: left;
@@ -886,7 +927,21 @@ div.fcimg_value_props {
 .fcfield_addressint_canvas_outer {
 	width: 100%;
 	min-width: 400px;
+	max-width: 600px;
 }
+#flexicontent .has_fc_google_maps_map {
+	/*width: 100%;
+	height: 0;
+	padding-bottom: 40%;*/
+	margin: 8px 0 0 0;
+}
+#flexicontent input.addrint_autocomplete {
+	width: 318px;
+}
+#flexicontent select.addrint_ac_type {
+	width: 160px;
+}
+
 /* FIELDs: (sharedmedia field), limit height of preview */
 iframe.sharedmedia {
 	max-height: 420px;
@@ -942,3 +997,7 @@ iframe.sharedmedia {
 	padding-left: 6px !important;
 	padding-right: 6px !important;
 }*/
+
+.fc-field-value-properties-box.fc-field-value-disabled {
+	display: none;
+}
