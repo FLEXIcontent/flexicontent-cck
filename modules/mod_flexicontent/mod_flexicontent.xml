@@ -107,7 +107,7 @@
 			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
-			<field name="orderby_2nd" type="fcordering" default="alpha" add_expired_scheduled="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
+			<field name="ordering_2nd" type="fcordering" default="alpha" add_expired_scheduled="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" level="level3" />
 			<field name="orderbycustomfield_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="customorder2_ops">FLEXI_NO</option>
