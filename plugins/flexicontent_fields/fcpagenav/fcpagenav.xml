@@ -51,13 +51,20 @@
 			
 		</fieldset>	
 		<fieldset name="group-fcpagenav-viewing-links" repeat="1" icon_class="icon-link" label_prefix="FLEXI_FIELD_VIEWING" label="Links" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="links_sep" type="separator" default="Links" description="" level="level1" />
-			
-			<field name="item_sep" type="separator" default="Previous / Next items" description="" level="level2" />
-			<field name="show_prevnext_count" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_SHOWCOUNT" description="FLEXI_FIELD_PAGENAV_SHOWCOUNT_DESC" class="btn-group btn-group-yesno">
+
+			<field name="information_sep" type="separator" default="FLEXI_INFORMATION" description="" level="level1" />
+
+			<field name="show_prevnext_count" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CURR_NAV_INFO" description="FLEXI_FIELD_PAGENAV_CURR_NAV_INFO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
+			</field>
+
+			<field name="links_sep" type="separator" default="Links" description="" level="level1" />
+
+			<field name="item_sep" type="separator" default="Previous / Next items" description="" level="level2" />
+			<field name="loop_prevnext" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_LOOP_PREVIOUS_NEXT" description="FLEXI_FIELD_PAGENAV_LOOP_PREVIOUS_NEXT_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="item_tooltips_sep" type="separator" default="Tooltips" description="" level="level3" />
@@ -81,7 +88,7 @@
 				<option value="0" show_list="" hide_list="cat-mode">FLEXI_NO</option>
 				<option value="1" show_list="cat-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="category_label" type="text" default="" depend_class="cat-mode" label="FLEXI_FIELDS_PAGENAV_CATEGORY" description="" />
+			<field name="category_label" type="text" default="" depend_class="cat-mode" label="FLEXI_FIELD_PAGENAV_CATEGORY" description="" />
 			
 		</fieldset>	
 		<fieldset name="group-fcpagenav-viewing-images" repeat="1" icon_class="icon-image" label_prefix="FLEXI_FIELD_VIEWING" label="Images" addfieldpath="/administrator/components/com_flexicontent/elements">

@@ -56,9 +56,16 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$add_tooltips = JComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
 		
 		// No output if it is not FLEXIcontent item view or view is "print"
-		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print) return;
-		
-		// parameters shortcuts
+		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print)
+		{
+			return;
+		}
+
+
+		// ***
+		// *** Parameters shortcuts
+		// ***
+
 		$tooltip_class = 'hasTooltip';
 		$load_css 			= $field->parameters->get('load_css', 1);
 		$use_tooltip		= $field->parameters->get('use_tooltip', 1);
@@ -70,6 +77,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$prev_label			= JText::_($field->parameters->get('prev_label', 'FLEXI_FIELDS_PAGENAV_GOTOPREV'));
 		$next_label			= JText::_($field->parameters->get('next_label', 'FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
+		$loop_prevnext = (int) $field->parameters->get('loop_prevnext', 1);
 		
 		$field->{$prop} = null;
 		$cid = $app->input->get('cid', 0 , 'int');
@@ -80,23 +88,35 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$item_count = $app->getUserState( $option.'.'.$cid.'nav_item_count', 0);
 		$loc_to_ids = $app->getUserState( $option.'.'.$cid.'nav_loc_to_ids', array());
 		$ids_to_loc = array_flip($loc_to_ids);
-		
-		
-		// Get category parameters
+
+
+		// ***
+		// *** Get category parameters
+		// ***
+
 		$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
 		$db->setQuery($query);
 		$category = $db->loadObject();
 		$category->parameters = new JRegistry($category->params);
-		
-		
+
+
+		// ***
+		// *** First check if location-IDs map has been already populated for this category id (for current user)
+		// ***
+
 		if ( isset($ids_to_loc[$item->id]) )
 		{
 			$location = $ids_to_loc[$item->id];
 		}
-		
-		else {
-			// Get list of ids of selected, null indicates to return item ids array. TODO retrieve item ids from view: 
-			// This will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
+
+
+		// ***
+		// *** Get location-IDs map, we pass [ids = null] to indicate to return an item ids array. TODO retrieve item ids from view:
+		// *** this will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
+		// ***
+
+		else
+		{
 			$ids = null;
 			$loc_to_ids = $this->getItemList($ids, $cid, $user->id);
 			
@@ -104,21 +124,32 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$item_count = count($loc_to_ids);    // Total items in category
 			$location   = isset($ids_to_loc[$item->id]) ? $ids_to_loc[$item->id] : false;  // Location of current content item in array list
 			
-			if ($location!==false) {
+			if ($location!==false)
+			{
 				$offset = $location-50 > 0 ? $location-50 : 0;
 				$length = $offset+100 < $item_count ? 100 : $item_count-$offset;
 				$nav_loc_to_ids = array_slice( $loc_to_ids, $offset, $length, true);
-				
+
+				// Also add ID of first and last item to allow looping but add them
+				// as negative to prevent same index twice when array is flipped
+				$loc_to_ids[-1] = $nav_loc_to_ids[-1] = - $loc_to_ids[0];
+				$loc_to_ids[-2] = $nav_loc_to_ids[-2] = - $loc_to_ids[$item_count - 1];
+
 				$app->setUserState( $option.'.'.$cid.'nav_item_count', $item_count);
 				$app->setUserState( $option.'.'.$cid.'nav_loc_to_ids', $nav_loc_to_ids);
 			}
-			else {
+			else
+			{
 				$app->setUserState( $option.'.'.$cid.'nav_item_count', null);
 				$app->setUserState( $option.'.'.$cid.'nav_loc_to_ids', null);
 			}
 		}
-		
-		// Get previous and next item data
+
+
+		// ***
+		// *** Initialize to empty before getting data of: previous item / next item / category
+		// ***
+
 		$field->prev = null;
 		$field->prevtitle = null;
 		$field->prevurl = null;
@@ -128,39 +159,48 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$field->category = null;
 		$field->categorytitle = null;
 		$field->categoryurl = null;
-		
-		// Get item data
+
+
+		// ***
+		// *** Get item data
+		// ***
+
 		$rows = false;
 		$prev_id = null;
 		$next_id = null;
 		if ($location !== false)
 		{
-			$prev_id = ($location - 1) >= 0 ? $loc_to_ids[$location - 1] : null;
-			$next_id = ($location + 1) < $item_count ? $loc_to_ids[$location + 1] : null;
-			
+			$prev_id = ($location - 1) >= 0
+				? $loc_to_ids[$location - 1]
+				: ($loop_prevnext && isset($loc_to_ids[-2]) ?  (- $loc_to_ids[-2]) : null);  // -2 index is last item
+
+			$next_id = ($location + 1) < $item_count
+				? $loc_to_ids[$location + 1]
+				: ($loop_prevnext && isset($loc_to_ids[-1]) ? (- $loc_to_ids[-1]) : null);  // -1 index is first item
+
 			$ids = array();
-			
+
 			// Previous item if it exists
 			if ($prev_id) $ids[] = $prev_id;
-			
-			// Current item may belong may not be list in main category so retrieve it to get a proper categoryslug
+
+			// Current item may not be listed in main category so retrieve it to get a proper categoryslug
 			$ids[] = $item->id;
-			
+
 			// Next item if it exists
 			if ($next_id) $ids[] = $next_id;
-			
+
 			// Query specific ids
 			$rows = $this->getItemList($ids, $cid, $user->id);
-			
-			// previous content item
+
+			// Previous content item
 			if ($prev_id)
 			{
 				$field->prev = $rows[$prev_id];
 				$field->prevtitle = $field->prev->title;
 				$field->prevurl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->prev->slug, $field->prev->categoryslug, 0, $field->prev));
 			}
-			
-			// next content item
+
+			// Next content item
 			if ($next_id)
 			{
 				$field->next = $rows[$next_id];
@@ -168,15 +208,22 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				$field->nexturl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->next->slug, $field->next->categoryslug, 0, $field->next));
 			}
 		}
-		
-		
-		// Check if displaying nothing and stop
+
+
+		// ***
+		// *** Check if displaying nothing and stop
+		// ***
+
 		if (!$field->prev && !$field->next && (!$use_category_link || empty($rows[$item->id]->categoryslug)))
 		{
 			return;
 		}
-		
-		// Get images
+
+
+		// ***
+		// *** Get images
+		// ***
+
 		$items_arr = array();
 		if ($field->prev) $items_arr[$field->prev->id] = $field->prev;
 		if ($field->next) $items_arr[$field->next->id] = $field->next;
@@ -186,24 +233,35 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		
 		$field->prevThumb = $field->prev && isset($thumbs[$field->prev->id]) ? $thumbs[$field->prev->id] : '';
 		$field->nextThumb = $field->next && isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
-		
-		// Get layout name
+
+
+		// ***
+		// *** Load view layout
+		// ***
+
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-		
+
 		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
-		
-		
-		// Load needed JS/CSS
+
+
+		// ***
+		// *** Load needed JS/CSS
+		// ***
+
 		if ($add_tooltips && $use_tooltip)
+		{
 			JHtml::_('bootstrap.tooltip');
+		}
 		if ($load_css)
+		{
 			JFactory::getDocument()->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
-		
+		}
+
 		$field->{$prop} = $html;
 	}
-	
-	
+
+
 	function getItemThumbs(&$params, &$items, & $img_err_msg, $uprefix='item', $rprefix='nav')
 	{
 		if ( !$params->get($uprefix.'_use_image', 0) ) return array();
