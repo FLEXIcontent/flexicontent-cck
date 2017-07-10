@@ -947,7 +947,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 			foreach($properties as $prop)
 			{
-				if (is_array($data[$prop]))
+				if (isset($data[$prop]) && is_array($data[$prop]))
 				{
 					// Filter the existing data with the current JForm
 					$db_data = new JRegistry($item->$prop);
@@ -970,7 +970,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 		foreach($properties as $prop)
 		{
-			if (is_array($data[$prop]))
+			if (isset($data[$prop]) && is_array($data[$prop]))
 			{
 				// Overwrite existing data with new data
 				$db_data_registry[$prop]->loadArray($data[$prop]);

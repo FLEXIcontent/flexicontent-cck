@@ -3711,7 +3711,7 @@ class ParentClassItem extends FCModelAdmin
 				// Categories and Tags must have been serialized but some early versions did not do it, we will check before unserializing them
 				if ($field->name=='categories' || $field->name=='tags')
 				{
-					$array = flexicontent_db::unserialize_array($field->value[0], $force_array=true, $force_value=false);
+					$array = !isset($field->value[0]) ? array() : flexicontent_db::unserialize_array($field->value[0], $force_array=true, $force_value=false);
 					if ( $array!==false )
 					{
 						$field->value = $array;

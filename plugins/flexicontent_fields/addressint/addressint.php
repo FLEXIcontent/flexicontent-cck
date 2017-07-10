@@ -503,7 +503,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');	
 
 			// Load google maps library
-			flexicontent_html::loadFramework('google-maps', '', $field->parameters);
+			flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
 		}
 
 
