@@ -1940,6 +1940,8 @@ class modFlexicontentHelper
 			$_microtime = $modfc_jprof->getmicrotime();
 			// Get content list per given category
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
+			//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
+			//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
 			$db->setQuery($per_cat_query, 0, $count);
 			$content = $db->loadColumn(0);
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
