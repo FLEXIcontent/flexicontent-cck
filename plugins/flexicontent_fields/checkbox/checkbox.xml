@@ -69,7 +69,7 @@
 				<option value="1" show_list="elements_sql" hide_list="elements_list" fcreadonly="{'field_elements':0}" force_list="elements_field" >FLEXI_YES</option>
 			</field>
 			<field name="field_elements" type="fcsortablelist" subtype="elements"
-				default="1::Yes%% 0::No%% "
+				default="1::Yes%% 0::No%% " filter="raw"
 				add_end="1" add_before="1" add_after="1" skip_initial_list="1"
 				edit_inline="0" edit_popup="1" raw_inline="0" raw_popup="1"
 				record_sep="%%" props_sep="::" prop_widths="8%,14%,14%,14%,14%" prop_lbls="FLEXI_VALUE,FLEXI_LABEL,FLEXI_IMAGE,FLEXI_VALGRP,FLEXI_STATE" props_used="1,1,0,1,1"
