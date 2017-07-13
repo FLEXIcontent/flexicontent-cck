@@ -213,13 +213,22 @@ class flexicontent_db
 	 */
 	static function getUserConfig($user_id)
 	{
+		static $userConfig = array();
+
+		if (isset($userConfig[$user_id]))
+		{
+			return $userConfig[$user_id];
+		}
+
 		$db = JFactory::getDBO();
-		
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user_id);
-		$authorparams = $db->loadResult();
-		$authorparams = new JRegistry($authorparams);
-		
-		return $authorparams;
+		$query = 'SELECT author_basicparams'
+			. ' FROM #__flexicontent_authors_ext'
+			. ' WHERE user_id = ' . $user_id;
+		$authorparams = $db->setQuery($query)->loadResult();
+
+		$userConfig[$user_id] = new JRegistry($authorparams);
+
+		return $userConfig[$user_id];
 	}
 	
 	

@@ -3788,15 +3788,27 @@ class FlexicontentFields
 			
 			foreach ($results as $result)
 			{
-				if ( !strlen($result->value) ) continue;
-				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
-				$checked_attr = $checked ? ' checked=checked ' : '';
-				$disable_attr = $faceted_filter==2 && !$result->found ? ' disabled=disabled ' : '';
-				$checked_class = $checked ? 'fc_highlight' : '';
-				$checked_class .= $faceted_filter==2 && !$result->found ? ' fcdisabled ' : '';
-				$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
+				if ( !strlen($result->value) )
+				{
+					continue;
+				}
+				$checked = ($display_filter_as==5)
+					? in_array($result->value, $value)
+					: $result->value == $value;
 
-				$escaped_label = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
+				$checked_attr = $checked
+					? ' checked=checked ' : '';
+				$disable_attr = $faceted_filter==2 && !$result->found
+					? ' disabled=disabled ' : '';
+
+				$checked_class = $checked
+					? 'fc_highlight' : '';
+				$checked_class .= $faceted_filter==2 && !$result->found
+					? ' fcdisabled ' : '';
+				$checked_class_li = $checked
+					? ' fc_checkradio_checked' : '';
+
+				$result_text_encoded = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
 
 				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
 				
@@ -3804,8 +3816,8 @@ class FlexicontentFields
 				if ($filter_vals_display == 2)
 				{
 					$filter->html .= isset( $result->image_url ) ?
-						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$escaped_label.'" title="'.$escaped_label.'" /></span>' :
-						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$escaped_label.'"></span></span>' ;
+						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$result_text_encoded.'" title="'.$result_text_encoded.'" /></span>' :
+						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$result_text_encoded.'"></span></span>' ;
 				}
 				
 				if ($display_filter_as==4)
@@ -3823,7 +3835,7 @@ class FlexicontentFields
 				
 				$filter->html .= '<label class="fc_filter_val fc_cleared '.$checked_class.'" for="'.$filter_ffid.$i.'">';
 				if ($filter_vals_display == 0 || $filter_vals_display == 2)
-					$filter->html .= '<span class="fc_filter_val_lbl">'.$escaped_label.'</span>';
+					$filter->html .= '<span class="fc_filter_val_lbl">' . $result_text_encoded . '</span>';
 				else if ($add_usage_counters && $result->found)
 					$filter->html .= '<span class="fc_filter_val_lbl">('.$result->found.')</span>';
 				$filter->html .= '</label>';
@@ -3832,8 +3844,12 @@ class FlexicontentFields
 				if ($filter_vals_display == 1)
 				{
 					$filter->html .= isset( $result->image_url ) ?
-						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$escaped_label.'" title="'.$escaped_label.'" /></span>' :
-						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$escaped_label.'"></span></span>' ;
+						'<span class="fc_filter_val_img">
+							<img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="' . $result_text_encoded . '" title="' . $result_text_encoded . '" />
+						</span>' :
+						'<span class="fc_filter_val_img">
+							<span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="' . $result_text_encoded . '"></span>
+						</span>' ;
 				}
 				
 				$filter->html .= '</li>';
