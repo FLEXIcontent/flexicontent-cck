@@ -147,7 +147,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				// For errors, we redirect back to refer
 				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 
-				return false;
+				if ($this->input->get('fc_doajax_submit'))
+					jexit(flexicontent_html::get_system_messages_html());
+				else
+					return false;
 			}
 
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
@@ -228,9 +231,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (!$model->store($data))
 		{
+			$app->enqueueMessage($model->getError() ?: JText::_('FLEXI_ERROR_SAVING_FILENAME'), 'error');
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_ERROR_SAVING_FILENAME') . ' : ' . $model->getError(), 'error');
-			return;
+
+			// For errors, we redirect back to refer
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+
+			if ($this->input->get('fc_doajax_submit'))
+				jexit(flexicontent_html::get_system_messages_html());
+			else
+				return false;
 		}
 
 		// Clear dependent cache data

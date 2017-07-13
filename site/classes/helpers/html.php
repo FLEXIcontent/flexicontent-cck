@@ -1115,8 +1115,9 @@ class flexicontent_html
 				break;
 
 			case 'google-maps':
-				$lang_code = flexicontent_html::getUserCurrentLang();
-				$force_language = $mode == 'form' ? '&amp;language=' . flexicontent_html::getUserCurrentLang() : '';
+				$force_language = $mode == 'form'
+					? '&amp;language=' . flexicontent_html::getUserCurrentLang()
+					: '';
 				$google_maps_js_api_key = $params->get('google_maps_js_api_key', $params->get('apikey'));
 				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&amp;key=' . $google_maps_js_api_key : '') . $force_language);
 				break;

@@ -203,6 +203,8 @@ class FlexicontentModelField extends FCModelAdmin
 	 */
 	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
+		$data_obj = $data && is_array($data) ? (object) $data : $data;
+
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 
@@ -210,8 +212,8 @@ class FlexicontentModelField extends FCModelAdmin
 		$client = JApplicationHelper::getClientInfo(0);
 
 		// Get plugin name from field type
-		$plugin_name = $data
-			? ($data->iscore ? 'core' : $data->field_type)
+		$plugin_name = $data_obj
+			? ($data_obj->iscore ? 'core' : $data_obj->field_type)
 			: ($this->plugin_name ?: 'text');
 		$plugin_name = JFactory::getApplication()->input->get('field_type', $plugin_name, 'cmd');
 

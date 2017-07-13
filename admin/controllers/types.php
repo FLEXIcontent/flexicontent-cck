@@ -141,7 +141,10 @@ class FlexicontentControllerTypes extends FlexicontentController
 				// For errors, we redirect back to refer
 				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 
-				return false;
+				if ($this->input->get('fc_doajax_submit'))
+					jexit(flexicontent_html::get_system_messages_html());
+				else
+					return false;
 			}
 
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
@@ -203,14 +206,16 @@ class FlexicontentControllerTypes extends FlexicontentController
 			$app->enqueueMessage($this->getError(), 'error');
 			$app->setHeader('status', 500, true);
 
-			if ($this->input->get('fc_doajax_submit'))
-			{
-				jexit(flexicontent_html::get_system_messages_html());
-			}
+			// Set the POSTed form data into the session, so that they get reloaded
+			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 
 			// For errors, we redirect back to refer
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			return false;
+
+			if ($this->input->get('fc_doajax_submit'))
+				jexit(flexicontent_html::get_system_messages_html());
+			else
+				return false;
 		}
 
 		if ( !$model->store($validated_data) )
@@ -218,14 +223,16 @@ class FlexicontentControllerTypes extends FlexicontentController
 			$app->enqueueMessage($model->getError() ?: JText::_( 'FLEXI_ERROR_SAVING_'. $this->_NAME ), 'error');
 			$app->setHeader('status', 500, true);
 
-			if ($this->input->get('fc_doajax_submit'))
-			{
-				jexit(flexicontent_html::get_system_messages_html());
-			}
+			// Set the POSTed form data into the session, so that they get reloaded
+			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 
 			// For errors, we redirect back to refer
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			return false;
+
+			if ($this->input->get('fc_doajax_submit'))
+				jexit(flexicontent_html::get_system_messages_html());
+			else
+				return false;
 		}
 
 		// Clear dependent cache data

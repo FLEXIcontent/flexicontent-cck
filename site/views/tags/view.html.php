@@ -79,22 +79,23 @@ class FlexicontentViewTags extends JViewLegacy
 		// ************************************************************************
 		
 		flexicontent_html::calculateItemMarkups($items, $params);
-		
-		
-		// ********************************
-		// Load needed JS libs & CSS styles
-		// ********************************
-		
+
+
+		// ***
+		// *** Load needed JS libs & CSS styles
+		// ***
+
 		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
-		
+
 		// Add css files to the document <head> section (also load CSS joomla template override)
-		if (!$params->get('disablecss', '')) {
+		if (!$params->get('disablecss', ''))
+		{
 			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-			//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
+		{
 			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
 		}
 		

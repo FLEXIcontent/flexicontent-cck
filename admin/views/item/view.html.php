@@ -16,12 +16,14 @@
  * GNU General Public License for more details.
  */
 
+// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
- * HTML View class for the Items View
+ * HTML View class for the Item View
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -38,12 +40,29 @@ class FlexicontentViewItem extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		// ********************************
-		// Initialize variables, flags, etc
-		// ********************************
+		if (1)
+		{
+			$this->_displayForm($tpl);
+			return;
+		}
+	}
+
+
+
+	/**
+	 * Creates the item create / edit form
+	 *
+	 * @since 1.0
+	 */
+	function _displayForm($tpl)
+	{
+		// ***
+		// *** Initialize variables, flags, etc
+		// ***
+
 		global $globalcats;
 		$categories = & $globalcats;		
-		
+
 		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
 		$dispatcher = JDispatcher::getInstance();
@@ -52,32 +71,72 @@ class FlexicontentViewItem extends JViewLegacy
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDBO();
+		$uri        = JFactory::getURI();
 		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
+		if ( $app->isSite() )
+		{
+			$menu = $app->getMenu()->getActive();
+		}
+		$useAssocs  = flexicontent_db::useAssociations();
 		
-		// We do not have item parameters yet, but we need to do some work before creating the item
-		
-		// Get the COMPONENT only parameter
+		// Get the COMPONENT only parameter, since we do not have item parameters yet, but we need to do some work before creating the item
 		$page_params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$page_params->merge($cparams);
 		
-		// Some flags
-		$useAssocs = flexicontent_db::useAssociations();
+		// Runtime stats
 		$print_logging_info = $page_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
-		
-		
-		// ***********************
-		// Get data from the model
-		// ***********************
-		
+
+
+		// ***
+		// *** Get session data before record form is created, because during form creation the session data are loaded and then they are cleared
+		// ***
+
+		$session_data = $app->getUserState('com_flexicontent.edit.item.data');
+
+
+		// ***
+		// *** Get item data and create item form (that loads item data)
+		// ***
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+
+		// Get model and indicate to model that current view IS item form
+		$model = $this->getModel();
+		$model->isForm = true;  // Currently this flag is used only by frontend model
+
+		// Get the item, loading item data and doing parameters merging
+		$item = $model->getItem(null, $check_view_access=false, $no_cache=true);
+
+		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+		// ***
+		// *** Frontend form: replace component/menu 'params' with the merged component/category/type/item/menu ETC ... parameters
+		// ***
+		if ( $app->isSite() )
+		{
+			$page_params = $item->parameters;
+		}
+
+
+		// ***
+		// *** Get (CORE & CUSTOM) fields and their VERSIONED values and then
+		// ***
+
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
-		$model = $this->getModel();
-		$item = $model->getItem();
+		$fields = $this->get( 'Extrafields' );
+		$item->fields = & $fields;
+		
+		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
+		// Load permissions (used by form template)
+		$perms = $this->_getItemPerms($item);
+		
+		// Most core field are created via calling methods of the form (J2.5)
 		$form = $this->get('Form');
 		if (!$form)
 		{
@@ -90,26 +149,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$isnew = ! $cid;
 		$manager_view = $ctrl = 'items';
 		
-		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		
-		// **************************************************************
-		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
-		// **************************************************************
 		
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		
-		$fields = $this->get( 'Extrafields' );
-		$item->fields = & $fields;
-		
-		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		
-		// ***************************
-		// Get Associated Translations
-		// ***************************
+		// ***
+		// *** Get Associated Translations
+		// ***
 		
 		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
@@ -130,9 +176,9 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		
 		
-		// ******************
-		// Version Panel data
-		// ******************
+		// ***
+		// *** Version Panel data
+		// ***
 		
 		// Get / calculate some version related variables
 		$versioncount    = $model->getVersionCount();
@@ -158,10 +204,10 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		
 		
-		// *****************
-		// Type related data
-		// *****************
-		
+		// ***
+		// *** Type related data
+		// ***
+
 		// Get available types and the currently selected/requested type
 		$types         = $model->getTypeslist();
 		$typesselected = $model->getTypesselected();
@@ -170,18 +216,12 @@ class FlexicontentViewItem extends JViewLegacy
 		$tparams = $this->get( 'Typeparams' );
 		$tparams = new JRegistry($tparams);
 		$page_params->merge($tparams);       // Apply type configuration if it type is set
-		
-		// Get user allowed permissions on the item ... to be used by the form rendering
-		// Also hide parameters panel if user can not edit parameters
-		$perms = $this->_getItemPerms($item);
-		if (!$perms['canparams'])  $document->addStyleDeclaration( '#details-options {display:none;}' );
-		
-		
-		
-		// *****************
-		// Load JS/CSS files
-		// *****************
-		
+
+
+		// ***
+		// *** Load JS/CSS files
+		// ***
+
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -189,7 +229,7 @@ class FlexicontentViewItem extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+
 		// Fields common CSS
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 		
@@ -204,16 +244,19 @@ class FlexicontentViewItem extends JViewLegacy
 		$_params->set('load-ui-dialog', 1);
 		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
 		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
-		
+
 		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');
 		flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
-		
-		// Add js function to overload the joomla submitform validation
+
+		// Load custom behaviours: form validation, popup tooltips
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('bootstrap.tooltip');
+
+		// Add js function to overload the joomla submitform validation
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
@@ -221,10 +264,23 @@ class FlexicontentViewItem extends JViewLegacy
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 
 
+		// ***
+		// *** Add frontend CSS override files to the document (also load CSS joomla template override)
+		// ***
 
-		// ******************
-		// Create the toolbar
-		// ******************
+		if ( $app->isSite() )
+		{
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
+			{
+				$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
+			}
+		}
+
+
+		// ***
+		// *** Create the toolbar
+		// ***
 		$toolbar = JToolBar::getInstance('toolbar');
 		$tip_class = ' hasTooltip';
 		
@@ -232,7 +288,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$cid
 			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' )   // Editing existing item
 			: JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );    // Creating new item
-
 
 
 		// ***
@@ -498,342 +553,11 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		$quicktagsIds = $page_params->get('quick_tags', array());
 		$quicktagsdata = !empty($quicktagsIds) ? $model->getTagsByIds($quicktagsIds, $_indexed = true) : array();
-		
-		
-		
-		// ***
-		// *** Get categories used by the item
-		// ***
-		
-		if ($isnew)
-		{
-			// Case for preselected main category for new items
-			$maincat = $item->catid ? $item->catid : $jinput->get('maincat', 0, 'int');
-			if (!$maincat)
-			{
-				$maincat = $app->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-			}
-			if ($maincat)
-			{
-				$selectedcats = array($maincat);
-				$item->catid = $maincat;
-			}
-			else
-			{
-				$selectedcats = array();
-			}
 
-			if ( $page_params->get('cid_default') )
-			{
-				$selectedcats = $page_params->get('cid_default');
-			}
-			if ( $page_params->get('catid_default') )
-			{
-				$item->catid = $page_params->get('catid_default');
-			}
-		}
-		else
-		{
-			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
-			$selectedcats = $this->get( 'Catsselected' );
-		}
-		
-		
-		
-		// *********************************************************************************************
-		// Build select lists for the form field. Only few of them are used in J1.6+, since we will use:
-		// (a) form XML file to declare them and then (b) getInput() method form field to create them
-		// *********************************************************************************************
-		
-		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		// we do this after creating the description field which is used un-encoded inside 'textarea' tags
-		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES, $exclude_keys = '' );  // Maybe exclude description text ?
-		
-		$lists = array();
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded
-		
-		// build state list
-		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;
-		$special_privelege_stategrp = ($item->state==2 || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
-		
-		$state = array();
-		// Using <select> groups
-		if ($non_publishers_stategrp || $special_privelege_stategrp)
-			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
-			
-		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-		
-		// States reserved for workflow
-		if ( $non_publishers_stategrp ) {
-			$state[] = JHTML::_('select.optgroup', '' );
-			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_NON_PUBLISHERS_WORKFLOW_STATES' ) );
-		}
-		if ($item->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
-		if ($item->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-		
-		// Special access states
-		if ( $special_privelege_stategrp ) {
-			$state[] = JHTML::_('select.optgroup', '' );
-			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
-		}
-		if ($item->state==2  || $perms['canarchive']) $state[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_ARCHIVED' ) );
-		if ($item->state==-2 || $perms['candelete'])  $state[] = JHTML::_('select.option', -2, JText::_( 'FLEXI_TRASHED' ) );
-		
-		// Close last <select> group
-		if ($non_publishers_stategrp || $special_privelege_stategrp)
-			$state[] = JHTML::_('select.optgroup', '');
-		
-		$fieldname = 'jform[state]';
-		$elementid = 'jform_state';
-		$class = 'use_select2_lib';
-		$attribs = 'class="'.$class.'"';
-		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
-		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
-		
-		// build featured flag
-		$fieldname = 'jform[featured]';
-		$elementid = 'jform_featured';
-		/*
-		$options = array();
-		$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
-		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
-		$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-		$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
-		*/
-		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-		$attribs = ' class="'.$classes.'" ';
-		$i = 1;
-		$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
-		$lists['featured'] = '';
-		foreach ($options as $option_id => $option_label)
-		{
-			$checked = $option_id==$item->featured ? ' checked="checked"' : '';
-			$elementid_no = $elementid.'_'.$i;
-			if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-			$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
-				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-			if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.JText::_($option_label).'</label>';
-			$i++;
-		}
-		
-		// build version approval list
-		$fieldname = 'jform[vstate]';
-		$elementid = 'jform_vstate';
-		/*
-		$options = array();
-		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-		$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-		$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-		$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
-		*/
-		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-		$attribs = ' class="'.$classes.'" ';
-		$i = 1;
-		$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
-		$lists['vstate'] = '';
-		foreach ($options as $option_id => $option_label) {
-			$checked = $option_id==2 ? ' checked="checked"' : '';
-			$elementid_no = $elementid.'_'.$i;
-			if (!$prettycheckable_added) $lists['vstate'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-			$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
-				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
-			$i++;
-		}
-		
-		
-		// check access level exists
-		$level_name = flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false);
-		if (empty($level_name))
-		{
-			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
-		}
-		
-		
-		// build field for notifying subscribers
-		if ( !$subscribers )
-		{
-			$lists['notify'] = !$isnew ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_NO_SUBSCRIBERS_EXIST').'</div>' : '';
-		} else {
-			// b. Check if notification emails to subscribers , were already sent during current session
-			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
-			if ( !empty($subscribers_notified[$item->id]) ) {
-				$lists['notify'] = '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED').'</div>';
-			} else {
-				// build favs notify field
-				$fieldname = 'jform[notify]';
-				$elementid = 'jform_notify';
-				/*
-				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
-				*/
-				$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-				$attribs = ' class="'.$classes.'" ';
-				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
-				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['notify'] = ' <input type="checkbox" id="'.$elementid.'" data-element-grpid="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' checked="checked" />';
-				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
-			}
-		}
-		
-		// Retrieve author configuration
-		$authorparams = flexicontent_db::getUserConfig($user->id);
-		
-		// Get author's maximum allowed categories per item and set js limitation
-		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
-		$document->addScriptDeclaration('
-			max_cat_assign_fc = '.$max_cat_assign.';
-			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
-		');
-		JText::script('FLEXI_TOO_MANY_ITEM_CATEGORIES',true);
-		
-		
-		// Creating categorories tree for item assignment, we use the 'create' privelege
-		$actions_allowed = array('core.create');
 
-		// Featured categories form field
-		$featured_cats_parent = $page_params->get('featured_cats_parent', 0);
-		$featured_cats = array();
-		$enable_featured_cid_selector = $perms['multicat'] && $perms['canchange_featcat'];
-		if ( $featured_cats_parent )
-		{
-			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
-			$disabled_cats = $page_params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
-			
-			$featured_sel = array();
-			foreach($selectedcats as $item_cat) if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
-			
-			$class  = "use_select2_lib";
-			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
-			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
-			$fieldname = 'jform[featured_cid][]';
-			
-			// Skip main category from the selected cats to allow easy change of it
-			$featured_sel_nomain = array();
-			foreach($featured_sel as $cat_id) if ($cat_id!=$item->catid) $featured_sel_nomain[] = $cat_id;
-			
-			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, true,	$actions_allowed,
-					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
-				);
-		}
-		else{
-			// Do not display, if not configured or not allowed to the user
-			$lists['featured_cid'] = false;
-		}
-		
-		
-		// Multi-category form field, for user allowed to use multiple categories
-		$lists['cid'] = '';
-		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
-		if ( 1 )
-		{
-			if ($page_params->get('cid_allowed_parent'))
-			{
-				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('cid_allowed_parent'), $depth_limit=0);
-				$disabled_cats = $page_params->get('cid_allowed_parent_disable', 1) ? array($page_params->get('cid_allowed_parent')) : array();
-			}
-			else
-			{
-				$cid_tree = & $categories;
-				$disabled_cats = array();
-			}
-			
-			// Get author's maximum allowed categories per item and set js limitation
-			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
-			$document->addScriptDeclaration('
-				max_cat_assign_fc = '.$max_cat_assign.';
-				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
-			');
-			
-			$class  = "mcat use_select2_lib";
-			$class .= $max_cat_assign ? " validate-fccats" : " validate";
-			
-			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
-			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
-			
-			$fieldname = 'jform[cid][]';
-			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
-			
-			// Skip main category from the selected secondary cats to allow easy change of it
-			$selectedcats_nomain = array();
-			foreach($selectedcats as $cat_id) if ($cat_id!=$item->catid) $selectedcats_nomain[] = $cat_id;
-			
-			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats_nomain, false, $attribs, true, true, $actions_allowed,
-					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
-				);
-		}
-		else {
-			if ( count($selectedcats)>1 ) {
-				foreach ($selectedcats as $catid) {
-					$cat_titles[$catid] = $globalcats[$catid]->title;
-				}
-				$lists['cid'] .= implode(', ', $cat_titles);
-			} else {
-				$lists['cid'] = false;
-			}
-		}
-		
-		
-		// Main category form field
-		$class = 'scat use_select2_lib';
-		if ($perms['multicat']) {
-			$class .= ' validate-catid';
-		} else {
-			$class .= ' required';
-		}
-		$attribs = 'class="'.$class.'"';
-		$fieldname = 'jform[catid]';
-		
-		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
-		
-		if ($tparams->get('catid_allowed_parent'))
-		{
-			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
-			$disabled_cats = $tparams->get('catid_allowed_parent_disable', 1) ? array($tparams->get('catid_allowed_parent')) : array();
-		} else {
-			$catid_tree = & $categories;
-			$disabled_cats = array();
-		}
-		
-		$lists['catid'] = false;
-		if ( !empty($catid_tree) ) {
-			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
-			$attribs .= $disabled;
-			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed,
-					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
-				);
-		} else if ( !$isnew && $item->catid ) {
-			$lists['catid'] = $globalcats[$item->catid]->title;
-		}
-		
-		
-		//buid types selectlist
-		$class   = 'required use_select2_lib';
-		$attribs = 'class="'.$class.'"';
-		$fieldname = 'jform[type_id]';
-		$elementid = 'jform_type_id';
-		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
-		
-		
-		//build languages list
-		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
-		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
+		// Get the edit lists
+		$lists = $this->_buildEditLists($perms, $page_params, $session_data);
 
-		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
-		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
-		$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', 'class="use_select2_lib"', $item->language, 2, $allowed_langs);
-		
 		// Label for current item state: published, unpublished, archived etc
 		switch ($item->state) {
 			case 0:
@@ -858,19 +582,21 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 
 
-		// **************************************************************
-		// Handle Item Parameters Creation and Load their values for J1.5
-		// In J1.6+ we declare them in the item form XML file
-		// **************************************************************
-		
-		if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $db->getNullDate() || empty($item->publish_down) ) {
+
+		// ***
+		// *** SET INTO THE FORM, parameter values for various parameter groups
+		// ***
+
+		if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
+		{
+			$item->publish_down = '';//JText::_( 'FLEXI_NEVER' );
 			$form->setValue('publish_down', null, ''/*JText::_( 'FLEXI_NEVER' )*/);  // Setting to text will break form date element 
 		}
-		
-		
-		// ****************************
-		// Handle Template related work
-		// ****************************
+
+
+		// ***
+		// *** Handle Template related work
+		// ***
 
 		// (a) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
@@ -930,32 +656,41 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 		}
 
-		// ******************************
-		// Assign data to VIEW's template
-		// ******************************
-		$this->document = $document;
+		// ***
+		// *** Assign data to VIEW's template
+		// ***
+
+		$this->item   = $item;
+		$this->form   = $form;  // most core field are created via calling JForm methods
+
+		if ($useAssocs)  $this->lang_assocs = $langAssocs;
+		$this->langs  = $langs;
+		$this->params = $page_params;
 		$this->lists  = $lists;
-		$this->row    = $item;
-		$this->form   = $form;
-		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
-		$this->assignRef('langs'        , $langs);
-		$this->assignRef('typesselected', $typesselected);
-		$this->assignRef('published'		, $published);
-		$this->assignRef('nullDate'			, $nullDate);
-		$this->assignRef('subscribers'	, $subscribers);
-		$this->assignRef('fields'				, $fields);
-		$this->assignRef('versions'			, $versions);
-		$this->assignRef('ratings'			, $ratings);
-		$this->assignRef('pagecount'		, $pagecount);
-		$this->assignRef('params'				, $page_params);
-		$this->assignRef('tparams'			, $tparams);
-		$this->assignRef('tmpls'				, $tmpls);
-		$this->assignRef('usedtagsdata'  , $usedtagsdata);
-		$this->assignRef('quicktagsdata' , $quicktagsdata);
-		$this->assignRef('perms'				, $perms);
-		$this->assignRef('current_page'	, $current_page);
-		
-		// Clear custom form data from session
+		$this->typesselected = $typesselected;
+
+		$this->published     = $published;
+		$this->subscribers   = $subscribers;
+		$this->usedtagsdata  = $usedtagsdata;
+		$this->quicktagsdata = $quicktagsdata;
+
+		$this->fields     = $fields;
+		$this->versions   = $versions;
+		$this->ratings    = $ratings;
+		$this->pagecount  = $pagecount;
+		$this->tparams    = $tparams;
+		$this->tmpls      = $tmpls;
+		$this->perms      = $perms;
+		$this->document   = $document;
+		$this->nullDate   = $nullDate;
+		$this->current_page = $current_page;
+
+
+
+		// ***
+		// *** Clear custom form data from session
+		// ***
+
 		$app->setUserState($form->option.'.edit.item.custom', false);
 		$app->setUserState($form->option.'.edit.item.jfdata', false);
 		$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', false);
@@ -964,8 +699,470 @@ class FlexicontentViewItem extends JViewLegacy
 		parent::display($tpl);
 		if ( $print_logging_info ) $fc_run_times['form_rendering'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
-	
-	
+
+
+
+	/**
+	 * Creates the HTML of various form fields used in the item edit form
+	 *
+	 * @since 1.0
+	 */
+	function _buildEditLists(&$perms, &$page_params, &$session_data)
+	{
+		$app      = JFactory::getApplication();
+		$jinput   = $app->input;
+		$db       = JFactory::getDBO();
+		$user     = JFactory::getUser();	// get current user
+		$model    = $this->getModel();
+		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO means unversioned data
+		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
+
+		global $globalcats;
+		$categories = $globalcats;			// get the categories tree
+		$types = $this->get( 'Typeslist' );
+		$typesselected = $this->get( 'Typesselected' );
+		$subscribers   = $this->get( 'SubscribersCount' );
+		$isnew = !$item->id;
+
+
+		// ***
+		// *** Get categories used by the item
+		// ***
+
+		if ($isnew)
+		{
+			// Case for preselected main category for new items
+			$maincat = $item->catid
+				? $item->catid
+				: $jinput->get('maincat', 0, 'int');
+
+			// For backend form also try the items manager 's category filter
+			if ( $app->isAdmin() && !$maincat )
+			{
+				$maincat = $app->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
+			}
+			if ($maincat)
+			{
+				$item->categories = array($maincat);
+				$item->catid = $maincat;
+			}
+			else
+			{
+				$item->categories = array();
+			}
+
+			if ( $page_params->get('cid_default') )
+			{
+				$item->categories = $page_params->get('cid_default');
+			}
+			if ( $page_params->get('catid_default') )
+			{
+				$item->catid = $page_params->get('catid_default');
+			}
+
+			$item->cats = $item->categories;
+		}
+
+		// Main category and secondary categories from session
+		$form_catid = !empty($session_data['catid'])
+			? (int) $session_data['catid']
+			: $item->catid;
+
+		$form_cid = !empty($session_data['cid'])
+			? $session_data['cid']
+			: $item->categories;
+		JArrayHelper::toInteger($form_cid);
+
+
+		// ***
+		// *** Build select lists for the form field. Only few of them are used in J1.6+, since we will use:
+		// ***  (a) form XML file to declare them and then (b) getInput() method form field to create them
+		// ***
+
+		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		// we do this after creating the description field which is used un-encoded inside 'textarea' tags
+		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES, $exclude_keys = '' );  // Maybe exclude description text ?
+		
+		$lists = array();
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded
+		
+		// build state list
+		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;
+		$special_privelege_stategrp = ($item->state==2 || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
+		
+		$state = array();
+		// Using <select> groups
+		if ($non_publishers_stategrp || $special_privelege_stategrp)
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
+			
+		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
+		
+		// States reserved for workflow
+		if ( $non_publishers_stategrp ) {
+			$state[] = JHTML::_('select.optgroup', '' );
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_NON_PUBLISHERS_WORKFLOW_STATES' ) );
+		}
+		if ($item->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
+		if ($item->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+		
+		// Special access states
+		if ( $special_privelege_stategrp ) {
+			$state[] = JHTML::_('select.optgroup', '' );
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
+		}
+		if ($item->state==2  || $perms['canarchive']) $state[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_ARCHIVED' ) );
+		if ($item->state==-2 || $perms['candelete'])  $state[] = JHTML::_('select.option', -2, JText::_( 'FLEXI_TRASHED' ) );
+		
+		// Close last <select> group
+		if ($non_publishers_stategrp || $special_privelege_stategrp)
+			$state[] = JHTML::_('select.optgroup', '');
+		
+		$fieldname = 'jform[state]';
+		$elementid = 'jform_state';
+		$class = 'use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
+		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
+
+
+		// ***
+		// *** Build featured flag
+		// ***
+
+		if ( $app->isAdmin() )
+		{
+			$fieldname = 'jform[featured]';
+			$elementid = 'jform_featured';
+			/*
+			$options = array();
+			$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
+			$attribs = '';
+			$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
+			*/
+			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$i = 1;
+			$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
+			$lists['featured'] = '';
+			foreach ($options as $option_id => $option_label)
+			{
+				$checked = $option_id==$item->featured ? ' checked="checked"' : '';
+				$elementid_no = $elementid.'_'.$i;
+				if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+				if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.JText::_($option_label).'</label>';
+				$i++;
+			}
+		}
+		
+		// build version approval list
+		$fieldname = 'jform[vstate]';
+		$elementid = 'jform_vstate';
+		/*
+		$options = array();
+		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+		$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+		$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		*/
+		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+		$attribs = ' class="'.$classes.'" ';
+		$i = 1;
+		$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
+		$lists['vstate'] = '';
+		foreach ($options as $option_id => $option_label) {
+			$checked = $option_id==2 ? ' checked="checked"' : '';
+			$elementid_no = $elementid.'_'.$i;
+			if (!$prettycheckable_added) $lists['vstate'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
+				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
+			$i++;
+		}
+		
+		
+		// check access level exists
+		$level_name = flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false);
+		if (empty($level_name))
+		{
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
+			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+		}
+		
+		
+		// build field for notifying subscribers
+		if ( !$subscribers )
+		{
+			$lists['notify'] = !$isnew ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_NO_SUBSCRIBERS_EXIST').'</div>' : '';
+		}
+		else
+		{
+			// b. Check if notification emails to subscribers , were already sent during current session
+			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
+			if ( !empty($subscribers_notified[$item->id]) )
+			{
+				$lists['notify'] = '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED').'</div>';
+			}
+			else
+			{
+				// build favs notify field
+				$fieldname = 'jform[notify]';
+				$elementid = 'jform_notify';
+				/*
+				$attribs = '';
+				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+				*/
+				$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['notify'] = ' <input type="checkbox" id="'.$elementid.'" data-element-grpid="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' checked="checked" />';
+				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
+			}
+		}
+
+		// Retrieve author configuration
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+
+		// Get author's maximum allowed categories per item and set js limitation
+		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+		$document->addScriptDeclaration('
+			max_cat_assign_fc = '.$max_cat_assign.';
+			existing_cats_fc  = ["'.implode('","', $form_cid).'"];
+		');
+		JText::script('FLEXI_TOO_MANY_ITEM_CATEGORIES',true);
+		
+		
+		// Creating categorories tree for item assignment, we use the 'create' privelege
+		$actions_allowed = array('core.create');
+
+		// Featured categories form field
+		$featured_cats_parent = $page_params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		$enable_featured_cid_selector = $perms['multicat'] && $perms['canchange_featcat'];
+		if ( $featured_cats_parent )
+		{
+			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$disabled_cats = $page_params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
+			
+			$featured_sel = array();
+			foreach($form_cid as $item_cat)
+			{
+				if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
+			}
+			
+			$class  = "use_select2_lib";
+			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
+			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
+			$fieldname = 'jform[featured_cid][]';
+			
+			// Skip main category from the selected cats to allow easy change of it
+			$featured_sel_nomain = array();
+			foreach($featured_sel as $cat_id)
+			{
+				if ($cat_id != $form_catid)
+				{
+					$featured_sel_nomain[] = $cat_id;
+				}
+			}
+			
+			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, true,	$actions_allowed,
+					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				);
+		}
+		else{
+			// Do not display, if not configured or not allowed to the user
+			$lists['featured_cid'] = false;
+		}
+		
+		
+		// Multi-category form field, for user allowed to use multiple categories
+		$lists['cid'] = '';
+		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
+		if ( 1 )
+		{
+			if ($page_params->get('cid_allowed_parent'))
+			{
+				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('cid_allowed_parent'), $depth_limit=0);
+				$disabled_cats = $page_params->get('cid_allowed_parent_disable', 1) ? array($page_params->get('cid_allowed_parent')) : array();
+			}
+			else
+			{
+				$cid_tree = & $categories;
+				$disabled_cats = array();
+			}
+			
+			// Get author's maximum allowed categories per item and set js limitation
+			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+			$document->addScriptDeclaration('
+				max_cat_assign_fc = '.$max_cat_assign.';
+				existing_cats_fc  = ["'.implode('","', $form_cid).'"];
+			');
+			
+			$class  = "mcat use_select2_lib";
+			$class .= $max_cat_assign ? " validate-fccats" : " validate";
+			
+			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
+			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
+			
+			$fieldname = 'jform[cid][]';
+			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
+			
+			// Skip main category from the selected secondary cats to allow easy change of it
+			$form_cid_nomain = array();
+			foreach($form_cid as $cat_id)
+			{
+				if ($cat_id != $form_catid) $form_cid_nomain[] = $cat_id;
+			}
+			
+			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs, true, true, $actions_allowed,
+					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				);
+		}
+
+		else
+		{
+			if ( count($form_cid) > 1 )
+			{
+				foreach ($form_cid as $catid)
+				{
+					$cat_titles[$catid] = $globalcats[$catid]->title;
+				}
+				$lists['cid'] .= implode(', ', $cat_titles);
+			}
+			else
+			{
+				$lists['cid'] = false;
+			}
+		}
+		
+		
+		// Main category form field
+		$class = 'scat use_select2_lib'
+			.($perms['multicat']
+				? ' validate-catid'
+				: ' required'
+			);
+		$attribs = ' class="' . $class . '" ';
+		$fieldname = 'jform[catid]';
+		
+		$enable_catid_selector = ($isnew && !$page_params->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
+		
+		if ($page_params->get('catid_allowed_parent'))
+		{
+			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$page_params->get('catid_allowed_parent'), $depth_limit=0);
+			$disabled_cats = $page_params->get('catid_allowed_parent_disable', 1) ? array($page_params->get('catid_allowed_parent')) : array();
+		} else {
+			$catid_tree = & $categories;
+			$disabled_cats = array();
+		}
+		
+		$lists['catid'] = false;
+		if ( !empty($catid_tree) )
+		{
+			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
+			$attribs .= $disabled;
+			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed,
+					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
+					$empty_errmsg=JText::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED')
+				);
+		} else if ( !$isnew && $item->catid ) {
+			$lists['catid'] = $globalcats[$item->catid]->title;
+		}
+		
+		
+		//buid types selectlist
+		$class   = 'required use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$fieldname = 'jform[type_id]';
+		$elementid = 'jform_type_id';
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
+
+
+		// ***
+		// *** Build disable comments selector
+		// ***
+
+		if ( $app->isSite() && $page_params->get('allowdisablingcomments_fe') )
+		{
+			// Set to zero if disabled or to "" (aka use default) for any other value.  THIS WILL FORCE comment field use default Global/Category/Content Type setting or disable it,
+			// thus a per item commenting system cannot be selected. This is OK because it makes sense to have a different commenting system per CONTENT TYPE by not per Content Item
+			$isdisabled = !$page_params->get('comments') && strlen($page_params->get('comments'));
+			$fieldvalue = $isdisabled ? 0 : "";
+
+			$fieldname = 'jform[attribs][comments]';
+			$elementid = 'jform_attribs_comments';
+			/*
+			$options = array();
+			$options[] = JHTML::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
+			$options[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
+			$attribs = '';
+			$lists['disable_comments'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
+			*/
+			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$i = 1;
+			$options = array(""=>JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ), 0=>JText::_( 'FLEXI_DISABLE' ) );
+			$lists['disable_comments'] = '';
+			foreach ($options as $option_id => $option_label)
+			{
+				$checked = $option_id===$fieldvalue ? ' checked="checked"' : '';
+				$elementid_no = $elementid.'_'.$i;
+				if (!$prettycheckable_added) $lists['disable_comments'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['disable_comments'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+				if (!$prettycheckable_added) $lists['disable_comments'] .= '&nbsp;'.JText::_($option_label).'</label>';
+				$i++;
+			}
+		}
+		
+		// ***
+		// *** Build languages list
+		// ***
+
+		// We will not use the default getInput() JForm method, since we want to customize display of language selection according to configuration
+		// probably we should create a new form element and use it in record's XML ... but maybe this is an overkill, we may do it in the future
+
+		// Find user's allowed languages
+		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
+
+		if ( $app->isSite() )
+		{
+			// Find globaly or per content type disabled languages
+			$disable_langs = $page_params->get('disable_languages_fe', array());
+
+			$langdisplay = $page_params->get('langdisplay_fe', 2);
+			$langconf = array();
+			$langconf['flags'] = $page_params->get('langdisplay_flags_fe', 1);
+			$langconf['texts'] = $page_params->get('langdisplay_texts_fe', 1);
+			$field_attribs = $langdisplay==2 ? 'class="use_select2_lib"' : '';
+			$lists['languages'] = flexicontent_html::buildlanguageslist( 'jform[language]', $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
+		}
+		else
+		{
+			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', 'class="use_select2_lib"', $item->language, 2, $allowed_langs);
+		}
+
+		return $lists;
+	}
+
+
+
 	/**
 	 * Calculates the user permission on the given item
 	 *
@@ -1021,6 +1218,4 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		return $perms;
 	}
-	
 }
-?>

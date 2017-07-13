@@ -3433,29 +3433,39 @@ class ParentClassItem extends FCModelAdmin
 	 * @return array
 	 * @since 1.0
 	 */
-	function getCatsselected($item_id=0)
+	function getCatsselected($item_id = 0)
 	{
 		// Allow retrieval of categories of any item
-		$item_id = $item_id ? $item_id : $this->_id;
+		$item_id = (int) ($item_id ?: $this->_id);
 		
-		// *** NOTE: this->_record->categories may already contain a VERSIONED array of values !!!
-		if( $this->_id == $item_id && !empty($this->_record->categories) ) {
-			// Return existing categories of current item
+		// Return existing categories of current item
+		// NOTE: 'categories' property may already contain a VERSIONED array of values
+		if( $this->_id == $item_id && !empty($this->_record->categories) )
+		{
 			return $this->_record->categories;
 		}
-		else if ($item_id) {
-			// Not current item, or current item's categories are not set
-			$query = "SELECT tid FROM #__flexicontent_cats_item_relations WHERE itemid ='".$item_id."'";
-			$this->_db->setQuery($query);
-			$categories = $this->_db->loadColumn();
-			if ($this->_id == $item_id) {
+
+		// Not current item, or current item's categories are not set
+		else if ($item_id)
+		{
+			$query = 'SELECT tid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int) $item_id;
+			$categories = $this->_db->setQuery($query)->loadColumn();
+
+			if ($this->_id == $item_id)
+			{
 				// Retrieved categories of current item, set them
-				$this->_record->categories = & $categories;
-				// 'cats' is alias of categories
-				$this->_record->cats = & $this->_record->categories;  // possibly used by CORE plugin for displaying in frontend
+				$this->_record->categories = $categories;
+
+				// Also set 'cats' which is alias of categories (possibly used by CORE plugin for displaying in frontend)
+				$this->_record->cats = & $this->_record->categories;
 			}
+
 			return $categories;
-		} else {
+		}
+
+		// Zero item_id return empty array
+		else
+		{
 			return array();
 		}
 	}
@@ -3778,12 +3788,13 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		
-		// ****************************************************************
-		// Trigger Event 'onContentChangeState' of Joomla's Content plugins
-		// ****************************************************************
+		// ***
+		// *** Trigger Event 'onContentChangeState' of Joomla's Content plugins
+		// ***
+
 		// Make sure we import flexicontent AND content plugins since we will be triggering their events
 		JPluginHelper::importPlugin('content');
-		
+
 		// PREPARE FOR TRIGGERING content events
 		// We need to fake joomla's states ... when triggering events
 		$fc_state = $state;
@@ -3792,21 +3803,25 @@ class ParentClassItem extends FCModelAdmin
 		else $jm_state = $fc_state;                                      // trashed & archive states
 
 		$item = new stdClass();
-		
+
 		// Compatibility steps (including Joomla compatible state),
 		// so that 3rd party plugins using the change state event work properly
 		$jinput->set('view', 'article');
 		$jinput->set('option', 'com_content');
 		$item->state = $jm_state;
-		
+
+		// Workaround for buggy extensions using article model but not setting correct include path
+		JModelLegacy::addIncludePath(JPATH_BASE . '/components/com_content/models');
+
+		//Trigger the event
 		$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
-		
+
 		// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
 		// besides the plugins using the change state event, should have updated DB state value anyway
 		$jinput->set('view', $view);
 		$jinput->set('option', $option);
 		if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
-		
+
 		if (in_array(false, $result, true) && !$event_failed_notice_added)
 		{
 			$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
