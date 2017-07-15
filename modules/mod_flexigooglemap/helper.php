@@ -115,11 +115,8 @@ class modFlexigooglemapHelper
 			{
 				if ( empty($itemLoc->value) ) continue;   // skip empty value
 
-				$coord = unserialize ($itemLoc->value);
-				$lat = $coord['lat'];
-				$lon = $coord['lon'];
-
-				if ( empty($lat) && empty($lon) ) continue;    // skip empty value
+				$coord = unserialize($itemLoc->value);
+				if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;    // skip empty value
 
 				$title = rtrim( addslashes($itemLoc->title) );
 
@@ -149,7 +146,7 @@ class modFlexigooglemapHelper
 
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
 
-				$coordinates = $lat .','. $lon;
+				$coordinates = $coord['lat'] .','. $coord['lon'];
 				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
 			}
 		}
@@ -165,13 +162,10 @@ class modFlexigooglemapHelper
 			}
 			foreach ($fc_list_items as $address)
 			{
-				if ( ! isset( $address->fieldvalues[$fieldaddressid][0]) ) continue;   // skip empty value
+				if ( !isset($address->fieldvalues[$fieldaddressid][0]) ) continue;   // skip empty value
 
-				$coord = unserialize ($address->fieldvalues[$fieldaddressid][0]);
-				$lat = $coord['lat'];
-				$lon = $coord['lon'];
-
-				if ( empty($lat) && empty($lon) ) continue;    // skip empty value
+				$coord = unserialize($address->fieldvalues[$fieldaddressid][0]);
+				if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;    // skip empty value
 
 				$title = addslashes($address->title);
 
@@ -201,7 +195,7 @@ class modFlexigooglemapHelper
 
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
 
-				$coordinates = $lat .','. $lon;
+				$coordinates = $coord['lat'] .','. $coord['lon'];
 				$mapLocations[] = "['<h4 class=\"fleximaptitle\">$title</h4>$contentwindows $linkdirection'," . $coordinates . "]\r\n";
 			}
 		}

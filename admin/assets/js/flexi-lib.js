@@ -53,13 +53,19 @@ jQuery(document).ready(function()
 
 		helper: function(e, tr)
 		{
-			var $originals = tr.children();
-			var $helper = tr.clone();
-			$helper.children().each(function(index) {
-				// Set helper cell sizes to match the original sizes
-				jQuery(this).width($originals.eq(index).width());
+			// Set header cell sizes to match the original sizes so that the table does not change size
+			var $table_head_cells = tr.closest('table').find('thead tr').children();
+			$table_head_cells.each(function(index) {
+				jQuery(this).css('width', $table_head_cells.eq(index).width());
 			});
-			return $helper;
+
+			// Set helper cell sizes to match the original sizes
+			var $original_row_cells = tr.children();
+			var $helper_row = tr.clone();
+			$helper_row.children().each(function(index) {
+				jQuery(this).css('width', $original_row_cells.eq(index).width());
+			});
+			return $helper_row;
 		},
 
 		start: function(event, ui)
@@ -72,6 +78,12 @@ jQuery(document).ready(function()
 
 		stop: function(event, ui)
 		{
+			// Remove forced width from header cell (added so that the table does not change size)
+			var $table_head_cells = ui.item.closest('table').find('thead tr').children();
+			$table_head_cells.each(function(index) {
+				jQuery(this).css('width', '');
+			});
+
 			row_new_index = ui.item.index();
 			moved_row_ord_grp = ui.item.find('td input[name="ord_grp\[\]"]').val();
 
