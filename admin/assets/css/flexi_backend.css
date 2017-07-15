@@ -184,9 +184,6 @@ icon-typeadd:before,
 	display: inline-block !important;
 	vertical-align: middle !important;
 }
-.flexicontent #adminForm table.adminlist {
-	width: 100% !important;
-}
 html body#minwidth-body {
 	min-width: 760px;
 }

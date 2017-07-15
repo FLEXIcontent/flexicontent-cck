@@ -1625,7 +1625,7 @@ table.adminlist {
 	border-spacing: 0px !important;
 	border-collapse: collapse !important;
 	color: #555;
-	width: 100%;
+	width: auto;
 	margin-bottom: 20px;
 }
 table.adminlist thead tr {
@@ -3205,9 +3205,6 @@ icon-typeadd:before,
 	float: none !important;
 	display: inline-block !important;
 	vertical-align: middle !important;
-}
-.flexicontent #adminForm table.adminlist {
-	width: 100% !important;
 }
 html body#minwidth-body {
 	min-width: 760px;
