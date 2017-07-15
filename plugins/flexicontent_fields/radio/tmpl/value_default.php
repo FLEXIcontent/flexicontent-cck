@@ -25,7 +25,7 @@ if ($text_or_value > 1)
 foreach ($values as $value)
 {
 	// Compatibility for serialized values
-	if ( $multiple && self::$valueIsArr )
+	if ( $multiple && static::$valueIsArr )
 	{
 		if (!is_array($value))
 		{
@@ -121,11 +121,18 @@ foreach ($values as $value)
 			$index[] = $pretext . $element->value . $posttext;
 		}
 	}
-	if ($multiple && self::$valueIsArr) {
+
+	// If field is multi-value with each value being an array of values, then implode current value into a single display string
+	if ($multiple && static::$valueIsArr)
+	{
 		// For current array of values, apply values separator, and field 's opening / closing texts
 		$field->{$prop}[] = !count($html) ? '' : $opentag . implode($separatorf, $html)  . $closetag;
 		$display_index[]  = !count($html) ? '' : $opentag . implode($separatorf, $index) . $closetag;
-	} else {
+	}
+
+	// Not a multi-value field or each value is not an array of values
+	else
+	{
 		// Done, there should not be more !!, since we handled an array of singular values
 		$field->{$prop} = $html;
 		$display_index = $index;
