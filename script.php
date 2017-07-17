@@ -472,8 +472,15 @@ class com_flexicontentInstallerScript
 			<tbody>
 			
 		<?php
-		$deprecated_fields = array('hidden'=>'text', 'relateditems'=>'relation', 'relateditems_backlinks'=>'relation_reverse', 'sharedaudio'=>'sharedmedia', 'sharedvideo'=>'sharedmedia');
-		
+		$deprecated_fields = array(
+			'hidden'=>'text',
+			'relateditems'=>'relation',
+			'relateditems_backlinks'=>'relation_reverse',
+			'sharedaudio'=>'sharedmedia',
+			'sharedvideo'=>'sharedmedia',
+			'extendedweblink'=>'weblink'
+		);
+
 		// Get DB table information
 		
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields_item_relations"';
@@ -1547,5 +1554,44 @@ class com_flexicontentInstallerScript
 			' WHERE name = "com_flexicontent"' );
 			$db->execute();
 		}
+	}
+
+
+	// Get existing field values
+	function renameLegacyRecordParameters($map, $dbtbl_name, $dbcol_name, $record_id)
+	{
+		// Load parameters directly from DB
+		$db = JFactory::getDBO();
+		$query = 'SELECT ' . $dbcol_name
+			. ' FROM #__' . $dbtbl_name . ' '
+			. ' WHERE '
+			. '  id='. $db->Quote($record_id)
+			;
+		$db->setQuery($query);
+		$attribs = $db->loadResult();
+
+		// Decode parameters
+		$_attribs = json_decode($attribs);
+
+		// Set old parameter values into new parameters, removing the old parameter values
+		foreach($map as $old => $new)
+		{
+			if (isset($_attribs->$old))
+			{
+				// Set new parameter value and remove legacy parameter value
+				$_attribs->$new = $_attribs->$old;
+				unset($_attribs->$old);
+			}
+		}
+
+		// Re-encode parameters
+		$attribs = json_encode($_attribs);
+		
+		// Store field parameter back to the DB
+		$query = 'UPDATE #__' . $dbtbl_name . ''
+			.' SET ' . $dbcol_name . '=' . $db->Quote($attribs)
+			.' WHERE id = ' . $record_id;
+		$db->setQuery($query);
+		$db->execute();
 	}
 }

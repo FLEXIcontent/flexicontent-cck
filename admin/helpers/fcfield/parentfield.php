@@ -368,8 +368,8 @@ class FCField extends JPlugin
 		$field  = $this->getField();
 		$item   = $this->getItem();
 		
-		$opentag	= $this->getOpenTag();
-		$closetag	= $this->getCloseTag();
+		$opentag   = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag  = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
 		$separatorf	= $this->getSeparatorF($opentag, $closetag);
 		
 		$field->{$prop} = array();
@@ -392,18 +392,9 @@ class FCField extends JPlugin
 	
 	
 	
-	// *********************************************
-	// Functions to execute common value preparation
-	// *********************************************
-	
-	protected function getOpenTag()
-	{
-		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'opentag', '' ), 'opentag' );
-	}
-	protected function getCloseTag()
-	{
-		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
-	}
+	// ***
+	// *** Functions to execute common value preparation
+	// ***
 	
 	// Do something before creating field's HTML for edit form
 	protected function beforeDisplayField() {}
@@ -442,21 +433,21 @@ class FCField extends JPlugin
 
 
 	// Get Prefix - Suffix - Separator parameters and other common parameters
-	protected function & getCommonParams(& $field, $item, $sep_default = 1)
+	protected function & getCommonParams($sep_default = 1)
 	{
 		static $conf = array();
-		if (isset($conf[$field->id]))
+		if (isset($conf[$this->field->id]))
 		{
-			return $conf[$field->id];
+			return $conf[$this->field->id];
 		}
-		
+
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$arr = array();
-		$arr['remove_space'] = $field->parameters->get( 'remove_space', 0 ) ;
-		$arr['pretext']   = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$arr['posttext']  = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$arr['opentag']   = $this->getOpenTag();
-		$arr['closetag']  = $this->getCloseTag();
+		$arr['remove_space'] = $this->field->parameters->get( 'remove_space', 0 ) ;
+		$arr['pretext']   = FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'pretext', '' ), 'pretext' );
+		$arr['posttext']  = FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'posttext', '' ), 'posttext' );
+		$arr['opentag']   = FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'opentag', '' ), 'opentag' );
+		$arr['closetag']  = FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
 		
 		if ($arr['pretext'])
 		{
@@ -477,5 +468,105 @@ class FCField extends JPlugin
 	function unserialize_array($v, $force_array=false, $force_value = true)
 	{
 		return flexicontent_db::unserialize_array($v, $force_array, $force_value);
+	}
+
+
+	// Create once the options for every field property that has specific selection options (e.g. drop down-selection)
+	function getPropertyOptions($choices)
+	{
+		// Parse the elements used by field unsetting last element if empty
+		$choices = preg_split("/[\s]*%%[\s]*/", $choices);
+		if ( empty($choices[count($choices)-1]) )
+		{
+			unset($choices[count($choices)-1]);
+		}
+
+		// Split elements into their properties: value, label, extra_prop1, extra_prop2
+		$elements = array();
+		$k = 0;
+		foreach ($choices as $choice)
+		{
+			$choice_props  = preg_split("/[\s]*::[\s]*/", $choice);
+			if (count($choice_props) < 2)
+			{
+				echo "Error in field: ".$field->label.
+					" while splitting class element: ".$choice.
+					" properties needed: ".$props_needed.
+					" properties found: ".count($choice_props);
+				continue;
+			}
+			$elements[$k] = new stdClass();
+			$elements[$k]->value = $choice_props[0];
+			$elements[$k]->text  = $choice_props[1];
+			$k++;
+		}
+
+		// Create the options for select drop down
+		$options = array();
+		$options[] = JHTML::_('select.option', '', '-');
+		foreach ($elements as $element)
+		{
+			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+		}
+		return $options;
+	}
+
+
+	// Get existing field values
+	function getExistingFieldValues()
+	{
+		$db = JFactory::getDBO();
+		$query = 'SELECT value '
+			. ' FROM #__flexicontent_fields_item_relations '
+			. ' WHERE '
+			. '  field_id='. $db->Quote($this->field->id)
+			. '  AND item_id='. $db->Quote($this->item->id)
+			. ' ORDER BY valueorder'
+			;
+		$db->setQuery($query);
+		$values = $db->loadColumn();
+		return $values;
+	}
+
+
+	// Get existing field values
+	function renameLegacyFieldParameters($map)
+	{
+		// Load parameters directly from DB
+		$db = JFactory::getDBO();
+		$query = 'SELECT attribs'
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE '
+			. '  id='. $db->Quote($this->field->id)
+			;
+		$db->setQuery($query);
+		$attribs = $db->loadResult();
+
+		// Decode parameters
+		$_attribs = json_decode($attribs);
+
+		// Set old parameter values into new parameters, removing the old parameter values
+		foreach($map as $old => $new)
+		{
+			if (isset($_attribs->$old))
+			{
+				// Set new parameter value and remove legacy parameter value
+				$_attribs->$new = $_attribs->$old;
+				unset($_attribs->$old);
+
+				// Update existing parameters object, to avoid reload field parameters
+				$this->field->parameters->set($new, $_attribs->$new);
+			}
+		}
+
+		// Re-encode parameters
+		$attribs = json_encode($_attribs);
+		
+		// Store field parameter back to the DB
+		$query = 'UPDATE #__flexicontent_fields'
+			.' SET attribs=' . $db->Quote($attribs)
+			.' WHERE id = ' . $this->field->id;
+		$db->setQuery($query);
+		$db->execute();
 	}
 }

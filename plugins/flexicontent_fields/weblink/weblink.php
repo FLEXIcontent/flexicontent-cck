@@ -68,20 +68,15 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 1);
 
+		// Link source mode. 0: is normal editing, 1: is editing of Joomla article links
+		$link_source = (int) $field->parameters->get('link_source', 0);
+		$show_values_expand_btn = $link_source === 0 ? $show_values_expand_btn : 0;
 
-		// ***
-		// *** URL
-		// ***
-		
-		// Default value
-		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
-		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_value_link', '' ) : '';
-		$default_link = $default_link ? JText::_($default_link) : '';
-		
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
-		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
+		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
+		$inputmask	= $allow_relative_addrs ? '' : $field->parameters->get( 'inputmask', '' ) ;
 		
 		// create extra HTML TAG parameters for the form field
 		$link_attribs = $field->parameters->get( 'extra_attributes', '' )
@@ -105,28 +100,66 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 		// ***
-		// *** URL title & linking text (optional)
+		// *** Default values
 		// ***
+		
+		// Legacy parameter names, weblink and extendended weblink were merged
+		$this->checkLegacyParameters($field);
 
-		// Default value
+		// URL value
+		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
+		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
+
+		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
 		$default_title = $default_title ? JText::_($default_title) : '';
 
+		// URL linking text (optional)
+		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
+		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
+		$default_text = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
+		$default_text = $default_text ? JText::_($default_text) : '';
 
-		// ***
-		// *** Hits usage
-		// ***
+		// URL class (optional)
+		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
+		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
+		$default_class = ($item->version == 0 || $class_usage > 0) ? $field->parameters->get( 'default_class', '' ) : '';
+		$default_class = $default_class ? JText::_($default_class) : '';
 
+
+		// URL id (optional)
+		$useid      = $field->parameters->get( 'use_id', 0 ) ;
+		$id_usage   = $field->parameters->get( 'id_usage', 0 ) ;
+		$default_id = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
+		$default_id = $default_id ? JText::_($default_id) : '';
+
+		// URL target
+		$usetarget  = $field->parameters->get( 'use_target', 0 ) ;
+
+		// URL Hits
 		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
 
 
+		// CSS class names
+		$class_choices = $field->parameters->get( 'class_choices', '') ;
+		if ($useclass==2)
+		{
+			$class_options = $this->getPropertyOptions($class_choices);
+		}
+
 		// Initialise property with default value
-		if ( !$field->value ) {
+		if ( !$field->value )
+		{
 			$field->value = array();
 			$field->value[0]['link']  = $default_link;
 			$field->value[0]['title'] = $default_title;
+			$field->value[0]['linktext']= $default_text;
+			$field->value[0]['class'] = $default_class;
+			$field->value[0]['id']    = $default_id;
+			$field->value[0]['target']= ''; // Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time
 			$field->value[0]['hits']  = 0;
 			$field->value[0] = serialize($field->value[0]);
 		}
@@ -138,6 +171,17 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+
+
+		// Joomla article links mode
+		if ( $link_source == -1 )
+		{
+			$field->html = $use_ingroup ?
+				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use Joomla article links, please disable use in group</div>') :
+				'_JOOMLA_ARTICLE_LINKS_HTML_';
+			return;
+		}
+
 
 		$js = "";
 		$css = "";
@@ -198,6 +242,17 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
 			
+			if ($allow_relative_addrs==2) $js .= "
+				var nr = 0;
+				newField.find('input.autoprefix').each(function() {
+					var elem = jQuery(this);
+					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autoprefix]');
+					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					nr++;
+				});
+				";
+			
 			// Update new URL optional properties
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.urltitle').first();
@@ -207,6 +262,39 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
 			
+			if ($usetext) $js .= "
+				theInput = newField.find('input.urllinktext').first();
+				theInput.val(".json_encode($default_text).");
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
+				newField.find('.urllinktext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
+				";
+			
+			if ($useclass) $js .= "
+				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
+				theField.val(".json_encode($default_class).");
+				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
+				theField.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
+				newField.find('.urlclass-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
+				";
+			
+			if ($useid) $js .= "
+				theInput = newField.find('input.urlid').first();
+				theInput.val(".json_encode($default_id).");
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
+				newField.find('.urlid-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
+				";
+			
+			// Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time
+			if ($usetarget) $js .= "
+				theInput = newField.find('input.ulrtarget').first();
+				theInput.val('');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][target]');
+				theInput.attr('target','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
+				newField.find('.ulrtarget-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
+				";
+			
 			if ($usehits) $js .="
 				theInput = newField.find('input.urlhits').first();
 				theInput.val('0');
@@ -214,6 +302,15 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				newField.find('.urlhits-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				
+				// Re-init any select2 elements
+				var has_select2 = newField.find('div.select2-container').length != 0;
+				if (has_select2)
+				{
+					newField.find('div.select2-container').remove();
+					newField.find('select.use_select2_lib').select2('destroy').show();
+					fc_attachSelect2(newField);
+				}
+
 				// Set hits to zero for new row value
 				newField.find('span span').html('0');
 				";
@@ -379,6 +476,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+
+		// Link source mode. 0: is normal editing, 1: is editing of Joomla article links
+		$link_source = (int) $field->parameters->get('link_source', 0);
+		$multiple = $link_source==-1 ? 1 : $multiple;
 		
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
@@ -386,30 +487,110 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// some parameter shortcuts
 		$tooltip_class = 'hasTooltip';
 
-		// Target window
-		$target       = $field->parameters->get( 'targetblank', 0 );
-		$target_param = $target ? ' target="_blank"' : '';
 
-		// Hits
+		// ***
+		// *** Default values
+		// ***
+
+		// Legacy parameter names, weblink and extendended weblink were merged
+		$this->checkLegacyParameters($field);
+
+		// URL value
+		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
+		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_link', '' ) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
+		
+		// URL title (optional)
+		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
+		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
+
+		// URL linking text (optional)
+		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
+		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
+		$default_text = ($text_usage == 2)  ?  $field->parameters->get( 'default_text', '' ) : '';
+		$default_text = $default_text ? JText::_($default_text) : '';
+		
+		// URL class (optional)
+		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
+		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
+		$default_class = ($class_usage == 2)  ?  $field->parameters->get( 'default_class', '' ) : '';
+		$default_class = $default_class ? JText::_($default_class) : '';
+		
+		// URL id (optional)
+		$useid      = $field->parameters->get( 'use_id', 0 ) ;
+		$id_usage	  = $field->parameters->get( 'id_usage', 0 ) ;
+		$default_id = ($id_usage == 2)  ?  $field->parameters->get( 'default_id', '' ) : '';
+		$default_id = $default_id ? JText::_($default_id) : '';
+
+		// URL target && rel-nofollow
+		$usetarget      = $field->parameters->get( 'use_target', 0 ) ;
+		$default_target = $field->parameters->get( 'target', '' );
+		$add_rel_nofollow = $field->parameters->get( 'add_rel_nofollow', 0 );
+
+		// URL Hits
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
-		$rel_nofollow = $field->parameters->get( 'add_rel_nofollow', 0 ) ? ' rel="nofollow"'    : '';
-		
-		// URL value
-		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
-		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_value_link', '' ) : '';
-		$default_link = $default_link ? JText::_($default_link) : '';
-		
-		// URL title & linking text (optional)
-		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
-		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = $default_title ? JText::_($default_title) : '';
-		
+
+		// Compatibility with old layouts
+		$target_param = $default_target ? ' target="'.$default_target.'" ' : '';
+		$rel_nofollow = $add_rel_nofollow ? ' rel="nofollow" ' : '';
+
 		// Get field values
 		$values = $values ? $values : $field->value;
-		
+
+		// Joomla article links mode
+		if ( $link_source == -1 )
+		{
+			$usetitle = false;
+			$usetext = true;
+			$useclass = false;
+			$usetarget = true;
+			$useid = false;
+			$values = array();
+
+			$target_remap = array(
+				'', $default_target,
+				'0' => '_self',   // current window / frame /tab
+				'1' => '_blank',  // new window
+				'2' => '_popup',  // use single (shared) popup window, that opens with onclick event using window.open()
+				'3' => '_modal',  // use modal popup window
+			);
+
+			if ( $item->urls )
+			{
+				if (!is_object($item->urls))
+				{
+					try
+					{
+						$item->urls = new JRegistry($item->urls);
+					}
+					catch (Exception $e)
+					{
+						$item->urls = flexicontent_db::check_fix_JSON_column('urls', 'content', 'id', $item->id);
+					}
+				}
+				//echo "<pre>"; print_r($item->urls); echo "</pre>"; exit;
+
+				$c_arr = array('a', 'b', 'c');
+				foreach ($c_arr as $c)
+				{
+					if ($url = $item->urls->get('url'.$c, null))
+					{
+						$values[] = serialize(array(
+							'link' => $url,
+							'linktext' => $item->urls->get('url'.$c.'text', null),
+							'target' => $target_remap[$item->urls->get('target'.$c, 0)]
+						));
+					}
+				}
+				//echo "<pre>"; print_r($values); echo "</pre>"; exit;
+			}
+		}
+
+
 		// Check for no values and no default value, and return empty display
 		if ( empty($values) )
 		{
@@ -419,9 +600,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				return;
 			}
 			$values = array();
-			$values[0]['link']  = $default_link;
-			$values[0]['title'] = $default_title;
-			$values[0]['hits']  = 0;
+			$values[0]['link']     = $default_link;
+			$values[0]['title']    = $default_title;
+			$values[0]['linktext'] = $default_text;
+			$values[0]['class']    = $default_class;
+			$values[0]['id']       = $default_id;
+			$values[0]['target']   = '';  // do not set viewing default !, this will allow re-configuring default in viewing at any time ...
+			$values[0]['hits']     = 0;
 			$values[0] = serialize($values[0]);
 		}
 		
@@ -436,7 +621,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				{
 					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
 					$value = $array ?: array(
-						'link' => $value, 'title' => '', 'hits' => 0
+						'link' => $value, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
 					);
 				}
 			}
@@ -517,17 +702,40 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$host = JURI::getInstance('SERVER')->gethost();
 		
+		// URL title (optional)
+		$usetitle   = $field->parameters->get( 'use_title', 0 ) ;
+		$usetext    = $field->parameters->get( 'use_text', 0 ) ;
+		$useclass   = $field->parameters->get( 'use_class', 0 ) ;
+		$useid      = $field->parameters->get( 'use_id', 0 ) ;
+		$usetarget  = $field->parameters->get( 'use_target', 0 ) ;
+		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
+
 		// Server side validation
-		//$validation = $field->parameters->get( 'validation', 'URL' ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
 		
+		$db_values_arr = $this->getExistingFieldValues();
+		$db_values = array();
+		foreach($db_values_arr as $db_value)
+		{
+				$array = $this->unserialize_array($db_value, $force_array=false, $force_value=false);
+				$v = $array ?: array(
+					'link' => $v, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
+				);
+				$db_values[$v['link']] = $v;
+		}
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
@@ -541,7 +749,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			{
 				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
 				$v = $array ?: array(
-					'link' => $v, 'title' => '', 'hits' => 0
+					'link' => $v, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
 				);
 			}
 
@@ -559,22 +767,37 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				continue;
 			}
 			
+			// Sanitize the URL as absolute or relative
+			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int) @$v['autoprefix']);
+
 			// Has protocol nothing to do
 			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
+
 			// Has current domain but no protocol just add http://
 			else if (strpos($link, $host) === 0) $prefix = 'http://';
-			// URLs are absolute, for relative URL support you need extended web link field
-			else {
+
+			// Relative URLs allowed, do to not add Joomla ROOT, to allow website to be moved and change subfolder
+			else if ( !$force_absolute ) $prefix = '';
+
+			// Absolute URLs are forced
+			else
+			{
 				if (substr($link, 0, 10) == '/index.php')  $link = substr($link, 1);
 				$prefix = (substr($link, 0, 9) == 'index.php') ? JURI::root() : 'http://';
 			}
+
+			$prefixed_link = empty($link) ? '' : $prefix . $link;
 			
 			$newpost[$new] = array();
-			$newpost[$new]['link'] = empty($link) ? '' : $prefix.$link;
+			$newpost[$new]['link'] = $prefixed_link;
 			
 			// Validate other value properties
-			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
-			$newpost[$new]['hits']    = (int) @ $v['hits'];
+			$newpost[$new]['title']   = !$usetitle  ? '' : flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
+			$newpost[$new]['linktext']= !$usetext   ? '' : flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
+			$newpost[$new]['class']   = !$useclass  ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
+			$newpost[$new]['id']      = !$useid     ? '' : flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
+			$newpost[$new]['target']  = !$usetarget ? '' : flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
+			$newpost[$new]['hits']    = isset($db_values[$prefixed_link]) ? (int) @ $db_values[$prefixed_link]['hits'] : 0;
 			
 			$new++;
 		}
@@ -683,5 +906,24 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$cleanurl = str_replace($prefix, "", $url);
 		return $cleanurl;
 	}
-	
+
+
+	// Get a url without the protocol
+	function checkLegacyParameters($field)
+	{
+		// Legacy parameter names, weblink and extendended weblink were merged
+		if (
+			$field->parameters->get('default_link_usage')!==null ||
+			$field->parameters->get('default_value_link')!==null ||
+			$field->parameters->get('default_value_title')!==null)
+		{
+			$this->setField($field);
+			$this->setItem($item);
+			$this->renameLegacyFieldParameters(array(
+				'default_link_usage'=>'link_usage',
+				'default_value_link'=>'default_link',
+				'default_value_title'=>'default_title'
+			));
+		}
+	}
 }

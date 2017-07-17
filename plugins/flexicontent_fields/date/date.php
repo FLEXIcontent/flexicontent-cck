@@ -428,8 +428,11 @@ class plgFlexicontent_fieldsDate extends FCField
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
 		$field->label = JText::_($field->label);
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 		
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
@@ -489,12 +492,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
 
-		// Set field and item objects
-		$this->setField($field);
-		$this->setItem($item);
-
 		// Prefix - Suffix - Separator parameters - Other common parameters
-		$common_params_array = $this->getCommonParams($item, 1);
+		$common_params_array = $this->getCommonParams();
 		extract($common_params_array);
 		
 		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
