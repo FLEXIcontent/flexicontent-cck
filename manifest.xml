@@ -2,7 +2,7 @@
 <extension type="component" version="3.4.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
-	<creationDate>09 June 2017</creationDate>
+	<creationDate>17 July 2017</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, FLEXIcontent Team</author>
 	<authorEmail>noreply@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
@@ -182,7 +182,6 @@
 		<plugin name="coreprops"          folder="plugins/flexicontent_fields/coreprops"          instfolder="flexicontent_fields">FLEXIcontent - Item Form CORE property placer</plugin>
 		<plugin name="date"               folder="plugins/flexicontent_fields/date"               instfolder="flexicontent_fields">FLEXIcontent - Date / Timestamp / Publish Up-Down Dates</plugin>
 		<plugin name="email"              folder="plugins/flexicontent_fields/email"              instfolder="flexicontent_fields">FLEXIcontent - Email</plugin>
-		<plugin name="extendedweblink"    folder="plugins/flexicontent_fields/extendedweblink"    instfolder="flexicontent_fields">FLEXIcontent - Extended Weblink</plugin>
 		<plugin name="fcloadmodule"       folder="plugins/flexicontent_fields/fcloadmodule"       instfolder="flexicontent_fields">FLEXIcontent - Load Module / Module position</plugin>
 		<plugin name="fcpagenav"          folder="plugins/flexicontent_fields/fcpagenav"          instfolder="flexicontent_fields">FLEXIcontent - Navigation (Next/Previous Item)</plugin>
 		<plugin name="fieldgroup"         folder="plugins/flexicontent_fields/fieldgroup"         instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Repeatable and cascadable group of fields)</plugin>

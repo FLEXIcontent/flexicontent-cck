@@ -142,7 +142,7 @@ class JFormFieldFCFieldWrapper extends JFormField
 			}
 
 
-			else if ($field->field_type=='extendedweblink')
+			else if ($field->field_type=='weblink')
 			{
 				if ($field->parameters->get('link_source')==-1)
 				{
