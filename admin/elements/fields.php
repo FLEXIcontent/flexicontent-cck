@@ -160,7 +160,7 @@ class JFormFieldFields extends JFormField
 		$orderable = (int) @ $attributes['orderable'];
 		if ( $orderable && empty($non_orderable) )
 		{
-			$non_orderable1 = 'account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule';
+			$non_orderable1 = 'account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,email,fcloadmodule';
 			$non_orderable2 = trim($cparams->get('non_orderable_types', ''));
 			
 			$non_orderable = $non_orderable1.($non_orderable2 ? ','.$non_orderable2 : '');

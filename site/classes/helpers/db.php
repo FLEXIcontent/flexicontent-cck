@@ -785,7 +785,7 @@ class flexicontent_db
 		$grps = array(
 			JText::_('FLEXI_SELECTION_FIELDS')          => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
 			JText::_('FLEXI_SINGLE_PROP_FIELDS')        => array('date', 'text', 'textarea', 'textselect'),
-			JText::_('FLEXI_MULTIPLE_PROP_FIELDS')      => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
+			JText::_('FLEXI_MULTIPLE_PROP_FIELDS')      => array('weblink', 'email', 'phonenumbers', 'termlist'),
 			JText::_('FLEXI_MEDIA_MINI_APPS_FIELDS')    => array('file', 'image', 'minigallery', 'sharedmedia', 'addressint'),
 			JText::_('FLEXI_ITEM_FORM_FIELDS')          => array('fieldgroup', 'account_via_submit', 'groupmarker', 'coreprops'),
 			JText::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist', 'authoritems', 'jprofile'),

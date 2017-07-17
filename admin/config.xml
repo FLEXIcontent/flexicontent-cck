@@ -746,7 +746,7 @@
 
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="" level="level1" />
 			
-			<field name="non_orderable_types" type="textarea" default="account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
+			<field name="non_orderable_types" type="textarea" default="account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,email,fcloadmodule" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="orderby" type="fcordering" default="rdate" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
