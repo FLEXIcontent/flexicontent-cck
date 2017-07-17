@@ -44,7 +44,7 @@ abstract class JHtmlFcitems
 
 		return $canChange
 			? '
-			<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="featured btn btn-small ntxt hasTooltip'
+			<a href="javascript:;" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="featured btn btn-small ntxt hasTooltip'
 				. ($value == 1 ? ' active' : '') . '" title="' . $state[3] . '">
 				<span class="icon-' . $state[0] . '"></span>
 			</a>
@@ -88,8 +88,6 @@ abstract class JHtmlFcitems
 	}
 
 
-
-
 	/**
 	 * Create the scheduled/expired icons
 	 *
@@ -121,5 +119,28 @@ abstract class JHtmlFcitems
 		}
 
 		return '';
+	}
+
+
+	/**
+	 * Create the reviewing needed icon
+	 *
+	 * @param   int      $row        The row
+	 * @param   int      $user       The user
+	 * @param   int      $i          Row number
+	 *
+	 * @return  string       HTML code
+	 */
+	public static function reviewing_needed($row, $user, $i)
+	{
+		$html = '';
+		if ($row->unapproved_version)
+		{
+			$tip_class = 'hasTooltip';
+			$tip_text = JText::_('FLEXI_UNREVIEWED_VERSION') . ' , ' . JText::_('FLEXI_NEED_TO_BE_APPROVED');
+			$html = '<span class="fc-revised-icon"><span class="icon-out-3 '.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span></<span> ';
+		}
+
+		return $html;
 	}
 }
