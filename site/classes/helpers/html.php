@@ -1115,9 +1115,8 @@ class flexicontent_html
 				break;
 
 			case 'google-maps':
-				$force_language = $mode == 'form'
-					? '&amp;language=' . flexicontent_html::getUserCurrentLang()
-					: '';
+				//$force_language = $mode == 'form' ? '&amp;language=' . flexicontent_html::getUserCurrentLang() : '';
+				$force_language = '&amp;language=' . flexicontent_html::getUserCurrentLang();
 				$google_maps_js_api_key = $params->get('google_maps_js_api_key', $params->get('apikey'));
 				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&amp;key=' . $google_maps_js_api_key : '') . $force_language);
 				break;
@@ -1922,22 +1921,39 @@ class flexicontent_html
 				$q = 'SELECT id, created_user_id as created_by, parent_id as catid FROM #__categories WHERE id =' . $id;
 				$asset = 'com_content.category.' . $id;
 				break;
+			case 'tag':
+				$q = 'SELECT id, created_user_id as created_by, parent_id as catid FROM #__tags WHERE id =' . $id;
+				$asset = 'com_tags.tag.' . $id;
+				$canManage = FlexicontentHelperPerm::getPerm()->CanTags ? true : false;
+				$archive_unsupported = false;
+				$trash_unsupported = false;
+				break;
 			default:
 				die('flexicontent_html::statebutton() , unknown type: ' . $record_type);
 				break;
 		}
 
-		// Get owner and other record data
-		$db = JFactory::getDBO();
-		$db->setQuery($q);
-		$record = $db->loadObject();
-
 		// Determine privileges of the current user on the given item
-		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $record->created_by == $user->get('id'));
-		$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $record->created_by == $user->get('id'));
+		if (!isset($canManage))
+		{
+			$has_edit_state = $canManage;
+			$has_delete = $canManage;
+		}
+		else
+		{
+			// Get owner and other record data
+			$db = JFactory::getDBO();
+			$db->setQuery($q);
+			$record = $db->loadObject();
+
+			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $record->created_by == $user->get('id'));
+			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $record->created_by == $user->get('id'));
+		}
+		$has_delete = $has_delete && empty($trash_unsupported);
+
 		// ...
 		$permission = FlexicontentHelperPerm::getPerm();
-		$has_archive    = $permission->CanArchives;
+		$has_archive    = $permission->CanArchives && empty($archive_unsupported);
 
 		$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
 		$has_delete     = $has_delete     && $state == -2;
@@ -2444,13 +2460,31 @@ class flexicontent_html
 				$created_by = $item->created_user_id;
 				$refresh_on_success = 'true';
 				break;
+			case 'tags':
+				$canManage = FlexicontentHelperPerm::getPerm()->CanTags ? true : false;
+				$refresh_on_success = 'false';
+				$archive_unsupported = false;
+				$trash_unsupported = false;
+				break;
 			default:
 				die('flexicontent_html::statebutton() , unknown type: ' . $ops['controller']);
 				break;
 		}
+
 		$item->canCheckin   = isset($item->canCheckin)   ? $item->canCheckin   : $has_checkin || $item->checked_out == 0 || $item->checked_out == $user->id;
-		$item->canEditState = isset($item->canEditState) ? $item->canEditState : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.edit.state', $asset) || ($created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset)));
-		$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.delete', $asset)     || ($created_by == $user->get('id') && $user->authorise('core.delete.own', $asset)));
+		if (isset($canManage))
+		{
+			$item->canEditState = isset($item->canEditState) ? $item->canEditState : $canManage;
+			$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : $canManage;
+		}
+		else
+		{
+			$item->canEditState = isset($item->canEditState) ? $item->canEditState : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.edit.state', $asset) || ($created_by == $user->get('id') && $user->authorise('core.edit.state.own', $asset)));
+			$item->canDelete    = isset($item->canDelete)    ? $item->canDelete    : (!$isAdmin || $item->canCheckin) && ($user->authorise('core.delete', $asset)     || ($created_by == $user->get('id') && $user->authorise('core.delete.own', $asset)));
+		}
+
+		$item->canDelete = $item->canDelete && empty($trash_unsupported);
+		$has_archive = $has_archive && empty($archive_unsupported);
 
 		// Display state toggler if it can do any of state change
 		$canChangeState = $item->canEditState || $item->canDelete || $has_archive;
@@ -4956,5 +4990,80 @@ class flexicontent_html
 		} catch ( Exception $e ) {
 			return '';
 		}
+	}
+
+
+	// Get SEF url regardless of being in backend / frontend
+	public static function getSefUrl($url, $xhtml = true, $ssl = null)
+	{
+		static $site_router, $isAdmin, $isSH404SEF;
+
+		// Get frontend route instance if we are in the backend and SH404SEF is not installed
+		if ( $site_router === null )
+		{
+			$isAdmin = JFactory::getApplication()->isAdmin();
+			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
+			$site_router = $isAdmin && !$isSH404SEF
+				? JApplication::getInstance('site')::getRouter()
+				: JFactory::getApplication()::getRouter();
+		}
+
+		if (!is_array($url) && (strpos($url, '&') !== 0) && (strpos($url, 'index.php') !== 0))
+		{
+			return $url;
+		}
+
+		// Force application to the site app if we are in the backend
+		if ( $isAdmin && !$isSH404SEF )  JFactory::$application = JApplication::getInstance('site');
+
+		// Build route
+		$uri = $site_router->build($url);
+
+		// Restore application to the admin app if we are in the backend
+		if  ( $isAdmin && !$isSH404SEF )  JFactory::$application = JApplication::getInstance('administrator');
+
+		$scheme = array('path', 'query', 'fragment');
+
+		/*
+		 * Get the secure/unsecure URLs.
+		 *
+		 * If the first 5 characters of the BASE are 'https', then we are on an ssl connection over
+		 * https and need to set our secure URL to the current request URL, if not, and the scheme is
+		 * 'http', then we need to do a quick string manipulation to switch schemes.
+		 */
+		if ((int) $ssl || $uri->isSsl())
+		{
+			static $host_port;
+
+			if (!is_array($host_port))
+			{
+				$uri2 = JUri::getInstance();
+				$host_port = array($uri2->getHost(), $uri2->getPort());
+			}
+
+			// Determine which scheme we want.
+			$uri->setScheme(((int) $ssl === 1 || $uri->isSsl()) ? 'https' : 'http');
+			$uri->setHost($host_port[0]);
+			$uri->setPort($host_port[1]);
+			$scheme = array_merge($scheme, array('host', 'port', 'scheme'));
+		}
+
+		$url = $uri->toString($scheme);
+
+		// Replace spaces.
+		$url = preg_replace('/\s/u', '%20', $url);
+
+		if ($xhtml)
+		{
+			$url = htmlspecialchars($url, ENT_COMPAT, 'UTF-8');
+		}
+
+		// Check if we are in the backend again and remove administrator from URL as it is added even though we've set the application to the site app
+		if ( $isAdmin )
+		{
+			$url = str_replace(JURI::base(true), JURI::root(true), $url);
+		}
+
+		return $url;
 	}
 }
