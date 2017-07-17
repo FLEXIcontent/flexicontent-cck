@@ -317,12 +317,22 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		$where = array();
 
-		if ( $filter_state ) {
+		if ( empty($filter_state) )
+		{
+			$where[] = 't.published <> -2';
+			$where[] = 't.published <> 2';
+		}
+		else
+		{
 			if ( $filter_state == 'P' ) {
 				$where[] = 't.published = 1';
 			} else if ($filter_state == 'U' ) {
 				$where[] = 't.published = 0';
-			} // else ALL: published & unpublished (in future we may have more states, e.g. archived, trashed)
+			} else if ($filter_state == 'A' ) {
+				$where[] = 't.published = 2';
+			} else if ($filter_state == 'T' ) {
+				$where[] = 't.published = -2';
+			}
 		}
 
 		if ($search) {
