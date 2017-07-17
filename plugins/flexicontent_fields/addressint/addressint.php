@@ -439,29 +439,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					rowCount".$field->id."--;
 				}
 			}
-
-			function enableField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				row.find('.fcfield-enablevalue').parent().hide();
-				row.find('.fcfield-disablevalue').parent().show();
-
-				row.find('.fc-field-prop-disabled').removeAttr('disabled').prop('disabled', false).removeClass('fc-field-prop-disabled');
-				row.find('.fc-field-value-properties-box').removeClass('fc-field-value-disabled');
-			}
-			function disableField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				row.find('.fcfield-enablevalue').parent().show();
-				row.find('.fcfield-disablevalue').parent().hide();
-
-				row.find(':enabled').attr('disabled', 'disabled').prop('disabled', true).addClass('fc-field-prop-disabled');
-				row.find('.fc-field-value-properties-box').addClass('fc-field-value-disabled');
-			}
 			";
 			
 			$css .= '';
@@ -478,6 +455,31 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$js .= '';
 			$css .= '';
 		}
+
+			$js .= "
+			function enableField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('.fcfieldval_container');
+
+				row.find('.fcfield-enablevalue').parent().hide();
+				row.find('.fcfield-disablevalue').parent().show();
+
+				row.find('.fc-field-prop-disabled').removeAttr('disabled').prop('disabled', false).removeClass('fc-field-prop-disabled');
+				row.find('.fc-field-value-properties-box').removeClass('fc-field-value-disabled');
+			}
+			function disableField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('.fcfieldval_container');
+
+				row.find('.fcfield-enablevalue').parent().show();
+				row.find('.fcfield-disablevalue').parent().hide();
+
+				row.find(':enabled').attr('disabled', 'disabled').prop('disabled', true).addClass('fc-field-prop-disabled');
+				row.find('.fc-field-value-properties-box').addClass('fc-field-value-disabled');
+			}
+		";
 
 		$enable_disable_btns = $required ? '' : '
 			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
@@ -542,9 +544,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here).'
 				</div>
-				' . ($enable_disable_btns ? sprintf($enable_disable_btns, !$field->fc_form_data[$n]->value_disabled ? 'display:none' : '',  $field->fc_form_data[$n]->value_disabled ? 'display:none' : '') : '') . '
+				')
+				. ($enable_disable_btns ? sprintf($enable_disable_btns, !$field->fc_form_data[$n]->value_disabled ? 'display:none' : '',  $field->fc_form_data[$n]->value_disabled ? 'display:none' : '') : '') . '
 				<div class="fcclear"></div>
-				').'
 				'.$_html_;
 		}
 		unset($_html_);
