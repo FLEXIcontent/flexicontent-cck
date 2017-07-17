@@ -204,6 +204,8 @@ class FlexicontentViewTags extends JViewLegacy
 
 		// Create pagination object
 		$pagination = $this->get( 'Pagination' );
+		$inline_ss_max = 50000;
+		$drag_reorder_max = 150;
 
 		$lists = array();
 		
@@ -221,7 +223,8 @@ class FlexicontentViewTags extends JViewLegacy
 		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$states[] = JHTML::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
+		$states[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		$states[] = JHTML::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
 		
 		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
 			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
@@ -238,14 +241,15 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		
 		//assign data to template
-		$this->assignRef('count_filters', $count_filters);
+		$this->count_filters = $count_filters;
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->pagination = $pagination;
-		
+
+		$this->inline_ss_max = $inline_ss_max;
 		$this->option = $option;
 		$this->view = $view;
-		
+
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}

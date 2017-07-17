@@ -32,7 +32,6 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
-$autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $list_total_cols = 8;
 
@@ -53,8 +52,13 @@ $attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class
 $attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED_RSS', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
-$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
-$image_rsslist = JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
+$image_preview = 0
+	? JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
+	: '<span class="icon-screen"></span>';
+$image_rsslist = 0
+	? JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"')
+	: '<span class="icon-feed"></span>';
+
 $image_editlayout = 0 ?
 	JHTML::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
@@ -158,15 +162,14 @@ function delAllFilters() {
 	<thead>
 		<tr class="header">
 			<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="center">
+			<th class="left">
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
-			<th class="center hidden-phone"></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', 'FLEXI_STATUS', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass alias hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
@@ -174,7 +177,7 @@ function delAllFilters() {
 	<tbody>
 		<?php
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
-		$edit_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&amp;task=';
+		$edit_task = 'task=tags.';
 		$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;fcform=1&amp;filter_tag=';
 		$use_catlinks = $cparams->get('tags_using_catview', 0);
 
@@ -184,8 +187,9 @@ function delAllFilters() {
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row  = & $this->rows[$i];
+			$row->language = !empty($row->language) ? $row->language : '*';
+
 			$link = 'index.php?option=com_flexicontent&amp;'.$edit_task.'edit&amp;cid='. $row->id;
-			$published	= JHTML::_('jgrid.published', $row->published, $i, 'tags.' );
 
 			$canEdit    = 1;
 			$canEditOwn = 1;
@@ -199,16 +203,33 @@ function delAllFilters() {
 				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
-			<td class="center hidden-phone">
-				<?php
-				$tag_link = $use_catlinks ?
-					FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$row->slug)) :
-					FlexicontentHelperRoute::getTagRoute($row->slug) ;
-				$tag_link    = str_replace('&', '&amp;', $tag_link);
-				$tag_link    = JRoute::_(JURI::root().$tag_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
-				$previewlink = $tag_link . $autologin;
-				echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
-				?>
+			<td class="col_state" style="padding-right: 8px;">
+				<div class="btn-group fc-group fc-tags">
+					<?php
+					$record_url =
+						// Route the record URL to an appropriate menu item
+						($use_catlinks
+							? FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$row->slug), $row)
+							: FlexicontentHelperRoute::getTagRoute($row->slug)
+						)
+
+						// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
+						. ( $row->language != '*' ? '&lang=' . substr($row->language, 0, 2) : '' );
+
+					// Build a frontend SEF url
+					$record_url = flexicontent_html::getSefUrl($record_url);
+
+					$previewlink = $record_url;
+					$rsslink = $record_url  . (strstr($record_url, '?') ? '&amp;' : '?') . 'format=feed&amp;type=rss';
+
+					//echo JHTML::_('jgrid.published', $row->published, $i, 'tags.', $canChange);
+					//echo JHtml::_('fctags.published', $row->published, $i, $canChange);
+
+					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small', array('controller'=>'tags', 'state_propname'=>'published') );
+					echo (!$use_catlinks ? '' : '<a '.$attribs_rsslist.' href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>');
+					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+					?>
+				</div>
 			</td>
 			<td class="title">
 				<?php
@@ -263,9 +284,6 @@ function delAllFilters() {
 				<a class="btn btn-small fc-assignments-btn" href="<?php echo $items_link.$row->id; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>">
 					<?php echo $row->nrassigned ? $row->nrassigned : 0; ?>
 				</a>
-			</td>
-			<td class="center">
-				<?php echo $published; ?>
 			</td>
 			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
 		</tr>

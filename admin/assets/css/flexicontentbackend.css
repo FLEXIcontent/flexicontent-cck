@@ -1247,10 +1247,14 @@ body .btn-group.fc-group > .statetoggler_disabled.btn.btn-small,
 body .btn-group.fc-group > .statetoggler.btn.btn-small {
 	padding: 4px 8px;
 }
-.fc-preview-btn .icon-screen:before {
+.fc-revised-icon .icon-out-3 {
 	color: darkorange;
+	vertical-align: middle;
+	line-height: 1em;
+	color: black;
+	font-size: 120%;
 }
-.fc-preview-btn .icon-screen:before {
+.fc-preview-btn .icon-screen {
 	color: darkcyan;
 }
 #flexicontent .fc-box,

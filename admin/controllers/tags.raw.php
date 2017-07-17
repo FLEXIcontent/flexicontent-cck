@@ -143,4 +143,17 @@ class FlexicontentControllerTags extends FlexicontentController
 		}
 		jexit();
 	}
+
+
+	/**
+	 * Logic to change the state of a tag
+	 *
+	 * @access public
+	 * @return void
+	 * @since 3.2
+	 */
+	function setitemstate()
+	{
+		flexicontent_html::setitemstate($this, 'json', $_record_type = 'tag');
+	}
 }
