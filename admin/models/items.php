@@ -977,7 +977,8 @@ class FlexicontentModelItems extends JModelLegacy
 			$where		= $this->_buildContentWhere($extra_joins);
 			$orderby	= $this->_buildContentOrderBy();
 		}
-		
+
+		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
 		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
 		
@@ -1009,7 +1010,8 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 		}
 		
-		if ( !$query_ids ) {
+		if ( !$query_ids )
+		{
 			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
 				//. ($filter_order=='type_name' ? ', t.name AS type_name ' : '')
 				//. ($filter_order=='catsordering' ? ', rel.ordering as catsordering ' : '')
@@ -1019,7 +1021,9 @@ class FlexicontentModelItems extends JModelLegacy
 					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order ' : ''
 					)
 				;
-		} else {
+		}
+		else
+		{
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
 				. 'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
@@ -1032,6 +1036,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled, '
 				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired, '
 				. 't.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
+				. ($use_versioning ? ', CASE WHEN i.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
 				;
 		}
 		
@@ -1044,9 +1049,10 @@ class FlexicontentModelItems extends JModelLegacy
 				. ($use_tmp ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
 				. ($tmp_only ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id')
 				. ' JOIN #__categories AS c ON c.id = i.catid'
-				. ((!$query_ids && count($customFiltsActive)) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
+				. (!$query_ids && count($customFiltsActive) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
-				. (in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
+				. (!$query_ids && in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
+				. ($query_ids && $use_versioning ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && $filter_subcats ? ' AND rel.catid='.$filter_cats : '')
@@ -1057,7 +1063,8 @@ class FlexicontentModelItems extends JModelLegacy
 				. $extra_joins
 				;
 		
-		if ( !$query_ids ) {
+		if ( !$query_ids )
+		{
 			$having = array();
 			if ( in_array('RV', $filter_state) ) $having[] = ' i.version<>MAX(fv.version_id) ';
 			if ( count($customFiltsActive) ) $having[] = ' matched_custom = '.count($customFiltsActive);
@@ -1067,7 +1074,9 @@ class FlexicontentModelItems extends JModelLegacy
 				. ( count($having) ? ' HAVING '.implode(' AND ', $having) : '' )
 				. $orderby
 				;
-		} else {
+		}
+		else
+		{
 			$query .= ''
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
 				. ' GROUP BY i.id'

@@ -873,6 +873,9 @@ jQuery(document).ready(function(){
 
 			<td class="col_title">
 				<?php
+				// Display an icon if item has an unapproved latest version, thus needs revising
+				echo JHtml::_('fcitems.reviewing_needed', $row, $user, $i);
+
 				// Display a check-in button if: either (a) current user has Global Checkin privilege OR (b) record checked out by current user, otherwise display a lock with no link
 				echo JHtml::_('fcitems.checkedout', $row, $user, $i);
 
