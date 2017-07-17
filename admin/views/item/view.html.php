@@ -696,6 +696,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO means unversioned data
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
+		$option   = $jinput->get('option', '', 'cmd');
 
 		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
