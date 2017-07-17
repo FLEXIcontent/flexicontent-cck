@@ -41,13 +41,13 @@
 		$autoprefix = '';
 		if ($allow_relative_addrs==2)
 		{
-			$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_EXTWL_IS_RELATIVE_DESC', 1, 1);
+			$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_FIELD_WEBLINK_IS_RELATIVE_DESC', 1, 1);
 			$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
 			$has_value_class = ' fc-has-value';
 
 			$autoprefix = '
 			<div class="' . $box_classes . ' fc-lbl-external-box">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_FIELD_WEBLINK_IS_RELATIVE' ).'</label>
 				<fieldset class="radio btn-group group-fcinfo">
 					<input ' . $ff_events . ' class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
 					<label class="' . $lbl_classes . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
@@ -67,7 +67,7 @@
 
 			$title = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_EXTWL_URLTITLE' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTITLE' ).'</label>
 				<input ' . $ff_events . ' class="urltitle ' . $input_classes . '" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
 			</div>';
 		}
@@ -81,7 +81,7 @@
 
 			$linktext = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.JText::_( 'FLEXI_EXTWL_URLLINK_TEXT' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLLINK_TEXT' ).'</label>
 				<input ' . $ff_events . ' class="urllinktext ' . $input_classes . '" name="'.$fieldname_n.'[linktext]" id="'.$elementid_n.'_linktext" type="text" size="'.$size.'" value="'.$value['linktext'].'" />
 			</div>';
 		}
@@ -97,7 +97,7 @@
 			{
 				$class = '
 					<div class="' . $box_classes . '">
-						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
+						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
 						<input ' . $ff_events . ' class="urlclass ' . $input_classes . '" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.$value['class'].'" />
 					</div>';
 			}
@@ -106,7 +106,7 @@
 				$class_attribs = ' class="urlclass use_select2_lib" ';
 				$class = '
 					<div class="' . $box_classes . ' fc-lbl-external-box">
-						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
+						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
 						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $elementid_n.'_class').'
 					</div>';
 			}
@@ -121,7 +121,7 @@
 
 			$id = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLID' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLID' ).'</label>
 				<input ' . $ff_events . ' class="urlid ' . $input_classes . '" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.$value['id'].'" />
 			</div>';
 		}
@@ -137,15 +137,15 @@
 			$target_attribs = ' class="urltarget use_select2_lib" ';
 			$target_options = array(
 				(object) array('value'=>'', 'text'=>JText::_('FLEXI_DEFAULT')),
-				(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_EXTWL_NEW_WIN_TAB')),
-				(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_EXTWL_PARENT_FRM')),
-				(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_EXTWL_SAME_FRM_WIN_TAB')),
-				(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_EXTWL_TOP_FRM')),
-				(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_EXTWL_MODAL_POPUP_WIN'))
+				(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_NEW_WIN_TAB')),
+				(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_PARENT_FRM')),
+				(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_SAME_FRM_WIN_TAB')),
+				(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_TOP_FRM')),
+				(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_MODAL_POPUP_WIN'))
 			);
 			$target = '
 			<div class="' . $box_classes . ' fc-lbl-external-box">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl ulrtarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLTARGET' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl ulrtarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTARGET' ).'</label>
 				'.JHTML::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
 			</div>';
 		}
@@ -157,7 +157,7 @@
 
 			$hits = '
 				<div class="' . $input_grp_class . ' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_EXTWL_POPULARITY' ).'</label>
+					<label class="' . $add_on_class . ' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_WEBLINK_POPULARITY' ).'</label>
 					<input class="urlhits fc_hidden_value ' . $has_value_class . '" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.$hits.'" />
 					<span class="' . $add_on_class . ' hitcount">'.$hits.' '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 				</div>
