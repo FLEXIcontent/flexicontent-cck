@@ -28,18 +28,50 @@ foreach ($values as $value)
 		continue;
 	}
 	
+	// Check if link is 'internal' aka 'safer'
+	$isInternal = JUri::isInternal($value['link']);
+
 	// If not using property or property is empty, then use default property value
 	// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-	$title    = ($usetitle && @$value['title']   )  ?  $value['title']    : $default_title;
-	$linktext = '';  // no linktext for weblink for extended web link field if this is needed
-	$hits     = (int) @ $value['hits'];
-	
-	$link_params  = $title ? ' title="' . $title . '"' : '';
-	$link_params .= $target_param;
-	$link_params .= $rel_nofollow;
-	
+	$title    = ($usetitle  && !empty($value['title'])   )  ?  $value['title']    : $default_title;
+	$linktext = ($usetext   && !empty($value['linktext']))  ?  $value['linktext'] : $default_text;
+	$class    = ($useclass  && !empty($value['class'])   )  ?  $value['class']    : $default_class;
+	$id       = ($useid     && !empty($value['id'])      )  ?  $value['id']       : $default_id;
+	$target   = ($usetarget && !empty($value['target'])  )  ?  $value['target']   : $default_target;
+	$hits     = isset($value['hits']) ? (int) $value['hits'] : 0;
+
+	// New window is forced for external links
+	$target = $isInternal ? $target : '_blank';
+
+	// Calculate a REL attribute of the link
+	$rel = ''
+		// Prevent external pages from having access the original window object (the 'opener' window)
+		. (!$isInternal ? 'noopener noreferrer' : '')
+
+		// 1: nofollow all, 0: nofollow external, -1: allow following (indexing) any link
+		. ($add_rel_nofollow == 1 || ($add_rel_nofollow == 0 && !$isInternal) ? ' nofollow' : '');
+
+	$link_params = '';
+	if ($target == '_popup')
+	{
+		$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
+	}
+	else if ($target == '_modal')
+	{
+		$link_params .= ' onclick="window.open(this.href, \'targetWindow\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=600\'); return false;" ';
+	}
+	else
+	{
+		$link_params .= $target ? ' target="'.$target.'"' : '';
+	}
+	$link_params .= ''
+		. ($title  ? ' title="' . $title . '"' : '')
+		. ($id     ? ' id="' . $id . '"' : '')
+		. ($class ? ' class="' . $class . '"' : '')
+		. ($rel    ? ' rel="' . $rel . '" ' : '');
+
 	// Direct access to the web-link, hits counting not possible
-	if ( $field->parameters->get( 'use_direct_link', 0 ) )
+	if ( $field->parameters->get('use_direct_link', 0) || $field->parameters->get('link_source', 0) ==-1 )
 	{
 		$href = $value['link'];
 	}

@@ -62,7 +62,7 @@
 			</field>
 			
 			<field name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" depend_class="not_jurls" />
-			<field name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC" depend_class="not_jurls" >
+			<field name="link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC" depend_class="not_jurls" >
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
@@ -191,21 +191,24 @@
 
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/extendedweblink/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
+			<field name="" type="separator" default="FLEXI_NOTE_NEW_WINDOW_FORCED_FOR_EXTERNAL_LINKS" description="" level="-" class="alert alert-info fcpadded" />
 			<field name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET_DEFAULT" description="FLEXI_EXTWL_URLTARGET_DEFAULT_DESC" >
-				<option value="">FLEXI_EXTWL_NOTARGET</option>
-				<option value="_blank">FLEXI_EXTWL_NEW_WIN_TAB</option>
-				<option value="_parent">FLEXI_EXTWL_PARENT_FRM</option>
-				<option value="_self">FLEXI_EXTWL_SAME_FRM_WIN_TAB</option>
-				<option value="_top">FLEXI_EXTWL_TOP_FRM</option>
-				<option value="_modal">FLEXI_EXTWL_MODAL_POPUP_WIN</option>
+				<option value="">FLEXI_FIELD_LINK_NOTARGET</option>
+				<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
+				<option value="_parent">FLEXI_FIELD_LINK_PARENT_FRM</option>
+				<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
+				<option value="_top">FLEXI_FIELD_LINK_TOP_FRM</option>
+				<option value="_popup">FLEXI_FIELD_LINK_SINGLE_POPUP_WIN</option>
+				<option value="_modal">FLEXI_FIELD_LINK_MODAL_POPUP_WIN</option>
 			</field>
 			<field name="use_direct_link" type="radio" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_EXTWL_YES_DISABLE_COUNT</option>
 			</field>
 			<field name="add_rel_nofollow" type="radio" default="0" label="FLEXI_FIELD_ADD_REL_NOFOLLOW" description="FLEXI_FIELD_ADD_REL_NOFOLLOW_DESC" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_FIELD_NO_ALLOW_INDEXING</option>
-				<option value="1">FLEXI_FIELD_YES_ALLOW_INDEXING</option>
+				<option value="0">FLEXI_FIELD_YES_PREVENT_INDEXING_EXTERNAL_LINKS</option>
+				<option value="1">FLEXI_FIELD_YES_PREVENT_INDEXING</option>
+				<option value="-1">FLEXI_FIELD_NO_ALLOW_INDEXING_ANY_LINK</option>
 			</field>
 			<field name="display_hits" type="radio" default="0" label="FLEXI_FIELD_SHOW_HITS" description="FLEXI_FIELD_SHOW_HITS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
