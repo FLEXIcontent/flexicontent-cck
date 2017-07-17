@@ -61,14 +61,14 @@ class FlexicontentModelItem extends ParentClassItem
 		$app  = JFactory::getApplication();
 		$user	= JFactory::getUser();
 		$session = JFactory::getSession();
+		$uri  = JFactory::getURI();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
 		$cid	= $this->_cid;
 		$params = $this->_record->parameters;
 		$cparams = $this->_cparams;
 		
-		$fcreturn = serialize( array('id'=>@$this->_record->id, 'cid'=>$cid) );      // a special url parameter, used by some SEF code
-		$referer = @$_SERVER['HTTP_REFERER'];                                      // the previously viewed page (refer)
+		$referer  = @ $_SERVER['HTTP_REFERER'];                                    // The previously viewed page (refer)
 		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base(); // Ignore it if potentially non safe URL, e.g. non-internal
 		
 		// a basic item title string
@@ -172,51 +172,74 @@ class FlexicontentModelItem extends ParentClassItem
 		//***********************************************************************************************************************
 
 		// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (-1)
-		if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner ) {
-			// SPECIAL workflow case, regardless of (view/edit privilege), allow users to view unpublished owned content, (a) if waiting for approval, or (b) if can request approval
+
+		// SPECIAL workflow case, regardless of (view/edit privilege), allow users to view unpublished owned content, (a) if waiting for approval, or (b) if can request approval
+		if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
+		{
 			$inactive_notice_set = true;
-		} else if ( !$item_is_published && !$ignore_publication ) {
-			// Raise error that the item is unpublished
+		}
+
+		// Raise error that the item is unpublished
+		else if ( !$item_is_published && !$ignore_publication )
+		{
 			$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str;
 			throw new Exception($msg, 404);
-		} else if ( !$item_is_published && !$inactive_notice_set ) {
-			// Item edittable, set warning that ...
-			JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') );
+		}
+
+		// Item edittable, set warning that ...
+		else if ( !$item_is_published && !$inactive_notice_set )
+		{
+			$app->enqueueMessage(JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED'), 'notice');  // 404
 			$inactive_notice_set = true;
 		}
 
 		// NOTE: First, we check for expired publication, since if item expired, scheduled publication is meaningless
 
 		// (b) Check that item has expired publication date
-		if ( $item_is_expired && !$ignore_publication ) {
-			// Raise error that the item is scheduled for publication
+
+		// Raise error that the item is scheduled for publication
+		if ( $item_is_expired && !$ignore_publication )
+		{
 			$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str;
 			throw new Exception($msg, 404);
-		} else if ( $item_is_expired && !$inactive_notice_set ) {
-			// Item edittable, set warning that ...
-			JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') );
+		}
+
+		// Item edittable, set warning that ...
+		else if ( $item_is_expired && !$inactive_notice_set )
+		{
+			$app->enqueueMessage(JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED'), 'notice');  // 404
 			$inactive_notice_set = true;
 		}
 
 		// (c) Check that item has scheduled publication date
-		if ( $item_is_scheduled && !$ignore_publication ) {
-			// Raise error that the item is scheduled for publication
+
+		// Raise error that the item is scheduled for publication
+		if ( $item_is_scheduled && !$ignore_publication )
+		{
 			$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str;
 			throw new Exception($msg, 404);
-		} else if ( $item_is_scheduled && !$inactive_notice_set ) {
-			// Item edittable, set warning that ...
-			JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') );
+		}
+
+		// Item edittable, set warning that ...
+		else if ( $item_is_scheduled && !$inactive_notice_set )
+		{
+			$app->enqueueMessage(JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED'), 'notice');  // 404
 			$inactive_notice_set = true;
 		}
 
 		// (d) Check that current item category or all items categories are published
-		if ( !$ancestor_cats_published && !$ignore_publication ) {
-			// Terminate execution with a HTTP not-found Server Error
+
+		// Terminate execution with a HTTP not-found Server Error
+		if ( !$ancestor_cats_published && !$ignore_publication )
+		{
 			$msg = $cats_np_err_mssg . $title_str;
 			throw new Exception($msg, 404);
-		} else if( !$ancestor_cats_published && !$inactive_notice_set ) {
-			// Item edittable, set warning that item's (ancestor) category is unpublished
-			JError::raiseNotice( 404, $cats_np_err_mssg );
+		}
+
+		// Item edittable, set warning that item's (ancestor) category is unpublished
+		else if( !$ancestor_cats_published && !$inactive_notice_set )
+		{
+			$app->enqueueMessage($cats_np_err_mssg, 'notice');  //404
 			$inactive_notice_set = true;
 		}
 
@@ -232,36 +255,51 @@ class FlexicontentModelItem extends ParentClassItem
 
 		// SPECIAL case when previewing an non-current version of an item, this is allowed only if user can edit the item
 		$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true); // Get current item version
-		if ( $version && $version!=$current_version && !$canedititem && !$previewing_and_unlogged )
-		{
-			// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit permission
-			JError::raiseNotice(403, JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />". JText::_('FLEXI_ALERTNOTAUTH_TASK') );
-			if ( $item_n_cat_active && $canviewitem ) {
-				$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)));
-			} else {
-				$app->redirect($referer);  // Item not viewable OR no view access, redirect to refer page
-			}
+		$last_version    = FLEXIUtilities::getLastVersions($this->_id, true);    // Get last version (=latest one saved, highest version id),
+		if ( !$canedititem
+			&& (($version > 0 && $version != $current_version) || ($version < 0 && $last_version != $current_version))
+		){
+			$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');           // Current URL as return URL (but we will for id / cid)
+			$fcreturn = serialize( array('id' => $this->_record->id, 'cid' => $cid) );  // A special url parameter, used by some SEF code
+			$url = $cparams->get('login_page', 'index.php?option=com_users&view=login')
+				. '&return='.$return
+				. '&fcreturn='.base64_encode($fcreturn);
+
+			// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit or view access
+			$app->enqueueMessage(
+				JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE') . '<br />' .
+				($user->guest ? JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url) : JText::_('FLEXI_ALERTNOTAUTH_TASK')) , 'notice'
+			);  // 403
+			$item_n_cat_active && $canviewitem
+				? $app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)))
+				: $app->redirect($referer);  // Item not viewable OR no view access, redirect to refer page
 		}
 
 		// SPECIAL cases for inactive item, but exclude preview+unlogged case (we will catch this below)
 		else if ( !$item_n_cat_active && !$previewing_and_unlogged )
 		{
+			// no redirect, SET message to owners, to wait for approval or to request approval of their content
 			if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
 			{
-				// no redirect, SET message to owners, to wait for approval or to request approval of their content
 				$app->enqueueMessage(JText::_( $item_state_pending ? 'FLEXI_ALERT_VIEW_OWN_PENDING_STATE' : 'FLEXI_ALERT_VIEW_OWN_DRAFT_STATE' ), 'notice');
 			}
+
+			// (b) redirect item owner to previous page if user cannot access (read/edit) the item
 			else if ( !$canedititem && !$caneditstate && $isOwner )
 			{
-				// (b) redirect item owner to previous page if user cannot access (read/edit) the item
-				JError::raiseNotice(403, JText::_( $item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW_OWN_UNPUBLISHED' ) );
+				$app->enqueueMessage(JText::_($item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW_OWN_UNPUBLISHED'), 'notice');  // 403
 				$app->redirect($referer);
 			}
+
+			// no redirect, SET notice to the editors, that they are viewing unreadable content because they can edit the item
 			else if ( $canedititem || $caneditstate )
 			{
-				// no redirect, SET notice to the editors, that they are viewing unreadable content because they can edit the item
 				$app->enqueueMessage(JText::_('FLEXI_CONTENT_ACCESS_ALLOWED_BECAUSE_EDITABLE_PUBLISHABLE'), 'notice');
-			} else {
+			}
+
+			// Internal error in our code
+			else
+			{
 				$app->enqueueMessage( 'INTERNAL ERROR: item inactive but checks were ignored despite current user not begin item owner or item assigned editor', 'notice');
 				$app->redirect($referer);
 			}
@@ -270,30 +308,37 @@ class FlexicontentModelItem extends ParentClassItem
 		// Cases for non-viewable and non-editable item
 		else if ( ( !$canviewitem && !$canedititem ) || !$item_n_cat_active )
 		{
-			if($user->guest) {
-				// (c) redirect unlogged user to login, so that user can possible login to privileged account
-				$uri		= JFactory::getURI();
-				$return		= $uri->toString();
-				$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
-				$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
-				$return = strtr(base64_encode($return), '+/=', '-_,');
-				$url .= '&return='.$return;
-				//$url .= '&return='.base64_encode($return);
-				$url .= '&fcreturn='.base64_encode($fcreturn);
+			// (c) redirect unlogged user to login, so that user can possible login to privileged account
+			if ($user->guest)
+			{
+				$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');           // Current URL as return URL (but we will for id / cid)
+				$fcreturn = serialize( array('id' => $this->_record->id, 'cid' => $cid) );  // A special url parameter, used by some SEF code
+				$url = $cparams->get('login_page', 'index.php?option=com_users&view=login')
+					. '&return='.$return
+					. '&fcreturn='.base64_encode($fcreturn);
 
-				JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
+				$app->setHeader('status', 403);
+				$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
 				$app->redirect( $url );
-			} else {
+			}
+
+			else
+			{
 				$msg  = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
 				$msg .= $item->type_id && !$this->_record->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
 				$msg .= $item->catid   && !$this->_record->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
 				$msg .= $cid  && !$this->_record->ancestor_cats_accessible ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
-				if ($cparams->get('unauthorized_page', '')) {
-					// (d) redirect unauthorized logged user to the unauthorized page (if this is set)
-					JError::raiseNotice( 403, $msg);
+
+				// (d) redirect unauthorized logged user to the unauthorized page (if this is set)
+				if ($cparams->get('unauthorized_page', ''))
+				{
+					$app->enqueueMessage($msg, 'notice');  // 403
 					$app->redirect($cparams->get('unauthorized_page'));				
-				} else {
-					// (e) finally raise a 403 forbidden Server Error if user is unauthorized to access item
+				}
+
+				// (e) finally raise a 403 forbidden Server Error if user is unauthorized to access item
+				else
+				{
 					throw new Exception($msg, 403);
 				}
 			}

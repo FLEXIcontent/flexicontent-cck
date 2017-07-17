@@ -24,9 +24,10 @@ class FlexicontentlinksTagged_items extends JObject {
 	*
 	* @access	protected
 	*/
-	public function __construct($options = array()) {
-
+	public function __construct($options = array())
+	{
 	}
+
 
 	/**
 	 * Returns a reference to a editor object
@@ -38,26 +39,41 @@ class FlexicontentlinksTagged_items extends JObject {
 	 * @return	JCE  The editor object.
 	 * @since	1.5
 	 */
-	public static function getInstance() {
+	public static function getInstance()
+	{
 		static $instance;
 
-		if (!is_object($instance)) {
+		if (!is_object($instance))
+		{
 			$instance = new FlexicontentlinksTagged_items();
 		}
 		return $instance;
 	}
 
-	public function getOption() {
+
+	public function getOption()
+	{
 		return $this->_option;
 	}
 
-	public function getList() {
+
+	public function getList()
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
-			return '<li id="index.php?option=com_flexicontent_tagged_items&view=category&layout=tags" class="folder fctagged nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG') . '</span></a></div></li>';
+			return '
+			<li id="index.php?option=com_flexicontent_tagged_items&view=category&layout=tags" class="folder fctagged nolink">
+				<div class="uk-tree-row">
+					<a href="javascript:;">
+						<span class="uk-tree-icon"></span>
+						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG') . '</span>
+					</a>
+				</div>
+			</li>';
 		}
 	}
+
 
 	public function getLinks($args)
 	{
@@ -98,7 +114,9 @@ class FlexicontentlinksTagged_items extends JObject {
 		return $items;
 	}
 
-	private static function route($url) {
+
+	private static function route($url)
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
@@ -107,7 +125,4 @@ class FlexicontentlinksTagged_items extends JObject {
 
 		return $url;
 	}
-
 }
-
-?>

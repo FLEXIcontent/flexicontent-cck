@@ -58,7 +58,7 @@
 
 			<field name="link_source" type="multilist" subtype="list" default="0" toggle_related="1" label="FLEXI_FIELD_WEBLINK_LINK_SRC_MODE" description="FLEXI_FIELD_WEBLINK_LINK_SRC_MODE_DESC" labelclass="label label-info">
 				<option value="-1" show_list="" hide_list="not_jurls">FLEXI_FIELD_WEBLINK_JOOMLA_ARTICLE_LINKS</option>
-				<option value="0"  show_list="not_jurls" hide_list="">FLEXI_FIELD_EXTENDED_WEBLINK</option>
+				<option value="0"  show_list="not_jurls" hide_list="">FLEXI_FIELD_WEBLINK</option>
 			</field>
 			
 			<field name="default_link" type="text" default="" label="FLEXI_FIELD_WEBLINK_DEFAULT_LINK" description="FLEXI_FIELD_WEBLINK_DEFAULT_LINK_DESC" depend_class="not_jurls" />

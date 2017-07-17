@@ -362,39 +362,18 @@ class FlexicontentViewItem extends JViewLegacy
 		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 		if ( $cid )
 		{
-			// Domain URL and autologin vars
-			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-			$autologin = ''; //$page_params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			
-			// We use 'isAdmin' check so that we can copy later without change, e.g. to a plugin
-			$isAdmin = JFactory::getApplication()->isAdmin();
-			
 			// Create the non-SEF URL
 			$item_url =
-				FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)
-				. ($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
-			
-			// Check if we are in the backend, in the backend we need to set the application to the site app
-			//if ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('site');
-			
-			// Create the SEF URL
-			$item_url = //!$isAdmin && $_sh404sef  ?  Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
-				JRoute::_($item_url);
-			
-			// Restore application to the admin app if we are in the backend
-			//if  ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('administrator');
-			
-			// Check if we are in the backend again
-			if ( $isAdmin )
-			{
-				// Remove administrator from URL as it is added even though we've set the application to the site app
-				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
-				$item_url = str_replace($admin_folder.'/', '/', $item_url);
-			}
-			
-			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&amp;' : '?') .'preview=1' . $autologin;
-			//$previewlink     = str_replace('&amp;', '&', $previewlink);
-			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
+				// Route the record URL to an appropriate menu item
+				FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug, 0, $item)
+
+				// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
+				. ( $item->language != '*' ? '&lang='.substr($item->language, 0, 2) : '' );
+
+			// Build a frontend SEF url
+			$item_url = flexicontent_html::getSefUrl($item_url);
+
+			$previewlink = $item_url . (strstr($item_url, '?') ? '&amp;' : '?') .'preview=1';
 			
 			// PREVIEW for latest version
 			if ( !$page_params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
@@ -408,27 +387,27 @@ class FlexicontentViewItem extends JViewLegacy
 				$btn_arr = array();
 
 				// Add a preview button for (currently) LOADED version of the item
-				$previewlink_loaded_ver = $previewlink .'&version='.$item->version;
+				$previewlink_loaded_ver = $previewlink .'&amp;version='.$item->version;
 				$btn_arr['preview_current'] = '
-					<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank">
+					<a class="toolbar btn btn-small" href="javascript:;" onclick="window.open(\''.$previewlink_loaded_ver.'\'); return false;">
 						<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
 						'.JText::_('FLEXI_PREVIEW' /*'FLEXI_PREVIEW_FORM_LOADED_VERSION'*/).' ['.$item->version.']
 					</a>';
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_current'], 'preview_current' );
 
 				// Add a preview button for currently ACTIVE version of the item
-				$previewlink_active_ver = $previewlink .'&version='.$item->current_version;
+				$previewlink_active_ver = $previewlink .'&amp;version='.$item->current_version;
 				$btn_arr['preview_active'] = '
-					<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_active_ver.'\');" target="_blank">
+					<a class="toolbar btn btn-small" href="javascript:;" onclick="window.open(\''.$previewlink_active_ver.'\'); return false;">
 						<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
 						'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']
 					</a>';
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_active'], 'preview_active' );
 
 				// Add a preview button for currently LATEST version of the item
-				$previewlink_last_ver = $previewlink; //'&version='.$item->last_version;
+				$previewlink_last_ver = $previewlink; //'&amp;version='.$item->last_version;
 				$btn_arr['preview_latest'] = '
-					<a class="toolbar btn btn-small" href="#" onclick="window.open(\''.$previewlink_last_ver.'\');" target="_blank">
+					<a class="toolbar btn btn-small" href="javascript:;" onclick="window.open(\''.$previewlink_last_ver.'\'); return false;">
 						<span title="'.JText::_('FLEXI_PREVIEW').'" class="icon-screen"></span>
 						'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']
 					</a>';

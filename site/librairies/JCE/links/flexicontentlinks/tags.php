@@ -24,8 +24,8 @@ class FlexicontentlinksTags extends JObject {
 	*
 	* @access	protected
 	*/
-	public function __construct($options = array()) {
-
+	public function __construct($options = array())
+	{
 	}
 
 	/**
@@ -38,7 +38,8 @@ class FlexicontentlinksTags extends JObject {
 	 * @return	JCE  The editor object.
 	 * @since	1.5
 	 */
-	public static function getInstance() {
+	public static function getInstance()
+	{
 		static $instance;
 
 		if (!is_object($instance)) {
@@ -55,11 +56,21 @@ class FlexicontentlinksTags extends JObject {
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->checkAccess('links.flexicontentlinks.tags', 1)) {
-			return '<li id="index.php?option=com_flexicontent_tags&view=tags" class="folder fctags nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG').' ('.JText::_('FLEXI_EDITOR_LINKS_LEGACY').')' . '</span></a></div></li>';
+			return '
+			<li id="index.php?option=com_flexicontent_tags&view=tags" class="folder fctags nolink">
+				<div class="uk-tree-row">
+					<a href="javascript:;">
+						<span class="uk-tree-icon"></span>
+						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG').' ('.JText::_('FLEXI_EDITOR_LINKS_LEGACY').')' . '</span>
+					</a>
+				</div>
+			</li>';
 		}
 	}
 
-	public function getLinks($args) {
+
+	public function getLinks($args)
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		require_once(JPATH_SITE . DIRECTORY_SEPARATOR. 'components' .DIRECTORY_SEPARATOR. 'com_flexicontent' .DIRECTORY_SEPARATOR. 'helpers' .DIRECTORY_SEPARATOR. 'route.php');
@@ -96,7 +107,9 @@ class FlexicontentlinksTags extends JObject {
 		return $items;
 	}
 
-	private static function route($url) {
+
+	private static function route($url)
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
@@ -105,7 +118,4 @@ class FlexicontentlinksTags extends JObject {
 
 		return $url;
 	}
-
 }
-
-?>

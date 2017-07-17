@@ -58,7 +58,6 @@ $user 		= JFactory::getUser();
 $_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 $isAdmin = $app->isAdmin();
 $useAssocs = flexicontent_db::useAssociations();
-$autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $list_total_cols = 17;
 if ( $useAssocs ) $list_total_cols++;
@@ -617,7 +616,7 @@ jQuery(document).ready(function(){
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
-			<th class="left nowrap hideOnDemandClass" style="padding-left: 0px; padding-right: 0px;">
+			<th class="hideOnDemandClass left nowrap" style="padding-left: 0px; padding-right: 0px;">
 				<?php
 				echo $this->CanOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
@@ -630,7 +629,7 @@ jQuery(document).ready(function(){
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JText::_('FLEXI_STATUS'); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_STATUS', 'i.state', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
@@ -806,7 +805,7 @@ jQuery(document).ready(function(){
 			</td>
 
 		<?php if ($this->CanOrder) : ?>
-			<td class="order">
+			<td class="order left">
 				<?php
 					if ($this->ordering)
 					{
@@ -857,12 +856,17 @@ jQuery(document).ready(function(){
 			<td class="col_state" style="padding-right: 8px;">
 				<div class="btn-group fc-group fc-items">
 					<?php
-					$item_url = str_replace('&', '&amp;',
-						FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $row->categoryslug, 0, $row).
-						($row->language!='*' ? '&lang='.substr($row->language, 0,2) : '')
-					);
-					$item_url = JRoute::_(JURI::root().$item_url, $xhtml=false); // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
-					$previewlink = $item_url .'&amp;preview=1' .$autologin;
+					$record_url =
+						// Route the record URL to an appropriate menu item
+						FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $row->categoryslug, 0, $row)
+
+						// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
+						. ( $row->language != '*' ? '&lang=' . substr($row->language, 0, 2) : '' );
+
+					// Build a frontend SEF url
+					$record_url = flexicontent_html::getSefUrl($record_url);
+
+					$previewlink = $record_url;
 
 					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small' );
 					echo JHtml::_('fcitems.featured', $row->featured, $i, $row->canEditState);

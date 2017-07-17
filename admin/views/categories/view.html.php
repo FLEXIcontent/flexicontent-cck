@@ -326,19 +326,21 @@ class FlexicontentViewCategories extends JViewLegacy
 		$orderingx = ($lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc') ? $order_property : '';
 
 		//assign data to template
-		$this->assignRef('CanTemplates', $perms->CanTemplates);
-		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('lists'	, $lists);
-		$this->assignRef('rows'		, $rows);
-		$this->assignRef('perms'	, $perms);
-		$this->assignRef('orderingx'	, $orderingx);
-		$this->assignRef('pagination'	, $pagination);
-		$this->assignRef('user'				, $user);
+		$this->CanTemplates  = $perms->CanTemplates;
+		$this->count_filters = $count_filters;
+
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pagination = $pagination;
+
+		$this->perms = $perms;
+		$this->orderingx = $orderingx;
+		$this->user = $user;
 		
-		$this->assignRef('inline_ss_max'	, $inline_ss_max);
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
-		
+		$this->inline_ss_max = $inline_ss_max;
+		$this->option = $option;
+		$this->view = $view;
+
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}

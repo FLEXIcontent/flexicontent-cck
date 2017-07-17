@@ -84,7 +84,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Indicate to model that current view IS item form
 		$model->isForm = false;
 		
-		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
+		$cid = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
 		
 		// Decide version to load
 		$version = $jinput->get( 'version', 0, 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
@@ -102,7 +102,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$start_microtime = microtime(true);
 
 		// Get the item, loading item data and doing parameters merging
-		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
+		$item = $model->getItem(null, $_check_view_access=2, $_no_cache=$version, $_force_version=$version);  // ZERO version means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Get item parameters as VIEW's parameters (item parameters are merged parameters in order: layout(template-manager)/component/category/type/item/menu/access)
@@ -507,6 +507,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$model = $this->getModel();
 		$model->isForm = true;  // Currently this flag is used only by frontend model
 
+		$cid = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
+
 		// WE NEED TO get OR decide the Content Type, before we call the getItem
 		// - we rely on typeid Request variable to decide type for new items so make sure this is set,
 		// - ZERO means allow user to select type, but if user is only allowed a single type, then autoselect it!
@@ -589,8 +591,8 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Load permissions (used by form template)
-		$perms = $this->_getItemPerms($item);
-		
+		$perms = $this->_getItemPerms();
+
 		// Most core field are created via calling methods of the form (J2.5)
 		$form = $this->get('Form');
 		if (!$form)
@@ -815,26 +817,31 @@ class FlexicontentViewItem extends JViewLegacy
 			// Edit check finished, throw error if needed
 			if (!$canEdit)
 			{
+				// Unlogged user, redirect to login page, also setting a return URL
 				if ($user->guest)
 				{
-					$return = strtr(base64_encode($uri->toString()), '+/=', '-_,');
-					$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
+					$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
+					$fcreturn = serialize( array('id' => $model->get('id'), 'cid' => $cid) );  // a special url parameter, used by some SEF code
 					$url = $page_params->get('login_page', 'index.php?option=com_users&view=login')
 						. '&return='.$return
 						. '&fcreturn='.base64_encode($fcreturn);
 
-					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
+					$app->setHeader('status', 403);
+					$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
 					$app->redirect( $url );
 				}
+
+				// Logged user, redirect to the unauthorized page (if this has been configured)
 				else if ($unauthorized_page)
 				{
-					//  unauthorized page via global configuration
-					JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+					$app->setHeader('status', 403);
+					$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'warning');
 					$app->redirect($unauthorized_page);
 				}
+
+				// Logged user, no unauthorized page has been configured, throw no access exception
 				else
 				{
-					// user isn't authorize to edit this content
 					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
 					throw new Exception($msg, 403);
 				}
@@ -1151,7 +1158,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();	// get current user
 		$model    = $this->getModel();
-		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO means unversioned data
+		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 
@@ -1605,7 +1612,7 @@ class FlexicontentViewItem extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item )
+	function _getItemPerms()
 	{
 		$user = JFactory::getUser();	// get current user
 		$permission = FlexicontentHelperPerm::getPerm();  // get global perms

@@ -1219,9 +1219,7 @@ class ParentClassItem extends FCModelAdmin
 		$user		= JFactory::getUser();
 		$session = JFactory::getSession();
 		$asset	= 'com_content.article.'.$this->_id;
-		
-		$isOwner = !empty($this->_record->created_by) && $this->_record->created_by == $user->get('id');
-		
+
 		// Check if item was editable, but was rendered non-editable
 		$hasTmpEdit = false;
 		$hasCoupon  = false;
@@ -1231,9 +1229,10 @@ class ParentClassItem extends FCModelAdmin
 			$hasTmpEdit = !empty($this->_id) && !empty($rendered_uneditable[$this->_id]);  // editable temporarily
 			$hasCoupon  = !empty($this->_id) && !empty($rendered_uneditable[$this->_id]) && $rendered_uneditable[$this->_id] == 2;  // editable temporarily via coupon
 		}
-		
+
+
 		// ***
-		// Compute CREATE access permissions.
+		// *** Compute CREATE access permissions.
 		// ***
 
 		if ( !$this->_id )
@@ -1252,9 +1251,10 @@ class ParentClassItem extends FCModelAdmin
 			// Skip further ACL checks, since for new item, we do not calculate EDIT, DELETE and VIEW access
 			return $iparams_extra;
 		}
-		
+
+
 		// ***
-		// Existing item, load item if not already loaded
+		// *** Existing item, load item if not already loaded
 		// ***
 
 		if ( empty($this->_record) )
@@ -1262,10 +1262,12 @@ class ParentClassItem extends FCModelAdmin
 			$this->_record = $this->getItem();
 		}
 
+		$isOwner = !empty($this->_record->created_by) && $this->_record->created_by == $user->get('id');
+
 		if ( $this->_id )
 		{
 			// ***
-			// Compute EDIT access permissions.
+			// *** Compute EDIT access permissions.
 			// ***
 
 			if ($hasTmpEdit)
@@ -1292,14 +1294,16 @@ class ParentClassItem extends FCModelAdmin
 				}
 			}
 
+
 			// ***
-			// Compute EDIT STATE access permissions.
+			// *** Compute EDIT STATE access permissions.
 			// ***
 
 			$iparams_extra->set('access-edit-state', $this->canEditState($this->_record));
 
+
 			// ***
-			// Compute DELETE access permissions.
+			// *** Compute DELETE access permissions.
 			// ***
 
 			// Get "delete items" permission on the type of the item
@@ -1319,8 +1323,9 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 
+
 		// ***
-		// Compute VIEW access permissions.
+		// *** Compute VIEW access permissions.
 		// ***
 
 		$iparams_extra->set('access-view', $this->canView($this->_record));
@@ -4195,32 +4200,43 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 		$body .= "<br/>\r\n<br/>\r\n";
-		
-		$lang = '&lang='. substr($this->get('language') ,0,2) ;
-		
+
 		// ADD INFO for custom notify text
 		$subject .= ' '. JText::_( $notify_text );
 		
+		// Create the non-SEF URL
+		$item_url =
+			FlexicontentHelperRoute::getItemRoute($this->_record->id, $this->_record->catid, 0, $this->_record)
+			. ( $this->_record->language != '*' ? '&lang=' . substr($this->_record->language, 0, 2) : '' );
+
+		// Create the SEF URL
+		$item_url = $app->isAdmin()
+			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+
+		// Make URL absolute since this URL will be emailed
+		$item_url = JURI::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+
 		// ADD INFO for view/edit link
 		if ( in_array('viewlink',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
-			$link = JRoute::_( JURI::root(false).FlexicontentHelperRoute::getItemRoute($this->get('id'), $this->get('catid')) . $lang);
+			$link = $item_url;
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkfe',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
-			$link = JRoute::_( JURI::root(false).'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$this->get('catid').'&id='.$this->get('id').'&task=edit');
+			$link = $item_url . (strstr($item_url, '?') ? '&amp;' : '?') . 'task=edit';
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkbe',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . "</u> : <br/>\r\n &nbsp; ";
-			$fc_ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
-			$link = JRoute::_( JURI::root(false).'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id'));
+			$fc_ctrl_task = 'task=items.edit';
+			$link = JRoute::_( JURI::root().'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id') );
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}

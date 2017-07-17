@@ -192,15 +192,15 @@ class plgFlexicontentFlexinotify extends JPlugin
 		// 5: $link			Link of the item
 		// 6: $sitename	Website
 		
-		$send_personalized  = $params->get('send_personalized', 1);
-		if ($send_personalized) {
-			// Disable personalized messages if subscriber limit for personal messages is exceeded
+		// Disable personalized messages if subscriber limit for personal messages is exceeded
+		$send_personalized = $params->get('send_personalized', 1);
+		if ($send_personalized)
+		{
 			$personalized_limit = $params->get('personalized_limit', 50);
 			$personalized_limit = $personalized_limit <= 100 ? $personalized_limit : 100;
 			$send_personalized  = count($subscribers) <= $personalized_limit ? true : false;
 		}
 		$include_fullname   = $params->get('include_fullname', 1);
-		$user_autologin     = $params->get('autologin', 1);
 		$debug_notifications= $params->get('debug_notifications', 0);
 		
 		
@@ -212,50 +212,27 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$itemid   = $item->id;
 		$title    = $item->title;
 		$maincat  = $categories[$item->catid]->title;
-		
-		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
-		
-		// Domain URL and autologin vars
-		$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-		$autologin = ($send_personalized && $user_autologin) ? '&fcu=__SUBSCRIBER_USERNAME__&fcp=__SUBSCRIBER_PASSWORD__' : '';
-		
-		// We use 'isAdmin' check so that we can copy later without change, e.g. to a plugin
-		$isAdmin = JFactory::getApplication()->isAdmin();
-		
+
 		// Create the non-SEF URL
 		$item_url =
 			FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)
-			. $autologin
 			. ($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
-		
-		// Check if we are in the backend, in the backend we need to set the application to the site app
-		if ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('site');
-		
+
 		// Create the SEF URL
-		$item_url = //!$isAdmin && $_sh404sef  ?  Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
-			JRoute::_($item_url);
+		$item_url = $app->isAdmin()
+			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+
+		// Make URL absolute since this URL will be emailed
+		$item_url = JURI::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 		
-		// Restore application to the admin app if we are in the backend
-		if  ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('administrator');
-		
-		// Check if we are in the backend again
-		if ( $isAdmin )
-		{
-			// Remove administrator from URL as it is added even though we've set the application to the site app
-			$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
-			$item_url = str_replace($admin_folder.'/', '/', $item_url);
-		}
-		
-		$link     = $server . $item_url;
-		$link     = str_replace('&amp;', '&', $link);
-		$sitename = $app->getCfg('sitename') . ' - ' . JURI::root();
 		
 		
 		// ************************************************
 		// Create parameters passed to mail helper function
 		// ************************************************
 		
+		$sitename = $app->getCfg('sitename') . ' - ' . JURI::root();
 		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
 		$sendermail	= JMailHelper::cleanAddress($sendermail);
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
@@ -278,10 +255,6 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$to_arr[] = $to;
 				$_message = $message;
 				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', $subscriber->name, $_message);
-				if ($user_autologin) {
-					$_message = str_replace('__SUBSCRIBER_USERNAME__', $subscriber->username, $_message);
-					$_message = str_replace('__SUBSCRIBER_PASSWORD__', $subscriber->password, $_message);
-				}
 				
 				$from      = $sendermail;
 				$fromname  = $sendername;

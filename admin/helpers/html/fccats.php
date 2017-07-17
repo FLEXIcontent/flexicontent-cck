@@ -45,7 +45,7 @@ abstract class JHtmlFccats
 
 		return $canChange
 			? '
-			<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="statetoggler btn btn-small ntxt hasTooltip'
+			<a href="javascript:;" onclick="return listItemTask(\'cb' . $i . '\',\'' . $state[1] . '\')" class="statetoggler btn btn-small ntxt hasTooltip'
 				. ($value == 1 ? ' active' : '') . '" title="' . $state[3] . '">
 				<span class="icon-' . $state[0] . '"></span>
 			</a>
