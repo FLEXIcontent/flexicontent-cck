@@ -20,6 +20,8 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+$isAdmin = JFactory::getApplication()->isAdmin();
+global $globalcats;
 
 $tip_class = ' hasTooltip';
 $btn_class = 'btn';  //'fc_button fcsimple';
@@ -37,7 +39,6 @@ $saveOrder  = ($listOrder == 'c.lft' && strtolower($listDirn) == 'asc');
 
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
-$autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $list_total_cols = 15;
 
@@ -206,24 +207,24 @@ function delAllFilters() {
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
-			<th class="left hideOnDemandClass"><?php echo JText::_('FLEXI_STATUS'); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', 'FLEXI_STATUS', 'c.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass center" width="1%">
+			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass center" width="1%">
+			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass center" width="1%">
+			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass center" width="1%">
+			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
 			</th>
@@ -321,17 +322,24 @@ function delAllFilters() {
 			<td class="col_state" style="padding-right: 8px;">
 				<div class="btn-group fc-group fc-cats">
 					<?php
-					$cat_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getCategoryRoute($row->id));
-					$cat_link    = JRoute::_(JURI::root().$cat_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+					$record_url =
+						// Route the record URL to an appropriate menu item
+						FlexicontentHelperRoute::getCategoryRoute($globalcats[$row->id]->slug, 0, array(), $row)
+
+						// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
+						. ( $row->language != '*' ? '&lang=' . substr($row->language, 0, 2) : '' );
+
+					// Build a frontend SEF url
+					$record_url = flexicontent_html::getSefUrl($record_url);
+
+					$previewlink = $record_url;
+					$rsslink = $record_url . (strstr($record_url, '?') ? '&amp;' : '?') . 'format=feed&amp;type=rss';
 
 					//echo JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange);
 					//echo JHtml::_('fccats.published', $row->published, $i, $canChange);
+
 					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small', array('controller'=>'categories', 'state_propname'=>'published') );
-
-					$rsslink     = $cat_link . '&amp;format=feed&amp;type=rss';
 					echo '<a '.$attribs_rsslist.' href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
-
-					$previewlink = $cat_link . $autologin;
 					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 					?>
 				</div>

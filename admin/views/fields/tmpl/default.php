@@ -239,7 +239,7 @@ function delAllFilters() {
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
-			<th class="nowrap">
+			<th class="left nowrap">
 				<?php
 				echo $image_ordering_tip;
 				echo !$this->filter_type
@@ -391,7 +391,7 @@ function delAllFilters() {
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
 			<?php if ($this->permission->CanOrderFields) : ?>
-			<td class="order">
+			<td class="order left">
 				<?php
 					$show_orderUp   = $i > 0;
 					$show_orderDown = $i < $total_rows-1;

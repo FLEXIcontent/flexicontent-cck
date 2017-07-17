@@ -24,9 +24,10 @@ class FlexicontentlinksItems extends JObject {
 	*
 	* @access	protected
 	*/
-	public function __construct($options = array()) {
-
+	public function __construct($options = array())
+	{
 	}
+
 
 	/**
 	 * Returns a reference to a editor object
@@ -38,7 +39,8 @@ class FlexicontentlinksItems extends JObject {
 	 * @return	JCE  The editor object.
 	 * @since	1.5
 	 */
-	public static function getInstance() {
+	public static function getInstance()
+	{
 		static $instance;
 
 		if (!is_object($instance)) {
@@ -47,19 +49,33 @@ class FlexicontentlinksItems extends JObject {
 		return $instance;
 	}
 
-	public function getOption() {
+
+	public function getOption()
+	{
 		return $this->_option;
 	}
 
-	public function getList() {
+
+	public function getList()
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->checkAccess('links.joomlalinks.content', 1)) {
-			return '<li id="index.php?option=com_flexicontent_items&view=category" class="folder fccats nolink"><div class="uk-tree-row"><a href="#"><span class="uk-tree-icon"></span><span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_CAT_N_SINGLE_ITEMS') . '</span></a></div></li>';
+			return '
+			<li id="index.php?option=com_flexicontent_items&view=category" class="folder fccats nolink">
+				<div class="uk-tree-row">
+					<a href="javascript:;">
+						<span class="uk-tree-icon"></span>
+						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_CAT_N_SINGLE_ITEMS') . '</span>
+					</a>
+				</div>
+			</li>';
 		}
 	}
 
-	public function getLinks($args) {
+
+	public function getLinks($args)
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		require_once(JPATH_SITE . DIRECTORY_SEPARATOR. 'components' .DIRECTORY_SEPARATOR. 'com_flexicontent' .DIRECTORY_SEPARATOR. 'helpers' .DIRECTORY_SEPARATOR. 'route.php');
@@ -94,7 +110,7 @@ class FlexicontentlinksItems extends JObject {
 				'class'	=> 'folder flexicat'
 			);
 		}
-		
+
 		// Add items
 		$query->clear();
 		$query
@@ -109,8 +125,7 @@ class FlexicontentlinksItems extends JObject {
 
 		$db->setQuery($query);
 		$contents = $db->loadObjectList();
-		
-		
+
 		foreach ($contents as $content)
 		{
 			$url = FlexicontentHelperRoute::getItemRoute($content->slug, $content->catslug, 0, $content);
@@ -125,7 +140,9 @@ class FlexicontentlinksItems extends JObject {
 		return $items;
 	}
 
-	private static function route($url) {
+
+	private static function route($url)
+	{
 		$wf = WFEditorPlugin::getInstance();
 
 		if ($wf->getParam('links.joomlalinks.sef_url', 0)) {
@@ -134,7 +151,4 @@ class FlexicontentlinksItems extends JObject {
 
 		return $url;
 	}
-
 }
-
-?>
