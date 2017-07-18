@@ -5003,9 +5003,11 @@ class flexicontent_html
 		{
 			$isAdmin = JFactory::getApplication()->isAdmin();
 			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
-			$site_router = $isAdmin && !$isSH404SEF
-				? JApplication::getInstance('site')::getRouter()
-				: JFactory::getApplication()::getRouter();
+			// Do not merge the following 2 statements (site_instance, site_router), PHP 5.6 and lower cannot parse 2 consequent operators ::
+			$site_instance = $isAdmin && !$isSH404SEF
+				? JApplication::getInstance('site')
+				: JFactory::getApplication();
+			$site_router = $site_instance::getRouter();
 		}
 
 		if (!is_array($url) && (strpos($url, '&') !== 0) && (strpos($url, 'index.php') !== 0))
