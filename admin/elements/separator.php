@@ -42,7 +42,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	 * @access	protected
 	 * @var		string
 	 */
-	var	$_name = 'separator';
+	var	$type = 'separator';
 	
 	static $css_js_added = null;
 	static $tab_css_js_added = null;
@@ -114,7 +114,21 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	function add_comp_acl_headers()
 	{
 		JFactory::getDocument()->addScriptDeclaration('
-			jQuery(document).ready(function(){
+			jQuery(document).ready(function()
+			{
+				jQuery("div.control-group > div").each(function(i, el) {
+					if ( jQuery(el).html().trim() == "" && ( jQuery(el).attr("class") == "control-label" || jQuery(el).attr("class") == "controls" ))
+					{
+						jQuery(el).remove();
+					}
+				});
+				jQuery("div.control-group").each(function(i, el) {
+					if (jQuery(el).html().trim() == "")
+					{
+						jQuery(el).remove();
+					}
+				});
+
 				var tr1  = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(1)");
 				var tr4  = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(4)");
 				var tr11 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(11)");
@@ -206,6 +220,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			array_unshift($vparts, $value);
 			$title = call_user_func_array(array('JText', 'sprintf'), $vparts);
 		}
+
 		$desc = JText::_($description);
 		if ($desc)
 		{
@@ -213,7 +228,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$tip = 'title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
 		}
 		$icon_class = @$attributes['icon_class'];
-		
+
 		$box_count = @ $attributes['remove_boxes'];
 		$box_count = strlen($box_count) ? (int) $box_count : ($is_fc ? 0 : 2);
 		$_bof = $box_count ? ($box_count == 2 ? '</div></div>' : str_repeat("</div>", $box_count)) : '';
@@ -225,43 +240,48 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		case 'hidden_field':
 			return '<input type="text" id="'. @$attributes['hidden_field_id'].'" name="'. @$attributes['hidden_field_id'].'" value="1" class="fc_hidden_value" />';
 			break;
+
 		case 'tabset_start':
 			$tab_id = 0;
-			if ($box_type==2)
-				return $_bof . JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1)) . $_eof;
-			else
-				return $_bof . "\n". '<div class="fctabber '.$tab_class.' '.$classes.'" id="tabset_attrs_'.($tabset_id++).'">' . $_eof;
+			return $box_type==2
+				? $_bof . JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1)) . $_eof
+				: $_bof . "\n". '<div class="fctabber '.$tab_class.' '.$classes.'" id="tabset_attrs_'.($tabset_id++).'">' . $_eof;
 			break;
 
 		case 'tabset_close':
-			if ($box_type==2)
-				return $_bof . JHtml::_('tabs.end') . $_eof;
-			else
-			return $_bof . '
+			return $box_type==2
+				? $_bof . JHtml::_('tabs.end') . $_eof
+				: $_bof . '
+					</div>
 				</div>
-			</div>' . $_eof;
+				' . $_eof;
 			break;
 
 		case 'tab_open':
 			if ($box_type==2)
+			{
 				return $_bof . JHtml::_('tabs.panel', $title, 'tab_attrs_'.$tabset_id.'_'.($tab_id++)) . $_eof;
-			return $_bof . ($tab_id > 0 ? '
-				</div>' : '').'
-				<div class="tabbertab" id="tab_attrs_'.$tabset_id.'_'.($tab_id++).'" data-icon-class="'.$icon_class.'" >
-					<h3 class="tabberheading '.$classes.'" '.$tip.'>'.$title.'</h3>
-				' . $_eof;
+			}
+			else
+			{
+				return $_bof . '
+					' . ($tab_id > 0 ? '</div>' : '') . '
+					<div class="tabbertab" id="tab_attrs_'.$tabset_id.'_'.($tab_id++).'" data-icon-class="'.$icon_class.'" >
+						<h3 class="tabberheading '.$classes.'" '.$tip.'>'.$title.'</h3>
+					' . $_eof;
+			}
 			break;
 
 		default:
 			// Will be handled after switch
 			break;
 		}
-		
-		if ($box_type==-1)
-		{
-			$_bof = '<div class="control-group">';
-			$_eof = '</div>';
-		}
-		return $_bof . '<div style="'.$style.'" class="'.$classes.'" '.$tip.' >'.$title.'</div><div class="fcclear"></div>' . $_eof;
+
+		return $_bof . '
+			<div style="'.$style.'" class="'.$classes.'" '.$tip.' >
+				' . $title . '
+			</div>
+			<div class="fcclear"></div>
+			' . $_eof;
 	}
 }

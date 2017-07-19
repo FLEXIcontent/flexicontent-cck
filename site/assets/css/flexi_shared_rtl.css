@@ -695,7 +695,7 @@ body .btn-group.group-fcsuccess .btn,
 body .btn-group.group-fcwarning .btn,
 body .btn-group.group-fcmethod .btn,
 body .btn-group input[value=""]:first-of-type + label.btn {
-	min-width: 64px;
+	min-width: 50px;
 }
 body .btn-group.group-fcinfo .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn:not(.btn-primary),
@@ -1732,4 +1732,7 @@ fieldset legend .fc_legend_header_text {
 	padding: 8px 10px;
 	position: relative;
 	top: 0;
+}
+body .form-horizontal .control-group {
+	margin-bottom: 8px;
 }

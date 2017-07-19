@@ -891,16 +891,27 @@ class FlexicontentController extends JControllerLegacy
 					}
 					else
 					{
-						$indexdrop = !empty($iconf['custom_drop']) ? $iconf['custom_drop'] : "";
-						$indexadd  = !empty($iconf['custom_add']) ? $iconf['custom_add'] : " ADD INDEX " . $indexname;
-						$_col_list = array();
-						foreach($iconf['cols'] as $indexcol => $len)
+						$indexdrop = !empty($iconf['custom_drop'])
+							? $iconf['custom_drop']
+							: '';
+						if ($indexdrop)
 						{
-							$indexlen  = $len ? "(".$len.")" : "";
-							$_col_list[] = "`".$indexcol."`" .$indexlen;
+							$index_cmds['indexdrop'][] = $indexdrop;
 						}
-						if ($indexdrop) $index_cmds['indexdrop'][] = $indexdrop;
-						if ($indexadd) $index_cmds['indexadd'][]   = $indexadd . "(". implode(", ", $_col_list) .")";
+
+						$indexadd  = !empty($iconf['custom_add'])
+							? $iconf['custom_add']
+							: ' ADD INDEX ' . $indexname;
+						if ($indexadd && !empty($iconf['cols']))
+						{
+							$_col_list = array();
+							foreach($iconf['cols'] as $indexcol => $len)
+							{
+								$indexlen  = $len ? "(".$len.")" : "";
+								$_col_list[] = "`".$indexcol."`" .$indexlen;
+							}
+							$index_cmds['indexadd'][]   = $indexadd . "(". implode(", ", $_col_list) .")";
+						}
 					}
 				}
 				

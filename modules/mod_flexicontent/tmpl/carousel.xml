@@ -31,7 +31,7 @@
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
-			<field name="carousel_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+			<field name="carousel_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
@@ -57,7 +57,7 @@
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
+			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -92,7 +92,7 @@
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="carousel_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
+			<field name="carousel_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -117,30 +117,30 @@
 			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
-			<field name="carousel_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+			<field name="carousel_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Active</option>
 				<option value="2">On Hover</option>
 				<option value="3">Both</option>
 			</field>
-			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge" class="btn-group btn-group-yesno">
+			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="Touch (mobile) / mouse support" level="level2" />
-			<field name="carousel_touch_walk" type="radio" default="1" label="Walk via touch drag" description="Allow mobile user to walk the carousel via touch drag" class="btn-group btn-group-yesno">
+			<field name="carousel_touch_walk" type="radio" default="1" label="Walk via touch drag" description="Allow mobile user to walk the carousel via touch drag" class="btn-group">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="carousel_mouse_walk" type="radio" default="0" label="Walk via mouse drag" description="Allow desktop user to walk the carousel via mouse drag" class="btn-group btn-group-yesno">
+			<field name="carousel_mouse_walk" type="radio" default="0" label="Walk via mouse drag" description="Allow desktop user to walk the carousel via mouse drag" class="btn-group">
 				<option value="0">No, recommended</option>
 				<option value="1">Yes, (experimental)</option>
 			</field>
 			<field name="carousel_drag_margin" type="text" default="100" label="Drag margin (px)" description="Minimum margin in pixel for doing a walk of the carousel via touch or mouse drag"/>
 			
 			<field name="" type="separator" default="Autoplay" level="level2" />
-			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads" class="btn-group btn-group-yesno">
+			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -151,7 +151,7 @@
 			</field>
 			
 			<field name="" type="separator" default="Page Buttons" level="level2" />
-			<field name="carousel_show_page_handles" type="radio" default="1" label="Enable" description="Display One page button per page of items" class="btn-group btn-group-yesno">
+			<field name="carousel_show_page_handles" type="radio" default="1" label="Enable" description="Display One page button per page of items" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -161,7 +161,7 @@
 			</field>
 			
 			<field name="" type="separator" default="Item Buttons" level="level2" />
-			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover" class="btn-group btn-group-yesno">
+			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -176,19 +176,19 @@
 			</field>
 			
 			<field name="" type="separator" default="Item Info" level="level3" />
-			<field name="carousel_handle_title" type="radio" default="0" label="Title" description="Display a title for the thumbnail, e.g. as tooltip or caption" class="btn-group btn-group-yesno">
+			<field name="carousel_handle_title" type="radio" default="0" label="Title" description="Display a title for the thumbnail, e.g. as tooltip or caption" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Thumbnail Tooltip</option>
 				<option value="2">Info Box</option>
 			</field>
-			<field name="carousel_handle_text" type="radio" default="0" label="Description" description="Display a title for the thumbnail, e.g. as tooltip or caption" class="btn-group btn-group-yesno">
+			<field name="carousel_handle_text" type="radio" default="0" label="Description" description="Display a title for the thumbnail, e.g. as tooltip or caption" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Thumbnail Tooltip</option>
 				<option value="2">Info Box</option>
 			</field>
 			
 			<field name="" type="separator" default="Playback controls" level="level2" />
-			<field name="carousel_show_controls" type="radio" default="1" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page" class="btn-group btn-group-yesno">
+			<field name="carousel_show_controls" type="radio" default="1" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Intergrated</option>
 				<option value="2">Detached controls</option>
@@ -201,7 +201,7 @@
 			</field>
 			
 			<field name="" type="separator" default="Detached controls" level="level3" />
-			<field name="carousel_dcontrols_labels" type="radio" default="1" label="Show labels" description="Display Autoplay, Pages, Items label in front of the controls" class="btn-group btn-group-yesno">
+			<field name="carousel_dcontrols_labels" type="radio" default="1" label="Show labels" description="Display Autoplay, Pages, Items label in front of the controls" class="btn-group">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -209,15 +209,15 @@
 				<option value="0">FLEXI_IMAGE</option>
 				<option value="1">Bootstrap</option>
 			</field>			
-			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls" class="btn-group btn-group-yesno">
+			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls" class="btn-group">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="carousel_dcontrols_pages" type="radio" default="1" label="Page controls" description="Display Page controls" class="btn-group btn-group-yesno">
+			<field name="carousel_dcontrols_pages" type="radio" default="1" label="Page controls" description="Display Page controls" class="btn-group">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="carousel_dcontrols_items" type="radio" default="1" label="Item controls" description="Display Item controls" class="btn-group btn-group-yesno">
+			<field name="carousel_dcontrols_items" type="radio" default="1" label="Item controls" description="Display Item controls" class="btn-group">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>

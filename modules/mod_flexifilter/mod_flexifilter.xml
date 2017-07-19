@@ -50,7 +50,7 @@
 			</field>
 
 			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_SELECTOR_CATS" description="FLEXI_FILTER_SELECTOR_CATS_DESC" class="disp_catselector" />
-			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC" class="btn-group btn-group-yesno disp_catselector">
+			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC" class="btn-group disp_catselector">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -74,11 +74,11 @@
 				<option value="1" show_list="using_slider" hide_list="">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
 			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM_MODULE" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="using_slider input-xxlarge" />
-			<field name="filter_autosubmit" type="radio" default="0" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group btn-group-yesno">
+			<field name="filter_autosubmit" type="radio" default="0" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filter_instructions" type="radio" default="1" label="FLEXI_SEARCH_FILTER_INSTRUCTIONS" description="FLEXI_SEARCH_FILTER_INSTRUCTIONS_DESC" class="btn-group btn-group-yesno" >
+			<field name="filter_instructions" type="radio" default="1" label="FLEXI_SEARCH_FILTER_INSTRUCTIONS" description="FLEXI_SEARCH_FILTER_INSTRUCTIONS_DESC" class="btn-group" >
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
@@ -101,7 +101,7 @@
 			</field>
 			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" class="custom_goclass input-xxlarge" />
 			
-			<field name="show_search_reset" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<field name="show_search_reset" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_resetbtn">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_resetbtn" hide_list="">FLEXI_SHOW</option>
 			</field>
@@ -118,7 +118,7 @@
 			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level1" />
-			<field name="use_search" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group btn-group-yesno">
+			<field name="use_search" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="usesearch">FLEXI_NO</option>
 				<option value="1" show_list="usesearch" hide_list="">FLEXI_YES</option>
 			</field>
@@ -127,12 +127,12 @@
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
 			</field>
-			<field name="search_autocomplete" type="radio" default="1" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" class="usesearch btn-group btn-group-yesno" >
+			<field name="search_autocomplete" type="radio" default="1" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" class="usesearch btn-group" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
 				<option value="2">FLEXI_AUTOCOMPLETE_TAG_LIKE</option>
 			</field>
-			<field name="show_searchphrase" type="radio" default="1" label="FLEXI_SEARCHWORD_COMBINATION" description="FLEXI_SEARCHWORD_COMBINATION_DESC" class="usesearch btn-group btn-group-yesno">
+			<field name="show_searchphrase" type="radio" default="1" label="FLEXI_SEARCHWORD_COMBINATION" description="FLEXI_SEARCHWORD_COMBINATION_DESC" class="usesearch btn-group">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -145,7 +145,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" />
-			<field name="use_filters" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" class="btn-group btn-group-yesno">
+			<field name="use_filters" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="usefilters">FLEXI_NO</option>
 				<option value="1" show_list="usefilters" hide_list="">FLEXI_YES</option>
 			</field>
@@ -166,7 +166,7 @@
 			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="usefilters input-xxlarge"/>
 
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level2" class="usefilters" />
-			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="usefilters btn-group btn-group-yesno">
+			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="usefilters btn-group">
 				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
@@ -187,7 +187,7 @@
 
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level1" />
-			<field name="use_persistent_filters" type="multilist" subtype="radio" inline_tip="FLEXI_FIELDS_MUST_BE_SET_AS_FILTERABLE" tip_class="" tip_img="note.gif" toggle_related="1" default="0" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group btn-group-yesno">
+			<field name="use_persistent_filters" type="multilist" subtype="radio" inline_tip="FLEXI_FIELDS_MUST_BE_SET_AS_FILTERABLE" tip_class="" tip_img="note.gif" toggle_related="1" default="0" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="usepersistantfilter">FLEXI_NO</option>
 				<option value="1" show_list="usepersistantfilter" hide_list="">FLEXI_YES</option>
 			</field>
@@ -233,7 +233,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
-			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group btn-group-yesno">
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

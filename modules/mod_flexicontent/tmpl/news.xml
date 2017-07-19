@@ -30,7 +30,7 @@
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
-			<field name="news_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+			<field name="news_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
@@ -56,7 +56,7 @@
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
+			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -83,7 +83,7 @@
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
-			<field name="news_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+			<field name="news_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
@@ -109,7 +109,7 @@
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
+			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
