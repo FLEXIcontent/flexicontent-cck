@@ -34,7 +34,7 @@
 				<field
 					name="show_description"
 					type="radio"
-					class="btn-group btn-group-yesno"
+					class="btn-group"
 					default="0"
 					label="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_LABEL"
 					description="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_DESC">
@@ -45,7 +45,7 @@
 				<field
 					name="numitems"
 					type="radio"
-					class="btn-group btn-group-yesno"
+					class="btn-group"
 					default="0"
 					label="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_LABEL"
 					description="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_DESC">
@@ -56,7 +56,7 @@
 				<field
 					name="show_children"
 					type="radio"
-					class="btn-group btn-group-yesno"
+					class="btn-group"
 					default="0"
 					label="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_LABEL"
 					description="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_DESC">
@@ -105,26 +105,26 @@
 				</field>
 
 				<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
-				<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group">
 					<option value="0" show_list="" hide_list="disp_cat_img">FLEXI_HIDE</option>
 					<option value="1" show_list="disp_cat_img" hide_list="">FLEXI_SHOW</option>
 				</field>
-				<field name="cat_image_source" type="radio" default="2" label="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE" description="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE_DESC" class="btn-group btn-group-yesno disp_cat_img">
+				<field name="cat_image_source" type="radio" default="2" label="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE" description="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE_DESC" class="btn-group disp_cat_img">
 					<option value="0">MOD_FLEXICATEGORIES_CAT_IMAGE_EXTRACT</option>
 					<option value="1">MOD_FLEXICATEGORIES_CAT_IMAGE_USEPARAM</option>
 					<option value="2">MOD_FLEXICATEGORIES_CAT_IMAGE_BOTH</option>
 				</field>
-				<field name="cat_link_image" type="radio" default="1" label="MOD_FLEXICATEGORIES_LINK_IMAGE" description="MOD_FLEXICATEGORIES_LINK_IMAGE_DESC" class="btn-group btn-group-yesno disp_cat_img">
+				<field name="cat_link_image" type="radio" default="1" label="MOD_FLEXICATEGORIES_LINK_IMAGE" description="MOD_FLEXICATEGORIES_LINK_IMAGE_DESC" class="btn-group disp_cat_img">
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</field>
-				<field name="cat_image_method" type="radio" default="1" label="MOD_FLEXICATEGORIES_PROCESSING_METHOD" description="MOD_FLEXICATEGORIES_PROCESSING_METHOD_DESC" class="btn-group btn-group-yesno disp_cat_img">
+				<field name="cat_image_method" type="radio" default="1" label="MOD_FLEXICATEGORIES_PROCESSING_METHOD" description="MOD_FLEXICATEGORIES_PROCESSING_METHOD_DESC" class="btn-group disp_cat_img">
 					<option value="0">MOD_FLEXICATEGORIES_SCALE</option>
 					<option value="1">MOD_FLEXICATEGORIES_CROP</option>
 				</field>		
 				<field name="cat_image_width" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_WIDTH" description="MOD_FLEXICATEGORIES_IMAGE_WIDTH" class="disp_cat_img" />
 				<field name="cat_image_height" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" description="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" class="disp_cat_img" />
-				<field name="cat_image_float" type="radio" default="left" label="MOD_FLEXICATEGORIES_IMAGE_POSITION" description="MOD_FLEXICATEGORIES_IMAGE_POSITION_DESC" class="btn-group btn-group-yesno disp_cat_img">
+				<field name="cat_image_float" type="radio" default="left" label="MOD_FLEXICATEGORIES_IMAGE_POSITION" description="MOD_FLEXICATEGORIES_IMAGE_POSITION_DESC" class="btn-group disp_cat_img">
 					<option value="left">MOD_FLEXICATEGORIES_IMAGE_LEFT</option>
 					<option value="right">MOD_FLEXICATEGORIES_IMAGE_RIGHT</option>
 				</field>

@@ -50,7 +50,7 @@
 			<field name="search_inner_prompt" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" class="input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_MOD_GO_BUTTON" level="level2" />
-			<field name="button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<field name="button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_gobtn">FLEXI_NO</option>
 				<option value="1" show_list="disp_gobtn" hide_list="">FLEXI_YES</option>
 			</field>
@@ -79,7 +79,7 @@
 			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" class="disp_gobtn gobtn_txt input-xxlarge"/>
 			
 			<field name="" type="separator" default="FLEXI_MOD_DIRECT_BUTTON" level="level2" />
-			<field name="direct_button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<field name="direct_button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_directbtn">FLEXI_NO</option>
 				<option value="1" show_list="disp_directbtn" hide_list="">FLEXI_YES</option>
 			</field>
@@ -108,7 +108,7 @@
 			<field name="direct_text"  type="text" default="FLEXI_ADV_MOD_DIRECT" label="FLEXI_MOD_DIRECT_TEXT" description="FLEXI_MOD_DIRECT_TEXT_DESC" class="disp_directbtn directbtn_txt input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_MOD_ADV_SEARCH" description="FLEXI_MOD_ADV_SEARCH_DESC" level="level2" />
-			<field name="linkadvsearch" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC" class="btn-group btn-group-yesno">
+			<field name="linkadvsearch" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC" class="btn-group">
 				<option value="0" show_list="" hide_list="disp_advlink">FLEXI_NO</option>
 				<option value="1" show_list="disp_advlink" hide_list="">FLEXI_YES</option>
 			</field>
@@ -172,7 +172,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
-			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group btn-group-yesno">
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

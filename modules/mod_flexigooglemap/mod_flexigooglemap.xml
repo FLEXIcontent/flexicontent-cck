@@ -72,7 +72,7 @@
 			<field
 				name="method_category" type="radio" default="0"
 				label="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_LABEL" description="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_DESC" showon="catidmode:0"
-				class="btn-group btn-group-yesno"
+				class="btn-group"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_INCLUDE</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_EXCLUDE</option>
@@ -176,7 +176,7 @@
 				name="animationmarker" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER"
 				description="MOD_FLEXIGOOGLEMAP_ANIMATIONMARKER_DESC"
-				class="btn-group btn-group-yesno"
+				class="btn-group"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -191,7 +191,7 @@
 				name="clustermode" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_CLUSTERMODE"
 				description="MOD_FLEXIGOOGLEMAP_CLUSTERMODE_DESC"
-				class="btn-group btn-group-yesno"
+				class="btn-group"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -219,7 +219,7 @@
 				name="uselink" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USELINK"
 				description="MOD_FLEXIGOOGLEMAP_USELINK_DESC"
-				class="btn-group btn-group-yesno"
+				class="btn-group"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -229,7 +229,7 @@
 				name="linkmode" type="radio"
 				default="" label="MOD_FLEXIGOOGLEMAP_LINKMODE"
 				description="MOD_FLEXIGOOGLEMAP_LINKMODE_DESC"
-				class="btn-group btn-group-yesno" showon="uselink:1"
+				class="btn-group" showon="uselink:1"
 				>
 				<option value="_blank">MOD_FLEXIGOOGLEMAP_BLANK</option>
 				<option value="">MOD_FLEXIGOOGLEMAP_SAME</option>
@@ -246,7 +246,7 @@
 				name="infotextmode" type="radio"
 				default="0" label="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE"
 				description="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_DESC"
-				class="btn-group btn-group-yesno"
+				class="btn-group"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_FULL</option>
@@ -256,7 +256,7 @@
 				name="useadress" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USEADDRESS"
 				description="MOD_FLEXIGOOGLEMAP_USEADDRESS_DESC"
-				class="btn-group btn-group-yesno" showon="infotextmode:0"
+				class="btn-group" showon="infotextmode:0"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
@@ -268,7 +268,7 @@
 				name="usedirection" type="radio"
 				default="1" label="MOD_FLEXIGOOGLEMAP_USEDIRECTION"
 				description="MOD_FLEXIGOOGLEMAP_USEDIRECTION_DESC"
-				class="btn-group btn-group-yesno"
+				class="btn-group"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>

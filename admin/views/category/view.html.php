@@ -440,9 +440,9 @@ class FlexicontentViewCategory extends JViewLegacy
 	 * @return	void
 	 * @since	1.5
 	 */
-	function getInheritedFieldDisplay($field, $params)
+	function getInheritedFieldDisplay($field, $params, $_v = null)
 	{
-		$_v = $params->get($field->fieldname);
+		$_v = $params ? $params->get($field->fieldname) : $_v;
 		
 		if ($_v==='' || $_v===null)
 			return $field->input;

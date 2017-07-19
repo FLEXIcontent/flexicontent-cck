@@ -70,6 +70,14 @@ $this->document->addScriptDeclaration($js);
 
 		<div class="span6 full_width_980">
 
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('parent_id')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->Lists['parent_id']; ?>
+			</div>
+
 			<span class="label-fcouter">
 				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('published')); ?>
 			</span>
@@ -79,10 +87,10 @@ $this->document->addScriptDeclaration($js);
 
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('parent_id')); ?>
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('access')); ?>
 			</span>
 			<div class="container_fcfield">
-				<?php echo $this->Lists['parent_id']; ?>
+				<?php echo $this->form->getInput('access'); ?>
 			</div>
 
 		</div><!-- span6 EOF -->
@@ -138,29 +146,8 @@ $this->document->addScriptDeclaration($js);
 				<div class="tabbertab" id="tabset_cat_props_publishing_tab" data-icon-class="icon-calendar" >
 					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
 
-					<fieldset class="panelform">
-						<?php echo $this->form->getLabel('created_user_id'); ?>
-						<?php echo $this->form->getInput('created_user_id'); ?>
-
-						<?php if (intval($this->form->getValue('created_time'))) : ?>
-							<?php echo $this->form->getLabel('created_time'); ?>
-							<?php echo $this->form->getInput('created_time'); ?>
-						<?php endif; ?>
-
-						<?php if ($this->form->getValue('modified_user_id')) : ?>
-							<?php echo $this->form->getLabel('modified_user_id'); ?>
-							<?php echo $this->form->getInput('modified_user_id'); ?>
-
-							<?php echo $this->form->getLabel('modified_time'); ?>
-							<?php echo $this->form->getInput('modified_time'); ?>
-						<?php endif; ?>
-
-						<?php echo $this->form->getLabel('hits'); ?>
-						<?php echo $this->form->getInput('hits'); ?>
-
-						<?php echo $this->form->getLabel('access'); ?>
-						<?php echo $this->form->getInput('access'); ?>
-					</fieldset>
+					<?php /* No inheritage needed for these */ ?>
+					<?php echo JLayoutHelper::render('joomla.edit.publishingdata', $this); ?>
 
 				</div><!-- tabbertab FLEXI_PUBLISHING -->
 				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_META_SEO'), 'metaseo-options');*/ ?>
@@ -169,21 +156,29 @@ $this->document->addScriptDeclaration($js);
 				<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
 					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
 
-					<fieldset class="panelform">
-						<?php echo $this->form->getLabel('metadesc'); ?>
-						<?php echo $this->form->getInput('metadesc'); ?>
+					<?php /*echo JLayoutHelper::render('joomla.edit.metadata', $this);*/ ?>
+					<?php
+					$fieldnames_arr = array( 'metadesc' => null, 'metakey' => null);
+					foreach($this->form->getGroup('metadata') as $field)  $fieldnames_arr[$field->fieldname] = 'metadata';
 
-						<?php echo $this->form->getLabel('metakey'); ?>
-						<?php echo $this->form->getInput('metakey'); ?>
+					foreach ($fieldnames_arr as $fieldnames => $groupname)
+					{
+						foreach ((array) $fieldnames as $f)
+						{
+							$field = $this->form->getField($f, $groupname);
+							if (!$field) continue;
 
-						<?php foreach($this->form->getGroup('metadata') as $field): ?>
-							<?php if ($field->hidden): echo $field->input; ?>
-							<?php else: ?>
-								<?php echo $field->label; ?>
-								<?php echo $field->input; /* non-inherited */?>
-							<?php endif; ?>
-						<?php endforeach; ?>
-					</fieldset>
+							echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+							<div class="control-group">
+								<div class="control-label">'.$field->label.'</div>
+								<div class="controls">
+									'.$field->input /* non-inherited */ .'
+								</div>
+							</div>
+							';
+						}
+					}
+					?>
 
 				</div><!-- tabbertab FLEXI_META_SEO -->
 

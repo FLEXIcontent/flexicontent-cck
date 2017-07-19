@@ -902,8 +902,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					'cols'=>array('id'=>0,'itemid'=>0, 'userid'=>0, 'type'=>0)
 				),
 				'unique_rec'=>array(
-					'custom_add'=>'ADD UNIQUE `unique_rec`',
-					'cols'=>array('itemid'=>0, 'userid'=>0, 'type'=>0)
+					'custom_drop'=>'DROP INDEX `unique_rec`',
+					//'cols'=>array()  // Empty cols, we only want to drop the index if it exists
 				)
 			),
 			'flexicontent_items_extravote'=>array(
@@ -932,17 +932,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$_update_clauses = array();
 			foreach($indexnames as $indexname => $iconf)
 			{
-				$query = "SELECT COUNT(1) AS IndexIsThere "
-					." FROM INFORMATION_SCHEMA.STATISTICS"
-					." WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."' AND index_name='".$indexname."'"
-					.(is_array($iconf) && !empty($iconf['cols'])  ? 
-						" AND COLUMN_NAME IN ('".implode("','", array_keys($iconf['cols']))."')".
-						" HAVING IndexIsThere = ".count($iconf['cols'])
-					: "");
+				$query = "SELECT COUNT(1) AS IndexIsThere"
+					. " FROM INFORMATION_SCHEMA.STATISTICS"
+					. " WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."' AND index_name='".$indexname."'"
+					. (is_array($iconf) && !empty($iconf['cols'])
+						? " AND COLUMN_NAME IN ('".implode("','", array_keys($iconf['cols']))."') HAVING IndexIsThere = ".count($iconf['cols'])
+						: "");
 				//if (is_array($iconf) && !empty($iconf['cols'])) echo $query ."<br/>";
 
 				$this->_db->setQuery($query);
 				$exists = $this->_db->loadResult();
+				$exists = is_array($iconf) && !empty($iconf['custom_drop']) && empty($iconf['cols']) ? !$exists : $exists;   // If 'custom_drop' exists but we have zero 'cols' it means we want to drop the index
 
 				if ($indexing_started)
 				{
@@ -975,12 +975,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$update_queries[$tblname] = 'UPDATE #__' . $tblname . ' SET ' . implode(' , ', $_update_clauses);
 			}
 		}
-		
-		if ($all_started) $missing = array();  // Indexing for all tables has started, clear the 'missing' array ... so that post-installation task will not appear
-		return $check_only ? empty($missing) : $missing;
+
+		// Indexing for all tables has started, clear the 'missing' array ... so that post-installation task will not appear
+		if ($all_started)
+		{
+			$missing = array();
+		}
+
+		return $check_only
+			? empty($missing)
+			: $missing;
 	}
-	
-	
+
+
 	/**
 	 * Method to check if the system plugin is installed
 	 *
