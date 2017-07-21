@@ -460,7 +460,7 @@ class flexicontent_db
 				$order_dir	= 'DESC';
 				break;
 			case 'modified': case 'updated': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
-				$order_col	= $i_as.'.modified';
+				$order_col	= $i_as.'.modified DESC, ' . $i_as.'.created';
 				$order_dir	= 'DESC';
 				break;
 			case 'published':
@@ -631,7 +631,7 @@ class flexicontent_db
 				$order_dir = 'DESC';
 				break;
 			case 'modified':
-				$order_col = $c_as.'.modified_time';
+				$order_col = $c_as.'.modified_time DESC, ' . $c_as.'.created_time';
 				$order_dir = 'DESC';
 				break;
 			case 'alpha':

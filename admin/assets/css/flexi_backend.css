@@ -317,9 +317,13 @@ div.adminthumbs.fcmanthumbs {
 	margin: 0px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .input-append,
-.flexicontent #fc-filters-box .fc-filter input-prepend {
+.flexicontent #fc-filters-box .fc-filter .input-prepend {
 	margin: 0px;
-	font-size: 13px;
+}
+.flexicontent #fc-filters-box .fc-filter .field-calendar > div > button {
+	width: 25px;
+	padding-left: 4px;
+	padding-right: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .input-prepend > .add-on + input,
 .flexicontent #fc-filters-box .fc-filter .input-append > .add-on + input {
