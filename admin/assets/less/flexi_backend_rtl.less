@@ -392,9 +392,13 @@ div.adminthumbs.fcmanthumbs {
 		margin: 0px !important;
 	}
 	.input-append,
-	input-prepend {
-		margin: 0px;
-		font-size: 13px;
+	.input-prepend {
+		margin: 0px;  /* do not set font-size !*/
+	}
+	.field-calendar > div > button {
+		width: 25px;
+		padding-left: 0;
+		padding-right: 4px;
 	}
 	.input-prepend > .add-on + input,
 	.input-append > .add-on + input {
@@ -404,7 +408,6 @@ div.adminthumbs.fcmanthumbs {
 	.input-append > input {
 		margin: 0 !important;
 	}
-
 	
 	/* SELECT2 */
 	/* Single-choice */

@@ -65,20 +65,22 @@ if ( $useAssocs ) $list_total_cols++;
 $list_total_cols += count($this->extra_fields);
 
 
-// *********************
-// COMMON repeated texts
-// *********************
+// ***
+// *** COMMON repeated texts
+// ***
 
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
 $edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
 $edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+$_NEVER_ = JText::_('FLEXI_NEVER');
+$_NULL_DATE_ = $this->db->getNullDate();
 
 
-// *****
-// ICONS
-// *****
+// ***
+// *** ICONS
+// ***
 
 $image_flag_path = "../media/mod_languages/images/";
 
@@ -919,8 +921,11 @@ jQuery(document).ready(function(){
 				if ( !empty($this->lang_assocs[$row->id]) )
 				{
 					$row_modified = strtotime($row->modified);
-					if (!$row_modified)  $row_modified = strtotime($row->created);
-					
+					if (!$row_modified)
+					{
+						$row_modified = strtotime($row->created);
+					}
+
 					foreach($this->lang_assocs[$row->id] as $assoc_item)
 					{
 						// Joomla article manager show also current item, so we will not skip it
@@ -1093,7 +1098,7 @@ jQuery(document).ready(function(){
 			</td>
 			
 			<td class="col_revised">
-				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, $date_format) : JText::_('FLEXI_NEVER'); ?>
+				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHTML::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
 			
 			<td>

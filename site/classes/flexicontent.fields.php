@@ -286,6 +286,7 @@ class FlexicontentFields
 		$dispatcher = JDispatcher::getInstance();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
+		$nullDate = $db->getNulldate();
 		
 		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
 		if ($vars==null)
@@ -364,26 +365,26 @@ class FlexicontentFields
 					$item->parameters = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $item->id, $item->attribs);
 				}
 			}
-			$item->params		= $item->parameters;
+			$item->params = $item->parameters;
 			
-			$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
-			$item->tags = $tags;
-			$item->cats = $cats;
-			$item->favs			= $favourites;
-			$item->fav			= $favoured;
+			$item->text  = $item->introtext . chr(13).chr(13) . $item->fulltext;
+			$item->tags  = $tags;
+			$item->cats  = $cats;
+			$item->favs  = $favourites;
+			$item->fav   = $favoured;
 			
-			$item->creator 	= @$author->alias ? $author->alias : (@$author->name 		? $author->name 	: '') ;
+			$item->creator 	= !empty($author->alias) ? $author->alias : (!empty($author->name) 		? $author->name 	: '') ;
 			$item->author		= & $item->creator;  // An alias ... of creator
-			$item->modifier	= @$modifier->name 		? $modifier->name 	: $item->creator;   // If never modified, set modifier to be the creator
-			$item->modified	= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;   // If never modified, set modification date to be the creation date
+			$item->modifier	= !empty($modifier->name)      ? $modifier->name  : $item->creator;   // If never modified, set modifier to be the creator
+			$item->modified	= $item->modified != $nullDate ? $item->modified  : $item->created;   // If never modified, set modification date to be the creation date
 			
-			$item->cmail 		= @$author->email 		? $author->email 	: '' ;
-			$item->cuname 	= @$author->username 	? $author->username 	: '' ;
-			$item->mmail		= @$modifier->email 	? $modifier->email 	: $item->cmail;
-			$item->muname		= @$modifier->muname 	? $modifier->muname : $item->cuname;
+			$item->cmail 		= !empty($author->email)     ? $author->email     : '' ;
+			$item->cuname 	= !empty($author->username)  ? $author->username  : '' ;
+			$item->mmail		= !empty($modifier->email)   ? $modifier->email   : $item->cmail;
+			$item->muname		= !empty($modifier->muname)  ? $modifier->muname  : $item->cuname;
 			
-			$item->typename	= @$typename->name 		? $typename->name 	: JText::_('Article');
-			$item->vote			= @$vote ? $vote : '';
+			$item->typename	= !empty($typename->name)    ? $typename->name 	: JText::_('Article');
+			$item->vote			= !empty($vote) ? $vote : '';
 			
 			// some aliases to much CORE field names
 			$item->categories    = & $item->cats;

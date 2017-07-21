@@ -350,16 +350,19 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->_data = array();
 			$this->_catids = array();
 			$this->_tagids = array();
-			foreach($query_ids as $item_id) {
+			foreach($query_ids as $item_id)
+			{
 				$item = $_data[$item_id];
 				
 				$item->catids = $item->relcats ? preg_split("/[\s]*,[\s]*/", $item->relcats) : array();
-				foreach ($item->catids as $item_cat) {
+				foreach ($item->catids as $item_cat)
+				{
 					if ($item_cat) $this->_catids[$item_cat] = 1;
 				}
 				
 				$item->tagids = $item->taglist ? array_reverse(preg_split("/[\s]*,[\s]*/", $item->taglist)) : array();
-				foreach ($item->tagids as $item_tag) {
+				foreach ($item->tagids as $item_tag)
+				{
 					if ($item_tag) $this->_tagids[$item_tag] = 1;
 				}
 				
@@ -393,7 +396,7 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			$k = 1 - $k;
 		}
-		
+
 		return $this->_data;
 	}
 	
@@ -1104,17 +1107,20 @@ class FlexicontentModelItems extends JModelLegacy
 		{
 			case 'type_name':
 				$_filter_order = 't.name';
-				$orderby 	= ' ORDER BY '.$_filter_order.' '.$filter_order_Dir .", i.id ASC";
+				$orderby 	= ' ORDER BY ' . $_filter_order . ' ' . $filter_order_Dir . ', i.id ASC';
 				break;
 			case 'i.ordering':
-				$orderby 	= ' ORDER BY i.catid, state_order, i.language, '. $filter_order .' '. $filter_order_Dir .", i.id DESC";
+				$orderby 	= ' ORDER BY i.catid, state_order, i.language, ' . $filter_order . ' ' . $filter_order_Dir . ', i.id DESC';
 				break;
 			case 'catsordering':
 				$_filter_order = 'rel.ordering';
-				$orderby 	= ' ORDER BY rel.catid, state_order, i.language, '. $_filter_order.' '.$filter_order_Dir .", i.id DESC";
+				$orderby 	= ' ORDER BY rel.catid, state_order, i.language, ' . $_filter_order . ' ' . $filter_order_Dir . ', i.id DESC';
+				break;
+			case 'i.modified':
+				$orderby 	= ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir . ', i.created ' . ' ' . $filter_order_Dir;
 				break;
 			default:
-				$orderby 	= empty($filter_order) ? '' : ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+				$orderby 	= empty($filter_order) ? '' : ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir;
 				break;
 		}
 		
