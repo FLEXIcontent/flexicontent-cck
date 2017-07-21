@@ -148,6 +148,10 @@
 
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/termlist/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
+			<field name="lang_filter_values" type="radio" default="0" label="FLEXI_LANG_FILTER_VALUES" description="FLEXI_LANG_FILTER_VALUES_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="encode_output" type="radio" default="0" label="FLEXI_ENCODE_OUTPUT" description="FLEXI_ENCODE_OUTPUT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -158,6 +162,21 @@
 				<option value="2">FLEXI_ALL_HTML</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_CATEGORY_VIEWS" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_TERMTEXT" level="_" class="alert alert-info" />
+			<field name="cut_text_catview" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_STRIP_N_CUT" description="FLEXI_FIELD_STRIP_N_CUT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cut_text_catview">FLEXI_NO</option>
+				<option value="1" show_list="cut_text_catview" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="cut_text_length_catview" type="text" size="4" default="200" label="FLEXI_FIELD_STRIP_N_CUT_LENGTH" description="FLEXI_FIELD_STRIP_N_CUT_LENGTH_DESC" depend_class="cut_text_catview" />
+			<field name="cut_text_display_catview" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_STRIP_N_CUT_DISPLAY" description="FLEXI_FIELD_STRIP_N_CUT_DISPLAY_DESC" depend_class="cut_text_catview" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cut_text_toggler_catview">FLEXI_NO</option>
+				<option value="1" show_list="cut_text_toggler_catview" hide_list="">FLEXI_INLINE</option>
+				<option value="2" show_list="cut_text_toggler_catview" hide_list="">FLEXI_MODAL_WINDOW</option>
+			</field>
+			<field name="cut_text_display_btn_icon_catview" type="text" size="40" default="icon-paragraph-center" label="FLEXI_BUTTON_ICON" description="..." depend_class="cut_text_catview cut_text_toggler_catview" />
+			<field name="cut_text_display_btn_text_catview" type="text" size="40" default="..." label="FLEXI_BUTTON_TEXT" description="..." depend_class="cut_text_catview cut_text_toggler_catview" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_LIST" description="" icon_class="icon-stack" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
@@ -168,11 +187,6 @@
 				<option value="3" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:circle\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (circle)</option>
 				<option value="4" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:square\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (square)</option>
 				<option value="5" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:none\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (no marking)</option>
-				<option value="6" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge</option>
-				<option value="7" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-success\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge success</option>
-				<option value="8" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-info\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge info</option>
-				<option value="9" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-warning\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge warning</option>
-				<option value="10" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-important\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge important</option>
 			</field>
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

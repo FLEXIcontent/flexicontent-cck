@@ -63,18 +63,19 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 		
 		
-		// ****************
-		// Number of values
-		// ****************
+		// ***
+		// *** Number of values
+		// ***
+
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
-		// **************
-		// Value handling
-		// **************
+		// ***
+		// *** Value handling
+		// ***
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
@@ -92,8 +93,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '98%') ;
 		if ( is_numeric($width) ) $width .= 'px';
-		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '250px' : '400px' ) ;
-		if (  is_numeric($height) ) $height .= 'px';
+		$height = $field->parameters->get( 'height', ($field->field_type == 'maintext') ? '400px' : '250px' ) ;
+		if ( is_numeric($height) ) $height .= 'px';
 		
 		// Decide editor plugin buttons to SKIP
 		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;
@@ -125,25 +126,43 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		{
 			$fieldname = 'custom['.$field->name.']';
 			$elementid = 'custom_'.$field->name;
+			$mce_fieldname = '_FC_FIELD_' . $field->name;
 		}
 		else
 		{
 			// Override element id and field name if rendering the main description text
-			if ( !is_array($field->name) ) {
+			if ( !is_array($field->name) )
+			{
 				$fieldname = 'jform['.$field->name.']';
 				$elementid = 'jform_'.$field->name;
-			} else {
-				foreach ( $field->name as $i => $ffname) {
-					if ($i==0) {
+			}
+			else
+			{
+				foreach ( $field->name as $i => $ffname)
+				{
+					if ($i==0)
+					{
 						$fieldname = $elementid = $ffname;
-					} else {
+					}
+					else
+					{
 						$fieldname .= '['.$ffname.']';
 						$elementid .= '_'.$ffname;
 					}
 				}
 			}
-			if ($multiple) { $field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be multiple'; return; }
-			if ($use_ingroup) { $field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be grouped'; return; }
+			$mce_fieldname = '';
+
+			if ($multiple)
+			{
+				$field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be multiple';
+				return;
+			}
+			if ($use_ingroup)
+			{
+				$field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be grouped';
+				return;
+			}
 			$multiple = 0;
 			$use_ingroup = 0;
 		}
@@ -194,7 +213,6 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update the new textarea field
 			$js .= "
 				// Update the new textarea
 				var boxClass = 'txtarea';
@@ -204,6 +222,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 				var hasTinyMCE = container.find('textarea').hasClass('mce_editable');  //typeof tinyMCE === 'undefined' ? false : !!tinyMCE.get( txtarea.attr('id') );
 				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : txtarea.next().hasClass('CodeMirror');
+
+				var oldAreaID = container.find('textarea').attr('id');
+				var newAreaID = '".$elementid."_'+uniqueRowNum".$field->id.";
+				var regex_oldAreaID = new RegExp(oldAreaID, 'g');
 
 				".( !$use_html ? "" : "
 				if (hasCodeMirror)  // CodeMirror case
@@ -216,13 +238,62 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				}
 				else   // tinyMCE / other editors
 				{
+					// Get options not from copy but from the original DOM element
+					var MCEoptions = null;
+					if (hasTinyMCE)
+					{
+						MCEoptions = tinyMCE.majorVersion >= 4 ?
+							tinymce.get(oldAreaID).settings :
+							tinymce.EditorManager.get(oldAreaID).settings;
+						
+						// Clear some options
+						MCEoptions.id = null;
+						MCEoptions.url_converter_scope = null;
+						
+						// tinyMCE of J3.7.0+ 
+						if (typeof MCEoptions.setupCallbackString != 'undefined')
+						{
+							MCEoptions.target = null;
+							MCEoptions.setup = null;
+							MCEoptions.setupCallbackString = MCEoptions.setupCallbackString.replace(regex_oldAreaID, newAreaID);
+						}
+					}
+					//window.console.log(MCEoptions);
+
 					// Append a new container after the current textarea container
 					container.after('<div class=\"'+ container.get(0).className +'\"></div>');
 
 					// Add inner container and copy only the textarea into the new container and make it visible
-					jQuery('<div class=\"'+ container_inner.get(0).className +'\">' + (hasTinyMCE ? '<div class=\"editor\"></div>' : '') + '</div>').appendTo(container.next());
-					var target = hasTinyMCE ? container.next().find('.editor') : container.next();
+					var newBox = jQuery('<div class=\"'+ container_inner.get(0).className +'\"></div>')
+					newBox.appendTo(container.next());
+
+					var target;
+					if (hasTinyMCE && tinyMCE.majorVersion >= 4)
+					{
+						jQuery('<div class=\"js-editor-tinymce\"></div>').appendTo(newBox);
+						target = container.next().find('.js-editor-tinymce');
+					}
+					else
+					{
+						target = container.next();
+					}
 					container.find('textarea').appendTo(target).css('display', '').css('visibility', '');
+					
+					// Legacy (external) editor XTD-buttons, e.g. JCE, tinyMCE of < J3.7.0 
+					var editor_xtd_buttons = false;
+					if (hasTinyMCE)
+					{
+						editor_xtd_buttons = container.find('#editor-xtd-buttons');
+						if (editor_xtd_buttons.length)
+						{
+							editor_xtd_buttons.removeClass(function (index, className) {
+								return (className.match(/(^|\s)fc_xtd_btns_-\S+/g) || []).join(' ');
+							});
+							editor_xtd_buttons.html(editor_xtd_buttons.html().replace(regex_oldAreaID, newAreaID));
+							editor_xtd_buttons.addClass('fc_xtd_btns_".$elementid."_'+uniqueRowNum".$field->id.");
+							editor_xtd_buttons.appendTo(target.parent());
+						}
+					}
 
 					// Remove old (cloned) container box along with all the contents
 					container.remove();
@@ -230,14 +301,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				")."
 
 				// Prepare the new textarea for attaching the HTML editor
+				var mce_fieldname = '" . $mce_fieldname . "';
+				var mce_fieldname_sfx = mce_fieldname ? '[' + mce_fieldname + ']' : '';
 				var theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
-
-				//var xtd_btns = newField.find('#editor-xtd-buttons');
-				//var id_replace_pattern = new RegExp(theArea.attr('id'), 'g');
-				//if (xtd_btns.length) xtd_btns.html(xtd_btns.html().replace(id_replace_pattern, '".$elementid."_'+uniqueRowNum".$field->id."));
-
-				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
+				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']' + mce_fieldname_sfx);
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 			
@@ -267,9 +335,14 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				}
 				else if (hasTinyMCE)
 				{
-					var jsEditor = fc_attachTinyMCE(theArea);
+					var jsEditor = fc_attachTinyMCE(theArea, MCEoptions, mce_fieldname);
+
+					// Add click event to Legacy (external) editor XTD-buttons, e.g. JCE, tinyMCE of < J3.7.0 
+					if (!(tinyMCE.majorVersion >= 4) && editor_xtd_buttons && editor_xtd_buttons.length)
+					{
+						SqueezeBox.assign(jQuery('#editor-xtd-buttons.fc_xtd_btns_".$elementid."_'+uniqueRowNum".$field->id." + ' a.modal-button').get(), { parse: 'rel' });
+					}
 				}
-				//window.console.log(jsEditor);
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -381,15 +454,16 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
+			$mce_fieldname_sfx = $mce_fieldname ? '[' . $mce_fieldname . ']' : '';
 			$txtarea = !$use_html ? '
 				<textarea class="fcfield_textval txtarea' .($required ? ' required' : ''). '" id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
-					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
+					$fieldname_n . $mce_fieldname_sfx, htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
 					$skip_buttons_arr, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params
 				);
-			
+
 			$txtarea = '
 				<div class="fc_txtarea">
 					<div class="fcfield_box' .($required ? ' required_box' : ''). '" data-label_text="'.$field->label.'">
@@ -443,22 +517,28 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+
+		$app = JFactory::getApplication();
+		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 		
 		// Value handling parameters
-		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
 		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 
-		// Optionally limit and cut text display in modal popup window
+		// Optionally limit and cut text, and also optionally display in modal popup window
 		$cut_text        = $view=='item' ? 0 : $field->parameters->get('cut_text_catview', 0);
 		$cut_text_length = $field->parameters->get('cut_text_length_catview', 200);
 		$cut_text_display = $field->parameters->get('cut_text_display_catview', 0);
 		$cut_text_display_btn_icon = JText::_($field->parameters->get('cut_text_display_btn_icon_catview', 'icon-paragraph-center'));
 		$cut_text_display_btn_text = JText::_($field->parameters->get('cut_text_display_btn_text_catview', '...'));
 
-		// Default value
+
+		// ***
+		// *** Default value
+		// ***
+
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_value = $default_value ? JText::_($default_value) : '';
@@ -492,7 +572,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			foreach ($values as &$value)
 			{
 				if ( !strlen($value) ) continue;  // skip further actions
-				
+
 				if ($lang_filter_values) {
 					$value = JText::_($value);
 				}
@@ -622,7 +702,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
+
+		// Joomla tinyMCE custom config bug workaround
+		$mce_fieldname = '_FC_FIELD_' . $field->name;
+
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 2 ) ;
 		$use_html   = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
@@ -637,11 +720,17 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// **************************************************************
-			// Validate data, skipping values that are empty after validation
-			// **************************************************************
-			
-			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
+			// Joomla tinyMCE custom config bug workaround
+			if (isset($v[$mce_fieldname]))
+			{
+				$v = $v[$mce_fieldname];
+			}
+
+			// ***
+			// *** Validate data, skipping values that are empty after validation
+			// ***
+
+			$post[$n] = flexicontent_html::dataFilter($v, $maxlength, $validation, 0);
 			
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($post[$n]))
