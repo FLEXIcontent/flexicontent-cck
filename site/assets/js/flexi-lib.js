@@ -1127,8 +1127,12 @@
 
 
 	/* Attach tinyMCE with default settings */
-	function fc_attachTinyMCE(txtareas)
+	function fc_attachTinyMCE(txtareas, MCEoptions, mceFieldname)
 	{
+		// Create a copy of the options,  so that we do not modify the original options objet
+		var _MCEoptions = typeof MCEoptions!=='undefined' ? jQuery.extend({}, MCEoptions) : {};
+		mceFieldname = typeof mceFieldname!=='undefined' ? mceFieldname : false;
+
 		var theArea, areaID;
 		txtareas.each(function(i, txtarea)
 		{
@@ -1138,15 +1142,30 @@
 			// Remove tinymce classes from the textarea
 			theArea.removeClass('mce_editable');
 
-			// Add tinyMCE editor
-			tinyMCE.majorVersion >= 4 ?
-				tinyMCE.EditorManager.execCommand('mceAddEditor', true, areaID)  :  //{ tinyMCE.init({  mode : 'exact',  elements : areaID });  //tinyMCE.get(areaid).show();  //tinyMCE.editors[areaID].show(); }
-				tinyMCE.EditorManager.execCommand('mceAddControl', true, areaID) ;  //{ tinyMCE.execCommand('mceAddControl', false, theArea.attr('id')); }
+			// J3.7.0+ (with integrated XTD buttons) is using new setup method 
+			if (typeof mceFieldname!=='undefined' && typeof Joomla.JoomlaTinyMCE != 'undefined' && typeof MCEoptions.joomlaExtButtons != 'undefined')
+			{
+				var tinyMCEOptions = {};
+				tinyMCEOptions[mceFieldname] = _MCEoptions;
+				Joomla.JoomlaTinyMCE.setupEditor(jQuery('#' + areaID).get(0), {tinyMCE: tinyMCEOptions});
+			}
+			else if (tinyMCE.majorVersion >= 4)
+			{
+				_MCEoptions.selector = '#' + areaID;
+				tinyMCE.init(_MCEoptions);
+				//tinyMCE.EditorManager.execCommand('mceAddEditor', true, areaID);  //var editor = tinyMCE.get(areaid);  //tinyMCE.editors[areaID];
+			}
+			else
+			{
+				_MCEoptions.mode = 'exact';
+				_MCEoptions.elements = areaID;
+				tinyMCE.init(_MCEoptions);
+				//tinyMCE.EditorManager.execCommand('mceAddControl', true, areaID);  //var editor = tinymce.EditorManager.get(area_id);  // tinyMCE.editors[areaID];
+			}
 
 			// Some cleanups for proper display
 			theArea.addClass('mce_editable');
 			theArea.parent().children('.mce-container').css('display', '');   // allow editor container to stretch to the full width of its external container
-			//tinyMCE.EditorManager.execCommand('mceFocus', true, areaID);
 		});
 
 		return txtareas.length==1 ? tinyMCE.get(areaID) : true;
