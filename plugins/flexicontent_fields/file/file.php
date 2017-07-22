@@ -852,16 +852,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
-		$app  = JFactory::getApplication();
-		$jinput = $app->input;
-
-		// Make sure posted data is an array 
-		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
 
 		// Get configuration
-		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
-		$import_docs_folder = $jinput->get('import_docs_folder', '', 'string');
+		$app  = JFactory::getApplication();
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
+		$import_docs_folder = $app->input->get('import_docs_folder', '', 'string');
 
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
 		$iform_allowdel = $field->parameters->get('iform_allowdel', 1);
@@ -876,13 +871,22 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
-		if ( !$initialized ) {
+		if ( !$initialized )
+		{
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
 			$srcpath_original  = JPath::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 		}
-		
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -1044,19 +1048,19 @@ class plgFlexicontent_fieldsFile extends FCField
 					$fman = new FlexicontentControllerFilemanager();
 					$fman->runMode = 'interactive';
 
-					$jinput->set('return-url', null);
-					$jinput->set('secure', $v['secure']);
-					$jinput->set('stamp', $v['stamp']);
-					$jinput->set('file-title', $v['file-title']);
-					$jinput->set('file-desc', $v['file-desc']);
-					$jinput->set('file-lang', $v['file-lang']);
-					$jinput->set('file-access', $v['file-access']);
+					$app->input->set('return-url', null);
+					$app->input->set('secure', $v['secure']);
+					$app->input->set('stamp', $v['stamp']);
+					$app->input->set('file-title', $v['file-title']);
+					$app->input->set('file-desc', $v['file-desc']);
+					$app->input->set('file-lang', $v['file-lang']);
+					$app->input->set('file-access', $v['file-access']);
 					
 					// The dform field name of the <input type="file" ...
-					$jinput->set('file-ffname', 'custom');
-					$jinput->set('fname_level1', $field->name);
-					$jinput->set('fname_level2', $n);
-					$jinput->set('fname_level3', 'file-data');
+					$app->input->set('file-ffname', 'custom');
+					$app->input->set('fname_level1', $field->name);
+					$app->input->set('fname_level2', $n);
+					$app->input->set('fname_level3', 'file-data');
 
 					$upload_err = null;
 					$file_id = $fman->upload(null, $upload_err);
@@ -1331,14 +1335,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		$db   = JFactory::getDBO();
 		$app  = JFactory::getApplication();
 
-		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		
-		$file_id    = $jinput->get('file_id', 0, 'int');
-		$content_id = $jinput->get('content_id', 0, 'int');
-		$field_id   = $jinput->get('field_id', 0, 'int');
-		$tpl = $jinput->get('tpl', 'default', 'cmd');
+		$file_id    = $app->input->get('file_id', 0, 'int');
+		$content_id = $app->input->get('content_id', 0, 'int');
+		$field_id   = $app->input->get('field_id', 0, 'int');
+		$tpl = $app->input->get('tpl', 'default', 'cmd');
 
 		// Check for missing file id
 		if (!$file_id)
@@ -1362,11 +1365,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->field_id   = $field_id;
 
 		// Load with previous data, if it exists
-		$mailto		= $jinput->get('mailto', '', 'string');
-		$sender		= $jinput->get('sender', '', 'string');
-		$from			= $jinput->get('from', '', 'string');
-		$subject	= $jinput->get('subject', '', 'string');
-		$desc     = $jinput->get('desc', '', 'string');
+		$mailto		= $app->input->get('mailto', '', 'string');
+		$sender		= $app->input->get('sender', '', 'string');
+		$from			= $app->input->get('from', '', 'string');
+		$subject	= $app->input->get('subject', '', 'string');
+		$desc     = $app->input->get('desc', '', 'string');
 
 		if ($user->get('id') > 0)
 		{
@@ -1404,7 +1407,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		$db   = JFactory::getDbo();
 		$app  = JFactory::getApplication();
 
-		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 
@@ -1418,10 +1420,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		$MailFrom	= $app->getCfg('mailfrom');
 		$FromName	= $app->getCfg('fromname');
 
-		$file_id    = $jinput->get('file_id', 0, 'int');
-		$content_id = $jinput->get('content_id', 0, 'int');
-		$field_id   = $jinput->get('field_id', 0, 'int');
-		$tpl = $jinput->get('tpl', 'default', 'cmd');
+		$file_id    = $app->input->get('file_id', 0, 'int');
+		$content_id = $app->input->get('content_id', 0, 'int');
+		$field_id   = $app->input->get('field_id', 0, 'int');
+		$tpl = $app->input->get('tpl', 'default', 'cmd');
 
 		// Check for missing file id
 		if (!$file_id)
@@ -1558,12 +1560,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		 */
 		unset ($headers, $fields);
 
-		$email		= $jinput->get('mailto', '', 'string');
-		$sender		= $jinput->get('sender', '', 'string');
-		$from			= $jinput->get('from', '', 'string');
+		$email		= $app->input->get('mailto', '', 'string');
+		$sender		= $app->input->get('sender', '', 'string');
+		$from			= $app->input->get('from', '', 'string');
 		$_subject = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender);
-		$subject  = $jinput->get('subject', $_subject, 'string');
-		$desc     = $jinput->get('desc', '', 'string');
+		$subject  = $app->input->get('subject', $_subject, 'string');
+		$desc     = $app->input->get('desc', '', 'string');
 		
 		// Check for a valid to address
 		$error	= false;

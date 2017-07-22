@@ -471,19 +471,25 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+
+		// Get configuration
+		$app  = JFactory::getApplication();
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$label_maxlength = (int) $field->parameters->get( 'label_maxlength', 0 ) ;  // client/server side enforced
 		$cc_maxlength    = (int) $field->parameters->get( 'cc_maxlength', 0 ) ;     // client/server side enforced
 		$phone1_maxlength = (int) $field->parameters->get( 'phone1_maxlength', 0 ) ;  // client/server side enforced
 		$phone2_maxlength = (int) $field->parameters->get( 'phone2_maxlength', 0 ) ;  // client/server side enforced
 		$phone3_maxlength = (int) $field->parameters->get( 'phone3_maxlength', 0 ) ;  // client/server side enforced
 		$allow_letters = (int) $field->parameters->get( 'allow_letters', 0 ); // allow letters during validation
-			
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -497,10 +503,9 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				);
 			}
 
-
-			// ****************************************************************************
-			// Validate phone number, skipping phone number that are empty after validation
-			// ****************************************************************************
+			// ***
+			// *** Validate phone number, skipping phone number that are empty after validation
+			// ***
 
 			$regex = $allow_letters ? '/[^0-9A-Z]/' : '/[^0-9]/';	// allow letters?
 			 

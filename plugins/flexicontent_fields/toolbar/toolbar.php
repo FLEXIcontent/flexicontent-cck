@@ -44,11 +44,11 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		
-		$view = JRequest::getString('view', FLEXI_ITEMVIEW);
-		
-		//if ($view != FLEXI_ITEMVIEW) return;
-		if (JRequest::getCmd('print')) return;
-		
+		$app = JFactory::getApplication();
+		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
+
+		if ($app->input->get('print', '', 'cmd')) return;
+
 		//$scheme = JURI::getInstance()->getScheme();  // we replaced http(s):// with //
 		$document	= JFactory::getDocument();
 		
@@ -166,7 +166,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		// print button
 		if ($display_print)
 		{
-			$print = JRequest::getInt('pop') || JRequest::getInt('print');
+			$print = $app->input->get('pop', 0, 'int') || $app->input->get('print', 0, 'int');
 			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 			$print_link = $print ? '#' : ( $item_url_abs .(strstr($item_url_abs, '?') ? '&amp;'  : '?') . 'pop=1&amp;tmpl=component&amp;print=1' );
 			$js_link = $print ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';

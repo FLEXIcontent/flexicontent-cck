@@ -1118,7 +1118,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
 		$app  = JFactory::getApplication();
-		$jinput = $app->input;
 		
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$target_dir   = (int) $field->parameters->get('target_dir', 1);
@@ -1135,7 +1134,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$app       = JFactory::getApplication();
 			$document	 = JFactory::getDocument();
-			$option    = $jinput->get('option', '', 'cmd');
+			$option    = $app->input->get('option', '', 'cmd');
 			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 			
@@ -1165,11 +1164,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Current view variable / FLAGs
 		// *****************************
 		
-		$realview = $jinput->get('view', FLEXI_ITEMVIEW, 'cmd');
-		$view = $jinput->get('flexi_callview', $realview, 'cmd');
+		$realview = $app->input->get('view', 'item', 'cmd');
+		$view = $app->input->get('flexi_callview', $realview, 'cmd');
 		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
 		$isSite = $app->isSite();
-		$is_FE_html_view = $jinput->get('format', 'html', 'cmd') == 'html' && $isSite;
+		$is_FE_html_view = $app->input->get('format', 'html', 'cmd') == 'html' && $isSite;
 		
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -2335,17 +2334,12 @@ class plgFlexicontent_fieldsImage extends FCField
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
-		$app  = JFactory::getApplication();
-		$jinput = $app->input;
-
-		// Make sure posted data is an array 
-		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
 
 		// Get configuration
-		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
-		$import_media_folder = $jinput->get('import_media_folder', '', 'string');
-		$unique_tmp_itemid = $jinput->get('unique_tmp_itemid', '', 'string');
+		$app  = JFactory::getApplication();
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
+		$import_media_folder = $app->input->get('import_media_folder', '', 'string');
+		$unique_tmp_itemid = $app->input->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 		
 		$image_source = (int) $field->parameters->get('image_source', 0);
@@ -2376,9 +2370,10 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		
-		// ***********************************************
-		// Special steps for image field in Folder-mode(s)
-		// ***********************************************
+		// ***
+		// *** Special steps for image field in Folder-mode(s)
+		// ***
+
 		if ( $image_source >= 1 )
 		{
 			$dir = $field->parameters->get('dir');
@@ -2403,22 +2398,23 @@ class plgFlexicontent_fieldsImage extends FCField
 				JFolder::move($temppath, $dest_path);
 			}
 		}
-		
-		
-		// ****************************************
-		// Special steps for image field in MM-mode
-		// ****************************************
+
+
+		// ***
+		// *** Special steps for image field in MM-mode
+		// ***
 		
 		if ( $image_source == -2 )
 		{
 			$dest_path_media = 'images/';
 			$dest_path_media_full = JPath::clean( JPATH_SITE .DS. $dest_path_media );
 		}
-		
-		
-		// **************************************************************************
-		// Rearrange file array so that file properties are groupped per value number
-		// **************************************************************************
+
+
+		// ***
+		// *** Rearrange file array so that file properties are groupped per value number
+		// ***
+
 		//echo "<pre>"; print_r($file); echo "</pre>";
 		$files = array();
 		if ($file) foreach( $file as $key => $all )
@@ -2429,11 +2425,15 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 		}
 		//echo "<pre>"; print_r($files); echo "</pre>";
-		
-		
-		// *****************************************************************************************
-		// Reformat the posted data & handle uploading / removing / deleting / replacing image files
-		// *****************************************************************************************
+
+
+		// ***
+		// *** Reformat the posted data & handle uploading / removing / deleting / replacing image files
+		// ***
+
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+
 		$new_filenames = array();
 		$newpost = array();
 		$new = 0;
@@ -2514,11 +2514,11 @@ class plgFlexicontent_fieldsImage extends FCField
 					$fman = new FlexicontentControllerFilemanager();
 					$fman->runMode = 'interactive';
 
-					$jinput->set('return-url', null);
-					$jinput->set('file-dir-path', DS.$import_media_folder . $sub_folder);
-					$jinput->set('file-filter-re', preg_quote($filename));
-					$jinput->set('secure', 1);
-					$jinput->set('keep', 1);
+					$app->input->set('return-url', null);
+					$app->input->set('file-dir-path', DS.$import_media_folder . $sub_folder);
+					$app->input->set('file-filter-re', preg_quote($filename));
+					$app->input->set('secure', 1);
+					$app->input->set('keep', 1);
 
 					$upload_err = null;
 					$file_ids = $fman->addlocal(null, $upload_err);
@@ -2606,8 +2606,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( empty($post) ) return;
 
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 
 		if ( !$is_importcsv ) return;
 		
@@ -2797,8 +2796,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	function uploadOriginalFile($field, &$post, $file)
 	{
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$format = $jinput->get('format', 'html', 'cmd');
+		$format = $app->input->get('format', 'html', 'cmd');
 		$err_text = null;
 		
 		// Get the component configuration

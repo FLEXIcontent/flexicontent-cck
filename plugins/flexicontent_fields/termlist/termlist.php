@@ -705,7 +705,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Get configuration
 		$app  = JFactory::getApplication();
 		$jinput = $app->input;
-		$is_importcsv = $jinput->get('task', '', 'cmd') == 'importcsv';
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 2 ) ;
@@ -713,11 +713,15 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 		$maxlength  = $use_html ? 0 : $maxlength;
 		$title_maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;
-		
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)

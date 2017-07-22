@@ -252,9 +252,9 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		}
 		
 		// Check if not inside form
-		$jinput = JFactory::getApplication()->input;
-		$layout = $jinput->get('layout', '', 'cmd');
-		$task   = $jinput->get('task', '', 'cmd');
+		$app = JFactory::getApplication();
+		$layout = $app->input->get('layout', '', 'cmd');
+		$task   = $app->input->get('task', '', 'cmd');
 		if ( $layout != "form" && $task != 'add' && $task != 'edit' ) return;
 		
 		

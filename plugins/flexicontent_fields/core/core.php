@@ -44,9 +44,6 @@ class plgFlexicontent_fieldsCore extends FCField
 	// Method to create field's HTML display for item form
 	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $raw_values=null, $prop='display' )
 	{
-		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
-		// Currently $raw_values only used by 'maintext'
-		
 		static $cat_links = array();
 		static $tag_links = array();
 
@@ -61,6 +58,9 @@ class plgFlexicontent_fieldsCore extends FCField
 		{
 			return;
 		}
+
+		$app = JFactory::getApplication();
+		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 
 		$field = is_object($_field)
 			? $_field
@@ -296,7 +296,9 @@ class plgFlexicontent_fieldsCore extends FCField
 				
 					// Special display variables
 					if ($raw_values!==null)
+					{
 						$field->{$prop} = $raw_values[0];
+					}
 					else if ($prop != 'display')
 					{
 						switch ($prop) {
@@ -536,21 +538,23 @@ class plgFlexicontent_fieldsCore extends FCField
 				// Get categories
 				global $globalcats;
 				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
-				$option = JRequest::getVar('option', '');
-				$view   = JRequest::getVar('view', '');
-				$cid    = JFactory::getApplication()->isSite() ? JRequest::getInt('cid', '') : 0;
-				$cids   = JRequest::getVar( 'cids', array(), $hash='default', 'array' );
+
+				$app = JFactory::getApplication();
+				$option = $app->input->get('option', '', 'cmd');
+				$view   = $app->input->get('view', '', 'cmd');
+
+				$cid    = $app->isSite() ? $app->input->get('cid', 0, 'int') : 0;
+				$cids   = $app->input->get('cids', array(), 'array');
 				JArrayHelper::toInteger($cids, array());
+
 				$cats = array();
-				
-				if ($option=='com_flexicontent' && $view=='category' && count($cids))
+
+				if ($option=='com_flexicontent' && $view=='category' && (count($cids) || $cid))
 				{
 					// Current view is category view limit to descendants
-				}
-				else if ($option=='com_flexicontent' && $view=='category' && $cid)
-				{
-					// Current view is category view limit to descendants
-					$cids = array($cid);
+					$cids = count($cids)
+						? $cids
+						: array($cid);
 					//$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
 					//$cats = $globalcats[$cid]->childrenarray;
 				}
@@ -567,8 +571,8 @@ class plgFlexicontent_fieldsCore extends FCField
 					foreach($cids as $_cid)
 					{
 						if ( !isset($globalcats[$_cid]) ) continue;
-						// if ( count($cids)>1 || !empty($globalcats[$_cid]->childrenarray) )
-						if ( count($cids)>1 )  // Do not add root category of single category sub-tree to the filter
+						// Do not add root category of single category sub-tree to the filter
+						if ( count($cids) > 1 )
 						{
 							$cat_obj = new stdClass();
 							$cat_obj->id = $globalcats[$_cid]->id;
