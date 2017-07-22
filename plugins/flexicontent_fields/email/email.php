@@ -478,17 +478,22 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
-		
+
+		// Get configuration
+		$app  = JFactory::getApplication();
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
+
 		// Server side validation
-		//$validation = $field->parameters->get( 'validation', 'EMAIL' ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
-		
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -501,7 +506,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 					'addr' => $v, 'text' => ''
 				);
 			}
-
 
 			// ***
 			// *** Validate data, skipping values that are empty after validation

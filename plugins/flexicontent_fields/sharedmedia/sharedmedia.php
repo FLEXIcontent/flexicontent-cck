@@ -1015,15 +1015,19 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
-
-		// Currently post is an array of properties, TODO: make field multi-value
-		if ( empty($post) ) $post = array();
-		else if ( !isset($post[0]) ) $post = array( $post );
-
+		// Get configuration
+		$app  = JFactory::getApplication();
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
 
-		// Reformat the posted data
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -1037,10 +1041,9 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				);
 			}
 
-
-			// **************************************************************
-			// Validate data, skipping values that are empty after validation
-			// **************************************************************
+			// ***
+			// *** Validate data, skipping values that are empty after validation
+			// ***
 
 			$url = flexicontent_html::dataFilter($v['url'], 4000, 'URL', 0);  // Clean bad text/html
 
@@ -1072,7 +1075,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 		// Serialize multi-property data before storing them into the DB,
 		// null indicates to increment valueorder without adding a value
-		foreach($post as $i => $v) {
+		foreach($post as $i => $v)
+		{
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 	}

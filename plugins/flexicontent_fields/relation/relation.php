@@ -409,10 +409,11 @@ jQuery(document).ready(function()
 		else if ( $show_total_only==1 || ($show_total_only == 2 && count($values)) )
 		{
 			$app = JFactory::getApplication();
-			$view = JRequest::getVar('view');
-			$option = JRequest::getVar('option');
-			$isItemsManager = $app->isAdmin() && $view=='items' && $option=='com_flexicontent';
-			
+			$option = $app->input->get('option', '', 'cmd');
+			$realview = $app->input->get('view', 'item', 'cmd');
+			$view = $app->input->get('flexi_callview', $realview, 'cmd');
+			$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
+
 			$total_in_view = $field->parameters->get('total_in_view', array('backend'));
 			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);
 			$display_total = ($isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
@@ -791,7 +792,6 @@ jQuery(document).ready(function()
 	{
 		// Get API objects / data
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
 		$user   = JFactory::getUser();
 		
 		// Get Access Levels of user
@@ -799,11 +799,11 @@ jQuery(document).ready(function()
 		
 		
 		// Get request variables
-		$field_id = $jinput->get('field_id', 0, 'int');
-		$item_id  = $jinput->get('item_id',  0, 'int');
-		$type_id  = $jinput->get('type_id',  0, 'int');
-		$lang_code= $jinput->get('lang_code',  0, 'cmd');
-		$catid    = $jinput->get('catid',    0, 'int');
+		$field_id = $app->input->get('field_id', 0, 'int');
+		$item_id  = $app->input->get('item_id',  0, 'int');
+		$type_id  = $app->input->get('type_id',  0, 'int');
+		$lang_code= $app->input->get('lang_code',  0, 'cmd');
+		$catid    = $app->input->get('catid',    0, 'int');
 		
 		
 		// Basic checks

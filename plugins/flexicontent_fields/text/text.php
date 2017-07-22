@@ -386,20 +386,26 @@ class plgFlexicontent_fieldsText extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+
+		$app = JFactory::getApplication();
+		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 		
 		// Value handling parameters
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
 		$format_output = $field->parameters->get('format_output', 0);
-		if ($format_output > 0) {  // 1: decimal, 2: integer
+
+		if ($format_output > 0)  // 1: decimal, 2: integer
+		{
 			$decimal_digits_displayed = $format_output==2 ? 0 : (int)$field->parameters->get('decimal_digits_displayed', 2);
 			$decimal_digits_sep    = $field->parameters->get('decimal_digits_sep', '.');
 			$decimal_thousands_sep = $field->parameters->get('decimal_thousands_sep', ',');
 			$output_prefix = JText::_($field->parameters->get('output_prefix', ''));
 			$output_suffix = JText::_($field->parameters->get('output_suffix', ''));
-		} else if ($format_output == -1) {
+		}
+		else if ($format_output == -1)
+		{
 			$output_custom_func = $field->parameters->get('output_custom_func', '');
 		}
 		

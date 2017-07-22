@@ -235,11 +235,13 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		// Render author profile
 		if ( $authordescr_itemid = $authorparams->get('authordescr_itemid') )
 		{
+			$app = JFactory::getApplication();
+			$saved_view = $app->input->get('view', '', 'cmd');
+
+			$app->input->set('view', 'module');
 			$flexi_html_helper = new flexicontent_html();
-			$saved_view = JRequest::getVar('view');
-			JRequest::setVar(view, 'module');
 			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
-			JRequest::setVar('view', $saved_view);
+			$app->input->set('view', $saved_view);
 		}
 		
 		return $authordescr_item_html;

@@ -709,11 +709,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
+
+		// Get configuration
+		$app  = JFactory::getApplication();
+		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$host = JURI::getInstance('SERVER')->gethost();
-		
+
 		// URL title (optional)
 		$usetitle   = $field->parameters->get( 'use_title', 0 ) ;
 		$usetext    = $field->parameters->get( 'use_text', 0 ) ;
@@ -724,7 +726,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		// Server side validation
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;
-		
+
 		$db_values_arr = $this->getExistingFieldValues();
 		$db_values = array();
 		foreach($db_values_arr as $db_value)
@@ -736,10 +738,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				$db_values[$v['link']] = $v;
 		}
 
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -752,7 +758,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					'link' => $v, 'title' => '', 'linktext' => '', 'class' => '', 'id' => '', 'hits' => 0
 				);
 			}
-
 
 			// ***
 			// *** Validate data, skipping values that are empty after validation
@@ -797,6 +802,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$newpost[$new]['class']   = !$useclass  ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
 			$newpost[$new]['id']      = !$useid     ? '' : flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
 			$newpost[$new]['target']  = !$usetarget ? '' : flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
+			
+			// Hits come only from DB and not via posted data
 			$newpost[$new]['hits']    = isset($db_values[$prefixed_link]) ? (int) @ $db_values[$prefixed_link]['hits'] : 0;
 			
 			$new++;

@@ -711,11 +711,15 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$use_html   = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 		$maxlength  = $use_html ? 0 : $maxlength;
-		
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
