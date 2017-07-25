@@ -158,7 +158,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$fftypes = array();
 			$fftypes[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
 			$fftypes[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
-			$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
+			$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
 			foreach ($fieldtypes as $field_type => $ftdata) {
 				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 			}

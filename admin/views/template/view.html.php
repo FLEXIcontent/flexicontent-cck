@@ -81,7 +81,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$fftypes[] = array('value'=>'', 'text'=>JText::_( 'FLEXI_ALL' ) );
 		//$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
 		//$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
-		//$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ));
+		//$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
 		foreach ($fieldTypes as $field_group => $ft_types) {
 			$fftypes[] = $field_group;
 			foreach ($ft_types as $field_type => $ftdata) {

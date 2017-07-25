@@ -59,7 +59,7 @@ $_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 $isAdmin = $app->isAdmin();
 $useAssocs = flexicontent_db::useAssociations();
 
-$list_total_cols = 17;
+$list_total_cols = 16;
 if ( $useAssocs ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);
@@ -608,11 +608,11 @@ jQuery(document).ready(function(){
 	<table id="adminListTableFCitems" class="adminlist fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
-			
-			<th class="left">
+
+			<!--th class="left">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
-			</th>
-			
+			</th-->
+
 			<th class="left">
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
@@ -796,11 +796,14 @@ jQuery(document).ready(function(){
 			$lang_default = !FLEXI_J16GE ? '' : '*';
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
+
 		<tr class="<?php echo 'row'.(1 - $i); ?>">
-			<td class="sort_handle">
+
+			<!--td class="col_rowcount">
 				<div class="adminlist-table-row"></div>
-				<?php echo $this->pagination->getRowOffset( $i ); ?>
-			</td>
+				<?php /*echo $this->pagination->getRowOffset( $i );*/ ?>
+			</td-->
+
 			<td>
 				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
