@@ -472,7 +472,7 @@
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals=""
-				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
+				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" cols="2" />
 			<field name="buttons_placement_fe" type="radio" default="" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_TOP</option>
@@ -612,7 +612,7 @@
 			</field>
 			<field name="useseoconf_fe" type="radio" default="" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
@@ -624,7 +624,7 @@
 			</field>
 			<field name="selecttheme_fe" type="radio" default="" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
@@ -731,7 +731,7 @@
 				checkoptions="FLEXI_NF_CREATOR,FLEXI_NF_MODIFIER,FLEXI_NF_CREATION_TIME,FLEXI_NF_MODIFICATION_TIME,FLEXI_NF_VIEW_LINK,FLEXI_NF_EDIT_LINK_FE,FLEXI_NF_EDIT_LINK_BE"
 				checkvals="creator,modifier,created,modified,viewlink,editlinkfe,editlinkbe"
 				defaultvals=""
-				label="FLEXI_NF_EXTRA_PROPERTIES" description="FLEXI_NF_EXTRA_PROPERTIES_DESC" />
+				label="FLEXI_NF_EXTRA_PROPERTIES" description="FLEXI_NF_EXTRA_PROPERTIES_DESC" cols="2" />
 			<field name="nf_add_introtext" type="radio" default="" label="FLEXI_NF_ADD_INTROTEXT" description="FLEXI_NF_ADD_INTROTEXT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -752,7 +752,7 @@
 			<field name="states_notify_new" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
 				checkvals="1,0,2,-3,-4,-5"
-				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" />
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" cols="2" />
 			<field name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" />
 			<field name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" />
 			<field name="text_notify_new" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" />
@@ -766,7 +766,7 @@
 			<field name="states_notify_existing" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
 				checkvals="1,0,2,-3,-4,-5"
-				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" />
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" cols="2" />
 			<field name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" />
 			<field name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" />
 			<field name="text_notify_existing" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" />

@@ -931,45 +931,45 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 		<?php $captured['timezone_info'] = ob_get_clean(); ?>
 
 		<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
-			<fieldset class="panelform">
-				<span class="label-fcouter" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by')); ?></span>
-				<div class="container_fcfield"><?php echo $this->perms['isSuperAdmin'] ? $this->form->getInput('created_by') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->author.'&nbsp;</span>'; ?></div>
-			</fieldset>
+			<div class="control-group">
+				<div class="control-label" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by')); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreator']*/ $this->form->getInput('created_by'); ?></div>
+			</div>
 		<?php $captured['created_by'] = ob_get_clean(); endif; ?>
 
 		<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
-			<fieldset class="panelform">
-				<span class="label-fcouter" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></span>
-				<div class="container_fcfield"><?php echo $this->perms['editcreationdate'] ? $this->form->getInput('created') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->created.'&nbsp;</span>'; ?></div>
-			</fieldset>
+			<div class="control-group">
+				<div class="control-label" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreationdate']/ $this->form->getInput('created'); ?></div>
+			</div>
 		<?php $captured['created'] = ob_get_clean(); endif; ?>
 
 		<?php ob_start(); ?>
-			<fieldset class="panelform">
-				<span class="label-fcouter" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by_alias')); ?></span>
-				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('created_by_alias') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->created_by_alias.'&nbsp;</span>'; ?></div>
-			</fieldset>
+			<div class="control-group">
+				<div class="control-label" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created_by_alias')); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreator']*/ $this->form->getInput('created_by_alias'); ?></div>
+			</div>
 		<?php $captured['created_by_alias'] = ob_get_clean(); ?>
 
 		<?php ob_start(); ?>
-			<fieldset class="panelform">
-				<span class="label-fcouter" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></span>
-				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_up') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->publish_up.'&nbsp;</span>'; ?></div>
-			</fieldset>
+			<div class="control-group">
+				<div class="control-label" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_up')); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish']*/ $this->form->getInput('publish_up'); ?></div>
+			</div>
 		<?php $captured['publish_up'] = ob_get_clean(); ?>
 
 		<?php ob_start(); ?>
-			<fieldset class="panelform">
-				<span class="label-fcouter" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></span>
-				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_down') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->publish_down.'&nbsp;</span>'; ?></div>
-			</fieldset>
+			<div class="control-group">
+				<div class="control-label" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('publish_down')); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['canpublish']*/ $this->form->getInput('publish_down'); ?></div>
+			</div>
 		<?php $captured['publish_down'] = ob_get_clean(); ?>
 
 		<?php ob_start(); ?>
-			<fieldset class="panelform">
-				<span class="label-fcouter" id="access-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('access')); ?></span>
-				<div class="container_fcfield"><?php echo $this->perms['canacclvl'] ? $this->form->getInput('access') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->access_level.'&nbsp;</span>'; ?></div>
-			</fieldset>
+			<div class="control-group">
+				<div class="control-label" id="access-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('access')); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['canacclvl']*/ $this->form->getInput('access'); ?></div>
+			</div>
 		<?php $captured['access'] = ob_get_clean(); ?>
 <?php endif;
 

@@ -141,11 +141,12 @@ class FlexicontentModelField extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	protected function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
-		parent::_initRecord($record);
+		parent::_initRecord($record, $initOnly);
 
-		// Set record specific properties
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		$record->id							= 0;
 		$record->field_type			= 'text';
 		$record->name						= null;  //$this->record_name . ($this->_getLastId() + 1);

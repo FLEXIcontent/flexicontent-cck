@@ -134,14 +134,14 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				var tr11 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(11)");
 				var tr15 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(15)");
 				var tr18 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(18)");
-				var tr22 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(22)");
-				var tr26 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(26)");
-				var tr28 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(28)");
-				var tr35 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(35)");
-				var tr39 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(39)");
-				var tr43 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(43)");
-				var tr45 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(45)");
-				var tr46 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(46)");
+				var tr22 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(23)");
+				var tr26 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(27)");
+				var tr28 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(29)");
+				var tr35 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(36)");
+				var tr39 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(40)");
+				var tr43 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(44)");
+				var tr45 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(46)");
+				var tr46 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(47)");
 
 				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Component access</td></tr>");
 				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items / Categories (inherited via category-tree)</td></tr>");

@@ -116,7 +116,7 @@ class ParentClassItem extends FCModelAdmin
 	var $_cparams = null;
 
 	/**
-	 * Item current category id (used for FRONTEND only)
+	 * Item current category id (currently used for FRONTEND only)
 	 *
 	 * @var int
 	 */
@@ -329,8 +329,8 @@ class ParentClassItem extends FCModelAdmin
 			throw new Exception($msg, 404);
 		}
 		
-		// --. Initialize new item, currently this succeeds always
-		else
+		// --. Initialize new item, if not already initialized, currently this succeeds always
+		else if (!$this->_record)
 		{
 			$this->_typeid = $jinput->get('typeid', 0, 'int');  // Get this again since it might have been change since model was constructed
 			$this->_initRecord();
@@ -497,7 +497,7 @@ class ParentClassItem extends FCModelAdmin
 				$select_access = 'mc.access as category_access, ty.access as type_access';
 				
 				// Access Flags for: content type, main category, item
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->get('id'));
 				$aid_list = implode(",", $aid_arr);
 				$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
 				$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
@@ -645,12 +645,14 @@ class ParentClassItem extends FCModelAdmin
 				$db->setQuery($query);
 				$translated_fields = $db->loadObjectList();
 				
-				if ( $editjf_translations == 0 && $translated_fields ) {  // 1:disable without warning about found translations
+				if ( $editjf_translations == 0 && $translated_fields )  // 1:disable without warning about found translations
+				{
 					$app->enqueueMessage( "3rd party Joom!Fish/Falang translations detected for current item."
 						." You can either enable editing them or disable this message in FLEXIcontent component configuration", 'message' );
-				} else if ( $editjf_translations == 2 ) {
-					if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-					
+				}
+
+				else if ( $editjf_translations == 2 )
+				{
 					// -- Parse translation data according to their language
 					if ( $translated_fields )
 					{
@@ -681,10 +683,12 @@ class ParentClassItem extends FCModelAdmin
 				}
 			}
 			//echo "<pre>"; print_r($item->item_translations); exit;
-			
-			// *****************************************************
-			// Overwrite item fields with the requested VERSION data
-			// *****************************************************
+
+
+			// ***
+			// *** Overwrite item fields with the requested VERSION data
+			// ***
+
 			$item->current_version = $current_version; 
 			$item->last_version    = $last_version; 
 			if ($use_versioning && $version) 
@@ -839,100 +843,9 @@ class ParentClassItem extends FCModelAdmin
 					}
 				}
 			}
-			
-			
-			// ***
-			// *** Retrieve item properties not defined in the model's CLASS
-			// ***
-			
-			if ( !isset($item->author) )
-			{
-				$query = 'SELECT name FROM #__users WHERE id = '. (int) ($item->id ? $item->created_by : $user->id);
-				$db->setQuery($query);
-				$item->author = $db->loadResult();
-			}
-			
-			$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
-			$db->setQuery($query);
-			$item->access_level = $db->loadResult();
-			
-			// Get category access for the item's main category, used later to determine viewing of the item
-			$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
-			$db->setQuery($query);
-			$item->category_access = $db->loadResult();
-			
-			// Typecast some properties in case LEFT JOIN produced nulls
-			if ( !isset($item->type_access) )
-			{
-				$public_acclevel = 1;
-				$item->type_access = $public_acclevel;
-			}
-			
-			if ( !isset($item->rating_count) )
-			{
-				$rating_resolution = (int)$this->getVotingResolution();
-				
-				// Get category access for the item's main category, used later to determine viewing of the item
-				$query = 'SELECT '
-					.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
-					.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $item->id
-					;
-				$db->setQuery($query);
-				$rating_data = $db->loadObject();
-				$item->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
-				$item->rating       = !$rating_data ? 0 : $rating_data->rating_count;
-				$item->score        = !$rating_data ? 0 : $rating_data->score;
-			}
 
-			if ( (!isset($item->typename) || !isset($item->typealias)) && $item->type_id )
-			{
-				$query = 'SELECT name, alias FROM #__flexicontent_types WHERE id = '. (int) $item->type_id;
-				$db->setQuery($query);
-				$typedata = $db->loadObject();
-				$item->typename = $typedata->name;
-				$item->typealias = $typedata->alias;
-			}
-			$item->typename   = !empty($item->typename)  ? $item->typename  : '';
-			$item->typealias  = !empty($item->typealias) ? $item->typealias : '';
-			
-			// Retrieve Creator NAME and email (used to display the gravatar)
-			$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
-			$db->setQuery($query);
-			$creator_data = $db->loadObject();
-			$item->creator = $creator_data ? $creator_data->name : '';
-			$item->creatoremail = $creator_data ? $creator_data->email : '';
-			
-			// Retrieve Modifier NAME
-			if ($item->created_by == $item->modified_by)
-			{
-				$item->modifier = $item->creator;
-			}
-			else
-			{
-				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->modified_by;
-				$db->setQuery($query);
-				$modifier_data = $db->loadObject();
-				$item->modifier = $modifier_data ? $modifier_data->name : '';
-				$item->modifieremail = $modifier_data ? $modifier_data->email : '';
-			}
-			
-			// Clear modified Date, if it is an invalid "null" date
-			if ($item->modified == $db->getNulldate())
-			{
-				$item->modified = null;
-			}
-
-			// *** 
-			// *** Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
-			// *** 
-
-			if ( $use_versioning && $current_version > $last_version )
-			{
-				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'flexicontent.php');
-				$fleximodel = new FlexicontentModelFlexicontent();
-				$fleximodel->addCurrentVersionData($item->id);
-				$item->last_version = $last_version = $current_version;
-			}
+			// Execute the extra "_afterLoad" record steps
+			$this->_afterLoad($item);
 
 			// Assign found record to the _record member property
 			$this->_record = & $item;
@@ -982,7 +895,8 @@ class ParentClassItem extends FCModelAdmin
 	public function getForm($data = array(), $loadData = true)
 	{
 		$app = JFactory::getApplication();
-		
+		$perms = FlexicontentHelperPerm::getPerm();
+
 		// Retrieve item if not already done, (loading item should been done by the view !), but:
 		// 1) allow maintaining existing value:   $no_cache=false
 		// 2) load by default the last saved version:   $force_version=-1   means latest (last saved) version)
@@ -1050,35 +964,55 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$frontend_new = !$id && $app->isSite();
 			
-			// Disable fields for display.
+			// *** Disable fields for display.
 			$form->setFieldAttribute('featured', 'disabled', 'true');
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
 			$form->setFieldAttribute('publish_up', 'disabled', 'true');
 			$form->setFieldAttribute('publish_down', 'disabled', 'true');
-			$form->setFieldAttribute('created_by', 'disabled', 'true');
-			$form->setFieldAttribute('created_by_alias', 'disabled', 'true');
-			if ( !$frontend_new ) {
-				// skip new items in frontend to allow override via menu (auto-publish), menu override must be checked during store
+
+			// Skip disabling state for new items in frontend to allow override via menu (auto-publish), menu override must be checked during store
+			if ( !$frontend_new )
+			{
 				$form->setFieldAttribute('state', 'disabled', 'true');   // only for existing items, not for new to allow menu item override
 			}
 			//$form->setFieldAttribute('vstate', 'disabled', 'true');  // DO not -disable- will cause problems
 			
-			// Disable fields while saving.
-			// The controller has already verified this is an article you can edit.
+			// *** Unset posted value for these fields too
 			$form->setFieldAttribute('featured', 'filter', 'unset');
 			$form->setFieldAttribute('ordering', 'filter', 'unset');
 			$form->setFieldAttribute('publish_up', 'filter', 'unset');
 			$form->setFieldAttribute('publish_down', 'filter', 'unset');
-			$form->setFieldAttribute('created_by', 'filter', 'unset');
-			$form->setFieldAttribute('created_by_alias', 'filter', 'unset');
-			if ( !$frontend_new ) {
-				// skip new items in frontend to allow override via menu (auto-publish), menu override must be check during store
+
+			// Skip unsetting state for new items in frontend to allow override via menu (auto-publish), menu override must be check during store
+			if ( !$frontend_new )
+			{
 				$form->setFieldAttribute('state', 'filter', 'unset');   // only for existing items, not for new to allow menu item override
 			}
 			//$form->setFieldAttribute('vstate', 'filter', 'unset');   // DO not -filter- will cause problems
 		}
-		
-		// Check if article is associated, and disable changing category and language
+
+		// (item edit form) edit creation date
+		if (!$perms->EditCreationDate)
+		{
+			$form->setFieldAttribute('created', 'disabled', 'true');
+			$form->setFieldAttribute('created', 'filter', 'unset');
+		}
+		if (!$perms->EditCreator)
+		{
+			$form->setFieldAttribute('created_by', 'disabled', 'true');
+			$form->setFieldAttribute('created_by_alias', 'disabled', 'true');
+			$form->setFieldAttribute('created_by', 'filter', 'unset');
+			$form->setFieldAttribute('created_by_alias', 'filter', 'unset');
+		}
+
+		// (item edit form) edit creation date
+		if (!$perms->CanAccLvl)
+		{
+			$form->setFieldAttribute('access', 'disabled', 'true');
+			$form->setFieldAttribute('access', 'filter', 'unset');
+		}
+
+		// Check if item has languages associations, and disable changing category and language in frontend
 		/*$useAssocs = $this->useAssociations();
 		
 		if ($id && $app->isSite() && $useAssocs)
@@ -1086,7 +1020,7 @@ class ParentClassItem extends FCModelAdmin
 			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $id);
 			
 			// Make fields read only
-			if ($associations)
+			if (!empty($associations))
 			{
 				$form->setFieldAttribute('language', 'readonly', 'true');
 				$form->setFieldAttribute('catid', 'readonly', 'true');
@@ -1410,9 +1344,9 @@ class ParentClassItem extends FCModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	protected function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
-		parent::_initRecord($record);
+		parent::_initRecord($record, $parent_initOnly = true);
 
 		// Get some variables
 		$app  = JFactory::getApplication();
@@ -1421,8 +1355,8 @@ class ParentClassItem extends FCModelAdmin
 		$nullDate   = $this->_db->getNullDate();
 		$cparams    = $this->_cparams;
 
-		$public_accesslevel  = 1;
-		$default_accesslevel = $app->getCfg( 'access', $public_accesslevel );
+		$public_acclevel = 1;
+		$default_accesslevel = $app->getCfg( 'access', $public_acclevel );
 
 		// Decide default publication state. NOTE this will only be used if user has publish privilege, otherwise items
 		// will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
@@ -1445,56 +1379,97 @@ class ParentClassItem extends FCModelAdmin
 			? $user->getParam('language', '*')
 			: $default_lang;
 
-		// Override defaults values, we assigned all properties, many of them having may have the correct value already
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		$record->id           = 0;
 		$record->cid          = array();
 		$record->categories   = array();
-		$record->catid        = null;
-		$record->title        = null;
-		$record->alias        = null;
-		$record->title_alias  = null;  // deprecated do not use
-		$record->introtext    = null;
-		$record->fulltext     = null;
-		$record->author       = null;
-		$record->text         = null;
+
+		// ***
+		// *** DB properties use (mostly) DB / getTable() defaults
+		// ***
+
+		$record->catid        = $this->_cid;
+		//$record->title        = '';
+		//$record->alias        = '';
+		//$record->introtext    = null;
+		//$record->fulltext     = null;
+		//$record->metadesc     = null;
+		//$record->metakey      = null;
+		//$record->hits         = 0;
+		//$record->images       = null;
+		//$record->urls         = null;
+		//$record->attribs      = null;
+		//$record->metadata     = null;
+
+		//$record->modified   = $nullDate;
+		//$record->modified_by  = 0;
+
+		// items_ext DB properties
 		$record->sectionid    = FLEXI_SECTION;
 		$record->type_id      = $this->_typeid;
-		$record->typename     = null;
-		$record->typealias    = null;
+		$record->search_index = null;
+
+
+		// ***
+		// *** non-DB properties
+		// ***
+		$record->text         = null;
 		$record->score        = 0;
 		$record->votecount    = 0;
-		$record->hits         = 0;
-		$record->version      = 0;
 		$record->current_version = 0;
 		$record->last_version    = 0;
-		$record->metadesc     = null;
-		$record->metakey      = null;
+
+		$record->rating_count = 0;
+		$record->rating       = 0;
+		$record->score        = 0;
+
+
+		// ***
+		// *** Override DB / getTable defaults
+		// ***
+
+		$record->version      = 0;  // override DB setting: 1
 		$record->created      = $createdate->toUnix();
 		$record->created_by   = $user->get('id');
 		$record->created_by_alias = null;
-		$record->creator      = null;
-		$record->modified     = $nullDate;
-		$record->modified_by  = null;
-		$record->modifier     = null;
 		$record->publish_up   = $createdate->toUnix();
 		$record->publish_down = null;
-		$record->images       = null;
-		$record->urls         = null;
-		$record->attribs      = null;
-		$record->metadata     = null;
 		$record->access       = $default_accesslevel;
 		$record->state        = $default_state;
-		$record->mask         = null;  // deprecated do not use
 		$record->language     = $default_lang;
 		$record->lang_parent_id = 0;
-		$record->search_index = null;
 		$record->parameters   = $this->_cparams;  // initialized to component + type parameters
 
-		$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $record->access;
-		$this->_db->setQuery($query);
-		$record->access_level = $this->_db->loadResult();
+		// ***
+		// *** Handled by _afteLoad() below
+		// ***
 
-		$this->_record				= $record;
+		//$record->access_level  = null;  // Title of item's access level
+
+		// Item's main category
+		//$record->categoryslug    = null;   // Slug
+		//$record->category_access = null;   // Access level
+
+		// Item's Type
+		//$record->typename     = null;  // Title
+		//$record->typealias    = null;  // Alias
+		//$record->type_access  = null;  // Access level
+
+		//$record->creator       = '';  // Name of item's creator (owner)
+		//$record->creatoremail  = '';  // Email of item's creator (owner)
+		//$record->author        = '';  // ... alias of the creator
+
+		//$record->modifier      = '';  // Name of item's last modifier
+		//$record->modifieremail = '';  // Email of item's last modifier
+
+		$this->_record = $record;
+
+		// Execute "_afterLoad" steps, we prevented parent method from running these during record initialization
+		if ( !$initOnly )
+		{
+			$this->_afterLoad($this->_record);
+		}
 
 		return true;
 	}
@@ -1528,9 +1503,9 @@ class ParentClassItem extends FCModelAdmin
 		global $fc_run_times;
 		$start_microtime = microtime(true);
 
-		// ****************************
-		// Initialize various variables
-		// ****************************
+		// ***
+		// *** Initialize various variables
+		// ***
 		
 		$db   = $this->_db;
 		$app  = JFactory::getApplication();
@@ -1542,8 +1517,8 @@ class ParentClassItem extends FCModelAdmin
 		$nullDate   = $this->_db->getNullDate();
 
 		$option = $jinput->get('option', '', 'cmd');
-		$view = $jinput->get('view', '', 'cmd');
-		$task = $jinput->get('task', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$task   = $jinput->get('task', '', 'cmd');
 		$jinput->set('isflexicontent', 'yes');
 
 		$use_versioning = $cparams->get('use_versioning', 1);
@@ -1558,17 +1533,20 @@ class ParentClassItem extends FCModelAdmin
 		$data['vstate'] = (int)$data['vstate'];
 		$data['id']     = (int)$data['id'];
 		$isNew = ! $data['id'];
-		
-		
-		// *****************************************
-		// Get an item object and load existing item
-		// *****************************************
-		
-		// Get an empty item model (with default values)
+
+
+		// ***
+		// *** Get an empty item model (with default values)
+		// ***
+
 		$item = $this->getTable();
 		$item->_isnew = $isNew;  // Pass information, if item is new to the fields
-		
-		// Load existing item into the empty item model
+
+
+		// ***
+		// *** Load existing item into the empty item model
+		// ***
+
 		if ( !$isNew )
 		{
 			$item->load( $data['id'] );
@@ -1595,9 +1573,19 @@ class ParentClassItem extends FCModelAdmin
 			{
 				unset($data['type_id']);
 			}
+
+			// Also make sure owner of existing item is not empty to avoid using GUEST user as owner during ACL calculation
+			if ( !$item->created_by )
+			{
+				$item->created_by = flexicontent_db::getSuperUserID();
+			}
 		}
 
-		// New ITEM: just set some properties since we have already created a new item only via DB TABLE object
+
+		// ***
+		// *** Reset new item, just set some properties since we have already created a new item only via DB TABLE object
+		// ***
+
 		else
 		{
 			$item->reset();
@@ -1609,11 +1597,11 @@ class ParentClassItem extends FCModelAdmin
 		$old_item = clone($item);
 		
 		
-		// *********************************
-		// Check and correct given item DATA
-		// *********************************
+		// ***
+		// *** Check and correct given item DATA
+		// ***
 		
-		// tags and cats will need some manipulation so we retieve them
+		// tags and cats will need some special manipulation, so set them into local variables and clear the posted variables, we will reassign these below
 		$tags = isset($data['tag']) ? $this->formatToArray($data['tag']) : array();
 		$cats = isset($data['cid']) ? $this->formatToArray($data['cid']) : array();
 		$featured_cats = isset($data['featured_cid']) ? $this->formatToArray($data['featured_cid']) : array();
@@ -1645,12 +1633,13 @@ class ParentClassItem extends FCModelAdmin
 		
 		// Reassign (unique) categories back to the cats array
 		$cats = array_keys($cats_indexed);
-		
-		
-		// *****************************
-		// Retrieve author configuration
-		// *****************************
-		$authorparams = flexicontent_db::getUserConfig($user->id);
+
+
+		// ***
+		// *** Retrieve author configuration
+		// ***
+
+		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
 		
 		// At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1)
@@ -1728,28 +1717,30 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
-		// *******************************************************
-		// Retrieve submit configuration for new items in frontend
-		// *******************************************************
+		// ***
+		// *** Retrieve submit configuration for new items in frontend
+		// ***
+
 		if ( $app->isSite() && $isNew && !empty($data['submit_conf']) )
 		{
 			$h = $data['submit_conf'];
 			$session = JFactory::getSession();
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
-			$submit_conf = @ $item_submit_conf[$h] ;
+			$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
 			
-			$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
-			$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
+			$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
+			$overridecatperms = $submit_conf && !empty($submit_conf['overridecatperms']) ? $submit_conf['overridecatperms'] : null;  // Override flag for CATEGORY ACL
+
 			if ( $autopublished)
 			{
 				// Dates forced during autopublishing
-				if ( @ $submit_conf['autopublished_up_interval'] )
+				if ( !empty($submit_conf['autopublished_up_interval']) )
 				{
 					$publish_up_date = JFactory::getDate(); // Gives editor's timezone by default
 					$publish_up_date->modify('+ '.$submit_conf['autopublished_up_interval'].' minutes');
 					$publish_up_forced = $publish_up_date->toSql();
 				}
-				if ( @ $submit_conf['autopublished_down_interval'] )
+				if ( !empty($submit_conf['autopublished_down_interval']) )
 				{
 					$publish_down_date = JFactory::getDate(); // Gives editor's timezone by default
 					$publish_down_date->modify('+ '.$submit_conf['autopublished_down_interval'].' minutes');
@@ -1762,13 +1753,14 @@ class ParentClassItem extends FCModelAdmin
 			$autopublished    = 0;
 			$overridecatperms = 0;
 		}
-		
-		
-		// ***********************************************************
-		// SECURITY concern: Check form tampering of categories, of:
-		// (a) menu overridden categories for frontent item submit
-		// (b) or check user has 'create' privilege in item categories
-		// ***********************************************************
+
+
+		// ***
+		// *** SECURITY concern: Check form tampering of categories, of:
+		// *** (a) menu overridden categories for frontent item submit
+		// *** (b) or check user has 'create' privilege in item categories
+		// ***
+
 		$allowed_cid = $overridecatperms ?
 			@ $submit_conf['cids'] :
 			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true) ;
@@ -1783,7 +1775,8 @@ class ParentClassItem extends FCModelAdmin
 			$allowed_cid = array_merge($allowed_cid, $item->categories);
 			
 			// Check main category tampering
-			if ( !in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid ) {
+			if ( !in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid )
+			{
 				$this->setError( 'main category is not in allowed list (form tampered ?)' );
 				return false;
 			}
@@ -1799,18 +1792,41 @@ class ParentClassItem extends FCModelAdmin
 			// Make sure values are unique
 			$data['categories'] = array_keys(array_flip($data['categories']));
 		}
-		
-		
-		// *****************************************************************
-		// SECURITY concern: Check form tampering of state related variables
-		// *****************************************************************
+
+
+		// ***
+		// *** SECURITY concern: Prevent users from changing the item owner and creation date unless either they are super admin or they have special ACL privileges
+		// ***
+
+		if ( !$user->authorise('flexicontent.editcreator', 'com_flexicontent') )
+		{
+			unset( $data['created_by'] );
+			unset( $data['created_by_alias'] );
+		}
+
+
+		if ( !$user->authorise('flexicontent.editcreationdate', 'com_flexicontent') )
+		{
+			unset( $data['created'] );
+		}
+
+		// Set creator to current user if item is NEW and no ACL permission to set creator (owner)
+		if ($isNew && !isset($data['created_by']))
+		{
+			$data['created_by'] = $user->get('id') ?: flexicontent_db::getSuperUserID();
+		}
+
+
+		// ***
+		// *** SECURITY concern: Check can edit state using proper owner, type and new category (all of them FORCED above)
+		// ***
 		
 		// Save old main category & creator (owner)
 		$old_created_by = $item->created_by;
 		$old_catid      = $item->catid;
 		
-		// New or Existing item must use the current user + new main category to calculate 'Edit State' privilege
-		$item->created_by = $user->get('id');
+		// Set proper into the item record proper owner (FORCED above) and type(FORCED above) + new main category
+		$item->created_by = isset($data['created_by']) ? $data['created_by'] : $item->created_by;
 		$item->catid      = $data['catid'];
 		$item->type_id    = isset($data['type_id']) ? $data['type_id'] : $item->type_id;
 		$canEditState = $this->canEditState( $item );
@@ -1830,51 +1846,46 @@ class ParentClassItem extends FCModelAdmin
 			unset( $data['ordering'] );
 			
 			// Check for publish up/down dates forced during auto-publishing
-			if ( @ $publish_up_forced )   $data['publish_up']   = $publish_up_forced;
-			if ( @ $publish_down_forced ) $data['publish_down'] = $publish_down_forced;
+			if ( !empty($publish_up_forced) )   $data['publish_up']   = $publish_up_forced;
+			if ( !empty($publish_down_forced) ) $data['publish_down'] = $publish_down_forced;
 			
 			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
 			
-			if (!$isNew) {
-				// Prevent changing state of existing items by users that cannot publish
-				$catid_changed = $old_catid != $data['catid'];
-				if ($catid_changed && !$use_versioning) {
-					$data['state'] = $pending_approval_state;
-					$app->enqueueMessage('You have changed category for this content item to be a category in which you cannot publish, you content item is now in "Pending Approval" State, you will have to wait for it to be re-approved', 'warning');
-				} else {
-					$data['state'] = $item->state;
+			// For existing items, force pending-state approval when user cannot publish, and versioning is OFF (aka not possible to use 'currently' active version + unapproved new version)
+			if (!$isNew)
+			{
+				$catid_changed_n_vers_off = $old_catid != $data['catid'] && !$use_versioning;
+
+				if ($catid_changed_n_vers_off)
+				{
+					$app->enqueueMessage(JText::_('FLEXI_WARNING_CONTENT_UNPUBLISHED_CAT_CHANGED_REAPPROVAL_NEEDED'), 'warning');
 				}
+
+				$data['state'] = $catid_changed_n_vers_off
+					? $pending_approval_state
+					: $item->state;
 			}
-			else if ($autopublished) {
-				// Autopublishing new item via menu configuration
+
+			// Autopublishing new item via menu configuration
+			else if ($autopublished)
+			{
 				$data['state'] = $pubished_state;
 			}
-			else {
-				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
-				if ( $app->isAdmin() ) {
-					$data['state'] = $cparams->get('non_publishers_item_state', $draft_state);     // Use the configured setting for backend items
-				} else {
-					$data['state'] = $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
-				}
+
+			// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
+			else
+			{
+				$data['state'] = $app->isAdmin()
+					? $cparams->get('non_publishers_item_state', $draft_state)  // Use the configured setting for backend items
+					: $cparams->get('non_publishers_item_state_fe', $pending_approval_state);  // Use the configured setting for frontend items
 			}
-			
 		}
-		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
-		
-		// Prevent frontend user from changing the item owner and creation date unless they are super admin
-		if ( $app->isSite() && !$isSuperAdmin )
-		{
-			if ($isNew)  $data['created_by'] = $user->get('id');
-			else         unset( $data['created_by'] );
-			if ( !$user->authorise('flexicontent.editcreationdate', 'com_flexicontent') )
-				unset( $data['created'] );
-			unset( $data['created_by_alias'] );
-		}
-		
-		
-		// ***********************************************************
-		// SECURITY concern: Check form tampering of allowed languages
-		// ***********************************************************
+
+
+		// ***
+		// *** SECURITY concern: Check form tampering of allowed languages
+		// ***
+
 		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 
@@ -1912,9 +1923,9 @@ class ParentClassItem extends FCModelAdmin
 		$this->_prepareBind($item, $data);
 
 
-		// *************************************************************************
-		// Bind given (possibly modifed) item DATA and PARAMETERS to the item object
-		// *************************************************************************
+		// ***
+		// *** Bind given (possibly modifed) item DATA and PARAMETERS to the item object
+		// ***
 
 		if ( !$item->bind($data) )
 		{
@@ -1923,10 +1934,10 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
-		// *************************************************************************************
-		// Check and correct CORE item properties (some such work was done above before binding)
-		// *************************************************************************************
-			
+		// ***
+		// *** Check and correct CORE item properties (some such work was done above before binding)
+		// ***
+
 		// -- Modification Date and Modifier, (a) new item gets null modification date and (b) existing item get the current date
 		if ($isNew)
 		{
@@ -1939,12 +1950,6 @@ class ParentClassItem extends FCModelAdmin
 			$item->modified    = $datenow->toSql();
 			$item->modified_by = $user->get('id');
 		}
-			
-		// -- Creator, if this is not already set, will be the current user or administrator if current user is not logged
-		if ( !$item->created_by )
-		{
-			$item->created_by = $user->get('id') ?: JFactory::getUser('admin')->get('id');
-		}
 
 		// -- Creation Date
 		if ($item->created && StringHelper::strlen(StringHelper::trim( $item->created )) <= 10)
@@ -1952,17 +1957,25 @@ class ParentClassItem extends FCModelAdmin
 			$item->created 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->created);
-		$date->setTimeZone( new DateTimeZone( $tz_offset ) );    // J2.5: Date from form field is in user's timezone
+		if ($data['created'])
+		{
+			$date->setTimeZone( new DateTimeZone( $tz_offset ) );  // Date originated from form field, so it was in user's timezone
+		}
 		$item->created = $date->toSql();
-			
+
+
 		// -- Publish UP Date
 		if ($item->publish_up && StringHelper::strlen(StringHelper::trim( $item->publish_up )) <= 10)
 		{
 			$item->publish_up 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->publish_up);
-		$date->setTimeZone( new DateTimeZone( $tz_offset ) );       // J2.5: Date from form field is in user's timezone
+		if ($data['publish_up'])
+		{
+			$date->setTimeZone( new DateTimeZone( $tz_offset ) );   // Date originated from form field, so it was in user's timezone
+		}
 		$item->publish_up = $date->toSql();
+
 
 		// -- Publish Down Date
 		if (trim($item->publish_down) == JText::_('FLEXI_NEVER') || trim( $item->publish_down ) == '')
@@ -1971,25 +1984,31 @@ class ParentClassItem extends FCModelAdmin
 		}
 		else if ($item->publish_down != $nullDate)
 		{
-			if ( StringHelper::strlen(StringHelper::trim( $item->publish_down )) <= 10 ) {
+			if ( StringHelper::strlen(StringHelper::trim( $item->publish_down )) <= 10 )
+			{
 				$item->publish_down .= ' 00:00:00';
 			}
 			$date = JFactory::getDate($item->publish_down);
-			$date->setTimeZone( new DateTimeZone( $tz_offset ) );         // J2.5: Date from form field is in user's timezone
+			if ($data['publish_down'])
+			{
+				$date->setTimeZone( new DateTimeZone( $tz_offset ) );  // Date originated from form field, so it was in user's timezone
+			}
 			$item->publish_down = $date->toSql();
 		}
-		
+
+
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
 		$item->language   = $item->language ? $item->language :
 			($app->isSite() ? $cparams->get('default_language_fe', '*') : ('*' /*flexicontent_html::getSiteDefaultLang()*/));
 		
 		// Ignore language parent id, we are now using J3.x associations
 		$item->lang_parent_id = 0;
-		
-		
-		// ****************************************************************************************************************
-		// Get version info, force version approval ON is versioning disabled, and decide new item's current version number
-		// ****************************************************************************************************************
+
+
+		// ***
+		// *** Get version info, force version approval ON is versioning disabled, and decide new item's current version number
+		// ***
+
 		$current_version = (int) FLEXIUtilities::getCurrentVersions($item->id, true);
 		$last_version    = (int) FLEXIUtilities::getLastVersions($item->id, true);
 		
@@ -2012,28 +2031,30 @@ class ParentClassItem extends FCModelAdmin
 		$item->version = ($isNew && !empty($data['type_id_not_set']) ) ? 0 : $item->version;
 		
 		if ( $print_logging_info ) @$fc_run_times['item_store_prepare'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		// *********************************************************************************************
-		// Make sure we import flexicontent AND content plugins since we will be triggering their events
-		// *********************************************************************************************
+
+
+		// ***
+		// *** Make sure we import flexicontent AND content plugins since we will be triggering their events
+		// ***
+
 		JPluginHelper::importPlugin('flexicontent');
 		JPluginHelper::importPlugin('content');
-		
-		
-		// **************************************************************************************************
-		// Trigger Event 'onBeforeSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
-		// **************************************************************************************************
+
+
+		// ***
+		// *** Trigger Event 'onBeforeSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isNew));
 		if((count($result)>0) && in_array(false, $result, true)) return false;   // cancel item save
 		if ( $print_logging_info ) $fc_run_times['onBeforeSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		// ******************************************************************************************************
-		// Trigger Event 'OnBeforeContentSave' (J1.5) or 'onContentBeforeSave' (J2.5) of Joomla's Content plugins
-		// ******************************************************************************************************
-		
+
+
+		// ***
+		// *** Trigger Event 'OnBeforeContentSave' (J1.5) or 'onContentBeforeSave' (J2.5) of Joomla's Content plugins
+		// ***
+
 		// Some compatibility steps
 		if (!$isNew)
 		{
@@ -2057,12 +2078,12 @@ class ParentClassItem extends FCModelAdmin
 		$jinput->set('option', $option);
 		
 		if (in_array(false, $result, true))	{ $this->setError($item->getError()); return false; }    // cancel item save
-		
-		
-		
-		// ************************************************************************************************************
-		// IF new item, create it before saving the fields (and constructing the search_index out of searchable fields)
-		// ************************************************************************************************************
+
+
+		// ***
+		// *** IF new item, create it before saving the fields (and constructing the search_index out of searchable fields)
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		if( $isNew )
 		{
@@ -2074,7 +2095,9 @@ class ParentClassItem extends FCModelAdmin
 				$this->_db->setQuery('UPDATE #__content SET title=id, alias=id WHERE id=' . (int)$item->id);
 				$this->_db->execute();
 			}
-		} else {
+		}
+		else
+		{
 			// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
 			// e.g. a getForm() used to validate input data may have set an empty item and empty id
 			// e.g. type_id of item may have been altered by authorized users
@@ -2083,12 +2106,12 @@ class ParentClassItem extends FCModelAdmin
 			$this->_typeid = $item->type_id;
 		}
 		if ( $print_logging_info ) $fc_run_times['item_store_core'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		// ****************************************************************************
-		// Save fields values to appropriate tables (versioning table or normal tables)
-		// NOTE: This allow canceling of item save operation, if 'abort' is returned
-		// ****************************************************************************
+
+
+		// ***
+		// *** Save fields values to appropriate tables (versioning table or normal tables)
+		// *** NOTE: This allow canceling of item save operation, if 'abort' is returned
+		// ***
 		
 		// Do not try to load fields / save field values, if applying type
 		$result = true;
@@ -2109,8 +2132,10 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 		$version_approved = $isNew || $data['vstate']==2;
-		if( $result==='abort' ) {
-			if ($isNew) {
+		if( $result==='abort' )
+		{
+			if ($isNew)
+			{
 				$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
 				$db->execute();
 				$db->setQuery('DELETE FROM #__content WHERE id ='.$item->id);
@@ -2122,7 +2147,9 @@ class ParentClassItem extends FCModelAdmin
 				
 				$this->setId(0);
 				$this->setError( $this->getError().' '.JText::_('FLEXI_NEW_ITEM_NOT_CREATED') );
-			} else {
+			}
+			else
+			{
 				$this->setError( $this->getError().' '.JText::_('FLEXI_EXISTING_ITEM_NOT_SAVED') );
 			}
 			
@@ -2130,31 +2157,29 @@ class ParentClassItem extends FCModelAdmin
 			// and set POSTED data into session so that form reloads them properly
 			return false;
 		}
-		
-		
-		// ***************************************************************
-		// ITEM DATA SAVED:  EITHER new, OR approving current item version
-		// ***************************************************************
+
+
+		// ***
+		// *** ITEM DATA SAVED:  EITHER new, OR approving current item version
+		// ***
+
 		if ( $version_approved )
 		{
-			// *****************************************************************************************************************************
 			// Save -both- item CORE data AND custom fields, rebinding the CORE ITEM DATA since the onBeforeSaveField may have modified them
-			// *****************************************************************************************************************************
 			if ( $print_logging_info ) $start_microtime = microtime(true);
 			if( !$this->applyCurrentVersion($item, $data, $createonly=false) ) return false;
 			if ( $print_logging_info ) @$fc_run_times['item_store_core'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//echo "<pre>"; var_dump($data); exit();
-			
-			
-			// ***************************
+
+
 			// Update Joomla Featured FLAG
-			// ***************************
 			$this->featured(array($item->id), $item->featured);
-			
-			
-			// *****************************************************************************************************
-			// Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
-			// *****************************************************************************************************
+
+
+			// ***
+			// *** Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
+			// ***
+
 			if ( $print_logging_info ) $start_microtime = microtime(true);
 
 			// Some compatibility steps
@@ -2169,20 +2194,23 @@ class ParentClassItem extends FCModelAdmin
 
 			if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
-		
-		
-		// *************************************************************************************************
-		// Trigger Event 'onAfterSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
-		// *************************************************************************************************
+
+
+		// ***
+		// *** Trigger Event 'onAfterSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$results = $dispatcher->trigger('onAfterSaveItem', array( &$item, &$data ));
 		if ( $print_logging_info ) @$fc_run_times['onAfterSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		// *********************************************************************
-		// ITEM DATA NOT SAVED:  NEITHER new, NOR approving current item version
-		// *********************************************************************
-		if ( !$version_approved ) {
+
+
+		// ***
+		// *** ITEM DATA NOT SAVED:  NEITHER new, NOR approving current item version
+		// ***
+
+		if ( !$version_approved )
+		{
 			if ( $app->isAdmin() || $cparams->get('approval_warning_aftersubmit_fe', 1) )
 			{
 				// Warn editor that his/her changes will need approval to before becoming active / visible
@@ -2196,13 +2224,15 @@ class ParentClassItem extends FCModelAdmin
 			$item->modified			= $datenow->toSql();
 			$item->modified_by	= $user->get('id');
 		}
-		
-		
-		// *********************************************
-		// Create and store version METADATA information 
-		// *********************************************
+
+
+		// ***
+		// *** Create and store version METADATA information 
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		if ($use_versioning) {
+		if ($use_versioning)
+		{
 			$v = new stdClass();
 			$v->item_id			= (int)$item->id;
 			$v->version_id	= ($isNew && !empty($data['type_id_not_set']) ) ? 0 : (int)$last_version+1;
@@ -2216,11 +2246,12 @@ class ParentClassItem extends FCModelAdmin
 			$v->comment		= isset($data['versioncomment']) ? htmlspecialchars($data['versioncomment'], ENT_QUOTES) : '';
 			$this->_db->insertObject('#__flexicontent_versions', $v);
 		}
-		
-		
-		// *************************************************************
-		// Delete old versions that are above the limit of kept versions
-		// *************************************************************
+
+
+		// ***
+		// *** Delete old versions that are above the limit of kept versions
+		// ***
+
 		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
 		$vmax	= $cparams->get('nr_versions', 10);
 
@@ -2245,11 +2276,12 @@ class ParentClassItem extends FCModelAdmin
 			$this->_db->execute();
 		}
 		if ( $print_logging_info ) @$fc_run_times['ver_cleanup_ver_metadata'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		// ****************************************************************************************************
-		// Trigger Event 'onCompleteSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
-		// ****************************************************************************************************
+
+
+		// ***
+		// *** Trigger Event 'onCompleteSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
 		if ( $print_logging_info ) @$fc_run_times['onCompleteSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -2560,7 +2592,6 @@ class ParentClassItem extends FCModelAdmin
 				.implode(",", $ai_query_vals);
 			$this->_db->setQuery($query);
 			$this->_db->execute();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		foreach( $ai_query_vals_f as $_field_id => $_query_vals) {  // Current for advanced index only
 			$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
@@ -2785,7 +2816,6 @@ class ParentClassItem extends FCModelAdmin
 					."\n".implode(",\n", $ver_query_vals);
 				$this->_db->setQuery($query);
 				$this->_db->execute();
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 
 
@@ -2802,7 +2832,6 @@ class ParentClassItem extends FCModelAdmin
 					."\n".implode(",\n", $rel_query_vals);
 				$this->_db->setQuery($query);
 				$this->_db->execute();
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 
 			// Update values of common data types
@@ -2979,7 +3008,6 @@ class ParentClassItem extends FCModelAdmin
 			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . implode(",", $cat_vals);
 			$this->_db->setQuery($query);
 			$this->_db->execute();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		
 		return true;
@@ -3694,7 +3722,6 @@ class ParentClassItem extends FCModelAdmin
 				;
 		$this->_db->setQuery($query);
 		$fields = $this->_db->loadObjectList('name');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		// Get values of CUSTOM fields for current item
 		$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
@@ -3983,7 +4010,6 @@ class ParentClassItem extends FCModelAdmin
 				$query .= " WHERE " . implode (' OR ', $where_clauses);
 				$db->setQuery( $query );
 				$user_emails_ulist = $db->loadColumn();
-				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }
 			}
 			
 			$user_emails_ugrps = array();
@@ -3995,7 +4021,6 @@ class ParentClassItem extends FCModelAdmin
 				
 				$db->setQuery( $query );
 				$user_emails_ugrps = $db->loadColumn();
-				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps); exit; }
 			}
 			
 			// merge them
@@ -4076,7 +4101,7 @@ class ParentClassItem extends FCModelAdmin
 			$subject .= JText::_( $isNew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
 			
 			// (b) ADD INFO about editor's name and username (or being guest)
-			$subject .= !$user->id ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
+			$subject .= !$user->get('id') ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
 			
 			// (c) (new items) ADD INFO for content needing publication approval
 			if ($isNew) {
@@ -4809,7 +4834,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// The access filter has not been set, we will set access flag(s) if not set already the layout takes some responsibility for display of limited information,
-		$groups = JAccess::getAuthorisedViewLevels($user->id);
+		$groups = JAccess::getAuthorisedViewLevels($user->get('id'));
 		
 		if ( !isset($record->has_item_access) )
 		{
@@ -4897,5 +4922,166 @@ class ParentClassItem extends FCModelAdmin
 	protected function _afterLoad($record)
 	{
 		parent::_afterLoad($record);
+
+		// ***
+		// *** Retrieve item properties not defined in the model's CLASS (if not already popuplated)
+		// ***
+
+		$public_acclevel = 1;
+
+
+		// ***
+		// *** Item's access level data (its title, e.g. title: 'Public')
+		// ***
+
+		if ( !$record->access )
+		{
+			$record->access_level = '';
+		}
+		else if ( !isset($record->access_level) )
+		{
+			$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $record->access;
+			$this->_db->setQuery($query);
+			$record->access_level = $this->_db->loadResult();
+		}
+
+
+		// ***
+		// *** Get category data for the item's main category, access is used later to determine viewing of the item
+		// ***
+
+		if ( !$record->catid )
+		{
+			$record->categoryslug    = '';
+			$record->category_access = $public_acclevel;
+		}
+		else if ( !isset($record->category_access) || !isset($record->categoryslug) )
+		{
+			$query = 'SELECT id, title, access FROM #__categories WHERE id = '. (int) $record->catid;
+			$cat = $this->_db->setQuery($query)->loadObject();
+			$record->categoryslug    = $cat ? $cat->id . ':' . $cat->title : '';
+			$record->category_access = $cat ? $cat->access : $public_acclevel;
+		}
+		// Force to public access if category access level is empty
+		$record->category_access = !empty($record->category_access) ? $record->category_access : $public_acclevel;
+
+
+		// ***
+		// *** Get type data for the item's type, access is used later to determine viewing of the item
+		// ***
+
+		if ( !$record->type_id )
+		{
+			$record->typename    = '';
+			$record->typealias   = '';
+			$record->type_access = '';
+		}
+		else if ( !isset($record->type_access) || !isset($record->typename) || !isset($record->typealias) )
+		{
+			$query = 'SELECT name, alias, access FROM #__flexicontent_types WHERE id = '. (int) $record->type_id;
+			$type = $this->_db->setQuery($query)->loadObject();
+			$record->typename    = $type ? $type->name : '';
+			$record->typealias   = $type ? $type->alias : '';
+			$record->type_access = $type ? $type->access : $public_acclevel;
+		}
+		// Force to public access if type access level is empty
+		$record->type_access = !empty($record->type_access) ? $record->type_access : $public_acclevel;
+
+
+		// ***
+		// *** Get rating data
+		// ***
+
+		if ( $record->id )
+		{
+			$record->rating_count = 0;
+			$record->rating       = 0;
+			$record->score        = 0;
+		}
+		else if ( !isset($record->rating_count) || !isset($record->rating) || !isset($record->score) )
+		{
+			$rating_resolution = (int)$this->getVotingResolution();
+
+			// Get category access for the item's main category, used later to determine viewing of the item
+			$query = 'SELECT '
+				.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
+				.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $record->id
+				;
+			$this->_db->setQuery($query);
+			$rating_data = $this->_db->loadObject();
+			$record->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
+			$record->rating       = !$rating_data ? 0 : $rating_data->rating;
+			$record->score        = !$rating_data ? 0 : $rating_data->score;
+		}
+
+
+		// ***
+		// *** Retrieve Creator (owner) data (e.g. name and email used to display the gravatar)
+		// ***
+
+		// For new item, if creator id is empty, then set it to current user id
+		if ( !$record->id && !$record->created_by )
+		{
+			$record->created_by = JFactory::getUser()->id;
+		}
+
+		if ( !$record->created_by )
+		{
+			$record->creator      = '';
+			$record->creatoremail = '';
+			$record->author = & $record->creator;  // an alias
+		}
+		else if ( !isset($record->creator) || !isset($record->creatoremail) || !isset($record->author) )
+		{
+			$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $record->created_by;
+			$creator = $this->_db->setQuery($query)->loadObject();
+			$record->creator      = $creator ? $creator->name : '';
+			$record->creatoremail = $creator ? $creator->email : '';
+			$record->author = & $record->creator;  // an alias
+		}
+
+
+		// ***
+		// *** Retrieve Last modifier data
+		// ***
+
+		if ($record->created_by == $record->modified_by)
+		{
+			$record->modifier = $record->creator;
+			$record->modifieremail = $record->creatoremail;
+		}
+
+		if ( !$record->modified_by )
+		{
+			$record->modifier = '';
+			$record->modifieremail = '';
+		}
+		else if ( !isset($record->modifier) || !isset($record->modifieremail) )
+		{
+			$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $record->modified_by;
+			$modifier = $this->_db->setQuery($query)->loadObject();
+			$record->modifier      = $modifier ? $modifier->name : '';
+			$record->modifieremail = $modifier ? $modifier->email : '';
+		}
+
+
+		// Clear modified Date, if it is an empty "DB-null" date
+		if ($record->modified == $this->_db->getNulldate())
+		{
+			$record->modified = null;
+		}
+
+
+		// *** 
+		// *** Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
+		// *** 
+
+		if ( $this->_cparams->get('use_versioning', 1) && $record->id && $record->current_version > $record->last_version )
+		{
+			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'flexicontent.php');
+			$fleximodel = new FlexicontentModelFlexicontent();
+			$fleximodel->addCurrentVersionData($record->id);
+			$record->last_version = $record->last_version = $record->current_version;
+		}
 	}
 }

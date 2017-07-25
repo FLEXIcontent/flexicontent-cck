@@ -334,10 +334,12 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * Method to initialise the record data
 	 *
 	 * @access	protected
+	 * @param	object    $record   The record being initialized
+	 * @param	boolean   $uid      If true then only a new record will be initialized without running the _afterLoad() method
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	protected function _initRecord(&$record = null)
+	protected function _initRecord(&$record = null, $initOnly = false)
 	{
 		// Initialize a given record object
 		if ($record) ;
@@ -355,12 +357,16 @@ abstract class FCModelAdmin extends JModelAdmin
 			$record = $this->getTable();
 		}
 
-		// Set record specific properties and then assign to member property
+		// Set some new record specific properties, note most properties already have proper values
+		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
 		// ...
 		$this->_record = $record;
 
 		// Extra steps after loading
-		$this->_afterLoad($this->_record);
+		if ( !$initOnly )
+		{
+			$this->_afterLoad($this->_record);
+		}
 
 		return true;
 	}
@@ -370,6 +376,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * Method to checkin/unlock the record
 	 *
 	 * @access	public
+	 * @param	  int    $pk   The record id to checkin (unlock)
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
@@ -390,7 +397,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * Method to checkout/lock the record
 	 *
 	 * @access	public
-	 * @param	int	$uid	User ID of the user checking the item out
+	 * @param	  int    $pk   The record id to checkin (unlock)
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */

@@ -187,10 +187,8 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			$item->cid[]				= 0;
 			$item->title				= null;
 			$item->alias				= null;
-			$item->title_alias	= null;  // deprecated do not use
 			$item->text					= null;
-			if (!FLEXI_J16GE)
-				$item->sectionid	= FLEXI_SECTION;
+			$item->sectionid		= FLEXI_SECTION;   // deprecated do not use
 			$item->catid				= null;
 			$item->score				= 0;
 			$item->votecount		= 0;
@@ -209,7 +207,6 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			$item->access					= 0;
 			$item->metadata				= null;
 			$item->state				= 1;
-			$item->mask					= null;  // deprecated do not use
 			$item->parentid			= null;  // deprecated do not use
 			$item->images				= null;
 			$item->urls					= null;
