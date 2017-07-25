@@ -1866,6 +1866,26 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// ***
+		// *** Load item and its fields and its type parameters
+		// ***
+
+		$model = new FlexicontentModelItem();
+		$item = $model->getItem($data->id, $check_view_access=false);
+
+		$fields = $model->getExtrafields();
+		$item->fields = & $fields;
+
+		$tparams = $model->getTypeparams();
+		$tparams = new JRegistry($tparams);
+		$item->tparams = & $tparams;
+		
+		$item->params = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$item->params->merge($cparams);
+		$item->params->merge($item->tparams);
+
+
+		// ***
 		// *** Load CSS files
 		// ***
 		
@@ -1883,6 +1903,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Fields common CSS
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+
 
 		// ***
 		// *** Load JS libraries
@@ -1916,28 +1937,8 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// ***
-		// *** Load item and its fields and its type parameters
-		// ***
-
-		$model = new FlexicontentModelItem();
-		$item = $model->getItem($data->id, $check_view_access=false);
-
-		$fields = $model->getExtrafields();
-		$item->fields = & $fields;
-
-		$tparams = $this->get( 'Typeparams' );
-		$tparams = new JRegistry($tparams);
-		$item->tparams = & $tparams;
-		
-		$item->params = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$item->params->merge($cparams);
-		$item->params->merge($item->tparams);
-
-
-		// ***
-		// *** Load any previous form, NOTE: Because of fieldgroup rendering other fields
-		// *** this step must be done in seperate loop, placed before FIELD HTML creation
+		// *** Load field values from session (typically during a form reload after a servers-side form validation failure)
+		// *** NOTE: Because of fieldgroup rendering other fields, this step must be done in seperate loop, placed before FIELD HTML creation
 		// *** 
 
 		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');
@@ -1945,12 +1946,14 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			if (!$field->iscore)
 			{
-				if ( isset($jcustom[$field->name]) ) {
+				if ( isset($jcustom[$field->name]) )
+				{
 					$field->value = array();
 					foreach ($jcustom[$field->name] as $i => $_val)  $field->value[$i] = $_val;
 				}
 			}
 		}
+
 
 		// ***
 		// *** (a) Apply Content Type Customization to CORE fields (label, description, etc)

@@ -27,7 +27,8 @@
 		<action name="flexicontent.change.cat.feat" title="Change featured categories" description="Allow users in the group to change the categories assigned to an item (after the item has been created). &lt;br/&gt; &lt;br/&gt; NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />		
 		<!-- Various -->
 		<action name="flexicontent.accesslevel" title="Edit Access Level (also in items / cats managers)" description="Allow users in the group to set the Access Level of items / categories that they can edit" />
-		<action name="flexicontent.editcreationdate" title="Edit creation date" description="Allow users in the group to edit creation date of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for administrator since creation date might be important for subscription sites and other site behavior" />
+		<action name="flexicontent.editcreationdate" title="Edit creation date" description="Allow users in the group to edit creation date of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for super administrators since creation date is important for subscription sites and other site behavior" />
+		<action name="flexicontent.editcreator" title="Edit creator (owner)" description="Allow users in the group to edit creator (aka owner) of an item. &lt;br/&gt; &lt;br/&gt; NOTE: that is usually reserved for super administrators since creator (ownere) is important for subscription sites and other site behavior" />
 		<action name="flexicontent.versioning" title="Use versions" description="Allow users in the group to use multiple Versions per Item" />
 		<action name="flexicontent.assocanytrans" title="Associate items authored by other users" description="Allow users in the group to associate translations (items) authored by any user" />
 
