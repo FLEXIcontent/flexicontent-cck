@@ -51,10 +51,10 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 
 		//Get data from the model
 		$model			= $this->getModel();
-		$row     		= $this->get( 'Item' );
-		$fields			= $this->get( 'Extrafields' );
-		$versions		= $this->get( 'VersionList' );
-		$tparams		= $this->get( 'Typeparams' );
+		$row     		= $model->getItem();
+		$fields			= $model->getExtrafields();
+		$versions		= $model->getVersionList();
+		$tparams		= $model->getTypeparams();
 				
 		// Create the type parameters
 		$tparams = new JRegistry($tparams);

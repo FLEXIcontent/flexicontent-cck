@@ -1132,7 +1132,7 @@
 			<field name="allowbuttons_fe" type="fccheckbox" default=""
 				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
-				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
+				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" cols="2" />
 			<field name="buttons_placement_fe" type="fcradio" default="0" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
@@ -1242,7 +1242,7 @@
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
 			<field name="useseoconf_fe" type="fcradio" default="0" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
@@ -1252,7 +1252,7 @@
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
 			</field>
 			<field name="selecttheme_fe" type="fcradio" default="0" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" class="btn-group group-fcmethod">
-				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
@@ -1399,7 +1399,7 @@
 				checkoptions="FLEXI_NF_CREATOR,FLEXI_NF_MODIFIER,FLEXI_NF_CREATION_TIME,FLEXI_NF_MODIFICATION_TIME,FLEXI_NF_VIEW_LINK,FLEXI_NF_EDIT_LINK_FE,FLEXI_NF_EDIT_LINK_BE"
 				checkvals="creator,modifier,created,modified,viewlink,editlinkfe,editlinkbe"
 				defaultvals="creator,modifier,created,modified,viewlink,editlinkfe,editlinkbe"
-				label="FLEXI_NF_EXTRA_PROPERTIES" description="FLEXI_NF_EXTRA_PROPERTIES_DESC" class="disp_notifications"/>
+				label="FLEXI_NF_EXTRA_PROPERTIES" description="FLEXI_NF_EXTRA_PROPERTIES_DESC" class="disp_notifications" cols="2" />
 			<field name="nf_add_introtext" type="fcradio" default="0" label="FLEXI_NF_ADD_INTROTEXT" description="FLEXI_NF_ADD_INTROTEXT_DESC" class="disp_notifications btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -1421,7 +1421,7 @@
 				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
 				checkvals="1,0,2,-3,-4,-5"
 				defaultvals="1,0,2,-3,-4,-5"
-				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" class="disp_notifications" />
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" class="disp_notifications" cols="2" />
 			<field name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
 			<field name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge" />
 			<field name="text_notify_new" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
@@ -1436,7 +1436,7 @@
 				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
 				checkvals="1,0,2,-3,-4,-5"
 				defaultvals="1,0,2,-3,-4,-5"
-				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" class="disp_notifications" />
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" class="disp_notifications" cols="2" />
 			<field name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
 			<field name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge"/>
 			<field name="text_notify_existing" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
@@ -1645,15 +1645,15 @@
 			<field name="file_path" type="text" size="50" default="components/com_flexicontent/uploads" label="FLEXI_PATH_TO_FILE_FOLDER" description="FLEXI_TIPFILEFOLDER" class="input-xxlarge" />
 			<field name="media_path" type="text" size="50" default="components/com_flexicontent/medias" label="FLEXI_PATH_TO_MEDIA_FOLDER" description="FLEXI_TIPMEDIAFOLDER" class="input-xxlarge" />
 
-			<field name="" type="separator" default="FLEXI_FILES_PDF_HANDING" label="" level="level3" />
-			<field name="index_pdf_files" type="radio" default="0" label="FLEXI_INDEX_PDF_FILES" description="FLEXI_INDEX_PDF_FILES_DESC" class="btn-group">
+			<field name="" type="separator" default="FLEXI_SEARCH_INDEX" label="" level="level3" />
+
+			<field name="index_pdf_files" type="multilist" subtype="radio" default="0" label="FLEXI_INDEX_PDF_FILES" description="FLEXI_INDEX_PDF_FILES_DESC" class="btn-group" inline_tip="FLEXI_FILES_PDF_HANDING" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="pdfparser_path" type="hidden" size="50" default="" label="FLEXI_PATH_PDF_PARSER" description="FLEXI_PATH_PDF_PARSER_DESC" class="input-xxlarge" />
 
-			<field name="" type="separator" default="FLEXI_FILES_CSV_HANDING" label="" level="level3" />
-			<field name="index_csv_files" type="radio" default="0" label="FLEXI_INDEX_CSV_FILES" description="FLEXI_INDEX_CSV_FILES_DESC" class="btn-group">
+			<field name="index_csv_files" type="multilist" subtype="radio" default="0" label="FLEXI_INDEX_CSV_FILES" description="FLEXI_INDEX_CSV_FILES_DESC" class="btn-group" inline_tip="FLEXI_FILES_CSV_HANDING" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -1791,7 +1791,7 @@
 
 
 	</fieldset>	
-	<fieldset name="permissions1" label="Permissions-flexicontent" description="JCONFIG_PERMISSIONS_DESC">
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
 		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component" />
 	</fieldset>
 		

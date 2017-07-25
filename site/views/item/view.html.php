@@ -616,7 +616,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$typesselected = $model->getTypesselected();
 		
 		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
-		$tparams = $this->get( 'Typeparams' );
+		$tparams = $model->getTypeparams();
 		$tparams = new JRegistry($tparams);
 
 
@@ -925,8 +925,8 @@ class FlexicontentViewItem extends JViewLegacy
 
 
 		// ***
-		// *** Load any previous form, NOTE: Because of fieldgroup rendering other fields
-		// *** this step must be done in seperate loop, placed before FIELD HTML creation
+		// *** Load field values from session (typically during a form reload after a server-side form validation failure)
+		// *** NOTE: Because of fieldgroup rendering other fields, this step must be done in seperate loop, placed before FIELD HTML creation
 		// ***
 		
 		$jcustom = $app->getUserState($form->option.'.edit.item.custom');
@@ -934,7 +934,8 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			if (!$field->iscore)
 			{
-				if ( isset($jcustom[$field->name]) ) {
+				if ( isset($jcustom[$field->name]) )
+				{
 					$field->value = array();
 					foreach ($jcustom[$field->name] as $i => $_val)  $field->value[$i] = $_val;
 				}
@@ -1630,6 +1631,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$perms['canacclvl']    = $permission->CanAccLvl;
 		$perms['canversion']   = $permission->CanVersion;
 		$perms['editcreationdate'] = $permission->EditCreationDate;
+		$perms['editcreator']  = $permission->EditCreator;
 		
 		// Get general edit/publish/delete permissions (we will override these for existing items)
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;

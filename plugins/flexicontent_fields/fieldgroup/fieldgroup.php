@@ -421,8 +421,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		
 		// Append non value html of fields
 		$field->html =
-			($non_value_html ? '
-				<div class="fcclear"></div>'.$non_value_html : '') .
+			($non_value_html ? $non_value_html . '<div class="fcclear"></div>' : '') .
 			/*(version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', self::$prior_to_version), '>=') ?
 				'<span class="alert alert-warning fc-iblock fc-small" style="margin: 0 0 8px 0;">
 					<b>Warning</b>: installed version of Field: \'<b>'.$field->field_type.'</b>\' was meant for FLEXIcontent versions prior to: v'.self::$prior_to_version.' It may or may not work properly in later versions

@@ -333,7 +333,7 @@ $this->document->addScriptDeclaration($js);
 			<?php endif; ?>
 			
 			
-			<?php if ($this->permission->CanConfig) :
+			<?php if ($this->perms->CanConfig) :
 				/*$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');

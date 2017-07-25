@@ -1952,8 +1952,8 @@ class flexicontent_html
 		$has_delete = $has_delete && empty($trash_unsupported);
 
 		// ...
-		$permission = FlexicontentHelperPerm::getPerm();
-		$has_archive    = $permission->CanArchives && empty($archive_unsupported);
+		$perms = FlexicontentHelperPerm::getPerm();
+		$has_archive    = $perms->CanArchives && empty($archive_unsupported);
 
 		$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
 		$has_delete     = $has_delete     && $state == -2;

@@ -28,7 +28,8 @@
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_start" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
-			
+			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_VALUES_TAB_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-warning fcpadded" />
+
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
@@ -92,15 +93,16 @@
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" icon_class="icon-wrench" level="tab_open" box_type="1" />
 
 			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC">
-				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode,client-resize">Joomla media manager</option>
-				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode,client-resize">Joomla article images: (intro + full)</option>
-				<option value="0"  show_list="img-db-mode,img-common-conf,client-resize"  hide_list="img-fld-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
-				<option value="1"  show_list="img-fld-mode,img-common-conf,client-resize" hide_list="img-db-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
+				<option value="-2" show_list="img-joomla-mode" hide_list="img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla media manager</option>
+				<option value="-1" show_list="img-joomla-mode" hide_list="img-db-mode,img-fld-mode,img-common-conf,client-resize">Joomla article images: (intro + full)</option>
+				<option value="0"  show_list="img-db-mode,img-common-conf,client-resize"  hide_list="img-fld-mode,img-joomla-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
+				<option value="1"  show_list="img-fld-mode,img-common-conf,client-resize" hide_list="img-db-mode,img-joomla-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
 			<field name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES" description="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES_DESC" depend_class="img-common-conf" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-info fcpadded" />
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level1" depend_class="img-fld-mode" />
 			<field name="of_usage" type="radio" default="0" label="FLEXI_FIELD_IMAGE_ASSOC_ITEMS_SAME_IMAGES" description="FLEXI_FIELD_IMAGE_ASSOC_ITEMS_SAME_IMAGES_DESC" depend_class="img-fld-mode" class="btn-group group-fcinfo">
@@ -151,6 +153,7 @@
 
 			
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" icon_class="icon-checkmark-circle" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_SETTINGS_NOT_USED_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-warning fcpadded" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
 			<field name="linkto_url" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">

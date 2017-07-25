@@ -493,7 +493,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						</div>
 						
 						
-						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
+						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'); ?></div>
 						
 						<div class="positions_container">
 							<ul id="sortableuserfields" class="positions">

@@ -201,10 +201,10 @@ class FlexicontentControllerItems extends FlexicontentController
 	function selectstate()
 	{
 		// Use general permissions since we do not have examine any specific item
-		$permission = FlexicontentHelperPerm::getPerm();
-		$auth_publish = $permission->CanPublish || $permission->CanPublishOwn || $permission->CanPublish==null || $permission->CanPublishOwn==null;
-		$auth_delete  = $permission->CanDelete  || $permission->CanDeleteOwn  || $permission->CanDelete==null  || $permission->CanDeleteOwn==null;
-		$auth_archive = $permission->CanArchives;
+		$perms = FlexicontentHelperPerm::getPerm();
+		$auth_publish = $perms->CanPublish || $perms->CanPublishOwn || $perms->CanPublish==null || $perms->CanPublishOwn==null;
+		$auth_delete  = $perms->CanDelete  || $perms->CanDeleteOwn  || $perms->CanDelete==null  || $perms->CanDeleteOwn==null;
+		$auth_archive = $perms->CanArchives;
 		
 		if($auth_publish || $auth_archive || $auth_delete)
 		{

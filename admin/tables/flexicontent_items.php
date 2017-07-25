@@ -90,8 +90,6 @@ class flexicontent_items extends _flexicontent_items {
 	/** @var string */
 	var $alias				= null;
 	/** @var string */
-	var $title_alias	= null;  // deprecated do not use
-	/** @var string */
 	var $introtext		= null;
 	/** @var string */
 	var $fulltext			= null;

@@ -95,68 +95,69 @@ class FlexicontentHelperPerm
 		$permission->CanAccLvl		= $user->authorise('flexicontent.accesslevel',		'com_flexicontent');
 		
 		// ITEMS: component controlled permissions
-		$permission->DisplayAllItems		= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
-		$permission->CanCopy			= $user->authorise('flexicontent.copyitems',	'com_flexicontent'); // (backend) Item Copy Task
-		$permission->CanOrder			= $user->authorise('flexicontent.orderitems',	'com_flexicontent'); // (backend) Reorder items inside the category
-		$permission->CanParams		= 1; // Legacy permission, we will not use it in FC v3.0.15+
-		$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
+		$permission->DisplayAllItems    = $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
+		$permission->CanCopy      = $user->authorise('flexicontent.copyitems',  'com_flexicontent'); // (backend) Item Copy Task
+		$permission->CanOrder     = $user->authorise('flexicontent.orderitems', 'com_flexicontent'); // (backend) Reorder items inside the category
+		$permission->CanParams    = 1; // Legacy permission, we will not use it in FC v3.0.15+
+		$permission->CanVersion   = $user->authorise('flexicontent.versioning', 'com_flexicontent'); // (backend) Use item versioning
 		
-		$permission->AssocAnyTrans		  = $user->authorise('flexicontent.assocanytrans',	  	'com_flexicontent'); // (item edit form) associate any translation
-		$permission->EditCreationDate	  = $user->authorise('flexicontent.editcreationdate',	  'com_flexicontent'); // (item edit form) edit creation date (frontend)
-		$permission->IgnoreViewState	  = $user->authorise('flexicontent.ignoreviewstate',	  'com_flexicontent'); // (Frontend Content Lists) ignore view state
-		$permission->RequestApproval	  = $user->authorise('flexicontent.requestapproval',	  'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
-		$permission->AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent'); // (Workflow) Can publish document changes regardless of edit state
+		$permission->AssocAnyTrans      = $user->authorise('flexicontent.assocanytrans',      'com_flexicontent'); // (item edit form) associate any translation
+		$permission->EditCreationDate   = $user->authorise('flexicontent.editcreationdate',   'com_flexicontent'); // (item edit form) edit creation date
+		$permission->EditCreator        = $user->authorise('flexicontent.editcreator',        'com_flexicontent'); // (item edit form) edit creator (owner)
+		$permission->IgnoreViewState    = $user->authorise('flexicontent.ignoreviewstate',    'com_flexicontent'); // (Frontend Content Lists) ignore view state
+		$permission->RequestApproval    = $user->authorise('flexicontent.requestapproval',    'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
+		$permission->AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges', 'com_flexicontent'); // (Workflow) Can publish document changes regardless of edit state
 		
 		// CATEGORIES: management tab and usage
-		$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
-		$permission->ViewAllCats	= $user->authorise('flexicontent.usercats',		'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
-		$permission->ViewTree			= 1;  // Old (non-used) ACL, we will always displaying of categories as tree
-		$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
+		$permission->CanCats      = $user->authorise('flexicontent.managecats',  'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+		$permission->ViewAllCats  = $user->authorise('flexicontent.usercats',    'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+		$permission->ViewTree     = 1;  // Old (non-used) ACL, we will always displaying of categories as tree
+		$permission->MultiCat     = $user->authorise('flexicontent.multicat',    'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
 		
 		// REVIEWs: management tab and usage
-		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',	'com_flexicontent');
-		$permission->CanCreateReviews = $user->authorise('flexicontent.createreviews',	'com_flexicontent');
+		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',  'com_flexicontent');
+		$permission->CanCreateReviews = $user->authorise('flexicontent.createreviews',  'com_flexicontent');
 		
 		// TAGS: management tab and usage
-		$permission->CanTags			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types
-		$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit tag assignments (item form)
-		$permission->CanCreateTags= $user->authorise('flexicontent.createtags',	'com_flexicontent'); // create new tags
+		$permission->CanTags       = $user->authorise('flexicontent.managetags',  'com_flexicontent'); // (backend) Allow management of Item Types
+		$permission->CanUseTags    = $user->authorise('flexicontent.usetags',     'com_flexicontent'); // edit tag assignments (item form)
+		$permission->CanCreateTags = $user->authorise('flexicontent.createtags',  'com_flexicontent'); // create new tags
 		
 		// VARIOUS management TABS: types, archives, statistics, templates, tags
-		$permission->CanTypes			= $user->authorise('flexicontent.managetypes',			'com_flexicontent'); // (backend) Allow management of Item Types
-		$permission->CanArchives	= $user->authorise('flexicontent.managearchives', 	'com_flexicontent'); // (backend) Allow management of Archives
-		$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates',	'com_flexicontent'); // (backend) Allow management of Templates
-		$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent'); // (backend) Allow management of Statistics
-		$permission->CanImport		= $user->authorise('flexicontent.manageimport',			'com_flexicontent'); // (backend) Allow management of (Content) Import
-		$permission->CanAppsman		= $permission->CanConfig;
+		$permission->CanTypes      = $user->authorise('flexicontent.managetypes',      'com_flexicontent'); // (backend) Allow management of Item Types
+		$permission->CanArchives   = $user->authorise('flexicontent.managearchives',   'com_flexicontent'); // (backend) Allow management of Archives
+		$permission->CanTemplates  = $user->authorise('flexicontent.managetemplates',  'com_flexicontent'); // (backend) Allow management of Templates
+		$permission->CanStats      = $user->authorise('flexicontent.managestats',      'com_flexicontent'); // (backend) Allow management of Statistics
+		$permission->CanImport     = $user->authorise('flexicontent.manageimport',     'com_flexicontent'); // (backend) Allow management of (Content) Import
+		$permission->CanAppsman    = $permission->CanConfig;
 		
 		// FIELDS: management tab
-		$permission->CanFields			= $user->authorise('flexicontent.managefields', 'com_flexicontent'); // (backend) Allow management of Fields
-		$permission->CanCopyFields	= $user->authorise('flexicontent.copyfields', 	'com_flexicontent'); // (backend) Field Copy Task
-		$permission->CanOrderFields	= $user->authorise('flexicontent.orderfields', 	'com_flexicontent'); // (backend) Reorder fields inside each item type
-		$permission->CanAddField		= $user->authorise('flexicontent.createfield', 	'com_flexicontent'); // (backend) Create fields
-		$permission->CanEditField		= $user->authorise('flexicontent.editfield', 		'com_flexicontent'); // (backend) Edit fields
-		$permission->CanDeleteField	= $user->authorise('flexicontent.deletefield', 	'com_flexicontent'); // (backend) Delete fields
+		$permission->CanFields      = $user->authorise('flexicontent.managefields', 'com_flexicontent'); // (backend) Allow management of Fields
+		$permission->CanCopyFields  = $user->authorise('flexicontent.copyfields',   'com_flexicontent'); // (backend) Field Copy Task
+		$permission->CanOrderFields = $user->authorise('flexicontent.orderfields',  'com_flexicontent'); // (backend) Reorder fields inside each item type
+		$permission->CanAddField    = $user->authorise('flexicontent.createfield',  'com_flexicontent'); // (backend) Create fields
+		$permission->CanEditField   = $user->authorise('flexicontent.editfield',    'com_flexicontent'); // (backend) Edit fields
+		$permission->CanDeleteField = $user->authorise('flexicontent.deletefield',  'com_flexicontent'); // (backend) Delete fields
 		$permission->CanPublishField= $user->authorise('flexicontent.publishfield', 'com_flexicontent'); // (backend) Publish fields
 		
 		// FILES: management tab
-		$permission->CanFiles				= $user->authorise('flexicontent.managefiles', 	'com_flexicontent'); // (backend) Allow management of Files
-		$permission->CanUpload	 		= $user->authorise('flexicontent.uploadfiles', 	'com_flexicontent'); // allow user to upload Files
-		$permission->CanViewAllFiles= $user->authorise('flexicontent.viewallfiles',	'com_flexicontent'); // allow user to view all Files
+		$permission->CanFiles        = $user->authorise('flexicontent.managefiles',   'com_flexicontent'); // (backend) Allow management of Files
+		$permission->CanUpload       = $user->authorise('flexicontent.uploadfiles',   'com_flexicontent'); // allow user to upload Files
+		$permission->CanViewAllFiles = $user->authorise('flexicontent.viewallfiles',  'com_flexicontent'); // allow user to view all Files
 		
 		// AUTHORS: management tab
-		$permission->CanAuthors		= $user->authorise('core.manage', 'com_users');
-		$permission->CanGroups		= $permission->CanAuthors;
+		$permission->CanAuthors   = $user->authorise('core.manage', 'com_users');
+		$permission->CanGroups    = $permission->CanAuthors;
 		
 		// SEARCH INDEX: management tab
-		$permission->CanIndex			= $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);
+		$permission->CanIndex     = $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);
 		
 		// OTHER components permissions
-		$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
-		$permission->CanComments 	= $user->authorise('core.manage', 'com_jcomments');
-		$permission->CanComments	=	$permission->CanComments && $JComments_Installed;
+		$permission->CanPlugins   = $user->authorise('core.manage', 'com_plugins');
+		$permission->CanComments  = $user->authorise('core.manage', 'com_jcomments');
+		$permission->CanComments  =  $permission->CanComments && $JComments_Installed;
 		$permission->JComments_Installed = $JComments_Installed;
-		
+
 		return $permission;
 	}
 	

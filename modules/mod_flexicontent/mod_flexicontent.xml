@@ -409,7 +409,7 @@
 			</field>
 
 
-			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_SCOPE" description="FLEXI_CUSTOM_FIELD_SCOPE_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_CUSTOM_NON_CORE_FIELDS_SCOPE" description="FLEXI_CUSTOM_NON_CORE_FIELDS_SCOPE_DESC" level="level1" />
 
 			<field name="behaviour_filt" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_ABOUT_BEHAVIOUR_STATIC_DYNAMIC_DESC" class="use_select2_lib fc_skip_highlight" inline_text="FLEXI_UMOD_DYNAMIC_SET_BEHAVIOUR_TO_STATIC_TO_DISABLE" text_class="fc-mssg-inline fc-success fc-small behaviour_dyn_filts">
 				<option value="0" show_list="" hide_list="behaviour_dyn_filts">FLEXI_FILTER_BY_STATIC_FIELD_VALUES</option>

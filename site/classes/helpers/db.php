@@ -1066,4 +1066,59 @@ class flexicontent_db
 
 		return false;
 	}
+
+
+	/**
+	 * Get a list of the user groups.
+	 *
+	 * @return  array
+	 * @since   3.2
+	 */
+	private static function _getUserGroupIDs()
+	{
+		$db = JFactory::getDBO();
+
+		$query = $db->getQuery(true);
+		$query
+			->select('a.id')
+			->from('#__usergroups AS a');
+
+		return $db->setQuery($query)->loadColumn();
+	}
+
+
+	/**
+	 * Get a list of the user groups.
+	 *
+	 * @return  array
+	 * @since   3.2
+	 */
+	static function getSuperUserID()
+	{
+		// Return already found super user ID
+		static $superUserID = null;
+		if ($superUserID !== null)
+		{
+			return $superUserID;
+		}
+
+		// Find usergroups with Super Admin privilege
+		$groupIDs = flexicontent_db::getUserGroupIDs();
+		$suGroupIDs = array();
+
+		foreach($groupIDs as $groupID)
+		{
+			if ( JAccess::checkGroup($groupID, 'core.admin') )
+			{
+				$suGroupIDs[] = $groupID;
+			}
+		}
+
+		// Find the fist user that is super id
+		$query = 'SELECT DISTINCT id FROM #__users as u'
+			. ' JOIN #__user_usergroup_map ugm ON u.id = ugm.user_id AND ugm.group_id IN (' . implode(',', $suGroupIDs) . ')'
+			. ' LIMIT 1';
+
+		return $db->setQuery($query)->loadColumn();
+	}
 }

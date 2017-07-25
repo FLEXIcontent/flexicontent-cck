@@ -260,8 +260,8 @@ class FlexicontentViewType extends JViewLegacy
 		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 		// Assign data to template
-		$this->permission = FlexicontentHelperPerm::getPerm();
-		$this->document   = $document;
+		$this->perms    = FlexicontentHelperPerm::getPerm();
+		$this->document = $document;
 		$this->row      = $row;
 		$this->form     = $form;
 		$this->tmpls    = $tmpls;
@@ -328,4 +328,3 @@ class FlexicontentViewType extends JViewLegacy
 			return $field->input;
 	}
 }
-?>
