@@ -59,7 +59,7 @@ $_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 $isAdmin = $app->isAdmin();
 $useAssocs = flexicontent_db::useAssociations();
 
-$list_total_cols = 16;
+$list_total_cols = 18;
 if ( $useAssocs ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);
@@ -748,13 +748,21 @@ jQuery(document).ready(function(){
 				endif;
 				?>
 			</th>
-			
+
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'i.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'JGLOBAL_HITS', 'i.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			
+
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="left hideOnDemandClass">
+				<?php echo JHTML::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="left hideOnDemandClass">
+				<?php echo JHTML::_('grid.sort', 'JGRID_HEADING_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
@@ -810,6 +818,7 @@ jQuery(document).ready(function(){
 			</td>
 
 		<?php if ($this->CanOrder) : ?>
+
 			<td class="order left">
 				<?php
 					if ($this->ordering)
@@ -852,10 +861,13 @@ jQuery(document).ready(function(){
 				<input type="hidden" name="ord_grp[]" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 				<?php endif; ?>
 			</td>
+
 		<?php else : ?>
+
 			<td>
 				<?php echo !$this->filter_order_type  ?  $row->ordering  :  $row->catsordering; ?>
 			</td>
+
 		<?php endif; ?>
 
 			<td class="col_state" style="padding-right: 8px;">
@@ -1071,7 +1083,7 @@ jQuery(document).ready(function(){
 				echo count($row_cats) ? '</div>' : '';
 				?>
 			</td>
-			
+
 			<td class="col_tag">
 				<?php
 					$row_tags  = array();
@@ -1095,23 +1107,31 @@ jQuery(document).ready(function(){
 					echo count($row_tags) ? '</div>' : '';
 				?>
 			</td>
-			
+
 			<td class="col_created">
 				<?php echo JHTML::_('date',  $row->created, $date_format ); ?>
 			</td>
-			
+
 			<td class="col_revised">
 				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHTML::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
-			
+
 			<td>
 				<?php echo $row->hits; ?>
 			</td>
-			
+
+			<td>
+				<?php echo $row->rating_count; ?>
+			</td>
+
+			<td>
+				<?php echo sprintf('%.1f', (float) $row->rating); ?>%
+			</td>
+
 			<td class="col_id">
 				<?php echo $row->id; ?>
 			</td>
-			
+
 		</tr>
 		<?php
 		}
