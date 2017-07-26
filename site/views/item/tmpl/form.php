@@ -940,7 +940,7 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 		<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
 			<div class="control-group">
 				<div class="control-label" id="created-lbl-outer"><?php echo str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $this->form->getLabel('created')); ?></div>
-				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreationdate']/ $this->form->getInput('created'); ?></div>
+				<div class="controls container_fcfield"><?php echo /*$this->perms['editcreationdate']*/ $this->form->getInput('created'); ?></div>
 			</div>
 		<?php $captured['created'] = ob_get_clean(); endif; ?>
 
@@ -982,10 +982,12 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 		</legend>
 		
 		<?php if ( $this->params->get('usemetadata_fe', 1) >= 1) : ?>
-			<div class="fcclear"></div>
-			<?php echo $this->form->getLabel('metadesc'); ?>
 
-			<div class="container_fcfield">
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo $this->form->getLabel('metadesc'); ?>
+			</div>
+			<div class="controls container_fcfield">
 				<?php	if ( isset($this->row->item_translations) ) : ?>
 					<?php
 					array_push($tabSetStack, $tabSetCnt);
@@ -1019,11 +1021,14 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<?php endif; ?>
 				
 			</div>
+		</div>
 
-			<div class="fcclear"></div>
-			<?php echo $this->form->getLabel('metakey'); ?>
-			
-			<div class="container_fcfield">
+		<div class="control-group">
+			<div class="control-label">
+				<?php echo $this->form->getLabel('metakey'); ?>
+			</div>
+
+			<div class="controls container_fcfield">
 				<?php	if ( isset($this->row->item_translations) ) :?>
 					<?php
 					array_push($tabSetStack, $tabSetCnt);
@@ -1057,6 +1062,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<?php endif; ?>
 				
 			</div>
+		</div>
 		<?php endif; ?>
 		
 		
@@ -1064,15 +1070,19 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 			<?php foreach($this->form->getGroup('metadata') as $field) : ?>
 			<div class="fcclear"></div>
 			<?php if ($field->hidden) : ?>
-				<span style="display:none !important;">
+				<div style="display:none !important;">
 					<?php echo $field->input; ?>
-				</span>
-			<?php else : ?>
-				<?php echo $field->label; ?>
-				<div class="container_fcfield">
-					<?php echo $field->input;?>
 				</div>
-			<?php endif; ?>
+			<?php else :
+				echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+				<div class="control-group">
+					<div class="control-label">' . $field->label . '</div>
+					<div class="controls container_fcfield">
+						' . $field->input . '
+					</div>
+				</div>
+				';
+			endif; ?>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		
@@ -1087,13 +1097,16 @@ if ( $typeid && $this->params->get('useseoconf_fe', 0) ) : ob_start(); // seocon
 			<?php echo JText::_( 'FLEXI_SEO' ); ?>
 		</legend>
 		
-		<?php foreach ($this->form->getFieldset('params-seoconf') as $field) : ?>
-		<div class="fcclear"></div>
-		<?php echo $field->label; ?>
-		<div class="container_fcfield">
-			<?php echo $field->input;?>
+		<?php foreach ($this->form->getFieldset('params-seoconf') as $field) :
+		echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
+		<div class="control-group">
+			<div class="control-label">' . $field->label . '</div>
+			<div class="controls container_fcfield">
+				' . $field->input . '
+			</div>
 		</div>
-		<?php endforeach; ?>	
+		';
+		endforeach; ?>
 	</fieldset>
 <?php $captured['seoconf'] = ob_get_clean(); endif;
 
@@ -1161,14 +1174,14 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 				{
 					$_depends = $field->getAttribute('depend_class');
 					echo '
-					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						<span class="label-fcouter">
+					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<div class="control-label">
 							'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $field->label).'
-						</span>
-						<div class="container_fcfield">
+						</div>
+						<div class="controls container_fcfield">
 							'.$field->input.'
 						</div>
-					</fieldset>
+					</div>
 					';
 				}
 			endforeach; ?>
@@ -1623,15 +1636,19 @@ foreach ($fieldSets as $name => $fieldSet) :
 				<span style="display:none !important;">
 					<?php echo $field->input; ?>
 				</span>
-			<?php else: ?>
-				<fieldset class="panelform">
-					<?php echo ($field->label ? '
-						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
-						<div class="container_fcfield">'.$field->input.'</div>
-					' : $field->input); ?>
-				</fieldset>
-			<?php endif; ?>
-			
+			<?php else :
+				echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
+				<div class="control-group">
+					<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
+						' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+					</div>
+					<div class="controls container_fcfield">
+						' . $field->input . '
+					</div>
+				</div>
+				';
+			endif; ?>
+
 		<?php endforeach; ?>
 	</div>
 	
@@ -1689,15 +1706,19 @@ foreach ($fieldSets as $name => $fieldSet) :
 				<span style="display:none !important;">
 					<?php echo $field->input; ?>
 				</span>
-			<?php else: ?>
-				<fieldset class="panelform">
-					<?php echo ($field->label ? '
-						<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)).'</span>
-						<div class="container_fcfield">'.$field->input.'</div>
-					' : $field->input); ?>
-				</fieldset>
-			<?php endif; ?>
-			
+			<?php else :
+				echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label) ? $field->input : '
+				<div class="control-group">
+					<div class="control-label" id="jform_attribs_'.$field->fieldname.'-lbl-outer">
+						' . str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', str_replace(' for="', ' data-for="', $field->label)) . '
+					</div>
+					<div class="controls container_fcfield">
+						' . $field->input . '
+					</div>
+				</div>
+				';
+			endif; ?>
+
 		<?php endforeach; ?>
 	</div>
 	
@@ -1905,4 +1926,3 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 <?php
 //keep session alive while editing
 JHTML::_('behavior.keepalive');
-?>
