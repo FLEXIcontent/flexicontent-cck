@@ -312,9 +312,12 @@ class FlexicontentModelItems extends JModelLegacy
 		// Lets load the Items if it doesn't already exist
 		if ( $this->_data === null )
 		{
-			if ($task=='copy') {
+			if ($task=='copy')
+			{
 				$query_ids = $cid;
-			} else {
+			}
+			else
+			{
 				// 1, get filtered, limited, ordered items
 				$query = $this->_buildQuery();
 				
@@ -330,7 +333,8 @@ class FlexicontentModelItems extends JModelLegacy
 				
 				// 3, get item ids
 				$query_ids = array();
-				foreach ($rows as $row) {
+				foreach ($rows as $row)
+				{
 					$query_ids[] = $row->id;
 				}
 			}
@@ -339,9 +343,9 @@ class FlexicontentModelItems extends JModelLegacy
 			if (count($query_ids)) $query = $this->_buildQuery($query_ids);
 			if ( $print_logging_info )  $start_microtime = microtime(true);
 			$_data = array();
-			if (count($query_ids)) {
-				$this->_db->setQuery($query);
-				$_data = $this->_db->loadObjectList('item_id');
+			if (count($query_ids))
+			{
+				$_data = $this->_db->setQuery($query)->loadObjectList('item_id');
 			}
 			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
@@ -1013,11 +1017,32 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 		}
 		
+		if ( $query_ids || in_array($filter_order, array('rating_count','rating')) )
+		{
+			$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
+			$voting_field->parameters = new JRegistry($voting_field->attribs);
+			$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
+
+			$rating_resolution = (int)$voting_field->parameters->get('rating_resolution', 5);
+			$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
+			$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
+
+			$_weights = array();			
+			for ($i = 1; $i <= 9; $i++)
+			{
+				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * ' . (100 / $rating_resolution) . ')';
+			}
+			$ratings_col = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * ' . (100 / $rating_resolution) . ' END AS rating';
+		}
+
 		if ( !$query_ids )
 		{
 			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
 				//. ($filter_order=='type_name' ? ', t.name AS type_name ' : '')
 				//. ($filter_order=='catsordering' ? ', rel.ordering as catsordering ' : '')
+				. ( in_array($filter_order, array('rating_count','rating')) ? 
+					', cr.rating_count AS rating_count' . $ratings_col : ''
+					)
 				. ( count($customFiltsActive) ? ', COUNT(DISTINCT fi.field_id) AS matched_custom ' : '' )
 				. ( in_array('RV', $filter_state) ? ', i.version' : '' )
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
@@ -1028,17 +1053,18 @@ class FlexicontentModelItems extends JModelLegacy
 		else
 		{
 			$query =
-				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
-				. 'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-				. 'GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats, '
-				. 'GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist, '
-				. 'CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level, '
+				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid'
+				. ', cr.rating_count AS rating_count' . $ratings_col
+				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+				. ', GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats'
+				. ', GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist'
+				. ', CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
-					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order, ' : ''
+					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order' : ''
 					)
-				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled, '
-				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired, '
-				. 't.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
+				. ', CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
+				. ', CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
+				. ', t.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 				. ($use_versioning ? ', CASE WHEN i.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
 				;
 		}
@@ -1054,6 +1080,9 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' JOIN #__categories AS c ON c.id = i.catid'
 				. (!$query_ids && count($customFiltsActive) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
+				. ( $query_ids || in_array($filter_order, array('rating_count','rating')) ?
+						' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id' : ''
+					)
 				. (!$query_ids && in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ($query_ids && $use_versioning ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE

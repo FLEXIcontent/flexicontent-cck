@@ -503,15 +503,6 @@ body .alert.fcpadded {
 	float: left;
 	clear: both;
 }
-body .control-group .alert.fcpadded,
-.control-group .fcsep_level0,
-.control-group .fcsep_level1,
-.control-group .fcsep_level2,
-.control-group .fcsep_level3,
-.control-group .fcsep_level4 {
-	float: left;
-	margin-bottom: -3px;
-}
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
