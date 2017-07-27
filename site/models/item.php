@@ -72,7 +72,7 @@ class FlexicontentModelItem extends ParentClassItem
 		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base(); // Ignore it if potentially non safe URL, e.g. non-internal
 		
 		// a basic item title string
-		$title_str = "<br />". JText::_('FLEXI_TITLE').": ".$this->_record->title.'[id: '.$this->_record->id.']';
+		$title_str = ' ' . JText::_('FLEXI_ID') .' : '.$this->_record->id;
 
 
 

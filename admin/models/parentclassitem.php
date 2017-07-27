@@ -1995,7 +1995,7 @@ class ParentClassItem extends FCModelAdmin
 			$item->created 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->created);
-		if ($data['created'])
+		if (!empty($data['created']))
 		{
 			$date->setTimeZone( new DateTimeZone( $tz_offset ) );  // Date originated from form field, so it was in user's timezone
 		}
@@ -2008,7 +2008,7 @@ class ParentClassItem extends FCModelAdmin
 			$item->publish_up 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->publish_up);
-		if ($data['publish_up'])
+		if (!empty($data['publish_up']))
 		{
 			$date->setTimeZone( new DateTimeZone( $tz_offset ) );   // Date originated from form field, so it was in user's timezone
 		}
@@ -2027,7 +2027,7 @@ class ParentClassItem extends FCModelAdmin
 				$item->publish_down .= ' 00:00:00';
 			}
 			$date = JFactory::getDate($item->publish_down);
-			if ($data['publish_down'])
+			if (!empty($data['publish_down']))
 			{
 				$date->setTimeZone( new DateTimeZone( $tz_offset ) );  // Date originated from form field, so it was in user's timezone
 			}
