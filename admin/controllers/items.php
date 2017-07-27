@@ -710,8 +710,8 @@ class FlexicontentControllerItems extends FlexicontentController
 				if ( $params->get('items_session_editable', 0) )
 				{
 					// Set notice for existing item being editable till logoff 
-					JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
-					
+					$app->enqueueMessage( JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ), 'notice' );
+
 					// Allow item to be editable till logoff
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$rendered_uneditable[$model->get('id')]  = 1;
@@ -723,7 +723,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Set notice about saving an item that cannot be changed further
 			if ( !$canEdit )
 			{
-				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT' ), 'message' );
+				$app->enqueueMessage( JText::_( 'FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT' ), 'notice' );
 			}
 		}
 		
@@ -822,13 +822,15 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check access
 		if ( !$canOrder )
 		{
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage( JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ), 'error' );
 			$app->redirect($this->returnURL);
 		}
 
 		if ( !$model->move($dir, $ord_catid, $prev_order, $item_cb) )
 		{
-			JError::raiseWarning( 500, JText::_( 'FLEXI_ERROR_SAVING_ORDER' ) . ': ' . $model->getError() );
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage( JText::_( 'FLEXI_ERROR_SAVING_ORDER' ) . ': ' . $model->getError(), 'error' );
 			$app->redirect($this->returnURL);
 		}
 
@@ -1681,21 +1683,26 @@ class FlexicontentControllerItems extends FlexicontentController
 		$canAdd  = $model->getItemAccess()->get('access-create');
 		$canEdit = $model->getItemAccess()->get('access-edit');
 
-		if ( !$canEdit ) {
+		if ( !$canEdit )
+		{
 			// No edit privilege, check if item is editable till logoff
-			if ($session->has('rendered_uneditable', 'flexicontent')) {
+			if ($session->has('rendered_uneditable', 'flexicontent'))
+			{
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 			}
 		}
 		
 		// New item: check if user can create in at least one category
-		if ($isnew) {
-			
+		if ($isnew)
+		{
 			// A. Check create privilege
-			if( !$canAdd ) {
-				JError::raiseNotice( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ));
-				$this->setRedirect($this->returnURL);
+			if( !$canAdd )
+			{
+				$app->setHeader('status', '403 Forbidden', true);
+				$this->setRedirect($this->returnURL, JText::_( 'FLEXI_NO_ACCESS_CREATE' ), 'error');
+
+				$model->enqueueMessages($_exclude = array('showAfterLoad'=>1));
 				return;
 			}
 			
@@ -1705,38 +1712,48 @@ class FlexicontentControllerItems extends FlexicontentController
 			$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // maximum number of content items the user can create
 			
 			// B. Check if max authored content limit reached
-			if ($max_auth_limit) {
+			if ($max_auth_limit)
+			{
 				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
 				$authored_count = $db->loadResult();
-				if ($authored_count >= $max_auth_limit) {
-					JError::raiseNotice( 403, JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) );
-					$this->setRedirect($this->returnURL, '' );
+				if ($authored_count >= $max_auth_limit)
+				{
+					$app->setHeader('status', '403 Forbidden', true);
+					$this->setRedirect($this->returnURL, JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ), 'warning');
+
+					$model->enqueueMessages($_exclude = array('showAfterLoad'=>1));
 					return;
 				}
 			}
 			
 			// C. Check if Content Type can be created by current user
 			$typeid = JRequest::getVar('typeid', 0, '', 'int');
-			if ($typeid) {
-				$canCreateType = $model->canCreateType( array($typeid), true, $types ); // Can create given Content Type
-			} else {
-				$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
-			}
-			
-			if( !$canCreateType ) {
+			$canCreateType = $typeid
+				? $model->canCreateType( array($typeid), true, $types )  // Can create given Content Type
+				: $model->canCreateType( );  // Can create at least one Content Type
+
+			if( !$canCreateType )
+			{
 				$type_name = isset($types[$$typeid]) ? '"'.JText::_($types[$$typeid]->name).'"' : JText::_('FLEXI_ANY');
 				$msg = JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
-				JError::raiseNotice( 403, $msg );
-				$this->setRedirect($this->returnURL);
+
+				$app->setHeader('status', '403 Forbidden', true);
+				$this->setRedirect($this->returnURL, $msg, 'error');
+
+				$model->enqueueMessages($_exclude = array('showAfterLoad'=>1));
 				return;
 			}
 		}
 		
 		// Existing item: Check if user can edit current item
-		else {
-			if ( !$canEdit ) {
-				JError::raiseNotice( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ));
-				$this->setRedirect($this->returnURL);
+		else
+		{
+			if ( !$canEdit )
+			{
+				$app->setHeader('status', '403 Forbidden', true);
+				$this->setRedirect($this->returnURL, JText::_( 'FLEXI_NO_ACCESS_EDIT' ), 'error');
+
+				$model->enqueueMessages($_exclude = array('showAfterLoad'=>1));
 				return;
 			}
 		}
@@ -1744,8 +1761,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check if record is checked out by other editor
 		if ( $model->isCheckedOut($user->get('id')) )
 		{
-			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$this->setRedirect($this->returnURL);
+			$app->setHeader('status', '500', true);
+			$this->setRedirect($this->returnURL, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'notice');
+
+			$model->enqueueMessages($_exclude = array('showAfterLoad'=>1));
 			return;
 		}
 		
@@ -1754,8 +1773,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			$app->setHeader('status', '400 Bad Request', true);
 			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+			$model->enqueueMessages($_exclude = array('showAfterLoad'=>1));
 			return;
 		}
+
+		// Enqueue minor model messages / notices
+		$model->enqueueMessages();
 
 		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();

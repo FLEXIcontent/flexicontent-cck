@@ -133,9 +133,11 @@ class FlexicontentModelItemcompare extends JModelLegacy
 				$this->_db->setQuery($query);
 				$this->_item->modifier = $this->_db->loadResult();
 			}
-			
 		}
-		else  $this->_initItem();
+		else
+		{
+			die('_loadItem() failed to load record: ' . $this->_id);
+		}
 
 		return $this->_item;
 	}
@@ -167,54 +169,6 @@ class FlexicontentModelItemcompare extends JModelLegacy
 		return true;
 	}
 
-	/**
-	 * Method to initialise the item data
-	 *
-	 * @access	private
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function _initItem()
-	{
-		// Lets load the item if it doesn't already exist
-		if (empty($this->_item))
-		{
-			$createdate = JFactory::getDate();
-			$nullDate	= $this->_db->getNullDate();
-			
-			$item = new stdClass();
-			$item->id						= 0;
-			$item->cid[]				= 0;
-			$item->title				= null;
-			$item->alias				= null;
-			$item->text					= null;
-			$item->sectionid		= FLEXI_SECTION;   // deprecated do not use
-			$item->catid				= null;
-			$item->score				= 0;
-			$item->votecount		= 0;
-			$item->hits					= 0;
-			$item->version				= 0;
-			$item->metadesc				= null;
-			$item->metakey				= null;
-			$item->created				= $createdate->toUnix();
-			$item->created_by			= null;
-			$item->created_by_alias		= '';
-			$item->modified				= '';//$nullDate//JText::_( 'FLEXI_NEVER' );
-			$item->modified_by		= null;
-			$item->publish_up 		= $createdate->toUnix();
-			$item->publish_down 	= '';//$nullDate//JText::_( 'FLEXI_NEVER' );
-			$item->attribs				= null;
-			$item->access					= 0;
-			$item->metadata				= null;
-			$item->state				= 1;
-			$item->parentid			= null;  // deprecated do not use
-			$item->images				= null;
-			$item->urls					= null;
-			$this->_item				= $item;
-			return (boolean) $this->_item;
-		}
-		return true;
-	}
 
 	/**
 	 * Method to get the type parameters of an item

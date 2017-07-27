@@ -1112,9 +1112,9 @@ class flexicontent_db
 		{
 			return $superUserID;
 		}
-die('reached getSuperUserID()');
 
 		// Find usergroups with Super Admin privilege
+		$db = JFactory::getDBO();
 		$groupIDs = flexicontent_db::_getUserGroupIDs();
 		$suGroupIDs = array();
 

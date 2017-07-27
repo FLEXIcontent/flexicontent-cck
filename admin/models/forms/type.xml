@@ -391,7 +391,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" class="btn-group btn-group-yesno">
+			<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" class="btn-group group-fcmethod fcoffactive">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
 				<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>

@@ -447,16 +447,23 @@ class ParentClassItem extends FCModelAdmin
 		//if ($version == $current_version) $version = 0;   // Force zero to retrieve unversioned data
 		
 		// Check if not loading the current version while we are in edit form, and raise a notice to inform the user
-		if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+		if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice)
+		{
 			$unapproved_version_notice = 1;
-			if (!$app->isAdmin()) {
-				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')));
-			} else {
-				JError::raiseNotice(10,
-					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')) . ' :: ' .
-					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE'.($app->isAdmin() ? '_ADMIN' : ''), $version, $current_version)
+			if (!$app->isAdmin())
+			{
+				$message = (object) array('type'=>'notice', 'showAfterLoad'=>true, 'text'=>
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE')
 				);
 			}
+			else
+			{
+				$message = (object) array('type'=>'notice', 'showAfterLoad'=>true, 'text'=>
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE_ADMIN') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE_ADMIN', $version, $current_version)
+				);
+			}
+			$this->registerMessage($message);					
 		}
 		
 		
@@ -1349,100 +1356,37 @@ class ParentClassItem extends FCModelAdmin
 		parent::_initRecord($record, $parent_initOnly = true);
 
 		// Get some variables
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$createdate = JFactory::getDate();
-		$nullDate   = $this->_db->getNullDate();
-		$cparams    = $this->_cparams;
-
-		$public_acclevel = 1;
-		$default_accesslevel = $app->getCfg( 'access', $public_acclevel );
-
-		// Decide default publication state. NOTE this will only be used if user has publish privilege, otherwise items
-		// will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
-		$pubished_state = 1;
-		$draft_state = -4;
-		$pending_approval_state = -3;
-
-		$default_state = $app->isAdmin()
-			? $cparams->get('new_item_state', $pubished_state)      // Use the configured setting for backend items
-			: $cparams->get('new_item_state_fe', $pubished_state);  // Use the configured setting for frontend items
-
-		// Decide default language
-		$default_lang = '*';  //flexicontent_html::getSiteDefaultLang();
-
-		$default_lang = $app->isSite()
-			? $cparams->get('default_language_fe', $default_lang)
-			: $default_lang;
-
-		$default_lang = $default_lang=='_author_lang_'
-			? $user->getParam('language', '*')
-			: $default_lang;
-
-		// Set some new record specific properties, note most properties already have proper values
-		// Either the DB default values (set by getTable() method) or the values set by _afterLoad() method
-		$record->id           = 0;
-		$record->cid          = array();
-		$record->categories   = array();
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		$cparams = $this->_cparams;
 
 		// ***
-		// *** DB properties use (mostly) DB / getTable() defaults
+		// *** Set model's default values into the record properties, overriding DB table column default values
 		// ***
 
-		$record->catid        = $this->_cid;
-		//$record->title        = '';
-		//$record->alias        = '';
-		//$record->introtext    = null;
-		//$record->fulltext     = null;
-		//$record->metadesc     = null;
-		//$record->metakey      = null;
-		//$record->hits         = 0;
-		//$record->images       = null;
-		//$record->urls         = null;
-		//$record->attribs      = null;
-		//$record->metadata     = null;
+		$this->setDefaults($record);
 
-		//$record->modified   = $nullDate;
-		//$record->modified_by  = 0;
-
-		// items_ext DB properties
-		$record->sectionid    = FLEXI_SECTION;
-		$record->type_id      = $this->_typeid;
-		$record->search_index = null;
 
 
 		// ***
 		// *** non-DB properties
 		// ***
-		$record->text         = null;
-		$record->score        = 0;
-		$record->votecount    = 0;
+		$record->text      = null;
+		$record->sectionid = FLEXI_SECTION;  // Deprecated do not use !!
+
 		$record->current_version = 0;
 		$record->last_version    = 0;
+		$record->lang_parent_id  = 0;  // Deprecated do not use !!
 
 		$record->rating_count = 0;
 		$record->rating       = 0;
 		$record->score        = 0;
 
+		$record->parameters   = $this->_cparams;  // Initialized to component + type parameters
+
 
 		// ***
-		// *** Override DB / getTable defaults
-		// ***
-
-		$record->version      = 0;  // override DB setting: 1
-		$record->created      = $createdate->toUnix();
-		$record->created_by   = $user->get('id');
-		$record->created_by_alias = null;
-		$record->publish_up   = $createdate->toUnix();
-		$record->publish_down = null;
-		$record->access       = $default_accesslevel;
-		$record->state        = $default_state;
-		$record->language     = $default_lang;
-		$record->lang_parent_id = 0;
-		$record->parameters   = $this->_cparams;  // initialized to component + type parameters
-
-		// ***
-		// *** Handled by _afteLoad() below
+		// *** non-DB properties, that are handled by _afteLoad() below
 		// ***
 
 		//$record->access_level  = null;  // Title of item's access level
@@ -1472,6 +1416,97 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Set model's default values into the record properties, overriding DB table column default values
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * @since	1.6
+	 */
+	protected function setDefaults($record)
+	{
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		
+		// Default -- Dates: current and null.
+		$currentdate = JFactory::getDate();
+		$nullDate    = $this->_db->getNullDate();
+
+		// Default -- Created By (Owner).
+		$default_created_by = $user->get('id') ?: flexicontent_db::getSuperUserID();
+
+		// Default -- Access level.
+		// -- NOTE: This default will be forced if user has not access level edit privelege
+		$default_accesslevel = $app->getCfg( 'access', $public_acclevel = 1 );
+
+		// Default -- Publication state.
+		// -- NOTE: this will only be used if user has publish privilege, otherwise items will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
+		$default_state = $app->isAdmin()
+			? $this->_cparams->get('new_item_state', $pubished_state = 1)      // Use the configured setting for backend items
+			: $this->_cparams->get('new_item_state_fe', $pubished_state = 1);  // Use the configured setting for frontend items
+
+		// Default -- Language
+		// -- NOTE: There are language limitations per user / usergroup that may override the defaults ...
+		$default_lang = $app->isSite()
+			? $this->_cparams->get('default_language_fe', '_author_lang_')
+			: '*';   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
+		$default_lang = $default_lang === '_author_lang_'
+			? $user->getParam('language', '*')
+			: $default_lang;
+
+
+		// ***
+		// *** DB properties that do not use DB / getTable() defaults
+		// ***
+
+		$record->id             = 0;  // DB setting: no default value
+		$record->version        = 0;  // DB setting: 1
+		$record->created        = $currentdate->toSql();
+		$record->created_by     = $default_created_by;
+		$record->publish_up     = $currentdate->toSql();
+		$record->publish_down   = $nullDate;
+		$record->access         = $default_accesslevel;
+		$record->state          = $default_state;
+		$record->language       = $default_lang;
+
+
+		// ***
+		// *** DB properties that use DB / getTable() defaults
+		// ***
+
+		//$record->catid        = 0;
+		//$record->title        = '';  // required
+		//$record->alias        = '';
+		//$record->introtext    = null;  // required
+		//$record->fulltext     = null;  // required
+		//$record->metadesc     = null;
+		//$record->metakey      = null;
+		//$record->hits         = 0;
+
+		//$record->images       = null;
+		//$record->urls         = null;
+		//$record->attribs      = null;
+		//$record->metadata     = null;
+
+		//$record->modified     = $nullDate;
+		//$record->modified_by  = 0;
+		//$record->created_by_alias = null;
+
+
+		// ***
+		// *** (a) Some items_ext DB properties , (b) Type id & main category id,  (c) Categories and Tags
+		// ***
+
+		$record->search_index = null;
+
+		$record->type_id      = $this->_typeid;
+		$record->catid        = $this->_cid;
+
+		$record->categories   = array();
+		$record->tags         = array();
 	}
 
 
@@ -1579,6 +1614,12 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$item->created_by = flexicontent_db::getSuperUserID();
 			}
+
+			// Also make sure we have a valid access level
+			if ( !$item->access || !flexicontent_html::userlevel(null, $item->access, null, null, null, $_createlist = false) )
+			{
+				$item->access = $app->getCfg( 'access', $public_acclevel = 1 );
+			}
 		}
 
 
@@ -1588,12 +1629,15 @@ class ParentClassItem extends FCModelAdmin
 
 		else
 		{
+			// Reset record properties to their DB table Columns default values
 			$item->reset();
 
-			// Create default values for SOME properties that do not exist in the DB TABLE class, but are created by the ITEM model
-			$item->categories = array();
-			$item->tags = array();
+			// Set model's default values into the record properties, overriding DB table column default values
+			$this->setDefaults($item);
 		}
+
+
+		// Create a copy of the old item
 		$old_item = clone($item);
 		
 		
@@ -1810,12 +1854,6 @@ class ParentClassItem extends FCModelAdmin
 			unset( $data['created'] );
 		}
 
-		// Set creator to current user if item is NEW and no ACL permission to set creator (owner)
-		if ($isNew && !isset($data['created_by']))
-		{
-			$data['created_by'] = $user->get('id') ?: flexicontent_db::getSuperUserID();
-		}
-
 
 		// ***
 		// *** SECURITY concern: Check can edit state using proper owner, type and new category (all of them FORCED above)
@@ -1998,9 +2036,16 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
-		$item->language   = $item->language ? $item->language :
-			($app->isSite() ? $cparams->get('default_language_fe', '*') : ('*' /*flexicontent_html::getSiteDefaultLang()*/));
-		
+		$item->language = $item->language ?:
+			($app->isSite()
+				? $cparams->get('default_language_fe', '_author_lang_')
+				: '*'   // or Site default:  // flexicontent_html::getSiteDefaultLang()  // JComponentHelper::getParams('com_languages')->get('site', '*')
+			);
+		$item->language = $item->language === '_author_lang_'
+			? $user->getParam('language', '*')
+			: $item->language;
+
+
 		// Ignore language parent id, we are now using J3.x associations
 		$item->lang_parent_id = 0;
 
@@ -4915,6 +4960,9 @@ class ParentClassItem extends FCModelAdmin
 	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @access	protected
+	 * @param	object   $record   The record object
 	 *
 	 * @since	3.2.0
 	 */
