@@ -242,7 +242,7 @@ class flexicontent_db
 	{
 		$db     = JFactory::getDBO();
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$option = $app->input->get('option', '', 'cmd');
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
 		
 		$_word_clause = $isprefix ? '+%s*' : '+%s';
@@ -298,8 +298,8 @@ class flexicontent_db
 	 */
 	static function & directQuery($query, $assoc = false, $unbuffered = false)
 	{
-		$db     = JFactory::getDBO();
-		$app = JFactory::getApplication();
+		$db   = JFactory::getDBO();
+		$app  = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbtype   = $app->getCfg('dbtype');
 		$dbtype   = $dbtype == 'mysql' && !function_exists('mysql_query') ? 'mysqli' : $dbtype;  // PHP 7 removes mysql but 'mysql' database may still be in the configuration file
@@ -360,18 +360,21 @@ class flexicontent_db
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
-		
+		$app = JFactory::getApplication();
+
 		$order_fallback = 'rdate';  // Use as default or when an invalid ordering is requested
 		$orderbycustomfield   = (int) $params->get('orderbycustomfield'.$sfx, 1);    // Backwards compatibility, defaults to enabled *
 		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);  // * but this needs to be set in order for field ordering to be used
 		
 		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
-		if (!$order) {
+		if (!$order)
+		{
 			$order = ($orderbycustomfield && $orderbycustomfieldid)  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $params->get('orderby_override') && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
+		$request_order = $app->input->get($request_var.$sfx, '', 'cmd');
+		$order = $params->get('orderby_override') && $request_order ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
 		if ($order=='field' && !$orderbycustomfieldid ) {
@@ -411,21 +414,26 @@ class flexicontent_db
 		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);  // * but this needs to be set in order for field ordering to be used
 		
 		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
-		if (!$order) {
+		if (!$order)
+		{
 			$order = ($orderbycustomfield && $orderbycustomfieldid)  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
+		$request_order = $app->input->get($request_var.$sfx, '', 'cmd');
+		$order = $request_var && $request_order ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
-		if ($order=='field' && !$orderbycustomfieldid ) {
+		if ($order=='field' && !$orderbycustomfieldid )
+		{
 			// This can occur only if field ordering was requested explicitly, otherwise an not set 'orderbycustomfieldid' will prevent 'field' ordering
 			echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
 			$order = $order_fallback;
 		}
-		if ($order=='commented') {
-			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+		if ($order=='commented')
+		{
+			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php'))
+			{
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br/>\n";
 				$order = $order_fallback;
 			} 
@@ -612,14 +620,17 @@ class flexicontent_db
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
+		$app = JFactory::getApplication();
 
 		// 1. If forced ordering not given, then use ordering parameters from configuration
-		if (!$order) {
+		if (!$order)
+		{
 			$order = $params->get($config_param, 'default');
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
+		$request_order = $app->input->get($request_var.$sfx, '', 'cmd');
+		$order = $request_var && $request_order ? $request_order : $order;
 
 		switch ($order) {
 			case 'date':
