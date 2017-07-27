@@ -541,7 +541,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				
 				// Get categories
 				global $globalcats;
-				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
+				$rootcatid = $filter->parameters->get( 'rootcatid'.$_s, '' ) ;
 
 				$app = JFactory::getApplication();
 				$option = $app->input->get('option', '', 'cmd');
@@ -626,13 +626,13 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			case 'created':  // creation dates
 			case 'modified': // modification dates
-				$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+				$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
 				if ($date_filter_group=='year') { $date_valformat='%Y'; }
 				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 				else { $date_valformat='%Y-%m-%d'; }
 
 				// Display date 'label' can be different than the (aggregated) date value
-				$date_filter_label_format = $filter->parameters->get('date_filter_label_format', '');
+				$date_filter_label_format = $filter->parameters->get('date_filter_label_format'.$_s, '');
 				$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 
 				$filter->date_valformat = $date_valformat;
@@ -768,7 +768,8 @@ class plgFlexicontent_fieldsCore extends FCField
 		//echo __FUNCTION__ ." of CORE field type: ".$filter->field_type;
 		
 		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
-		if ($isdate) {
+		if ($isdate)
+		{
 			$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
 			if ($date_filter_group=='year') { $date_valformat='%Y'; }
 			else if ($date_filter_group=='month') { $date_valformat='%Y-%m';}
@@ -781,12 +782,14 @@ class plgFlexicontent_fieldsCore extends FCField
 			// 'isindexed' is not applicable for basic index and CORE fields
 			$filter->isindexed = 0; //in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
 			return FlexicontentFields::getFiltered($filter, $value, $return_sql);
-		} else {
+		}
+		else
+		{
 			return $return_sql ? ' AND i.id IN (0) ' : array(0);
 		}
 	}	
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
@@ -852,18 +855,22 @@ class plgFlexicontent_fieldsCore extends FCField
 		static $state_names = null;
 		if (!$state_names) $state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'));
 		
-		if ($post===null) {
+		if ($post===null)
+		{
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 			// for CORE fields, we do not set the query clauses, these are inside the fields helper file
 			return null;
 		}
 		
-		if (empty($post)) {
+		if (empty($post))
+		{
 			// no data posted, nothing to index
 			return array();
 		}
 		
 		$db = JFactory::getDBO();
+		$_s = $for_advsearch ? '_s' : '';
+
 		$values = array();
 		if ($field->field_type=='type') {
 			$textcol = 't.name';
@@ -885,13 +892,13 @@ class plgFlexicontent_fieldsCore extends FCField
 		} else if ($field->field_type=='created' || $field->field_type=='modified') {
 			if ($nullDate===null) $nullDate	= $db->getNullDate();
 			
-			$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
+			$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
 			if ($date_filter_group=='year') { $date_valformat='%Y'; }
 			else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 			else { $date_valformat='%Y-%m-%d'; }
 			
 			// Display date 'label' can be different than the (aggregated) date value
-			$date_filter_label_format = $field->parameters->get('date_filter_label_format_s', '');
+			$date_filter_label_format = $field->parameters->get('date_filter_label_format'.$_s, '');
 			$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 			
 			$valuecol = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);

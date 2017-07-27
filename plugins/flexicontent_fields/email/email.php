@@ -85,8 +85,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// create extra HTML TAG parameters for the form field
 		$addr_attribs = $field->parameters->get( 'extra_attributes', '' )
-			. ' maxlength="' . $maxlength . '" '
-			. ' size="' . $size . '" ';
+			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
+			. ($size ? ' size="' . $size . '" ' : '')
+			;
 
 		static $inputmask_added = false;
 	  if ($inputmask && !$inputmask_added)

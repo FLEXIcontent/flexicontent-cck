@@ -431,8 +431,14 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$field->html = array();
 		$n = 0;
 		//if ($use_ingroup) {print_r($field->value);}
-		foreach ($field->value as $value)
+		foreach ($field->value as $i => $value)
 		{
+			// Joomla tinyMCE custom config bug workaround, (form reload, data from SESSION)
+			if ($mce_fieldname && isset($value[$mce_fieldname]))
+			{
+				$field->value[$i] = $value = $value[$mce_fieldname];
+			}
+
 			// Special case TABULAR representation of single value textarea
 			if ($n==0 && $field->parameters->get('editorarea_per_tab', 0))
 			{
@@ -725,7 +731,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		foreach ($post as $n => $v)
 		{
 			// Joomla tinyMCE custom config bug workaround
-			if (isset($v[$mce_fieldname]))
+			if ($mce_fieldname && isset($v[$mce_fieldname]))
 			{
 				$v = $v[$mce_fieldname];
 			}

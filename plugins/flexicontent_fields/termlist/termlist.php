@@ -440,6 +440,13 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					'title' => $value, 'text' => ''
 				);
 			}
+
+			// Joomla tinyMCE custom config bug workaround, (form reload, data from SESSION)
+			if (isset($value['text'][$mce_fieldname . '_text']))
+			{
+				$value['text'] = $value['text'][$mce_fieldname . '_text'];
+			}
+
 			if ( empty($value['title']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			$fieldname_n = $fieldname.'['.$n.']';
@@ -448,7 +455,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$title = '
 				<div class="fc_termtitle">
 					<label id="'.$elementid_n.'_title-lbl" class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label.'</label>
-					<input class="fcfield_textval termtitle '.($required ? ' required' : '').'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'"
+					<input class="fcfield_textval termtitle '.($required ? ' required' : '').'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" '.($title_maxlength ? 'maxlength="'.$title_maxlength.'"' : '').'
 						value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" data-defvals="'.htmlspecialchars( $default_title, ENT_COMPAT, 'UTF-8' ).'"/>
 				</div>';
 			
