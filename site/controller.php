@@ -387,13 +387,18 @@ class FlexicontentController extends JControllerLegacy
 				// Use already assigned main category (existing item)
 				$data['catid'] = $model->get('catid');
 		}
-		
-		
-		
-		// **************************
-		// Basic Form data validation
-		// **************************
-		
+
+		// These need to be an array during validation
+		if (!isset($data['rules']) || !is_array($data['rules']))
+		{
+			$data['rules'] = array();
+		}		
+
+
+		// ***
+		// ***Basic Form data validation
+		// ***
+
 		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
