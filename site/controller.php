@@ -853,7 +853,7 @@ class FlexicontentController extends JControllerLegacy
 			// Set notice about saving an item that cannot be changed further
 			if ( !$canEdit )
 			{
-				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT' ), 'message' );
+				$app->enqueueMessage(JText::_( 'FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT' ), 'notice' );
 			}
 		}
 		

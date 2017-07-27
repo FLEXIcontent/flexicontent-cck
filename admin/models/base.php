@@ -103,6 +103,13 @@ abstract class FCModelAdmin extends JModelAdmin
 	var $associations_context = false;
 
 	/**
+	 * Use language associations
+	 *
+	 * @var string
+	 */
+	var $_messages= array();
+
+	/**
 	 * Various record specific properties
 	 *
 	 */
@@ -996,9 +1003,66 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
+	 * Method to get the enqueued message array
+	 *
+	 * @since	3.2.0
+	 */
+	public function getMessageQueue()
+	{
+		return $this->_messages;
+	}
+
+
+	/**
+	 * Method to register a message to the message Queue
+	 *
+	 * @access	protected
+	 * @param	object   $message   The message object
+	 *
+	 * @since	3.2.0
+	 */
+	protected function registerMessage($message)
+	{
+		$this->_messages[] = $message;
+	}
+
+
+	/**
+	 * Method to add a message to the message Queue
+	 *
+	 * @access	protected
+	 * @param	object   $message   The message object
+	 *
+	 * @since	3.2.0
+	 */
+	public function enqueueMessages($exclude = array())
+	{
+		$app = JFactory::getApplication();
+		$messages = $this->getMessageQueue();
+
+		if ($messages)
+		{
+			foreach($messages as $message)
+			{
+				// Skip some message if this was requested
+				if ( isset($exclude['showAfterLoad']) && !empty($message->showAfterLoad) )
+				{
+					continue;
+				}
+				$app->enqueueMessage($message->text, $message->type);
+			}
+		}
+	}
+
+
+	/**
 	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @access	protected
+	 * @param	object   $record   The record object
+	 * @param	array    $data     The new data array
 	 *
 	 * @since	3.2.0
 	 */
@@ -1050,6 +1114,10 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
+	 * @access	protected
+	 * @param	object   $record   The record object
+	 * @param	array    $data     The new data array
+	 *
 	 * @since	3.2.0
 	 */
 	protected function _afterStore($record, & $data)
@@ -1061,6 +1129,9 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
+	 *
+	 * @access	protected
+	 * @param	object   $record   The record object
 	 *
 	 * @since	3.2.0
 	 */

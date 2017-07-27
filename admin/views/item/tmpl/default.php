@@ -1550,7 +1550,7 @@ if ( count($FC_jfields_html) ) : ?>
 		<?php
 		// used to hide "Reset Hits" when hits = 0
 		$visibility = !$this->item->hits ? 'style="display: none; visibility: hidden;"' : '';
-		$visibility2 = !$this->item->score ? 'style="display: none; visibility: hidden;"' : '';
+		$visibility2 = !$this->item->rating_count ? 'style="display: none; visibility: hidden;"' : '';
 		$default_label_attrs = 'class="fc-prop-lbl"';
 		?>
 
