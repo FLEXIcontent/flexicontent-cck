@@ -90,7 +90,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_WEBLINK_LINK" level="level2" depend_class="not_jurls" />
-			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="not_jurls" />
+			<field name="maxlength" type="text" default="4000" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="not_jurls" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" depend_class="not_jurls" />
 			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" depend_class="not_jurls" />
 

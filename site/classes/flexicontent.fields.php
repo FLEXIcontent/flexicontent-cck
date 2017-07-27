@@ -2736,6 +2736,8 @@ class FlexicontentFields
 	static function searchIndex_getFieldValues(&$field, &$item, $for_advsearch=0)
 	{
 		$db = JFactory::getDBO();
+		$_s = $for_advsearch ? '_s' : '';
+
 		static $nullDate = null;
 		static $valCols = array();
 		static $txtCols = array();
@@ -2797,13 +2799,13 @@ class FlexicontentFields
 
 			if (!isset($valCols[$field->field_type]))
 			{
-				$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
+				$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
 				if ($date_filter_group=='year') { $date_valformat='%Y'; }
 				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 				else { $date_valformat='%Y-%m-%d'; }
 
 				// Display date 'label' can be different than the (aggregated) date value
-				$date_filter_label_format = $field->parameters->get('date_filter_label_format_s', '');
+				$date_filter_label_format = $field->parameters->get('date_filter_label_format'.$_s, '');
 				$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 
 				$valCols[$field->field_type] = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);

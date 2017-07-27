@@ -629,7 +629,7 @@ class flexicontent_db
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$request_order = $app->input->get($request_var.$sfx, '', 'cmd');
+		$request_order = $app->input->get($request_var, '', 'cmd');
 		$order = $request_var && $request_order ? $request_order : $order;
 
 		switch ($order) {
@@ -1112,9 +1112,10 @@ class flexicontent_db
 		{
 			return $superUserID;
 		}
+die('reached getSuperUserID()');
 
 		// Find usergroups with Super Admin privilege
-		$groupIDs = flexicontent_db::getUserGroupIDs();
+		$groupIDs = flexicontent_db::_getUserGroupIDs();
 		$suGroupIDs = array();
 
 		foreach($groupIDs as $groupID)
