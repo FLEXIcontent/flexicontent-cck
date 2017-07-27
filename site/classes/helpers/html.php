@@ -806,10 +806,10 @@ class flexicontent_html
 		$svar = $layout ? '.'.$layout : '.category';
 		$layout_typename = $layout_type=='clayout' ? 'category' : 'items';
 
-		/*if (!$layout) $svar .= JRequest::getInt('cid');
-		else if ($layout=='tags') $svar .= JRequest::getInt('tagid');
-		else if ($layout=='author') $svar .= JRequest::getInt('authorid');
-		if ($layout) $svar .= '.category'.JRequest::getInt('cid');*/
+		/*if (!$layout) $svar .= $jinput->get('cid', 0, 'INT');
+		else if ($layout=='tags') $svar .= $jinput->get('tagid', 0, 'INT');
+		else if ($layout=='author') $svar .= $jinput->get('authorid', 0, 'INT');
+		if ($layout) $svar .= '.category'.$jinput->get('cid', 0, 'INT');*/
 
 		//$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$layout_type, $layout_type, $default_layout, 'cmd' );
 		$layout = $jinput->get($layout_type, $default_layout, 'cmd') ;
@@ -885,9 +885,11 @@ class flexicontent_html
 	}
 
 
-	static function searchphrase_selector(&$params, $formname='adminForm') {
+	static function searchphrase_selector(&$params, $formname='adminForm')
+	{
 		$searchphrase = '';
-		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
+		if($show_searchphrase = $params->get('show_searchphrase', 1))
+		{
 			$default_searchphrase = $params->get('default_searchphrase', 'all');
 			$searchphrase = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
 			$searchphrase_names = array(
@@ -896,15 +898,19 @@ class flexicontent_html
 			);
 
 			$searchphrases = array();
-			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
+			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name)
+			{
 				$_obj = new stdClass();
 				$_obj->value = $searchphrase_value;
 				$_obj->text  = $searchphrase_name;
 				$searchphrases[] = $_obj;
 			}
 			$searchphrase = JHTML::_('select.genericlist', $searchphrases, 'p',
-				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
+				'class="fc_field_filter use_select2_lib"', 'value', 'text',
+				$searchphrase, 'searchphrase', $_translate=true
+			);
 		}
+
 		return $searchphrase;
 	}
 
@@ -2817,15 +2823,17 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_addbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 
+		$app = JFactory::getApplication();
+		$user	= JFactory::getUser();
+
 		// Currently add button will appear to logged users only
 		// ... unless unauthorized users are allowed
-		$user	= JFactory::getUser();
 		if ( !$user->id && $ignore_unauthorized < 2 ) return '';
 
 
 		// IF not auto-relation given ... then check if current view / layout can use ADD button
-		$view = JRequest::getVar('view');
-		$layout = JRequest::getVar('layout', 'default');
+		$view   = $app->input->get('view', '', 'CMD');
+		$layout = $app->input->get('layout', '', 'CMD');
 		if ( !$auto_relations )
 		{
 			if ( $view!='category' || $layout == 'author' || $layout == 'favs' ) return '';
@@ -4907,17 +4915,22 @@ class flexicontent_html
 		if ($layout_vars) return $layout_vars;
 
 		// Get URL variables
+		$app = JFactory::getApplication();
 		$layout_vars = array();
-		$layout_vars['cid'] = $obj && isset($obj->_id) ? $obj->_id : JRequest::getInt('cid', 0);
-		$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : JRequest::getInt('authorid', 0);
-		$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : JRequest::getInt('tagid', 0);
-		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : JRequest::getCmd('layout', '');
+		$layout_vars['cid'] = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'INT');
+		$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : $app->input->get('authorid', 0, 'INT');
+		$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : $app->input->get('tagid', 0, 'INT');
+		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : $app->input->get('layout', '', 'CMD');
 
-		if ($obj && isset($obj->_ids)) {
+		if ($obj && isset($obj->_ids))
+		{
 			$layout_vars['cids'] = !is_array($obj->_ids) ? $obj->_ids : implode(',' , $obj->_ids);
-		} else {
+		}
+		else
+		{
 			$mcats_list = JRequest::getVar('cids', '');
-			if ( !is_array($mcats_list) ) {
+			if ( !is_array($mcats_list) )
+			{
 				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
 				$mcats_list = explode(',', $mcats_list);
 			}

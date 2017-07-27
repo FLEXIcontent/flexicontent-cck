@@ -413,8 +413,7 @@ class plgFlexicontent_fieldsCore extends FCField
 		}
 		
 		else if ($filter->field_type == 'created' || $filter->field_type == 'modified') {
-			$filter->filter_orderby_adv = ' ORDER BY value_id';  // we can use a date type cast here, but it is not needed due to the format of value_id
-			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
+			$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		}
 		
 		else {
@@ -422,13 +421,18 @@ class plgFlexicontent_fieldsCore extends FCField
 			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		}
 	}
-	
-	
+
+
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if($filter->iscore != 1) return; // performance check
-		
+
+		// This will make filter values to be retrieved from the value_id DB column
+		$indexed_elements = $isSearchView
+			? in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'))
+			: false;
+
 		$db = JFactory::getDBO();
 		$formfieldname = 'filter_'.$filter->id;
 		
@@ -626,11 +630,14 @@ class plgFlexicontent_fieldsCore extends FCField
 				if ($date_filter_group=='year') { $date_valformat='%Y'; }
 				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 				else { $date_valformat='%Y-%m-%d'; }
-				
+
 				// Display date 'label' can be different than the (aggregated) date value
 				$date_filter_label_format = $filter->parameters->get('date_filter_label_format', '');
 				$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
-				
+
+				$filter->date_valformat = $date_valformat;
+				$filter->date_txtformat = $date_txtformat;
+
 				if($disable_keyboardinput)
 				{
 					$filter_ffid   = $formName.'_'.$filter->id.'_val';
@@ -655,22 +662,29 @@ class plgFlexicontent_fieldsCore extends FCField
 					}
 				}
 
-				$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
-				$nullDate_quoted = $db->Quote($db->getNullDate());
-				$valuecol = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN '.$nullDate_quoted.' ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
-				$textcol  = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
-				
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
-				// partial SQL clauses
-				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
-				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
-				$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : ' ';  // ... a space, (indicates not needed and prevents using default)
-				// full SQL clauses
-				$filter->filter_groupby = ' GROUP BY '.$valuecol;
-				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = ' ORDER BY '.$valuecol;
-				
-				FlexicontentFields::createFilter($filter, $value, $formName);
+				if (!$isSearchView)
+				{
+					$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
+					$nullDate_quoted = $db->Quote($db->getNullDate());
+					$valuecol = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN '.$nullDate_quoted.' ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
+					$textcol  = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
+
+					// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
+					// partial SQL clauses
+					$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
+					$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
+					$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : ' ';  // ... a space, (indicates not needed and prevents using default)
+					// full SQL clauses
+					$filter->filter_groupby = ' GROUP BY '.$valuecol;
+					$filter->filter_having  = null;   // this indicates to use default, space is use empty
+					$filter->filter_orderby = ' ORDER BY '.$valuecol;
+				}
+				else
+				{
+					$filter->filter_orderby_adv = ' ORDER BY value_id';  // we can use a date type cast here, but it is not needed due to the format of value_id
+				}
+
+				FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 			break;
 
 			default:

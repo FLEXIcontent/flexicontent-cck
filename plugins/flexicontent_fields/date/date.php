@@ -707,29 +707,37 @@ class plgFlexicontent_fieldsDate extends FCField
 		if ($date_filter_group=='year') { $date_valformat='%Y'; }
 		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 		else { $date_valformat='%Y-%m-%d'; }
-		
+
 		// Display date 'label' can be different than the (aggregated) date value
 		$date_filter_label_format = $filter->parameters->get('date_filter_label_format'.$_s, '');
 		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
-		
+
+		$filter->date_valformat = $date_valformat;
+		$filter->date_txtformat = $date_txtformat;
+
 		$db = JFactory::getDBO();
 		$nullDate_quoted = $db->Quote($db->getNullDate());
-		
+
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
 		$date_source = $filter->parameters->get('date_source', 0);
-		
-		if ( !$date_source || $date_source==3 ) {
+
+		if ( !$date_source || $date_source==3 )
+		{
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
-		} else if ( $date_source==1 || $date_source==2 ) {
+		}
+		else if ( $date_source==1 || $date_source==2 )
+		{
 			$_value_col = ($date_source == 1) ? 'i.publish_up' : 'i.publish_down';
 			$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_valformat);
 			$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
-		} else {
+		}
+		else
+		{
 			return "date_source: ".$date_source." not implemented";
 		}
-		
+
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
