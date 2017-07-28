@@ -121,6 +121,12 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function getData()
 	{
+		$app = JFactory::getApplication();
+
+		$print_logging_info = $this->_params->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+
+
 		// Get limit from http request OR use default category parameters
 		$this->_listall = $app->input->get('listall', 0, 'int');
 		$this->_active_limit = strlen( $app->input->get('limit', '', 'string') );
@@ -132,6 +138,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 		{
 			return $this->_data;
 		}
+
+
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 
 		// Query the content items
 		$query = $this->_buildQuery();
@@ -160,6 +169,13 @@ class FlexicontentModelFavourites extends JModelLegacy
 
 		// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
 		flexicontent_db::getOriginalContentItemids($this->_data);
+
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+		// This is used in places that item data need to be retrieved again because item object was not given
+		global $fc_list_items;
+		foreach ($this->_data as $_item) $fc_list_items[$_item->id] = $_item;
 
 		return $this->_data;
 	}
@@ -377,13 +393,18 @@ class FlexicontentModelFavourites extends JModelLegacy
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
+		
+		$where = ' WHERE  1 ';
 
 		// Favourites via cookie
 		$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
 
-		// First thing we need to do is to select only the requested FAVOURED items
-		$or_favs_via_cookie = empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')';
-		$where = ' WHERE (fav.userid = ' . (int)$user->get('id') . $or_favs_via_cookie . ')';
+		// Select only current user's favoured items
+		$where_favs = array();
+		$where_favs[] = $user->get('id') ? 'fav.userid = ' . (int)$user->get('id') : '0';
+		$where_favs[] = !empty($favs)    ? 'i.id IN (' . implode(',', $favs) . ')' : '0';
+
+		$where .= ' AND (' . implode(' OR ', $where_favs) . ')';
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place

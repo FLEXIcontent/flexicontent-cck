@@ -870,7 +870,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$from_clause = $counting ? ' FROM #__flexicontent_items_tmp AS i ' : ' FROM #__content AS i ';
 
 		$_join_clauses = ''
-			. ($this->_layout=='favs' ? ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND type = 0' : '')
+			. ($this->_layout=='favs' ? ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND type = 0' : '')
 			. ($this->_layout=='tags' ? ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id' : '')
 			. ' JOIN #__flexicontent_types AS ty ON '. ($counting ? 'i.' : 'ie.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -947,8 +947,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Favourites via cookie
 			$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
 
-			$or_favs_via_cookie = empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')';
-			$where .= ' AND (fav.userid = ' . $db->Quote($this->_uid) . $or_favs_via_cookie . ')';
+			// First thing we need to do is to select only the requested FAVOURED items
+			$where_favs = array();
+			$where_favs[] = $this->_uid   ? 'fav.userid = ' . (int)$this->_uid      : '0';
+			$where_favs[] = !empty($favs) ? 'i.id IN (' . implode(',', $favs) . ')' : '0';
+
+			$where .= ' AND (' . implode(' OR ', $where_favs) . ')';
 		}
 		
 		// Limit to give tag id
