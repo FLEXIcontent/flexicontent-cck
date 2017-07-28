@@ -1940,7 +1940,7 @@ class flexicontent_html
 		}
 
 		// Determine privileges of the current user on the given item
-		if (!isset($canManage))
+		if (isset($canManage))
 		{
 			$has_edit_state = $canManage;
 			$has_delete = $canManage;
