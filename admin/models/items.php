@@ -160,6 +160,12 @@ class FlexicontentModelItems extends JModelLegacy
 			$jinput->set( 'filter_subcats',	0 );
 			$filter_subcats = 0;
 		}
+		global $globalcats;
+		if ($filter_cats && !isset($globalcats[$filter_cats]))
+		{
+			$jinput->set( 'filter_cats', '' );
+			$filter_cats = '';
+		}
 
 		// Featured filtering, get as string to detect empty
 		$filter_featured    = $fcform ? $jinput->get('filter_featured',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_featured',    'filter_featured',   '',  'string' );

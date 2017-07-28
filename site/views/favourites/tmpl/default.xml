@@ -192,7 +192,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="cat_item_filtering" label="FLEXI_PARAMETERS_CAT_ITEM_FILTERING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_item_filtering" label="FLEXI_CAT_PARAMETERS_MENU_ITEM" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<!--field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" />
 			<field name="show_alpha" type="alphaindex" default="1" use_global="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
@@ -211,17 +211,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_search_label" type="radio" default="" label="FLEXI_SEARCH_LABEL" description="FLEXI_SEARCH_LABEL_DESC" class="btn-group btn-group-yesno">
+			<field name="show_search_label" type="radio" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_search_tip" type="radio" default="" label="FLEXI_SEARCH_TIP" description="FLEXI_SEARCH_TIP_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			
 			<field name="show_search_go" type="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_AUTO</option>

@@ -2812,8 +2812,8 @@ class FlexicontentFields
 				$txtCols[$field->field_type]  = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_txtformat);
 			}
 
-			$field->date_valformat = $valColFormat[$field->field_type];
-			$field->date_txtformat = $txtColFormat[$field->field_type];
+			$valuecol = $valCols[$field->field_type];
+			$textcol  = $txtCols[$field->field_type];
 
 			$query 	= 'SELECT '.$valuecol.' AS value_id, '.$textcol.' AS value, i.id AS itemid'
 				.' FROM #__content AS i'

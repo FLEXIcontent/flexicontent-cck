@@ -1011,12 +1011,12 @@ class modFlexicontentHelper
 
 		// Favourites via cookie
 		$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
-		$curruserid = (int)$user->get('id');
 
 		// Exclude method
   	if ($method_curuserfavs == 1)
   	{
-			$join_favs  = ' LEFT OUTER JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND fav.userid = '.$curruserid;
+			$join_favs  = ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND fav.userid = ' . (int)$user->get('id');
+
 			$where .= ' AND (fav.itemid IS NULL '
 				. (empty($favs) ? '' : ' AND i.id NOT IN (' . implode(',', $favs) . ')')
 				. ')';
@@ -1026,9 +1026,12 @@ class modFlexicontentHelper
 		else if ($method_curuserfavs == 2)
 		{
 			$join_favs  = ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id';
-			$where .= ' AND (fav.userid = ' . $curruserid
-				. (empty($favs) ? '' : ' OR i.id IN (' . implode(',', $favs) . ')')
-				. ')';
+
+			$where_favs = array();
+			$where_favs[] = $user->get('id') ? 'fav.userid = ' . (int)$user->get('id') : '0';
+			$where_favs[] = !empty($favs) ? 'i.id IN (' . implode(',', $favs) . ')' : '0';
+
+			$where .= ' AND (' . implode(' OR ', $where_favs) . ')';
 		}
 
 		// All Items regardless of being favoured by current user
