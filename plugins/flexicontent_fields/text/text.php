@@ -70,7 +70,7 @@ class plgFlexicontent_fieldsText extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 		$default_values= array($default_value);
 		
 		// Input field display size & max characters
@@ -413,7 +413,7 @@ class plgFlexicontent_fieldsText extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
