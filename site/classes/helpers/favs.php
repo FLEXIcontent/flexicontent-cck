@@ -31,7 +31,7 @@ class flexicontent_favs
 		}
 		catch (Exception $e)
 		{
-			$jcookie->set('fcfavs', '{}');
+			$jcookie->set('fcfavs', '{}', time()+60*60*24*(365*5), JURI::base(true), '');
 		}
 
 		// Make sure it is a class

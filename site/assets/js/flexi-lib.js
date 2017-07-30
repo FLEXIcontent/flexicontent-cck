@@ -766,7 +766,7 @@
 				// Special case 0: Re-attach cascade function to the updated HTML of radio/checkbox set
 				if (fc_cascade_field_funcs.hasOwnProperty(trgID) && trgTagName!='SELECT')
 				{
-					window.console.log ('Re-attach cascade function for new HTML source for tag ID:' + trgID);
+					//window.console.log ('Re-attach cascade function for new HTML source for tag ID:' + trgID);
 					fc_cascade_field_funcs[trgID]();
 				}
 				
@@ -998,10 +998,17 @@
 				col_selected[i++] = jQuery(col_selectors[cnt]).attr("data-colno");
 			}
 		}
-		var cookieValue = col_selected.join(',');
-		var cookieName = 'columnchoose_' + data_tbl_id;
+
+		var cookieName = 'fc_columnchooser';
+		var cookieValue  = fclib_getCookie(cookieName);
+		//window.console.log(cookieName + 'old value: ' +cookieValue);
+
+		cookieValue = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
+		cookieValue[data_tbl_id] = col_selected.join(',');
+		//window.console.log(cookieName + 'new value: ' + JSON.stringify(cookieValue));
+
 		var nDays = 30;
-		fclib_setCookie(cookieName, cookieValue, nDays);
+		fclib_setCookie(cookieName, JSON.stringify(cookieValue), nDays);
 
 		var totals_tag = jQuery('#columnchoose_totals');
 		if (totals_tag.length)
@@ -1069,14 +1076,14 @@
 	function fclib_setCookie(cookieName, cookieValue, nDays)
 	{
 		var today = new Date();
-		var expire = new Date();
-		var path = window.location.hostname;
+		var expires = new Date();
+		var path = typeof jclient_path_fc != 'undefined' ? jclient_path_fc : window.location.hostname;
 		if (nDays==null || nDays<0) nDays=0;
 
 		if (nDays)
 		{
-			expire.setTime(today.getTime() + 3600000*24*nDays);
-			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
+			expires.setTime(today.getTime() + 3600000*24*nDays);
+			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path + ";expires="+expires.toGMTString();
 		} else {
 			document.cookie = cookieName+"="+encodeURIComponent(cookieValue) + ";path=" + path;
 		}
@@ -1087,7 +1094,7 @@
 	/* Get a cookie */
 	function fclib_getCookie(cookieName)
 	{
-	  var matched = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));
+	  var matched = document.cookie.match(new RegExp(cookieName + '=([^;]+)'));   //window.console.log(matched);
 	  return matched ? decodeURIComponent(matched[1]) : '';
 	}
 

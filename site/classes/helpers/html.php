@@ -402,25 +402,64 @@ class flexicontent_html
 		$app  = JFactory::getApplication();
 		$jinput = $app->input;
 
+		// Clear legacy cookie
+		$jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
+
 		$js = "
 		var show_col_${data_tbl_id} = Array();
 		jQuery(document).ready(function() {
 		";
 
-		$columnchoose_post   = $jinput->post->get('columnchoose_'.$data_tbl_id, null, 'array');
-		$columnchoose_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, '', 'string');
+		// Firstly try to find POSTED data
+		$columnchoose = $jinput->post->get('columnchoose_'.$data_tbl_id, null, 'array');
+		if ($columnchoose !== null)
+		{
+			$columnchoose = array_keys($columnchoose);
+		}
 
-		$columnchoose = $columnchoose_post !== null
-			? array_keys($columnchoose_post)
-			: preg_split("/[\s]*,[\s]*/", $columnchoose_cookie);
+		// Otherwise try to find COOKIE data
+		else
+		{
+			$fc_columnchooser = $jinput->cookie->get('fc_columnchooser', '{}', 'string');
+			print_r($fc_columnchooser);
 
-		foreach ($columnchoose as $colnum)
+			// Parse the favourites
+			try
+			{
+				$fc_columnchooser = json_decode($fc_columnchooser);
+
+				// Make sure it is a class
+				if (!$fc_columnchooser || !isset($fc_columnchooser->vhash) || $fc_columnchooser->vhash !== FLEXI_VHASH)
+				{
+					$fc_columnchooser = new stdClass();
+					$fc_columnchooser->vhash = FLEXI_VHASH;
+					$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JURI::base(true), '');
+				}
+				else if (isset($fc_columnchooser->$data_tbl_id))
+				{
+					$columnchoose = preg_split("/[\s]*,[\s]*/", $fc_columnchooser->$data_tbl_id);
+					foreach($columnchoose as $i => $id)
+					{
+						$columnchoose[$i] = (int) $id;
+					}
+				}
+			}
+			catch (Exception $e)
+			{
+				$fc_columnchooser = new stdClass();
+				$fc_columnchooser->vhash = FLEXI_VHASH;
+				$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JURI::base(true), '');
+				$columnchoose = null;
+			}
+		}
+
+		if ($columnchoose) foreach ($columnchoose as $colnum)
 		{
 			$colnum = (int) $colnum;
 			$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
 		}
 
-		$firstload = isset($_POST["columnchoose_${data_tbl_id}"]) || isset($_COOKIE["columnchoose_${data_tbl_id}"]) ? "false" : "true";
+		$firstload = $columnchoose !== null ? "false" : "true";
 		$js .= "
 			create_column_choosers('$container_div_id', '$data_tbl_id', $firstload, '".$start_html."', '".$end_html."');
 		});
@@ -1068,6 +1107,17 @@ class flexicontent_html
 				<link href="'.JURI::root(true).'/components/com_flexicontent/assets/css/ie8.css?' . FLEXI_VHASH . '" rel="stylesheet" />
 				<![endif]-->
 			');
+			$specific_browser_support = true;
+		}
+
+		static $shared_js_added = null;
+		if ( $shared_js_added === null )
+		{
+			$js .= "
+				var jroot_url_fc = ".json_encode(JURI::root()).";
+				var jclient_path_fc = ".json_encode(JURI::base(true)).";
+			";
+			$shared_js_added = true;
 		}
 
 		switch ( $framework )
@@ -1206,9 +1256,7 @@ class flexicontent_html
 				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
 
 				// Extra inputmask declarations definitions, e.g. ...
-				$js .= "
-				";
-
+				$js .= "";
 
 				// Attach inputmask to all input fields that have appropriate tag parameters
 				$js .= "
@@ -1369,7 +1417,7 @@ class flexicontent_html
 				}
 
 				// Attach multibox to ... this will be left to the caller so that it will create a multibox object with custom options
-				//$js .= "";
+				$js .= "";
 				break;
 
 			case 'fancybox':
@@ -1444,9 +1492,9 @@ class flexicontent_html
 				$document->addScript($framework_path.'/code.photoswipe.min.js');
 
 				$js .= "
-				jQuery(document).ready(function() {
-					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe();
-				});
+					jQuery(document).ready(function() {
+						var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe();
+					});
 				";
 				break;
 
@@ -1540,7 +1588,6 @@ class flexicontent_html
 
 				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
-					var jbase_url_fc = ".json_encode(JURI::root()).";
 				";
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
@@ -1553,9 +1600,8 @@ class flexicontent_html
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$js .= "
-					var jbase_folder_fc = ".json_encode(JURI::root(true)).";
-				";
+				$js .= "";
+
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				JText::script('FLEXI_LOADING_IMAGES',true);
