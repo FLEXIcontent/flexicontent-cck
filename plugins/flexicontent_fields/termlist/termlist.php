@@ -83,7 +83,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Default value
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = $default_title ? JText::_($default_title) : '';
+		$default_title = strlen($default_title) ? JText::_($default_title) : '';
 		
 		// Input field display size & max characters
 		$title_size      = $field->parameters->get( 'title_size', 80 ) ;
@@ -100,7 +100,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 		
 		// Editing method, text editor or HTML editor
 		$use_html = (int) $field->parameters->get( 'use_html', 0 );
@@ -552,13 +552,13 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = $default_title ? JText::_($default_title) : '';
+		$default_title = strlen($default_title) ? JText::_($default_title) : '';
 		
 		// Term (description) Text
 		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;

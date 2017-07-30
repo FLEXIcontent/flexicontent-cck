@@ -80,7 +80,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 		
 		// Editing method, text editor or HTML editor
 		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
@@ -547,7 +547,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;

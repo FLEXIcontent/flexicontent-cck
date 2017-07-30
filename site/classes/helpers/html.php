@@ -421,7 +421,6 @@ class flexicontent_html
 		else
 		{
 			$fc_columnchooser = $jinput->cookie->get('fc_columnchooser', '{}', 'string');
-			print_r($fc_columnchooser);
 
 			// Parse the favourites
 			try
