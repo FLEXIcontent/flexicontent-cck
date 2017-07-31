@@ -1099,36 +1099,37 @@
 	}
 
 
-	/* Get a new list of elements living inside a cookie */
+	/* Get a new list of 2-typles (key, element) living inside a cookie
+	 * List is an object with 'key' being the property name and 'element' being the value of the property
+	 */
 	function fclib_createCookieList(cookieName)
 	{
-		var cookie = fclib_getCookie(cookieName);
-		var items = cookie ? cookie.split(/:::/) : new Array();
-		
+		var cookieValue = fclib_getCookie(cookieName);
+		var items = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
+
 		return {
 			// Add to the items
-			"add": function(val)
+			"add": function(key, element)
 			{
-				items.push(val);
-				fclib_setCookie(cookieName, items.join(':::'), null);
+				items[key] = element;
+				fclib_setCookie(cookieName, JSON.stringify(items), null);
 			},
 	
 			// Remove from items
-			"remove": function (val)
+			"remove": function (key)
 			{
-				indx = items.indexOf(val);
-				if (indx!=-1)
+				if (typeof items[key] != 'undefined')
 				{
-					items.splice(indx, 1);
+					delete items[key];
+					fclib_setCookie(cookieName, JSON.stringify(items), null);
 				}
-				fclib_setCookie(cookieName, items.join(':::'), null);
 			},
 			
 			// Clear items
 			"clear": function()
 			{
-				items = null;
-				fclib_setCookie(cookieName, '', null);
+				items = {};
+				fclib_setCookie(cookieName, JSON.stringify(items), null);
 			},
 	
 			// Get all the items
