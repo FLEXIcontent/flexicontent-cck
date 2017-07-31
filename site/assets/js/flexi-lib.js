@@ -1098,6 +1098,48 @@
 	  return matched ? decodeURIComponent(matched[1]) : '';
 	}
 
+
+	/* Get a new list of elements living inside a cookie */
+	function fclib_createCookieList(cookieName)
+	{
+		var cookie = fclib_getCookie(cookieName);
+		var items = cookie ? cookie.split(/:::/) : new Array();
+		
+		return {
+			// Add to the items
+			"add": function(val)
+			{
+				items.push(val);
+				fclib_setCookie(cookieName, items.join(':::'), null);
+			},
+	
+			// Remove from items
+			"remove": function (val)
+			{
+				indx = items.indexOf(val);
+				if (indx!=-1)
+				{
+					items.splice(indx, 1);
+				}
+				fclib_setCookie(cookieName, items.join(':::'), null);
+			},
+			
+			// Clear items
+			"clear": function()
+			{
+				items = null;
+				fclib_setCookie(cookieName, '', null);
+			},
+	
+			// Get all the items
+			"items": function()
+			{
+				return items;
+			}
+		}
+	}
+
+
 	/* Remove known textarea editors, optionally add a flag to restore editors laters */
 	function fc_removeAreaEditors(txtareas, addRestoreClass)
 	{

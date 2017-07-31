@@ -181,9 +181,9 @@ $mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime() - $m
 $mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime();
 
 // Load needed JS libs & CSS styles
-//JHtml::_('behavior.framework', true);
 flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('flexi_tmpl_common');
+flexicontent_html::loadFramework('flexi-lib');
 
 // Add tooltips
 if ($add_tooltips) JHtml::_('bootstrap.tooltip');

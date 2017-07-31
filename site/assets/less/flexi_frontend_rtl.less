@@ -538,6 +538,18 @@ div table.adminform td {
 .fav-block {
 	display: inline-block;
 
+	.fcfav-delete-btn {
+		padding: 5px 4px 3px 4px;
+		vertical-align: top;
+		cursor: pointer;
+	}
+
+	.fcfav-toggle-btn {
+		padding: 4px 4px 2px 4px;
+		vertical-align: top;
+		cursor: pointer;
+	}
+
 	.fcfav-reponse-tip {
 		display: inline-block;
 	}
@@ -560,12 +572,14 @@ div table.adminform td {
 	[class^="fcfav_icon_"]:before, [class*=" fcfav_icon_"]:before {
 	}
 
+	.fcfav_icon_delete:before {
+		color: black;
+		font-size: 14px;
+	}
 	.fcfav_icon_on:before {
-		color: darkgreen;
+		color: darkgoldenrod;
 	}
 	.fcfav_icon_off:before {
-		opacity: 1;
-		filter: alpha(opacity=100);
 		color: darkgray;
 	}
 	.fcfav_icon_disabled:before {
