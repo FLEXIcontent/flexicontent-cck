@@ -87,6 +87,10 @@ else
 		: ($favoured ? $icon_is_fav : $icon_not_fav)
 	);
 	$btn_title = $favoured === -1 ? JText::_('FLEXI_REMOVE_FAVOURITE') : $tooltip_title;
+	
+	$item_url  = $favoured === -1
+		? $item->url
+		: JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 
 	$onclick 	= "javascript:FCFav(".$item->id.", '".$type."', ".$users_counter.")";
 
@@ -97,5 +101,6 @@ else
 			</span>
 			<span class="fav_item_id" style="display:none;">'.$item->id.'</span>
 			<span class="fav_item_title" style="display:none;">'.$item->title.'</span>
+			<span class="fav_item_url" style="display:none;">'.$item_url.'</span>
 		</span>';
 }
