@@ -1113,6 +1113,7 @@ class flexicontent_html
 		if ( $shared_js_added === null )
 		{
 			$js .= "
+				var jbase_url_fc = ".json_encode(JURI::base()).";
 				var jroot_url_fc = ".json_encode(JURI::root()).";
 				var jclient_path_fc = ".json_encode(JURI::base(true)).";
 			";
