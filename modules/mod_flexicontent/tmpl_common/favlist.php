@@ -1,13 +1,38 @@
-<?php if ($params->get('display_favlist', 0)) : ?>
-	<?php
+<?php
+if ($params->get('display_favlist', 0)) :
+
 	$document->addScript(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
-	?>
-	
+
+	?>	
 	<p class="news_favs_head"><?php echo JText::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES'); ?></p>
-	<ul id="mod_fc_favlist">
-	</ul>
-	
+	<div id="mod_fc_favlist">
+	</div>
 	<?php
+
+	$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+	$item = (object) array('id' => '__ITEM_ID__', 'title' => '__ITEM_TITLE__');
+	
+	$displayData = array(
+		'field' => null,
+		'item' => $item,
+		'favoured' => ($favoured = -1),
+		'favourites' => '',
+		'type' => 'item'
+	);
+
+	echo '
+	<div class="mod_fc_favlist_favblock_template">
+		<div class="fav-block">
+			' . JLayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path) .'
+			<div class="fcitem_readon">
+				<a href="' . JURI::base(true) . 'index.php?option=com_flexicontent&view=item&id=__ITEM_ID__" class="readon">
+					__ITEM_TITLE__
+				</a>
+			</div>
+		</div>
+	</div>
+	';
+
 	$fav_tip_title	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 	$fav_tip_hover	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
 	$fav_show_item	= JText::_( 'READ MORE...' );
@@ -18,45 +43,39 @@
     var fl_currentURL   = window.location;
     var fl_base_folder  = "'.JURI::base(true).'";
     var fl_live_site    = fl_currentURL.protocol+"//" + fl_currentURL.host + fl_base_folder;
-    //var fl_del_icon=\'<img align="top" alt="'.$alt_delete.'" src="\'+fl_live_site+\'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />\';
-    //var fl_add_icon=\'<img align="top" alt="'.$alt_add.'" src="\'+fl_live_site+\'/components/com_flexicontent/assets/images/heart_add.png" border="0" />\';
-    var fl_del_icon=\'<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 1; vertical-align: text-bottom; "></span>\';
-    var fl_add_icon=\'<span class="icon-heart" style="font-size: 1.4em; color: darkgreen; opacity: 0.2; vertical-align: text-bottom; "></span>\';
-    var fl_icon_title="'.$fav_tip_hover.'";
-    var fl_show_item="'.$fav_show_item.'";
-    var fl_item_link="index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.($forced_itemid?'&itemid='.$forced_itemid:'').'&id=";
+    var fl_icon_title="' . $fav_tip_hover . '";
+    var fl_show_item="' . $fav_show_item . '";
+    var fl_item_link="index.php?option=com_flexicontent&view=item' . ($forced_itemid ? '&itemid='.$forced_itemid : '') . '&id=";
 
-    window.addEvent("domready", function(){
-      if (typeof jQuery == "undefined" ) {
-        alert("jQuery library not loaded, favorites list in universal module cannot work");
-        return;
-      } else {
-        if (typeof jQuery.ui == "undefined")  {
-          //alert("jQuery ui not loaded, favorites list in universal module cannot work");
-        }
-      }
-      
-      if (typeof jQuery != "undefined") {
-        if (jQuery.ui) jQuery("ul#mod_fc_favlist").sortable();
-        
-        for(var i=0; i<fl_item_ids.length; i++) {
-          var icon_onclick  = "javascript:FCFav("+fl_item_ids[i]+");";
-          var item_link     = fl_item_link + fl_item_ids[i];
-          jQuery("ul#mod_fc_favlist").prepend(
-                 "<li class=\'item_"+fl_item_ids[i]+" fcfav_delete\'>"
-                +" <a id=\'favlist_del_fav_"+fl_item_ids[i]+"\' href=\'javascript:void(null)\' onclick=\'"+icon_onclick+"\' title=\'"+fl_icon_title+"\'>"+fl_del_icon+"</a> "
-                +" <a id=\'favlist_show_item_"+fl_item_ids[i]+"\' href=\'"+item_link+"\' title=\'"+fl_show_item+"\'>"+fl_item_titles[i]+"</a> "
-                +" <span class=\'fav_item_id\' style=\'display:none;\'>"+fl_item_ids[i]+"</span>"
-                +" <span class=\'fav_item_title\' style=\'display:none;\'>"+fl_item_titles[i]+"</span>"
-                +"</li>");
-          jQuery("a#favlist_del_fav_"+fl_item_ids[i]).bind("click", favicon_clicked);
+    window.addEvent("domready", function()
+    {
+      if (typeof jQuery != "undefined")
+      {
+        if (jQuery.ui) jQuery("div#mod_fc_favlist").sortable();
+
+        var fcfavs_list = fcfavs_list_init();
+				var item_ids = fcfavs_list.ids.items();
+				var item_titles = fcfavs_list.titles.items();
+
+        for(var i=0; i < item_ids.length; i++)
+        {
+          var icon_onclick  = "javascript:FCFav("+item_ids[i]+", \"item\", 0);";
+          var item_link     = fl_item_link + item_ids[i];
+          var box_html = jQuery("div#mod_fc_favlist").next().html();
+					jQuery("div#mod_fc_favlist").prepend(
+						"<div class=\'fcfav_item_"+item_ids[i]+"\'>"
+						+ box_html.replace(/__ITEM_ID__/g, item_ids[i]).replace(/__ITEM_TITLE__/g, item_titles[i])
+						+"</div>"
+					);
+
+          jQuery(".fcfav_item_"+item_ids[i]).find("span.fcfav-delete-btn").bind("click", favicon_clicked);
         }
 
-        jQuery("a.fcfav-reponse").bind("click", favicon_clicked);
+        jQuery("span.fcfav-toggle-btn").bind("click", favicon_clicked);
       }
     });
   ';
 	$document->addScriptDeclaration($js);
 	?>
 
-<?php endif; ?>
+<?php endif;

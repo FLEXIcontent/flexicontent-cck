@@ -59,7 +59,7 @@ function FCFav(id, type, add_counter)
 	var _box_start = '<div class="fc-mssg fc-info fc-iblock fc-nobgimage';
 	
 	
-	var divs = jQuery('#fcfav-reponse_'+type+'_'+id);
+	var divs = jQuery('.fcfav-reponse_'+type+'_'+id);
 	if (divs.length)
 	{
 		divs.html(_box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>');
@@ -72,7 +72,7 @@ function FCFav(id, type, add_counter)
 			lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
 		},
 		success: function( response ) {
-			var links = jQuery('#favlink_'+type+'_'+id);
+			var links = jQuery('.favlink_' + type + '_' + id + '.fcfav-toggle-btn');
 			if (!divs) return;
 
 			response = response.trim();
