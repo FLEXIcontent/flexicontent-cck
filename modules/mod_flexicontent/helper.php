@@ -1972,15 +1972,18 @@ class modFlexicontentHelper
 			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
 			flexicontent_db::getOriginalContentItemids($cat_items_arr[$catid]);
 		}
-		
-		
-		// ************************************************************************************************
-		// Return items indexed per category id OR via empty string if not apply configuration per category
-		// ************************************************************************************************
+
+
+		// ***
+		// *** Return items indexed per category id OR via empty string if not apply configuration per category
+		// ***
 		return $cat_items_arr;
 	}
-	
-	
+
+
+	/*
+	 * Find which categories will be shown, retrieve their data and return them
+	 */
 	public static function getCategoryData(&$params)
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
@@ -2006,10 +2009,11 @@ class modFlexicontentHelper
 			($currcat_source==2 && ($isflexi_itemview || $isflexi_catview))
 			|| ($currcat_source==0 && $isflexi_itemview)
 			|| ($currcat_source==1 && $isflexi_catview);
+
 		if ($currcat_custom_display && $currcat_valid_case)
 		{
-			
 			$catconf = new stdClass();
+
 			$catconf->orderby = '';
 			$catconf->fallback_maincat  = $params->get('currcat_fallback_maincat', 0);
 			$catconf->showtitle  = $params->get('currcat_showtitle', 0);
@@ -2036,9 +2040,10 @@ class modFlexicontentHelper
 			if ($cid) $cids = array($cid);
 		}
 		
-		if (empty($cids)) {
+		if (empty($cids))
+		{
 			$catconf = new stdClass();
-			
+
 			// Check if using a dynamic set of categories, that was decided by getItems()
 			$dynamic_cids = $params->get('dynamic_catids', false);
 			$static_cids  = $params->get('catids', array());
@@ -2086,23 +2091,26 @@ class modFlexicontentHelper
 		if (!$catdata_arr)  return false;
 		
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
-		foreach( $catdata_arr as $i => $catdata ) {
+		foreach( $catdata_arr as $i => $catdata )
+		{
 			$catdata->params = new JRegistry($catdata->params);
-			
+
 			// Category Title
 			$catdata->title = flexicontent_html::striptagsandcut($catdata->title, $catconf->cuttitle);
 			$catdata->showtitle = $catconf->showtitle;
-			
+
 			// Category image
 			$catdata->image = FLEXI_J16GE ? $catdata->params->get('image') : $catdata->image;
 			$catimage = "";
-			if ($catconf->show_image) {
+			if ($catconf->show_image)
+			{
 				$catdata->introtext = & $catdata->description;
 				$catdata->fulltext = "";
-				
-				if ( $catconf->image_source && $catdata->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image ) ) {
+
+				if ( $catconf->image_source && $catdata->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image ) )
+				{
 					$src = JURI::base(true)."/".$joomla_image_path."/".$catdata->image;
-			
+
 					$h		= '&amp;h=' . $catconf->image_height;
 					$w		= '&amp;w=' . $catconf->image_width;
 					$aoe	= '&amp;aoe=1';
@@ -2111,10 +2119,11 @@ class modFlexicontentHelper
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
-			
+
 					$catimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-				} else if ( $catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata) ) {
-		
+				}
+				else if ( $catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata) )
+				{
 					$h		= '&amp;h=' . $catconf->image_height;
 					$w		= '&amp;w=' . $catconf->image_width;
 					$aoe	= '&amp;aoe=1';
@@ -2123,11 +2132,11 @@ class modFlexicontentHelper
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
-		
+
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 					$catimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				}
-				
+
 				$catdata->image = $catimage;
 			}
   		
@@ -2150,39 +2159,48 @@ class modFlexicontentHelper
 		
 		return $catdata_arr;
 	}
-	
-	
-		
-	// Verify parameters, altering them if needed
+
+
+	/*
+	 * Verify parameters, altering them if needed
+	 */
 	public static function verifyParams( &$params )
 	{
 		// Calculate menu itemid for item links
-		$app   = JFactory::getApplication();
-		$menus = $app->getMenu();
-		$itemid_force	= (int)$params->get('itemid_force');
-		if ($itemid_force==1) {
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$menus  = $app->getMenu();
+
+		$itemid_force = (int) $params->get('itemid_force');
+		if ($itemid_force == 1)
+		{
 			$Itemid					= $jinput->get('Itemid', 0, 'int');
 			$menu						= $menus->getItem($Itemid);
-			$component			= @$menu->query['option'] ? $menu->query['option'] : '';
+			$component			= !empty($menu->query['option']) ? $menu->query['option'] : '';
 			$forced_itemid	= $component=="com_flexicontent" ? $Itemid : 0;
-		} else if ($itemid_force==2) {
+		}
+		else if ($itemid_force == 2)
+		{
 			$itemid_force_value	= (int)$params->get('itemid_force_value', 0);
 			$menu								= $menus->getItem($itemid_force_value);
-			$component					= @$menu->query['option'] ? $menu->query['option'] : '';
+			$component					= !empty($menu->query['option']) ? $menu->query['option'] : '';
 			$forced_itemid			= $component=="com_flexicontent" ? $itemid_force_value : 0;
-		} else {
+		}
+		else
+		{
 			$forced_itemid = 0;
 		}
 		$params->set('forced_itemid', $forced_itemid);
 		
 		// Disable output of comments if comments component not installed
-		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php'))
+		{
 			$params->set('display_comments', 0);
 			$params->set('display_comments_feat', 0);
 		}
 	}
-	
-	
+
+
 	/*
 	 * Retrieve comments for given items, item array has the structure: items[catid][ordername][]
 	 */
@@ -2200,9 +2218,13 @@ class modFlexicontentHelper
 			foreach($cat_items as $ord => $ord_items)
 			{
 				if ($list_comments)
+				{
 					foreach($ord_items['standard'] as $item) $item_ids[] = $item->id;
+				}
 				if ($list_comments_feat)
+				{
 					foreach($ord_items['featured'] as $item) $item_ids[] = $item->id;
+				}
 			}
 		}
 		
@@ -2212,18 +2234,17 @@ class modFlexicontentHelper
 		$query = 'SELECT id FROM #__jcomments AS com '
 			.' WHERE com.object_id IN (' . implode(',', $item_ids) .') AND com.object_group="com_flexicontent" AND com.published="1"'
 			.' ORDER BY com.object_id, com.date DESC';
-		$db->setQuery($query);
-		$comment_ids = FLEXI_J16GE ? $db->loadColumn(0) : $db->loadResultArray(0);
+		$comment_ids = $db->setQuery($query)->loadColumn(0);
 		
 		// Get comments data
 		$query = 'SELECT * FROM #__jcomments AS com '
 			.' WHERE com.id IN (' . implode(',', $comment_ids) .')';
-		$db->setQuery($query);
-		$_comments = $db->loadObjectList('id');
+		$_comments = $db->setQuery($query)->loadObjectList('id');
 		
 		// Order comments and return them, indexing them at first level by item ID
 		$comments = array();
-		foreach($comment_ids as $_id) {
+		foreach($comment_ids as $_id)
+		{
 			$comment = $_comments[$_id];
 			$comments[$comment->object_id][] = $comment;
 		}
