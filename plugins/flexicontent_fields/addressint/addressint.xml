@@ -289,10 +289,11 @@
 		<fieldset name="group-addressint-config" repeat="1" icon_class="icon-wrench" label="FLEXI_CONFIG" addfieldpath="/administrator/components/com_flexicontent/elements">
 		    
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_CONFIG" level="level1" />
-			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY" level="level4" />
-			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY_DESC" />
-			<field name="google_maps_static_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY_DESC" />
+
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY_INFO" level="_" class="alert alert-success"/>
+			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING_DESC" required="true" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_VIEWING_API_KEY" level="level4" class="alert alert-info fcpadded" />
+			<field name="google_maps_static_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_VIEWING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_VIEWING_DESC" />
 			
 		</fieldset>
 		
