@@ -92,6 +92,7 @@
 			<field
 				name="apikey" type="text" default=""
 				label="MOD_FLEXIGOOGLEMAP_APIKEY" description="MOD_FLEXIGOOGLEMAP_APIKEY_DESC"
+				require="true"
 			/>
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_DISPLAY" level="level1" />
 			<field

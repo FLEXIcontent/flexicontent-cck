@@ -52,6 +52,8 @@ foreach ($values as $value)
 	$disabled_class = $value_is_disabled ? ' fc-field-prop-disabled' : '';
 	$disabled_attr  = $value_is_disabled ? ' disabled="disabled" ' : '';
 
+	$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
+
 	$field_html = '
 	<div class="fcfield_field_data_box fcfield_addressint_data">
 	
@@ -60,6 +62,7 @@ foreach ($values as $value)
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
 			<td colspan="2" class="fc-nopad-h-cell">
+				' . ($google_maps_js_api_key ? '' : '<span class="alert alert-warning fc-iblock">' . JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_EMPTY_API_KEY_WARNING') . '</span>') . '
 				<div class="'.$input_grp_class . ' fc-xpended-row">
 					<label class="' . $add_on_class . ' fc-lbl-short addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete" style="float: none;"><span class="icon-search"></span></label>
 					<input id="'.$elementid_n.'_autocomplete" class="addrint_autocomplete" name="'.$fieldname_n.'[autocomplete]" type="text" />

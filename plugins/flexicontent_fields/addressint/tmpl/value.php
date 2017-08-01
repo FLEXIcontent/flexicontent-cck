@@ -7,7 +7,7 @@ $view = JFactory::getApplication()->input->get('view', '', 'CMD');
 
 // get parameters
 $google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
-$google_maps_static_api_key = $field->parameters->get('google_maps_static_api_key', '');
+$google_maps_static_api_key = $field->parameters->get('google_maps_static_api_key', $google_maps_js_api_key);  // Fallback to edit key
 
 $show_address = $field->parameters->get('show_address','both');
 $show_address = $show_address == 'both' || ($view != 'item' && $show_address == 'category') || ($view == 'item' && $show_address == 'item');
