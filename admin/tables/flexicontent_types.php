@@ -74,20 +74,28 @@ class flexicontent_types extends _flexicontent_types
 
 	/** @var int */
 	var $asset_id 		= null;
+
 	/** @var string */
 	var $name					= '';
+
 	/** @var string */
 	var $alias				= '';
+
 	/** @var int */
 	var $published		= null;
+
 	/** @var int */
 	var $itemscreatable	= 0;
+
 	/** @var int */
 	var $checked_out	= 0;
+
 	/** @var date */
 	var $checked_out_time	= '';
+
 	/** @var int */
 	var $access 			= 0;
+
 	/** @var string */
 	var $attribs	 		= null;
 
@@ -199,7 +207,7 @@ class flexicontent_types extends _flexicontent_types
 			JFactory::getApplication()->enqueueMessage($msg, 'notice');
 		}
 
-		else if ($bad_original_alias)
+		else if (!empty($bad_original_alias))
 		{
 			$msg = JText::sprintf('FLEXI_THIS_' . $this->_NAME . '_' . strtoupper($alias) . '_ALREADY_EXIST', $this->name);
 			JFactory::getApplication()->enqueueMessage($msg, 'warning');
