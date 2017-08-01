@@ -1087,7 +1087,9 @@
 
 		</fieldset>
 		<fieldset name="group-voting-reviews" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
+			<field name="" type="separator" default="This an unfinished BETA feature, it is meant to be enabled only by testers" level="-" class="fc-mssg fc-warning" />
+			<field name="" type="separator" default="" level="level_br" />
 			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

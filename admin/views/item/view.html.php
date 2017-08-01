@@ -450,7 +450,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Add collaboration button
 		// ************************
 
-		$do_collaboration = 0; //JPluginHelper::isEnabled('system', 'flexisyspro');
+		$do_collaboration = JPluginHelper::isEnabled('system', 'flexisyspro');
 		$com_mailto_found = file_exists(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 
 		if ($com_mailto_found)

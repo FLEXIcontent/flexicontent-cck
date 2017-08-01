@@ -727,9 +727,10 @@ class FLEXIUtilities
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
+		$db      = JFactory::getDBO();
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		
+
 		// Check access to current management tab
 		$is_authorized = $cando === null || $perms->$cando;
 		if ( !$is_authorized )
@@ -759,7 +760,12 @@ class FLEXIUtilities
 			$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
 			if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.1.99', '>'))
 			{
-				if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
+				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+				$field = $db->loadObject();
+				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
+				$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+
+				if ($allow_reviews && $perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 			}
 			
 			if ($perms->CanTypes || $perms->CanFields || $perms->CanTags || $perms->CanFiles) call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
