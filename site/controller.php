@@ -1382,7 +1382,7 @@ class FlexicontentController extends JControllerLegacy
 				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 				$field = $db->loadObject();
 				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
-				$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+				$allow_reviews = (int)$field->parameters->get('allow_reviews', 0);
 				if (!$allow_reviews)  $error = "Reviews are disabled";
 			}
 		}
@@ -1494,7 +1494,7 @@ class FlexicontentController extends JControllerLegacy
 				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 				$field = $db->loadObject();
 				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
-				$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+				$allow_reviews = (int)$field->parameters->get('allow_reviews', 0);
 				if (!$allow_reviews)  $error = "Reviews are disabled";
 			}
 		}

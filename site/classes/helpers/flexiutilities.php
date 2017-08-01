@@ -763,7 +763,7 @@ class FLEXIUtilities
 				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
 				$field = $db->loadObject();
 				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
-				$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+				$allow_reviews = (int)$field->parameters->get('allow_reviews', 0);
 
 				if ($allow_reviews && $perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 			}
