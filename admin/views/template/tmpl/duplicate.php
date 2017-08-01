@@ -59,7 +59,7 @@ JFactory::getDocument()->addScriptDeclaration($js);
 		<tr>
 			<td>
 			<input id="import" type="submit" class="btn" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
-			<input type="button" class="btn" onclick="window.parent.fc_tmpls_modal.dialog('destroy'); window.parent.document.adminForm.submit();" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="btn" onclick="window.parent.fc_tmpls_modal.dialog('close');" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
