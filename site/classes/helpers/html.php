@@ -5061,7 +5061,7 @@ class flexicontent_html
 		if ( $site_router === null )
 		{
 			$isAdmin = JFactory::getApplication()->isAdmin();
-			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
+			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 			// Do not merge the following 2 statements (site_instance, site_router), PHP 5.6 and lower cannot parse 2 consequent operators ::
 			$site_instance = $isAdmin && !$isSH404SEF
 				? JApplication::getInstance('site')
