@@ -6,7 +6,7 @@
 		<element>com_flexicontent</element>
 		<type>component</type>
 		<client>administrator</client>
-		<version>3.2.0a</version>
+		<version>3.2.0.1</version>
 
 		<infourl title="FAQ">
 			http://www.flexicontent.org/documentation/faq.html
