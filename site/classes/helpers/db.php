@@ -373,16 +373,18 @@ class flexicontent_db
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$request_order = $app->input->get($request_var.$sfx, '', 'cmd');
+		$request_order = $app->input->get($request_var.$sfx, '', 'string');
 		$order = $params->get('orderby_override') && $request_order ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
-		if ($order=='field' && !$orderbycustomfieldid ) {
+		if ($order=='field' && !$orderbycustomfieldid )
+		{
 			// This can occur only if field ordering was requested explicitly, otherwise an not set 'orderbycustomfieldid' will prevent 'field' ordering
 			echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
 			$order = $order_fallback;
 		}
-		if ($order=='commented') {
+		if ($order=='commented')
+		{
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br/>\n";
 				$order = $order_fallback;
@@ -396,11 +398,12 @@ class flexicontent_db
 		$orderby = ' ORDER BY '.$order_col_1st.' '.$order_dir_1st;
 		
 		
-		// ****************************************************************
-		// 2nd level ordering, (currently only supported when no SFX given)
-		// ****************************************************************
+		// ***
+		// *** 2nd level ordering, (currently only supported when no SFX given)
+		// ***
 		
-		if ($sfx!='' || !$support_2nd_lvl) {
+		if ($sfx!='' || !$support_2nd_lvl)
+		{
 			$orderby .= $order_col_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
 			$order_arr[2] = '';
 			$order = $order_arr;
@@ -420,7 +423,7 @@ class flexicontent_db
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$request_order = $app->input->get($request_var.$sfx, '', 'cmd');
+		$request_order = $app->input->get($request_var.$sfx, '', 'string');
 		$order = $request_var && $request_order ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
@@ -441,7 +444,8 @@ class flexicontent_db
 		
 		$order_col_2nd = '';
 		$order_dir_2nd = '';
-		if ($order!='default') {
+		if ($order!='default')
+		{
 			flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $order_col_2nd, $order_dir_2nd, $sfx);
 			$order_arr[2] = $order;
 			$orderby .= ', '.$order_col_2nd.' '.$order_dir_2nd;
@@ -580,11 +584,13 @@ class flexicontent_db
 
 			case 'default':
 			default:
-				if (substr($order, 0, 7)=='custom:') {
+				if (substr($order, 0, 7)=='custom:')
+				{
 					$order_parts = preg_split("/:/", $order);
 					$_field_id = (int) @ $order_parts[1];
 				}
-				if (!empty($_field_id) && count($order_parts)==4) {
+				if (!empty($_field_id) && count($order_parts)==4)
+				{
 					$cf = $sfx == '_2nd' ? 'f2' : 'f';
 					$order_type = strtolower($order_parts[2]);
 					switch( $order_type )
@@ -629,10 +635,11 @@ class flexicontent_db
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$request_order = $app->input->get($request_var, '', 'cmd');
+		$request_order = $app->input->get($request_var, '', 'string');
 		$order = $request_var && $request_order ? $request_order : $order;
 
-		switch ($order) {
+		switch ($order)
+		{
 			case 'date':
 				$order_col = $c_as.'.created_time';
 				$order_dir = 'ASC';
