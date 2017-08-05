@@ -1559,6 +1559,7 @@ class flexicontent_html
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
+						$country_code = str_replace('-', '_', $country_code);    // Files for this library use underscore ...
 						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$country_code.'.js') ) {
 							$document->addScript($framework_path.'/js/i18n/'.$country_code.'.js');
 						}
