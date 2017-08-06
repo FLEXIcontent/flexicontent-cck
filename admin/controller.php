@@ -44,8 +44,9 @@ class FlexicontentController extends JControllerLegacy
 		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
 		
 		// If configuration not saved REDIRECT TO DASHBOARD VIEW (will ask to save or import)
-		$view = JRequest::getVar('view');
-		if($view && !$config_saved) {
+		$view = $this->input->get('view', '', 'CMD');
+		if($view && !$config_saved)
+		{
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link);   // we do not message since this will be displayed by template of the view ...
 		}
@@ -63,7 +64,7 @@ class FlexicontentController extends JControllerLegacy
 		//echo  "postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";
 		//echo  "recheck_aftersave: " . (isset($valArray[$recheck_aftersave])  ?  $valArray[$recheck_aftersave]  :  $recheck_aftersave) ."<br/>\n";
 		
-		$format	= strtolower(JRequest::getCmd('format', 'html'));
+		$format = strtolower($this->input->get('format', 'html', 'CMD'));
 		if ($format == 'html')
 		{
 			if ( $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave )
@@ -114,7 +115,6 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Register Extra task
 		$this->registerTask( 'apply'								, 'save' );
-		$this->registerTask( 'applyacl'							, 'saveacl' );
 		$this->registerTask( 'createmenuitems'			, 'createMenuItems' );
 		$this->registerTask( 'createdefaultype'			, 'createDefaultType' );
 		$this->registerTask( 'createdefaultfields'	, 'createDefaultFields' );
@@ -131,10 +131,11 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'addcurrentversiondata', 'addCurrentVersionData' );
 		$this->registerTask( 'langfiles'						, 'processLanguageFiles' );
 		
-		$task = JRequest::getVar('task');
-		if (is_string($task) && $task=="translate") {
-			JRequest::setVar('task', 'copy');
-			JRequest::setVar('copy_behaviour', 'translate');
+		$task = $this->input->get('task', '', 'CMD');
+		if (is_string($task) && $task=="translate")
+		{
+			$this->input->set('task', 'copy');
+			$this->input->set('copy_behaviour', 'translate');
 		}
 		
 		if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -145,12 +146,12 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		$code 	= JRequest::getVar('code', 'en-GB');
-		$method = JRequest::getVar('method', '');
-		$name = JRequest::getVar('name', '');
-		$email = JRequest::getVar('email', '');
-		$web = JRequest::getVar('web', '');
-		$message = JRequest::getVar('message', '');
+		$code    = $this->input->get('code', 'en-GB', 'STRING');
+		$method  = $this->input->get('method', '', 'STRING');
+		$name    = $this->input->get('name', '', 'STRING');
+		$email   = $this->input->get('email', '', 'STRING');
+		$web     = $this->input->get('web', '', 'STRING');
+		$message = $this->input->get('message', '', 'STRING');
 		
 		$formparams = array();
 		$formparams['name'] 	= $name;
@@ -324,66 +325,8 @@ class FlexicontentController extends JControllerLegacy
 	{
 		parent::display();
 	}
-	
-	
-	/**
-	 * Saves the acl file
-	 *
-	 */
-	function saveacl()
-	{
 
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		// Initialize some variables
-		$app     = JFactory::getApplication();
-		$option  = JRequest::getVar('option');
-		$filename    = JRequest::getVar('filename', '', 'post', 'cmd');
-		$filecontent = JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
-
-		if (!$filecontent) {
-			$app->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::_( 'FLEXI_CONTENT_EMPTY' ));
-		}
-
-		// Set FTP credentials, if given
-		jimport('joomla.client.helper');
-		JClientHelper::setCredentialsFromRequest('ftp');
-		$ftp = JClientHelper::getCredentials('ftp');
-
-		$file = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.$filename;
-
-		// Try to make the acl file writeable
-		if (!$ftp['enabled'] && JPath::isOwner($file) && !JPath::setPermissions($file, '0755')) {
-			JError::raiseNotice('SOME_ERROR_CODE', JText::_( 'FLEXI_COULD_NOT_MAKE_ACL_FILE_WRITABLE' ));
-		}
-
-		jimport('joomla.filesystem.file');
-		$return = JFile::write($file, $filecontent);
-
-		// Try to make the acl file unwriteable
-		if (!$ftp['enabled'] && JPath::isOwner($file) && !JPath::setPermissions($file, '0555')) {
-			JError::raiseNotice('SOME_ERROR_CODE', JText::_( 'FLEXI_COULD_NOT_MAKE_ACL_FILE_UNWRITABLE' ));
-		}
-
-		if ($return)
-		{
-			$task = JRequest::getVar('task');
-			switch($task)
-			{
-				case 'applyacl' :
-					$app->redirect('index.php?option='.$option.'&view=editacl', JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ));
-					break;
-
-				case 'saveacl'  :
-				default         :
-					$app->redirect('index.php?option='.$option, JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ) );
-					break;
-			}
-		} else {
-			$app->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::sprintf('FLEXI_FAILED_TO_OPEN_FILE_FOR_WRITING', $file));
-		}
-	}
-	
 	/**
 	 * Method to create default type : article
 	 * 
@@ -409,12 +352,10 @@ class FlexicontentController extends JControllerLegacy
 		';
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
 		}
 		
@@ -426,16 +367,14 @@ class FlexicontentController extends JControllerLegacy
 		';
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
-		} else {
-			echo '<span class="install-ok"></span>';
 		}
+
+		echo '<span class="install-ok"></span>';
 	}
 	
 	/**
@@ -478,12 +417,10 @@ class FlexicontentController extends JControllerLegacy
 		
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
 		}
 		
@@ -499,16 +436,14 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
-		} else {
-			echo '<span class="install-ok"></span>';
 		}
+
+		echo '<span class="install-ok"></span>';
 		
 		// This is necessary as extension data are cached ... and just above we updated the component parameters -manually- (and (also added menu item)
 		$cache = JFactory::getCache();
@@ -551,16 +486,14 @@ class FlexicontentController extends JControllerLegacy
 		';
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
-		} else {
-			echo '<span class="install-ok"></span>';
 		}
+
+		echo '<span class="install-ok"></span>';
 	}
 
 	/**
@@ -575,40 +508,38 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$format = JRequest::getVar('format', '');
+		$format = strtolower($this->input->get('format', 'html', 'CMD'));
 		$db = JFactory::getDBO();
 		
-		$query	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__plugins')
-				. ' SET '. (FLEXI_J16GE ? 'enabled' : 'published') .' = 1'
-				. ' WHERE '. (FLEXI_J16GE ? ' `type`= ' . $db->Quote('plugin') : '1')
-				. ' AND (folder = ' . $db->Quote('flexicontent_fields')
-				. ' OR element = ' . $db->Quote('flexisearch')
-				. ' OR element = ' . $db->Quote('flexisystem')
-				. ' OR element = ' . $db->Quote('flexiadvsearch')
-				. ' OR element = ' . $db->Quote('flexiadvroute')
+		$query	= 'UPDATE #__extensions'
+				. ' SET enabled = 1'
+				. ' WHERE `type`= ' . $db->Quote('plugin')
+				. ' AND (`folder` = ' . $db->Quote('flexicontent_fields')
+				. ' OR `element` = ' . $db->Quote('flexisearch')
+				. ' OR `element` = ' . $db->Quote('flexisystem')
+				. ' OR `element` = ' . $db->Quote('flexiadvsearch')
+				. ' OR `element` = ' . $db->Quote('flexiadvroute')
 				. ')'
 				;
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			if ($format == 'raw') {
 				echo '<span class="install-notok"></span>';
-				if ($db->getErrorNum()) echo $db->getErrorMsg();
+				echo $e->getMessage();
 				jexit();
 			} else {
-				$db_err_msg = $db->getErrorNum() ? ' :<br/>'.$db->getErrorMsg() : '';
-				JError::raiseNotice(1, JText::_('FLEXI_COULD_NOT_PUBLISH_PLUGINS') . $db_err_msg);
+				$db_err_msg = $db->getErrorNum() ? ' :<br/>' . $e->getMessage() : '';
+				JFactory::getApplication()->enqueueMessage( JText::_('FLEXI_COULD_NOT_PUBLISH_PLUGINS') . $db_err_msg, 'notice' );
 				return false;
 			}
+		}
+
+		if ($format == 'raw') {
+			echo '<span class="install-ok"></span>';
 		} else {
-			if ($format == 'raw') {
-				echo '<span class="install-ok"></span>';
-			} else {
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -624,7 +555,8 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$format		= JRequest::getVar('format', '');
+		$format = strtolower($this->input->get('format', 'html', 'CMD'));
+
 		// PhpThumb cache directory
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 		$success = JPath::setPermissions($phpthumbcache, '0600', '0700');
@@ -633,15 +565,15 @@ class FlexicontentController extends JControllerLegacy
 				echo '<span class="install-notok"></span>';
 				jexit();
 			} else {
-				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_SET_PHPTHUMB_PERMS' ));
+				JFactory::getApplication()->enqueueMessage( JText::_('FLEXI_COULD_NOT_SET_PHPTHUMB_PERMS'), 'notice' );
 				return false;
 			}
+		}
+
+		if ($format == 'raw') {
+			echo '<span class="install-ok"></span>';
 		} else {
-			if ($format == 'raw') {
-				echo '<span class="install-ok"></span>';
-			} else {
-				return true;
-			}
+			return true;
 		}
 	}
 	
@@ -736,12 +668,10 @@ class FlexicontentController extends JControllerLegacy
 			." WHERE i.id IS NULL";
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
 		}
 		
@@ -755,17 +685,15 @@ class FlexicontentController extends JControllerLegacy
 		$query 	= 'INSERT INTO #__flexicontent_cats_item_relations'
 			.' (catid, itemid, ordering) '.$subquery;
 		$db->setQuery($query);
-		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
-		} else {
-			echo '<span class="install-ok"></span>';
 		}
+
+		echo '<span class="install-ok"></span>';
 	}
 	
 	/**
@@ -834,7 +762,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		catch (Exception $e) {
 			echo "Cannot convert FLEXIcontent associations to Joomla associations<br>";
-			JError::raiseWarning( 500, $e->getMessage() );
+			JFactory::getApplication()->enqueueMessage( $e->getMessage(), 'warning' );
 			$convert_assocs = $clear_assocs = false;
 		}
 		
@@ -927,13 +855,11 @@ class FlexicontentController extends JControllerLegacy
 					if ( isset($update_queries[$tblname]) )
 					{
 						$db->setQuery($update_queries[$tblname]);
-						try { $result = $db->execute(); }
-						catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 
-						if (!$result)
-						{
+						try { $db->execute(); }
+						catch (Exception $e) {
 							echo '<span class="install-notok"></span>';
-							if ($db->getErrorNum()) echo $db->getErrorMsg();
+							echo $e->getMessage();
 							jexit();
 						}
 					}
@@ -948,23 +874,22 @@ class FlexicontentController extends JControllerLegacy
 						$query .= implode(', ', $index_clause);
 						$db->setQuery($query);
 
-						try { $result = $db->execute(); }
-						catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-
-						if (!$result && $index_type!='indexdrop')
-						{
-							echo '<span class="install-notok"></span>';
-							if ($db->getErrorNum()) echo $db->getErrorMsg();
-							jexit();
+						try { $db->execute(); }
+						catch (Exception $e) {
+							if ($index_type!='indexdrop')
+							{
+								echo '<span class="install-notok"></span>';
+								echo $e->getMessage();
+								jexit();
+							}
 						}
 					}
 					JFile::delete($file);
 				}
 			}
-			echo '<span class="install-ok"></span>';
-		} else {
-			echo '<span class="install-ok"></span>';
 		}
+
+		echo '<span class="install-ok"></span>';
 	}
 	
 	
@@ -1027,16 +952,14 @@ class FlexicontentController extends JControllerLegacy
 					;
 		$db->setQuery($query);
 		
-		try { $result = $db->execute(); }
-		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
-		
-		if (!$result) {
+		try { $db->execute(); }
+		catch (Exception $e) {
 			echo '<span class="install-notok"></span>';
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			echo $e->getMessage();
 			jexit();
-		} else {
-			echo '<span class="install-ok"></span>';
 		}
+
+		echo '<span class="install-ok"></span>';
 	}
 	
 	/**
@@ -1361,7 +1284,8 @@ class FlexicontentController extends JControllerLegacy
 		}
 	}
 	
-	function initialPermission() {
+	function initialPermission()
+	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
@@ -1374,8 +1298,14 @@ class FlexicontentController extends JControllerLegacy
 		}
 	}
 
-	function checkDirtyFields() {
-		if (JRequest::getVar('task')!='' || JRequest::getVar('format')!='' || JRequest::getVar('tmpl')!='') return;
+	function checkDirtyFields()
+	{
+		// Do not execute in task=* requests, in non-HTML format requests, and in special template requests (e.g. tmpl=component)
+		if ($this->input->get('task', '', 'CMD') || $this->input->get('format', 'html', 'CMD') != 'html' || $this->input->get('tmpl', '', 'CMD'))
+		{
+			return;
+		}
+
 		$perms = FlexicontentHelperPerm::getPerm();
 		if ( !$perms->CanFields ) return;
 		
@@ -1398,8 +1328,14 @@ class FlexicontentController extends JControllerLegacy
 		$db->setQuery($query);
 		$dirty_advanced = $db->loadResult();
 		
-		if ($dirty_basic)    JError::raiseNotice( 403, JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_BASIC', $dirty_basic, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" ') );
-		if ($dirty_advanced) JError::raiseNotice( 403, JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_ADVANCED', $dirty_advanced, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" ') );
+		if ($dirty_basic)
+		{
+			JFactory::getApplication()->enqueueMessage( JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_BASIC', $dirty_basic, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '), 'notice' );
+		}
+		if ($dirty_advanced)
+		{
+			JFactory::getApplication()->enqueueMessage( JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_ADVANCED', $dirty_advanced, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '), 'notice' );
+		}
 	}
 	
 	
@@ -1408,7 +1344,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		@ob_end_clean();
-		JRequest::setVar('layout', 'fversion');
+		$this->input->set('layout', 'fversion');
 		parent::display();
 		exit;
 	}

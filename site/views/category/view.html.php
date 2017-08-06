@@ -61,7 +61,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
-		$uri      = JFactory::getURI();
+		$uri      = JUri::getInstance();
 		$user     = JFactory::getUser();
 		$aid      = JAccess::getAuthorisedViewLevels($user->id);
 		

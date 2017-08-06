@@ -89,13 +89,13 @@ class com_flexicontentInstallerScript
 		$jversion = new JVersion();
 		
 		// File version of new manifest file
-		$this->release = $parent->get( "manifest" )->version;
+		$this->release = $parent->getManifest()->version;
 		
 		// File version of existing manifest file
 		$this->release_existing = $existing_manifest[ 'version' ];
 		
 		// Manifest file minimum Joomla version
-		$this->minimum_joomla_release = $parent->get( "manifest" )->attributes()->version;
+		$this->minimum_joomla_release = $parent->getManifest()->attributes()->version;
 		
 		// !!! *** J2.5 no longer supported ***, For J2.5 require other minimum
 		/*if( version_compare( $jversion->getShortVersion(), '3.0', 'lt' ) )
@@ -748,7 +748,7 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `filename_original` VARCHAR(255) NOT NULL DEFAULT '' AFTER `filename`";
 					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NOT NULL AFTER `altname`";
 					}
 					if ( $files_tbl_exists && !array_key_exists('language', $tbl_fields['#__'.$tbl_name])) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
@@ -957,7 +957,7 @@ class com_flexicontentInstallerScript
 						  `content_id` int(11) NOT NULL,
 						  `type` varchar(255) NOT NULL DEFAULT 'item',
 						  `average_rating` float NOT NULL,
-						  `custom_ratings` text NOT NULL DEFAULT '',
+						  `custom_ratings` text NOT NULL,
 						  `user_id` int(11) NOT NULL DEFAULT '0',
 						  `email` varchar(255) NOT NULL DEFAULT '',
 						  `title` varchar(255) NOT NULL,
@@ -1172,7 +1172,7 @@ class com_flexicontentInstallerScript
 					
 			    $queries = array();
 					if ( !$fields_tbl_exists ) {
-						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL default ''";
+						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL";
 					}
 					
 					if ( !empty($queries) ) {
@@ -1257,7 +1257,7 @@ class com_flexicontentInstallerScript
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
 		
 		// Installed component manifest file version
-		$this->release = $parent->get( "manifest" )->version;
+		$this->release = $parent->getManifest()->version;
 		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .'Uninstalling FLEXIcontent '.$this->release. '</div>';
 		
 		// init vars

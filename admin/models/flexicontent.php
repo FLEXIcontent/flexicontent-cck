@@ -131,7 +131,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$total = $this->_db->loadResult();
 		
 		$genstats = array();
-		if ( !empty($ids) ) {
+		if ( !empty($ids) )
+		{
 			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')'
 				.' GROUP BY fv.item_id ';
 			$this->_db->SetQuery($query, 0, 5);
@@ -634,9 +635,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function checkCollations()
 	{
+		$db = $this->_db;
 		$session = JFactory::getSession();
 		$app = JFactory::getApplication();
-		$db = JFactory::getDBO();
+
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 		
@@ -804,7 +806,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Check missing in item counting table
 		$this->_db->setQuery($query);
 		$res = $this->_db->loadObject();
-		if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 		
 		$return = $res->total1 == $res->total2;
 		return $return;
@@ -865,7 +866,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$tblname_indexnames = array(
 			'flexicontent_tags'=>array('name'=>0),
 			'flexicontent_items_ext'=>array('lang_parent_id'=>0, 'type_id'=>0),
-			'flexicontent_items_tmp'=>array('alias'=>0, 'state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0),
+			'flexicontent_items_tmp'=>array('alias'=>64, 'state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0),
 			'flexicontent_fields_item_relations'=>array(
 				'value'=>32,
 				'value_integer'=>array('update'=>'CAST(value AS SIGNED)'),
@@ -932,12 +933,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$_update_clauses = array();
 			foreach($indexnames as $indexname => $iconf)
 			{
-				$query = "SELECT COUNT(1) AS IndexIsThere"
+				$query = "SELECT 1"
 					. " FROM INFORMATION_SCHEMA.STATISTICS"
 					. " WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."' AND index_name='".$indexname."'"
 					. (is_array($iconf) && !empty($iconf['cols'])
-						? " AND COLUMN_NAME IN ('".implode("','", array_keys($iconf['cols']))."') HAVING IndexIsThere = ".count($iconf['cols'])
-						: "");
+						? " AND COLUMN_NAME IN ('" . implode("','", array_keys($iconf['cols'])) . "')"
+						: "")
+					. " GROUP BY TABLE_NAME"
+					. (is_array($iconf) && !empty($iconf['cols'])
+						? " HAVING COUNT(TABLE_NAME) = ".count($iconf['cols'])
+						: "")
+					;
 				//if (is_array($iconf) && !empty($iconf['cols'])) echo $query ."<br/>";
 
 				$this->_db->setQuery($query);
@@ -1199,8 +1205,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$folders = flexicontent_tmpl::getThemes();
 		$views   = array('items', 'category');
 		
-		foreach ($folders as $folder) {
-			foreach ($views as $view) {
+		foreach ($folders as $folder)
+		{
+			foreach ($views as $view)
+			{
 				$groups = @ $tmpls->{$view}->{$folder}->positions;
 				if ($groups) {
 					foreach ($groups as $group) {
@@ -1213,15 +1221,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						$this->_db->setQuery( $query );
 						$fieldstopos = $this->_db->loadColumn();
 						
-						if ($fieldstopos) {
+						if ($fieldstopos)
+						{
 							$field = implode(',', $fieldstopos);
 
 							$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
 							$this->_db->setQuery($query);
+
 							// By catching SQL error (e.g. layout configuration of template already exists),
 							// we will allow execution to continue, thus clearing "positions" column in fields table
-							try { $this->_db->execute(); } catch (Exception $e) { }
-							if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
+							try { $this->_db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 						}
 					}
 				}
@@ -1293,44 +1302,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		return false;
 	}
 
-	/**
-	 * Method to check if FLEXI_SECTION (or FLEXI_CAT_EXTENSION for J1.6+) still exists
-	 *
-	 * @access public
-	 * @return	boolean	True on success
-	 */
-	function getExistsec()
-	{
-		if (FLEXI_CAT_EXTENSION) {
-			$query = 'SELECT COUNT( id )'
-			. ' FROM #__categories'
-			. ' WHERE id = 1 AND extension=\'system\''
-			;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-				
-			if ($count > 0) {
-				return true;
-			} else if (FLEXI_J16GE) {
-				die("Category table corrupted, SYSTEM root category not found");
-			} else {
-				// Save the created section as flexi_section for the component
-				$cparams = JComponentHelper::getParams('com_flexicontent');
-				$cparams->set('flexi_section', '');
-				$cparams_str = $cparams->toString();
-				
-				$flexi = JComponentHelper::getComponent('com_flexicontent');
-				$query = 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
-						. ' SET params = ' . $this->_db->Quote($cparams_str)
-						. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
-						;
-				$this->_db->setQuery($query);
-				$this->_db->execute();
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * Method to check if there is at list one menu item is created
@@ -1399,7 +1370,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_CAT_EXTENSION) return true;
 		
-		$db 		= &$this->_db;
+		$db = $this->_db;
 		$nullDate	= $db->getNullDate();
 
 		// @TODO: move somewhere else
@@ -1579,13 +1550,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$query .= implode(' ',$cases)
 			. ' END'
 			. ' WHERE '.$idcol.' IN ('.$ext_ids_list.')'
-			. ' AND folder =' . $db->Quote('flexicontent_fields')
-			. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
+			. '  AND folder =' . $db->Quote('flexicontent_fields')
+			. '  AND `type`=' . $db->Quote('plugin')
 			;
-		if ( count($cases) ) {
-			$db->setQuery($query);
-			$db->execute();
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+		if ( count($cases) )
+		{
+			$db->setQuery($query)->execute();
 		}
 		
 		/*$map = array(
@@ -1634,10 +1604,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. (FLEXI_J16GE ? ' AND `type`='. $db->Quote('plugin') : '')
 			. ' AND element IN ('.$elements_list.')'
 			;
-		if ( count($cases) ) {
+		if ( count($cases) )
+		{
 			$db->setQuery($query);
 			$db->execute();
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
 		}*/
 	}
 
@@ -1834,30 +1804,25 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
 		$db->setQuery($query);
 		
-		try { $db->execute(); } catch (Exception $e) { }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 
 		// DELETE bad top-level assets, only root.1 should exist
 		$query = $db->getQuery(true)->delete('#__assets')->where('(parent_id=0 OR level=0) AND name<>' . $db->quote('root.1'));
 		$db->setQuery($query);
 		
-		try { $db->execute(); } catch (Exception $e) { }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
-
+		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 
 		// SET Access View Level to public (=1) for fields that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
 		
-		try { $db->execute(); } catch (Exception $e) { }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 		
 		// SET Access View Level to public (=1) for types that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_types')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
 		
-		try { $db->execute(); } catch (Exception $e) { }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 		
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
 		$asset	= JTable::getInstance('asset');
@@ -1901,8 +1866,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$db->setQuery($query);
 		
-		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); echo $e->getMessage(); }
 		
 		if (!empty($result) && $debug_initial_perms) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
 		$category_section = count($result) == 0 ? 1 : 0;
@@ -1914,8 +1878,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		
-		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); echo $e->getMessage(); }
 		
 		if (!empty($result) && $debug_initial_perms) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
 		$field_section = count($result) == 0 ? 1 : 0;
@@ -1927,8 +1890,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		
-		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); echo $e->getMessage(); }
 		
 		if (!empty($result) && $debug_initial_perms) { echo "bad assets for types: "; print_r($result); echo "<br>"; }
 		$type_section = count($result) == 0 ? 1 : 0;
@@ -1942,8 +1904,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	
 	function initialPermission()
 	{
-		$component_name	= JRequest::getCmd('option');
-		$db     = $this->_db;
+		$app = JFactory::getApplication();
+		$component_name	= $app->input->get('option', '', 'CMD');
+		$db = $this->_db;
 		$asset	= JTable::getInstance('asset');   // Create an asset object
 		
 		/*** Component assets ***/
@@ -2053,8 +2016,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			//->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
 			->where( 'c.extension = ' . $db->quote('com_content') )
 			->order('c.level ASC');   // IMPORTANT create categories asset using increasing depth level, so that get parent assetid will not fail
-		$db->setQuery($query);
-		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+
+		$results = $db->setQuery($query)->loadObjectList();
 		
 		// Check that any assets of top-level categories point to the correct component (we used to make these point to 'com_flexicontent' asset)
 		$bad_cat_assets = array();
@@ -2086,8 +2049,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->where( ($asset->id ? ' id = ' . (int)$asset->id .' AND ' : '') . ' name = ' . $db->quote($name) );
 				$db->setQuery($query);
 				
-				try { $db->execute(); } catch (Exception $e) { }
-				if ($db->getErrorNum()) echo $db->getErrorMsg();
+				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 
 				// Nothing more to do
 				continue;
@@ -2099,9 +2061,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				->set('asset_id = ' . (int)$asset->id)
 				->where('id = ' . (int)$category->id);
 			$db->setQuery($query);
-			
-			try { $db->execute(); } catch (Exception $e) { }
-			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 		}
 		if (!empty($bad_cat_assets))
 		{
@@ -2121,11 +2081,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->from('#__assets AS se')->join('RIGHT', '#__content AS c ON se.id=c.asset_id AND se.name=concat("com_content.article.",c.id)')
 			->where('se.id is NULL');//->where('c.extension = ' . $db->quote('com_content'));
 		$db->setQuery($query);
-		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		$results = $db->loadObjectList();
 		
 		// Add an asset to every item that doesnot have one
-		if(count($results)>0) {
-			foreach($results as $item) {
+		if($results)
+		{
+			foreach($results as $item)
+			{
 				$parentId = $this->_getAssetParentId(null, $item);
 				$name = "com_content.article.{$item->id}";
 				
@@ -2179,12 +2141,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->set('asset_id = ' . (int)$asset->id)
 					->where('id = ' . (int)$item->id);
 				$db->setQuery($query);
-				
-				if (!$db->execute()) {
-					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-					return false;
-				}
+				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 			}
 		}
 		*/
@@ -2198,11 +2155,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
-		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		$results = $db->loadObjectList();
 		
 		// Add an asset to every field that doesnot have one
-		if(count($results)>0) {
-			foreach($results as $field) {
+		if($results)
+		{
+			foreach($results as $field)
+			{
 				$name = "com_flexicontent.field.{$field->id}";
 				
 				// Test if an asset for the current FIELD ID already exists and load it instead of creating a new asset
@@ -2244,12 +2203,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->set('asset_id = ' . (int)$asset->id)
 					->where('id = ' . (int)$field->id);
 				$db->setQuery($query);
-				
-				if (!$db->execute()) {
-					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-					return false;
-				}
+				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 			}
 		}
 
@@ -2262,11 +2216,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_types AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.type.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
-		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		$results = $db->loadObjectList();
 		
 		// Add an asset to every type that doesnot have one
-		if(count($results)>0) {
-			foreach($results as $type) {
+		if($results)
+		{
+			foreach($results as $type)
+			{
 				$name = "com_flexicontent.type.{$type->id}";
 				
 				// Test if an asset for the current TYPE ID already exists and load it instead of creating a new asset
@@ -2308,12 +2264,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->set('asset_id = ' . (int)$asset->id)
 					->where('id = ' . (int)$type->id);
 				$db->setQuery($query);
-				
-				if (!$db->execute()) {
-					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
-					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
-					return false;
-				}
+				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 			}
 		}
 		
@@ -2510,7 +2461,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$query	= $this->_db->getQuery(true)
 				->select('id')
 				->from('#__assets')
-				//->where('name = '.$this->_db->quote(JRequest::getCmd('option')));
 				->where('name = '.$this->_db->quote('com_content'));
 			$this->_db->setQuery($query);
 			$comp_assetid = (int) $this->_db->loadResult();

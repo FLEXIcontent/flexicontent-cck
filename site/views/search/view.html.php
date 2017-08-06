@@ -47,7 +47,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$db    = JFactory::getDBO();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
-		$uri   = JFactory::getURI();
+		$uri   = JUri::getInstance();
 		$pathway = $app->getPathway();
 		
 		// Get view's Model

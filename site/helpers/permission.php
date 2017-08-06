@@ -31,7 +31,10 @@ class FlexicontentHelperPerm
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 			
-			$permission = $catscache->call(array('FlexicontentHelperPerm', 'getUserPerms'), $user_id);
+			$permission = $catscache->get(
+				array('FlexicontentHelperPerm', 'getUserPerms'),
+				array($user_id)
+			);
 		}
 		
 		else {
@@ -182,7 +185,10 @@ class FlexicontentHelperPerm
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // set expire time (default is 1 hour)
 			
-			$allowedCats = $catscache->call(array('FlexicontentHelperPerm', '_getAllowedCats'), $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
+			$allowedCats = $catscache->get(
+				array('FlexicontentHelperPerm', '_getAllowedCats'),
+				array($user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first)
+			);
 		} else {
 			$allowedCats = FlexicontentHelperPerm::_getAllowedCats($user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
 		}

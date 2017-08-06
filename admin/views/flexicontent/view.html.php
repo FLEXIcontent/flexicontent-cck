@@ -47,8 +47,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$print_logging_info = $params->get('print_logging_info');
 		
 		// Special displaying when getting flexicontent version
-		$layout = JRequest::getVar('layout', 'default');
-		if($layout=='fversion') {
+		$layout = $app->input->get('layout', '', 'CMD');
+		if($layout=='fversion')
+		{
 			$this->fversion($tpl, $params);
 			return;
 		}
@@ -82,8 +83,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
 		$existcat 	= $model->getExistcat();
-		if (!FLEXI_J16GE)
-			$existsec = $model->getExistsec();
 		$existmenu 	= $model->getExistmenu();
 		
 		// 2. OPTIONAL AUTOMATIC TASKS,
@@ -99,7 +98,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// THE FOLLOWING WILL ONLY BE DISPLAYED IF $DOPOSTINSTALL IS INCOMPLETE
 		// SO WHY CALCULATE THEM, WE SKIP THEM, USER MUST LOG OUT ANYWAY TO SEE THEM ...
 		
-		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false)) {
+		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false))
+		{
 			$use_versioning = $params->get('use_versioning', 1);
 			
 			$existtype 			= $model->getExistType();
@@ -124,8 +124,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existdbindexes    = ! (boolean) ($missingindexes = $model->getExistDBindexes($check_only=false));
 			$itemcountingdok   = $model->getItemCountingDataOK();
 			$initialpermission = $model->checkInitialPermission();
-			
-		} else if ($optional_tasks) {  // IF optional tasks do not recheck instead just set the FLAGS to true
+		}
+
+		else if ($optional_tasks)  // IF optional tasks do not recheck instead just set the FLAGS to true
+		{
 			$existtype = $existmenuitems = $existfields = true;
 			$existfplg = $existseplg = $existsyplg = true;
 		  $existcats = $existlang = $existversions = $existversionsdata = $existauthors = true;
@@ -167,13 +169,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'flexicontent' );
+		JToolbarHelper::title( $doc_title, 'flexicontent' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if($perms->CanConfig)
@@ -188,7 +190,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 500, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
 							.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
 				";
-				JToolBarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
+				JToolbarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
 			}
 
 			if (0) // TODO evaluate for e.g. submiting a template
@@ -200,7 +202,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 					jQuery('#toolbar-language a.toolbar, #toolbar-language button').attr('href', '".$popup_load_url."')
 						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 540, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_SEND_LANGUAGE'), 2)."\'}); return false;');
 				";
-				JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
+				JToolbarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
 			}
 
 			$session = JFactory::getSession();
@@ -208,7 +210,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
 		$js .= "});";
@@ -236,53 +238,52 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$website 	= $app->getCfg('live_site');
 
 				
-		$this->assignRef('pending'		, $pending);
-		$this->assignRef('revised'		, $revised);
-		$this->assignRef('draft'		, $draft);
-		$this->assignRef('inprogress'	, $inprogress);
-		$this->assignRef('totalrows'	, $totalrows);
-		$this->assignRef('existcat'		, $existcat);
-		if (!FLEXI_J16GE)
-			$this->assignRef('existsec'		, $existsec);
-		$this->assignRef('existmenu'	, $existmenu);
-		$this->assignRef('template'		, $template);
-		$this->assignRef('params'		, $params);
-		$this->assignRef('lists'		, $lists);
-		$this->assignRef('activelang'	, $activelang);
-		$this->assignRef('mailfrom'		, $mailfrom);
-		$this->assignRef('fromname'		, $fromname);
-		$this->assignRef('website'		, $website);
+		$this->pending = $pending;
+		$this->revised = $revised;
+		$this->draft = $draft;
+		$this->inprogress = $inprogress;
+		$this->totalrows = $totalrows;
+		$this->existcat = $existcat;
+		$this->existmenu = $existmenu;
+		$this->template = $template;
+		$this->params = $params;
+		$this->lists = $lists;
+		$this->activelang = $activelang;
+		$this->mailfrom = $mailfrom;
+		$this->fromname = $fromname;
+		$this->website = $website;
 
 		// install check
-		$this->assignRef('dopostinstall'	, $postinst_integrity_ok);
-		$this->assignRef('allplgpublish'	, $allplgpublish);
+		$this->dopostinstall = $postinst_integrity_ok;
+		$this->allplgpublish = $allplgpublish;
 		
-		$this->assignRef('existtype'			, $existtype);
-		$this->assignRef('existmenuitems'	, $existmenuitems);
-		$this->assignRef('existfields'		, $existfields);
+		$this->existtype = isset($existtype) ? $existtype : null;
+		$this->existmenuitems = isset($existmenuitems) ? $existmenuitems : null;
+		$this->existfields = isset($existfields) ? $existfields : null;
 		
-		$this->assignRef('existfplg'			, $existfplg);
-		$this->assignRef('existseplg'			, $existseplg);
-		$this->assignRef('existsyplg'			, $existsyplg);
+		$this->existfplg = isset($existfplg) ? $existfplg : null;
+		$this->existseplg = isset($existseplg) ? $existseplg : null;
+		$this->existsyplg = isset($existsyplg) ? $existsyplg : null;
 		
-		$this->assignRef('existcats'			, $existcats);
-		$this->assignRef('existlang'			, $existlang);
-		$this->assignRef('existversions'		, $existversions);
-		$this->assignRef('existversionsdata', $existversionsdata);
-		$this->assignRef('existauthors'			, $existauthors);
+		$this->existcats = isset($existcats) ? $existcats : null;
+		$this->existlang = isset($existlang) ? $existlang : null;
+		$this->existversions = isset($existversions) ? $existversions : null;
+		$this->existversionsdata = isset($existversionsdata) ? $existversionsdata : null;
+		$this->existauthors = isset($existauthors) ? $existauthors : null;
 		
-		$this->assignRef('deprecatedfiles'	, $deprecatedfiles);
-		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
-		$this->assignRef('missingversion'		, $missingversion);
-		$this->assignRef('cachethumb'				, $cachethumb);
+		$this->deprecatedfiles = isset($deprecatedfiles) ? $deprecatedfiles : null;
+		$this->nooldfieldsdata = isset($nooldfieldsdata) ? $nooldfieldsdata : null;
+		$this->missingversion = isset($missingversion) ? $missingversion : null;
+		$this->cachethumb = isset($cachethumb) ? $cachethumb : null;
 
-		$this->assignRef('existdbindexes'	, $existdbindexes); $this->assignRef('missingindexes', $missingindexes);
-		$this->assignRef('itemcountingdok', $itemcountingdok);
-		$this->assignRef('initialpermission', $initialpermission);
+		$this->existdbindexes = isset($existdbindexes) ? $existdbindexes : null;
+		$this->missingindexes = isset($missingindexes) ? $missingindexes : null;
+		$this->itemcountingdok = isset($itemcountingdok) ? $itemcountingdok : null;
+		$this->initialpermission = isset($initialpermission) ? $initialpermission : null;
 		
 		// assign Rights to the template
-		$this->assignRef('perms'		, $perms);
-		$this->assignRef('document'		, $document);
+		$this->perms = $perms;
+		$this->document = $document;
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
@@ -326,7 +327,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	{
 		// Read installation file
 		$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
-		$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+		$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 		
 		// Version checking URL
 		$url = 'http://www.flexicontent.org/flexicontent_update.xml';
@@ -434,7 +435,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$cache->setCaching( 1 );
 		$cache->setLifeTime( 3600 );  // Set expire time (hard-code this to 1 hour), to avoid server load
 		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
-		$this->assignRef('check', $check);
+		$this->check = $check;
 		
 		parent::display($tpl);
 	}

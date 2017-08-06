@@ -61,7 +61,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$app  = JFactory::getApplication();
 		$user	= JFactory::getUser();
 		$session = JFactory::getSession();
-		$uri  = JFactory::getURI();
+		$uri  = JUri::getInstance();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
 		$cid	= $this->_cid;

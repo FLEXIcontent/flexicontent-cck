@@ -42,7 +42,7 @@ class FlexicontentViewTags extends JViewLegacy
 		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
-		$uri   = JFactory::getURI();
+		$uri   = JUri::getInstance();
 		$view  = JRequest::getCmd('view');
 		
 		// Get view's Model
