@@ -1777,7 +1777,7 @@ class plgSystemFlexisystem extends JPlugin
 				if (!file_exists($layoutpath)) return;
 			}
 			
-			// Load XML file
+			// Attempt to parse the XML file
 			$xml = simplexml_load_file($layoutpath);
 			if (!$xml)
 			{

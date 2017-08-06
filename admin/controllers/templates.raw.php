@@ -239,21 +239,19 @@ class FlexicontentControllerTemplates extends FlexicontentController
 				exit;
 			}
 		}
-		
-		// Get data from the model
-		// Load XML file
-		if (FLEXI_J30GE) {
-			$xml = simplexml_load_file($layoutpath);
-			$xmldoc = & $xml;
-		} else {
-			$xml = JFactory::getXMLParser('Simple');
-			$xml->loadFile($layoutpath);
-			$xmldoc = & $xml->document;
+
+		// Attempt to parse the XML file
+		$xml = simplexml_load_file($layoutpath);
+		if (!$xml)
+		{
+			die('Error parsing layout XML file : ' . $layoutpath);
 		}
-		
+
 		// Create form object, (form name seems not to cause any problem)
 		$form_layout = new JForm('com_flexicontent.layout.'.$layout_name, array('control' => 'jform', 'load_data' => true));
-		$tmpl_params = $xmldoc->asXML();
+
+		// Load XML file
+		$tmpl_params = $xml->asXML();
 		$form_layout->load($tmpl_params);
 		
 		// Load existing layout values into the object (that we got from DB)
