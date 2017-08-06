@@ -1020,7 +1020,8 @@ class FlexicontentController extends JControllerLegacy
 		// ///////////////////////
 		
 		// Also a compatibility check: Layout is form and task is not set:  this is new item submit ...
-		if ( $this->input->get('layout', false) == "form" && !$this->input->get('task', false)) {
+		if ( $this->input->get('layout', false) == "form" && !$this->input->get('task', false))
+		{
 			$this->input->set('browser_cachable', 0);
 			$this->input->set('task', 'add');
 			$this->add();

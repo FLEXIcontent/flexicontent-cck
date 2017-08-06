@@ -240,7 +240,7 @@ class FlexicontentViewField extends JViewLegacy
 				$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 				
 				$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
-				$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+				$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 				$ver_exceeded = version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=');
 				echo $ver_exceeded ? '
 					<span class="fc-note fc-mssg-inline">

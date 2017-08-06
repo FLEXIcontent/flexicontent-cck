@@ -1786,7 +1786,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if (!empty($login_redirect))
 				{
 					// redirect unlogged user to login
-					$uri		= JFactory::getURI();
+					$uri		= JUri::getInstance();
 					$return	= $uri->toString();
 					$url  = $this->_params->get('login_page', 'index.php?option=com_users&view=login');
 					$return = strtr(base64_encode($return), '+/=', '-_,');
@@ -1847,7 +1847,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ($user->guest)
 			{
 				// Redirect to login
-				$uri		= JFactory::getURI();
+				$uri		= JUri::getInstance();
 				$return	= $uri->toString();
 				$url  = $this->_params->get('login_page', 'index.php?option=com_users&view=login');
 				$return = strtr(base64_encode($return), '+/=', '-_,');

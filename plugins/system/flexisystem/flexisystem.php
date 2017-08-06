@@ -46,6 +46,8 @@ class plgSystemFlexisystem extends JPlugin
 
 		$this->extension = 'com_flexicontent';
 		$this->cparams = JComponentHelper::getParams($this->extension);
+		
+		//JFactory::getDBO()->setQuery("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
 	}
 	
 	
@@ -136,7 +138,7 @@ class plgSystemFlexisystem extends JPlugin
 				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->setCaching(1);                  // Force cache ON
 				$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
-				$globalcats = $catscache->call(array($this, 'getCategoriesTree'));
+				$globalcats = $catscache->get(array($this, 'getCategoriesTree'), array());
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}
@@ -332,7 +334,7 @@ class plgSystemFlexisystem extends JPlugin
 		}
 		
 		// Get current URL
-		$uri = JFactory::getUri();
+		$uri = JUri::getInstance();
 		
 		// First check excluded urls
 		foreach ($excluded_urls as $excluded_url) {
@@ -582,22 +584,31 @@ class plgSystemFlexisystem extends JPlugin
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
 		
-		// get the category tree and append the ancestors to each node
+		// Get the category tree
 		$query	= 'SELECT c.id, c.parent_id, c.published, c.access, c.title, c.level, c.lft, c.rgt, c.language,'
-			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug,'
-			. '  COUNT(rel.itemid) AS numitems'
+			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug, 0 AS numitems'
+			. ' FROM #__categories as c'
+			. ' WHERE c.extension=' . $db->Quote(FLEXI_CAT_EXTENSION) . ' AND c.lft > ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $db->Quote(FLEXI_RGT_CATEGORY)
+			. ' ORDER BY c.parent_id, c.lft'
+			;
+		$cats = $db->setQuery($query)->loadObjectList('id');
+
+		// Get total active items for every category
+		$query	= 'SELECT c.id, COUNT(rel.itemid) AS numitems'
 			. ' FROM #__categories as c'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
 			. ' LEFT JOIN #__content AS i ON rel.itemid=i.id '
 			. '  AND i.state IN (1,-5) '
-			. '  AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
-			. '  AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
-			. " WHERE c.extension='".FLEXI_CAT_EXTENSION."' AND c.lft > '" . FLEXI_LFT_CATEGORY . "' AND c.rgt < '" . FLEXI_RGT_CATEGORY . "'"
+			. '  AND ( i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' )'
+			. '  AND ( i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' )'
+			. ' WHERE c.extension=' . $db->Quote(FLEXI_CAT_EXTENSION) . ' AND c.lft > ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $db->Quote(FLEXI_RGT_CATEGORY)
 			. ' GROUP BY c.id'
-			. ' ORDER BY c.parent_id, c.lft'
 			;
-		$db->setQuery($query);
-		$cats = $db->loadObjectList();
+		$cat_totals = $db->setQuery($query)->loadObjectList('id');
+		foreach($cat_totals as $cat_id => $cat_total)
+		{
+			$cats[$cat_id]->numitems = $cat_total->numitems;
+		}
 
 		//establish the hierarchy of the categories
 		$children = array();
@@ -606,7 +617,8 @@ class plgSystemFlexisystem extends JPlugin
 		//set depth limit
 		$levellimit = 30;
 		
-		foreach ($cats as $child) {
+		foreach ($cats as $child)
+		{
 			$parent = $child->parent_id;
 			if ($parent) $parents[] = $parent;
 			$list = @$children[$parent] ? $children[$parent] : array();
@@ -1157,7 +1169,7 @@ class plgSystemFlexisystem extends JPlugin
 		$cache = JFactory::getCache('plg_'.$this->_name.'_'.__FUNCTION__);
 		$cache->setCaching(1);      // Force cache ON
 		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
-		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
 		// Execute every 15 minutes
 		$elapsed_time = time() - $last_check_time;  //JFactory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
@@ -1165,7 +1177,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Clear cache and call method again to restart the counter
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
-		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
@@ -1259,7 +1271,7 @@ class plgSystemFlexisystem extends JPlugin
 		$cache = JFactory::getCache('plg_'.$this->_name.'_'.__FUNCTION__);
 		$cache->setCaching(1);      // Force cache ON
 		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
-		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
 		// Execute every 15 minutes
 		$elapsed_time = time() - $last_check_time;  //JFactory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
@@ -1267,7 +1279,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Clear cache and call method again to restart the counter
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
-		$last_check_time = $cache->call(array($this, '_getLastCheckTime'), __FUNCTION__ );
+		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();

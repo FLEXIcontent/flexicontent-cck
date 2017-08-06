@@ -71,7 +71,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDBO();
-		$uri        = JFactory::getURI();
+		$uri        = JUri::getInstance();
 		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
 		if ( $app->isSite() )

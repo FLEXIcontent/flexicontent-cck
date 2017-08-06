@@ -42,7 +42,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
-		$uri   = JFactory::getURI();
+		$uri   = JUri::getInstance();
 		
 		// Get view's Model
 		$model  = $this->getModel();

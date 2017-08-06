@@ -417,7 +417,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		
 		// Check max allowed version
 		//$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
-		//$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+		//$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 		
 		// Append non value html of fields
 		$field->html =
