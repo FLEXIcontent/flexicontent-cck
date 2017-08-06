@@ -456,8 +456,7 @@ div table.fc-table-list.fc-tbl-short {
 	min-width: 400px;
 	float: left;
 }
-div table.fc-table-list,
-div#fc-dash-sliders table.fc-table-list {
+div table.fc-table-list {
 	font: 100%/30px 'Helvetica Neue', helvetica, arial, sans-serif;
 	text-shadow: 0 1px 0 #fff;
 	background: #f5f5f5;
@@ -465,12 +464,11 @@ div#fc-dash-sliders table.fc-table-list {
 	box-shadow: inset 0 1px 0 #fff;
 	font-size: 12px;
 	line-height: 24px;
-	margin: 16px auto;
+	margin: 16px;
 	text-align: left;
 	min-width: 50%;
 }
-div table.fc-table-list th,
-div#fc-dash-sliders table.fc-table-list th {
+div table.fc-table-list th {
 	background-color: #444444;
 	background-image: url(../images/noise1.png), -webkit-linear-gradient(#777777,#444444);
 	background-image: url(../images/noise1.png), linear-gradient(#777777,#444444);
@@ -486,8 +484,7 @@ div#fc-dash-sliders table.fc-table-list th {
 	position: relative;
 	text-shadow: 0 1px 0 #000;
 }
-div table.fc-table-list th:after,
-div#fc-dash-sliders table.fc-table-list th:after {
+div table.fc-table-list th:after {
 	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0.08));
 	content: '';
 	display: block;
@@ -498,17 +495,14 @@ div#fc-dash-sliders table.fc-table-list th:after {
 	top: 25%;
 	width: 100%;
 }
-div table.fc-table-list th:first-child,
-div#fc-dash-sliders table.fc-table-list th:first-child {
+div table.fc-table-list th:first-child {
 	border-left: 1px solid #777;
 	box-shadow: inset 1px 1px 0 #999;
 }
-div table.fc-table-list th:last-child,
-div#fc-dash-sliders table.fc-table-list th:last-child {
+div table.fc-table-list th:last-child {
 	box-shadow: inset -1px 1px 0 #999;
 }
-div table.fc-table-list td,
-div#fc-dash-sliders table.fc-table-list td {
+div table.fc-table-list td {
 	border-right: 1px solid #fff;
 	border-left: 1px solid #e8e8e8;
 	border-top: 1px solid #fff;
@@ -517,62 +511,49 @@ div#fc-dash-sliders table.fc-table-list td {
 	position: relative;
 	transition: all 300ms;
 }
-div table.fc-table-list.fc-tbl-short td,
-div#fc-dash-sliders table.fc-table-list.fc-tbl-short td {
+div table.fc-table-list.fc-tbl-short td {
 	padding: 0px 15px;
 	text-align: left;
 }
-div table.fc-table-list.fc-tbl-short td:first-child,
-div#fc-dash-sliders table.fc-table-list.fc-tbl-short td:first-child {
+div table.fc-table-list.fc-tbl-short td:first-child {
 	text-align: right;
 }
-div table.fc-table-list td a:not(.btn),
-div#fc-dash-sliders table.fc-table-list td a:not(.btn) {
+div table.fc-table-list td a:not(.btn) {
 	text-decoration: none;
 	color: #0088cc;
 	font-weight: bold;
 }
-div table.fc-table-list td:first-child,
-div#fc-dash-sliders table.fc-table-list td:first-child {
+div table.fc-table-list td:first-child {
 	box-shadow: inset 1px 0 0 #fff;
 }
-div table.fc-table-list td:last-child,
-div#fc-dash-sliders table.fc-table-list td:last-child {
+div table.fc-table-list td:last-child {
 	border-right: 1px solid #e8e8e8;
 	box-shadow: inset -1px 0 0 #fff;
 }
-div table.fc-table-list tr,
-div#fc-dash-sliders table.fc-table-list tr {
+div table.fc-table-list tr {
 	background: url(../images/noise1.png);
 }
-div table.fc-table-list tr:nth-child(odd) td,
-div#fc-dash-sliders table.fc-table-list tr:nth-child(odd) td {
+div table.fc-table-list tr:nth-child(odd) td {
 	background: #f1f1f1 url(../images/noise1.png);
 }
-div table.fc-table-list tr:last-of-type td,
-div#fc-dash-sliders table.fc-table-list tr:last-of-type td {
+div table.fc-table-list tr:last-of-type td {
 	box-shadow: inset 0 -1px 0 #fff;
 }
-div table.fc-table-list tr:last-of-type td:first-child,
-div#fc-dash-sliders table.fc-table-list tr:last-of-type td:first-child {
+div table.fc-table-list tr:last-of-type td:first-child {
 	box-shadow: inset 1px -1px 0 #fff;
 }
-div table.fc-table-list tr:last-of-type td:last-child,
-div#fc-dash-sliders table.fc-table-list tr:last-of-type td:last-child {
+div table.fc-table-list tr:last-of-type td:last-child {
 	box-shadow: inset -1px -1px 0 #fff;
 }
-div table.fc-table-list thead tr:hover th,
-div#fc-dash-sliders table.fc-table-list thead tr:hover th {
+div table.fc-table-list thead tr:hover th {
 	color: white;
 	background-color: #ffffdd;
 }
-div table.fc-table-list tbody tr:hover td,
-div#fc-dash-sliders table.fc-table-list tbody tr:hover td {
+div table.fc-table-list tbody tr:hover td {
 	color: black;
 	background-color: #dddddd;
 }
-div table.fc-table-list tbody tr:hover td a:not(.btn),
-div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
+div table.fc-table-list tbody tr:hover td a:not(.btn) {
 	color: #0088cc;
 }
 #flexicontent fieldset.fc-board-set {
@@ -594,6 +575,10 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 	padding: 12px 0px 0px 12px;
 	width: auto;
 	background: none repeat scroll 0 0 #f5f5f5;
+}
+div#fc-dash-sliders table.table {
+	width: unset;
+	margin: 8px 32px;
 }
 #flexicontent .fc-board-header {
 	float: left;

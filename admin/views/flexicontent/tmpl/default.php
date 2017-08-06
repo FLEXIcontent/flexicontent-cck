@@ -498,7 +498,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'pending' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			?>
-			<table class="fc-table-list">
+			<table class="table">
 				
 				<thead>
 				<tr>
@@ -538,20 +538,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
-				<?php if (count($this->pending) < $this->totalrows['pending']) : ?>
-				<tr>
-					<td colspan="3" style="padding-top:0!important;"> ... </td>
-				</tr>
-				<?php endif; ?>
-				</tbody>
-				
-				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
+						... &nbsp;
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
-				</tfoot>
+				</tbody>
 
 			</table>
 			<?php
@@ -564,7 +557,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'revised' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 			?>
-			<table class="fc-table-list">
+			<table class="table">
 				
 				<thead>
 				<tr>
@@ -604,20 +597,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->modifier; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
-				<?php if (count($this->revised) < $this->totalrows['revised']) : ?>
-				<tr>
-					<td colspan="3" style="padding-top:0!important;"> ... </td>
-				</tr>
-				<?php endif; ?>
-				</tbody>
-				
-				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
+						... &nbsp;
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
-				</tfoot>
+				</tbody>
 
 			</table>
 			<?php
@@ -631,7 +617,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'inprogress' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
-			<table class="fc-table-list">
+			<table class="table">
 				
 				<thead>
 				<tr>
@@ -671,20 +657,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
-				<?php if (count($this->inprogress) < $this->totalrows['inprogress']) : ?>
-				<tr>
-					<td colspan="3" style="padding-top:0!important;"> ... </td>
-				</tr>
-				<?php endif; ?>
-				</tbody>
-				
-				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
+						... &nbsp;
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
-				</tfoot>
+				</tbody>
+				
 
 			</table>
 			<?php
@@ -698,7 +678,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'draft' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
-			<table class="fc-table-list">
+			<table class="table">
 				
 				<thead>
 				<tr>
@@ -738,20 +718,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
-				<?php if (count($this->draft) < $this->totalrows['draft']) : ?>
-				<tr>
-					<td colspan="3" style="padding-top:0!important;"> ... </td>
-				</tr>
-				<?php endif; ?>
-				</tbody>
-				
-				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
+						... &nbsp;
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
-				</tfoot>
+				</tbody>
 
 			</table>
 			<?php
