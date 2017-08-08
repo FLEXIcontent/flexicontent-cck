@@ -3946,10 +3946,6 @@ class FlexicontentFields
 	// Method to create a calendar form field according to a given configuation, e.g. called during Filter Creation of FC views
 	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs=array(), $skip_on_invalid=false, $timezone=false, $date_format='%Y-%m-%d')
 	{
-		// 'false' timezone means ==> use server setting (=joomla site configured TIMEZONE),
-		// in J1.5 this must be null for using server setting (=joomla site configured OFFSET)
-		$timezone = ($timezone === false && !FLEXI_J16GE) ? null : $timezone;
-		
 		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
 		

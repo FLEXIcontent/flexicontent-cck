@@ -1984,3 +1984,45 @@
 		form.appendChild(button).click();
 		form.removeChild(button);
 	}
+
+
+	/*
+	 * Allow custom input in date fields having the custom text class
+	 */
+	document.addEventListener('DOMContentLoaded', function()
+	{
+		if (typeof JoomlaCalendar.prototype.setAltValue == 'function')
+		{
+			var JoomlaCalendar_setAltValue_fc = JoomlaCalendar.prototype.setAltValue;
+			JoomlaCalendar.prototype.setAltValue = function()
+			{
+				if (this.inputField.classList.contains('fc_date_allow_text'))
+				{
+					return;
+				}
+				return JoomlaCalendar_setAltValue_fc.call(this, arguments);
+			};
+		}
+		
+		if (typeof JoomlaCalendar.init == 'function')
+		{
+			var JoomlaCalendar_init_fc = JoomlaCalendar.init;
+			JoomlaCalendar.init = function()
+			{
+				var result = JoomlaCalendar_init_fc.apply(null, arguments);
+
+				var element = arguments[0];
+				var input = element ? element.getElementsByTagName('input')[0] : false;
+
+				if (input)
+				{
+					if (!!input.id && input.classList.contains('fc_date_allow_text'))
+					{
+						input.value = document.getElementById(input.id + '_fc_value').getAttribute('data-fc-value');
+					}
+				}
+
+				return result;
+			}
+		}
+	});
