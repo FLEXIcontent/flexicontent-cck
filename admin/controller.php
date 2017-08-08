@@ -390,11 +390,7 @@ class FlexicontentController extends JControllerLegacy
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$db = JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
-		} else {
-			$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
-		}
+		$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
 		$flexi_comp_id = $db->loadResult();	
 		
 		$db->setQuery("DELETE FROM #__menu_types WHERE menutype='flexihiddenmenu' ");	
@@ -410,9 +406,11 @@ class FlexicontentController extends JControllerLegacy
 		$query 	=	"INSERT INTO #__menu ("
 			."`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,"
 			."`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`, `language`"
+			. (FLEXI_J40GE ? ", `img`" : '')
 		.") VALUES ("
 			."'flexihiddenmenu','Content','content_page','content_page','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,"
 			."0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0,'*'"
+			. (FLEXI_J40GE ? ", ''" : "")
 		.")";
 		
 		$db->setQuery($query);

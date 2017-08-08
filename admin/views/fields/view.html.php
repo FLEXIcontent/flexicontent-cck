@@ -142,7 +142,7 @@ class FlexicontentViewFields extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FIELDS' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'fields' );
+		JToolbarHelper::title( $doc_title, 'fields' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -174,23 +174,23 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		if ($perms->CanCopyFields)
 		{
-			JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
-			JToolBarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
-			JToolBarHelper::divider();
+			JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+			JToolbarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
+			JToolbarHelper::divider();
 		}
 
-		JToolBarHelper::publishList($contrl.'publish');
-		JToolBarHelper::unpublishList($contrl.'unpublish');
+		JToolbarHelper::publishList($contrl.'publish');
+		JToolbarHelper::unpublishList($contrl.'unpublish');
 		if ($perms->CanAddField) {
-			JToolBarHelper::addNew($contrl.'add');
+			JToolbarHelper::addNew($contrl.'add');
 		}
 		if ($perms->CanEditField)
 		{
-			JToolBarHelper::editList($contrl.'edit');
+			JToolbarHelper::editList($contrl.'edit');
 		}
 		if ($perms->CanDeleteField)
 		{
-			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
 			$btn_task    = $contrl.'remove';
@@ -242,13 +242,13 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		
 		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		$js .= "});";

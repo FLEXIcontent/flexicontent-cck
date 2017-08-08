@@ -1151,15 +1151,15 @@ jQuery(document).ready(function(){
 		if ($unpublishableFound)
 		{
 			$ctrl_task = 'items.approval';
-			JToolBarHelper::spacer();
-			JToolBarHelper::divider();
-			JToolBarHelper::spacer();
+			JToolbarHelper::spacer();
+			JToolbarHelper::divider();
+			JToolbarHelper::spacer();
 			FLEXI_J16GE ?
-				JToolBarHelper::custom( $ctrl_task, 'apply.png', 'apply.png', 'FLEXI_APPROVAL_REQUEST' ) :
-				JToolBarHelper::custom( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
+				JToolbarHelper::custom( $ctrl_task, 'apply.png', 'apply.png', 'FLEXI_APPROVAL_REQUEST' ) :
+				JToolbarHelper::custom( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
-		JToolBarHelper::spacer();
-		JToolBarHelper::spacer();
+		JToolbarHelper::spacer();
+		JToolbarHelper::spacer();
 		?>
 	</tbody>
 

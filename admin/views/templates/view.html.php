@@ -85,7 +85,7 @@ class FlexicontentViewTemplates extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TEMPLATES' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'templates' );
+		JToolbarHelper::title( $doc_title, 'templates' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
@@ -112,15 +112,15 @@ class FlexicontentViewTemplates extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
 		
-		//JToolBarHelper::Back();
+		//JToolbarHelper::Back();
 		if ($perms->CanConfig) {
-			//JToolBarHelper::divider(); JToolBarHelper::spacer();
+			//JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		$tmpldirectory = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;

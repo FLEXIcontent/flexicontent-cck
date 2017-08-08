@@ -699,8 +699,7 @@ body .fc-close:hover {
 	background: none;
 }
 body .fc-mssg,
-body .fc-mssg-inline,
-body .fc-field-invalid {
+body .fc-mssg-inline {
 	border: 1px solid;
 	display: block;
 	margin: 1px 0 5px 0;

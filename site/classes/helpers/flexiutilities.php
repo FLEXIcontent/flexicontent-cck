@@ -125,11 +125,11 @@ class FLEXIUtilities
 			. ' ORDER BY lc.ordering ASC '
 			;
 	
-		if ( !empty($query) ) {
+		if ( !empty($query) )
+		{
 			$db->setQuery($query);
 			$languages = $db->loadObjectList('id');
 			//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		}
 		
 		
@@ -316,8 +316,10 @@ class FLEXIUtilities
 
 	static function &currentMissing()
 	{
-		static $status;
-		if(!$status) {
+		static $status = null;
+
+		if ($status === null)
+		{
 			$db = JFactory::getDBO();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
@@ -327,15 +329,10 @@ class FLEXIUtilities
 				." LIMIT 0,1";
 			$db->setQuery($query);
 			$rows = $db->loadObjectList("id");
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 
-			$rows = is_array($rows) ? $rows : array();
-			$status = false;
-			if(count($rows)>0) {
-				$status = true;
-			}
-			unset($rows);
+			$status = !empty($rows);
 		}
+
 		return $status;
 	}
 

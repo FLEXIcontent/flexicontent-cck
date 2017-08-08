@@ -128,7 +128,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_CATEGORIES' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'fc_categories' );
+		JToolbarHelper::title( $doc_title, 'fc_categories' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -136,7 +136,7 @@ class FlexicontentViewCategories extends JViewLegacy
 
 		$contrl = "categories.";
 		$contrl_singular = "category.";
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		
 		// Copy Parameters
@@ -148,10 +148,10 @@ class FlexicontentViewCategories extends JViewLegacy
 				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 600, 440, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
 					.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_COPY_PARAMS'), 2)."\'}); return false;');
 		";
-		JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
+		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 
 		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
-		JToolBarHelper::divider();
+		JToolbarHelper::divider();
 		
 		$add_divider = false;
 		if ( $user->authorise('core.create', 'com_flexicontent') ) {
@@ -164,25 +164,25 @@ class FlexicontentViewCategories extends JViewLegacy
 		}
 		
 		if ( $cancreate_cat ) {
-			JToolBarHelper::addNew($contrl_singular.'add');
+			JToolbarHelper::addNew($contrl_singular.'add');
 			$add_divider = true;
 		}
 		if ( $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent') ) {
-			JToolBarHelper::editList($contrl_singular.'edit');
+			JToolbarHelper::editList($contrl_singular.'edit');
 			$add_divider = true;
 		}
 		
 		$add_divider = false;
 		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') ) {
-			JToolBarHelper::publishList($contrl.'publish');
-			JToolBarHelper::unpublishList($contrl.'unpublish');
-			JToolBarHelper::divider();
-			JToolBarHelper::archiveList($contrl.'archive');
+			JToolbarHelper::publishList($contrl.'publish');
+			JToolbarHelper::unpublishList($contrl.'unpublish');
+			JToolbarHelper::divider();
+			JToolbarHelper::archiveList($contrl.'archive');
 		}
 		
 		$add_divider = false;
 		if ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) {
-			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
 			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
@@ -195,13 +195,13 @@ class FlexicontentViewCategories extends JViewLegacy
 			$add_divider = true;
 		}
 		elseif ( $user->authorise('core.edit.state', 'com_flexicontent') ) {
-			JToolBarHelper::trash($contrl.'trash');
+			JToolbarHelper::trash($contrl.'trash');
 			$add_divider = true;
 		}
-		if ($add_divider) JToolBarHelper::divider();
+		if ($add_divider) JToolbarHelper::divider();
 		
 		// Checkin
-		JToolBarHelper::checkin($contrl.'checkin');
+		JToolbarHelper::checkin($contrl.'checkin');
 
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
@@ -226,13 +226,13 @@ class FlexicontentViewCategories extends JViewLegacy
 		}
 		
 		if ($perms->CanConfig) {
-			//JToolBarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
+			//JToolbarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		

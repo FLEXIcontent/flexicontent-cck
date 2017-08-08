@@ -252,7 +252,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$site_title = $document->getTitle();
 		if ($view!='fileselement')
 		{
-			JToolBarHelper::title( $doc_title, 'files' );
+			JToolbarHelper::title( $doc_title, 'files' );
 		}
 		$document->setTitle($doc_title .' - '. $site_title);
 		
@@ -461,16 +461,16 @@ class FlexicontentViewFilemanager extends JViewLegacy
 	function setToolbar()
 	{
 		$document = JFactory::getDocument();
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		$contrl = "filemanager.";
-		JToolBarHelper::editList($contrl.'edit');
+		JToolbarHelper::editList($contrl.'edit');
 		JToolbarHelper::checkin($contrl.'checkin');
-		JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
+		JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
 		$js = "jQuery(document).ready(function(){";
 		if ($perms->CanConfig)
@@ -483,18 +483,18 @@ class FlexicontentViewFilemanager extends JViewLegacy
 					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
 						.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
 			";
-			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
+			JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
 		}
 
 		if ($perms->CanConfig)
 		{
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		$js .= "});";

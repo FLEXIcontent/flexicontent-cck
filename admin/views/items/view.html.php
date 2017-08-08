@@ -222,10 +222,10 @@ class FlexicontentViewItems extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_ITEMS' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'items' );
+		JToolbarHelper::title( $doc_title, 'items' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		
 		// Implementation of multiple-item state selector
@@ -236,12 +236,12 @@ class FlexicontentViewItems extends JViewLegacy
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
 
 			/*$btn_task = '';
-			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolBarHelper::publishList( $btn_task );
+			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
 			$js .= "
 				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
 					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
 			";
-			JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
+			JToolbarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
 
 			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
 			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
@@ -272,7 +272,7 @@ class FlexicontentViewItems extends JViewLegacy
 			if ( $filter_state && in_array('T',$filter_state) ) {
 				//$btn_msg = JText::_('FLEXI_ARE_YOU_SURE');
 				//$btn_task = 'items.remove';
-				//JToolBarHelper::deleteList($btn_msg, $btn_task);
+				//JToolbarHelper::deleteList($btn_msg, $btn_task);
 				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 				$btn_task    = 'items.remove';
@@ -318,36 +318,36 @@ class FlexicontentViewItems extends JViewLegacy
 				'FLEXI_RESTORE', 'restore', $full_js='', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
-		if ($add_divider) { JToolBarHelper::divider(); }
+		if ($add_divider) { JToolbarHelper::divider(); }
 		
 		$add_divider = false;
 		if ($CanAddAny)
 		{
 			$btn_task = '';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
-			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolBarHelper::addNew( $btn_task );
+			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
 			$js .= "
 				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
 					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 240, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
 			";
-			JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
+			JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
 			$add_divider = true;
 		}
 		if ($hasEdit)
 		{
 			$btn_task = 'items.edit';
-			JToolBarHelper::editList($btn_task);
+			JToolbarHelper::editList($btn_task);
 			$add_divider = true;
 		}
-		if ($add_divider) { JToolBarHelper::divider(); }
+		if ($add_divider) { JToolbarHelper::divider(); }
 		
 		$add_divider = false;
 		if ($CanAddAny && $CanCopy)
 		{
 			$btn_task = 'items.copy';
-			JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
+			JToolbarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
 			if ($useAssocs) {
-				JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
+				JToolbarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
 			}
 			$add_divider = true;
 		}
@@ -362,14 +362,14 @@ class FlexicontentViewItems extends JViewLegacy
 				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
 		}
 
-		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
+		if ($add_divider) { JToolbarHelper::divider(); JToolbarHelper::spacer(); }
 		if ($perms->CanConfig) {
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		$js .= "});";
@@ -793,12 +793,12 @@ class FlexicontentViewItems extends JViewLegacy
 			$doc_title = JText::_( 'FLEXI_BATCH' /*'FLEXI_COPYMOVE_ITEM'*/ );
 		}
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'itemadd' );
+		JToolbarHelper::title( $doc_title, 'itemadd' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
-		JToolBarHelper::save('items.copymove');
-		JToolBarHelper::cancel('items.cancel');
+		JToolbarHelper::save('items.copymove');
+		JToolbarHelper::cancel('items.cancel');
 
 		//Get data from the model
 		$rows     = $this->get( 'Data');

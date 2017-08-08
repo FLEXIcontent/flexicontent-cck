@@ -103,15 +103,15 @@ class FlexicontentViewType extends JViewLegacy
 		// ***
 		// *** Create the toolbar
 		// ***
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
 		
 		// SET toolbar title
 		!$isnew
-			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'typeedit' )   // Editing existing type
-			: JToolBarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'typeadd' );    // Creating new type
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'typeedit' )   // Editing existing type
+			: JToolbarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'typeadd' );    // Creating new type
 
 
 
@@ -139,7 +139,7 @@ class FlexicontentViewType extends JViewLegacy
 		$btn_task = $ctrl.'.apply';
 		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
 
-		//JToolBarHelper::apply($btn_task, $btn_title, false);
+		//JToolbarHelper::apply($btn_task, $btn_title, false);
 
 		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -158,7 +158,7 @@ class FlexicontentViewType extends JViewLegacy
 		$btn_name = 'save';
 		$btn_task = $ctrl.'.save';
 
-		//JToolBarHelper::save($btn_task);  //JToolBarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 		
 		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
@@ -172,7 +172,7 @@ class FlexicontentViewType extends JViewLegacy
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
 
-			//JToolBarHelper::save2new($btn_task);  //JToolBarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
@@ -185,7 +185,7 @@ class FlexicontentViewType extends JViewLegacy
 				$btn_name = 'save2copy';
 				$btn_task = $ctrl.'.save2copy';
 
-				//JToolBarHelper::save2copy($btn_task);  //JToolBarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+				//JToolbarHelper::save2copy($btn_task);  //JToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
 
 				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
@@ -198,8 +198,8 @@ class FlexicontentViewType extends JViewLegacy
 
 		// Cancel button
 		$isnew
-			? JToolBarHelper::cancel($ctrl.'.cancel')
-			: JToolBarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+			? JToolbarHelper::cancel($ctrl.'.cancel')
+			: JToolbarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
 
 
 

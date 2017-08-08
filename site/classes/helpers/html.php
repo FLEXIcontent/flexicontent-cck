@@ -4586,7 +4586,7 @@ class flexicontent_html
 		$text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='',
 		$list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="", $attrs='', $auto_add = true, $tag_type='a')
 	{
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		$text  = JText::_($text);
 		$class = $btn_icon ? $btn_icon : 'icon-32-'.$btn_name;
 
@@ -4632,7 +4632,7 @@ class flexicontent_html
 	// * Create a drop down button menu inside Joomla Toolbar
 	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null)
 	{
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		
 		if (!count($btn_arr))
 		{

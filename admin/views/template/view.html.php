@@ -215,14 +215,14 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		FLEXIUtilities::ManagerSideMenu('CanTemplates');
 
 		//create the toolbar
-		$bar = JToolBar::getInstance('toolbar');
-		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
+		$bar = JToolbar::getInstance('toolbar');
+		JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
 		if (!$ismodal) {
-			JToolBarHelper::apply('templates.apply');
-			JToolBarHelper::save('templates.save');
-			JToolBarHelper::cancel('templates.cancel');
+			JToolbarHelper::apply('templates.apply');
+			JToolbarHelper::save('templates.save');
+			JToolbarHelper::cancel('templates.cancel');
 		} else {
-			JToolBarHelper::apply('templates.apply_modal');
+			JToolbarHelper::apply('templates.apply_modal');
 			echo $bar->render();
 		}
 		

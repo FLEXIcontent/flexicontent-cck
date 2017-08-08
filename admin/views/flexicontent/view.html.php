@@ -416,7 +416,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		
 		if( $data && strstr($data, '<?xml') )
 		{
-			$xml = JFactory::getXML($data, $isFile=false);
+			$xml = simplexml_load_string($data);
 			$check['version']  = (string)$xml->version;
 			$check['released'] = (string)$xml->released;
 			$check['connect']  = 1;

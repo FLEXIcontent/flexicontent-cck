@@ -1991,7 +1991,7 @@
 	 */
 	document.addEventListener('DOMContentLoaded', function()
 	{
-		if (typeof JoomlaCalendar.prototype.setAltValue == 'function')
+		if (typeof JoomlaCalendar != 'undefined')
 		{
 			var JoomlaCalendar_setAltValue_fc = JoomlaCalendar.prototype.setAltValue;
 			JoomlaCalendar.prototype.setAltValue = function()
@@ -2002,10 +2002,7 @@
 				}
 				return JoomlaCalendar_setAltValue_fc.call(this, arguments);
 			};
-		}
-		
-		if (typeof JoomlaCalendar.init == 'function')
-		{
+
 			var JoomlaCalendar_init_fc = JoomlaCalendar.init;
 			JoomlaCalendar.init = function()
 			{
