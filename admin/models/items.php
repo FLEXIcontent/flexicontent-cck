@@ -332,7 +332,6 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 				$rows = $this->_db->loadObjectList();
 				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
 				// 2, get current items total for pagination
 				$this->_db->setQuery("SELECT FOUND_ROWS()");
@@ -355,7 +354,6 @@ class FlexicontentModelItems extends JModelLegacy
 				$_data = $this->_db->setQuery($query)->loadObjectList('item_id');
 			}
 			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			// 5, reorder items and get cat ids
 			$this->_data = array();
@@ -885,6 +883,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$query_len = 0;
 			}
 		}
+
 		// Update temporary item data
 		$this->updateItemCountingData($rows);
 	}
@@ -930,9 +929,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$query .= $row_ids ? ' WHERE c.id IN (' . implode(',', $row_ids) . ')' : '';
 
 		$db->setQuery($query);
-
-		try { $result = $db->execute(); } catch (Exception $e) { $result = false; }
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		try { $result = $db->execute(); } catch (Exception $e) { $result = false; echo $e->getMessage(); }
 
 		return $result;
 	}
@@ -2279,13 +2276,7 @@ class FlexicontentModelItems extends JModelLegacy
 			
 			$this->_db->setQuery( $sql, 0, 1 );  //echo $sql."\n";
 			$row = $this->_db->loadObject();
-			
-			if ( $this->_db->getErrorNum() ) {
-				$msg = $this->_db->getErrorMsg();
-				$this->setError( $msg );
-				return false;
-			}
-			
+
 			if (isset($row))
 			{
 				// NEXT or PREVIOUS item found, swap its order with currently moved item
@@ -2297,12 +2288,6 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery( $query );  //echo $query."\n";
 				$this->_db->execute();
 
-				if ( $this->_db->getErrorNum() ) {
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
-
 				$query = 'UPDATE #__flexicontent_cats_item_relations'
 					. ' SET ordering = '.(int) $origin->ordering
 					. ' WHERE itemid = '. (int) $row->itemid
@@ -2310,12 +2295,6 @@ class FlexicontentModelItems extends JModelLegacy
 					;
 				$this->_db->setQuery( $query );  //echo $query."\n";
 				$this->_db->execute();
-
-				if ( $this->_db->getErrorNum() ) {
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
 
 				$origin->ordering = $row->ordering;
 			}
@@ -2429,12 +2408,6 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery( $query );  //echo "<pre>". $query."\n";
 				$row = $this->_db->loadObject();
 				
-				if ( $this->_db->getErrorNum() ) {
-					$msg = $this->_db->getErrorMsg();
-					$this->setError( $msg );
-					return false;
-				}
-				
 				$row_stategrp = @ $state_grp_arr[$row->state];
 				
 				if ($prev_order[$i] != $order[$i]) {
@@ -2447,14 +2420,10 @@ class FlexicontentModelItems extends JModelLegacy
 							;
 					$this->_db->setQuery($query);  //echo "$query <br/>";
 					$this->_db->execute();
-					
-					if ( $this->_db->getErrorNum() ) {
-						$msg = $this->_db->getErrorMsg();
-						$this->setError( $msg );
-						return false;
-					}
-					
-				} else {
+				}
+
+				else
+				{
 					// Detect columns with duplicate orderings, to force reordering them
 					$_cid = $ord_catid[$i];  $_ord = $prev_order[$i];
 					if ( isset( $ord_count[$_cid][$row_stategrp][ (FLEXI_FISH || FLEXI_J16GE) ? $row->language : '_' ][$_ord] ) ) {
@@ -2485,13 +2454,7 @@ class FlexicontentModelItems extends JModelLegacy
 								;
 						$this->_db->setQuery( $query );  //echo "$query <br/>";
 						$rows = $this->_db->loadObjectList();
-						
-						if ( $this->_db->getErrorNum() ) {
-							$msg = $this->_db->getErrorMsg();
-							$this->setError( $msg );
-							return false;
-						}
-						
+
 						// Compact the ordering numbers
 						$cnt = 0;
 						foreach ($rows as $row)
@@ -2508,12 +2471,6 @@ class FlexicontentModelItems extends JModelLegacy
 											;
 									$this->_db->setQuery( $query);  //echo "$query <br/>";
 									$this->_db->execute();
-									
-									if ( $this->_db->getErrorNum() ) {
-										$msg = $this->_db->getErrorMsg();
-										$this->setError( $msg );
-										return false;
-									}
 								}
 							}
 						}

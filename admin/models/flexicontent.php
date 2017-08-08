@@ -2070,83 +2070,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				'. print_r($bad_cat_assets, true) .'
 			</div>';
 		}
-		
-		
-		
-		/*** ITEM assets ***/
-		/*
-		// Get a list com_content items that do not have assets (or have wrong asset names)
-		$query = $db->getQuery(true)
-			->select('c.id, c.catid as parent_id, c.title, c.asset_id')
-			->from('#__assets AS se')->join('RIGHT', '#__content AS c ON se.id=c.asset_id AND se.name=concat("com_content.article.",c.id)')
-			->where('se.id is NULL');//->where('c.extension = ' . $db->quote('com_content'));
-		$db->setQuery($query);
-		$results = $db->loadObjectList();
-		
-		// Add an asset to every item that doesnot have one
-		if($results)
-		{
-			foreach($results as $item)
-			{
-				$parentId = $this->_getAssetParentId(null, $item);
-				$name = "com_content.article.{$item->id}";
-				
-				// Try to load asset for the current CATEGORY ID
-				$asset_found = $asset->loadByName($name);
-				
-				if ( !$asset_found ) {
-					if ($item->asset_id) {
-						// asset name not found but item has an asset id set ?, we could delete it here
-						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
-					}
-					
-					// Set id to null since we will be creating a new asset on store
-					$asset->id 		= null;
-					
-					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new JAccessRules();
-					
-					//if ($parentId == $component_asset->id) {				
-					//	$actions	= JAccess::getActions($component_name, 'article');
-					//	$rules 		= json_decode($component_asset->rules);		
-					//	foreach ($actions as $action) {
-					//		$catrules[$action->name] = $rules->{$action->name};
-					//	}
-					//	$rules = new JAccessRules(json_encode($catrules));
-					//	$asset->rules = $rules->__toString();
-					//} else {
-					//	$parent = JTable::getInstance('asset');
-					//	$parent->load($parentId);
-					//	$asset->rules = $parent->rules;
-					//}
-				} else {
-					// do not change (a) the id OR (b) the rules, of the asset
-				}
-				
-				// Initialize appropriate asset properties
-				$asset->name	= $name;
-				$asset->title	= $item->title;
-				$asset->setLocation($parentId, 'last-child');     // Permissions of items are inherited from their main category
-				
-				// Save the item asset (create or update it)
-				if (!$asset->check() || !$asset->store(false)) {
-					echo $asset->getError();
-					$this->setError($asset->getError());
-					return false;
-				}
-				
-				// Assign the asset to the item, if it is not already assigned
-				$query = $db->getQuery(true)
-					->update('#__content')
-					->set('asset_id = ' . (int)$asset->id)
-					->where('id = ' . (int)$item->id);
-				$db->setQuery($query);
-				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
-			}
-		}
-		*/
-		
-		
+
+
 		/*** FLEXIcontent FIELDS assets ***/
 		
 		// Get a list flexicontent fields that do not have assets
@@ -2158,15 +2083,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$results = $db->loadObjectList();
 		
 		// Add an asset to every field that doesnot have one
-		if($results)
+		if ($results)
 		{
 			foreach($results as $field)
 			{
 				$name = "com_flexicontent.field.{$field->id}";
 				
 				// Test if an asset for the current FIELD ID already exists and load it instead of creating a new asset
-				if ( ! $asset->loadByName($name) ) {
-					if ($field->asset_id) {
+				if ( ! $asset->loadByName($name) )
+				{
+					if ($field->asset_id)
+					{
 						// asset name not found but field has an asset id set ?, we could delete it here
 						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
 					}
@@ -2185,9 +2112,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					foreach ($actions as $action) {
 						$fieldrules[$action->name] = $rules->{$action->name};
 					}
-					$rules = new JAccessRules(json_encode($fieldrules));
-					$asset->rules = $rules->__toString();
+					$asset->rules = new JAccessRules(json_encode($fieldrules));
 					*/
+					$asset->rules = (string) $asset->rules;
 					
 					// Save the asset
 					if (!$asset->check() || !$asset->store(false)) {
@@ -2196,7 +2123,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						return false;
 					}
 				}
-				
+
 				// Assign the asset to the field
 				$query = $db->getQuery(true)
 					->update('#__flexicontent_fields')
@@ -2246,9 +2173,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					foreach ($actions as $action) {
 						$typerules[$action->name] = $rules->{$action->name};
 					}
-					$rules = new JAccessRules(json_encode($typerules));
-					$asset->rules = $rules->__toString();
+					$asset->rules = new JAccessRules(json_encode($typerules));
 					*/
+					$asset->rules = (string) $asset->rules;
 					
 					// Save the asset
 					if (!$asset->check() || !$asset->store(false)) {
@@ -2257,7 +2184,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						return false;
 					}
 				}
-				
+
 				// Assign the asset to the type
 				$query = $db->getQuery(true)
 					->update('#__flexicontent_types')
@@ -2267,7 +2194,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 			}
 		}
-		
+
 		// Clear cache so that per user permissions objects are recalculated
 		$cache = FLEXIUtilities::getCache($group='', 0);
 		$cache->clean('com_flexicontent_cats');

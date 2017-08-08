@@ -81,19 +81,19 @@ class FlexicontentViewArchive extends JViewLegacy
 		FLEXIUtilities::ManagerSideMenu('CanArchives');
 
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
-		//JToolBarHelper::unarchiveList('archive.unarchive');
-		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'archive.remove');
+		JToolbarHelper::title( JText::_( 'FLEXI_ITEM_ARCHIVE' ), 'archive' );
+		//JToolbarHelper::unarchiveList('archive.unarchive');
+		//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'archive.remove');
 
 		if ($perms->CanConfig)
 		{
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
 		//Get data from the model

@@ -46,8 +46,9 @@ class plgSystemFlexisystem extends JPlugin
 
 		$this->extension = 'com_flexicontent';
 		$this->cparams = JComponentHelper::getParams($this->extension);
-		
-		//JFactory::getDBO()->setQuery("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
+
+		// Temporary workaround until code is updated
+		if (FLEXI_J40GE) JFactory::getDBO()->setQuery("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
 	}
 	
 	
@@ -2241,7 +2242,7 @@ class plgSystemFlexisystem extends JPlugin
 		//***
 		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'items.php');
 		$model = new FlexicontentModelItems();
-		$result = $model->updateItemCountingData(array($item));
+		$model->updateItemCountingData(array($item));
 
 		//*** 
 		//*** Maintain flexicontent-specific article parameters

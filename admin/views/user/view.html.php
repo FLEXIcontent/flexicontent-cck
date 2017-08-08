@@ -78,17 +78,17 @@ class FlexicontentViewUser extends JViewLegacy
 
 		//create the toolbar
 		if ( $isnew ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_ADD_USER' ), 'authoradd' );
+			JToolbarHelper::title( JText::_( 'FLEXI_ADD_USER' ), 'authoradd' );
 		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_USER' ), 'authoredit' );
+			JToolbarHelper::title( JText::_( 'FLEXI_EDIT_USER' ), 'authoredit' );
 		}
 		
 		$ctrl = 'users.';
-		JToolBarHelper::apply( $ctrl.'apply' );
-		JToolBarHelper::save( $ctrl.'save' );
-		JToolBarHelper::custom( $ctrl.'save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel( $ctrl.'cancel' );
-		JToolBarHelper::help( 'screen.users.edit' );
+		JToolbarHelper::apply( $ctrl.'apply' );
+		JToolbarHelper::save( $ctrl.'save' );
+		JToolbarHelper::custom( $ctrl.'save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolbarHelper::cancel( $ctrl.'cancel' );
+		JToolbarHelper::help( 'screen.users.edit' );
 		
 		$user   = $cid  ?  JUser::getInstance($cid)  :  JUser::getInstance();
 		$myuser = JFactory::getUser();
@@ -112,7 +112,7 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		$modal_title = JText::_('FLEXI_EDIT_JUSER', true);
 		$tip_class = ' hasTooltip';
-		JToolBarHelper::divider();
+		JToolbarHelper::divider();
 		flexicontent_html::addToolBarButton(
 			'FLEXI_EDIT_JUSER', $btn_name='edit_juser',
 			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",

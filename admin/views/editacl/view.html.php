@@ -50,10 +50,10 @@ class FlexicontentViewEditacl extends JViewLegacy
 		$acl_path	= $path.DS.$filename;
 
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ACL' ), 'editacl' );
-		JToolBarHelper::apply( 'applyacl' );
-		JToolBarHelper::save( 'saveacl' );
-		JToolBarHelper::cancel();
+		JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ACL' ), 'editacl' );
+		JToolbarHelper::apply( 'applyacl' );
+		JToolbarHelper::save( 'saveacl' );
+		JToolbarHelper::cancel();
 		
 		JRequest::setVar( 'hidemainmenu', 1 );
 

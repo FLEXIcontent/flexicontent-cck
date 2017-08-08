@@ -265,7 +265,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$site_title = $document->getTitle();
 		if ($view!='fileselement')
 		{
-			JToolBarHelper::title( $doc_title, 'files' );
+			JToolbarHelper::title( $doc_title, 'files' );
 		}
 		$document->setTitle($doc_title .' - '. $site_title);
 		

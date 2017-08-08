@@ -103,11 +103,11 @@ class FlexicontentViewAppsman extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'appsman' );
+		JToolbarHelper::title( $doc_title, 'appsman' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		
 		
 		/*$btn_icon = 'icon-import';
@@ -123,13 +123,13 @@ class FlexicontentViewAppsman extends JViewLegacy
 			if ($task!='processxml') {
 				$ctrl_task = 'appsman.processxml';
 				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
-				JToolBarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
+				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
 			}
 			$ctrl_task = 'appsman.clearxml';
-			JToolBarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
+			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
 		} else {
 			//$ctrl_task = 'appsman.initxml';
-			//JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
+			//JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
 		}
 
 
@@ -163,15 +163,15 @@ class FlexicontentViewAppsman extends JViewLegacy
 		*/
 		
 		
-		//JToolBarHelper::Back();
+		//JToolbarHelper::Back();
 		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		

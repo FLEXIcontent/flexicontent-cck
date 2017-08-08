@@ -120,18 +120,18 @@ class FlexicontentViewTypes extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TYPES' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'types' );
+		JToolbarHelper::title( $doc_title, 'types' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		$contrl = "types.";
-		JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
-		JToolBarHelper::divider(); JToolBarHelper::spacer();
-		JToolBarHelper::publishList($contrl.'publish');
-		JToolBarHelper::unpublishList($contrl.'unpublish');
-		JToolBarHelper::addNew($contrl.'add');
-		JToolBarHelper::editList($contrl.'edit');
+		JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		JToolbarHelper::divider(); JToolbarHelper::spacer();
+		JToolbarHelper::publishList($contrl.'publish');
+		JToolbarHelper::unpublishList($contrl.'unpublish');
+		JToolbarHelper::addNew($contrl.'add');
+		JToolbarHelper::editList($contrl.'edit');
 		
-		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+		//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
 		$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
@@ -167,13 +167,13 @@ class FlexicontentViewTypes extends JViewLegacy
 		}
 		
 		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		// Get data from the model

@@ -281,13 +281,13 @@ class FlexicontentViewItem extends JViewLegacy
 		// ***
 		// *** Create the toolbar
 		// ***
-		$toolbar = JToolBar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 		$tip_class = ' hasTooltip';
 		
 		// SET toolbar title
 		$cid
-			? JToolBarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' )   // Editing existing item
-			: JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );    // Creating new item
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'itemedit' )   // Editing existing item
+			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );    // Creating new item
 
 
 		// ***
@@ -310,7 +310,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$btn_task = $item->type_id ? $ctrl.'.apply' : $ctrl.'.apply_type';
 		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE');
 
-		//JToolBarHelper::apply($btn_task, $btn_title, false);
+		//JToolbarHelper::apply($btn_task, $btn_title, false);
 
 		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -326,9 +326,9 @@ class FlexicontentViewItem extends JViewLegacy
 		$btn_arr = array();
 		if (!$isnew || $item->version)
 		{
-			//JToolBarHelper::save($ctrl.'.save');
-			//JToolBarHelper::save2new($ctrl.'.save2new'); //JToolBarHelper::custom( $ctrl.'.save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-			//JToolBarHelper::save2copy($ctrl.'.save2copy'); //JToolBarHelper::custom( $ctrl.'.save2copy', 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+			//JToolbarHelper::save($ctrl.'.save');
+			//JToolbarHelper::save2new($ctrl.'.save2new'); //JToolbarHelper::custom( $ctrl.'.save2new', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			//JToolbarHelper::save2copy($ctrl.'.save2copy'); //JToolbarHelper::custom( $ctrl.'.save2copy', 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
 
 			$btn_name = 'save';
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
@@ -350,7 +350,7 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
-		JToolBarHelper::cancel($ctrl.'.cancel');
+		JToolbarHelper::cancel($ctrl.'.cancel');
 
 
 
@@ -415,9 +415,9 @@ class FlexicontentViewItem extends JViewLegacy
 
 				flexicontent_html::addToolBarDropMenu($btn_arr, 'preview_btns_group', null);
 			}
-			JToolBarHelper::spacer();
-			JToolBarHelper::divider();
-			JToolBarHelper::spacer();
+			JToolbarHelper::spacer();
+			JToolbarHelper::divider();
+			JToolbarHelper::spacer();
 		}
 
 
@@ -430,7 +430,7 @@ class FlexicontentViewItem extends JViewLegacy
 		if ($perms['cantemplates'])
 		{
 			$edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8');
-			JToolBarHelper::divider();
+			JToolbarHelper::divider();
 			if (!$isnew || $item->version)
 			{
 				$btn_name='edit_layout';

@@ -183,7 +183,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_AUTHORS' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'authors' );
+		JToolbarHelper::title( $doc_title, 'authors' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
@@ -289,9 +289,9 @@ class FlexicontentViewUsers extends JViewLegacy
 		$document = JFactory::getDocument();
 		$perms = FlexicontentHelperPerm::getPerm();
 		$contrl = "users.";
-		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
+		JToolbarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
 		
-		//JToolBarHelper::addNew($contrl.'add');
+		//JToolbarHelper::addNew($contrl.'add');
 		JText::script("FLEXI_UPDATING_CONTENTS", true);
 		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )
@@ -310,7 +310,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		$modal_title = JText::_('Add new Joomla user', true);
 		$tip_class = ' hasTooltip';
-		JToolBarHelper::divider();
+		JToolbarHelper::divider();
 		flexicontent_html::addToolBarButton(
 			'FLEXI_NEW', $btn_name='add_juser',
 			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
@@ -319,9 +319,9 @@ class FlexicontentViewUsers extends JViewLegacy
 			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id=0" title="Add new Joomla user"'
 		);
 		
-		JToolBarHelper::editList($contrl.'edit');
+		JToolbarHelper::editList($contrl.'edit');
 		
-		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+		//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
 		$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
 		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
@@ -331,16 +331,16 @@ class FlexicontentViewUsers extends JViewLegacy
 			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		
-		JToolBarHelper::divider(); JToolBarHelper::spacer();
-		JToolBarHelper::help('JHELP_USERS_USER_MANAGER');
+		JToolbarHelper::divider(); JToolbarHelper::spacer();
+		JToolbarHelper::help('JHELP_USERS_USER_MANAGER');
 		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 	}
 }

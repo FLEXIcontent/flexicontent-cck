@@ -92,7 +92,7 @@ class FlexicontentViewGroups extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_GROUPS' );
 		$site_title = $document->getTitle();
-		JToolBarHelper::title( $doc_title, 'groups' );
+		JToolbarHelper::title( $doc_title, 'groups' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
@@ -118,15 +118,15 @@ class FlexicontentViewGroups extends JViewLegacy
 		$canDo	= UsersHelper::getActions();
 
 		if ($canDo->get('core.create')) {
-			JToolBarHelper::addNew('group.add');
+			JToolbarHelper::addNew('group.add');
 		}
 		if ($canDo->get('core.edit')) {
-			JToolBarHelper::editList('group.edit');
-			JToolBarHelper::divider();
+			JToolbarHelper::editList('group.edit');
+			JToolbarHelper::divider();
 		}
 		if ($canDo->get('core.delete')) {
-			JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'groups.delete');
-			JToolBarHelper::divider();
+			JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'groups.delete');
+			JToolbarHelper::divider();
 		}
 		
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
@@ -152,9 +152,9 @@ class FlexicontentViewGroups extends JViewLegacy
 		}
 		
 		if ($canDo->get('core.admin')) {
-			JToolBarHelper::preferences('com_users');
-			JToolBarHelper::divider();
+			JToolbarHelper::preferences('com_users');
+			JToolbarHelper::divider();
 		}
-		JToolBarHelper::help('JHELP_USERS_GROUPS');
+		JToolbarHelper::help('JHELP_USERS_GROUPS');
 	}
 }
