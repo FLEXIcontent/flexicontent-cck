@@ -163,6 +163,7 @@ class FlexicontentModelItems extends JModelLegacy
 		global $globalcats;
 		if ($filter_cats && !isset($globalcats[$filter_cats]))
 		{
+			// Clear currently filtered category if this does not exist anymore
 			$jinput->set( 'filter_cats', '' );
 			$filter_cats = '';
 		}
@@ -994,14 +995,15 @@ class FlexicontentModelItems extends JModelLegacy
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
 		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
-		
+
 		$filter_tag 		= $this->getState( 'filter_tag' );
 		$filter_state   = $this->getState( 'filter_state' );
-		
-		$filter_cats    = $this->getState( 'filter_cats' );
-		$filter_subcats = $this->getState( 'filter_subcats' );
 		$filter_order   = $this->getState( 'filter_order' );
-		
+
+		$filter_cats        = $this->getState( 'filter_cats' );
+		$filter_subcats     = $this->getState( 'filter_subcats' );
+		$filter_catsinstate = $this->getState( 'filter_catsinstate' );
+
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate  = $this->_db->Quote( JFactory::getDate()->toSql() );
 		
@@ -1044,13 +1046,15 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( !$query_ids )
 		{
 			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
-				//. ($filter_order=='type_name' ? ', t.name AS type_name ' : '')
-				//. ($filter_order=='catsordering' ? ', rel.ordering as catsordering ' : '')
-				. ( in_array($filter_order, array('rating_count','rating')) ? 
+				. ( in_array($filter_order, array('rating_count','rating')) ?
 					', cr.rating_count AS rating_count' . $ratings_col : ''
 					)
-				. ( count($customFiltsActive) ? ', COUNT(DISTINCT fi.field_id) AS matched_custom ' : '' )
-				. ( in_array('RV', $filter_state) ? ', i.version' : '' )
+				. ( count($customFiltsActive) ?
+					', COUNT(DISTINCT fi.field_id) AS matched_custom ' : ''
+					)
+				. ( in_array('RV', $filter_state) ?
+					', i.version' : ''
+					)
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order ' : ''
 					)
@@ -1059,18 +1063,24 @@ class FlexicontentModelItems extends JModelLegacy
 		else
 		{
 			$query =
-				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid'
+				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' cousr.name AS editor'
+				. ($filter_cats || $filter_catsinstate != 99 ?
+					', rel.catid as rel_catid' : ''
+					)
 				. ', cr.rating_count AS rating_count' . $ratings_col
 				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 				. ', GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats'
 				. ', GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist'
 				. ', CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
-				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
+				. ( in_array($filter_order, array('i.ordering', 'catsordering')) ?
 					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order' : ''
+					)
+				. ( in_array($filter_order, array('i.ordering', 'catsordering')) ?
+					', rel.ordering as catsordering' : ''
 					)
 				. ', CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
 				. ', CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
-				. ', t.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
+				. ', t.name AS type_name, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 				. ($use_versioning ? ', CASE WHEN i.version = MAX(fv.version_id) THEN 0 ELSE MAX(fv.version_id) END as unapproved_version ' : ', 0 as unapproved_version')
 				;
 		}
@@ -1080,24 +1090,60 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$use_tmp = !$query_ids && (!$search || $scope!=2);
 		$tmp_only = $use_tmp && (!$search || $scope!=4);
-		$query .= ""
-				. ($use_tmp ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
-				. ($tmp_only ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id')
+		$query .= ''
+				. ($use_tmp
+					? ' FROM #__flexicontent_items_tmp AS i'
+					: ' FROM #__content AS i')
+
+				. (!$tmp_only
+					? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+					: '')
+
 				. ' JOIN #__categories AS c ON c.id = i.catid'
-				. (!$query_ids && count($customFiltsActive) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
+
+				. (!$query_ids && count($customFiltsActive)
+					? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id'
+					: '')
+
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
-				. ( $query_ids || in_array($filter_order, array('rating_count','rating')) ?
-						' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id' : ''
-					)
-				. (!$query_ids && in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
-				. ($query_ids && $use_versioning ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
-				.    ($filter_cats && $filter_subcats ? ' AND rel.catid='.$filter_cats : '')
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'   // left join and not inner join, needed to INCLUDE items without type !!
-				. ($use_tmp ? '' : ' LEFT JOIN #__users AS u ON u.id = i.checked_out')  // left join and not inner join, needed to INCLUDE items without an owner (e.g. was deleted) !!
-				. ' LEFT JOIN #__viewlevels AS level ON level.id=i.access'
-				//. ' LEFT JOIN #__categories AS cat ON i.catid=cat.id AND cat.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION)  // Detect items not included in FC Management, see WHERE too
+
+				. ($query_ids || in_array($filter_order, array('rating_count', 'rating'))
+					? ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
+					: '')
+
+				. (!$query_ids && in_array('RV', $filter_state)
+					? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id'
+					: '')
+
+				. ($query_ids && $use_versioning
+					? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id'
+					: '')
+
+				// Used to get list of the assigned categories (left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE)
+				. ($query_ids
+					? ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id'
+					: '')
+
+				// Limit to items according to their assigned categories (left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE)
+				// This is almost always true ... since cat state filter (filter_catsinstate) has default: 'Published'
+				. ($filter_cats || $filter_catsinstate != 99
+					? ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+						. ($filter_cats && !$filter_subcats ? ' AND rel.catid=' . $filter_cats : '') // Force rel.catid to be of the specific filtered category (rel.catid is used by ordering code)
+					: '')
+
+				// Get type info, (left join and not inner join, needed to INCLUDE items without type !!)
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'
+
+				// Get user info of that checkout the item, left join and not inner join, needed to INCLUDE items checkedout by a deleted user
+				. ($query_ids
+					? ' LEFT JOIN #__users AS cousr ON cousr.id = i.checked_out'
+					: '')
+
+				// Get access level info, (left join and not inner join, needed to INCLUDE items with bad access levels)
+				. ($query_ids
+					? ' LEFT JOIN #__viewlevels AS level ON level.id=i.access'
+					: '')
+
 				. $extra_joins
 				;
 		
@@ -1334,6 +1380,12 @@ class FlexicontentModelItems extends JModelLegacy
 
 		else
 		{
+			if ($this->getState( 'filter_order_type' ) && $this->getState( 'filter_order' )=='catsordering')
+			{
+				$where[] = ' FALSE  ';  // Force no items
+				//$this->setState('ordering_msg', array('warning' => JText::_('FLEXI_FCORDER_FC_ORDER_PLEASE_SET_CATEGORY_FILTER')));
+			}
+
 			if ($filter_catsinstate != 99)  // if not showing items in any category state
 			{
 				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published='.$filter_catsinstate.' )' .' OR '. 'c.published = '.$filter_catsinstate.')';
@@ -2167,9 +2219,10 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( !$filter_order_type )
 		{
-			$where = 'catid = '. $row->catid .' AND '. $state_where .((FLEXI_FISH || FLEXI_J16GE) ? ' AND language ='. $this->_db->Quote($row->language) : '');
-			
-			if ( !$row->move($direction, $where) ) {
+			$where = 'catid = ' . $row->catid . ' AND ' . $state_where . ' AND language = ' . $this->_db->Quote($row->language);
+
+			if ( !$row->move($direction, $where) )
+			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -2201,9 +2254,9 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			
 			// Find the NEXT or PREVIOUS item in category to use it for swapping the ordering numbers
-			$sql = 'SELECT rel.itemid, rel.ordering, i.state' . ((FLEXI_FISH || FLEXI_J16GE) ? ' , ie.language' : '')
+			$sql = 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
 					. ' FROM #__flexicontent_cats_item_relations AS rel'
-					. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
+					. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id'
 					. ' JOIN #__content AS i ON i.id=rel.itemid'
 					;
 			if ($direction < 0)
@@ -2366,9 +2419,9 @@ class FlexicontentModelItems extends JModelLegacy
 			$ord_count = array();
 			for( $i=0; $i < count($cid); $i++ )
 			{
-				$query 	= 'SELECT rel.itemid, rel.ordering, i.state' . ((FLEXI_FISH || FLEXI_J16GE) ? ' , ie.language' : '')
+				$query 	= 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
 						. ' FROM #__flexicontent_cats_item_relations AS rel'
-						. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
+						. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id'
 						. ' JOIN #__content AS i ON i.id=rel.itemid'
 						. ' WHERE rel.ordering >= 0'
 						. ' AND rel.itemid = ' . (int)$cid[$i]
@@ -2424,7 +2477,7 @@ class FlexicontentModelItems extends JModelLegacy
 						// Specific reorder procedure because the relations table has a composite primary key 
 						$query 	= 'SELECT rel.itemid, rel.ordering, state'
 								. ' FROM #__flexicontent_cats_item_relations AS rel'
-								. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
+								. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id'
 								. ' JOIN #__content AS i ON i.id=rel.itemid'
 								. ' WHERE rel.ordering >= 0'
 								. ' AND rel.catid = '. $altered_catid .' AND '. $state_where_arr[$state_group] . ( $lang_group != '_' ? ' AND ie.language ='. $this->_db->Quote($lang_group) : '')

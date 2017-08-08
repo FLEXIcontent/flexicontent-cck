@@ -244,9 +244,18 @@ function delFilter(name)
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
 	if (filter.attr('type')=='checkbox')
+	{
 		filter.checked = '';
+	}
 	else
+	{
 		filter.val('');
+		// Case that input has Calendar JS attached
+		if (filter.attr('data-alt-value'))
+		{
+			filter.attr('data-alt-value', '');
+		}
+	}
 }
 
 function delAllFilters() {
@@ -574,15 +583,20 @@ jQuery(document).ready(function(){
 		<?php
 		$order_msg = '';
 
-		if (!$this->filter_order_type):
-			$order_msg .= JText::_('Joomla order, GROUPING BY main category') .'. ';
-		elseif ($this->filter_order_type && !$this->filter_cats):
-			$order_msg .= JText::_('Grouping by first listed category') .'. ';
-		endif;
-
-		if ($this->filter_order_type && !$this->filter_cats):
-			$order_msg .= JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER');
-		endif;
+		if (!$this->filter_order_type)
+		{
+			$order_msg .= JText::_('FLEXI_FCORDER_JOOMLA_ORDER_GROUPING_BY_MAINCAT') . '. ';
+			$msg_class = 'fc-mssg-inline fc-nobgimage fc-success';
+			$msg_style = 'padding: 0px 8px; margin: 4px 0 0 0;';
+			$msg_icon  = '<span class="icon-checkbox"></span>';
+		}
+		else if ($this->filter_order_type && !$this->filter_cats)
+		{
+			$order_msg .= JText::_('FLEXI_FCORDER_FC_ORDER_PLEASE_SET_CATEGORY_FILTER') . '. ';
+			$msg_class = 'fc-mssg-inline fc-warning';
+			$msg_style = 'margin: 24px 0 24px 0; font-size: 16px; min-width: 50%;';
+			$msg_icon  = '';
+		}
 		?>
 
 		<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 8px 0 0 0;">
@@ -593,8 +607,9 @@ jQuery(document).ready(function(){
 		</div>
 
 		<?php if (!empty($order_msg)): ?>
-			<div id="fcorder_notes_box" class="fc-mssg-inline fc-nobgimage fc-success" style="padding: 0px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
-				<span class="icon-checkbox"></span> <?php echo $order_msg;?>
+			<div class="clear"></div>
+			<div id="fcorder_notes_box" class="<?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset;">
+				<?php echo $msg_icon; ?> <?php echo $order_msg;?>
 			</div>
 
 		<?php endif; ?>
@@ -851,14 +866,12 @@ jQuery(document).ready(function(){
 					<span><?php echo $this->pagination->orderDownIcon( $i, $total_rows, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
 
-				<?php /*$disabled = $this->ordering ?  '' : 'disabled="disabled"';*/ ?>
-				<?php if ($this->ordering): $disabled = ''; ?>
-				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
-
-				<input type="hidden" name="item_cb[]" value="<?php echo $row->id; ?>" />
-				<input type="hidden" name="ord_catid[]" value="<?php echo $row->$ord_catid; ?>" />
-				<input type="hidden" name="prev_order[]" value="<?php echo $row->$ord_col; ?>" />
-				<input type="hidden" name="ord_grp[]" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
+				<?php if ($this->ordering): ?>
+					<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" style="text-align: center" />
+					<input type="hidden" name="item_cb[]" value="<?php echo $row->id; ?>" />
+					<input type="hidden" name="ord_catid[]" value="<?php echo $row->$ord_catid; ?>" />
+					<input type="hidden" name="prev_order[]" value="<?php echo $row->$ord_col; ?>" />
+					<input type="hidden" name="ord_grp[]" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 				<?php endif; ?>
 			</td>
 
@@ -1159,24 +1172,25 @@ jQuery(document).ready(function(){
 		
 		<tr>
 			<td colspan="<?php echo $list_total_cols; ?>" style="margin: 0 auto !important; background-color: white;">
-				<table class="admintable" style="margin: 0 auto !important; background-color: white;">
+				<table class="admintable" style="margin: 0 auto !important; background-color: unset; font-size: 12px">
 					<tr>
-						<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-						<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS', true ); ?>" /></td>
-						<td colspan="3"><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+						<td><span class="icon-publish" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?></td>
+						<td><span class="icon-unpublish" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
+						<td><span class="icon-archive" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_ARCHIVED' ); ?></td>
+						<td><span class="icon-trash" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_TRASHED' ); ?></td>
 					</tr><tr>
-						<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
-						<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_PENDING', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-						<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TO_WRITE', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-					</tr><tr>
-						<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
-						<td><?php echo JText::_( 'FLEXI_ARCHIVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-						<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" style="border: 0;" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
-						<td colspan="3"><?php echo JText::_( 'FLEXI_TRASHED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td><span class="icon-checkmark-2" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> (<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>)</td>
+						<td><span class="icon-clock" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> (<?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?>)</td>
+						<td><span class="icon-pencil-2" style="font-size: 16px;"></span></td>
+						<td class="left"><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> (<?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?>)</td>
+						<td></td>
+						<td class="left"></td>
 					</tr>
 				</table>
 			</td>
