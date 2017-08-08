@@ -45,66 +45,24 @@ class JFormFieldFcdate extends JFormField
 	public function getInput()
 	{
 		$node = & $this->element;
-		$attributes = get_object_vars($node->attributes());
-		$attributes = $attributes['@attributes'];
+		$attribs = get_object_vars($node->attributes());
+		$attribs = $attribs['@attributes'];
 
 		$value = $this->value;
-		$fieldname	= $this->name;
-		$element_id = $this->id;
-		$date_format = @$attributes['date_format'] ? $attributes['date_format'] : '%Y-%m-%d';
+		$fieldname = $this->name;
+		$elementid = $this->id;
 
-		$attribs_arr = array();
+		$dateFormat = isset($attribs['format']) ? $attributes['format'] : '%Y-%m-%d';
+		$allowText  = isset($attribs['allowText']) ? (bool) $attributes['allowText'] : true;
 
-		if ($class = @$attributes['class'])
+		$value_holder = '';
+		if ($allowText)
 		{
-			$attribs_arr['class'] = $class;
+			$attribs['class'] = isset($attribs['class']) ? $attribs['class'] . ' fc_date_allow_text' : 'fc_date_allow_text';
+			$value_holder = '<span id="'.$elementid.'_fc_value" style="display: none;" data-fc-value="'.$value.'"></span>';
 		}
 
-		if ($hint = @$attributes['hint'])
-		{
-			$attribs_arr['hint'] = $hint;
-			$attribs_arr['placeholder'] = $hint;
-		}
-
-		$attribs_arr['size']     = isset($attributes['size']) ? $attributes['size'] : 18;
-		$attribs_arr['showTime'] = isset($attributes['showTime']) ? $attributes['showTime'] : 0;
-		$calendar_class = isset($attributes['calendar_class']) ? $attributes['calendar_class'] : null;
-
-		//return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs_arr);
-		return $this->calendar($value, $attribs_arr['showTime'], $fieldname, $element_id, $attribs_arr, $skip_on_invalid=true, $timezone=false, $date_format);
-	}
-
-
-	// Method to create a calendar form field according to a given configuation
-	function calendar($value, $date_allowtime, $fieldname, $elementid, $attribs=array(), $skip_on_invalid=false, $timezone=false, $date_format='%Y-%m-%d')
-	{
-		// 'false' timezone means ==> use server setting (=joomla site configured TIMEZONE),
-		// in J1.5 this must be null for using server setting (=joomla site configured OFFSET)
-		$timezone = ($timezone === false && !FLEXI_J16GE) ? null : $timezone;
-		
-		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
-		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
-		
-		try {
-			// we check if date has no SYNTAX error (=being invalid) so use $gregorian = true,
-			// to avoid it being change according to CALENDAR of current user
-			// because user already entered the date in his/her calendar
-			if ( !$value ) {
-				$date = '';
-			} else if (!$date_allowtime || !$time) {
-				$date = JHTML::_('date',  $date, 'Y-m-d', $timezone, $gregorian = true);
-			} else {
-				$date = JHTML::_('date',  $value, 'Y-m-d H:i', $timezone, $gregorian = true);
-			}
-		} catch ( Exception $e ) {
-			if (!$skip_on_invalid) return '';
-			else $date = '';
-		}
-		
 		// Create JS calendar
-		$time_formats_map = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
-		$date_time_format = $date_format . $time_formats_map[$date_allowtime];
-		$attribs['showTime'] = $date_allowtime ? 1 : 0;
-		return JHTML::_('calendar', $date, $fieldname, $elementid, $date_time_format, $attribs);
+		return $value_holder . JHTML::_('calendar', $value, $fieldname, $elementid, $dateFormat, $attribs);
 	}
 }
