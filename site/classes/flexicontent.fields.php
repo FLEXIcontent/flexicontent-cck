@@ -2469,7 +2469,10 @@ class FlexicontentFields
 		$handlercache = JFactory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
 		$handlercache->setCaching(1);         // Force cache ON
 		$handlercache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
-		$dictionary = $handlercache->call(array('Segment', 'loadDictionary'));
+		$dictionary = $handlercache->get(
+			array('Segment', 'loadDictionary'),
+			array()
+		);
 		Segment::setDictionary($dictionary);
 		$handler = new Segment();
 
@@ -3381,7 +3384,10 @@ class FlexicontentFields
 
 			// Get filter values considering PAGE configuration (regardless of ACTIVE filters)
 			if ( $apply_cache )
-				$results_page = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
+				$results_page = $itemcache->get(
+					array('FlexicontentFields', $createFilterValues),
+					array($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code)
+				);
 			else if (!$isSearchView)
 				$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
 			else

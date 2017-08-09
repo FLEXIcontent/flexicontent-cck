@@ -236,9 +236,9 @@ class FlexicontentTasksCore
 
 
 
-	// **************
-	// Helper methods
-	// **************
+	// ***
+	// *** Helper methods
+	// ***
 
 	protected function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
 	{
@@ -283,8 +283,13 @@ class FlexicontentTasksCore
 			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->setCaching(1);                  // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
-			$globalcats = $catscache->call(array($plg, 'getCategoriesTree'));
-		} else {
+			$globalcats = $catscache->get(
+				array($plg, 'getCategoriesTree'),
+				array()
+			);
+		}
+		else
+		{
 			$globalcats = $plg->getCategoriesTree();
 		}
 	}

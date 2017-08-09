@@ -263,14 +263,14 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('action',    $link);  // $uri->toString()
-		$this->assignRef('print_link',$print_link);
-		$this->assignRef('tag',       $tag);
-		$this->assignRef('items',     $items);
-		$this->assignRef('lists',     $lists);
-		$this->assignRef('params',    $params);
-		$this->assignRef('pageNav',   $pageNav);
-		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		$this->action = $link;  // $uri->toString()
+		$this->print_link = $print_link;
+		$this->tag = $tag;
+		$this->items = $items;
+		$this->lists = $lists;
+		$this->params = $params;
+		$this->pageNav = $pageNav;
+		$this->pageclass_sfx = $pageclass_sfx;
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }

@@ -878,27 +878,27 @@ class FlexicontentViewCategory extends JViewLegacy
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('layout_vars',$layout_vars);
-		$this->assignRef('action',     $category_link);
-		$this->assignRef('print_link', $print_link);
-		$this->assignRef('category',   $category);
-		$this->assignRef('categories',  $categories);
-		$this->assignRef('peercats',   $peercats);
-		$this->assignRef('items',      $items);
-		$this->assignRef('authordescr_item_html', $authordescr_item_html);
-		$this->assignRef('lists',      $lists);
-		$this->assignRef('params',     $params);
-		$this->assignRef('pageNav',    $pageNav);
-		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		$this->layout_vars = $layout_vars;
+		$this->action = $category_link;
+		$this->print_link = $print_link;
+		$this->category = $category;
+		$this->categories = $categories;
+		$this->peercats = $peercats;
+		$this->items = $items;
+		$this->authordescr_item_html = $authordescr_item_html;
+		$this->lists = $lists;
+		$this->params = $params;
+		$this->pageNav = $pageNav;
+		$this->pageclass_sfx = $pageclass_sfx;
 		
-		$this->assignRef('pagination',    $pageNav);  // compatibility Alias for old templates
-		$this->assignRef('resultsCounter',$resultsCounter);  // for overriding model's result counter
-		$this->assignRef('limitstart',    $limitstart); // compatibility shortcut
+		$this->pagination = $pageNav;  // compatibility Alias for old templates
+		$this->resultsCounter = $resultsCounter;  // for overriding model's result counter
+		$this->limitstart = $limitstart; // compatibility shortcut
 		
-		$this->assignRef('filters',   $filters);
-		$this->assignRef('comments',  $comments);
-		$this->assignRef('alpha',     $alpha);
-		$this->assignRef('tmpl',      $tmpl);
+		$this->filters = $filters;
+		$this->comments = $comments;
+		$this->alpha = $alpha;
+		$this->tmpl = $tmpl;
 		
 		
 		// NOTE: Moved decision of layout into the model, function decideLayout() layout variable should never be empty

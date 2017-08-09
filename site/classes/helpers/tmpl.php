@@ -173,7 +173,10 @@ class flexicontent_tmpl
 			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
-			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates_checked'), $tmpldir);
+			$tmpls = $tmplcache->get(
+				array('flexicontent_tmpl', 'parseTemplates_checked'),
+				array($tmpldir)
+			);
 			
 			$folder_names = array_flip( flexicontent_tmpl::getThemes($tmpldir) );
 			
@@ -218,7 +221,10 @@ class flexicontent_tmpl
 				// Clean and update caching re-parsing only new or changed XML files
 				$tmplcache->clean();
 				$tmplcache->gc();
-				$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates_checked'), $tmpldir);
+				$tmpls = $tmplcache->get(
+					array('flexicontent_tmpl', 'parseTemplates_checked'),
+					array($tmpldir)
+				);
 			}
 		}
 		else {
@@ -311,7 +317,10 @@ class flexicontent_tmpl
 			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
-			$layout_texts = $tmplcache->call(array('flexicontent_tmpl', '_getLayoutTexts'), $layout_typename);
+			$layout_texts = $tmplcache->get(
+				array('flexicontent_tmpl', '_getLayoutTexts'),
+				array($layout_typename)
+			);
 		}
 		else {
 			$layout_texts = flexicontent_tmpl::_getLayoutTexts($layout_typename);

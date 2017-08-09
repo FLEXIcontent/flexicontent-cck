@@ -732,19 +732,19 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('action',    $link);  // $uri->toString()
-		$this->assignRef('print_link',$print_link);
+		$this->action = $link;  // $uri->toString()
+		$this->print_link = $print_link;
 		
-		$this->assignRef('type_based_search', $type_based_search);
-		$this->assignRef('contenttypes', $contenttypes);
-		$this->assignRef('filters',   $filters);
+		$this->type_based_search = $type_based_search;
+		$this->contenttypes = $contenttypes;
+		$this->filters = $filters;
 		
-		$this->assignRef('results',   $results);
-		$this->assignRef('lists',     $lists);
-		$this->assignRef('params',    $params);
-		$this->assignRef('pageNav',   $pageNav);
-		$this->assignRef('pageclass_sfx', $pageclass_sfx);
-		$this->assignRef('typeData',	$typeData);
+		$this->results = $results;
+		$this->lists = $lists;
+		$this->params = $params;
+		$this->pageNav = $pageNav;
+		$this->pageclass_sfx = $pageclass_sfx;
+		$this->typeData = $typeData;
 
 		$this->assign('ordering',     $state->get('ordering'));
 		$this->assign('filter_values', $filter_values);
@@ -754,7 +754,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$this->assign('total',  $total);
 		$this->assign('error',  $error);
-		$this->assignRef('document', $document);
+		$this->assign('document', $document);
 		$this->assign('form_id', $form_id);
 		$this->assign('form_name', $form_name);
 		

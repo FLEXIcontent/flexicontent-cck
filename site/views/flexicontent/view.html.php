@@ -174,10 +174,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$pageNav = $this->get('pagination');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('categories',$categories);
-		$this->assignRef('params',    $params);
-		$this->assignRef('pageNav',   $pageNav);
-		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		$this->categories = $categories;
+		$this->params = $params;
+		$this->pageNav = $pageNav;
+		$this->pageclass_sfx = $pageclass_sfx;
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
