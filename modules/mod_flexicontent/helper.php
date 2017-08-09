@@ -736,13 +736,19 @@ class modFlexicontentHelper
 			if (FLEXI_SECTION || FLEXI_CAT_EXTENSION)
 			{
 				JPluginHelper::importPlugin('system', 'flexisystem');
-				if (FLEXI_CACHE) {
+				if (FLEXI_CACHE)
+				{
 					// add the category tree to categories cache
 					$catscache 	= JFactory::getCache('com_flexicontent_cats');
 					$catscache->setCaching(1); 		//force cache
 					$catscache->setLifeTime(84600); //set expiry to one day
-			    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
-				} else {
+					$globalcats = $catscache->get(
+						array('plgSystemFlexisystem', 'getCategoriesTree'),
+						array()
+					);
+				}
+				else
+				{
 					$globalcats = plgSystemFlexisystem::getCategoriesTree();
 				}
 			}
@@ -1480,31 +1486,38 @@ class modFlexicontentHelper
 			switch ($behaviour_dates) 
 			{
 				case '1' : // custom offset
-					if ($edate) {
+					if ($edate)
+					{
 						$edate = array(
-							// \s will remove spaces too
 							0 => preg_replace("/[^-+0-9\s]/", "", $edate),
-							1=> preg_replace("/[0-9-+\s]/", "", $edate)
+							1 => preg_replace("/[0-9-+\s]/", "", $edate)
 						);
-						if (empty($edate[1])) {
+						if (empty($edate[1]))
+						{
 							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
 							return;
-						} else {
+						}
+						else
+						{
 							$where .= ' AND ( '
 								.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1]))
 								.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
 							.' )';
 						}
 					}
-					if ($bdate) {
+					if ($bdate)
+					{
 						$bdate = array(
-							0 => preg_replace("/[^-+0-9]/", "", $bdate),
-							1=> preg_replace("/[0-9-+]/", "", $bdate)
+							0 => preg_replace("/[^-+0-9\s]/", "", $bdate),
+							1 => preg_replace("/[0-9-+\s]/", "", $bdate)
 						);
-						if (empty($bdate[1])) {
+						if (empty($bdate[1]))
+						{
 							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date: Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
 							return;
-						} else {
+						}
+						else
+						{
 							$where .= ' AND ( '
 								.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1]))
 								.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
