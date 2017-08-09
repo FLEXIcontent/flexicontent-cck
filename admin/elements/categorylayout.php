@@ -184,10 +184,10 @@ function clayout_activatePanel(active_layout_name)
 		return layout_name != active_layout_name;
 	});
 
-	inactives.each(function(layout_name)
+	for (var i = 0; i < inactives.length; i++)
 	{
-		clayout_disablePanel(layout_name);
-	});
+		clayout_disablePanel(inactives[i]);
+	}
 
 	if (active_layout_name)
 	{

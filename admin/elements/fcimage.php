@@ -23,7 +23,7 @@ jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 
 jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 /**
  * Renders an image element
@@ -32,7 +32,7 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
- class JFormFieldFcimage extends JFormFieldList
+ class JFormFieldFcimage extends JFormFieldGroupedList
 {
 	/**
 	 * Element name
@@ -41,11 +41,13 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
 	 */
 	var $type = 'Fcimage';
 
-	public function getOptions()
+	public function getGroups()
 	{
 
-		$images 	= array();
-		$images[] = JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
+		$images = array();
+		$images[] = array(
+			array('value' => '', 'text' => JText::_('FLEXI_SELECT_IMAGE_FIELD'))
+		);
 
 		$db = JFactory::getDBO();
 		$node = & $this->element;
@@ -59,23 +61,22 @@ JFormHelper::loadFieldClass('list');   // JFormFieldList
 		}
 		
 		$query = 'SELECT '.$valcolumn.' AS value, label AS text'
-		. ' FROM #__flexicontent_fields'
-		. ' WHERE published = 1'
-		. ' AND field_type = ' . $db->Quote('image')
-		. ' ORDER BY label ASC, id ASC'
-		;
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE published = 1'
+			. ' AND field_type = ' . $db->Quote('image')
+			. ' ORDER BY label ASC, id ASC';
 
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
-		$images[] = JHTML::_('select.optgroup', JText::_('FLEXI_FIELD') );
+		$grp = JText::_('FLEXI_FIELD');
+		$images[$grp] = array();
+
 		foreach ($fields as $field)
 		{
-			$images[] = JHTMLSelect::option($field->value, $field->text); 
+			$images[$grp][] = array('value' => $field->value, 'text' => $field->text); 
 		}
-		$images[] = JHTML::_('select.optgroup', '' );
 
 		return $images;
 	}
 }
-?>

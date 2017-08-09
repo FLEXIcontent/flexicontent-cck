@@ -36,11 +36,11 @@ class FlexicontentController extends JControllerLegacy
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
+
 		jimport('cms.version.version');
 		$jversion = new JVersion;
-		
-		$config_saved = !FLEXI_J16GE ? $params->get('flexi_section', 0) : $params->get('flexi_cat_extension', 0);
+
+		$config_saved = $params->get('flexi_cat_extension', 0);
 		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
 		
 		// If configuration not saved REDIRECT TO DASHBOARD VIEW (will ask to save or import)

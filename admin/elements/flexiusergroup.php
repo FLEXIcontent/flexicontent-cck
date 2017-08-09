@@ -106,7 +106,6 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			' ORDER BY a.lft ASC'
 		);
 		$options = $db->loadObjectList();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		if ( !$options )  return null;
 		
