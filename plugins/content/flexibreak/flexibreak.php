@@ -107,16 +107,16 @@ class plgContentFlexiBreak extends JPlugin
 			JRoute::_(self::$rowLinks[$row->slug].'&limitstart='. ($limitstart+1)) :
 			'';
 		
-		$this->assignRef('pages', $pages);
-		$this->assignRef('pagescount', $pagescount);
-		$this->assignRef('texts', $texts);
-		$this->assignRef('textscount', $textscount);
-		$this->assignRef('limitstart', $limitstart);
-		$this->assignRef('showall', $showall);
-		$this->assignRef('row', $row);
-		$this->assignRef('prev_link', $prev_link);
-		$this->assignRef('next_link', $next_link);
-		$this->assignRef('nonsef_link', self::$rowLinks[$row->slug]);
+		$this->pages = $pages;
+		$this->pagescount = $pagescount;
+		$this->texts = $texts;
+		$this->textscount = $textscount;
+		$this->limitstart = $limitstart;
+		$this->showall = $showall;
+		$this->row = $row;
+		$this->prev_link = $prev_link;
+		$this->next_link = $next_link;
+		$this->nonsef_link = self::$rowLinks[$row->slug];
 		
 		// Plugin base folder
 		$document = JFactory::getDocument();

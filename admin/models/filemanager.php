@@ -603,9 +603,18 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		if ($field && $field->field_type =='image' && $params->get('image_source', 0) == 0)
 		{
 			$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
-			$where[] = $params->get('list_all_media_files', 0)
-				? ' f.ext IN ("jpg","gif","png","jpeg") '
-				: $this->getFilesUsedByImageField($field, $params);
+			if ($params->get('list_all_media_files', 0))
+			{
+				$where[] = ' f.ext IN ("jpg","gif","png","jpeg") ';
+			}
+			else
+			{
+				$filesUsedByImageField = $this->getFilesUsedByImageField($field, $params);
+				if ($filesUsedByImageField)
+				{
+					$where[] = $filesUsedByImageField;
+				}
+			}
 		}
 
 		$scope  = $this->getState( 'scope' );
