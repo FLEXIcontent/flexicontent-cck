@@ -1162,6 +1162,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
+		$option   = $jinput->get('option', '', 'cmd');
 
 		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
@@ -1237,40 +1238,79 @@ class FlexicontentViewItem extends JViewLegacy
 		$special_privelege_stategrp = ($item->state==2 || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
 		
 		$state = array();
-		// Using <select> groups
+
+
+		// States for publishers
+		$ops = array(
+			array('value' =>  1, 'text' => JText::_('FLEXI_PUBLISHED')),
+			array('value' =>  0, 'text' => JText::_('FLEXI_UNPUBLISHED')),
+			array('value' => -5, 'text' => JText::_('FLEXI_IN_PROGRESS'))
+		);
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
-			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
-			
-		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-		
+		{
+			$grp = 'publishers_workflow_states';
+			$state[$grp] = array();
+			$state[$grp]['id'] = 'publishers_workflow_states';
+			$state[$grp]['text'] = JText::_('FLEXI_PUBLISHERS_WORKFLOW_STATES');
+			$state[$grp]['items'] = $ops;
+		}
+		else
+		{
+			$state[]['items'] = $ops;
+		}
+
+
 		// States reserved for workflow
-		if ( $non_publishers_stategrp ) {
-			$state[] = JHTML::_('select.optgroup', '' );
-			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_NON_PUBLISHERS_WORKFLOW_STATES' ) );
+		$ops = array();
+		if ($item->state==-3 || $perms['isSuperAdmin'])  $ops[] = array('value' => -3, 'text' => JText::_('FLEXI_PENDING'));
+		if ($item->state==-4 || $perms['isSuperAdmin'])  $ops[] = array('value' => -4, 'text' => JText::_('FLEXI_TO_WRITE'));
+
+		if ( $ops )
+		{
+			if ($non_publishers_stategrp)
+			{
+				$grp = 'non_publishers_workflow_states';
+				$state[$grp] = array();
+				$state[$grp]['id'] = 'non_publishers_workflow_states';
+				$state[$grp]['text'] = JText::_('FLEXI_NON_PUBLISHERS_WORKFLOW_STATES');
+				$state[$grp]['items'] = $ops;
+			}
+			else
+			{
+				$state[]['items'] = $ops;
+			}
 		}
-		if ($item->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
-		if ($item->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-		
+
+
 		// Special access states
-		if ( $special_privelege_stategrp ) {
-			$state[] = JHTML::_('select.optgroup', '' );
-			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
+		$ops = array();
+		if ($item->state==2  || $perms['canarchive']) $ops[] = array('value' =>  2, 'text' => JText::_('FLEXI_ARCHIVED'));
+		if ($item->state==-2 || $perms['candelete'])  $ops[] = array('value' => -2, 'text' => JText::_('FLEXI_TRASHED'));
+
+		if ( $ops )
+		{
+			if ( $special_privelege_stategrp )
+			{
+				$grp = 'special_action_states';
+				$state[$grp] = array();
+				$state[$grp]['id'] = 'special_action_states';
+				$state[$grp]['text'] = JText::_('FLEXI_SPECIAL_ACTION_STATES');
+				$state[$grp]['items'] = $ops;
+			}
+			else
+			{
+				$state[]['items'] = $ops;
+			}
 		}
-		if ($item->state==2  || $perms['canarchive']) $state[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_ARCHIVED' ) );
-		if ($item->state==-2 || $perms['candelete'])  $state[] = JHTML::_('select.option', -2, JText::_( 'FLEXI_TRASHED' ) );
-		
-		// Close last <select> group
-		if ($non_publishers_stategrp || $special_privelege_stategrp)
-			$state[] = JHTML::_('select.optgroup', '');
-		
+
+
 		$fieldname = 'jform[state]';
 		$elementid = 'jform_state';
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
-		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
+		$lists['state'] = JHTML::_('select.groupedlist', $state, $fieldname,
+			array('id' => $elementid, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $item->state)
+		);
 
 
 		// ***

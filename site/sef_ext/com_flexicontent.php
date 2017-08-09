@@ -110,7 +110,10 @@ if (!$FC_sh404sef_init)
 		//$_cache->setCaching(1); 		              // Force cache ON
 		//$_cache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		$_helper = new sh404_fc_helper();
-		$_cats = $_cache->call(array($_helper, 'getCats'), false);
+		$_cats = $_cache->get(
+			array($_helper, 'getCats'),
+			array(false)
+		);
 	}
 	else {
 		$_cats = & $globalcats;
