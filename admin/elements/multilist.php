@@ -137,16 +137,19 @@ class JFormFieldMultiList extends JFormField
 
 		$this->_options = array();
 		$V2L = array();
+
+		$num_index = 0;
+		$last_was_grp = false;
 		foreach ($this->element->children() as $option)
 		{
 			$name = $option->getName();   //echo 'Name: ' . $name . '<pre>' . print_r($option, true) .'</pre>'; exit;
 
-			// Check for current option is a GROUP and add its START
-			if ($name=="group")  $this->_options[] = JHTML::_('select.optgroup', JText::_( $option->attributes()->label ) );
-
 			// If current option is group then iterrate through its children, otherwise create single value array
-			$children = $name=="group" ? $option->children() : array( & $option );
+			$children = $name=="group"
+				? $option->children()
+				: array( & $option );
 
+			$_options = array();
 			foreach ($children as $sub_option)
 			{
 				$attr_arr = array();
@@ -165,8 +168,7 @@ class JFormFieldMultiList extends JFormField
 				$val  = (string) $sub_option->attributes()->value;
 				$text = JText::_( (string) $sub_option );
 
-				//$this->_options[] = JHTML::_('select.option', $val, $text);
-				$this->_options[] = (object) array(
+				$_options[] = (object) array(
 					'value' => $val,
 					'text'  => $text,
 					'attr'  => $attr_arr
@@ -174,8 +176,23 @@ class JFormFieldMultiList extends JFormField
 				$V2L[$val] = $text;
 			}
 
-			// Check for current option is a GROUP and add its END
-			if ($name=="group") $this->_options[] = JHTML::_('select.optgroup', '' );
+			// Check for current option is a GROUP
+			if ($name=="group")
+			{
+				$grp = $option->attributes()->name ?: $option->attributes()->label;
+				$grp = (string) $grp;
+				$this->_options[$grp] = array();
+				$this->_options[$grp]['id'] = null;
+				$this->_options[$grp]['text'] = JText::_($option->attributes()->label);
+				$this->_options[$grp]['items'] = $_options;
+				$last_was_grp = true;
+			}
+			else
+			{
+				$num_index = !$last_was_grp ? $num_index : ($num_index + 1);
+				$this->_options[$num_index]['items'][] = reset($_options);
+				$last_was_grp = false;
+			}
 		}
 		
 		// Support for parameter multi-value, flexicontent multi-parameter dependencies in non-FLEXIcontent views
@@ -208,21 +225,24 @@ class JFormFieldMultiList extends JFormField
 			$_class = ' class ="'.$attribs['list.attr']['class'].'"';
 			$_id = ' id="'.$element_id.'"';
 			$html = '';
-			foreach($this->_options as $i => $option)
+			foreach($this->_options as $i => $ops)
 			{
-				$selected = count($values) && $values[0]==$option->value ? ' checked="checked"' : '';
-				$input_attribs = '';
-				$label_class = '';
-				foreach ($option->attr as $k => $v)
+				foreach($ops['items'] as $i => $option)
 				{
-					if ($k=='class') { $label_class = $v; continue; }
-					$input_attribs .= ' ' .$k. '="' .$v. '"';
+					$selected = count($values) && $values[0]==$option->value ? ' checked="checked"' : '';
+					$input_attribs = '';
+					$label_class = '';
+					foreach ($option->attr as $k => $v)
+					{
+						if ($k=='class') { $label_class = $v; continue; }
+						$input_attribs .= ' ' .$k. '="' .$v. '"';
+					}
+					$html .= '
+						<input id="'.$element_id.$i.'" type="radio" value="'.$option->value.'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
+						<label class="'.$label_class.'" for="'.$element_id.$i.'">
+							' . $option->text . '
+						</label>';
 				}
-				$html .= '
-					<input id="'.$element_id.$i.'" type="radio" value="'.$option->value.'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
-					<label class="'.$label_class.'" for="'.$element_id.$i.'">
-						' . $option->text . '
-					</label>';
 			}
 			$html = '
 				<fieldset '.$_class.$_id.'>
@@ -244,7 +264,7 @@ class JFormFieldMultiList extends JFormField
 			{
 				$this->_options[0]->text = StringHelper::strtoupper($this->_options[0]->text). ' ... '. $V2L[$this->_inherited];
 			}
-			$html = JHTML::_('select.genericlist', $this->_options, $fieldname, $attribs);
+			$html = JHTML::_('select.groupedlist', $this->_options, $fieldname, $attribs);
 		}
 
 
