@@ -101,7 +101,7 @@ class com_flexicontentInstallerScript
 		if ($type=='update' || $type=='install') :
 		?>
 		
-		<table class="adminlist" style="width: 96%;">
+		<table style="border-collapse: collapse; background-color: transparent;">
 			<tr>
 				<td valign="top">
 		    	<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" style="width:300px; margin: 0px 48px 0px 0px;" alt="FLEXIcontent Logo" />
@@ -116,43 +116,15 @@ class com_flexicontentInstallerScript
 				</td>
 			</tr>
 
-			<tr>
-				<td valign="top">
-					<?php echo JText::_('After installation tasks'); ?>
-				</td>
-				<td valign="top" width="100%">
-					Please visit FLEXIcontent dashboard and click to complete some after installation tasks
-					<br/>
-					<a class="btn" href="index.php?option=com_flexicontent">
-						Dashboard
-		    	</a>
-				</td>
-			<tr>
-
-		<!-- This code maybe used in the future to automate post-installation tasks
-			<tr>
-				<td valign="top">
-					<?php // echo JText::_('Choose an option to finish the install :'); ?>
-				</td>
-				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
-					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
-		    		<?php // echo JText::_('New install'); ?>
-					</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
-					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
-		    		<?php // echo JText::_('Update an existing install'); ?>
-					</a>
-				</td>
-			</tr>
-		-->
 		</table>
 		
 		<?php		
 		echo '
-		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .JText::_('Performing prior to installation tasks ... '). '</div>
+		<div class="alert alert-info" style="margin:32px 0px 8px 0px;">' .JText::_('Performing prior to installation tasks ... '). '</div>
 		<ul>
 			<li>
 				'.JText::_('COM_FLEXICONTENT_REQUIRED_PHPVER').':
-				'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge">' .$PHP_VERSION_NEEDED. '</span>
+				'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge badge-info">' .$PHP_VERSION_NEEDED. '</span>
 				'.JText::_('COM_FLEXICONTENT_CURRENT').' <span class="badge badge-success">' .PHP_VERSION. '</span>
 			</li>
 		';
@@ -169,7 +141,7 @@ class com_flexicontentInstallerScript
 			echo '
 				<li>
 					'.JText::_('COM_FLEXICONTENT_REQUIRED_JVER').':
-					'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge">' .$this->minimum_joomla_release. '</span>
+					'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge badge-info">' .$this->minimum_joomla_release. '</span>
 					'.JText::_('COM_FLEXICONTENT_CURRENT').' <span class="badge badge-success">' .$jversion->getShortVersion(). '</span>
 				</li>';
 		}
@@ -181,7 +153,7 @@ class com_flexicontentInstallerScript
 			if ( !$downgrade_allowed && version_compare( $this->release, $this->release_existing, 'l' ) )
 			{
 				$from_to = ''
-					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge">' .$this->release_existing. '</span> '
+					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge badge-info">' .$this->release_existing. '</span> '
 					.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge badge-warning">' .$this->release. '</span> ';
 				// ?? Abort if the component being installed is not newer than the currently installed version
 				//echo '</ul>';
@@ -212,8 +184,10 @@ class com_flexicontentInstallerScript
 	function install( $parent )
 	{
 		echo '
-		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' . JText::_('COM_FLEXICONTENT_INSTALLING')
-			.' '.JText::_('COM_FLEXICONTENT_VERSION').'  <span class="badge badge-info">'.$this->release.'</span>
+		<div class="alert alert-success" style="margin:32px 0px 8px 0px;">'
+			. JText::_('COM_FLEXICONTENT_INSTALLING') . ' '
+			//. JText::_('COM_FLEXICONTENT_VERSION')
+			. ' <span class="badge badge-success">'.$this->release.'</span>
 		</div>';
 
 		if ( ! $this->do_extra( $parent ) ) return false;  // Abort installation
@@ -231,20 +205,22 @@ class com_flexicontentInstallerScript
 	*/
 	function update( $parent )
 	{
-		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">'
+		echo '<div class="alert alert-success" style="margin:32px 0px 8px 0px;">'
 			. JText::_('COM_FLEXICONTENT_UPDATING_INSTALLATION') . ' '
-			. JText::_('COM_FLEXICONTENT_VERSION').': ';
+			//. JText::_('COM_FLEXICONTENT_VERSION')
+			;
 
 		if ( version_compare( $this->release, $this->release_existing, 'ge' ) ) {
 			echo '
-				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge">' . $this->release_existing . '</span>
-				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-info">' . $this->release . '</span>';
+				<span class="badge badge-success">' . JText::_('COM_FLEXICONTENT_UPGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge badge-info">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-success">' . $this->release . '</span>';
 		}
 		else
 		{
 			echo '
-				<span class="badge badge-info">' . JText::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
-				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge">' . $this->release_existing . '</span>
+				<span class="badge badge-warning">' . JText::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge badge-info">' . $this->release_existing . '</span>
 				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-info">' . $this->release . '</span>';
 		}
 		echo '</div>';
@@ -352,10 +328,10 @@ class com_flexicontentInstallerScript
 			}
 		}
 		
+		echo JHtml::_('bootstrap.startAccordion', 'additional-extensions', array());
+		echo JHtml::_('bootstrap.addSlide', 'additional-extensions', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
 		?>
-				
-		<div class="alert alert-warning" style="margin:24px 0px 12px 0px; width:240px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
-		
+
 		<table class="adminlist">
 			<thead>
 				<tr>
@@ -406,8 +382,12 @@ class com_flexicontentInstallerScript
 		</table>
 
 		<?php
+		echo JHtml::_('bootstrap.endSlide');
+		echo JHtml::_('bootstrap.endAccordion');
+
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
-		if ($error) {
+		if ($error)
+		{
 			for ($i = 0; $i < count($extensions); $i++)
 			{
 				if ( $extensions[$i]['status'] )
@@ -474,10 +454,10 @@ class com_flexicontentInstallerScript
 		);*/
 
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
-		echo '
-		<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">
-		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .JText::_('Performing after installation tasks ... '). '</div>
-		';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
+
+		echo JHtml::_('bootstrap.startAccordion', 'upgrade-tasks', array());
+		echo JHtml::_('bootstrap.addSlide', 'upgrade-tasks', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
 		?>
 		
 		<table class="adminlist">
@@ -1269,6 +1249,34 @@ class com_flexicontentInstallerScript
 			</tbody>
 		</table>
 		<?php
+		echo JHtml::_('bootstrap.endSlide');
+		echo JHtml::_('bootstrap.endAccordion');
+		?>
+
+		<div class="alert alert-success" style="margin: 64px 0;">
+			Please visit FLEXIcontent dashboard and click to complete some after installation tasks
+			<br/>
+			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_blank');" >
+				Dashboard
+  		</span>
+  	</div>
+		
+		<?php
+		/* This code maybe used in the future to automate post-installation tasks
+			<tr>
+				<td valign="top">
+					<?php // echo JText::_('Choose an option to finish the install :'); ?>
+				</td>
+				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
+					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
+		    		<?php // echo JText::_('New install'); ?>
+					</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
+					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
+		    		<?php // echo JText::_('Update an existing install'); ?>
+					</a>
+				</td>
+			</tr>
+		*/
 	}
 
 	/*
@@ -1288,7 +1296,7 @@ class com_flexicontentInstallerScript
 		
 		// Installed component manifest file version
 		$this->release = $parent->getManifest()->version;
-		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .'Uninstalling FLEXIcontent '.$this->release. '</div>';
+		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px;">' .'Uninstalling FLEXIcontent '.$this->release. '</div>';
 		
 		// init vars
 		$error = false;
@@ -1371,7 +1379,7 @@ class com_flexicontentInstallerScript
 		}
 		
 		?>
-		<div class="alert alert-warning" style="margin:24px 0px 12px 0px; width:240px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
+		<div class="alert alert-warning" style="margin:24px 0px 2px 0px; width: 300px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
 		<table class="adminlist">
 			<thead>
 				<tr>
