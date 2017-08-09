@@ -38,18 +38,18 @@ class com_flexicontentInstallerScript
 	*/
 	function preflight( $type, $parent )
 	{
-		// Make sure that fatal errors are printed
-		error_reporting(E_ERROR);
+		// Display fatal errors, warnings, notices
+		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
 		ini_set('display_errors',1);
-		
+
 		// Try to increment some limits
-		
-		@set_time_limit( 150 );    // try to set execution time 2.5 minutes
+		@ set_time_limit( 150 );   // try to set execution time 2.5 minutes
 		ignore_user_abort( true ); // continue execution if client disconnects
-		
+
 		// Try to increment memory limits
-		$memory_limit	= trim( @ini_get( 'memory_limit' ) );
-		if ( $memory_limit ) {
+		$memory_limit	= trim( @ ini_get( 'memory_limit' ) );
+		if ( $memory_limit )
+		{
 			switch (strtolower(substr($memory_limit, -1)))
 			{
 				case 'm': $memory_limit = (int)substr($memory_limit, 0, -1) * 1048576; break;
@@ -65,12 +65,12 @@ class com_flexicontentInstallerScript
 				} break;
 				default: break;
 			}
-			if ( $memory_limit < 16000000 ) @ini_set( 'memory_limit', '16M' );
-			if ( $memory_limit < 32000000 ) @ini_set( 'memory_limit', '32M' );
-			if ( $memory_limit < 64000000 ) @ini_set( 'memory_limit', '64M' );
+			if ( $memory_limit < 16000000 ) @ ini_set( 'memory_limit', '16M' );
+			if ( $memory_limit < 32000000 ) @ ini_set( 'memory_limit', '32M' );
+			if ( $memory_limit < 64000000 ) @ ini_set( 'memory_limit', '64M' );
 		}
-		
-		// first check if PHP v5.3.10 or later is running
+
+		// First check PHP minimum version is running
 		$PHP_VERSION_NEEDED = '5.3.10';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
@@ -78,7 +78,7 @@ class com_flexicontentInstallerScript
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		
-			Jerror::raiseWarning(null, JText::sprintf( 'FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED ));
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
 			return false;
 		}
 		
@@ -96,12 +96,9 @@ class com_flexicontentInstallerScript
 		
 		// Manifest file minimum Joomla version
 		$this->minimum_joomla_release = $parent->getManifest()->attributes()->version;
-		
-		// !!! *** J2.5 no longer supported ***, For J2.5 require other minimum
-		/*if( version_compare( $jversion->getShortVersion(), '3.0', 'lt' ) )
-		{
-			$this->minimum_joomla_release = '2.5.0';
-		}*/
+
+		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
+		if ($type=='update' || $type=='install') :
 		?>
 		
 		<table class="adminlist" style="width: 96%;">
@@ -118,18 +115,32 @@ class com_flexicontentInstallerScript
 	      	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
 				</td>
 			</tr>
-		<!--
+
 			<tr>
-				<td valign="top" style="font-weight: bold;">
-		    		<?php // echo JText::_('Choose an option to finish the install :'); ?>
+				<td valign="top">
+					<?php echo JText::_('After installation tasks'); ?>
+				</td>
+				<td valign="top" width="100%">
+					Please visit FLEXIcontent dashboard and click to complete some after installation tasks
+					<br/>
+					<a class="btn" href="index.php?option=com_flexicontent">
+						Dashboard
+		    	</a>
+				</td>
+			<tr>
+
+		<!-- This code maybe used in the future to automate post-installation tasks
+			<tr>
+				<td valign="top">
+					<?php // echo JText::_('Choose an option to finish the install :'); ?>
 				</td>
 				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
 					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
 		    		<?php // echo JText::_('New install'); ?>
-		    		</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
+					</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
 					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
 		    		<?php // echo JText::_('Update an existing install'); ?>
-		    		</a>
+					</a>
 				</td>
 			</tr>
 		-->
@@ -147,11 +158,14 @@ class com_flexicontentInstallerScript
 		';
 		
 		// Check that current Joomla release is not older than minimum required
-		if( version_compare( $jversion->getShortVersion(), $this->minimum_joomla_release, 'lt' ) ) {
+		if ( version_compare($jversion->getShortVersion(), $this->minimum_joomla_release, 'lt') )
+		{
 			echo '</ul>';
-			Jerror::raiseWarning(null, 'Cannot install com_flexicontent in a Joomla release prior to '.$this->minimum_joomla_release);
+			JFactory::getApplication()->enqueueMessage('Cannot install com_flexicontent in a Joomla release prior to ' . $this->minimum_joomla_release, 'warning');
 			return false;
-		} else {
+		}
+		else
+		{
 			echo '
 				<li>
 					'.JText::_('COM_FLEXICONTENT_REQUIRED_JVER').':
@@ -171,7 +185,7 @@ class com_flexicontentInstallerScript
 					.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge badge-warning">' .$this->release. '</span> ';
 				// ?? Abort if the component being installed is not newer than the currently installed version
 				//echo '</ul>';
-				Jerror::raiseWarning(null, 'Refusing to downgrade installation of com_flexicontent '.$from_to);
+				JFactory::getApplication()->enqueueMessage('Can not perform downgrade of FLEXIcontent ' . $from_to, 'warning');
 				return false;
 				echo '</ul>';
 				return false;  // Returning false here would abort
@@ -181,6 +195,8 @@ class com_flexicontentInstallerScript
 		echo '
 		</ul>
 		';
+		
+		endif; // type == install / update
 		
 		// Set a flag about FLEXIcontent being installed (1) or upgraded (0)
 		define('FLEXI_NEW_INSTALL', $type=='install' ? 1 : 0);
@@ -199,8 +215,9 @@ class com_flexicontentInstallerScript
 		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' . JText::_('COM_FLEXICONTENT_INSTALLING')
 			.' '.JText::_('COM_FLEXICONTENT_VERSION').'  <span class="badge badge-info">'.$this->release.'</span>
 		</div>';
-		if ( ! $this->do_extra( $parent ) ) return false;
-		
+
+		if ( ! $this->do_extra( $parent ) ) return false;  // Abort installation
+
 		// You can have the backend jump directly to the newly installed component configuration page
 		// $parent->getParent()->setRedirectURL('index.php?option=com_flexicontent');
 	}
@@ -214,22 +231,26 @@ class com_flexicontentInstallerScript
 	*/
 	function update( $parent )
 	{
-		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' . JText::_('COM_FLEXICONTENT_UPDATING_INSTALLATION')
-			.' '.JText::_('COM_FLEXICONTENT_VERSION').': ';
+		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">'
+			. JText::_('COM_FLEXICONTENT_UPDATING_INSTALLATION') . ' '
+			. JText::_('COM_FLEXICONTENT_VERSION').': ';
+
 		if ( version_compare( $this->release, $this->release_existing, 'ge' ) ) {
 			echo '
-				'.JText::_('COM_FLEXICONTENT_FROM').' <span class="badge">'.$this->release_existing.'</span>
-				'.JText::_('COM_FLEXICONTENT_TO').' <span class="badge badge-info">'.$this->release.'</span>';
-		} else {
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-info">' . $this->release . '</span>';
+		}
+		else
+		{
 			echo '
-				<span class="badge badge-info">'.JText::_('COM_FLEXICONTENT_DOWNGRADING').'</span>
-				'.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge">' .$this->release_existing. '</span>
-				'.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge badge-info">' .$this->release. '</span>';
+				<span class="badge badge-info">' . JText::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge badge-info">' . $this->release . '</span>';
 		}
 		echo '</div>';
-		
-		if ( ! $this->do_extra( $parent ) ) return false;
-		
+
+		if ( ! $this->do_extra( $parent ) ) return false;  // Abort installation
+
 		// You can have the backend jump directly to the newly updated component configuration page
 		// $parent->getParent()->setRedirectURL('index.php?option=com_flexicontent');
 	}
@@ -262,19 +283,19 @@ class com_flexicontentInstallerScript
 		
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
-		// Original install.php file
-		// @package   Zoo Component
 		// @author    YOOtheme http://www.yootheme.com
 		// @copyright Copyright (C) 2007 - 2009 YOOtheme GmbH
-		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
+		// @license GPLv2
 		$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
 		$source   = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
 		$additional = $manifest->xpath('additional');
 		$additional = count($additional) ? reset($additional) : NULL;
-		
-		if ( is_object($additional) && count( $additional->children() ) ) {
-	    $exts = $additional->children();
-	    foreach ($exts as $ext) {
+
+		if (is_object($additional) && count($additional->children()))
+		{
+			$exts = $additional->children();
+			foreach ($exts as $ext)
+			{
 				$extensions[] = array(
 					'name' => strip_tags( $ext->asXml() ),
 					'type' => $ext->getName(),
@@ -287,7 +308,8 @@ class com_flexicontentInstallerScript
 	    }
 			//echo "<pre>"; print_r($extensions); echo "</pre>"; exit;
 		}
-		
+
+
 		// Install discovered extensions
 		foreach ($extensions as $i => $extension)
 		{
@@ -373,7 +395,7 @@ class com_flexicontentInstallerScript
 										$msg = JText::_(FLEXI_NEW_INSTALL ? 'Upgrade ERROR (extension removed)' : 'Installation -- FAILED --' ) ."<br/>";
 										if (FLEXI_NEW_INSTALL) $msg .= "FLEXIcontent may not work properly, please install an older or newer FLEXIcontent package";
 										echo $msg;
-										Jerror::raiseWarning(null, '<br/>'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .': '. $msg);
+										JFactory::getApplication()->enqueueMessage('<br/>'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) . ': ' . $msg, 'warning');
 									}
 								?>
 							</span>
@@ -386,8 +408,10 @@ class com_flexicontentInstallerScript
 		<?php
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
 		if ($error) {
-			for ($i = 0; $i < count($extensions); $i++) {
-				if ( $extensions[$i]['status'] ) {
+			for ($i = 0; $i < count($extensions); $i++)
+			{
+				if ( $extensions[$i]['status'] )
+				{
 					$extensions[$i]['installer']->abort('<span style="color:black">'.
 						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('COM_FLEXICONTENT_INSTALLED') .':</span>'.
 						' <span class="badge badge-warning">'. JText::_('rolling back').'</span>',
@@ -396,17 +420,14 @@ class com_flexicontentInstallerScript
 					//$extensions[$i]['status'] = false;
 				} /*else if ( $extensions[$i]['status'] === false ) {
 					$msg = ' <span style="color:red">'. JText::_('-- FAILED --').'</span>';
-					Jerror::raiseWarning(null, '<span style="color:black">'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .':</span>'.$msg);
+					JFactory::getApplication()->enqueueMessage('<span style="color:black">'.$extensions[$i]['name'] . ' ' . JText::_($extensions[$i]['type']) . ' ' . JText::_('Install') . '</span> : ' . $msg, 'warning');
 				} else {
 					$msg = ' <span style="color:darkgray">'. JText::_('Skipped').'</span>';
-					Jerror::raiseWarning(null, '<span style="color:black">'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .':</span>'.$msg);
+					JFactory::getApplication()->enqueueMessage('<span style="color:black">'.$extensions[$i]['name'] . ' ' . JText::_($extensions[$i]['type']) . ' ' . JText::_('Install') . '</span> : ' . $msg, 'warning');
 				}*/
 			}
-			if (!FLEXI_J16GE) {
-				$this->parent->abort("<br/>".JText::_('Component installation aborted'), 'component');
-			} else {
-				return false;  // In J1.6+ , returning false here will cancel (abort) component installation and rollback changes
-			}
+
+			return false;  // returning false here will cancel (abort) component installation and rollback changes
 		}
 		// All OK, or acceptable errors
 		return true;
@@ -420,11 +441,17 @@ class com_flexicontentInstallerScript
 	*/
 	function postflight( $type, $parent )
 	{
+		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
+		if ($type != 'install' && $type != 'update')
+		{
+			return;
+		}
+
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
-		
+
 		/*
 		// always create or modify these parameters
 		$params['my_param0'] = 'Component version ' . $this->release;
@@ -1248,9 +1275,12 @@ class com_flexicontentInstallerScript
 	* $parent is the class calling this method
 	* uninstall runs before any other action is taken (file removal or database processing).
 	*/
-	function uninstall( $parent ) {
-		//error_reporting(E_ALL & ~E_STRICT);
-		//ini_set('display_errors',1);
+	function uninstall( $parent )
+	{
+		// Display fatal errors, warnings, notices
+		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
+		ini_set('display_errors',1);
+
 		$app = JFactory::getApplication();
 		
 		// Extra CSS needed for J3.x+
@@ -1522,7 +1552,8 @@ class com_flexicontentInstallerScript
 	/*
 	* get a variable from the manifest file (actually, from the manifest cache).
 	*/
-	function getExistingManifest( $name='com_flexicontent', $type='component' ) {
+	function getExistingManifest( $name='com_flexicontent', $type='component' )
+	{
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
 		
@@ -1537,8 +1568,10 @@ class com_flexicontentInstallerScript
 	/*
 	* sets parameter values in the component's row of the extension table
 	*/
-	function setParams($param_array) {
-		if ( count($param_array) > 0 ) {
+	function setParams($param_array)
+	{
+		if ( count($param_array) > 0 )
+		{
 			// read the existing component value(s)
 			$db = JFactory::getDBO();
 			$db->setQuery('SELECT params FROM #__extensions WHERE element = "com_flexicontent"');
