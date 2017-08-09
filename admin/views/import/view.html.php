@@ -158,7 +158,7 @@ class FlexicontentViewImport extends JViewLegacy
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
 		if ( !empty($conf) && $task=='processcsv' )
 		{
-			$this->assignRef('conf', $conf);
+			$this->conf = $conf;
 			parent::display('process');
 			return;
 		}
@@ -166,11 +166,11 @@ class FlexicontentViewImport extends JViewLegacy
 		// Configuration has been parsed, display a 'preview' layout:  (import_list.php)
 		else if ( !empty($conf) )
 		{
-			$this->assignRef('conf', $conf);
-			$this->assignRef('cparams', $cparams);
-			$this->assignRef('types', $types);
-			$this->assignRef('languages', $languages);
-			$this->assignRef('categories', $globalcats);
+			$this->conf = $conf;
+			$this->cparams = $cparams;
+			$this->types = $types;
+			$this->languages = $languages;
+			$this->categories = $globalcats;
 			parent::display('list');
 			return;
 		}
@@ -322,12 +322,12 @@ class FlexicontentViewImport extends JViewLegacy
 		$file_fields = $db->loadObjectList('name');
 		
 		//assign data to template
-		$this->assignRef('model'   	, $model);
-		$this->assignRef('lists'   	, $lists);
-		$this->assignRef('user'			, $user);
-		$this->assignRef('cparams', $cparams);
-		$this->assignRef('file_fields', $file_fields);
-		$this->assignRef('formvals', $formvals);
+		$this->model = $model;
+		$this->lists = $lists;
+		$this->user = $user;
+		$this->cparams = $cparams;
+		$this->file_fields = $file_fields;
+		$this->formvals = $formvals;
 
 		parent::display($tpl);
 	}

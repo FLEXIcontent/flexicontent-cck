@@ -108,7 +108,8 @@ class FlexicontentViewStats extends JViewLegacy
 		
 		// Create the toolbar
 		//JToolbarHelper::Back();
-		if ($perms->CanConfig) {
+		if ($perms->CanConfig)
+		{
 			//JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -118,29 +119,26 @@ class FlexicontentViewStats extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		$this->assignRef('genstats'		, $genstats);
-		$this->assignRef('popular'		, $popular);
-		$this->assignRef('rating'			, $rating);
-		$this->assignRef('worstrating', $worstrating);
-		$this->assignRef('favoured'		, $favoured);
-		$this->assignRef('statestats'	, $statestats);
-		$this->assignRef('votesstats'	, $votesstats);
-		$this->assignRef('creators'		, $creators);
-		$this->assignRef('editors'		, $editors);
+		$this->genstats = $genstats;
+		$this->popular = $popular;
+		$this->rating = $rating;
+		$this->worstrating = $worstrating;
+		$this->favoured = $favoured;
+		$this->statestats = $statestats;
+		$this->votesstats = $votesstats;
+		$this->creators = $creators;
+		$this->editors = $editors;
 
-		// ************************************************** New data*********************************************************************************************************************//
-		$this->assignRef('itemsgraph'		  , $itemsgraph);
-		$this->assignRef('unpopular'		  , $unpopular);
-		$this->assignRef('totalitemspublish'  , $totalitemspublish);
-		$this->assignRef('totalitemsunpublish', $totalitemsunpublish);
-		$this->assignRef('totalitemswaiting'  , $totalitemswaiting);
-		$this->assignRef('totalitemsprogress' , $totalitemsprogress);
-		$this->assignRef('metadescription'    , $metadescription);
-		$this->assignRef('metakeywords'    , $metakeywords);
-		
-		// ************************************************** New data*********************************************************************************************************************//
+		$this->itemsgraph = $itemsgraph;
+		$this->unpopular = $unpopular;
+		$this->totalitemspublish = $totalitemspublish;
+		$this->totalitemsunpublish = $totalitemsunpublish;
+		$this->totalitemswaiting = $totalitemswaiting;
+		$this->totalitemsprogress = $totalitemsprogress;
+		$this->metadescription = $metadescription;
+		$this->metakeywords = $metakeywords;
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
 	}
 }

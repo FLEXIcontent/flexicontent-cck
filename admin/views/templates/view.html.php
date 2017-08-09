@@ -138,11 +138,11 @@ class FlexicontentViewTemplates extends JViewLegacy
 		}*/
 		
 		//assign data to template
-		$this->assignRef('rows'      		, $rows);
-		$this->assignRef('user'      		, $user);
-		$this->assignRef('tmpldirectory' 	, $tmpldirectory);
-		$this->assignRef('source'      		, $source);
-		$this->assignRef('dest'      		, $dest);
+		$this->rows = $rows;
+		$this->user = $user;
+		$this->tmpldirectory = $tmpldirectory;
+		$this->source = $source;
+		$this->dest = $dest;
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

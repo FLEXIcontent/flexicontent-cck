@@ -459,69 +459,52 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// filter publication state
 		$states 	= array();
-		//$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$states[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SINGLE_STATUS' ) );
-		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$states[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-		$states[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-		$states[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-		$states[] = JHTML::_('select.option',  'RV', JText::_( 'FLEXI_REVISED_VER' ) );
-		$states[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-		$states[] = JHTML::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
-		$states[] = JHTML::_('select.optgroup', '' );
-		
-		$states[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_STATUS_GROUPS' ) );
-		$states[] = JHTML::_('select.option',  'ALL', JText::_( 'FLEXI_GRP_ALL' ).' '. JText::_( 'FLEXI_STATE_S' ) );
-		$states[] = JHTML::_('select.option',  'ALL_P', JText::_( 'FLEXI_GRP_PUBLISHED' ).' '. JText::_( 'FLEXI_STATE_S' ) );
-		$states[] = JHTML::_('select.option',  'ALL_U', JText::_( 'FLEXI_GRP_UNPUBLISHED' ).' '. JText::_( 'FLEXI_STATE_S' ) );
-		$states[] = JHTML::_('select.option',  'ORPHAN', JText::_( 'FLEXI_GRP_ORPHAN' ) );
-		$states[] = JHTML::_('select.optgroup', '' );
+		//$states[]['items'][] = array('value' => '', 'text' => '-' /*JText::_('FLEXI_SELECT_STATE')*/);
 
+		$grp = 'single_status_states';
+		$states[$grp] = array();
+		$states[$grp]['id'] = 'single_status_states';
+		$states[$grp]['text'] = JText::_('FLEXI_SINGLE_STATUS');
+		$states[$grp]['items'] = array(
+			array('value' => 'P', 'text' => JText::_('FLEXI_PUBLISHED')),
+			array('value' => 'U', 'text' => JText::_('FLEXI_UNPUBLISHED')),
+			array('value' => 'PE', 'text' => JText::_('FLEXI_PENDING')),
+			array('value' => 'OQ', 'text' => JText::_('FLEXI_TO_WRITE')),
+			array('value' => 'IP', 'text' => JText::_('FLEXI_IN_PROGRESS')),
+			array('value' => 'RV', 'text' => JText::_('FLEXI_REVISED_VER')),
+			array('value' => 'A', 'text' => JText::_('FLEXI_ARCHIVED')),
+			array('value' => 'T', 'text' => JText::_('FLEXI_TRASHED'))
+		);
+
+		$grp = 'status_groups_states';
+		$states[$grp] = array();
+		$states[$grp]['id'] = 'status_groups_states';
+		$states[$grp]['text'] = JText::_('FLEXI_STATUS_GROUPS');
+		$states[$grp]['items'] = array(
+			array('value' => 'ALL', 'text' => JText::_('FLEXI_GRP_ALL') . ' ' . JText::_('FLEXI_STATE_S')),
+			array('value' => 'ALL_P', 'text' => JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S')),
+			array('value' => 'ALL_U', 'text' => JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S')),
+			array('value' => 'ORPHAN', 'text' => JText::_('FLEXI_GRP_ORPHAN'))
+		);
+
+		$attribs = 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHTML::_('select.genericlist', $states, 'filter_state[]', 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+			JHTML::_('select.groupedlist', $states, 'filter_state[]',
+				array('id' => 'filter_state', 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $filter_state)
+			);
 			//JHTML::_('grid.state', $filter_state );
-		
-		// build filter state group
-		if ($hasDelete || $CanArchives)   // Create state group filter only if user can delete or archive
-		{
-			//$stategroups[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			//$stategroups['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			//$stategroups['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			/*if ($hasDelete)
-				$stategroups['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );*/
-			/*if ($CanArchives)
-				$stategroups['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );*/
-			//$stategroups['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
-			//$stategroups['all']      = JText::_( 'FLEXI_GRP_ALL' );
-			
-			/*$_stategroups = array();
-			foreach ($stategroups as $i => $v) {
-				$_stategroups[] = JHTML::_('select.option', $i, $v);
-			}
-			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $_stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_stategrp );*/
-			
-			/*$lists['filter_stategrp'] = '';
-			foreach ($stategroups as $i => $v) {
-				$checked = $filter_stategrp == $i ? ' checked="checked" ' : '';
-				$lists['filter_stategrp'] .= '<input type="radio" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" class="inputbox" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp" />';
-				$lists['filter_stategrp'] .= '<label class="" id="filter_stategrp'.$i.'-lbl" for="filter_stategrp'.$i.'">'.$v.'</label>';
-			}*/
-		}
-		
-		// build the include subcats boolean list
-		
-		// build the include non-published cats boolean list
+
+
+		// include subcats boolean list
 		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) )
 		{
 			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />';
 			$lists['filter_subcats'] = $ordering_tip;
 		}
-
 		else
 		{
 			//$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_subcats );
-			$subcats = array();
+			//$subcats = array();
 			//$subcats[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_NO' ) );
 			//$subcats[] = JHTML::_('select.option', 1, JText::_( 'FLEXI_YES' ) );
 			//$lists['filter_subcats'] = JHTML::_('select.genericlist', $subcats, 'filter_subcats', 'size="1" class="use_select2_lib '.($filter_subcats!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_subcats, 'filter_subcats' );
@@ -699,55 +682,55 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		
 		//assign data to template
-		$this->assignRef('CanTemplates', $perms->CanTemplates);
-		$this->assignRef('count_filters', $count_filters);
-		//$this->assignRef('filter_stategrp', $filter_stategrp);
-		$this->assignRef('filter_catsinstate', $filter_catsinstate);
-		$this->assignRef('db'				, $db);
-		$this->assignRef('lists'		, $lists);
-		$this->assignRef('rows'			, $rows);
-		$this->assignRef('itemCats'	, $itemCats);
-		$this->assignRef('itemTags'	, $itemTags);
-		$this->assignRef('extra_fields'	, $extraCols);
-		$this->assignRef('custom_filts'	, $customFilts);
-		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
-		$this->assignRef('langs', $langs);
-		$this->assignRef('cid'      	, $cid);
-		$this->assignRef('pagination'	, $pagination);
-		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('CanOrder'		, $CanOrder);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanAccLvl'	, $CanAccLvl);
-		$this->assignRef('unassociated'	, $unassociated);
-		$this->assignRef('badcatitems'	, $badcatitems);
+		$this->CanTemplates = $perms->CanTemplates;
+		$this->count_filters = $count_filters;
+		//$this->filter_stategrp = $filter_stategrp;
+		$this->filter_catsinstate = $filter_catsinstate;
+		$this->db = $db;
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->itemCats = $itemCats;
+		$this->itemTags = $itemTags;
+		$this->extra_fields = $extraCols;
+		$this->custom_filts = $customFilts;
+		if ($useAssocs)  $this->lang_assocs = $langAssocs;
+		$this->langs = $langs;
+		$this->cid = $cid;
+		$this->pagination = $pagination;
+		$this->ordering = $ordering;
+		$this->CanOrder = $CanOrder;
+		$this->CanCats = $CanCats;
+		$this->CanAccLvl = $CanAccLvl;
+		$this->unassociated = $unassociated;
+		$this->badcatitems = $badcatitems;
 		
 		// filters
-		$this->assignRef('filter_id'			, $filter_id);
-		$this->assignRef('filter_state'		, $filter_state);
-		$this->assignRef('filter_author'	, $filter_author);
-		$this->assignRef('filter_type'		, $filter_type);
+		$this->filter_id = $filter_id;
+		$this->filter_state = $filter_state;
+		$this->filter_author = $filter_author;
+		$this->filter_type = $filter_type;
 		
-		$this->assignRef('filter_cats'		, $filter_cats);
-		$this->assignRef('filter_subcats'	, $filter_subcats);
-		$this->assignRef('filter_catsinstate'	, $filter_catsinstate);
+		$this->filter_cats = $filter_cats;
+		$this->filter_subcats = $filter_subcats;
+		$this->filter_catsinstate = $filter_catsinstate;
 		
-		$this->assignRef('filter_order_type', $filter_order_type);
-		$this->assignRef('filter_order'     , $filter_order);
+		$this->filter_order_type = $filter_order_type;
+		$this->filter_order = $filter_order;
 		
-		$this->assignRef('filter_lang'		, $filter_lang);
-		$this->assignRef('filter_access'	, $filter_access);
-		$this->assignRef('filter_tag'		  , $filter_tag);
-		$this->assignRef('filter_fileid'	, $filter_fileid);
+		$this->filter_lang = $filter_lang;
+		$this->filter_access = $filter_access;
+		$this->filter_tag = $filter_tag;
+		$this->filter_fileid = $filter_fileid;
 		
-		$this->assignRef('inline_ss_max'	, $inline_ss_max);
-		$this->assignRef('scope'			, $scope);
-		$this->assignRef('search'			, $search);
-		$this->assignRef('date'				, $date);
-		$this->assignRef('startdate'	, $startdate);
-		$this->assignRef('enddate'		, $enddate);
+		$this->inline_ss_max = $inline_ss_max;
+		$this->scope = $scope;
+		$this->search = $search;
+		$this->date = $date;
+		$this->startdate = $startdate;
+		$this->enddate = $enddate;
 		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
+		$this->option = $option;
+		$this->view = $view;
 
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
@@ -834,12 +817,12 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		
 		//assign data to template
-		$this->assignRef('lists'     	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('itemCats'		, $itemCats);
-		$this->assignRef('cid'      	, $cid);
-		$this->assignRef('user'				, $user);
-		$this->assignRef('behaviour'	, $behaviour);
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->itemCats = $itemCats;
+		$this->cid = $cid;
+		$this->user = $user;
+		$this->behaviour = $behaviour;
 		
 		parent::display($tpl);
 	}

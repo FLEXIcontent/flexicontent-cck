@@ -247,17 +247,17 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		
 		
-		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('lists',	$lists);
-		$this->assignRef('pagination',	$pagination);
-		$this->assignRef('rows', $rows);
-		$this->assignRef('total', $total);
-		$this->assignRef('limitstart', $limitstart);
-		$this->assignRef('f_active', $f_active);
+		$this->count_filters = $count_filters;
+		$this->lists = $lists;
+		$this->pagination = $pagination;
+		$this->rows = $rows;
+		$this->total = $total;
+		$this->limitstart = $limitstart;
+		$this->f_active = $f_active;
 		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
-		$this->assignRef('isADV', $isADV);
+		$this->option = $option;
+		$this->view = $view;
+		$this->isADV = $isADV;
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

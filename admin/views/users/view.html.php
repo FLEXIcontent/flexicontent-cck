@@ -253,25 +253,25 @@ class FlexicontentViewUsers extends JViewLegacy
 		// search id
 		$lists['filter_id'] = $filter_id;
 
-		$this->assignRef('count_filters'	, $count_filters);
-		$this->assignRef('lists'			, $lists);
-		$this->assignRef('rows'				, $rows);
-		$this->assignRef('usergroups'	,	$usergroups);
-		$this->assignRef('pagination'	, $pagination);
+		$this->count_filters = $count_filters;
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->usergroups = $usergroups;
+		$this->pagination = $pagination;
 
 		// filters
-		$this->assignRef('filter_id'	, $filter_id);
-		$this->assignRef('filter_itemscount', $filter_itemscount);
-		$this->assignRef('filter_usergrp'		, $filter_usergrp);
-		$this->assignRef('filter_logged'		, $filter_logged);
-		$this->assignRef('search'			, $search);
-		$this->assignRef('filter_id'	, $filter_id);
-		$this->assignRef('date'				, $date);
-		$this->assignRef('startdate'	, $startdate);
-		$this->assignRef('enddate'		, $enddate);
+		$this->filter_id = $filter_id;
+		$this->filter_itemscount = $filter_itemscount;
+		$this->filter_usergrp = $filter_usergrp;
+		$this->filter_logged = $filter_logged;
+		$this->search = $search;
+		$this->filter_id = $filter_id;
+		$this->date = $date;
+		$this->startdate = $startdate;
+		$this->enddate = $enddate;
 		
-		$this->assignRef('option'	, $option);
-		$this->assignRef('view'		, $view);
+		$this->option = $option;
+		$this->view = $view;
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
