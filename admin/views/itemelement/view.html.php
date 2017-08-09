@@ -166,13 +166,13 @@ class FlexicontentViewItemelement extends JViewLegacy
 			);
 		
 		// assign data to template
-		$this->assignRef('assocs_id'	, $assocs_id);
-		$this->assignRef('langs'    	, $langs);
-		$this->assignRef('filter_cats', $filter_cats);
-		$this->assignRef('lists'     	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('pagination'	, $pagination);
+		$this->assocs_id = $assocs_id;
+		$this->langs = $langs;
+		$this->filter_cats = $filter_cats;
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->ordering = $ordering;
+		$this->pagination = $pagination;
 
 		parent::display($tpl);
 	}

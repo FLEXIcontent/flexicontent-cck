@@ -67,9 +67,9 @@ class FlexicontentViewTagelement extends JViewLegacy {
 
 
 		//assign data to template
-		$this->assignRef('lists'     , $lists);
-		$this->assignRef('rows'      , $rows);
-		$this->assignRef('pageNav'   , $pageNav);
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pageNav = $pageNav;
 
 		parent::display($tpl);
 	}

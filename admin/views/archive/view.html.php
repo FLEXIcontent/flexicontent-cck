@@ -110,11 +110,11 @@ class FlexicontentViewArchive extends JViewLegacy
 		$ordering = ($lists['order'] == 'i.ordering');
 
 		//assign data to template
-		$this->assignRef('lists'			, $lists);
-		$this->assignRef('rows'				, $rows);
-		$this->assignRef('pageNav'		, $pageNav);
-		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('user'				, $user);
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pageNav = $pageNav;
+		$this->ordering = $ordering;
+		$this->user = $user;
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

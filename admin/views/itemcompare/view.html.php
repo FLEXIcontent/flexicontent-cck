@@ -99,14 +99,14 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		}
 		
 		//assign data to template
-		$this->assignRef('document'     , $document);
-		$this->assignRef('row'      	, $row);
-		$this->assignRef('fields'		, $fields);
-		$this->assignRef('versions'		, $versions);
-		$this->assignRef('rev'			, $rev);
-		$this->assignRef('tparams'		, $tparams);
-		$this->assignRef('cparams'		, $cparams);
-		$this->assignRef('codemode'		, $codemode);
+		$this->document = $document;
+		$this->row = $row;
+		$this->fields = $fields;
+		$this->versions = $versions;
+		$this->rev = $rev;
+		$this->tparams = $tparams;
+		$this->cparams = $cparams;
+		$this->codemode = $codemode;
 
 		parent::display($tpl);
 	}

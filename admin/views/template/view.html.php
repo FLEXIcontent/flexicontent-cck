@@ -249,19 +249,19 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		
 		//assign data to template
 		//print_r($conf);
-		$this->assignRef('conf'   	  , $conf);
-		$this->assignRef('layout'   	, $layout);
-		$this->assignRef('fields'   	, $fields);
-		$this->assignRef('user'     	, $user);
-		$this->assignRef('type'     	, $type);
-		$this->assignRef('folder'			, $folder);
-		$this->assignRef('jssort'			, $jssort);
-		$this->assignRef('positions'	, $positions);
-		$this->assignRef('used'				, $used);
-		$this->assignRef('fbypos'			, $fbypos);
-		$this->assignRef('use_jquery_sortable' , $use_jquery_sortable);
-		$this->assignRef('content_type_select' , $content_type_select );
-		$this->assignRef('field_type_select' , $field_type_select );
+		$this->conf = $conf;
+		$this->layout = $layout;
+		$this->fields = $fields;
+		$this->user = $user;
+		$this->type = $type;
+		$this->folder = $folder;
+		$this->jssort = $jssort;
+		$this->positions = $positions;
+		$this->used = $used;
+		$this->fbypos = $fbypos;
+		$this->use_jquery_sortable = $use_jquery_sortable;
+		$this->content_type_select = $content_type_select;
+		$this->field_type_select = $field_type_select;
 		
 		parent::display($tpl);
 	}

@@ -215,7 +215,7 @@ class FlexicontentViewReviews extends JViewLegacy
 		
 		
 		//assign data to template
-		$this->assignRef('count_filters', $count_filters);
+		$this->count_filters = $count_filters;
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->pagination = $pagination;

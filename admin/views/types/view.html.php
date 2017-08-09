@@ -220,14 +220,14 @@ class FlexicontentViewTypes extends JViewLegacy
 		
 		
 		//assign data to template
-		$this->assignRef('CanTemplates', $perms->CanTemplates);
-		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('lists'			, $lists);
-		$this->assignRef('rows'				, $rows);
-		$this->assignRef('pagination'	, $pagination);
+		$this->CanTemplates = $perms->CanTemplates;
+		$this->count_filters = $count_filters;
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pagination = $pagination;
 		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
+		$this->option = $option;
+		$this->view = $view;
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
