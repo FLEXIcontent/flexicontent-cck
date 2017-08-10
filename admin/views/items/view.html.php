@@ -457,6 +457,12 @@ class FlexicontentViewItems extends JViewLegacy
 		// Create Filters HTML
 		// *******************
 		
+		// filter ordering
+		$reOrderingActive = !$filter_order_type
+			? $filter_order == 'i.ordering'
+			: $filter_order == 'catsordering';
+
+
 		// filter publication state
 		$states 	= array();
 		//$states[]['items'][] = array('value' => '', 'text' => '-' /*JText::_('FLEXI_SELECT_STATE')*/);
@@ -496,25 +502,17 @@ class FlexicontentViewItems extends JViewLegacy
 
 
 		// include subcats boolean list
-		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) )
-		{
-			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />';
-			$lists['filter_subcats'] = $ordering_tip;
-		}
-		else
-		{
-			//$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_subcats );
-			//$subcats = array();
-			//$subcats[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_NO' ) );
-			//$subcats[] = JHTML::_('select.option', 1, JText::_( 'FLEXI_YES' ) );
-			//$lists['filter_subcats'] = JHTML::_('select.genericlist', $subcats, 'filter_subcats', 'size="1" class="use_select2_lib '.($filter_subcats!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_subcats, 'filter_subcats' );
-			$lists['filter_subcats'] = '
-				<input type="checkbox" id="filter_subcats" name="filter_subcats" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($filter_subcats ? ' checked="checked" ' : '').' />
-				<label id="filter_subcats-lbl" for="filter_subcats" style="margin-left: 12px!important;"></label>
-			';
-		}
+		$subcats_na = $filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering');
+		$lists['filter_subcats'] = $subcats_na
+			? '<img src="components/com_flexicontent/assets/images/comments.png" style="margin: 4px 0 0 8px;" class="hasTooltip" title="'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER', true ).' &lt;br/&gt; &lt;br/&gt; '.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />'
+			: '';
+		$lists['filter_subcats'] .= ($subcats_na ? '<div style="display:none">' : '') . '
+			<input type="checkbox" id="filter_subcats" name="filter_subcats" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($filter_subcats ? ' checked="checked" ' : '').' />
+			<label id="filter_subcats-lbl" for="filter_subcats" style="margin: 0 12px; vertical-align: middle;"></label>
+		' . ($subcats_na ? '</div>' : '');
 
-		$lists['filter_subcats'] = ($filter_subcats || 1 ? '<div class="add-on">'.JText::_('FLEXI_SUBCATEGORIES').'</div>' : '').$lists['filter_subcats'];
+		$lists['filter_subcats'] = ($filter_subcats || 1 ? '<div class="add-on'. ($reOrderingActive ? ' fc-lbl-short' : '') .'">'.JText::_('FLEXI_SUBCATEGORIES').'</div>' : '')
+			. $lists['filter_subcats'];
 
 		// build the order type boolean list
 		$featured_ops = array();
@@ -556,8 +554,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$lists['filter_order_type'] = JHTML::_('select.genericlist', $order_types, 'filter_order_type', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type, 'filter_order_type', $translate=true );
 		
 		// build the categories select list for filter
-		$lists['filter_cats'] = ($filter_cats || 1 ? '<div class="add-on">'.JText::_('FLEXI_CATEGORY').'</div>' : '').
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=false, $check_perms=false);
+		$lists['filter_cats'] = ($filter_cats || 1 ? '<div class="add-on'. ($reOrderingActive ? ' fc-lbl-short' : '') .'">'.JText::_('FLEXI_CATEGORY').'</div>' : '').
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, (1 ? '-' : 2), 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $check_published=false, $check_perms=false);
 
 		//build type select list
 		$lists['filter_type'] = ($filter_type || 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
@@ -631,13 +629,6 @@ class FlexicontentViewItems extends JViewLegacy
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		// filter ordering
-		if ( !$filter_order_type )
-		{
-			$ordering = ($lists['order'] == 'i.ordering');
-		} else {
-			$ordering = ($lists['order'] == 'catsordering');
-		}
 		
 		//build tags filter
 		$lists['filter_tag'] = ($filter_tag || 1 ? '<div class="add-on">'.JText::_('FLEXI_TAG').'</div>' : '').
@@ -697,7 +688,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->langs = $langs;
 		$this->cid = $cid;
 		$this->pagination = $pagination;
-		$this->ordering = $ordering;
+		$this->reOrderingActive = $reOrderingActive;
 		$this->CanOrder = $CanOrder;
 		$this->CanCats = $CanCats;
 		$this->CanAccLvl = $CanAccLvl;

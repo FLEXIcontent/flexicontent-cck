@@ -105,7 +105,7 @@ $image_editlayout = 0
 // ***
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
-if ($this->ordering)
+if ($this->reOrderingActive)
 {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
 	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
@@ -145,7 +145,6 @@ else
 $ordering_type_attrs = ' data-placement="bottom" class="add-on fc-lbl-inverted fc-lbl-padded icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" ';
 
 $ord_grp = 1;
-$reOrderingActive = $this->filter_order=='i.ordering' || $this->filter_order=='catsordering';
 
 
 
@@ -271,7 +270,7 @@ function delAllFilters() {
 	jQuery('#filter_catsinstate').val('1');	  // default: published categories
 }
 
-<?php if ($this->ordering) : ?>
+<?php if ($this->reOrderingActive) : ?>
 var move_within_ordering_groups_limits = <?php echo '"'.JText::_('FLEXI_MOVE_WITHIN_ORDERING_GROUPS_LIMITS',true).'"'; ?>
 <?php endif; ?>
 
@@ -523,17 +522,21 @@ jQuery(document).ready(function(){
 			</div>
 		</div>
 
+	<?php if (!$this->reOrderingActive): ?>
+
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_cats']; ?>
 			</div>
 		</div>
-		
+
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_subcats']; ?>
 			</div>
 		</div>
+
+	<?php endif; ?>
 		
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
@@ -578,29 +581,50 @@ jQuery(document).ready(function(){
 	<?php echo @$this->minihelp; ?>
 	<div class="fcclear"></div>
 
-	<?php if ($reOrderingActive): ?>
+	<?php if ($this->reOrderingActive): ?>
 
+		<?php if ($this->CanOrder): ?>
 		<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
-			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder') : '') ; ?>
+			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') . flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder'); ?>
 		</div>
+
+		<?php else: ?>
+		<div class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
+			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_ONLY_VIEW') ; ?>
+		</div>
+		<?php endif; ?>
 
 		<?php
 		$order_msg = '';
 
 		if (!$this->filter_order_type)
 		{
-			$order_msg .= JText::_('FLEXI_FCORDER_JOOMLA_ORDER_GROUPING_BY_MAINCAT') . '. ';
+			$order_msg .= JText::_('FLEXI_FCORDER_JOOMLA_ORDER_GROUPING_BY_MAINCAT');
 			$msg_class = 'fc-mssg-inline fc-nobgimage fc-success';
-			$msg_style = 'padding: 0px 8px; margin: 4px 0 0 0;';
+			$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
 			$msg_icon  = '<span class="icon-checkbox"></span>';
 		}
-		else if ($this->filter_order_type && !$this->filter_cats)
+		else
 		{
-			$order_msg .= JText::_('FLEXI_FCORDER_FC_ORDER_PLEASE_SET_CATEGORY_FILTER') . '. ';
-			$msg_class = 'fc-mssg-inline fc-warning';
-			$msg_style = 'margin: 24px 0 24px 0; font-size: 16px; min-width: 50%;';
-			$msg_icon  = '';
+			if (!$this->filter_cats)
+			{
+				$order_msg .= JText::_('FLEXI_FCORDER_FC_ORDER_PLEASE_SET_CATEGORY_FILTER');
+				$msg_class = 'fc-mssg-inline fc-nobgimage fc-warning';
+				$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
+				$msg_icon  = '<span class="icon-warning"></span>';
+			}
+			else
+			{
+				$order_msg .= JText::_('FLEXI_FCORDER_FC_ORDER_GROUPING_BY_SELECTED_CATEGORY');
+				$msg_class = 'fc-mssg-inline fc-nobgimage fc-success';
+				$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
+				$msg_icon  = '<span class="icon-checkbox"></span>';
+			}
 		}
+		
+		$order_msg .= '
+			<div '.  $fcfilter_attrs . ' style="margin: 0 12px !important;">' . $this->lists['filter_cats'] . ' </div>
+			<div '.  $fcfilter_attrs . ' style="margin: 0 12px !important;">' . $this->lists['filter_subcats'] . ' </div>';
 		?>
 
 		<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 8px 0 0 0;">
@@ -632,21 +656,21 @@ jQuery(document).ready(function(){
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="left">
-				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-				<label for="checkall-toggle" class="green single"></label>
-			</th>
-
-			<th class="hideOnDemandClass left nowrap" style="padding-left: 0px; padding-right: 0px;">
+			<th class="hideOnDemandClass left nowrap">
 				<?php
 				echo $this->CanOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
 
-				/*if ($this->CanOrder && $this->ordering) :
+				/*if ($this->CanOrder && $this->reOrderingActive) :
 					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
 				endif;*/
 				?>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo JText::_( 'FLEXI_ORDER' ); ?></span>
+			</th>
+
+			<th class="left">
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
 			<th class="left hideOnDemandClass">
@@ -792,7 +816,7 @@ jQuery(document).ready(function(){
 		</tr>
 	</thead>
 
-	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
+	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->reOrderingActive ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
 		$unpublishableFound = false;
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
@@ -831,16 +855,11 @@ jQuery(document).ready(function(){
 				<?php /*echo $this->pagination->getRowOffset( $i );*/ ?>
 			</td-->
 
-			<td>
-				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
-				<label for="cb<?php echo $i; ?>" class="green single"></label>
-			</td>
-
 		<?php if ($this->CanOrder) : ?>
 
-			<td class="order left">
+			<td class="order center">
 				<?php
-					if ($this->ordering)
+					if ($this->reOrderingActive)
 					{
 						$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
 						$row_stategrp = @ $stategrps[$this->rows[$i]->state];
@@ -857,7 +876,7 @@ jQuery(document).ready(function(){
 						}
 					}
 				?>
-				<?php if (!$this->ordering): echo '<span class="icon-move" style="color: #d0d0d0"></span>'; //$drag_handle_html['disabled']; ?>
+				<?php if (!$this->reOrderingActive): echo '<span class="icon-move" style="color: #d0d0d0"></span>'; //$drag_handle_html['disabled']; ?>
 				<?php elseif ($ordering_draggable): ?>
 					<?php
 						if ($show_orderUp && $show_orderDown) echo $drag_handle_html['both'];
@@ -866,11 +885,11 @@ jQuery(document).ready(function(){
 						else echo $drag_handle_html['none'];
 					?>
 				<?php else: ?>
-					<span><?php echo $this->pagination->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-					<span><?php echo $this->pagination->orderDownIcon( $i, $total_rows, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
+					<span><?php echo $this->pagination->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->reOrderingActive ); ?></span>
+					<span><?php echo $this->pagination->orderDownIcon( $i, $total_rows, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->reOrderingActive );?></span>
 				<?php endif; ?>
 
-				<?php if ($this->ordering): ?>
+				<?php if ($this->reOrderingActive): ?>
 					<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" style="text-align: center" />
 					<input type="hidden" name="item_cb[]" value="<?php echo $row->id; ?>" />
 					<input type="hidden" name="ord_catid[]" value="<?php echo $row->$ord_catid; ?>" />
@@ -881,11 +900,20 @@ jQuery(document).ready(function(){
 
 		<?php else : ?>
 
-			<td>
-				<?php echo !$this->filter_order_type  ?  $row->ordering  :  $row->catsordering; ?>
+			<td class="center">
+				<?php
+				echo !$this->reOrderingActive
+					? '<span class="icon-move" style="color: #d0d0d0"></span>'
+					: '<input class="fcitem_order_no" type="text" name="order[]" size="5" value="' . $row->$ord_col . '" disabled="disabled" />';
+				?>
 			</td>
 
 		<?php endif; ?>
+
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td>
 
 			<td class="col_state" style="padding-right: 8px;">
 				<div class="btn-group fc-group fc-items">
@@ -1065,7 +1093,7 @@ jQuery(document).ready(function(){
 					$isMainCat = ((int)$category->id == (int)$row->catid);
 
 					$catClass = ($isMainCat ? 'maincat' : 'secondarycat').
-						(($ix==0 && $reOrderingActive) ? ' orderingcat' : '');
+						(($ix==0 && $this->reOrderingActive) ? ' orderingcat' : '');
 					
 					$catLink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
