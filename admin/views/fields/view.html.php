@@ -262,7 +262,6 @@ class FlexicontentViewFields extends JViewLegacy
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		$pagination = $this->get( 'Pagination' ); // Pagination
 		$types      = $this->get( 'Typeslist' );  // Content types
-		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		
 		
 		$lists = array();
@@ -283,12 +282,13 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		
 		// build field-type filter
+		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
-		$fftypes[] = array('value'=>'', 'text'=>'-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-		$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
+		$fftypes[] = array('value' => '', 'text' => '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+		$fftypes[] = array('value' => 'BV', 'text' => $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$fftypes[] = array('value' => 'C',  'text' => $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$fftypes[] = array('value' => 'NC', 'text' => $ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
 		$n = 0;
 		foreach ($fieldTypes as $field_group => $ft_types)
 		{

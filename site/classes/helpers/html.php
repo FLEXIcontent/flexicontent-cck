@@ -3798,13 +3798,6 @@ class flexicontent_html
 					$field_types[$key] = $data;
 					$in_grp = true;
 				}
-				// To be removed ...
-				elseif ( is_string($data) )
-				{
-					$n = !$in_grp ? $n : ($n + 1);
-					$field_types[$n]['items'][] = array('value' => '_buildfieldtypeslist_' . $n , 'text' =>  strtoupper($data));
-					$in_grp = false;
-				}
 				else
 				{
 					$n = !$in_grp ? $n : ($n + 1);
