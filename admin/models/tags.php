@@ -307,7 +307,7 @@ class FlexicontentModelTags extends JModelLegacy
 	function _buildContentWhere()
 	{
 		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$option = $app->input->get('option', '', 'CMD');
 		
 		$filter_state	= $this->getState( 'filter_state' );
 		

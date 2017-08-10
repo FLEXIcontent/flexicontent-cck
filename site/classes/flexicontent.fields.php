@@ -291,7 +291,7 @@ class FlexicontentFields
 		
 		static $type_fields = array();
 		
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$nullDate = $db->getNulldate();
@@ -905,7 +905,7 @@ class FlexicontentFields
 			// We use a custom Dispatcher to allow selective Content Plugin triggering
 			// ***********************************************************************
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'dispatcher.php');
-			$dispatcher   = JDispatcher::getInstance();
+			$dispatcher   = JEventDispatcher::getInstance();
 			$fcdispatcher = FCDispatcher::getInstance_FC($debug);
 		}
 		

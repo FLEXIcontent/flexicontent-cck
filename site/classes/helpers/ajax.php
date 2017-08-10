@@ -65,7 +65,7 @@ class flexicontent_ajax
 			}
 
 			// Create a plugin instance, also pass the parameters so that $this->params are created too
-			$dispatcher = JDispatcher::getInstance();
+			$dispatcher = JEventDispatcher::getInstance();
 			$plg_db_data = JPluginHelper::getPlugin($extfolder, $extname);
 			$obj = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 		}

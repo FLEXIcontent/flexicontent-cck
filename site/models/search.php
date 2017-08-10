@@ -200,7 +200,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$areas = $this->getAreas();
 
 			JPluginHelper::importPlugin( 'search');
-			$dispatcher = JDispatcher::getInstance();
+			$dispatcher = JEventDispatcher::getInstance();
 			$results = $dispatcher->trigger( 'onContentSearch',
 				array(
 					$this->getState('keyword'),
@@ -279,7 +279,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		
 		// Using other search areas, get all search
 		JPluginHelper::importPlugin( 'search');
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$searchareas = $dispatcher->trigger( 'onContentSearchAreas' );
 		$areas = array();
 		foreach ($searchareas as $area) {

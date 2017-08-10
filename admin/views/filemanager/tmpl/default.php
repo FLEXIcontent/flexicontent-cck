@@ -426,7 +426,7 @@ flexicontent_html::loadFramework('flexi-lib');
 	});
 </script>*/
 
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 
 <div id="fc-fileman-overlay" onclick="jQuery('img.fc_zoomed, li.fc_zoomed .plupload_img_preview img').trigger('click');"></div>
@@ -434,12 +434,16 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 <div id="flexicontent" class="flexicontent">
 
 <?php if (!empty( $this->sidebar)) : ?>
-	<div id="j-sidebar-container" class="span2">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div id="j-main-container" class="span10">
+	<div class="span10 col-md-10">
+		<div id="j-main-container">
 <?php else : ?>
-	<div id="j-main-container">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div class="span12 col-md-12">
+		<div id="j-main-container">
 <?php endif;?>
 
 
@@ -699,7 +703,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 				$file_assign_arr = array();   // fileselement view only
 
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
-				$index = JRequest::getInt('index', 0);
+				$index = $jinput->get('index', 0, 'INT');
 				$k = 0;
 				$i = 0;
 				$n = count($this->rows);
@@ -1011,7 +1015,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 			<div id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminthumbs fcmanthumbs fman_grid_element" style="display: none;">
 				<?php
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
-				$index = JRequest::getInt('index', 0);
+				$index = $jinput->get('index', 0, 'INT');
 				$k = 0;
 				$i = 0;
 				$n = count($this->rows);
@@ -1704,7 +1708,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 </div><!-- .fctabber end -->
 
 		<!-- fc_perf -->
-<?php if (!empty( $this->sidebar)) : ?>
-	</div>  <!-- sidebar -->
-<?php endif; ?>
+		</div>  <!-- j-main-container -->
+	</div>  <!-- spanNN -->
+</div>  <!-- row -->
 </div><!-- #flexicontent end -->

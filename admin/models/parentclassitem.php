@@ -1547,7 +1547,7 @@ class ParentClassItem extends FCModelAdmin
 		$user = JFactory::getUser();
 
 		$jinput     = JFactory::getApplication()->input;
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$nullDate   = $this->_db->getNullDate();
 
@@ -2348,7 +2348,7 @@ class ParentClassItem extends FCModelAdmin
 		
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$print_logging_info = $cparams->get('print_logging_info');
@@ -3827,7 +3827,7 @@ class ParentClassItem extends FCModelAdmin
 		$user = JFactory::getUser();
 
 		$jinput     = JFactory::getApplication()->input;
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');

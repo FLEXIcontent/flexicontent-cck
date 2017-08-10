@@ -271,7 +271,7 @@ class FlexicontentTasksCore
 
 		require_once JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
 
-		$dispatcher   = JDispatcher::getInstance();
+		$dispatcher   = JEventDispatcher::getInstance();
 		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
 		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 

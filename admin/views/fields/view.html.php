@@ -289,12 +289,17 @@ class FlexicontentViewFields extends JViewLegacy
 		$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
 		$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
 		$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
-		foreach ($fieldTypes as $field_group => $ft_types) {
-			$fftypes[] = $field_group;
-			foreach ($ft_types as $field_type => $ftdata) {
-				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>'-'.$ftdata->assigned.'- '. $ftdata->friendly);
+		$n = 0;
+		foreach ($fieldTypes as $field_group => $ft_types)
+		{
+			$fftypes[$field_group] = array();
+			$fftypes[$field_group]['id'] = 'field_group_' . ($n++);
+			$fftypes[$field_group]['text'] = $field_group;
+			$fftypes[$field_group]['items'] = array();
+			foreach ($ft_types as $field_type => $ftdata)
+			{
+				$fftypes[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => '-'.$ftdata->assigned.'- '. $ftdata->friendly);
 			}
-			$fftypes[] = '';
 		}
 		$lists['fftype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
 			flexicontent_html::buildfieldtypeslist($fftypes, 'filter_fieldtype', $filter_fieldtype, ($_grouped ? 1 : 0), 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"');
@@ -353,4 +358,3 @@ class FlexicontentViewFields extends JViewLegacy
 		parent::display($tpl);
 	}
 }
-?>

@@ -2534,7 +2534,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function delete($cid, &$itemmodel=null)
 	{
-		$dispatcher = JDispatcher::getInstance();  // Get event dispatcher and load all content plugins for triggering their delete events
+		$dispatcher = JEventDispatcher::getInstance();  // Get event dispatcher and load all content plugins for triggering their delete events
 		JPluginHelper::importPlugin('content');    // Load all content plugins for triggering their delete events
 		$item_arr = array();                       // We need an array of items to use for calling the 'onContentAfterDelete' Event
 		

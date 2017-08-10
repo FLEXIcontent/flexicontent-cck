@@ -93,7 +93,7 @@ if($this->check['connect'] == 0) {
 				<span class="label"><?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ); ?></span>
 			</td>
 			<td>
-				<span class="badge <?php echo $this->check['current']==-1 ? 'badge-warning' : ($this->check['current']==0 ? 'badge-success' : ''); ?>"><?php echo $this->check['current_version']; ?></span>
+				<span class="badge <?php echo $this->check['current']==-1 ? 'badge-warning' : ($this->check['current']==0 ? 'badge-success' : 'badge-info'); ?>"><?php echo $this->check['current_version']; ?></span>
 				&nbsp; <strong><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
 				
 				<?php

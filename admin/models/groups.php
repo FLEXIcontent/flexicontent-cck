@@ -26,8 +26,13 @@ jimport('legacy.model.list');
  * @subpackage	com_flexicontent
  * @since		1.6
  */
-require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'groups.php');
-
-class FlexicontentModelGroups extends UsersModelGroups
+if (FLEXI_J40GE)
 {
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'Groups.php');
+	class FlexicontentModelGroups extends Joomla\Component\Users\Administrator\Model\Groups {}
+}
+else
+{
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'groups.php');
+	class FlexicontentModelGroups extends UsersModelGroups {}
 }

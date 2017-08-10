@@ -113,7 +113,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		$asSelect = $filter->parameters->get('filter_customize_options') != 0;
 
 		// Create a 'select' or 'text' field object and render its filter display
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$filter->field_type = $asSelect ? 'select' : 'text';
 		$_fld_obj = $asSelect ? new plgFlexicontent_fieldsSelect($dispatcher, array()) : new plgFlexicontent_fieldsText($dispatcher, array());
 		$_fld_obj->onDisplayFilter($filter, $value, $formName);

@@ -91,12 +91,16 @@ function delAllFilters() {
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
-	<div id="j-sidebar-container" class="span2">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div id="j-main-container" class="span10">
+	<div class="span10 col-md-10">
+		<div id="j-main-container">
 <?php else : ?>
-	<div id="j-main-container">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div class="span12 col-md-12">
+		<div id="j-main-container">
 <?php endif;?>
 
 	<div id="fc-filters-header">
@@ -323,7 +327,9 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
-	<!-- fc_perf -->
-	</div>
+		<!-- fc_perf -->
+		</div>  <!-- j-main-container -->
+	</div>  <!-- spanNN -->
+</div>  <!-- row -->
 </form>
-</div>
+</div><!-- #flexicontent end -->

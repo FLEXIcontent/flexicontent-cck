@@ -179,7 +179,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 		$rows = $this->_db->loadObjectList();
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		
 		// 2, get current items total for pagination
@@ -206,7 +205,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$_data = $this->_db->loadObjectList($isADV ? 'sid' : 'item_id');
 		}
 		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		
 		// 5, reorder items and get cat ids

@@ -13,6 +13,8 @@
 	height: 14px;
 	line-height: 14px;
 	width: 20px;
+	margin-right: 9px !important;
+	font-size: 16px;
 }
 [class^="fcsb-icon-"]:before,
 [class*=" fcsb-icon-"]:before {
@@ -24,11 +26,9 @@
 	font-weight: normal;
 	color: #aaa;
 }
-.fcsb-icon-flexicontent:before,
 .icon-flexicontent:before {
 	content: "\e250";
 }
-.fcsb-icon-items:before,
 .icon-items:before {
 	content: "\e242";
 }
@@ -36,31 +36,26 @@
 .icon-itemadd:before {
 	content: "\2c";
 }
-.fcsb-icon-reviews:before,
 .icon-reviews:before,
 icon-reviewadd:before,
 .icon-reviewedit:before {
 	content: "%";
 }
-.fcsb-icon-types:before,
 .icon-types:before,
 icon-typeadd:before,
 .icon-typeedit:before {
 	content: "\e243";
 }
-.fcsb-icon-fc_categories:before,
 .icon-fc_categories:before,
 .icon-fc_categoryadd:before,
 .icon-fc_categoryedit:before {
 	content: "\2d";
 }
-.fcsb-icon-fields:before,
 .icon-fields:before,
 .icon-fieldadd:before,
 .icon-fieldedit:before {
 	content: "\e230";
 }
-.fcsb-icon-tags:before,
 .icon-tags:before {
 	content: "\e264";
 }
@@ -68,26 +63,21 @@ icon-typeadd:before,
 .icon-tagedit:before {
 	content: "\e262";
 }
-.fcsb-icon-templates:before,
 .icon-templates:before {
 	content: "\3c";
 }
-.fcsb-icon-authors:before,
 .icon-authors:before {
 	content: "\e01f";
 }
-.fcsb-icon-users:before,
 .icon-authoredit:before,
 .icon-authoradd:before {
 	content: "\22";
 }
-.fcsb-icon-groups:before,
 .icon-groups:before,
 .icon-groupedit:before,
 .icon-groupadd:before {
 	content: "\e01f";
 }
-.fcsb-icon-filemanager:before,
 .icon-files:before {
 	content: "\30";
 }
@@ -95,22 +85,11 @@ icon-typeadd:before,
 .icon-fileadd:before {
 	content: "\e239";
 }
-.fcsb-icon-search:before,
 .icon-searchtext:before {
 	content: "\53";
 }
-.fcsb-icon-stats:before,
 .icon-stats:before {
 	content: "\75";
-}
-.fcsb-icon-comments:before {
-	content: "$";
-}
-.fcsb-icon-plugins:before {
-	content: "2";
-}
-.fcsb-icon-translations:before {
-	content: "5";
 }
 .icon-test:before {
 	content: "l";
@@ -132,12 +111,6 @@ icon-typeadd:before,
 }
 .icon-32-archive:before {
 	content: "\50";
-}
-.fcsb-icon-wrench:before {
-	content: ":";
-}
-.fcsb-icon-import:before {
-	content: "\e022";
 }
 .icon-import:before {
 	content: "\e022";

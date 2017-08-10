@@ -24,7 +24,7 @@ jimport('joomla.event.dispatcher');
  * @see         JPlugin
  * @since       11.1
  */
-class FCDispatcher extends JDispatcher
+class FCDispatcher extends JEventDispatcher
 {
 	protected $prepContentFuncs = null;
 	protected $debug = false;
@@ -135,7 +135,7 @@ class FCDispatcher extends JDispatcher
 
 		$event = strtolower($event);
 		
-		// Get static properties to use from JDispatcher class
+		// Get static properties to use from JEventDispatcher class
 		$this->_methods   = & $this->getInstance()->_methods;
 		$this->_observers = & $this->getInstance()->_observers;
 

@@ -32,7 +32,7 @@ class FlexicontentViewItems extends JViewLegacy
 	function display($tpl = null)
 	{
 		$user       = JFactory::getUser();
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 
 		// Initialize some variables
 		$item 		= $this->get('Item');

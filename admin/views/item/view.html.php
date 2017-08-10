@@ -65,7 +65,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$document   = JFactory::getDocument();
 		$config     = JFactory::getConfig();
 		$session    = JFactory::getSession();

@@ -45,8 +45,8 @@ class FlexicontentViewGroups extends JViewLegacy
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
+		$option   = $app->input->get('option', '', 'CMD');
+		$view     = $app->input->get('view', '', 'CMD');
 		
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
