@@ -59,7 +59,7 @@ if ($this->filter_type == '' || $this->filter_type == 0) {
 	$ord_col = 'typeordering';
 }
 $ord_grp = 1;
-$list_total_cols = 14;
+$list_total_cols = 13;
 
 
 // Parse parameter and find fieldgroup
@@ -238,11 +238,10 @@ function delAllFilters() {
 	<table id="adminListTableFCfields" class="adminlist fcmanlist">
 	<thead>
 		<tr>
+			<?php /*
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="left">
-				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-				<label for="checkall-toggle" class="green single"></label>
-			</th>
+			*/ ?>
+
 			<th class="left nowrap">
 				<?php
 				echo $image_ordering_tip;
@@ -255,7 +254,14 @@ function delAllFilters() {
 				endif;
 				?>
 			</th>
+
+			<th class="left">
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<label for="checkall-toggle" class="green single"></label>
+			</th>
+
 			<?php /*<th style="padding:0px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
+
 			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -386,14 +392,14 @@ function delAllFilters() {
 				</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
+
+			<?php /*
 			<td>
 				<div class="adminlist-table-row"></div>
 				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
-			<td>
-				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
-				<label for="cb<?php echo $i; ?>" class="green single"></label>
-			</td>
+			*/ ?>
+
 			<?php if ($this->permission->CanOrderFields) : ?>
 			<td class="order left">
 				<?php
@@ -431,6 +437,11 @@ function delAllFilters() {
 				?>
 			</td>
 			<?php endif; ?>
+
+			<td>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
+				<label for="cb<?php echo $i; ?>" class="green single"></label>
+			</td>
 
 			<td style="padding:0px;">
 				<?php
