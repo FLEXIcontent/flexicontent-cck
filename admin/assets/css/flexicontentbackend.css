@@ -3211,6 +3211,9 @@ div.adminthumbs.fcmanthumbs {
 .flexicontent #fc-filters-box {
 	padding-left: 0px;
 }
+#flexicontent input.fcitem_order_no {
+	text-align: center;
+}
 .flexicontent #fc-filters-header #search {
 	margin: 0px !important;
 	padding: 4px !important;

@@ -1072,8 +1072,8 @@ class FlexicontentModelItems extends JModelLegacy
 				. ( in_array($filter_order, array('i.ordering', 'catsordering')) ?
 					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order' : ''
 					)
-				. ( in_array($filter_order, array('i.ordering', 'catsordering')) ?
-					', rel.ordering as catsordering' : ''
+				. ($filter_cats && !$filter_subcats ?
+					', rel.ordering as catsordering' : ', \'\' as catsordering'
 					)
 				. ', CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled'
 				. ', CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
@@ -1122,11 +1122,8 @@ class FlexicontentModelItems extends JModelLegacy
 					: '')
 
 				// Limit to items according to their assigned categories (left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE)
-				// This is almost always true ... since cat state filter (filter_catsinstate) has default: 'Published'
-				. ($filter_cats || $filter_catsinstate != 99
-					? ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-						. ($filter_cats && !$filter_subcats ? ' AND rel.catid=' . $filter_cats : '') // Force rel.catid to be of the specific filtered category (rel.catid is used by ordering code)
-					: '')
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+					. ($filter_cats && !$filter_subcats ? ' AND rel.catid=' . $filter_cats : '') // Force rel.catid to be of the specific filtered category (rel.catid is used by ordering code)
 
 				// Get type info, (left join and not inner join, needed to INCLUDE items without type !!)
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'
@@ -1346,8 +1343,11 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( $filter_cats )
 		{
 			// CURRENTLY in main or secondary category.  -TODO-  maybe add limiting by main category, if ... needed
-			$cat_type = 'rel.catid';  // $filter_maincat ? 'i.catid' : 'rel.catid';
 			
+			$cat_type = !$this->getState( 'filter_order_type' ) && $this->getState( 'filter_order' )=='i.ordering'
+				? 'i.catid'
+				: 'rel.catid';
+
 			if ( $filter_subcats )
 			{
 				global $globalcats;

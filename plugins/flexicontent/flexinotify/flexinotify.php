@@ -237,7 +237,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$sendermail	= JMailHelper::cleanAddress($sendermail);
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
 		$subject	= $params->get('mailsubject', '') ? JMailHelper::cleanSubject($params->get('mailsubject')) : JText::_('FLEXI_SUBJECT_DEFAULT');
-		$message 	= JText::sprintf('FLEXI_NOTIFICATION_MESSAGE', $subname, $itemid, $title, $maincat, '<a href="'.$link.'">'.$link.'</a>', $sitename);
+		$message 	= JText::sprintf('FLEXI_NOTIFICATION_MESSAGE', $subname, $itemid, $title, $maincat, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 		$message  = nl2br($message);
 		
 		
