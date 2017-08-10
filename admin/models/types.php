@@ -171,8 +171,8 @@ class FlexicontentModelTypes extends JModelList
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$app  = JFactory::getApplication();
 		$db   = JFactory::getDBO();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+		$option = $app->input->get('option', '', 'CMD');
+		$view   = $app->input->get('view', '', 'CMD');
 		
 		$filter_order     = $this->getState( 'filter_order' );
 		$filter_order_Dir	= $this->getState( 'filter_order_Dir' );

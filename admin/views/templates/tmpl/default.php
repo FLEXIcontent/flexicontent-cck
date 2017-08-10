@@ -76,15 +76,20 @@ $list_total_cols = 8;
 ?>
 
 <div id="flexicontent" class="flexicontent">
+
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
-	<div id="j-sidebar-container" class="span2">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div id="j-main-container" class="span10">
+	<div class="span10 col-md-10">
+		<div id="j-main-container">
 <?php else : ?>
-	<div id="j-main-container">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div class="span12 col-md-12">
+		<div id="j-main-container">
 <?php endif;?>
 
 
@@ -171,7 +176,7 @@ $list_total_cols = 8;
 					</span>
 			 	<?php endif; ?>
 				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
-				<span class="btn hasTooltip" title="<?php echo JText::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" href="<?php echo $copylink; ?>">
+				<span class="btn hasTooltip" title="<?php echo JText::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
 					<?php echo $copyTmpl_icon; ?>
 				</span>
 			</td>
@@ -266,7 +271,9 @@ $list_total_cols = 8;
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 
-	<!-- fc_perf -->
-	</div>
+		<!-- fc_perf -->
+		</div>  <!-- j-main-container -->
+	</div>  <!-- spanNN -->
+</div>  <!-- row -->
 </form>
-</div>
+</div><!-- #flexicontent end -->

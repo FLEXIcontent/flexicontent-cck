@@ -113,7 +113,8 @@ class FlexicontentViewTemplates extends JViewLegacy
 		}
 		
 		//JToolbarHelper::Back();
-		if ($perms->CanConfig) {
+		if ($perms->CanConfig)
+		{
 			//JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -124,7 +125,7 @@ class FlexicontentViewTemplates extends JViewLegacy
 		}
 		
 		$tmpldirectory = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
-		$source = JRequest::getString('source', '');
+		$source = $jinput->get('source', '', 'STRING');
 		$dest   = $source ? flexicontent_upload::sanitizedir($tmpldirectory, $source) : '';
 
 		//Get data from the model
@@ -148,4 +149,3 @@ class FlexicontentViewTemplates extends JViewLegacy
 		parent::display($tpl);
 	}
 }
-?>

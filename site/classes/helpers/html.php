@@ -1,6 +1,8 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 use Joomla\String\StringHelper;
+use Joomla\CMS\Application\CMSApplication;
 
 class flexicontent_html
 {
@@ -3776,32 +3778,49 @@ class flexicontent_html
 	{
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 
-		if (!$displaytype) {   // $displaytype: 0, is ungrouped
+		// $displaytype: 0, is ungrouped
+		if (!$displaytype)
+		{
 			ksort( $list, SORT_STRING );
 			return JHTML::_('select.genericlist', $list, $name, $attribs, 'value', 'text', $selected, $tagid );
 		}
 
-		else { // $displaytype: 1, is grouped
+		// $displaytype: 1, is grouped
+		else
+		{
 			$field_types = array();
+			$n = 0;
+			$in_grp = false;
 			foreach ($list as $key => $data)
 			{
-				if ( is_object($data) )
-					$field_types[] = $data;
-
-				else if ( is_string($data) )
-					$field_types[] = JHTML::_('select.optgroup', $data);
-
+				if ( !is_numeric($key) )
+				{
+					$field_types[$key] = $data;
+					$in_grp = true;
+				}
+				// To be removed ...
+				elseif ( is_string($data) )
+				{
+					$n = !$in_grp ? $n : ($n + 1);
+					$field_types[$n]['items'][] = array('value' => '_buildfieldtypeslist_' . $n , 'text' =>  strtoupper($data));
+					$in_grp = false;
+				}
 				else
-					$field_types[] = $data;
+				{
+					$n = !$in_grp ? $n : ($n + 1);
+					$field_types[$n]['items'][] = $data;
+					$in_grp = false;
+				}
 			}
 
 			$xml = new SimpleXMLElement("<element $attribs />");
 			$xml = (array)$xml->attributes();
-			$attribs = $xml['@attributes'];
+			$attributes = $xml['@attributes'];
 
 			$attribs = array(
 				'id' => $tagid, // HTML id for select field
-				'list.attr' => $attribs, // array(),  // additional HTML attributes for select field
+				'group.id' => 'id',
+				'list.attr' => $attributes, // array(),  // additional HTML attributes for select field
 				'list.translate'=>false, // true to translate
 				'option.key'=>'value', // key name for value in data array
 				'option.text'=>'text', // key name for text in data array
@@ -3809,7 +3828,7 @@ class flexicontent_html
 				'list.select'=>$selected, // value of the SELECTED field
 			);
 
-			return JHTML::_('select.genericlist', $field_types, $name, $attribs);
+			return JHTML::_('select.groupedlist', $field_types, $name, $attribs);
 		}
 	}
 
@@ -4506,12 +4525,7 @@ class flexicontent_html
 			$query->order('`title` ASC');
 
 			// Get the options.
-			$db->setQuery($query);
-			$options = $db->loadObjectList('value');
-
-			// Check for a database error.
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			if ( !$options ) return null;
+			$options = $db->setQuery($query)->loadObjectList('value');
 
 			// Return ACCESS LEVEL NAME
 			if (!$createlist)
@@ -5065,7 +5079,7 @@ class flexicontent_html
 			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 			// Do not merge the following 2 statements (site_instance, site_router), PHP 5.6 and lower cannot parse 2 consequent operators ::
 			$site_instance = $isAdmin && !$isSH404SEF
-				? JApplication::getInstance('site')
+				? (FLEXI_J40GE ? CMSApplication::getInstance('site') : JApplication::getInstance('site'))
 				: JFactory::getApplication();
 			$site_router = $site_instance::getRouter();
 		}
@@ -5076,13 +5090,13 @@ class flexicontent_html
 		}
 
 		// Force application to the site app if we are in the backend
-		if ( $isAdmin && !$isSH404SEF )  JFactory::$application = JApplication::getInstance('site');
+		if ( $isAdmin && !$isSH404SEF )  JFactory::$application = FLEXI_J40GE ? CMSApplication::getInstance('site') : JApplication::getInstance('site');
 
 		// Build route
 		$uri = $site_router->build($url);
 
 		// Restore application to the admin app if we are in the backend
-		if  ( $isAdmin && !$isSH404SEF )  JFactory::$application = JApplication::getInstance('administrator');
+		if  ( $isAdmin && !$isSH404SEF )  JFactory::$application = FLEXI_J40GE ? CMSApplication::getInstance('administrator') : JApplication::getInstance('administrator');
 
 		$scheme = array('path', 'query', 'fragment');
 

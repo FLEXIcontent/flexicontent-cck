@@ -120,12 +120,13 @@ class com_flexicontentInstallerScript
 		
 		<?php		
 		echo '
-		<div class="alert alert-info" style="margin:32px 0px 8px 0px;">' .JText::_('Performing prior to installation tasks ... '). '</div>
+		<div class="alert alert-info" style="margin:32px 0px 0px 0px;">' .JText::_('Performing prior to installation tasks ... '). '
+		<br/>
 		<ul>
 			<li>
-				'.JText::_('COM_FLEXICONTENT_REQUIRED_PHPVER').':
-				'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge badge-info">' .$PHP_VERSION_NEEDED. '</span>
-				'.JText::_('COM_FLEXICONTENT_CURRENT').' <span class="badge badge-success">' .PHP_VERSION. '</span>
+				' . JText::_('COM_FLEXICONTENT_REQUIRED_PHPVER') . '
+				' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge badge-info">' . $PHP_VERSION_NEEDED . '</span>
+				' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge badge-success">' . PHP_VERSION . '</span>
 			</li>
 		';
 		
@@ -140,9 +141,9 @@ class com_flexicontentInstallerScript
 		{
 			echo '
 				<li>
-					'.JText::_('COM_FLEXICONTENT_REQUIRED_JVER').':
-					'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge badge-info">' .$this->minimum_joomla_release. '</span>
-					'.JText::_('COM_FLEXICONTENT_CURRENT').' <span class="badge badge-success">' .$jversion->getShortVersion(). '</span>
+					' . JText::_('COM_FLEXICONTENT_REQUIRED_JVER') . '
+					' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge badge-info">' . $this->minimum_joomla_release . '</span>
+					' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge badge-success">' . $jversion->getShortVersion() . '</span>
 				</li>';
 		}
 		
@@ -166,6 +167,7 @@ class com_flexicontentInstallerScript
 		
 		echo '
 		</ul>
+		</div>
 		';
 		
 		endif; // type == install / update
@@ -184,7 +186,7 @@ class com_flexicontentInstallerScript
 	function install( $parent )
 	{
 		echo '
-		<div class="alert alert-success" style="margin:32px 0px 8px 0px;">'
+		<div class="alert alert-success" style="margin:8px 0px 8px 0px;">'
 			. JText::_('COM_FLEXICONTENT_INSTALLING') . ' '
 			//. JText::_('COM_FLEXICONTENT_VERSION')
 			. ' <span class="badge badge-success">'.$this->release.'</span>
@@ -205,7 +207,7 @@ class com_flexicontentInstallerScript
 	*/
 	function update( $parent )
 	{
-		echo '<div class="alert alert-success" style="margin:32px 0px 8px 0px;">'
+		echo '<div class="alert alert-success" style="margin:8px 0px 8px 0px;">'
 			. JText::_('COM_FLEXICONTENT_UPDATING_INSTALLATION') . ' '
 			//. JText::_('COM_FLEXICONTENT_VERSION')
 			;
@@ -1253,12 +1255,11 @@ class com_flexicontentInstallerScript
 		echo JHtml::_('bootstrap.endAccordion');
 		?>
 
-		<div class="alert alert-success" style="margin: 64px 0;">
-			Please visit FLEXIcontent dashboard and click to complete some after installation tasks
-			<br/>
-			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_blank');" >
-				Dashboard
+		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
+			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_blank');" style="cursor: pointer;">
+				<?php echo JText::_('FLEXI_DASHBOARD');
   		</span>
+			<?php echo JText::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD');
   	</div>
 		
 		<?php

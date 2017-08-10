@@ -105,10 +105,16 @@ abstract class JHtmlFcitems
 			$tip_class = 'hasTooltip';
 
 			$tip_text = JText::_('FLEXI_SCHEDULED_FOR_PUBLICATION', true);
-			$html['scheduled'] = '<span class="btn btn-micro ntxt active" style="cursor:default"><img src="components/com_flexicontent/assets/images/pushished_scheduled.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span> ';
+			$html['scheduled'] = '
+			<span class="btn btn-micro ntxt active" style="cursor:default">
+				<img src="components/com_flexicontent/assets/images/pushished_scheduled.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" />
+			</span> ';
 
 			$tip_text = JText::_('FLEXI_PUBLICATION_EXPIRED', true);
-			$html['expired'] = '<span class="btn btn-micro ntxt active" style="cursor:default"><img src="components/com_flexicontent/assets/images/pushished_expired.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span> ' ;
+			$html['expired'] = '
+			<span class="btn btn-micro ntxt active" style="cursor:default">
+				<img src="components/com_flexicontent/assets/images/pushished_expired.png" width="16" height="16" style="border: 0;" class="'.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" />
+			</span> ' ;
 		}
 
 		// Check publication START/FINISH dates (publication Scheduled / Expired)
@@ -138,7 +144,10 @@ abstract class JHtmlFcitems
 		{
 			$tip_class = 'hasTooltip';
 			$tip_text = JText::_('FLEXI_UNREVIEWED_VERSION') . ' , ' . JText::_('FLEXI_NEED_TO_BE_APPROVED');
-			$html = '<span class="fc-revised-icon"><span class="icon-out-3 '.$tip_class.'" alt="'.$tip_text.'" title="'.$tip_text.'" /></span></<span> ';
+			$html = '
+			<span class="fc-revised-icon">
+				<span class="icon-out-3 '.$tip_class.'" title="'.$tip_text.'"></span>
+			</span> ';
 		}
 
 		return $html;

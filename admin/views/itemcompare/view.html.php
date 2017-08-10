@@ -38,7 +38,7 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
 		$template   = $mainframe->getTemplate();
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$rev      = JRequest::getInt('version','','request');
 		$codemode = JRequest::getInt('codemode',0);
 		$cparams  = JComponentHelper::getParams('com_flexicontent');

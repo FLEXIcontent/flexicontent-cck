@@ -86,15 +86,20 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 ?>
 
 <div id="flexicontent" class="flexicontent">
+
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
-	<div id="j-sidebar-container" class="span2">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div id="j-main-container" class="span10">
+	<div class="span10 col-md-10">
+		<div id="j-main-container">
 <?php else : ?>
-	<div id="j-main-container">
+<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+	<div class="span12 col-md-12">
+		<div id="j-main-container">
 <?php endif;?>
 
 		<?php
@@ -836,7 +841,9 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		<input type="hidden" name="task" value="" />
 		<?php echo JHTML::_( 'form.token' ); ?>
 		
-	<!-- fc_perf -->
-	</div>  <!-- sidebar -->
+		<!-- fc_perf -->
+		</div>  <!-- j-main-container -->
+	</div>  <!-- spanNN -->
+</div>  <!-- row -->
 </form>
 </div><!-- #flexicontent end -->

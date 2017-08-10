@@ -112,6 +112,17 @@ if (!FLEXI_J16GE) {
 		if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 	}
 }
+if (FLEXI_J40GE)
+{
+	class JEventDispatcher extends Joomla\Event\Dispatcher
+	{
+		protected static $instance = null;
+		public static function getInstance()
+		{
+			return self::$instance ?: (self::$instance = new static);
+		}
+	}
+}
 
 // Define configuration constants
 if (!defined('FLEXI_ACCESS'))  define('FLEXI_ACCESS'	, 0);  // TO BE REMOVED

@@ -44,7 +44,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
 		//initialize variables
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$app      = JFactory::getApplication();
 		$jinput   = JFactory::getApplication()->input;
 		$session  = JFactory::getSession();

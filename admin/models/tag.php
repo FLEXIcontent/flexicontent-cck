@@ -299,7 +299,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		$user = JFactory::getUser();
 
 		$jinput     = JFactory::getApplication()->input;
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
