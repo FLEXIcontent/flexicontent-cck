@@ -76,18 +76,23 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		
 		
 		// Create FIELD TYPE SELECTOR
-		$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
+		//$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
 		$fftypes[] = array('value'=>'', 'text'=>JText::_( 'FLEXI_ALL' ) );
-		//$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		//$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
-		//$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
-		foreach ($fieldTypes as $field_group => $ft_types) {
-			$fftypes[] = $field_group;
-			foreach ($ft_types as $field_type => $ftdata) {
-				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>$ftdata->friendly);
+		//$fftypes[] = array('value' => 'BV', 'text' => $ALL . JText::_('FLEXI_BACKEND_FIELDS'));
+		//$fftypes[] = array('value' => 'C',  'text' => $ALL . JText::_('FLEXI_CORE_FIELDS'));
+		//$fftypes[] = array('value' => 'NC', 'text' => $ALL . JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'));
+		$n = 0;
+		foreach ($fieldTypes as $field_group => $ft_types)
+		{
+			$fftypes[$field_group] = array();
+			$fftypes[$field_group]['id'] = 'field_group_' . ($n++);
+			$fftypes[$field_group]['text'] = $field_group;
+			$fftypes[$field_group]['items'] = array();
+			foreach ($ft_types as $field_type => $ftdata)
+			{
+				$fftypes[$field_group]['items'][] = array('value' => $ftdata->field_type, 'text' => $ftdata->friendly);
 			}
-			$fftypes[] = '';
 		}
 		$fieldname = $elementid = 'field_type__au__';
 		$attribs = ' class="use_select2_lib" onchange="filterFieldList(\'%s\', \'%s\', \'%s\');"';
