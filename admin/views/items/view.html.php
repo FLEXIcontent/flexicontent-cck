@@ -98,8 +98,13 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_catsinstate = $model->getState('filter_catsinstate');
 		$filter_featured    = $model->getState('filter_featured');
 
-		if ($filter_cats) $count_filters++;
-		if ($filter_subcats!=1) $count_filters++;
+		// filter ordering
+		$reOrderingActive = !$filter_order_type
+			? $filter_order == 'i.ordering'
+			: $filter_order == 'catsordering';
+
+		if ($filter_cats && !$reOrderingActive) $count_filters++;
+		if ($filter_subcats!=1 && !$reOrderingActive) $count_filters++;
 		if ($filter_catsinstate!=1) $count_filters++;
 		if (strlen($filter_featured)) $count_filters++;
 		
@@ -457,12 +462,6 @@ class FlexicontentViewItems extends JViewLegacy
 		// Create Filters HTML
 		// *******************
 		
-		// filter ordering
-		$reOrderingActive = !$filter_order_type
-			? $filter_order == 'i.ordering'
-			: $filter_order == 'catsordering';
-
-
 		// filter publication state
 		$states 	= array();
 		//$states[]['items'][] = array('value' => '', 'text' => '-' /*JText::_('FLEXI_SELECT_STATE')*/);
