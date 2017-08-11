@@ -996,7 +996,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		// Set only authenticated item ids, to be used by the parent display method ...
-		$cid = JRequest::setVar( 'cid', $auth_cid, 'post', 'array' );
+		$cid = $this->input->set('cid', $auth_cid);
 		
 		// display the form of the task
 		parent::display();
@@ -1040,23 +1040,23 @@ class FlexicontentControllerItems extends FlexicontentController
 			return false;
 		}
 
-		$method   = JRequest::getInt( 'method', 1);
-		$keeepcats= JRequest::getInt( 'keeepcats', 1 );
-		$keeptags = JRequest::getInt( 'keeptags', 1 );
-		$prefix   = JRequest::getVar( 'prefix', 1, 'post' );
-		$suffix   = JRequest::getVar( 'suffix', 1, 'post' );
-		$copynr   = JRequest::getInt( 'copynr', 1 );
-		$maincat  = JRequest::getInt( 'maincat', '' );
-		$seccats  = JRequest::getVar( 'seccats', array(), 'post', 'array' );
-		$keepseccats = JRequest::getVar( 'keepseccats', 0, 'post', 'int' );
-		$lang    = JRequest::getVar( 'language', '', 'post' );
+		$method   = $this->input->get('method', 1, 'int');
+		$keeepcats= $this->input->get('keeepcats', 1, 'int');
+		$keeptags = $this->input->get('keeptags', 1, 'int');
+		$prefix   = $this->input->get('prefix', 1, 'string');
+		$suffix   = $this->input->get('suffix', 1, 'string');
+		$copynr   = $this->input->get('copynr', 1, 'int');
+		$maincat  = $this->input->get('maincat', '', 'int');
+		$seccats  = $this->input->get('seccats', array(), 'array');
+		$keepseccats = $this->input->get('keepseccats', 0, 'int');
+		$lang    = $this->input->get('language', '', 'string');
 		
-		$state   = JRequest::getVar( 'state', '');
+		$state   = $this->input->get('state', '', 'int');
 		$state   = strlen($state) ? (int)$state : null;
 		
-		$type_id = JRequest::getInt( 'type_id', '');
+		$type_id = $this->input->get('type_id', '', 'int');
 		
-		$access  = JRequest::getVar( 'access', '');
+		$access  = $this->input->get('access', '', 'int');
 		$access  = strlen($access) ? (int)$access : null;
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
@@ -1629,8 +1629,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$id			= JRequest::getInt( 'id', 0 );
-		$version	= JRequest::getVar( 'version', '', 'request', 'int' );
+		$id			= $this->input->get('id', 0, 'int');
+		$version	= $this->input->get('version', '', 'int');
 		$itemmodel = $this->getModel('item');
 
 		// First checkin the open item
@@ -1660,6 +1660,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function edit()
 	{
+		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
@@ -1681,7 +1682,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$view->document = $document;
 		
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
-		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$version = $this->input->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 		
 		$isnew  = !$model->getId();
@@ -1733,7 +1734,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 			
 			// C. Check if Content Type can be created by current user
-			$typeid = JRequest::getVar('typeid', 0, '', 'int');
+			$typeid = $this->input->get('typeid', 0, 'int');
 			$canCreateType = $typeid
 				? $model->canCreateType( array($typeid), true, $types )  // Can create given Content Type
 				: $model->canCreateType( );  // Can create at least one Content Type
@@ -1802,7 +1803,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		$id    = JRequest::getInt('id', 0);
+		$id    = $this->input->get('id', 0, 'int');
 		$itemmodel = $this->getModel('item');
 		$tags  = $itemmodel->gettags();
 		$user  = JFactory::getUser();

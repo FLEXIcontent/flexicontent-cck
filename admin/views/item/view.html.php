@@ -107,8 +107,12 @@ class FlexicontentViewItem extends JViewLegacy
 		$model = $this->getModel();
 		$model->isForm = true;  // Currently this flag is used only by frontend model
 
+
+		// FORCE model to load versioned data (URL specified version or latest version (last saved))
+		$version = $jinput->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+
 		// Get the item, loading item data and doing parameters merging
-		$item = $model->getItem(null, $check_view_access=false, $no_cache=true);
+		$item = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
