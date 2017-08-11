@@ -476,6 +476,8 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		//echo "**************************<br/>\n LOADING item id: {$pk}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+
 		
 		// ***
 		// *** TRY TO LOAD ITEM DATA

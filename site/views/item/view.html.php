@@ -507,7 +507,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$model = $this->getModel();
 		$model->isForm = true;  // Currently this flag is used only by frontend model
 
-		$cid = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
+
+		// ***
+		// *** Get data of current version (this will load version 0, since item has not been loaded yet)
+		// ***
+
+		$cid = $model->_cid ? $model->_cid : $model->get('catid');
+
 
 		// WE NEED TO get OR decide the Content Type, before we call the getItem
 		// - we rely on typeid Request variable to decide type for new items so make sure this is set,
@@ -559,10 +565,11 @@ class FlexicontentViewItem extends JViewLegacy
 			$canCreateType = true;
 		}
 		
-		// FORCE model to load versioned data (URL specified version or latest version (last saved))
-		$version = $jinput->get( 'version', 0, 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
+
+		// FORCE model to load versioned data (URL specified version or latest version (last saved))
+		$version = $jinput->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		
 		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
