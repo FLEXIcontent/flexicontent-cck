@@ -557,72 +557,98 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	static function & getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
+	static function getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
 	{
 		// 1. Convert to array of items if not an array already
 		if ( empty($item_arr) ) {
 			$err_msg = __FUNCTION__."(): empty item data given";
 			return $err_msg;
 		}
-		else if ( !is_array($item_arr) ) 
+		else if ( !is_array($item_arr) )
+		{
 			$items = array( & $item_arr );
+		}
 		else
+		{
 			$items = & $item_arr;
-		
-  	// 2. Make sure that fields have been created for all given items
+		}
+
+		// 2. Make sure that fields have been created for all given items
 		$_items = array();
-	  foreach ($items as $i => $item)  if (!isset($item->fields))  $_items[] = & $items[$i];
-	  if ( count($_items) )  FlexicontentFields::getFields($_items, $view);
-	  
-	  // 3. Check and create HTML display for the given field name
-	  $_return = array();
-	  foreach ($items as $item)
-	  {
-		  // Check if we have already created the display and skip current item
-		  if ( isset($item->onDemandFields[$fieldname]->{$method}) )  continue;
-		  
-		  // Find the field inside item
-		  foreach ($item->fields as $field)  {
+		foreach ($items as $i => $item)  if (!isset($item->fields))  $_items[] = & $items[$i];
+		if ( count($_items) )  FlexicontentFields::getFields($_items, $view);
+
+		// 3. Check and create HTML display for the given field name
+		$_method_html = array();
+		foreach ($items as $item)
+		{
+			// Check if we have already created the display and skip current item
+			if ( isset($item->onDemandFields[$fieldname]->{$method}) )
+			{
+				$_method_html[$item->id] = $item->onDemandFields[$fieldname]->{$method};
+				continue;
+			}
+
+			// Find the field inside item
+			foreach ($item->fields as $field)
+			{
 				if ( !empty($field->name) && $field->name==$fieldname ) break;
 			}
-		  
-		  // Check for not found field, and skip it, this is either due to no access or wrong name ...
-	    $item->onDemandFields[$fieldname] = new stdClass();
-		  if ( empty($field->name) || $field->name!=$fieldname) {
-			  $item->onDemandFields[$fieldname]->label = '';
-		  	$item->onDemandFields[$fieldname]->noaccess = true;
-		  	$item->onDemandFields[$fieldname]->errormsg = 'field not assigned to this type of item or current user has no access';
-		  	$item->onDemandFields[$fieldname]->{$method} = '';
-		  	continue;
-		  }
-		  
-		  // Get field's values if they were custom values were not given
-		  if ( $single_item_vals!==null && count($items) == 1 ) {
-				// $values is used only if rendering a single item
-		  	$values = $single_item_vals;
-		  } else {
-		  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
-		  }
-		  
-		  // Set other field data like label and field itself !!!
-		  $item->onDemandFields[$fieldname]->label = $field->label;
-		  $item->onDemandFields[$fieldname]->noaccess = false;
-		  $item->onDemandFields[$fieldname]->field = & $field;
-		  
-		  // Render the (display) method of the field
-		  if (!isset($field->{$method})) $field = FlexicontentFields::renderField($item, $field, $values, $method, $view);
-		  if (!isset($field->{$method})) $field->{$method} = '';
-		  $item->onDemandFields[$fieldname]->{$method} = & $field->{$method};
-		  $_method_html[$item->id] = & $field->{$method};
-		}
-		
-		// Return field(s) HTML (in case of multiple items this will be an array indexable by item ids
-		if ( !is_array($item_arr) ) {
-			$_method_html = @ $_method_html[$item_arr->id];   // Suppress field name not found ...
-		}
-  	return $_method_html;
-	}
 	
+			// Check for not found field, and skip it, this is either due to no access or wrong name ...
+			$item->onDemandFields[$fieldname] = new stdClass();
+			if ( empty($field->name) || $field->name!=$fieldname)
+			{
+				$item->onDemandFields[$fieldname]->label = '';
+				$item->onDemandFields[$fieldname]->noaccess = true;
+				$item->onDemandFields[$fieldname]->errormsg = 'field not assigned to this type of item or current user has no access';
+				$item->onDemandFields[$fieldname]->{$method} = '';
+				$_method_html[$item->id] = '';
+				continue;
+			}
+	
+			// Get field's values if they were custom values were not given
+			if ( $single_item_vals!==null && count($items) == 1 ) {
+				// $values is used only if rendering a single item
+				$values = $single_item_vals;
+			} else {
+				$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+			}
+	
+			// Set other field data like label and field itself !!!
+			$item->onDemandFields[$fieldname]->label = $field->label;
+			$item->onDemandFields[$fieldname]->noaccess = false;
+			$item->onDemandFields[$fieldname]->field = & $field;
+
+			// Render the (display) method of the field
+			if (!isset($field->{$method}))
+			{
+				$field = FlexicontentFields::renderField($item, $field, $values, $method, $view);
+			}
+			if (!isset($field->{$method}))
+			{
+				$field->{$method} = '';
+			}
+
+			// Only cache the result, only if using no values were given, thus DB values were used
+			if ( $single_item_vals===null )
+			{
+				$item->onDemandFields[$fieldname]->{$method} = $field->{$method};
+				$_method_html[$item->id] = $field->{$method};
+			}
+		}
+
+		// Return field(s) HTML (in case of multiple items this will be an array indexable by item ids
+		if ( !is_array($item_arr) )
+		{
+	   // Not isset should occur only when fieldname was not found
+			$_method_html = isset($_method_html[$item_arr->id]) ? $_method_html[$item_arr->id] : '';
+		}
+		return $_method_html;
+	}
+
+
+
 	/**
 	 * Method to render a field
 	 * 
