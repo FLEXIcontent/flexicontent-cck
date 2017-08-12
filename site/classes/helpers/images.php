@@ -8,7 +8,7 @@ class flexicontent_images
 	 *
 	 * @since 1.5
 	 */
-	static function BuildIcons($rows)
+	static function BuildIcons($rows, $default_text = null)
 	{
 		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.file');
@@ -24,8 +24,14 @@ class flexicontent_images
 			}
 			else if (is_file($basePath.DS.$rows[$i]->filename))
 			{
-				$path = str_replace(DS, '/', JPath::clean($basePath.DS.$rows[$i]->filename));
-				$size = filesize($path);
+				if (empty($rows[$i]->size))
+				{
+					$size = $default_text ?: filesize(str_replace(DS, '/', JPath::clean($basePath.DS.$rows[$i]->filename)));
+				}
+				else
+				{
+					$size = $rows[$i]->size;
+				}
 			}
 			else
 			{
@@ -34,16 +40,19 @@ class flexicontent_images
 
 			if (is_numeric($size))
 			{
-				if ($size < 1024) {
+				if ($size < 1024)
+				{
 					$rows[$i]->size = $size . ' bytes';
-				} else {
-					if ($size >= 1024 && $size < 1024 * 1024) {
-						$rows[$i]->size = sprintf('%01.2f', $size / 1024.0) . ' KBs';
-					} else {
-						$rows[$i]->size = sprintf('%01.2f', $size / (1024.0 * 1024)) . ' MBs';
-					}
 				}
-			} else {
+				else
+				{
+					$rows[$i]->size = $size < 1024 * 1024
+						? sprintf('%01.2f', $size / 1024.0) . ' KBs'
+						: sprintf('%01.2f', $size / (1024.0 * 1024)) . ' MBs';
+				}
+			}
+			else
+			{
 				$rows[$i]->size = $size;
 			}
 
@@ -69,11 +78,9 @@ class flexicontent_images
 				// Non-image document
 				default:
 					$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$ext.'.png';
-					if (file_exists($icon)) {
-						$rows[$i]->icon = 'components/com_flexicontent/assets/images/mime-icon-16/'.$ext.'.png';
-					} else {
-						$rows[$i]->icon = 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
-					}
+					$rows[$i]->icon = file_exists($icon)
+						? 'components/com_flexicontent/assets/images/mime-icon-16/'.$ext.'.png'
+						: 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 					break;
 			}
 		}

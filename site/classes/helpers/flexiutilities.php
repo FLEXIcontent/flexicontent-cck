@@ -804,12 +804,12 @@ class FLEXIUtilities
 			if ($perms->CanConfig && empty($_SERVER['HTTPS']))
 				call_user_func($addEntry,
 				'<a href="http://www.flexicontent.org/downloads/download-translation-flexicontent.html?tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
-					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'Translation packages' ).
+					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
 			elseif ($perms->CanConfig)
 				call_user_func($addEntry,
 				'<a href="http://www.flexicontent.org/downloads/download-translation-flexicontent.html?tmpl=component" target="_blank">'.
-					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'Translation packages' ).
+					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
 		}
 	}

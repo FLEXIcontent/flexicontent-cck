@@ -483,7 +483,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
 						.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
 			";
-			JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
+			JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_FILE_STATISTICS', false );
 		}
 
 		if ($perms->CanConfig)

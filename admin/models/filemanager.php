@@ -221,7 +221,13 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $this->_db->loadResult();
 			
-			$this->_data = flexicontent_images::BuildIcons($this->_data);
+			$filter_order = $this->getState( 'filter_order' );
+			$default_size_message = $filter_order != 'f.size' ? null : '
+				<span class="hasTooltip" title="' . JText::sprintf('FLEXI_PLEASE_REINDEX_FILE_STATISTICS', JText::_('FLEXI_INDEX_FILE_STATISTICS')) . '">
+					<span class="icon-warning"></span>
+					<span class="icon-loop"></span>
+				</span>';
+			$this->_data = flexicontent_images::BuildIcons($this->_data, $default_size_message);
 			
 			// Single property fields, get file usage (# assignments), if not already done by main query
 			if ( !$s_assigned_via_main && $s_assigned_fields)
