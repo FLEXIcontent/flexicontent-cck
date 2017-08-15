@@ -26,6 +26,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
+		JPlugin::loadLanguage('plg_flexicontent_fields_relation', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -66,9 +67,9 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		}
 
 
-		// ************************************************************
-		// Get relation field being reversed and load its configuration
-		// ************************************************************
+		// ***
+		// *** Get relation field being reversed and load its configuration
+		// ***
 		
 		$reversed_field = reset($_fields);
 		FlexicontentFields::loadFieldConfig($reversed_field, $item);
@@ -78,9 +79,9 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		$elementid = 'custom_'.$field->name;
 
 
-		// ************************
-		// Case of autorelated item
-		// ************************
+		// ***
+		// *** Case of autorelated item
+		// ***
 
 		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$reverse_field_id, 0, 'int');
 
@@ -114,12 +115,14 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		}
 
 
-		// *************************************************************
-		// Pass null items since the items will be retrieved from the DB
-		// *************************************************************
+		// ***
+		// *** Pass null items since the items will be retrieved from the DB
+		// ***
 
 		$_items = null;
-		$field->html = FlexicontentFields::getItemsList($field->parameters, $_items, $isform=1, $reverse_field_id, $field, $item);
+		$options = new stdClass();
+		$options->isform = 1;
+		$field->html = FlexicontentFields::getItemsList($field->parameters, $_items, $field, $item, $options);
 	}
 
 
@@ -127,72 +130,9 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
-		$field->label = JText::_($field->label);
-		$field->{$prop} = '';
 
-		$values = $values ? $values : $field->value;
-		if ( !is_array($values) )
-		{
-			$values = array($values);
-		}
-
-
-
-		// ***********************************************************
-		// Prepare item list data for rendering the related items list
-		// ***********************************************************
-
-		$reverse_field_id = $field->parameters->get('reverse_field', 0);
-
-		if ($field->field_type == 'relation_reverse')
-		{
-			// Check that relation field to be reversed was configured
-			if ( !$reverse_field_id )
-			{
-				$field->{$prop} .= '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
-				return;
-			}
-
-			// Always ignore passed items, the DB query will determine the items
-			$_itemids_catids = null;
-		}
-		else  // $field->field_type == 'relation')
-		{
-			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-			$array = $this->unserialize_array(reset($values), $force_array=false, $force_value=false);
-			$values = $array ?: $values;
-
-			// set upper limit as $values array length
-			$itemcount = count($values);
-
-			// change upper limit if itemcount is set and error checked
-			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&  
-				$field->parameters->get( 'itemcount', 0) > 0 && 
-				$field->parameters->get( 'itemcount', 0) < $itemcount
-			) {
-				$itemcount = $field->parameters->get( 'itemcount', 0);
-			}
-
-			// Limit list to desired max # items
-			$_itemids_catids = array();
-
-			for($i = 0; $i < $itemcount; $i++)
-			{
-				list ($itemid,$catid) = explode(":", $values[$i]);
-				$_itemids_catids[$itemid] = new stdClass();
-				$_itemids_catids[$itemid]->itemid = $itemid;
-				$_itemids_catids[$itemid]->catid = $catid;
-				$_itemids_catids[$itemid]->value  = $values[$i];
-			}
-		}
-
-		if (1)
-		{
-			$field->{$prop} .= ''
-				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, $reverse_field_id, $field, $item)
-				;
-		}
+		// field_type is not changed text field can handle this field type
+		FLEXIUtilities::call_FC_Field_Func('relation', 'onDisplayFieldValue', array(&$field, $item, $values, $prop));
 	}
 
 

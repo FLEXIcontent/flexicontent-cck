@@ -92,17 +92,17 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		$_itemids_catids = array();
+		$related_items = array();
 		$_itemids = array();
 		foreach($field->value as $i => $val)
 		{
 			list ($itemid,$catid) = explode(":", $val);
 			$itemid = (int) $itemid;
 			$catid  = (int) $catid;
-			$_itemids_catids[$itemid] = new stdClass();
-			$_itemids_catids[$itemid]->itemid = $itemid;
-			$_itemids_catids[$itemid]->catid  = $catid;
-			$_itemids_catids[$itemid]->value  = $val;
+			$related_items[$itemid] = new stdClass();
+			$related_items[$itemid]->itemid = $itemid;
+			$related_items[$itemid]->catid  = $catid;
+			$related_items[$itemid]->value  = $val;
 			$_itemids[] = $itemid;
 		}
 
@@ -189,13 +189,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 				$itemtitle = $statestr.$itemtitle." ";
 			}
 			$itemid = $itemdata->id;
-			$items_options_select .= '<option selected="selected" value="'.$_itemids_catids[$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
+			$items_options_select .= '<option selected="selected" value="'.$related_items[$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
 		}
 
 
-		// *************
-		// Add needed JS
-		// *************
+		// ***
+		// *** Add needed JS
+		// ***
 
 		static $common_css_js_added = false;
 	  if ( !$common_css_js_added )
@@ -382,9 +382,11 @@ jQuery(document).ready(function()
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
 		$field->label = JText::_($field->label);
-		$field->{$prop} = '';
+
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
 
 		$values = $values ? $values : $field->value;
 		if ( !is_array($values) )
@@ -392,21 +394,52 @@ jQuery(document).ready(function()
 			$values = array($values);
 		}
 
-		$user = JFactory::getUser();
-		$show_total_only     = $field->parameters->get('show_total_only', 0);
-		$total_show_auto_btn = $field->parameters->get('total_show_auto_btn', 0);
-		$total_show_list     = $field->parameters->get('total_show_list', 0);
-
 
 		// ***
-		// *** Check for special display : total info only
+		// *** Calculate access for item list and auto relation button
 		// ***
-		
-		if ($prop=='display_total')
+
+		static $has_itemslist_access = array();
+		if ( !isset($has_itemslist_access[$field->id]) )
 		{
-			$display_total = true;
+			$aid_arr = JAccess::getAuthorisedViewLevels(JFactory::getUser()->id);
+			$acclvl = (int) $field->parameters->get('itemslist_acclvl', 1);
+			$has_itemslist_access[$field->id] = in_array($acclvl, $aid_arr);
 		}
-		else if ( $show_total_only==1 || ($show_total_only == 2 && count($values)) )
+
+		static $has_auto_relate_access = array();
+		if ( !isset($has_auto_relate_access[$field->id]) )
+		{
+			$aid_arr = JAccess::getAuthorisedViewLevels(JFactory::getUser()->id);
+			$acclvl = (int) $field->parameters->get('auto_relate_acclvl', 1);
+			$has_auto_relate_access[$field->id] = in_array($acclvl, $aid_arr);
+		}
+
+
+		// ***
+		// *** Decide what to display
+		// ***  - total information
+		// ***  - item list
+		// ***  - auto relation button
+		// ***
+
+		$disp = new stdClass();
+		$HTML = new stdClass();
+
+		// Total information
+		$show_total_only     = $field->field_type != 'relation' ? 0 : $field->parameters->get('show_total_only', 0);
+		$total_show_auto_btn = $field->field_type != 'relation' ? 0 : $field->parameters->get('total_show_auto_btn', 0);
+		$total_show_list     = $field->field_type != 'relation' ? 0 : $field->parameters->get('total_show_list', 0);
+		
+		if ($field->field_type != 'relation')  // not supported by field type
+		{
+			$disp->total_info = false;
+		}
+		elseif ($prop=='display_total')  // Explicetely requested
+		{
+			$disp->total_info = true;
+		}
+		elseif ( $show_total_only==1 || ($show_total_only == 2 && count($values)) )
 		{
 			$app = JFactory::getApplication();
 			$option = $app->input->get('option', '', 'cmd');
@@ -416,33 +449,23 @@ jQuery(document).ready(function()
 
 			$total_in_view = $field->parameters->get('total_in_view', array('backend'));
 			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);
-			$display_total = ($isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
+			$disp->total_info = ($isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
 		}
 		else
 		{
-			$display_total = false;
+			$disp->total_info = false;
 		}
 
+		// Auto-relate submit button
+		$submit_related_curritem    = $field->parameters->get( 'auto_relate_curritem', 0);
+		$submit_related_menu_itemid = $field->parameters->get( 'auto_relate_menu_itemid', 0);
+		$submit_related_position    = $field->parameters->get( 'auto_relate_position', 0);
 
-		// ***
-		// *** Create total info and terminate if not adding the item list
-		// ***
-		
-		if ($display_total)
-		{
-			$total_append_text = $field->parameters->get('total_append_text', '');
-			$field->{$prop} .= '<span class="fcrelation_field_total">'. count($values) .' '. $total_append_text .'</span>';
-			
-			// Terminate if not adding any extra information
-			if ( !$total_show_list && !$total_show_auto_btn ) return;
-			
-			// Override the item list HTML parameter ...
-			$total_relitem_html = $field->parameters->get('total_relitem_html', '');
-			if ($total_relitem_html)
-			{
-				$field->parameters->set('relitem_html', $total_relitem_html);
-			}
-		}
+		$disp->submit_related_btn = $submit_related_curritem && $submit_related_menu_itemid
+			&& $has_auto_relate_access[$field->id] && (!$disp->total_info || $total_show_auto_btn);
+
+		// Item list
+		$disp->item_list = $has_itemslist_access[$field->id] && (!$disp->total_info || $total_show_list);
 
 
 		// ***
@@ -456,12 +479,12 @@ jQuery(document).ready(function()
 			// Check that relation field to be reversed was configured
 			if ( !$reverse_field_id )
 			{
-				$field->{$prop} .= '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+				$field->{$prop} = '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 				return;
 			}
 
 			// Always ignore passed items, the DB query will determine the items
-			$_itemids_catids = null;
+			$related_items = null;
 		}
 		else  // $field->field_type == 'relation')
 		{
@@ -481,81 +504,52 @@ jQuery(document).ready(function()
 			}
 
 			// Limit list to desired max # items
-			$_itemids_catids = array();
+			$related_items = array();
 
 			for($i = 0; $i < $itemcount; $i++)
 			{
 				list ($itemid,$catid) = explode(":", $values[$i]);
-				$_itemids_catids[$itemid] = new stdClass();
-				$_itemids_catids[$itemid]->itemid = $itemid;
-				$_itemids_catids[$itemid]->catid = $catid;
-				$_itemids_catids[$itemid]->value  = $values[$i];
+				$related_items[$itemid] = new stdClass();
+				$related_items[$itemid]->itemid = $itemid;
+				$related_items[$itemid]->catid = $catid;
+				$related_items[$itemid]->value  = $values[$i];
 			}
 		}
 
 
 		// ***
-		// *** Create the submit button for auto related item
+		// *** Get related items data and their display HTML as an array of items
+		// *** NOTE: this is not moved to layout because in future it could be optimized
+		// ***       to retrieve related items for all items in category view with single query
 		// ***
 
-		$auto_relate_curritem = $field->parameters->get( 'auto_relate_curritem', 0);
-		$auto_relate_menu_itemid = $field->parameters->get( 'auto_relate_menu_itemid', 0);
-		$auto_relate_position = $field->parameters->get( 'auto_relate_position', 0);
-		$auto_rel_btn = '';
-		if ( $auto_relate_curritem && $auto_relate_menu_itemid && (!$display_total || $total_show_auto_btn) )
+		$options = new stdClass();
+		if ($disp->item_list || $disp->total_info)
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-			$acclvl = (int) $field->parameters->get('auto_relate_acclvl', 1);
-			$has_acclvl = in_array($acclvl, $aid_arr);
-			
-			if ($has_acclvl)
-			{
-				$_btn_text = new stdClass();
-				$_btn_text->title = $field->parameters->get( 'auto_relate_submit_title', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED');
-				$_btn_text->tooltip = $field->parameters->get( 'auto_relate_submit_text', 'FLEXI_RIFLD_SUBMIT_NEW_RELATED_TIP');
-	
-				$auto_relations[0] = new stdClass();
-				$auto_relations[0]->itemid  = $item->id;
-				$auto_relations[0]->fieldid = $field->id;
-	
-				$category = null;
-				$_show_to_unauth = $field->parameters->get( 'auto_relate_show_to_unauth', 0);
-	
-				$auto_rel_btn = flexicontent_html::addbutton(
-					$field->parameters, $category, $auto_relate_menu_itemid, $_btn_text, $auto_relations, $_show_to_unauth
-				);
-			}
+			// 0: return string with related items HTML, 1: return related items array,
+			// 2: same as 1 but also means do not create HTML display, 3: same as 2 but also do not get any item data
+			$options->return_items_array = $disp->item_list ? 1 : 3;
+
+			// Get related items data and also create the item's HTML display per item (* see above)
+			$related_items = FlexicontentFields::getItemsList($field->parameters, $related_items, $field, $item, $options);
 		}
 
 
 		// ***
-		// *** Finally, create and add the item list if user has the needed access level
+		// *** Create output
 		// ***
 
-		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		$acclvl = (int) $field->parameters->get('itemslist_acclvl', 1);
-		$has_acclvl = in_array($acclvl, $aid_arr);
-		
-		if (!$has_acclvl)
-		{
-			$field->{$prop} = $auto_rel_btn;   // Only show the autorelate button
-		}
+		// Prefix - Suffix - Separator parameters - Other common parameters
+		$common_params_array = $this->getCommonParams();
+		extract($common_params_array);
 
-		else if ( !$display_total || $total_show_list )
-		{
-			$add_before = $auto_rel_btn && ($auto_relate_position == 0 || $auto_relate_position == 2);
-			$add_after  = $auto_rel_btn && ($auto_relate_position == 1 || $auto_relate_position == 2);
-			
-			$field->{$prop} .= ''
-				.($add_before ? $auto_rel_btn : '')
-				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, $reverse_field_id, $field, $item)
-				.($add_after ? $auto_rel_btn : '');
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
-		else if ($auto_rel_btn)
-		{
-			$field->{$prop} .= $auto_rel_btn;
-		}
+		// Create field's HTML, using layout file
+		$field->{$prop} = '';
+		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 	}
 
 

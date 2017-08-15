@@ -4759,86 +4759,149 @@ class FlexicontentFields
 		}
 	}	
 
-	
-	
-	// **********************************************************************************************************
-	// Helper methods to create GENERIC ITEM LISTs which also includes RENDERED display of fields and custom HTML
-	// **********************************************************************************************************
-	
-	// Helper method to perform HTML replacements on given list of item ids (with optional catids too), the items list is either given
-	// as parameter or the list is created via the items that have as value the id of 'parentitem' for field with id 'reverse_field'
-	static function getItemsList(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false, $states=array(1,-5,2))
-	{
-		// Execute query to get item list data 
-		$db = JFactory::getDBO();
-		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem, $states);
-		if (!$query) return '';
 
-		$db->setQuery($query);
+
+	// ***
+	// *** Helper methods to create GENERIC ITEM LISTs which also includes RENDERED display of fields and custom HTML
+	// ***
+
+	/*
+	 * Helper method to perform HTML replacements on given list of item ids (with optional catids too), the items of the item
+	 * is either given as parameter or the list is created via a field / item pair (field is relation or relation reverse)
+	 *
+	 * @param 	object 		$params     some parameters, typically the parameters of a relation field
+	 * @param 	string    $itemIDs    the item IDs as index of an array of some item data
+	 * @param 	object 		$field      a field that is a relation or relation reverse field
+	 * @param 	object 		$item       an item having a relation or relation reverse field
+	 * @param 	string    $options    some options like 'return_items_array' meaning to return an items array and not the final HTML
+	 *
+	 * @return  a string with the rendered display HTML of the calculated items list, or an array of item objects, with their display HTML as a property
+	 * @since 2.1
+	 *
+	 */
+	static function getItemsList($params, $itemIDs, $field, $item, $options = null)
+	{
+		if (!is_object($field) || !is_object($item))  return 'getItemsList : Legacy call not possible, please review your custom code';
+		if (!$options) $options = new stdClass();
+
+		// 0: return imploded display HTML
+		// 1: return items array with display HTML per item
+		// 2: return items array without rendering display HTML
+		$return_items_array = isset($options->return_items_array) ? (int) $options->return_items_array : 0;
+
+		// Create the SQL query to retrieve item list data array,
+		// ... and check for empty SQL query, e.g. no valid related items for relation field
+		$query = FlexicontentFields::createItemsListSQL($params, $itemIDs, $field, $item, $options);
+		if (!$query)
+		{
+			return $return_items_array ? array() : '';
+		}
+
+		// Execute SQL query to get item list data array,
+		// ... and check for none found items (e.g. none published)
+		$db = JFactory::getDBO();
 		try {
-			$item_list = $db->loadObjectList('id');
+			$rows = flexicontent_db::directQuery($query);
+			$item_list = array();
+
+			if ($return_items_array != 3)
+			{
+				foreach ($rows as $row)
+				{
+					$item_list[$row->id] = $row;
+				}
+				$db->setQuery("SELECT FOUND_ROWS()");
+				$total = $db->loadResult();
+			}
+			else
+			{
+				// instead of items array contains the total 
+				$total = $rows;
+			}
+			$options->total = $total;
 		}
 		catch (Exception $e) {
-			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br(JDEBUG ? $e->getMessage() : 'Joomla Debug is OFF'), 'warning');
-		}
-		
-		// Return item ids list instead of rendering their HTML
-		if ($return_item_list)  $return_item_list = & $item_list;
-		
-		// No published related items or SQL query failed, return
-		if ( !$item_list ) return '';
-		
-		// If catid exists ... add prefered catid to items list data
-		if ($_item_data) foreach($item_list as $_item)
-		{
-			$_item->rel_catid = @ $_item_data[$_item->id]->catid;
+			$item_list = $db->setQuery($query)->loadObjectList('id');
 		}
 
-		return FlexicontentFields::createItemsListHTML($params, $item_list, $isform, $parentfield, $parentitem, $_item_data);
+		if ( !$item_list )
+		{
+			return $return_items_array ? array() : '';
+		}
+
+		// Only return the items array without creating their HTML
+		if ( $return_items_array == 2)
+		{
+			return $item_list;
+		}
+		
+		// Finally create the display HTML of the items,
+		// - either returning an imploded string of the items display HTML
+		// - or returning the items data array, with the display HTML as property of every item object
+		return FlexicontentFields::createItemsListHTML($params, $item_list, $field, $item, $itemIDs, $options);
 	}
 
 
 	// Helper method to create SQL query for retrieving items list data
-	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, $states=array(1,-5,2))
+	static function createItemsListSQL($params, $itemIDs, $field, $item, $options)
 	{
 		$db = JFactory::getDBO();
 		$user = JFactory::getUser();
+
+		// Options
+		$reverse_field_id = (int) $params->get('reverse_field', 0);
+		$isform = isset($options->isform) ? (int) $options->isform : 0;
+		$states = isset($options->items_list_state)   // if isform this is ignored
+			? $options->items_list_state
+			: array(1,-5,2);
 		$sfx = $isform ? '_form' : '';
 		
 		$publish_where = '';
 		
 		// Get data like aliases and published state
 		$use_publish_dates = $params->get('use_publish_dates_view', 1) != -1  ?  $params->get('use_publish_dates_view', 1)  :  $params->get('use_publish_dates', 1);
-		if ($use_publish_dates)
+		if (!$isform)
 		{
-			// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
-			//  thus the items are published globally at the time the author specified in his/her local clock
-			//$app  = JFactory::getApplication();
-			//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-			//$date = JFactory::getDate();
-			//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
-			$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
-			$nullDate = $db->getNullDate();
-			
-			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
-			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
+			if ($use_publish_dates)
+			{
+				// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+				//  thus the items are published globally at the time the author specified in his/her local clock
+				//$app  = JFactory::getApplication();
+				//$now  = $app->requestTime;   // NOT correct behavior it should be UTC (below)
+				//$date = JFactory::getDate();
+				//$now  = $date->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
+				$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
+				$nullDate = $db->getNullDate();
+
+				$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
+				$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
+			}
+
+			$onlypublished = $params->get('onlypublished_view', 1) != -1  ?  $params->get('onlypublished_view', 1)  :  $params->get('onlypublished', 1);
+			if ($onlypublished && count($states))
+			{
+				$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
+			}
 		}
 
-		$onlypublished = $params->get('onlypublished_view', 1) != -1  ?  $params->get('onlypublished_view', 1)  :  $params->get('onlypublished', 1);
-		if ($onlypublished && count($states))
+
+		// Item IDs via reversing a relation field
+		if ($reverse_field_id)
 		{
-			$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
+			$item_join = ' JOIN #__flexicontent_fields_item_relations AS fi_rel'
+				.'  ON i.id=fi_rel.item_id AND fi_rel.field_id=' . $reverse_field_id . ' AND CAST(fi_rel.value AS SIGNED)=' . (int) $item->id;
 		}
 
-		// item IDs via reversing a relation field
-		if ($reverse_field) {
-			$item_join  = ' JOIN #__flexicontent_fields_item_relations AS fi_rel'
-				.'  ON i.id=fi_rel.item_id AND fi_rel.field_id=' .$reverse_field .' AND CAST(fi_rel.value AS SIGNED)=' .$parentitem->id;
+		// Indicate nothing to do, since no related items given
+		elseif (empty($itemIDs))
+		{
+			return false;
 		}
-		// item IDs via a given list (relation field and ... maybe other cases too)
-		else {
-			if (empty($_item_data)) return false;
-			$item_where = ' AND i.id IN ('. implode(',', array_keys($_item_data)) .')';
+
+		// Item IDs via a given related items list (relation field and ... maybe other cases too)
+		else
+		{
+			$item_where = ' AND i.id IN ('. implode(',', array_keys($itemIDs)) .')';
 		}
 
 
@@ -4861,22 +4924,22 @@ class FlexicontentFields
 			//if related item owned by editing user/logged in user currently editing the field
 			if ($ownedbyuser == 1) $itemowned_where = ' AND i.created_by=' . $user->id;
 			//if related item owned by the parent item's owner
-			else if ($ownedbyuser == 2) $itemowned_where = ' AND i.created_by=' . $parentitem->created_by;
+			else if ($ownedbyuser == 2) $itemowned_where = ' AND i.created_by=' . $item->created_by;
 		}
 
 
 		// item count limit
-		if($params->get('itemcount', 0) && is_numeric($params->get('itemcount', 0)) && $params->get('itemcount', 0) > 0)
-		{
-			$limit = ' LIMIT ' . $params->get('itemcount', 0);
-		}
+		$itemcount = $isform ? (int) $params->get('itemcount_form ', 0) : (int) $params->get('itemcount', 0);
+		$limit = $itemcount
+			? ' LIMIT ' . $itemcount
+			: '';
 
 
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
 		if ($params && $params->get('orderby') == 'manual')
 		{
 			$order = array(1 => 'manual', 2=>'');
-			$orderby = ' ORDER BY FIELD(i.id, '. implode(',', array_keys($_item_data)) .')';
+			$orderby = ' ORDER BY FIELD(i.id, '. implode(',', array_keys($itemIDs)) .')';
 		}
 		else
 		{
@@ -4957,34 +5020,62 @@ class FlexicontentFields
 		
 		
 		// Because query includes specific items it should be fast
-		$query = 'SELECT i.*, ext.*,'
-			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
-			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
-			. @ $orderby_col
-			.' FROM #__content AS i '
-			.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
-			. @ $item_join
-			. @ $orderby_join
-			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '  // to get info for item's categories
-			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
-			.' WHERE 1 '
-			. @ $item_where
-			. @ $type_where
-			. @ $cat_where
-			. @ $itemowned_where
-			. $publish_where
-			.' GROUP BY i.id '
-			. $orderby
-			.@ $limit
-			;
+		$return_items_array = isset($options->return_items_array) ? (int) $options->return_items_array : 0;
+
+		// Only count found items
+		if ($return_items_array == 3)
+		{
+			$query = 'SELECT COUNT(i.id)'
+				.' FROM #__content AS i '
+				.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
+				. @ $item_join
+				. @ $orderby_join
+				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '  // to get info for item's categories
+				.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
+				.' WHERE 1 '
+				. @ $item_where
+				. @ $type_where
+				. @ $cat_where
+				. @ $itemowned_where
+				. $publish_where
+				.' GROUP BY i.id '
+				//. $orderby
+				//.@ $limit
+				;
+		}
+		else
+		{
+			$query = 'SELECT ' . ($itemcount ? 'SQL_CALC_FOUND_ROWS' : '') . ' i.*, ext.*,'
+				.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
+				.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
+				. @ $orderby_col
+				.' FROM #__content AS i '
+				.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
+				. @ $item_join
+				. @ $orderby_join
+				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '  // to get info for item's categories
+				.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
+				.' WHERE 1 '
+				. @ $item_where
+				. @ $type_where
+				. @ $cat_where
+				. @ $itemowned_where
+				. $publish_where
+				.' GROUP BY i.id '
+				. $orderby
+				.@ $limit
+				;
+		}
+
 		//echo "<pre>".$query."</pre>";
 		return $query;
 	}
 	
 	
 	// Helper method to create HTML display of an item list according to replacements
-	static function createItemsListHTML(&$params, &$item_list, $isform=0, &$parentfield, &$parentitem, &$_item_data=null)
+	static function createItemsListHTML($params, & $item_list, $field, $item, & $itemIDs, $options)
 	{
+		$isform = isset($options->isform) ? (int) $options->isform : 0;
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		
 		$db = JFactory::getDBO();
@@ -5045,7 +5136,8 @@ class FlexicontentFields
 		}
 
 		// some parameter shortcuts
-		$relitem_html = $params->get( $isform ? 'relitem_html_form' : 'relitem_html', '__display_text__' ) ;
+		$relitem_html_param = $params->get('relitem_html_override', $isform ? 'relitem_html_form' : 'relitem_html');
+		$relitem_html = $params->get( $relitem_html_param, '__display_text__' ) ;
 		$displayway		= $params->get( $isform ? 'displayway_form' : 'displayway', 1 ) ;
 		$addlink 			= $params->get( $isform ? 'addlink_form' : 'addlink', 1 ) ;
 		$addtooltip		= $params->get( $isform ? 'addtooltip_form' : 'addtooltip', 1 ) ;
@@ -5090,7 +5182,9 @@ class FlexicontentFields
 			}
 
 			$rel_itemid = $result->id;
-			$rel_catid = !empty($result->rel_catid) ? $result->rel_catid : $result->catid;
+			$rel_catid = isset($itemIDs[$result->id]->catid)
+				? $itemIDs[$result->id]->catid
+				: $result->catid;
 
 			if ( isset($itemcataliases[$rel_catid]) && !in_array($rel_catid, $globalnoroute) && $globalcats[$rel_catid]->published)
 			{
@@ -5123,7 +5217,8 @@ class FlexicontentFields
 		// *** Perform field's display replacements
 		// ***
 
-		if ( $i_slave = $parentfield ? $parentitem->id."_".$parentfield->id : '' )
+		$i_slave = $field ? $item->id . '_' . $field->id : '';
+		if ( $i_slave )
 		{
 			$fc_run_times['render_subfields'][$i_slave] = 0;
 		}
@@ -5142,11 +5237,16 @@ class FlexicontentFields
 		}
 
 		$tooltip_class = ' hasTooltip';
-		$display = array();
+		$display_html = array();
+		$read_more_about = JText::_('FLEXI_READ_MORE_ABOUT', true);
 		foreach($item_list as $result)
 		{
-			$url_read_more = JText::_( isset($_item_data->url_read_more) ? $_item_data->url_read_more : 'FLEXI_READ_MORE_ABOUT' , 1);
-			$url_class = (isset($_item_data->url_class) ? $_item_data->url_class : 'relateditem');
+			$url_read_more = isset($itemIDs[$result->id]->url_read_more)
+				? JText::_($itemIDs[$result->id]->url_read_more, true)
+				: $read_more_about;
+			$url_class = isset($itemIDs[$result->id]->url_class)
+				? $itemIDs[$result->id]->url_class
+				: 'relateditem';
 
 			// a. Replace some custom made strings
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));
@@ -5185,11 +5285,27 @@ class FlexicontentFields
 				}
 				$curr_relitem_html = str_replace($custom_field_reps[$i], $custom_field_display, $curr_relitem_html);
 			}
-			$display[] = trim($pretext . $curr_relitem_html . $posttext);
+			
+			$result->ri_url  = $item_url;
+			$result->ri_html = $pretext . $curr_relitem_html . $posttext;
+			$display_html[] = $result->ri_html;
 		}
-		
-		$display = $opentag . implode($separatorf, $display) . $closetag;
-		return $display;
+
+		// Return item list data array
+		$return_items_array = isset($options->return_items_array) ? (int) $options->return_items_array : 0;
+		if ($return_items_array)
+		{
+			return $item_list;
+		}
+
+		// Return item list HTML
+		else
+		{
+			$display_html = implode($separatorf, $display_html);
+			return $display_html
+				? $opentag . $display_html . $closetag
+				: '';
+		}
 	}
 	
 	

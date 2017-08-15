@@ -370,7 +370,7 @@ class FCField extends JPlugin
 		
 		$opentag   = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag  = FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-		$separatorf	= $this->getSeparatorF($opentag, $closetag);
+		$separatorf	= $this->getSeparatorF($opentag, $closetag, 1);
 		
 		$field->{$prop} = array();
 		
