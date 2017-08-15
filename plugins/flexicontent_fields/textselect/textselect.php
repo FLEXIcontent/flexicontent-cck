@@ -26,6 +26,8 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
+		JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 	}
 
 
