@@ -11,6 +11,8 @@ if ($disp->item_list && !empty($related_items))
 	$HTML->items_list = array();
 	foreach($related_items as $rel_item)
 	{
+		// NOTE: besides normal item data, like ...->title, ...->created, ...->fields
+		// you can also use ...->ri_html and ->ri_url (the display HTML of the related item)
 		$HTML->items_list[$rel_item->id] = $rel_item->ri_html;
 	}
 

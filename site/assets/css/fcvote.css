@@ -73,6 +73,7 @@ div.fcvote > ul.fcvote_list > li.current-rating {
 	top: 0pt !important;
 	margin: 0 !important;
 	padding: 0 !important;
+	transition: none !important;
 }
 div.fcvote > ul.fcvote_list > li.voting-links a:hover {
 	background-position: left bottom !important;

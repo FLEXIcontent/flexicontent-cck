@@ -127,12 +127,16 @@ class plgFlexicontent_fieldsFile extends FCField
 			$files_data = $this->getFileData( $file_ids, $published=false );
 			
 			// Do not skip values if in fieldgroup
-			if ($use_ingroup) {
-				foreach($field->value as $i => $v) {
+			if ($use_ingroup)
+			{
+				foreach($field->value as $i => $v)
+				{
 					$file_id = is_array($v) && isset($v['file-id']) ?  $v['file-id']  :  $v;
 					$field->value[$i] = isset($files_data[$file_id]) ? (int)$file_id : 0;
 				}
-			} else {
+			}
+			else
+			{
 				$field->value = array_keys($files_data);
 			}
 		}
@@ -920,19 +924,31 @@ class plgFlexicontent_fieldsFile extends FCField
 
 					$upload_err = null;
 					$file_ids = $fman->addlocal($Fobj, $upload_err);
-					$v = !empty($file_ids) ? reset($file_ids) : false; // Get fist element
-					//$_filetitle = key($file_ids);  this is the cleaned up filename, currently not needed
+
+					// Get fist element
+					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
+		    	$v = $v ?: ($use_ingroup ? null : false);
+					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
 				}
 			}
 			
+			// we were given a file ID
+			elseif (!is_array($v))
+			{
+	    	$file_id = (int) $v;
+	    	$v = $v ?: ($use_ingroup ? null : false);
+			}
+
 			// Using inline property editing
 			else
 			{
-	    	$file_id = isset($v['file-id']) ? (int) $v['file-id'] : $v;
-	    	$file_id = is_numeric($file_id) ? (int) $file_id : 0;  // if $v is not an array
-				
-				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data']) ? $_FILES['custom']['error'][$field->name][$n]['file-data'] : UPLOAD_ERR_NO_FILE;
+	    	$file_id = (int) $v['file-id'];
+
+				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data'])
+					? $_FILES['custom']['error'][$field->name][$n]['file-data']
+					: UPLOAD_ERR_NO_FILE;
 				$new_file = $err_code === 0;
+
 				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
 				{
 					$err_msg = array(
@@ -962,7 +978,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 				
 				// UPDATE existing file
-				if( !$new_file && $file_id )
+				if ( !$new_file && $file_id )
 				{
 					$dbdata = array();
 					
@@ -993,7 +1009,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					if ( $v['file-del'] )
 					{
 						$canDelete = $this->canDeleteFile($field, $file_id, $item);
-						if ($isAssigned && $canDelete) {
+						if ($isAssigned && $canDelete)
+						{
 							$fm = new FlexicontentModelFilemanager();
 							$fm->delete( array($file_id) );
 						}
@@ -1005,7 +1022,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					foreach ($dbdata as $index => $data) $row->{$index} = $data;
 					
 					// Update DB data of the file 
-					if ( !$row->check() || !$row->store() ) {
+					if ( !$row->check() || !$row->store() )
+					{
 						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDBO()->getErrorMsg(), 'warning' );
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
@@ -1016,14 +1034,15 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 				
 				//INSERT new file
-				else if( $new_file )
+				elseif( $new_file )
 				{
 					// new file was uploaded, but also handle previous selected file ...
 					if ($file_id)
 					{
 						// Security concern, check file is assigned to current item
 						$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
-						if ( !$isAssigned ) {
+						if ( !$isAssigned )
+						{
 							/*$row = JTable::getInstance('flexicontent_files', '');
 							$row->load( $file_id );
 							$_filename = $row->filename_original ? $row->filename_original : $row->filename;
@@ -1031,7 +1050,8 @@ class plgFlexicontent_fieldsFile extends FCField
 						}
 						
 						// Delete previous file if no longer used
-						else if ( $this->canDeleteFile($field, $file_id, $item) ) {
+						else if ( $this->canDeleteFile($field, $file_id, $item) )
+						{
 							$fm = new FlexicontentModelFilemanager();
 							$fm->delete( array($file_id) );
 						}
@@ -1078,10 +1098,13 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 	    }
 			
-	    if (!$use_ingroup) {
+	    if (!$use_ingroup)
+			{
 	    	// NOT inside field group, add it only if not empty reverse the file array, indexing it by file IDs, to add each file only once
 				if ( !empty($v) && is_numeric($v) ) $newpost[(int)$v] = $new++;
-			} else {
+			}
+			else
+			{
 				// Inside fieldgroup, allow same file multiple times
 				$newpost[$new++] = $v===null ? null : (int)$v;  // null means skip value but increment value position
 			}
