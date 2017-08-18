@@ -407,6 +407,7 @@ class plgFlexicontent_fieldsText extends FCField
 		else if ($format_output == -1)
 		{
 			$output_custom_func = $field->parameters->get('output_custom_func', '');
+			$format_output = !$output_custom_func ? 0 : $format_output;
 		}
 		
 		
@@ -445,11 +446,14 @@ class plgFlexicontent_fieldsText extends FCField
 			{
 				if ( !strlen($value) ) continue;  // skip further actions
 				
-				if ($format_output > 0) {  // 1: decimal, 2: integer
+				if ($format_output > 0)  // 1: decimal, 2: integer
+				{
 					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
 					$value = $value === NULL ? 0 : $value;
 					$value = $output_prefix .$value. $output_suffix;
-				} else if (!empty($output_custom_func)) {
+				}
+				else if ($format_output === -1)
+				{
 					$value = eval( "\$value= \"{$value}\";" . $output_custom_func);
 				}
 				

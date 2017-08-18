@@ -4012,7 +4012,22 @@ class FlexicontentFields
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
-		
+
+		$format_output = (int) $filter->parameters->get('format_output', 0);
+		if ($format_output > 0)  // 1: decimal, 2: integer
+		{
+			$decimal_digits_displayed = $format_output==2 ? 0 : (int)$filter->parameters->get('decimal_digits_displayed', 2);
+			$decimal_digits_sep    = $filter->parameters->get('decimal_digits_sep', '.');
+			$decimal_thousands_sep = $filter->parameters->get('decimal_thousands_sep', ',');
+			$output_prefix = JText::_($filter->parameters->get('output_prefix', ''));
+			$output_suffix = JText::_($filter->parameters->get('output_suffix', ''));
+		}
+		else if ($format_output === -1)
+		{
+			$output_custom_func = $filter->parameters->get('output_custom_func', '');
+			$format_output = !$output_custom_func ? 0 : $format_output;
+		}
+
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		
@@ -4102,15 +4117,31 @@ class FlexicontentFields
 
 		if (empty($results)) $results = array();
 
-		// Language filter labels
-		if ($lang_filter_values)
+		// Language filter values/labels (for indexed fields this is already done)
+		if ( ($lang_filter_values || $format_output) && !$indexed_elements )
 		{
 			foreach ($results as $i => $result)
 			{
-				$results[$i]->text = JText::_($result->text);
+				if ($format_output > 0)  // 1: decimal, 2: integer
+				{
+					$results[$i]->text = @ number_format($results[$i]->text, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$results[$i]->text = $results[$i]->text === NULL ? 0 : $results[$i]->text;
+					$results[$i]->text = $output_prefix .$results[$i]->text. $output_suffix;
+				}
+				else if ($format_output === -1)
+				{
+					$value = & $results[$i]->text;
+					$results[$i]->text = eval( "\$value= \"{$value}\";" . $output_custom_func);
+				}
+
+				if ($lang_filter_values)
+				{
+					$results[$i]->text = JText::_($result->text);
+				}
 			}
+			unset($value);
 		}
-		
+
 		// Skip sorting for indexed elements, DB query or element entry is responsible
 		// for ordering indexable fields, also skip if ordering is done by the filter
 		if ( !$indexed_elements && empty($filter->filter_orderby) )
@@ -4130,7 +4161,22 @@ class FlexicontentFields
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
-		
+
+		$format_output = (int) $filter->parameters->get('format_output', 0);
+		if ($format_output > 0)  // 1: decimal, 2: integer
+		{
+			$decimal_digits_displayed = $format_output==2 ? 0 : (int)$filter->parameters->get('decimal_digits_displayed', 2);
+			$decimal_digits_sep    = $filter->parameters->get('decimal_digits_sep', '.');
+			$decimal_thousands_sep = $filter->parameters->get('decimal_thousands_sep', ',');
+			$output_prefix = JText::_($filter->parameters->get('output_prefix', ''));
+			$output_suffix = JText::_($filter->parameters->get('output_suffix', ''));
+		}
+		else if ($format_output === -1)
+		{
+			$output_custom_func = $filter->parameters->get('output_custom_func', '');
+			$format_output = !$output_custom_func ? 0 : $format_output;
+		}
+
 		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		
@@ -4170,11 +4216,28 @@ class FlexicontentFields
 		}
 		
 		// Language filter values/labels (for indexed fields this is already done)
-		if ($lang_filter_values && !$indexed_elements)
+		if ( ($lang_filter_values || $format_output) && !$indexed_elements )
 		{
-			foreach ($results as $i => $result) {
-				$results[$i]->text = JText::_($result->text);
+			foreach ($results as $i => $result)
+			{
+				if ($format_output > 0)  // 1: decimal, 2: integer
+				{
+					$results[$i]->text = @ number_format($results[$i]->text, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$results[$i]->text = $results[$i]->text === NULL ? 0 : $results[$i]->text;
+					$results[$i]->text = $output_prefix .$results[$i]->text. $output_suffix;
+				}
+				else if ($format_output === -1)
+				{
+					$value = & $results[$i]->text;
+					$results[$i]->text = eval( "\$value= \"{$value}\";" . $output_custom_func);
+				}
+
+				if ($lang_filter_values)
+				{
+					$results[$i]->text = JText::_($result->text);
+				}
 			}
+			unset($value);
 		}
 		
 		// Skip sorting for indexed elements, DB query or element entry is responsible

@@ -330,7 +330,7 @@
 				<option value="0">FLEXI_ORDER_NORMAL</option>
 				<option value="1">FLEXI_ORDER_REVERSE</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
 			<field name="filter_compare_type" type="radio" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC" class="btn-group group-fcinfo">
