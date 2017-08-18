@@ -659,6 +659,7 @@ class FCIndexedField extends FCField
 			if (!$ajax)
 			{
 				// Set order of selected values for the case that field is sortable
+				$this_val_attribs = '';
 				if ($sortable && $display_as_select)
 				{
 					$d = array();
@@ -670,12 +671,12 @@ class FCIndexedField extends FCField
 						}
 					}
 					//$per_val_js .= 'jQuery("#'.$elementid_n.'").select2("data", '.json_encode($d).');';
-					$attribs .= ' data-select2-initdata = "' . htmlentities(json_encode($d), ENT_QUOTES, 'UTF-8') . '"';
+					$this_val_attribs .= ' data-select2-initdata = "' . htmlentities(json_encode($d), ENT_QUOTES, 'UTF-8') . '"';
 				}
 
 				$field->html[] = '
 					'.($display_as_select ?
-						$opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
+						$opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs . $this_val_attribs . ' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
 						'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>'
 					).'
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
