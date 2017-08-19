@@ -63,29 +63,29 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
 
-		$jinput = JFactory::getApplication()->input;
-		$task   = $jinput->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
+		$app  = JFactory::getApplication();
+		$task = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 
 		if ( $task=='config.store' )
 		{
-			$comp = $jinput->get('comp', '', 'cmd');
+			$comp = $app->input->get('comp', '', 'cmd');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
 			$comp = str_replace('com_flexicontent.item.', 'com_content.article.', $comp);
-			$jinput->set('comp', $comp);
+			$app->input->set('comp', $comp);
 
 			if ( $comp == 'com_content' || $comp == 'com_flexicontent' )
 			{
 				$skip_arr = array('core.admin'=>1, 'core.options'=>1, 'core.manage'=>1);
-				$action = $jinput->get('action');
+				$action = $app->input->get('action');
 				if ( substr($action, 0, 5) == 'core.' && !isset($skip_arr[$action]) )
 				{
 					$comp_other = $comp == 'com_content'  ?  'com_flexicontent'  :  'com_content';
 					$permissions = array(
 						'component' => $comp_other,
-						'action'    => $jinput->get('action', '', 'cmd'),
-						'rule'      => $jinput->get('rule', '', 'cmd'),
-						'value'     => $jinput->get('value', '', 'cmd'),
-						'title'     => $jinput->get('title', '', 'string')
+						'action'    => $app->input->get('action', '', 'cmd'),
+						'rule'      => $app->input->get('rule', '', 'cmd'),
+						'value'     => $app->input->get('value', '', 'cmd'),
+						'title'     => $app->input->get('title', '', 'string')
 					);
 					
 					JLoader::register('ConfigModelApplication', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_config'.DS.'model'.DS.'application.php');
@@ -106,14 +106,14 @@ class plgSystemFlexisystem extends JPlugin
 		
 		
 		// Fix for return urls with unicode aliases
-		$return   = $jinput->get('return', null);
-		$isfcurl  = $jinput->get('isfcurl', null);
-		$fcreturn = $jinput->get('fcreturn', null);
-		if ($return && ($isfcurl || $fcreturn)) $jinput->set('return', strtr($return, '-_,', '+/='));
+		$return   = $app->input->get('return', null);
+		$isfcurl  = $app->input->get('isfcurl', null);
+		$fcreturn = $app->input->get('fcreturn', null);
+		if ($return && ($isfcurl || $fcreturn)) $app->input->set('return', strtr($return, '-_,', '+/='));
 		
-		$username = $jinput->get('fcu', null);
-		$password = $jinput->get('fcp', null);
-		$option   = $jinput->get('option', null);
+		$username = $app->input->get('fcu', null);
+		$password = $app->input->get('fcp', null);
+		$option   = $app->input->get('option', null);
 		$session = JFactory::getSession();
 		
 		
@@ -151,7 +151,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $option==$this->extension && $this->cparams->get('print_logging_info')==1 )
 		{
 			// Try request variable first then session variable
-			$fcdebug = $jinput->get('fcdebug', '', 'cmd');
+			$fcdebug = $app->input->get('fcdebug', '', 'cmd');
 			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
 
 			// Enable/Disable debugging
@@ -177,9 +177,9 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// (c) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
-		if ($redirect_pdf_format && $jinput->get('format', 'html', 'cmd') == 'pdf')
+		if ($redirect_pdf_format && $app->input->get('format', 'html', 'cmd') == 'pdf')
 		{
-			$jinput->set('format', 'html');
+			$app->input->set('format', 'html');
 			if ($redirect_pdf_format==2)
 			{
 				JFactory::getApplication()->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
@@ -203,23 +203,21 @@ class plgSystemFlexisystem extends JPlugin
 		// We place this above format check, because maybe, saving will be AJAX based (? format=raw ?)
 		$this->trackSaveConf();
 		
-		$jinput = JFactory::getApplication()->input;		
-		$format = $jinput->get('format', 'html', 'cmd');
+		$format = JFactory::getApplication()->input->get('format', 'html', 'cmd');
 		if ($format != 'html') return;
 		
 		$app      = JFactory::getApplication();
-		$jinput   = $app->input;
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$controller = $jinput->get('controller', '', 'cmd');
-		$component  = $jinput->get('component', '', 'cmd');
+		$option = $app->input->get('option', '', 'cmd');
+		$view   = $app->input->get('view', '', 'cmd');
+		$controller = $app->input->get('controller', '', 'cmd');
+		$component  = $app->input->get('component', '', 'cmd');
 		
-		$layout = $jinput->get('layout', '', 'string');
-		$tmpl   = $jinput->get('tmpl', '', 'string');
-		$task   = $jinput->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
+		$layout = $app->input->get('layout', '', 'string');
+		$tmpl   = $app->input->get('tmpl', '', 'string');
+		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 		
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
 		$isAdmin = JFactory::getApplication()->isAdmin();
@@ -307,14 +305,19 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function redirectAdminComContent()
 	{
-		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		$user   = JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$option = $app->input->get('option', '', 'cmd');
 		
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
-		$task   = $jinput->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
-		
+		// Skip other components
+		if (empty($option) || ($option !== 'com_content'  && $option !== 'com_categories'))
+		{
+			return;
+		}
+
+		$view   = $app->input->get('view', '', 'cmd');
+		$task   = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
+
 		// Split the task into 'controller' and task
 		$_ct = explode('.', $task);
 		$task = $_ct[ count($_ct) - 1];
@@ -336,83 +339,95 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Get current URL
 		$uri = JUri::getInstance();
-		
+
+
 		// First check excluded urls
-		foreach ($excluded_urls as $excluded_url) {
+		foreach ($excluded_urls as $excluded_url)
+		{
 			$quoted = preg_quote($excluded_url, "#");
-			if(preg_match("#$quoted#", $uri)) return false;
+			if(preg_match("#$quoted#", $uri)) return;
 		}
-		
-		if (empty($option)) return;
+
+		// Get request variables used to determine whether to apply redirection
+		$layout   = $app->input->get('layout', '', 'cmd');
+		//$function = $app->input->get('function', '', 'cmd');
+		//$editor   = $app->input->get('editor', '', 'cmd');
+
+		// Selecting Joomla article / category from a modal e.g. from a menu item, or from an editor
+		if ($layout=="modal")
+		{
+			return;
+		}
+
 
 		// if try to access com_content you get redirected to Flexicontent items
-		if ( $option == 'com_content' )
+		if ( $option === 'com_content' )
 		{
 			// Check if a user group is groups, that are excluded from article redirection
-			if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
-
-			// Default (target) redirection url
-			$redirectURL = 'index.php?option='.$this->extension;
-
-			// Get request variables used to determine whether to apply redirection
-			$layout   = $jinput->get('layout', '', 'cmd');
-			$function = $jinput->get('function', '', 'cmd');
+			if( count(array_intersect($usergroups, $exclude_arts)) ) return;
 
 			// *** Specific Redirect Exclusions ***
 
-			//--. (J2.5 only) Selecting Joomla article for menu item
-			if ( $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
-
 			//--. JA jatypo (editor-xtd plugin button for text style selecting)
-			if ($jinput->get('jatypo', '', 'cmd')!="" && $layout=="edit") return false;
+			if ($app->input->get('jatypo', '', 'cmd') && $layout=="edit") return;
 
 			//--. Allow listing featured backend management
-			if ($view=="featured") return false;
-			//return false;  // for testing
+			if ($view=="featured") return;
 
-			if ($task)
+			switch ($task)
 			{
-				if ($task == 'add') {
-					$redirectURL .= '&task=items.add';
-				} else if ($task == 'edit') {
-					$cid = $jinput->get('id', $jinput->get('cid', 0));
-					$redirectURL .= '&task=items.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
-				} else if ($task == 'element') {
-					$redirectURL .= '&view=itemelement&tmpl=component&object=' . $jinput->get('object', '');
-				} else {
-					return;
-				}
+				case 'add':
+					$redirectURL = 'index.php?option=' . $this->extension . '&task=items.add';
+					break;
+				case 'edit':
+					$cid = $app->input->get('id', $app->input->get('cid', 0));
+					$redirectURL = 'index.php?option=' . $this->extension . '&task=items.edit&cid=' . intval(is_array($cid) ? $cid[0] : $cid);
+					break;
+				case 'element':
+					$redirectURL = 'index.php?option=' . $this->extension . '&view=itemelement&tmpl=component&object=' . $app->input->get('object', '');
+					break;
+				default:
+					if (!$task)
+					{
+						$redirectURL = 'index.php?option=' . $this->extension . '&view=items';
+					}
+					break;
 			}
-
-			$redirectURL .= '&view=items';
-
-			// Apply redirection
-			$app->redirect($redirectURL,'');
-			return false;
 		}
 
-		elseif ( $option == 'com_categories' )
+		elseif ( $option === 'com_categories' )
 		{
 			// Check if a user group is groups, that are excluded from category redirection
-			if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
+			if( count(array_intersect($usergroups, $exclude_cats)) ) return;
 
 			// Get request variables used to determine whether to apply redirection
-			$category_scope = $jinput->get('extension', '', 'cmd');
+			$category_scope = $app->input->get('extension', '', 'cmd');
 
-			// Apply redirection if in com_categories is in content scope
-			if ( $category_scope == 'com_content' )
+			// Apply redirection only if in com_categories is in content scope
+			if ( $category_scope !== 'com_content' ) return;
+
+			switch ($task)
 			{
-				if ($task == 'add') {
-					$redirectURL .= 'index.php?option='.$this->extension.'&task=category.add&extension='.$this->extension;
-				} else if ($task == 'edit') {
-					$cid = $jinput->get('id', $jinput->get('cid', 0));
-					$redirectURL .= 'index.php?option='.$this->extension.'&task=category.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
-				} else {
-					$redirectURL = 'index.php?option='.$this->extension.'&view=categories';
-				}
-				$app->redirect($redirectURL,'');
+				case 'add':
+					$redirectURL = 'index.php?option=' . $this->extension . '&task=category.add&extension='.$this->extension;
+					break;
+				case 'edit':
+					$cid = $app->input->get('id', $app->input->get('cid', 0));
+					$redirectURL = 'index.php?option=' . $this->extension . '&task=category.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
+					break;
+				default:
+					if (!$task)
+					{
+						$redirectURL = 'index.php?option=' . $this->extension . '&view=categories';
+					}
+					break;
 			}
-			return false;
+		}
+
+		// Apply redirection
+		if (!empty($redirectURL))
+		{
+			$app->redirect($redirectURL, '');
 		}
 	}
 	
@@ -428,11 +443,10 @@ class plgSystemFlexisystem extends JPlugin
 	function redirectSiteComContent()
 	{
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
 		$db     = JFactory::getDBO();
 
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
+		$option = $app->input->get('option', '', 'cmd');
+		$view   = $app->input->get('view', '', 'cmd');
 
 		//***
 		//*** Let's Redirect/Reroute Joomla's article view & form to FLEXIcontent item view & form respectively !!
@@ -456,11 +470,11 @@ class plgSystemFlexisystem extends JPlugin
 		//***
 
 		// In case of form we need to use a_id instead of id, this will also be set in HTTP Request too and JRouter too
-		$id = $jinput->get('id', 0, 'int');
-		$id = ($view=='form') ? $jinput->get('a_id', 0, 'int') : $id;
+		$id = $app->input->get('id', 0, 'int');
+		$id = ($view=='form') ? $app->input->get('a_id', 0, 'int') : $id;
 
 		// Get article category id, if it is not already in url
-		$catid = $jinput->get('catid', 0, 'int');
+		$catid = $app->input->get('catid', 0, 'int');
 		if (!$catid && $id)
 		{
 			$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
@@ -517,10 +531,10 @@ class plgSystemFlexisystem extends JPlugin
 			{
 				case 'article':  // a. CASE :  com_content ARTICLE link that is rerouted to its corresponding flexicontent link
 				case 'item':     // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
-					$newRequest = array('option' => $this->extension, 'view' => 'item', 'Itemid' => $jinput->get('Itemid', null, 'int'), 'lang' => $jinput->get('lang', null, 'cmd'));
+					$newRequest = array('option' => $this->extension, 'view' => 'item', 'Itemid' => $app->input->get('Itemid', null, 'int'), 'lang' => $app->input->get('lang', null, 'cmd'));
 					break;
 				case 'form':     // c. CASE :  com_content link to article edit form
-					$newRequest = array ('option' => $this->extension, 'view' => 'item', 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => $jinput->get('Itemid', null, 'int'), 'lang' => $jinput->get('lang', null, 'cmd'));
+					$newRequest = array ('option' => $this->extension, 'view' => 'item', 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => $app->input->get('Itemid', null, 'int'), 'lang' => $app->input->get('lang', null, 'cmd'));
 					break;
 				default:
 					// Unknown CASE ?? unreachable ?
@@ -531,7 +545,7 @@ class plgSystemFlexisystem extends JPlugin
 			// Set variables in the HTTP request
 			foreach($newRequest as $k => $v)
 			{
-				$jinput->set($k, $v);
+				$app->input->set($k, $v);
 			}
 
 			// Set variables in the router too
@@ -546,7 +560,7 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			if ($view=='form')
 			{
-				$urlItem = 'index.php?option='.$this->extension.'&view=item&id='.$id.'&task=edit';
+				$urlItem = 'index.php?option=' . $this->extension . '&view=item&id='.$id.'&task=edit';
 			}
 
 			else
@@ -555,8 +569,8 @@ class plgSystemFlexisystem extends JPlugin
 				require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 				require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-				$itemslug	= $jinput->get('id', '', 'string');
-				$catslug	= $jinput->get('catid', '', 'string');
+				$itemslug	= $app->input->get('id', '', 'string');
+				$catslug	= $app->input->get('catid', '', 'string');
 
 				// Warning current menu item id must not be passed to the routing functions since it points to com_content, and thus it will break FC SEF URLs
 				$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
@@ -771,12 +785,11 @@ class plgSystemFlexisystem extends JPlugin
 	function trackSaveConf()
 	{
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 		$session = JFactory::getSession();
 
-		$option    = $jinput->get('option', '', 'cmd');
-		$component = $jinput->get('component', '', 'cmd');
-		$task      = $jinput->get('task', '', 'cmd');
+		$option    = $app->input->get('option', '', 'cmd');
+		$component = $app->input->get('component', '', 'cmd');
+		$task      = $app->input->get('task', '', 'cmd');
 
 		if ( $option == 'com_config' && $component == $this->extension &&
 			($task == 'apply' || $task == 'save' || $task == 'component.apply' || $task == 'component.save' || $task == 'config.save.component.apply' || $task == 'config.save.component.save') )
@@ -798,7 +811,6 @@ class plgSystemFlexisystem extends JPlugin
 		if ( !empty($_POST['fcdata_serialized']) )
 		{
 			$app     = JFactory::getApplication();
-			$jinput  = $app->input;
 
 			//parse_str($_POST['fcdata_serialized'], $form_data);  // Combined with "jQuery.serialize()", but cannot be used to overcome 'max_input_vars'
 			
@@ -812,7 +824,7 @@ class plgSystemFlexisystem extends JPlugin
 			
 			foreach($form_data as $n => $v)
 			{
-				$jinput->set($n, $v);
+				$app->input->set($n, $v);
 			}
 			
 			/*foreach($_GET as $var => $val) {
@@ -842,10 +854,9 @@ class plgSystemFlexisystem extends JPlugin
 	function loginUser() 
 	{
 		$app = JFactory::getApplication();
-		$jinput = $app->input;
 
-		$username  = $jinput->get('fcu', null);
-		$password  = $jinput->get('fcp', null);
+		$username  = $app->input->get('fcu', null);
+		$password  = $app->input->get('fcp', null);
 
 		jimport('joomla.user.helper');
 		
@@ -885,7 +896,6 @@ class plgSystemFlexisystem extends JPlugin
 		$this->set_cache_control();  // Avoid expiration messages by the browser when browser's back/forward buttons are clicked
 		
 		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
 		$session = JFactory::getSession();
 		
 		// Count an item or category hit if appropriate
@@ -897,12 +907,12 @@ class plgSystemFlexisystem extends JPlugin
 			$start_microtime = microtime(true);
 			$css = array();
 
-			$view = $jinput->get('view', '', 'cmd');
+			$view = $app->input->get('view', '', 'cmd');
 
 			if ($view=='item')
 			{
-				if ($id = $jinput->get('id', 0, 'int'))            $css[] = "item-id-".$id;  // Item's id
-				if ($cid = $jinput->get('cid', 0, 'int'))          $css[] = "item-catid-".$cid;  // Item's category id
+				if ($id = $app->input->get('id', 0, 'int'))            $css[] = "item-id-".$id;  // Item's id
+				if ($cid = $app->input->get('cid', 0, 'int'))          $css[] = "item-catid-".$cid;  // Item's category id
 				if ($id)
 				{
 					$db = JFactory::getDBO();
@@ -923,10 +933,10 @@ class plgSystemFlexisystem extends JPlugin
 			
 			else if ($view=='category')
 			{
-				if ($cid = $jinput->get('cid', 0, 'int'))            $css[] = "catid-".$cid;  // Category id
-				if ($authorid = $jinput->get('authorid', 0, 'int'))  $css[] = "authorid-".$authorid; // Author id
-				if ($tagid = $jinput->get('tagid', 0, 'int'))        $css[] = "tagid-".$tagid;  // Tag id
-				if ($layout = $jinput->get('layout', '', 'cmd'))     $css[] = "cat-layout-".$layout;   // Category 'layout': tags, favs, author, myitems, mcats
+				if ($cid = $app->input->get('cid', 0, 'int'))            $css[] = "catid-".$cid;  // Category id
+				if ($authorid = $app->input->get('authorid', 0, 'int'))  $css[] = "authorid-".$authorid; // Author id
+				if ($tagid = $app->input->get('tagid', 0, 'int'))        $css[] = "tagid-".$tagid;  // Tag id
+				if ($layout = $app->input->get('layout', '', 'cmd'))     $css[] = "cat-layout-".$layout;   // Category 'layout': tags, favs, author, myitems, mcats
 			}
 			
 			$html = JResponse::getBody();
@@ -997,9 +1007,11 @@ class plgSystemFlexisystem extends JPlugin
 
 	public function set_cache_control()
 	{
-		$jinput = JFactory::getApplication()->input;
-		$option = $jinput->get('option', '', 'cmd');
-		$browser_cachable = $jinput->get('browser_cachable', null);
+		$app = JFactory::getApplication();
+
+		$option = $app->input->get('option', '', 'cmd');
+		$browser_cachable = $app->input->get('browser_cachable', null);
+
 		if ($option==$this->extension && $browser_cachable!==null)
 		{
 			// Use 1/4 of Joomla cache time for the browser caching
@@ -1318,14 +1330,12 @@ class plgSystemFlexisystem extends JPlugin
 	function countHit()
 	{
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
-		
-		$option = $jinput->get('option', '', 'cmd');
-		$view   = $jinput->get('view', '', 'cmd');
+		$option = $app->input->get('option', '', 'cmd');
+		$view   = $app->input->get('view', '', 'cmd');
 
 		if ($option==$this->extension && $view=='item')
 		{
-			$item_id = $jinput->get('id', 0, 'int');
+			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id && $this->count_new_hit($item_id) )
 			{
 				$db = JFactory::getDBO();
@@ -1339,7 +1349,7 @@ class plgSystemFlexisystem extends JPlugin
 		else if ($option=='com_content' && $view=='article')
 		{
 			// Always increment if non FLEXIcontent view
-			$item_id = $jinput->get('id', 0, 'int');
+			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id )
 			{
 				$db = JFactory::getDBO();
@@ -1355,8 +1365,8 @@ class plgSystemFlexisystem extends JPlugin
 
 		else if ($option==$this->extension &&  $view=='category')
 		{
-			$cat_id = $jinput->get('cid', 0, 'int');
-			$layout = $jinput->get('layout', '', 'cmd');
+			$cat_id = $app->input->get('cid', 0, 'int');
+			$layout = $app->input->get('layout', '', 'cmd');
 
 			if ($cat_id && empty($layout))
 			{
@@ -1683,9 +1693,9 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
-		$jinput = JFactory::getApplication()->input;
-		$option = $jinput->get('component', '', 'cmd');
-		$user   = JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$option = $app->input->get('component', '', 'cmd');
 		
 		if ( $context=='com_config.component' && ($option == 'com_content' || $option == 'com_flexicontent') )
 		{
@@ -2017,11 +2027,11 @@ class plgSystemFlexisystem extends JPlugin
 		// This is meant for Joomla article view
 		if ( $context!='com_content.article' ) return;
 		
-		$jinput = JFactory::getApplication()->input;
+		$app = JFactory::getApplication();
 		if (
-			$jinput->get('option', '', 'CMD')!='com_content' ||
-			$jinput->get('view', '', 'CMD')!='article' ||
-			$jinput->get('isflexicontent', false, 'CMD')
+			$app->input->get('option', '', 'CMD')!='com_content' ||
+			$app->input->get('view', '', 'CMD')!='article' ||
+			$app->input->get('isflexicontent', false, 'CMD')
 		) return;
 		
 		
@@ -2123,8 +2133,7 @@ class plgSystemFlexisystem extends JPlugin
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$jinput  = $app->input;
-		$jcookie = $jinput->cookie;
+		$jcookie = $app->input->cookie;
 
 		// Set id for client-side (browser) caching via unique URLs (logged users)
 		$jcookie->set( 'fc_uid', JUserHelper::getShortHashedUserAgent(), 0);
