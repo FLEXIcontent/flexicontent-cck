@@ -1,104 +1,36 @@
 <?php
 /**
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package     Joomla.Administrator
+ * @subpackage  com_flexicontent
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+use Joomla\Utilities\ArrayHelper;
 jimport('legacy.model.admin');
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'user.php');
 
 /**
  * User model.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_flexicontent
- * @since       1.6
+ * @since  1.6
  */
 class FlexicontentModelUser extends UsersModelUser
 {
 	/**
-	 * Type primary key
+	 * Constructor.
 	 *
-	 * @var int
-	 */
-	var $_id = null;
-	
-	/**
-	 * Type data
+	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
-	 * @var object
+	 * @since   3.2
 	 */
-	var $_user = null;
-
-	/**
-	 * Constructor
-	 *
-	 * @since 1.0
-	 */
-	function __construct()
+	public function __construct($config = array())
 	{
-		parent::__construct();
-		
-		$jinput = JFactory::getApplication()->input;
-
-		$id = $jinput->get('id', array(0), 'array');
-		JArrayHelper::toInteger($id, array(0));
-		$pk = (int) $id[0];
-
-		if (!$pk)
-		{
-			$cid = $jinput->get('cid', array(0), 'array');
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = (int) $cid[0];
-		}
-		
-		if (!$pk)
-		{
-			$data = $jinput->get('jform', array('id'=>0), 'array');
-			$pk = (int) $data['id'];
-		}
-		$this->setId((int)$pk);
-
-		$this->populateState();
-	}
-
-
-	/**
-	 * Method to set the identifier
-	 *
-	 * @access	public
-	 * @param	int type identifier
-	 */
-	function setId($id)
-	{
-		// Set type id and wipe data
-		$this->_id     = $id;
-		$this->_user   = null;
-	}
-	
-
-	/**
-	 * Method to get the type identifier
-	 *
-	 * @access	public
-	 */
-	function getId()
-	{
-		return $this->_id;
+		parent::__construct($config);
 	}
 
 	/**
@@ -113,8 +45,13 @@ class FlexicontentModelUser extends UsersModelUser
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		// Initialise variables.
-		$app = JFactory::getApplication();
+		$pluginParams = new Registry;
+		
+		if (JPluginHelper::isEnabled('user', 'joomla'))
+		{
+			$plugin = JPluginHelper::getPlugin('user', 'joomla');
+			$pluginParams->loadString($plugin->params);
+		}
 
 		// Get the form.
 		$form = $this->loadForm('com_flexicontent.user', 'user', array('control' => 'jform', 'load_data' => $loadData));
@@ -122,6 +59,34 @@ class FlexicontentModelUser extends UsersModelUser
 		if (empty($form))
 		{
 			return false;
+		}
+
+		// Passwords fields are required when mail to user is set to No in joomla user plugin
+		$userId = $form->getValue('id');
+
+		if ($userId === 0 && $pluginParams->get('mail_to_user', '1') === '0')
+		{
+			$form->setFieldAttribute('password', 'required', 'true');
+			$form->setFieldAttribute('password2', 'required', 'true');
+		}
+
+		// If the user needs to change their password, mark the password fields as required
+		if (JFactory::getUser()->requireReset)
+		{
+			$form->setFieldAttribute('password', 'required', 'true');
+			$form->setFieldAttribute('password2', 'required', 'true');
+		}
+
+		// When multilanguage is set, a user's default site language should also be a Content Language
+		if (JLanguageMultilang::isEnabled())
+		{
+			$form->setFieldAttribute('language', 'type', 'frontend_language', 'params');
+		}
+
+		// The user should not be able to set the requireReset value on their own account
+		if ((int) $userId === (int) JFactory::getUser()->id)
+		{
+			$form->removeField('requireReset');
 		}
 
 		return $form;
@@ -141,22 +106,10 @@ class FlexicontentModelUser extends UsersModelUser
 
 		if (empty($data))
 		{
-			$data = $this->getItem($this->_id);
+			$data = $this->getItem();
 		}
 
-		// TODO: Maybe this can go into the parent model somehow?
-		// Get the dispatcher and load the users plugins.
-		$dispatcher	= JEventDispatcher::getInstance();
-		JPluginHelper::importPlugin('user');
-
-		// Trigger the data preparation event.
-		$results = $dispatcher->trigger('onContentPrepareData', array('com_users.profile', $data));
-
-		// Check for errors encountered while preparing the data.
-		if (count($results) && in_array(false, $results, true))
-		{
-			$this->setError($dispatcher->getError());
-		}
+		$this->preprocessData('com_users.profile', $data, 'user');
 
 		return $data;
 	}

@@ -1,33 +1,23 @@
 <?php
 /**
- * @version 1.5 stable $Id: types.php 1223 2012-03-30 08:34:34Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package     Joomla.Administrator
+ * @subpackage  com_flexicontent
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.list');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+jimport('legacy.model.list');
 
 /**
- * FLEXIcontent Component types Model
+ * Methods supporting a list of user records.
  *
- * @package Joomla
- * @subpackage FLEXIcontent
- * @since		1.0
+ * @since  1.6
  */
 class FlexicontentModelUsers extends JModelList
 {
@@ -78,17 +68,23 @@ class FlexicontentModelUsers extends JModelList
 		// **************
 		
 		// Various filters
-		$filter_itemscount = $fcform ? $jinput->get('filter_itemscount', 0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_itemscount', 'filter_itemscount', 0, 'int' );
-		$filter_usergrp    = $fcform ? $jinput->get('filter_usergrp',    0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_usergrp',    'filter_usergrp',    0, 'int' );
-		$filter_logged     = $fcform ? $jinput->get('filter_logged',     0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_logged',     'filter_logged',     0, 'int' );
+		$filter_itemscount = $fcform ? $jinput->get('filter_itemscount', 0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_itemscount', 'filter_itemscount', 0,  'int' );
+		$filter_usergrp    = $fcform ? $jinput->get('filter_usergrp',    0,  'int')  :  $app->getUserStateFromRequest( $p.'filter_usergrp',    'filter_usergrp',    0,  'int' );
+		$filter_logged     = $fcform ? $jinput->get('filter_logged',     '', 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_logged',     'filter_logged',     '', 'cmd' );
+		$filter_state      = $fcform ? $jinput->get('filter_state',      '', 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_state',      'filter_state',      '', 'cmd' );
+		$filter_active     = $fcform ? $jinput->get('filter_active',     '', 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_active',     'filter_active',     '', 'cmd' );
 		
 		$this->setState('filter_itemscount', $filter_itemscount);
 		$this->setState('filter_usergrp', $filter_usergrp);
 		$this->setState('filter_logged', $filter_logged);
+		$this->setState('filter_state', $filter_state);
+		$this->setState('filter_active', $filter_active);
 		
 		$app->setUserState($p.'filter_itemscount', $filter_itemscount);
 		$app->setUserState($p.'filter_usergrp', $filter_usergrp);
 		$app->setUserState($p.'filter_logged', $filter_logged);
+		$app->setUserState($p.'filter_state', $filter_state);
+		$app->setUserState($p.'filter_active', $filter_active);
 		
 		
 		// Date filters
@@ -211,6 +207,8 @@ class FlexicontentModelUsers extends JModelList
 		$filter_itemscount = $this->getState( 'filter_itemscount' );
 		$filter_usergrp    = $this->getState( 'filter_usergrp' );
 		$filter_logged     = $this->getState( 'filter_logged' );
+		$filter_state      = $this->getState( 'filter_state' );
+		$filter_active     = $this->getState( 'filter_active' );
 		
 		// date filters
 		$date       = $this->getState( 'date' );
@@ -273,10 +271,26 @@ class FlexicontentModelUsers extends JModelList
 		if ( $filter_usergrp )  // Filtering by usergroup, right join with usergroups DB table, to limit users to those belonging to the selected group
 			$extra_joins[] = ' RIGHT JOIN #__user_usergroup_map AS ug ON ug.user_id = a.id AND ug.group_id='. (int)$filter_usergrp;
 		
-		if ( $filter_logged == 1 )
-			$where[] = 's.userid IS NOT NULL';
-		else if ($filter_logged == 2)
-			$where[] = 's.userid IS NULL';
+		if (strlen($filter_logged))
+		{
+			if ( $filter_logged === '1' )
+				$where[] = 's.userid IS NOT NULL';
+			else if ($filter_logged === '0')
+				$where[] = 's.userid IS NULL';
+		}
+
+		if (strlen($filter_state))
+		{
+			$where[] = 'a.block = ' . (int) $filter_state;
+		}
+
+		if (strlen($filter_active))
+		{
+			if ( $filter_active === '1' )
+				$where[] = ' LENGTH(a.activation) > 1';  // Not active
+			else if ($filter_active === '0')
+				$where[] = 'a.activation IN (' . $this->_db->quote('') . ', ' . $this->_db->quote('0') . ')';   // Active
+		}
 
 		if ( $filter_itemscount==2 )
 			$having[] = ' itemscount > 0 ';

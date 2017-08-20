@@ -1,10 +1,12 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_flexicontent
+ *
+ * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
 
 // Import parent controller
@@ -13,15 +15,13 @@ jimport('legacy.controller.form');
 /**
  * User view level controller class.
  *
- * @package		Joomla.Administrator
- * @subpackage	com_flexicontent
- * @since		1.6
+ * @since  1.6
  */
 class FlexicontentControllerGroup extends JControllerForm
 {
-		/**
-	 * @var		string	The prefix to use with controller messages.
-	 * @since	1.6
+	/**
+	 * @var	    string  The prefix to use with controller messages.
+	 * @since   1.6
 	 */
 	protected $text_prefix = 'COM_USERS_GROUP';
 
@@ -30,11 +30,12 @@ class FlexicontentControllerGroup extends JControllerForm
 	 *
 	 * Overrides JControllerForm::allowSave to check the core.admin permission.
 	 *
-	 * @param	array	An array of input data.
-	 * @param	string	The name of the key for the primary key.
+	 * @param   array   $data  An array of input data.
+	 * @param   string  $key   The name of the key for the primary key.
 	 *
-	 * @return	boolean
-	 * @since	1.6
+	 * @return  boolean
+	 *
+	 * @since   1.6
 	 */
 	protected function allowSave($data, $key = 'id')
 	{
@@ -46,23 +47,25 @@ class FlexicontentControllerGroup extends JControllerForm
 	 *
 	 * Checks that non-Super Admins are not editing Super Admins.
 	 *
-	 * @param	array	An array of input data.
-	 * @param	string	The name of the key for the primary key.
+	 * @param   array   $data  An array of input data.
+	 * @param   string  $key   The name of the key for the primary key.
 	 *
-	 * @return	boolean
-	 * @since	1.6
+	 * @return  boolean
+	 *
+	 * @since   1.6
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
-		// Edit a Super Admin User Group is only allowed to a Super Admin
-		if (JAccess::checkGroup($data[$key], 'core.admin')) {
-			if (!JFactory::getUser()->authorise('core.admin')) 	return false;
+		// Check if this group is a Super Admin
+		if (JAccess::checkGroup($data[$key], 'core.admin'))
+		{
+			// If I'm not a Super Admin, then disallow the edit.
+			if (!JFactory::getUser()->authorise('core.admin'))
+			{
+				return false;
+			}
 		}
-		
+
 		return parent::allowEdit($data, $key);
-	}
-	
-	function edit() {
-		return parent::edit();
 	}
 }

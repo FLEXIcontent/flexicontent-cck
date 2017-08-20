@@ -1,10 +1,12 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_flexicontent
+ *
+ * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
 
 // Import parent controller
@@ -13,22 +15,26 @@ jimport('legacy.controller.admin');
 /**
  * User groups list controller class.
  *
- * @package		Joomla.Administrator
- * @subpackage	com_flexicontent
- * @since		1.6
+ * @since  1.6
  */
 class FlexicontentControllerGroups extends JControllerAdmin
 {
 	/**
-	 * @var		string	The prefix to use with controller messages.
-	 * @since	1.6
+	 * @var     string  The prefix to use with controller messages.
+	 * @since   1.6
 	 */
 	protected $text_prefix = 'COM_USERS_GROUPS';
 
 	/**
 	 * Proxy for getModel.
 	 *
-	 * @since	1.6
+	 * @param   string  $name    The model name. Optional.
+	 * @param   string  $prefix  The class prefix. Optional.
+	 * @param   array   $config  Configuration array for model. Optional.
+	 *
+	 * @return  object  The model.
+	 *
+	 * @since   1.6
 	 */
 	public function getModel($name = 'Group', $prefix = 'FlexicontentModel', $config = array())
 	{
@@ -40,11 +46,14 @@ class FlexicontentControllerGroups extends JControllerAdmin
 	 *
 	 * Overrides JControllerAdmin::delete to check the core.admin permission.
 	 *
-	 * @since	1.6
+	 * @return  boolean  Returns true on success, false on failure.
+	 *
+	 * @since   1.6
 	 */
-	function delete()
+	public function delete()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option)) {
+		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		{
 			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
 			jexit();
 		}
@@ -57,11 +66,14 @@ class FlexicontentControllerGroups extends JControllerAdmin
 	 *
 	 * Overrides JControllerAdmin::publish to check the core.admin permission.
 	 *
-	 * @since	1.6
+	 * @return  void
+	 *
+	 * @since   1.6
 	 */
-	function publish()
+	public function publish()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option)) {
+		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		{
 			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
 			jexit();
 		}
@@ -74,11 +86,14 @@ class FlexicontentControllerGroups extends JControllerAdmin
 	 *
 	 * Overrides JControllerAdmin::reorder to check the core.admin permission.
 	 *
-	 * @since	1.6
+	 * @return  boolean  True on success
+	 *
+	 * @since   1.6
 	 */
 	public function reorder()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option)) {
+		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		{
 			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
 			jexit();
 		}
@@ -91,11 +106,14 @@ class FlexicontentControllerGroups extends JControllerAdmin
 	 *
 	 * Overrides JControllerAdmin::saveorder to check the core.admin permission.
 	 *
-	 * @since	1.6
+	 * @return  boolean  True on success
+	 *
+	 * @since   1.6
 	 */
 	public function saveorder()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option)) {
+		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		{
 			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
 			jexit();
 		}
@@ -108,11 +126,14 @@ class FlexicontentControllerGroups extends JControllerAdmin
 	 *
 	 * Overrides JControllerAdmin::checkin to check the core.admin permission.
 	 *
-	 * @since	1.6
+	 * @return  boolean  True on success
+	 *
+	 * @since   1.6
 	 */
 	public function checkin()
 	{
-		if (!JFactory::getUser()->authorise('core.admin', $this->option)) {
+		if (!JFactory::getUser()->authorise('core.admin', $this->option))
+		{
 			JError::raiseError(500, JText::_('JERROR_ALERTNOAUTHOR'));
 			jexit();
 		}

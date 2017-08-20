@@ -42,7 +42,7 @@ $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_N
 $date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
 //$date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
-$list_total_cols = 13;
+$list_total_cols = 14;
 
 // COMMON repeated texts
 $edit_entry = JText::_('FLEXI_EDIT_TAG', true);
@@ -107,7 +107,7 @@ function delFilter(name)
 
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_itemscount');
-	delFilter('filter_logged'); delFilter('filter_usergrp');
+	delFilter('filter_logged'); delFilter('filter_state'); delFilter('filter_active'); delFilter('filter_usergrp');
 	delFilter('startdate'); delFilter('enddate');
 	delFilter('filter_id');
 	delFilter('filter_order'); delFilter('filter_order_Dir');
@@ -185,6 +185,18 @@ function delAllFilters() {
 
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_state']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_active']; ?>
+			</div>
+		</div>
+
+		<div class="fc-filter nowrap_box">
+			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_usergrp']; ?>
 			</div>
 		</div>
@@ -229,20 +241,38 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
+
 			<th class="hideOnDemandClass nowrap" >
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
+
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LOGIN', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LOGGED', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_logged) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_logged');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
+
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort',   'COM_USERS_HEADING_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php if (strlen($this->filter_state)) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_state');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
 			</th>
+
+			<th class="hideOnDemandClass nowrap hidden-phone">
+				<?php echo JHTML::_('grid.sort',   'COM_USERS_HEADING_ACTIVATED', 'a.activation', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php if (strlen($this->filter_active)) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_active');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
+			</th>
+
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JText::_( 'FLEXI_USERGROUPS' ); ?>
 				<?php if ($this->filter_usergrp) : ?>
@@ -251,6 +281,7 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
+
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_itemscount) : ?>
@@ -259,6 +290,7 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
+
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (@$this->filter_uploadssize) : ?>
@@ -267,9 +299,11 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
+
 			<th class="hideOnDemandClass left nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_EMAIL', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
+
 			<th style="width:110px;" class="hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_REGISTRED_DATE', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
@@ -284,6 +318,7 @@ function delAllFilters() {
 				endif;
 				?>
 			</th>
+
 			<th style="width:110px;" class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LAST_VISIT', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
@@ -298,6 +333,7 @@ function delAllFilters() {
 				endif;
 				?>
 			</th>
+
 			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
@@ -324,13 +360,18 @@ function delAllFilters() {
 				}
 				$row->groupname = implode(', ', $row->groupname);
 
+				$users_task = 'task=users.';
+				$edit_link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;cid='. $row->id. '';
+
 				$img_path  = '../components/com_flexicontent/assets/images/';
 				$tick_img  = $img_path . 'tick.png';
-				$block_img = $img_path . ($row->block ? 'publish_x.png' : 'tick.png');
-				$task_block= 'users.' . ($row->block ? 'unblock' : 'block');
-				$users_task = 'task=users.';
-				$alt   = $row->block ? JText::_( 'Enabled' ) : JText::_( 'Blocked' );
-				$link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;cid='. $row->id. '';
+
+				$block_img   = $img_path . ($row->block ? 'publish_x.png' : 'tick.png');
+				$block_task  = 'users.' . ($row->block ? 'unblock' : 'block');
+				$block_title = $row->block ? JText::_( 'COM_USERS_TOOLBAR_UNBLOCK' ) : JText::_( 'COM_USERS_USER_FIELD_BLOCK_DESC' );
+
+				$activation_img   = $img_path . ($row->activation ? 'publish_x.png' : 'tick.png');
+				$activation_title = $row->activation ? JText::_( 'COM_USERS_UNACTIVATED' ) : JText::_( 'COM_USERS_ACTIVATED' );
 
 				if ($row->lastvisitDate == "0000-00-00 00:00:00") {
 					$lvisit = JText::_( 'Never' );
@@ -357,21 +398,28 @@ function delAllFilters() {
 					<label for="cb<?php echo $i; ?>" class="green single"></label>
 				</td>
 				<td class="col_title">
-					<a href="<?php echo $link; ?>">
+					<a href="<?php echo $edit_link; ?>">
 						<?php echo $row->name; ?></a>
 				</td>
 				<td>
-					<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $link; ?>"> -->
+					<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $edit_link; ?>"> -->
 					<?php echo $row->username; ?>
 					<!-- </a> -->
 				</td>
 				<td class="center col_logged">
 					<?php echo $row->loggedin ? '<img src="'.$tick_img.'" width="16" height="16" style="border:0;" class="fc-man-icon-s" alt="" />': ''; ?>
 				</td>
-				<td class="center">
-					<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $task_block;?>')">
-						<img src="images/<?php echo $block_img;?>" width="16" height="16" style="border:0;" class="fc-man-icon-s" alt="<?php echo $alt; ?>" /></a>
+
+				<td class="center col_state">
+					<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $block_task;?>')">
+						<img src="images/<?php echo $block_img;?>" class="<?php echo $tip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $block_title; ?>" alt="<?php echo $block_title; ?>" />
+					</a>
 				</td>
+
+				<td class="center col_active hidden-phone">
+					<img src="images/<?php echo $activation_img;?>" class="<?php echo $tip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $activation_title; ?>" alt="<?php echo $activation_title; ?>" />
+				</td>
+
 				<td class="center col_usergrp">
 					<?php echo JText::_( $row->groupname ); ?>
 				</td>

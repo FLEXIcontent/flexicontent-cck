@@ -163,7 +163,10 @@ if ( isset($forced_views[$controller]) )
 // CASE 1: Use (if it exists) controller named as current view name
 if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
 {
-	$controller = $view;
+	if ($controller != 'group')
+	{
+		$controller = $view;
+	}
 }
 
 
@@ -212,7 +215,12 @@ $jinput->set('task', $controller_task);
 // Files needed for user groups manager
 // ************************************
 
-if ( $view=='group' || $controller_name=='group'   || $view=='groups' || $controller_name=='groups'   || $view=='debuggroup' || $controller_name=='debuggroup' ) {
+if (
+	$view=='group' || $controller_name=='group'   || $view=='groups' || $controller_name=='groups' ||
+	$view=='user' || $controller_name=='user'   || $view=='users' || $controller_name=='users' ||
+	$view=='debuggroup' || $controller_name=='debuggroup'
+)
+{
 	// Load english language file for 'com_users' component then override with current language file
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);

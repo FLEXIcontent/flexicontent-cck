@@ -169,7 +169,7 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		// Featured filtering, get as string to detect empty
-		$filter_featured    = $fcform ? $jinput->get('filter_featured',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_featured',    'filter_featured',   '',  'string' );
+		$filter_featured    = $fcform ? $jinput->get('filter_featured',    '', 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_featured',    'filter_featured',   '',  'cmd' );
 		if (strlen($filter_featured))
 		{
 			$filter_featured = (int) $filter_featured ? 1 : 0;
