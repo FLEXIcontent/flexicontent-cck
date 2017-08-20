@@ -32,6 +32,9 @@ class FlexicontentViewUsers extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
+		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false);
+		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, $force_reload = false);
+
 		// ********************
 		// Initialise variables
 		// ********************
@@ -70,10 +73,14 @@ class FlexicontentViewUsers extends JViewLegacy
 		$filter_itemscount = $model->getState( 'filter_itemscount' );
 		$filter_usergrp    = $model->getState( 'filter_usergrp' );
 		$filter_logged     = $model->getState( 'filter_logged' );
+		$filter_state      = $model->getState( 'filter_state' );
+		$filter_active     = $model->getState( 'filter_active' );
 		
 		if ($filter_itemscount) $count_filters++;
 		if ($filter_usergrp)    $count_filters++;
-		if ($filter_logged)     $count_filters++;
+		if (strlen($filter_logged))     $count_filters++;
+		if (strlen($filter_state))      $count_filters++;
+		if (strlen($filter_active))     $count_filters++;
 		
 		$date       = $model->getState( 'date' );
 		$startdate  = $model->getState( 'startdate' );
@@ -151,6 +158,8 @@ class FlexicontentViewUsers extends JViewLegacy
 		if ($filter_itemscount) $js .= "jQuery('.col_itemscount').each(function(){ jQuery(this).addClass('yellow'); });";
 		if ($filter_usergrp)    $js .= "jQuery('.col_usergrp').each(function(){ jQuery(this).addClass('yellow'); });";
 		if ($filter_logged)     $js .= "jQuery('.col_logged').each(function(){ jQuery(this).addClass('yellow'); });";
+		if (strlen($filter_state))    $js .= "jQuery('.col_state').each(function(){ jQuery(this).addClass('yellow'); });";
+		if (strlen($filter_active))   $js .= "jQuery('.col_active').each(function(){ jQuery(this).addClass('yellow'); });";
 		if ($filter_id)         $js .= "jQuery('.col_id').each(function(){ jQuery(this).addClass('yellow'); });";
 		if ($startdate || $enddate)
 		{
@@ -228,10 +237,24 @@ class FlexicontentViewUsers extends JViewLegacy
 
 		// get list of Log Status for dropdown filter
 		$logged[] = JHTML::_('select.option',  '', '-' /*JText::_( 'Select Log Status' )*/);
-		$logged[] = JHTML::_('select.option',  1, JText::_( 'Logged In' ) );
-		$logged[] = JHTML::_('select.option',  2, JText::_( 'Logged Out' ) );
-		$lists['filter_logged'] = ($filter_logged || 1 ? '<div class="add-on">'.JText::_('Log Status').'</div>' : '').
+		$logged[] = JHTML::_('select.option',  '1', JText::_( 'JYES' ) );
+		$logged[] = JHTML::_('select.option',  '0', JText::_( 'JNO' ) );
+		$lists['filter_logged'] = ($filter_logged || 1 ? '<div class="add-on">'.JText::_('FLEXI_USER_LOGGED').'</div>' : '').
 			JHTML::_('select.genericlist', $logged, 'filter_logged', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_logged );
+
+		// get list of Log Status for dropdown filter
+		$state[] = JHTML::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_STATE' )*/);
+		$state[] = JHtml::_('select.option', '0', JText::_('JENABLED'));
+		$state[] = JHtml::_('select.option', '1', JText::_('JDISABLED'));
+		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('COM_USERS_HEADING_ENABLED').'</div>' : '').
+			JHTML::_('select.genericlist', $state, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+
+		// get list of Log Status for dropdown filter
+		$active[] = JHTML::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_ACTIVE' )*/);
+		$active[] = JHtml::_('select.option', '0', JText::_('COM_USERS_ACTIVATED'));
+		$active[] = JHtml::_('select.option', '1', JText::_('COM_USERS_UNACTIVATED'));
+		$lists['filter_active'] = ($filter_active || 1 ? '<div class="add-on">'.JText::_('COM_USERS_HEADING_ACTIVATED').'</div>' : '').
+			JHTML::_('select.genericlist', $active, 'filter_active', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_active );
 
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
@@ -264,6 +287,8 @@ class FlexicontentViewUsers extends JViewLegacy
 		$this->filter_itemscount = $filter_itemscount;
 		$this->filter_usergrp = $filter_usergrp;
 		$this->filter_logged = $filter_logged;
+		$this->filter_state = $filter_state;
+		$this->filter_active = $filter_active;
 		$this->search = $search;
 		$this->filter_id = $filter_id;
 		$this->date = $date;
@@ -289,6 +314,9 @@ class FlexicontentViewUsers extends JViewLegacy
 		$document = JFactory::getDocument();
 		$perms = FlexicontentHelperPerm::getPerm();
 		$contrl = "users.";
+
+		$canDo = UsersHelper::getActions();
+
 		JToolbarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
 		
 		//JToolbarHelper::addNew($contrl.'add');
@@ -331,16 +359,10 @@ class FlexicontentViewUsers extends JViewLegacy
 			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		
-		JToolbarHelper::divider(); JToolbarHelper::spacer();
-		JToolbarHelper::help('JHELP_USERS_USER_MANAGER');
-		if ($perms->CanConfig) {
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		if ($canDo->get('core.admin')) {
+			JToolbarHelper::preferences('com_users');
+			JToolbarHelper::divider();
 		}
+		JToolbarHelper::help('JHELP_USERS_GROUPS');
 	}
 }
