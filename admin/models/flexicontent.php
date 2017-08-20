@@ -1093,6 +1093,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	}
 
 	/**
+	 * TODO IF/WHEN THIS LIST GROWS: Move it to an optional "Cleanup task" or use both session and joomla caching with long-expire to recheck it
+	 *
 	 * Method to check if the files from beta3 still exist in the category and item view
 	 *
 	 * @access public
@@ -1107,51 +1109,38 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 
 		$deprecated = array();
-		return true;  // Do not execute, TODO revise this task and remove some used files
 		
 		static $return;
 		if ($return===true) return $return;
-		
+
+		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
-		$files 	= array (
-			'author.xml',
-			'author.php',
-			'myitems.xml',
-			'myitems.php',
-			'mcats.xml',
-			'mcats.php',
-			'default.xml',
-			'default.php',
-			'tags.xml',
-			'tags.php',
-			'favs.xml',
-			'favs.php',
-			'index.html'
-			);
-		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
-		$cattmpl 	= JFolder::files($catdir);		
-		$ctmpl 		= array_diff($cattmpl,$files);
-		foreach ($ctmpl as $c)
-		{
-			$deprecated[$catdir][] = $c;
-		}
+
+		$deprecated['files'] = array();
+		$deprecated['folders'] = array();
 		
-		$files 	= array (
-			'default.xml',
-			'default.php',
-			'form.php',
-			'form.xml',
-			'index.html'
-			);
-		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
-		$itemtmpl	= JFolder::files($itemdir);		
-		$itmpl 		= array_diff($itemtmpl,$files);
-		foreach ($itmpl as $c)
+		$files = array(
+			'/administrator/components/com_flexicontent/helpers/html/users.php'
+		);
+		foreach ($files as $file)
 		{
-			$deprecated[$itemdir][] = $c;
+			if (JFile::exists(JPATH_ROOT . $file))
+			{
+				$deprecated['files'][] = $file;
+			}
 		}
-		
-		$return = count($deprecated) ? false : true;
+
+		$folders = array(
+		);
+		foreach ($folders as $folder)
+		{
+			if (JFolder::exists(JPATH_ROOT . $folder))
+			{
+				$deprecated['folders'][] = $folder;
+			}
+		}
+
+		$return = count($deprecated['files']) + count($deprecated['folders']) ? false : true;
 		return $return;
 	}
 

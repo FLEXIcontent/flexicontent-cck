@@ -449,7 +449,7 @@ jQuery(document).ready(function() {
 	</tr>
 	<tr>
 		<td class="key">
-			<?php echo JText::_( 'FLEXI_CLEANUP_TEMPLATE_FILES' ); ?>
+			<?php echo JText::_( 'FLEXI_REMOVE_DEPRECATED_FILES' ); ?>
 		</td>
 		<td>
 			<div id="deprecatedfiles-log" class="install-task">

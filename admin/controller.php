@@ -1063,7 +1063,7 @@ class FlexicontentController extends JControllerLegacy
 	}
 
 	/**
-	 * Method to check if the files from beta3 still exist in the category and item view
+	 * Method to check if the deprecated files still exist and delete them
 	 *
 	 * @access public
 	 * @return	boolean	True on success
@@ -1073,17 +1073,32 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
+		// Get deprecated files and folders that still exist
 		$model = $this->getModel('flexicontent');
 		$deprecated = null;
 		$model->getDeprecatedFiles($deprecated);
-		
+
 		jimport('joomla.filesystem.file');
-		foreach ($deprecated as $dir => $dirfiles) {
-			foreach ($dirfiles as $file) {
-				JFile::delete($dir.DS.$file);
+		jimport('joomla.filesystem.folder');
+
+		// Delete deprecated files that were found
+		foreach ($deprecated['files'] as $file)
+		{
+			if (!JFile::delete(JPATH_ROOT . $file))
+			{
+				echo 'Cannot delete legacy file: ' . $file . '<br />';
 			}
 		}
-		
+
+		// Delete deprecated folders that were found
+		foreach ($deprecated['folders'] as $folder)
+		{
+			if (!JFolder::delete(JPATH_ROOT . $folder))
+			{
+				echo 'Cannot delete legacy folder: ' . $folder . '<br />';
+			}
+		}
+
 		if ($model->getDeprecatedFiles()) {
 			echo '<span class="install-ok"></span>';
 		} else {
