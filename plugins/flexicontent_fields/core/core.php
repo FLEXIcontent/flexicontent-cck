@@ -371,6 +371,14 @@ class plgFlexicontent_fieldsCore extends FCField
 		if($field->iscore != 1) return;
 		if(!is_array($post) && !strlen($post)) return;
 		
+		if ($field->field_type == 'title')
+		{
+			if ($item->parameters->get('auto_title', 0))  // AUTOMATIC TITLE, set to item ID
+			{
+				$post[0] = $item->title = $item->id;
+			}
+		}
+
 		if ($field->field_type == 'maintext')
 		{
 			// Field_type is not changed textarea so that field can handle this field type
@@ -855,16 +863,16 @@ class plgFlexicontent_fieldsCore extends FCField
 		static $state_names = null;
 		if (!$state_names) $state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'));
 		
+		// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
+		// for CORE fields, we do not set the query clauses, these are inside the fields helper file
 		if ($post===null)
 		{
-			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
-			// for CORE fields, we do not set the query clauses, these are inside the fields helper file
 			return null;
 		}
 		
+		// IF no data posted, nothing to index
 		if (empty($post))
 		{
-			// no data posted, nothing to index
 			return array();
 		}
 		
@@ -872,24 +880,35 @@ class plgFlexicontent_fieldsCore extends FCField
 		$_s = $for_advsearch ? '_s' : '';
 
 		$values = array();
-		if ($field->field_type=='type') {
+		if ($field->field_type=='type')
+		{
 			$textcol = 't.name';
-			$query 	= ' SELECT t.id AS value_id, '.$textcol.' AS value FROM #__flexicontent_types AS t WHERE t.id<>0 AND t.id = '.(int)$post[0];
-			
-		} else if ($field->field_type=='state') {
+			$query = ' SELECT t.id AS value_id, '.$textcol.' AS value FROM #__flexicontent_types AS t WHERE t.id<>0 AND t.id = '.(int)$post[0];
+		}
+
+		else if ($field->field_type=='state')
+		{
 			$values[$post[0]] = $state_names[$post[0]];
-			
-		} else if ($field->field_type=='categories') {
-			$query 	= ' SELECT c.id AS value_id, c.title AS value FROM #__categories AS c WHERE c.id<>0 AND c.id IN ('.implode(",",$post).')';
-			
-		} else if ($field->field_type=='tags') {
-			$query 	= ' SELECT t.id AS value_id, t.name AS value FROM #__flexicontent_tags AS t WHERE t.id<>0 AND t.id IN ('.implode(",",$post).')';
-			
-		} else if ($field->field_type=='createdby' || $field->field_type=='modifiedby') {
+		}
+
+		else if ($field->field_type=='categories')
+		{
+			$query = ' SELECT c.id AS value_id, c.title AS value FROM #__categories AS c WHERE c.id<>0 AND c.id IN ('.implode(",",$post).')';
+		}
+
+		else if ($field->field_type=='tags')
+		{
+			$query = ' SELECT t.id AS value_id, t.name AS value FROM #__flexicontent_tags AS t WHERE t.id<>0 AND t.id IN ('.implode(",",$post).')';
+		}
+
+		else if ($field->field_type=='createdby' || $field->field_type=='modifiedby')
+		{
 			$textcol = 'u.name';
-			$query 	= ' SELECT u.id AS value_id, '.$textcol.' AS value FROM #__users AS u WHERE u.id<>0 AND u.id = '.(int)$post[0];
-			
-		} else if ($field->field_type=='created' || $field->field_type=='modified') {
+			$query = ' SELECT u.id AS value_id, '.$textcol.' AS value FROM #__users AS u WHERE u.id<>0 AND u.id = '.(int)$post[0];
+		}
+
+		else if ($field->field_type=='created' || $field->field_type=='modified')
+		{
 			if ($nullDate===null) $nullDate	= $db->getNullDate();
 			
 			$date_filter_group = $field->parameters->get('date_filter_group'.$_s, 'month');
@@ -911,17 +930,24 @@ class plgFlexicontent_fieldsCore extends FCField
 			$obj = $db->loadObject();
 			$values = !$obj ? false : array( $obj->value_id => $obj->value) ;
 			unset($query);
-			
-		} else {
+		}
+
+		else
+		{
 			$values = $post;  // Other fields will be entered as is into the index !!
 		}
 		
-		if (!empty($query)) {
+		if (!empty($query))
+		{
 			$db->setQuery($query);
 			$_values = $db->loadAssocList();
 			$values = array();
-			foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
+			foreach ($_values as $v)
+			{
+				$values[$v['value_id']] = $v['value'];
+			}
 		}
+
 		return $values;
 	}
 	

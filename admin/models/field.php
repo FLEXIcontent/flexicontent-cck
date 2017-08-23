@@ -422,7 +422,7 @@ class FlexicontentModelField extends FCModelAdmin
 		}
 
 		// Load type assigments (an array of type IDs)
-		$record->tid = $this->getTypesselected($record->id);
+		$record->tid = $this->getFieldType($record->id);
 
 		// Needed during preprocessForm to load correct XML file
 		$this->field_type  = $record->field_type;
@@ -503,12 +503,12 @@ class FlexicontentModelField extends FCModelAdmin
 
 
 	/**
-	 * Method to get used types when performing an edit action
+	 * Method to the Field Type for a given or for current field ID
 	 * 
 	 * @return array
-	 * @since 1.5
+	 * @since 3.2
 	 */
-	function getTypesselected($pk = 0)
+	function getFieldType($pk = 0)
 	{
 		$pk = $pk ?: (int) $this->_id;
 
