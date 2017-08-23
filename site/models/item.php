@@ -391,7 +391,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
 		
 		// Get item layout (... if not already set), from the configuration parameter (that was decided above)
-		$ilayout = $this->_ilayout=='__request__' ? JRequest::getVar($_ilayout, false) : false;
+		$ilayout = $this->_ilayout=='__request__' ? $app->input->get($_ilayout, false, 'STRING') : false;
 		if (!$ilayout) {
 			$desktop_ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
 			$ilayout = !$useMobile ? $desktop_ilayout : $itemParams->get('ilayout_mobile', $typeParams->get('ilayout_mobile', $desktop_ilayout));
@@ -423,7 +423,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// Finally set the ilayout (template name) into model / item's parameters / HTTP Request
 		$this->setItemLayout($ilayout);
 		$itemParams->set('ilayout', $ilayout);
-		JRequest::setVar('ilayout', $ilayout);
+		$app->input->set('ilayout', $ilayout);
 	}
 
 
@@ -522,14 +522,14 @@ class FlexicontentModelItem extends ParentClassItem
 			if (!empty($this->isForm))
 			{
 				$this->menu_matches = false;
-				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
 				$this->menu_matches = $view_ok;
 			}
 			else
 			{
-				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
-				$cid_ok  = JRequest::getInt('cid') == (int) @$menu->query['cid'];
-				$id_ok   = JRequest::getInt('id')  == (int) @$menu->query['id'];
+				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$cid_ok  = $app->input->get('cid', 0, 'INT') == (int) @$menu->query['cid'];
+				$id_ok   = $app->input->get('id', 0, 'INT')  == (int) @$menu->query['id'];
 				$this->menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
 			}
 		}

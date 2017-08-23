@@ -620,7 +620,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Get available types and the currently selected/requested type
 		$types         = $model->getTypeslist();
-		$typesselected = $model->getTypesselected();
+		$typesselected = $model->getItemType();
 		
 		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
 		$tparams = $model->getTypeparams();
@@ -1173,9 +1173,9 @@ class FlexicontentViewItem extends JViewLegacy
 
 		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
-		$types = $this->get( 'Typeslist' );
-		$typesselected = $this->get( 'Typesselected' );
-		$subscribers   = $this->get( 'SubscribersCount' );
+		$types = $model->getTypeslist();
+		$typesselected = $model->getItemType();
+		$subscribers   = $model->getSubscribersCount();
 		$isnew = !$item->id;
 
 
@@ -1701,7 +1701,7 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		// Get can change categories ACL access
-		$type = $this->get( 'Typesselected' );
+		$type = $model->getItemType();
 		if ( $type->id )
 		{
 			$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);

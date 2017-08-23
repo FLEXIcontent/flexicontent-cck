@@ -129,23 +129,35 @@ abstract class FCModelAdmin extends JModelAdmin
 		$this->records_jtable = $this->records_jtable ?: 'flexicontent_' . $this->record_name . 's';
 
 		$jinput = JFactory::getApplication()->input;
+		$pk = null;
 
-		$id = $jinput->get('id', array(0), 'array');
-		JArrayHelper::toInteger($id, array(0));
-		$pk = (int) $id[0];
-
-		if (!$pk)
+		if ($pk === null)
 		{
-			$cid = $jinput->get('cid', array(0), 'array');
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = (int) $cid[0];
+			$id = $jinput->get('id', array(), 'array');
+			if (count($id))
+			{
+				JArrayHelper::toInteger($id);
+				$pk = (int) $id[0];
+			}
 		}
 
-		if (!$pk)
+		if ($pk === null)
 		{
-			$data = $jinput->get('jform', array('id'=>0), 'array');
+			$cid = $jinput->get('cid', array(), 'array');
+			if (count($cid))
+			{
+				JArrayHelper::toInteger($cid);
+				$pk = (int) $cid[0];
+			}
+		}
+
+		if ($pk === null)
+		{
+			$data = $jinput->get('jform', array(), 'array');
 			$pk = isset($data['id']) ? (int) $data['id'] : 0;
 		}
+
+		$pk = $pk ?: 0;
 		$this->setId($pk);
 	}
 

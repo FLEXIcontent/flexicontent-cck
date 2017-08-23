@@ -53,21 +53,21 @@ class FlexicontentControllerItems extends FlexicontentController
 		parent::__construct();
 
 		// Register task aliases
-		$this->registerTask( 'add',          'edit' );
-		$this->registerTask( 'apply_type',   'save' );
-		$this->registerTask( 'apply',        'save' );
-		$this->registerTask( 'apply_ajax',   'save' );
-		$this->registerTask( 'save2new',     'save' );
-		$this->registerTask( 'save2copy',    'save' );
+		$this->registerTask( 'add',            'edit' );
+		$this->registerTask( 'apply_type',     'save' );
+		$this->registerTask( 'apply',          'save' );
+		$this->registerTask( 'apply_ajax',     'save' );
+		$this->registerTask( 'save2new',       'save' );
+		$this->registerTask( 'save2copy',      'save' );
 
-		$this->registerTask( 'unfeatured',   'featured' );
+		$this->registerTask( 'unfeatured',     'featured' );
 
 		$this->option = $this->input->get('option', '', 'cmd');
 		$this->task   = $this->input->get('task', '', 'cmd');
 		$this->view   = $this->input->get('view', '', 'cmd');
 		$this->format = $this->input->get('format', '', 'cmd');
 
-		// Get return URL
+		// Get custom return URL, if this was present in the HTTP request
 		$this->returnURL = $this->input->get('return-url', null, 'base64');
 		$this->returnURL = $this->returnURL ? base64_decode($this->returnURL) : $this->returnURL;
 
@@ -126,15 +126,37 @@ class FlexicontentControllerItems extends FlexicontentController
 		$data['id'] = (int) $data['id'];
 		$isnew = $data['id'] == 0;
 
-		// If new make sure that type id is set too, before creating the model
+		// Extra steps before creating the model
 		if ($isnew)
 		{
-			$this->input->set('typeid', (int) @ $data['type_id']);
+			// Nothing needed
 		}
 
 		// Get the model
 		$model = $this->getModel('item');
 		$model->setId($data['id']);  // Make sure id is correct
+		$model->getState();   // Populate state
+		$record = $model->getItem($data['id'], $check_view_access=false, $no_cache=true, $force_version=0);
+
+		// Make sure type is set into the given data, using type from model, if one was not given
+		$data['type_id'] = empty($data['type_id'])
+			? $model->get('type_id')
+			: (int) $data['type_id'];
+
+		// Set frontend item form as default return URL
+		if ($app->isSite())
+		{
+			$Itemid = $this->input->get('Itemid', 0, 'int');  // maintain current menu item if this was given
+			if (!$isnew)
+			{
+				$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($record->slug, $record->categoryslug, $Itemid));
+				$this->returnURL = $item_url . ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit';
+			}
+			elseif($Itemid)
+			{
+				$this->returnURL = JRoute::_('index.php?Itemid=' . $Itemid);
+			}
+		}
 
 		// The save2copy task needs to be handled slightly differently.
 		if ($this->task == 'save2copy')
@@ -146,31 +168,28 @@ class FlexicontentControllerItems extends FlexicontentController
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 				$this->setMessage($this->getError(), 'error');
 
-				// For errors, we redirect back to refer
-				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+				// Redirect back to the edit form
+				$this->setRedirect($this->returnURL);
 				return false;
 			}
 
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
 			$isnew = 1;
 			$data['id'] = 0;
-			$data['type_id'] = $model->get('type_id') ?: (int) @ $data['type_id'];
 			$data['associations'] = array();
 			$this->task = 'apply';
-
-			// Set HTTP request Needed for Frontend Model, to-do remove
-			$this->input->set('id', 0);
-			$this->input->set('typeid', $data['type_id']);   // Needed for FE, to do remove
 
 			// Keep existing model data (only clear ID)
 			$model->set('id', 0);
 			$model->setProperty('_id', 0);
-			$model->setProperty('_typeid', $data['type_id']);
+			$model->setState('item.id', 0);
 		}
 
 		// Get merged parameters: component, type, and (FE only) menu
+		// We will force using new type_id only for the purpose of getting type parameters
+		// Below a check will be made if this type is allowed to the user
 		$params = new JRegistry();
-		$model_params = $model->getComponentTypeParams();
+		$model_params = $model->getComponentTypeParams($data['type_id']);
 		$params->merge($model_params);
 
 		// For frontend merge the active menu parameters
@@ -218,14 +237,16 @@ class FlexicontentControllerItems extends FlexicontentController
 		$unique_tmp_itemid = $this->input->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 
-		// Auto title for some content types
-		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
-		
-		
-		
-		// *************************************
-		// ENFORCE can change category ACL perms
-		// *************************************
+		// Auto title for some content types, set it to pass validation. NOTE real value will be created via onBeforeSaveField event
+		if ( $params->get('auto_title', 0) )
+		{
+			$data['title'] = (int) $data['id'];  // item id or ZERO for new items
+		}
+
+
+		// ***
+		// *** ENFORCE can change category ACL perms
+		// ***
 		
 		$perms = FlexicontentHelperPerm::getPerm();
 		
@@ -305,7 +326,6 @@ class FlexicontentControllerItems extends FlexicontentController
 		}		
 
 
-
 		// ***
 		// *** Basic Form data validation
 		// ***
@@ -334,8 +354,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
 			$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
-			// For errors, we redirect back to refer
-			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			// Redirect back to the edit form
+			$this->setRedirect($this->returnURL);
 
 			if ( $fc_doajax_submit )
 				jexit(flexicontent_html::get_system_messages_html());
@@ -376,35 +396,42 @@ class FlexicontentControllerItems extends FlexicontentController
 		//echo "<pre>"; print_r($diff_arr); jexit();
 		
 		
-		// ********************************************************************************
-		// PERFORM ACCESS CHECKS, NOTE: we need to check access again, despite having
-		// checked them on edit form load, because user may have tampered with the form ... 
-		// ********************************************************************************
+		// ***
+		// *** PERFORM ACCESS CHECKS, NOTE: we need to check access again, despite having
+		// *** checked them on edit form load, because user may have tampered with the form ... 
+		// ***
 		
 		$itemAccess = $model->getItemAccess();
 		$canAdd  = $itemAccess->get('access-create');  // includes check of creating in at least one category
 		$canEdit = $itemAccess->get('access-edit');    // includes privileges edit and edit-own
-		
+
 		$type_id = (int) @ $validated_data['type_id'];  // Typecast to int, (already done for J2.5 via validating)
-		if ( !$isnew && $model->get('type_id') == $type_id ) {
-			// Existing item with Type not being ALTERED, content type can be maintained regardless of privilege
+
+		// Existing item with Type not being ALTERED, content type can be maintained regardless of privilege
+		if ( !$isnew && $model->get('type_id') == $type_id )
+		{
 			$canCreateType = true;
-		} else {
-			// New item or existing item with Type is being ALTERED, check privilege to create items of this type
+		}
+
+		// New item or existing item with Type is being ALTERED, check privilege to create items of this type
+		else
+		{
 			$canCreateType = $model->canCreateType( array($type_id), true, $types );
 		}
 
 
-		// *****************************************************************
-		// Calculate user's CREATE / EDIT privileges on current content item
-		// *****************************************************************
+		// ***
+		// *** Calculate user's CREATE / EDIT privileges on current content item
+		// ***
 		
 		$hasCoupon = false;  // Normally used in frontend only
 		if (!$isnew)
 		{
-			// If no edit privilege, check if item is editable till logoff
-			if ( !$canEdit ) {
-				if ($session->has('rendered_uneditable', 'flexicontent')) {
+			if ( !$canEdit )
+			{
+				// No edit privilege, check if item is editable till logoff
+				if ($session->has('rendered_uneditable', 'flexicontent'))
+				{
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 					$hasCoupon = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
@@ -413,7 +440,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		// Special CASEs of overriding CREATE ACL in FrontEnd via menu item
-		else if ($app->isSite())
+		elseif ($app->isSite())
 		{
 			// Allow creating via submit menu OVERRIDE
 			if ( $allowunauthorize )
@@ -483,13 +510,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			$db->setQuery( $query );
 			$before_cats = $db->loadObjectList('id');
 			$before_maincat = $model->get('catid');
-			$original_item = $model->getItem($validated_data['id'], $check_view_access=false, $no_cache=true, $force_version=0);
 		}
 		
 		
-		// ****************************************
-		// Try to store the form data into the item
-		// ****************************************
+		// ***
+		// *** Try to store the form data into the item
+		// ***
 
 		// If saving fails, do any needed cleanup, and then redirect back to item form
 		if ( ! $model->store($validated_data) )
@@ -506,7 +532,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$this->setMessage($this->getError(), 'error');
 
 			// For errors, we redirect back to refer
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			$this->setRedirect($this->returnURL);
 			
 			// Try to check-in the record, but ignore any new errors
 			try {
@@ -521,9 +547,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// **************************************************
-		// Check in model and get item id in case of new item
-		// **************************************************
+		// ***
+		// *** Check in model and get item id in case of new item
+		// ***
 		$model->checkin();
 		$validated_data['id'] = $isnew ? (int) $model->get('id') : $validated_data['id'];
 		
@@ -545,9 +571,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$canPublish = $model->canEditState( $item ) || $hasCoupon;
 		
 		
-		// ********************************************************************************************
-		// Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
-		// ********************************************************************************************
+		// ***
+		// *** Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
+		// ***
 		$is_first_save = true;
 		if ($session->has('saved_fcitems', 'flexicontent'))
 		{
@@ -559,9 +585,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
 		
 		
-		// ********************************************
-		// Get categories added / removed from the item
-		// ********************************************
+		// ***
+		// *** Get categories added / removed from the item
+		// ***
 		$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 			. ' WHERE rel.itemid = '.(int) $model->get('id');
@@ -585,9 +611,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// *******************************************************************************************************************
-		// We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
-		// *******************************************************************************************************************
+		// ***
+		// *** We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
+		// ***
 		$notify_emails = array();
 		if ( $is_first_save || $cats_altered || $params->get('nf_enable_debug',0) )
 		{
@@ -642,9 +668,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// *********************************************************************************************************************
-		// If there are emails to notify for current saving case, then send the notifications emails, but 
-		// *********************************************************************************************************************
+		// ***
+		// *** If there are emails to notify for current saving case, then send the notifications emails, but 
+		// ***
 		if ( !empty($notify_emails) )
 		{
 			$notify_vars = new stdClass();
@@ -655,15 +681,15 @@ class FlexicontentControllerItems extends FlexicontentController
 			$notify_vars->notify_text   = $notify_text;
 			$notify_vars->before_cats   = $before_cats;
 			$notify_vars->after_cats    = $after_cats;
-			$notify_vars->original_item = @ $original_item;
+			$notify_vars->original_item = $record;
 			
 			$model->sendNotificationEmails($notify_vars, $params, $manual_approval_request=0);
 		}
 		
 		
-		// ***************************************************
-		// CLEAN THE CACHE so that our changes appear realtime
-		// ***************************************************
+		// ***
+		// *** CLEAN THE CACHE so that our changes appear realtime
+		// ***
 		$cache = FLEXIUtilities::getCache($group='', 0);
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
@@ -672,17 +698,17 @@ class FlexicontentControllerItems extends FlexicontentController
 		$cache->clean('com_flexicontent_filters');
 		
 		
-		// ****************************************************************************************************************************
-		// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
-		// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
-		// ****************************************************************************************************************************
+		// ***
+		// *** Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
+		// *** and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
+		// ***
 		$asset = 'com_content.article.' . $model->get('id');
 		$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 		
 		
-		// *******************************************************************************************************
-		// Check if user can not edit item further (due to changed main category, without edit/editown permission)
-		// *******************************************************************************************************
+		// ***
+		// *** Check if user can not edit item further (due to changed main category, without edit/editown permission)
+		// ***
 		if (!$canEdit)
 		{
 			// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
@@ -734,9 +760,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// ****************************************************************
-		// Check for new Content Item is being closed, and clear some flags
-		// ****************************************************************
+		// ***
+		// *** Check for new Content Item is being closed, and clear some flags
+		// ***
 		
 		if ($this->task!='apply' && $this->task!='apply_type' && $newly_submitted_item )
 		{
@@ -758,9 +784,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// ****************************************
-		// Saving is done, decide where to redirect
-		// ****************************************
+		// ***
+		// *** Saving is done, decide where to redirect
+		// ***
 		switch ($this->task)
 		{
 			// REDIRECT CASE FOR APPLY / SAVE AS COPY: Save and reload the item edit form
@@ -773,9 +799,11 @@ class FlexicontentControllerItems extends FlexicontentController
 			// REDIRECT CASE FOR SAVE and NEW: Save and load new item form
 			case 'save2new':
 				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = $type_id ?
-					'index.php?option=com_flexicontent&view=item&typeid='.$type_id :
-					'index.php?option=com_flexicontent&view=item' ;
+				$link =
+					'index.php?option=com_flexicontent&view=item' .
+					'&typeid=' . $model->get('type_id') .
+					'&filter_cats=' . $model->get('catid')
+				;
 				break;
 
 			// REDIRECT CASES FOR SAVING

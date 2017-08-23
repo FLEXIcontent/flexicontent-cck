@@ -161,15 +161,28 @@ class ParentClassItem extends FCModelAdmin
 
 		$jinput = JFactory::getApplication()->input;
 
-		// Set current category ID and current type ID only for new items
-		$curcatid = $this->_id
-			? 0
+		// Set current category ID and current type ID via URL variables (only for new items)
+		$currcatid = $this->_id
+			? 0  // existing item, zero means set to its main category
 			: $jinput->get('cid', 0, 'int');
-		$typeid =  $this->_id
-			? 0
+		$typeid = $this->_id
+			? 0  // existing item, zero means set to its current type
 			: $jinput->get('typeid', 0, 'int');
 
-		$this->setId($this->_id, $curcatid, $typeid);
+		// For new item, try to use posted data
+		if (!$this->_id && (!$currcatid || !$typeid))
+		{
+			$data = $jinput->get('jform', array(), 'array');
+
+			$currcatid = !$currcatid && isset($data['catid'])
+				? (int) $data['catid']
+				: $currcatid;
+			$typeid = !$typeid && isset($data['type_id'])
+				? (int) $data['type_id']
+				: $typeid;
+		}
+
+		$this->setId($this->_id, $currcatid, $typeid, null);
 	}
 
 
@@ -179,44 +192,52 @@ class ParentClassItem extends FCModelAdmin
 	 * @access	public
 	 * @param	int record identifier
 	 */
-	function setId($id, $currcatid=0, $typeid=0, $ilayout=null)
+	function setId($id, $currcatid=null, $typeid=null, $ilayout=null)
 	{
 		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
 		{
+			$this->_id = (int) $id;
 			$this->_record = null;
 			$this->_version = null;
 			$this->_cparams = null;
 		}
-		$this->_id     = (int) $id;
+
+		// Same ID if not setting custom category / type / layout then return
+		elseif ($currcatid === null && $typeid === null && $ilayout === null)
+		{
+			return;
+		}
 
 		// Set current category and verify that item is assigned to this category, (SECURITY concern)
-		$this->_cid = (int) $currcatid;
+		$this->_cid = $currcatid !== null
+			? (int) $currcatid
+			: (int) $this->_cid;
 
-		// Clear cid, if category not assigned to the item
 		if ($this->_id)
 		{
 			$query = 'SELECT catid '
 				. ' FROM #__flexicontent_cats_item_relations '
 				. ' WHERE itemid = ' . (int) $this->_id
 				. '  AND catid = '. (int) $this->_cid;
-			$this->_db->setQuery($query);
-			$this->_cid = $this->_db->loadResult() ? $this->_cid : 0;
+			$this->_cid = (int) $this->_db->setQuery($query)->loadResult();
 		}
 
 		// Set item layout
 		$this->_ilayout = $ilayout;
 
-		// Set item type, will be verified below
-		$this->_typeid = $typeid;
+		// Set item type, then, -for new item- verify item type exists, -for existing item- its current type will be forced (SECURITY concern)
+		$this->_typeid = $typeid !== null
+			? (int) $typeid
+			: (int) $this->_typeid;
 
-		// Get the type of an existing item, or check that the type of new item exists
+		// Verify item's type. This method verify new item type exists or gets item type for existing item
 		if ($this->_id || $this->_typeid)
 		{
-			$this->getTypesselected();  // Check, set, or clear member variable: $this->_typeid
+			$this->_typeid = $this->getItemType()->id;
 		}
 
-		// Recalcuclate if needed, component + type parameters
+		// Recalculate if needed, component + type parameters
 		$this->getComponentTypeParams();
 	}
 
@@ -228,27 +249,37 @@ class ParentClassItem extends FCModelAdmin
 	 * @access	public
 	 * @return	int item identifier
 	 */
-	function getComponentTypeParams()
+	function getComponentTypeParams($forced_typeid = 0)
 	{
 		// Calculate component + type parameters
-		if ($this->_cparams) return $this->_cparams;
-		$app = JFactory::getApplication();
-		
+		static $CTparams = array();
+		if (isset($CTparams[$this->_typeid]))
+		{
+			$this->_cparams = $CTparams[$this->_typeid];
+			return $this->_cparams;
+		}
+
 		// Get component parameters
 		$params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
-		
+
 		// Merge into them the type parameters, *(type was set/verified above)
-		if ($this->_typeid)
+		if ($this->_typeid || $forced_typeid)
 		{
-			$tparams = $this->getTypeparams();
+			$tparams = $this->getTypeparams($forced_typeid);
 			$tparams = new JRegistry($tparams);
 			$params->merge($tparams);
 		}
-		
+
+		// Return forced parameters without setting them into the object
+		if ($forced_typeid)
+		{
+			return $params;
+		}
+
 		// Set and return component + type parameters
-		$this->_cparams = $params;
+		$this->_cparams = $CTparams[$this->_typeid] = $params;
 		return $this->_cparams;
 	}
 
@@ -332,7 +363,6 @@ class ParentClassItem extends FCModelAdmin
 		// --. Initialize new item, if not already initialized, currently this succeeds always
 		else if (!$this->_record)
 		{
-			$this->_typeid = $jinput->get('typeid', 0, 'int');  // Get this again since it might have been change since model was constructed
 			$this->_initRecord();
 			if ( !$app->isAdmin() )
 			{
@@ -341,9 +371,12 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 		
-		// Verify item's type
-		$this->_record->type_id = $this->getTypesselected()->id;  // Also checks, sets, or clears member variable: $this->_typeid
-		
+		// Verify item's type. This method verify new item type exists or gets item type for existing item
+		$this->_typeid = $this->_record->type_id = $this->getItemType()->id;
+
+		// Recalculate if needed, component + type parameters
+		$this->getComponentTypeParams();
+
 		return $this->_record;
 	}
 
@@ -595,6 +628,7 @@ class ParentClassItem extends FCModelAdmin
 				$item = & $data;
 			}
 			$this->_typeid = $item->type_id;
+			$this->getComponentTypeParams();
 			
 			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
 			$item->text = $item->introtext;
@@ -864,6 +898,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$this->_record = false;
 			$this->_typeid = 0;
+			$this->getComponentTypeParams();
 			if (!$version)
 			{
 				$items[$pk] = false;
@@ -1297,19 +1332,23 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		$allow = null;
-		if (count($cats)) {
+		if (count($cats))
+		{
 			$allow = true;
-			foreach ($cats as $curcatid) {
+			foreach ($cats as $currcatid)
+			{
 				// If the category has been passed in the data or URL check it.
-				$cat_allowed = $user->authorise('core.create', 'com_content.category.'.$curcatid);
-				if (!$cat_allowed) {
-					return JError::raiseWarning( 500, "No access to add item to category with id ".$curcatid );
+				$cat_allowed = $user->authorise('core.create', 'com_content.category.' . $currcatid);
+				if (!$cat_allowed)
+				{
+					return JError::raiseWarning( 500, "No access to add item to category with id " . $currcatid );
 				}
 				$allow &= $cat_allowed;
 			}
 		}
 		
-		if ($allow === null) {
+		if ($allow === null)
+		{
 			// no categories specified, revert to the component permissions.
 			$allow	= $user->authorise('core.create', 'com_flexicontent');
 		}
@@ -1360,14 +1399,13 @@ class ParentClassItem extends FCModelAdmin
 		// Get some variables
 		$app     = JFactory::getApplication();
 		$user    = JFactory::getUser();
-		$cparams = $this->_cparams;
+
 
 		// ***
 		// *** Set model's default values into the record properties, overriding DB table column default values
 		// ***
 
 		$this->setDefaults($record);
-
 
 
 		// ***
@@ -2132,26 +2170,27 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
+
+		// Only create the item not save the CUSTOM fields yet, no need to rebind this is already done above
 		if( $isNew )
 		{
-			// Only create the item not save the CUSTOM fields yet, no need to rebind this is already done above
 			$this->applyCurrentVersion($item, $data, $createonly=true);
-			if ($cparams->get('auto_title', 0))  // AUTOMATIC TITLE, set to item ID
-			{
-				$item->title = $item->id;
-				$this->_db->setQuery('UPDATE #__content SET title=id, alias=id WHERE id=' . (int)$item->id);
-				$this->_db->execute();
-			}
 		}
+
+		// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
+		// e.g. because getForm() is used to validate input data and may have set an empty item and empty id
+		// e.g. type_id of item may have been altered by authorized users
 		else
 		{
-			// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
-			// e.g. a getForm() used to validate input data may have set an empty item and empty id
-			// e.g. type_id of item may have been altered by authorized users
 			$this->_id     = $item->id;
-			$this->_record   = & $item;
+			$this->_record = & $item;
 			$this->_typeid = $item->type_id;
+			$this->getComponentTypeParams();
 		}
+
+		// Set item parameters, to the component + type parametes e.g. needed by onBeforeSaveField event
+		$item->parameters = $this->_cparams;
+
 		if ( $print_logging_info ) $fc_run_times['item_store_core'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -2165,9 +2204,11 @@ class ParentClassItem extends FCModelAdmin
 		if ($task != 'apply_type')
 		{
 			if ( $print_logging_info ) $start_microtime = microtime(true);
-			$files = JRequest::get( 'files', JREQUEST_ALLOWRAW );
+
+			$files = $app->input->files->get('files');
 			$core_data_via_events = null;
 			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events);
+
 			if ( $print_logging_info ) $fc_run_times['item_store_custom'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			
 			// Re-bind (possibly modified data) to the item
@@ -2356,15 +2397,15 @@ class ParentClassItem extends FCModelAdmin
 		$print_logging_info = $cparams->get('print_logging_info');
 		$last_version = (int) FLEXIUtilities::getLastVersions($item->id, true);
 		$mval_query = true;
-		
+
 		if ( $print_logging_info ) global $fc_run_times;
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		
-		
-		// ********************************
-		// Checks for untranslatable fields
-		// ********************************
-		
+
+
+		// ***
+		// *** Checks for untranslatable fields
+		// ***
+
 		// CASE 1. Check if saving an item that translates an original content in site's default language
 		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
 		$useAssocs = $this->useAssociations();
@@ -2382,11 +2423,12 @@ class ParentClassItem extends FCModelAdmin
 			$assoc_item_ids = array_keys($_langAssocs);
 		}
 		if (empty($assoc_item_ids)) $assoc_item_ids = array();
-		
-		
-		// ***************************************************************************************************************************
-		// Get item's fields ... and their values (for untranslatable fields the field values from original content item are retrieved
-		// ***************************************************************************************************************************		
+
+
+		// ***
+		// *** Get item's fields ... and their values (for untranslatable fields the field values from original content item are retrieved
+		// ***
+
 		$original_content_id = 0;
 		if ($get_untraslatable_values)
 		{
@@ -2401,12 +2443,13 @@ class ParentClassItem extends FCModelAdmin
 		$fields = $this->getExtrafields($force=true, $original_content_id, $old_item);
 		$item->fields = & $fields;
 		$item->calculated_fieldvalues = array();
-		
-		
-		// ******************************************************************************************************************
-		// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
-		// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
-		// ******************************************************************************************************************
+
+
+		// ***
+		// *** Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
+		// *** to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
+		// ***
+
 		$searchindex = array();
 		//$qindex = array();
 		$core_data_via_events = array();  // Extra validation for some core fields via onBeforeSaveField
@@ -2526,12 +2569,11 @@ class ParentClassItem extends FCModelAdmin
 			unset($item->calculated_fieldvalues);
 		}
 		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		
-		// **********************
-		// Empty per field TABLES
-		// **********************
+
+
+		// ***
+		// *** Empty per field TABLES
+		// ***
 		
 		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
 		$filterables = array_keys($filterables);
@@ -2587,13 +2629,13 @@ class ParentClassItem extends FCModelAdmin
 			$this->_db->setQuery($query);
 			$this->_db->execute();
 		}
-		
-		
-		
-		// ****************************************************************************************************************************
-		// Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
-		//  event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
-		// ****************************************************************************************************************************
+
+
+		// ***
+		// *** Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
+		// *** event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		
 		$ai_query_vals = array();
@@ -2662,13 +2704,14 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		if ( $print_logging_info ) @$fc_run_times['fields_value_indexing'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
+
+
+		// ***
+		// *** IF new version is approved, remove old version values from the field table
+		// ***
+
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		
-		// **************************************************************************
-		// IF new version is approved, remove old version values from the field table
-		// **************************************************************************
+
 		if($data['vstate']==2)
 		{
 			//echo "delete __flexicontent_fields_item_relations, item_id: " .$item->id;
@@ -2702,11 +2745,12 @@ class ParentClassItem extends FCModelAdmin
 				$this->_db->execute();
 			}
 		}
-		
-		
-		// *******************************************
-		// Loop through Fields saving the field values
-		// *******************************************
+
+
+		// ***
+		// *** Loop through Fields saving the field values
+		// ***
+
 		if ($fields)
 		{
 			// Do not save if versioning disabled or item has no type (version 0)
@@ -2850,10 +2894,10 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 
-			// *********************************************
-			// Insert values in item fields versioning table
-			// *********************************************
-			
+			// ***
+			// *** Insert values in item fields versioning table
+			// ***
+
 			if ( count($ver_query_vals) )
 			{
 				$query = "INSERT INTO #__flexicontent_items_versions "
@@ -2866,10 +2910,10 @@ class ParentClassItem extends FCModelAdmin
 			}
 
 
-			// *******************************************
-			// Insert values in item fields relation table
-			// *******************************************
-			
+			// ***
+			// *** Insert values in item fields relation table
+			// ***
+
 			if ( count($rel_query_vals) )
 			{
 				$query = "INSERT INTO #__flexicontent_fields_item_relations "
@@ -2886,10 +2930,10 @@ class ParentClassItem extends FCModelAdmin
 			//echo "<pre>"; print_r($rel_update_objs); exit;
 
 
-			// **************************************************************
-			// Save other versioned item data into the field versioning table
-			// **************************************************************
-			
+			// ***
+			// *** Save other versioned item data into the field versioning table
+			// ***
+
 			// a. Save a version of item properties that do not have a corresponding CORE Field
 			if ( $record_versioned_data ) {
 				$obj = new stdClass();
@@ -2929,11 +2973,12 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		if ( $print_logging_info ) @$fc_run_times['fields_value_saving'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		// ******************************
-		// Trigger onAfterSaveField Event
-		// ******************************
+
+
+		// ***
+		// *** Trigger onAfterSaveField Event
+		// ***
+
 		if ( $fields )
 		{
 			if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -2946,7 +2991,7 @@ class ParentClassItem extends FCModelAdmin
 			}
 			if ( $print_logging_info ) @$fc_run_times['onAfterSaveField_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
-		
+
 		return true;
 	}
 
@@ -2982,8 +3027,9 @@ class ParentClassItem extends FCModelAdmin
 		
 		// Set model properties
 		$this->_id     = $item->id;
-		$this->_record   = & $item;
+		$this->_record = & $item;
 		$this->_typeid = $item->type_id;
+		$this->getComponentTypeParams();
 		
 		
 		// ****************************
@@ -3454,56 +3500,49 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Decide item type id for existing or new item ... verifying that the type exists ...
-	 * NOTE: for new items the value of 'typeid' variable out of the JRequest array is used
+	 * Find the item type for a given or for current item ID, ... verifying that the type exists ...
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypesselected($force = false)
+	function getItemType()
 	{
-		static $typedata = array();
-		
-		if ( !$this->_id && !$this->_typeid)
+		static $itemTypes = array();
+		static $knownTypes = null;
+
+		if ($knownTypes === null)
 		{
-			$_typedata = new stdClass();
-			$_typedata->id = 0;
-			$_typedata->name = null;
+			$query = 'SELECT id, name FROM #__flexicontent_types';
+			$knownTypes = $this->_db->setQuery($query)->loadObjectList('id');
 		}
-		
-		if ( !$force && isset($typedata[$this->_typeid]) ) return $typedata[$this->_typeid];
-		
+		$knownTypes[0] = (object) array('id' => 0, 'name'=> null);
+
+		// New item, just verify item type exists
+		if ( !$this->_id )
+		{
+			return isset($knownTypes[$this->_typeid])
+				? $knownTypes[$this->_typeid]
+				: (object) array('id' => 0, 'name'=> null);
+		}
+
+		// Existing item, return its type if already known
+		elseif (isset($itemTypes[$this->_id]))
+		{
+			return $itemTypes[$this->_id];
+		}
+
 		// Existing item, get its type
-		if ($this->_id)
-		{
-			$query = 'SELECT ie.type_id as id,t.name FROM #__flexicontent_items_ext as ie'
-				. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
-				. ' WHERE ie.item_id = ' . (int)$this->_id;
-			$this->_db->setQuery($query);
-			$_typedata = $this->_db->loadObject();
-			if ($_typedata) $this->_typeid = $_typedata->id;
-		}
-		
-		 // New item check type exists
-		else if ( (int)$this->_typeid )
-		{
-			$query = 'SELECT t.id,t.name FROM #__flexicontent_types as t'
-				. ' WHERE t.id = ' . (int)$this->_typeid;
-			$this->_db->setQuery($query);
-			$_typedata = $this->_db->loadObject();
-			if (!$_typedata) $this->_typeid = 0;
-		}
-		
-		// Create default type object, if type not specified or not found
-		if (empty($_typedata)) {
-			$_typedata = new stdClass();
-			$_typedata->id = 0;
-			$_typedata->name = null;
-		}
-		
-		// Cache and return
-		$typedata[$this->_typeid] = & $_typedata;
-		return $typedata[$this->_typeid];
+		$query = 'SELECT ie.type_id'
+			. ' FROM #__flexicontent_items_ext as ie'
+			. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
+			. ' WHERE ie.item_id = ' . (int) $this->_id;
+		$typeID = (int) $this->_db->setQuery($query)->loadResult();
+
+		$itemTypes[$this->_id] = isset($knownTypes[$typeID])
+			? $knownTypes[$typeID]
+			: $knownTypes[0];
+
+		return $itemTypes[$this->_id];
 	}
 
 
@@ -3557,33 +3596,31 @@ class ParentClassItem extends FCModelAdmin
 	 * @return string
 	 * @since 1.5
 	 */
-	function getTypeparams($force = false)
+	function getTypeparams($forced_typeid = 0)
 	{
 		static $typeparams = array();
-		
-		if ( !$this->_id && !$this->_typeid) return '';
-		
-		if ( !$force && isset($typeparams[$this->_typeid]) ) return $typeparams[$this->_typeid];
-		
-		if ( $this->_id || $this->_typeid)
+
+		$typeid = $forced_typeid ?: ($this->_id ? 0 : $this->_typeid);
+
+		if ($typeid && isset($typeparams[$typeid]))
 		{
-			$query	= 'SELECT t.id, t.attribs'
-				. ' FROM #__flexicontent_types AS t'
-				.( $this->_id ?
-					' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id WHERE ie.item_id = ' . (int)$this->_id :
-					' WHERE t.id = ' . (int)$this->_typeid
-				);
-			$this->_db->setQuery($query);
-			if ( $data = $this->_db->loadObject() )
-			{
-				$this->_typeid = $data->id;
-				$attribs = $data->attribs;
-			}
+			return $typeparams[$typeid];
 		}
-		
+
+		$query = 'SELECT t.id, t.attribs'
+			. ' FROM #__flexicontent_types AS t'
+			.( !$forced_typeid && $this->_id
+				? ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id WHERE ie.item_id = ' . (int) $this->_id
+				: ' WHERE t.id = ' . (int) ($forced_typeid ?: $this->_typeid)
+			);
+		$data = $this->_db->setQuery($query)->loadObject();
+
 		// Cache and return
-		$typeparams[$this->_typeid] = !empty($attribs) ? $attribs : '';
-		return $typeparams[$this->_typeid];
+		if (!$data)
+		{
+			return '';
+		}
+		return $typeparams[$data->id] = $data->attribs;
 	}
 
 
@@ -3742,7 +3779,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get the FIELDs (configuration and values) belonging to the Content Type of:
-	 * (a) the current item or (b) the one specified in the URL (variable 'typeid')
+	 * (a) either the current item or (b) or the current _typeid (new items)
 	 *
 	 * NOTE: Fields are skipped if (a) are not pubished OR (b) no longer belong to the item type
 	 * NOTE: VERSIONED field values will be retrieved if version is set in the HTTP REQUEST !!!
@@ -3753,22 +3790,27 @@ class ParentClassItem extends FCModelAdmin
 	function getExtrafields($force = false, $lang_parent_id = 0, $old_item=null)
 	{
 		static $fields;
-		if ($fields && !$force) return $fields;
-		
+		if ($fields && !$force)
+		{
+			return $fields;
+		}
+
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
-		$typeid = $this->get('type_id');   // Get item's type_id, loading item if neccessary
-		$typeid = $typeid ? $typeid : JRequest::getVar('typeid', 0, '', 'int');
-		$type_join = ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$typeid;
+
+		// Get item's type_id, loading item if neccessary
+		$typeid = $this->_id ? $this->get('type_id') : 0;
+		$typeid = $typeid ?: $this->_typeid;
+
+		$type_join = ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = ' . $typeid;
 		
 		$query = 'SELECT  fi.*'
-				.' FROM #__flexicontent_fields AS fi'
-				.($typeid ? $type_join : '')            // Require field belonging to item type
-				.' WHERE fi.published = 1'              // Require field published
-				.($typeid ? '' : ' AND fi.iscore = 1')  // Get CORE fields when typeid not set
-				.' ORDER BY '. ($typeid ? 'ftrel.ordering, ' : '') .'fi.ordering, fi.name'
-				;
-		$this->_db->setQuery($query);
-		$fields = $this->_db->loadObjectList('name');
+			. ' FROM #__flexicontent_fields AS fi'
+			. ($typeid ? $type_join : '')            // Require field belonging to item type
+			. ' WHERE fi.published = 1'              // Require field published
+			. ($typeid ? '' : ' AND fi.iscore = 1')  // Get CORE fields when typeid not set
+			. ' ORDER BY '. ($typeid ? 'ftrel.ordering, ' : '') .'fi.ordering, fi.name'
+			;
+		$fields = $this->_db->setQuery($query)->loadObjectList('name');
 		
 		// Get values of CUSTOM fields for current item
 		$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);

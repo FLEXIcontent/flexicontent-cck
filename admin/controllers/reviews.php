@@ -73,7 +73,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$this->view   = $this->input->get('view', '', 'cmd');
 		$this->format = $this->input->get('format', '', 'cmd');
 
-		// Get return URL
+		// Get custom return URL, if this was present in the HTTP request
 		$this->returnURL = $this->input->get('return-url', null, 'base64');
 		$this->returnURL = $this->returnURL ? base64_decode($this->returnURL) : $this->returnURL;
 

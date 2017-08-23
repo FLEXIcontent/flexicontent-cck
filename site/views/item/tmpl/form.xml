@@ -10,7 +10,7 @@
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="typeid" type="types" default="" label="FLEXI_MENU_FORM_TYPE" description="FLEXI_MENU_FORM_TYPE_DESC" user_selection="1" /> 
-			<field name="" type="separator" default="FLEXI_MENU_OVERRIDE_FORM_CONFIG_ACL_DESC" level="" class="alert alert-info fcpadded fcinlineblock" />
+			<field name="" type="separator" default="FLEXI_MENU_OVERRIDE_FORM_CONFIG_ACL_DESC" level="" class="fc-mssg-inline fc-info" />
 		</fieldset>
 	</fields>
 		
@@ -159,7 +159,7 @@
 		<fieldset name="acloverrides" label="FLEXI_MENU_OVERRIDE_SUBMIT_PUBLISH_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" label="" type="separator" default="FLEXI_MENU_UNAUTHORIZED_USERS" level="level1" />
-			<field name="" type="separator" default="- Override 'create' permission (ACL) of TYPES. &lt;br/&gt; - CATEGORIES 'create' permission (ACL) is still enforced" level="" class="alert alert-info fcpadded fcinlineblock" />
+			<field name="" type="separator" default="- Override 'create' permission (ACL) of TYPES. &lt;br/&gt; - CATEGORIES 'create' permission (ACL) is still enforced" level="" class="fc-mssg-inline fc-info" />
 			<field name="allowunauthorize" type="radio" default="0" label="FLEXI_MENU_UNAUTHORIZED_SUBMIT" description="FLEXI_MENU_UNAUTHORIZED_SUBMIT_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1">FLEXI_YES</option>
@@ -180,7 +180,7 @@
 		<fieldset name="catpermsoverride" label="FLEXI_MENU_OVERRIDE_CATEGORY_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements" >
 
 			<field name="" label="" type="separator" default="FLEXI_CATEGORIES" level="level1"/>
-			<field name="" type="separator" default="- Override 'create' permission (ACL) of CATEGORIES. &lt;br/&gt; - TYPES 'create' permission (ACL) is still enforced" level="" class="alert alert-info fcpadded fcinlineblock" />
+			<field name="" type="separator" default="- Override 'create' permission (ACL) of CATEGORIES. &lt;br/&gt; - TYPES 'create' permission (ACL) is still enforced" level="" class="fc-mssg-inline fc-info" />
 			<field name="overridecatperms" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="overridecatperms_on">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1" show_list="overridecatperms_on" hide_list="">FLEXI_YES</option>
@@ -201,7 +201,7 @@
 				<option value="0" show_list="using_fixed_cats" hide_list="using_mul_cats">FLEXI_MENU_LOCKED_SUBMIT_IN_ALL_CATS</option>
 			</field>
 			
-			<field name="" label="" type="separator" default="Note: Users are not allowed to submit into multiple categories, unless they have ACL (COMPONENT) permission &lt;b&gt;'Assign multiple categories to items'&lt;/b&gt;" level="level3" class="overridecatperms_on using_mul_cats alert alert-info fcpadded" />
+			<field name="" label="" type="separator" default="Note: Users are not allowed to submit into multiple categories, unless they have ACL (COMPONENT) permission &lt;b&gt;'Assign multiple categories to items'&lt;/b&gt;" level="level3" class="overridecatperms_on using_mul_cats fc-mssg-inline fc-info" />
 			<field name="override_mulcatsperms" type="radio" default="1" label="Allow to ALL users" description="Select to ignore user's privilege of assigning an item to multiple categories" class="overridecatperms_on using_mul_cats btn-group group-fcinfo" >
 				<option value="0">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1">FLEXI_YES</option>
