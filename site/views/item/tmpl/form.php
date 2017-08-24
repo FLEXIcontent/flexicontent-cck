@@ -344,29 +344,29 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<?php if ( $typeid ) : ?>
 
 				<?php if ( in_array( 'apply_ajax', $allowbuttons_fe) && !$isnew ) : ?>
-					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('apply_ajax', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+					<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('apply_ajax', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_apply_ajax"><?php echo JText::_( /*in_array( 'apply', $allowbuttons_fe) ? 'FLEXI_FAST_APPLY' :*/ 'FLEXI_APPLY' ) ?></span>
 					</button>
 				<?php endif; ?>
 
-				<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+				<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('save', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 				</button>
 
 				<?php if ( in_array( 'save2new', $allowbuttons_fe) && !$isnew ) : ?>
-					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save2new', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+					<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('save2new', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_save2new"><?php echo JText::_( 'FLEXI_SAVE_AND_NEW' ) ?></span>
 					</button>
 				<?php endif; ?>
 
 				<?php if ( in_array( 'save2copy', $allowbuttons_fe) && !$isnew ) : ?>
-					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save2copy', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+					<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('save2copy', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_save2copy"><?php echo JText::_( 'FLEXI_SAVE_AS_COPY' ) ?></span>
 					</button>
 				<?php endif; ?>
 
 				<?php if ( in_array( 'save_preview', $allowbuttons_fe) && !$isredirected_after_submit ) : ?>
-					<button class="<?php echo $btn_class;?>  btn-success" type="button" onclick="return flexi_submit('save_a_preview', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+					<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('save_a_preview', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 					</button>
 				<?php endif; ?>
@@ -377,14 +377,14 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				?>
 			
 				<?php if ( in_array( 'preview_latest', $allowbuttons_fe) && !$isredirected_after_submit && !$isnew ) : ?>
-					<button class="<?php echo $btn_class;?>  btn-default" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
+					<button class="<?php echo $btn_class;?> btn-default" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
 						<span class="fcbutton_preview"><?php echo JText::_( $this->params->get('use_versioning', 1) ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW' ) ?></span>
 					</button>
 				<?php endif; ?>
 			
 			<?php endif; ?>
 			
-			<button class="<?php echo $btn_class;?>  btn-danger" type="button" onclick="return flexi_submit('cancel', 'flexi_form_submit_btns', 'flexi_form_submit_msg')">
+			<button class="<?php echo $btn_class;?>" type="button" onclick="return flexi_submit('cancel', 'flexi_form_submit_btns', 'flexi_form_submit_msg')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
 			
