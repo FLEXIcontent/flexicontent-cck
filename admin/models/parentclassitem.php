@@ -2432,8 +2432,10 @@ class ParentClassItem extends FCModelAdmin
 		$original_content_id = 0;
 		if ($get_untraslatable_values)
 		{
-			foreach($langAssocs as $content_id => $_assoc) {
-				if ($site_default == substr($_assoc->language, 0,2)) {
+			foreach($langAssocs as $content_id => $_assoc)
+			{
+				if ($site_default == substr($_assoc->language, 0,2))
+				{
 					$original_content_id = $content_id;
 					break;
 				}
@@ -2454,125 +2456,146 @@ class ParentClassItem extends FCModelAdmin
 		//$qindex = array();
 		$core_data_via_events = array();  // Extra validation for some core fields via onBeforeSaveField
 		$postdata = array();
-		if ($fields)
+		
+		$core_via_post = array('title'=>1, 'text'=>1);
+		foreach($fields as $field)
 		{
-			$core_via_post = array('title'=>1, 'text'=>1);
-			foreach($fields as $field)
-			{
-				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
-				$field->item_vstate = $data['vstate'];
-				
-				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
-				$maintain_dbval = false;
-				
-				// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
-				if (
-					( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
-					( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
-					!$is_editable
-				) {
-					$postdata[$field->name] = $field->value;
-					$maintain_dbval = true;
-					
-				// UNTRANSLATABLE (CUSTOM) FIELDS: maintain their DB value ...
-				/*} else if ( $get_untraslatable_values && $field->untranslatable ) {
-					$postdata[$field->name] = $field->value;
-					$maintain_dbval = true;*/
-					
-				}
-
-				else if ($field->iscore)
-				{
-					// (posted) CORE FIELDS: if not set maintain their DB value ...
-					if ( isset($core_via_post[$field->name]) )
-					{
-						if ( isset($data[$field->name]) ) {
-							$postdata[$field->name] = $data[$field->name];
-						}
-						else {
-							$postdata[$field->name] = $field->value;
-							$maintain_dbval = true;
-						}
-					}
-
-					// (not posted) CORE FIELDS: get current value
-					else
-					{
-						// Get value from the updated item instead of old data
-						$postdata[$field->name] = $this->getCoreFieldValue($field, 0);
-					}
-				}
-
-				// OTHER CUSTOM FIELDS (not hidden and not untranslatable)
-				else
-				{
-					$postdata[$field->name] = isset($data['custom'][$field->name]) ? $data['custom'][$field->name] : null;
-				}
-				
-				// Force array for field values
-				if ( !is_array($postdata[$field->name]) )
-				{
-					$postdata[$field->name] = strlen($postdata[$field->name]) ? array($postdata[$field->name]) : array();
-				}
-
-				// Unserialize values already serialized values
-				// e.g. (a) if current values used are from DB or (b) are being imported from CSV file that contains exported serialized data
-				// (we exclude inner serialized objects, as theses are not valid user data)
-				foreach ($postdata[$field->name] as $i => $postdata_val)
-				{
-					$postdata[$field->name][$i] = flexicontent_db::unserialize_array($postdata_val, $force_array=false, $force_value=true);
-				}
-
-				// Trigger plugin Event 'onBeforeSaveField'
-				if (!$field->iscore || isset($core_via_post[$field->name]))
-				{
-					$field_type = $field->iscore ? 'core' : $field->field_type;
-					$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
-					$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item ));
-
-					if ($result===false)
-					{
-						// Field requested to abort item saving
-						$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
-						return 'abort';
-					}
-
-					// For CORE field get the modified data, which will be used for storing in DB (these will be re-bind later)
-					if ( isset($core_via_post[$field->name]) )
-					{
-						$core_data_via_events[$field->name] = isset($postdata[$field->name][0]) ? $postdata[$field->name][0] : '';  // The validation may have skipped it !!
-					}
-					
-				}
-
-				// Currently other CORE fields, these are skipped we will not call onBeforeSaveField() on them, neither rebind them
-				else
-				{
-				}
-
-				//$qindex[$field->name] = NULL;
-				//$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
-				//$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item, &$qindex[$field->name] ));
-				//if ($result===false) { ... }
-
-				// Get vstate property from the field object back to the data array ... in case it was modified, since some field may decide to prevent approval !
-				$data['vstate'] = $field->item_vstate;
-			}
-			//echo "<pre>"; print_r($postdata); echo "</pre>"; exit;
+			// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
+			$field->item_vstate = $data['vstate'];
 			
-			// Set values of other fields (e.g. this is used for "Properties as Fields" feature)
-			foreach($item->calculated_fieldvalues as $fieldname => $fieldvalues)
-			{
-				if ( isset($fields[$fieldname]) ) $postdata[$fieldname] = $fieldvalues;
+			$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			$maintain_dbval = false;
+			
+			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
+			if (
+				( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
+				( $app->isAdmin() && ($field->formhidden==2 || $field->formhidden==3 || $field->parameters->get('backend_hidden')) ) ||
+				!$is_editable
+			) {
+				$postdata[$field->name] = $field->value;
+				$maintain_dbval = true;
 			}
-			//echo "<pre>";  print_r($item->calculated_fieldvalues);  exit;
-			unset($item->calculated_fieldvalues);
+
+			else if ($field->iscore)
+			{
+				// (posted) CORE FIELDS: if not set maintain their DB value ...
+				if ( isset($core_via_post[$field->name]) )
+				{
+					if ( isset($data[$field->name]) ) {
+						$postdata[$field->name] = $data[$field->name];
+					}
+					else {
+						$postdata[$field->name] = $field->value;
+						$maintain_dbval = true;
+					}
+				}
+
+				// (not posted) CORE FIELDS: get current value
+				else
+				{
+					// Get value from the updated item instead of old data
+					$postdata[$field->name] = $this->getCoreFieldValue($field, 0);
+				}
+			}
+
+			// OTHER (non-hidden) CUSTOM FIELDS 
+			else
+			{
+				$postdata[$field->name] = isset($data['custom'][$field->name]) ? $data['custom'][$field->name] : null;
+			}
+			
+			// Force array for field values
+			if ( !is_array($postdata[$field->name]) )
+			{
+				$postdata[$field->name] = strlen($postdata[$field->name]) ? array($postdata[$field->name]) : array();
+			}
+
+			// Unserialize values already serialized values
+			// e.g. (a) if current values used are from DB or (b) are being imported from CSV file that contains exported serialized data
+			// (we exclude inner serialized objects, as theses are not valid user data)
+			foreach ($postdata[$field->name] as $i => $postdata_val)
+			{
+				$postdata[$field->name][$i] = flexicontent_db::unserialize_array($postdata_val, $force_array=false, $force_value=true);
+			}
+
+			// Trigger plugin Event 'onBeforeSaveField'
+			if (!$field->iscore || isset($core_via_post[$field->name]))
+			{
+				//$qindex[$field->name] = NULL;
+				$field_type = $field->iscore ? 'core' : $field->field_type;
+				$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
+				$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item /*, &$qindex[$field->name]*/ ));
+
+				if ($result===false)
+				{
+					// Field requested to abort item saving
+					$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
+					return 'abort';
+				}
+			}
+
+			// Currently other CORE fields, these are skipped we will not call onBeforeSaveField() on them, neither rebind them
+			else
+			{
+			}
+
+			// Get vstate property from the field object back to the data array ... in case it was modified, since some field may decide to prevent approval !
+			$data['vstate'] = $field->item_vstate;
 		}
-		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
 
 
 		// ***
-		// *** Empty per field TABLES
+		// *** Set values of other fields (e.g. this is used for "Properties as Fields" feature)
+		// ***
+		
+		foreach($item->calculated_fieldvalues as $fieldname => $fieldvalues)
+		{
+			if (isset($fields[$fieldname]))
+			{
+				$postdata[$fieldname] = $fieldvalues;
+			}
+		}
+		unset($item->calculated_fieldvalues);
+
+
+
+		// ***
+		// *** Set postdata / filedata field properties
+		// ***
+
+		foreach($fields as $field)
+		{
+			$field->filedata = isset($files[$field->name]) ? $files[$field->name] : null;
+			$field->postdata = $this->formatToArray( $postdata[$field->name] );
+		}
+
+
+		// ***
+		// *** Trigger plugin Event 'onAllFieldsPostDataValidated'
+		// ***
+
+		foreach($fields as $field)
+		{
+			$field_type = $field->iscore ? 'core' : $field->field_type;
+			$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onAllFieldsPostDataValidated', array( &$field, &$item ));
+
+			// For CORE field get the modified data, which will be used for storing in DB (these will be re-bind later)
+			if ( isset($core_via_post[$field->name]) )
+			{
+				$core_data_via_events[$field->name] = isset($field->postdata[0]) ? $field->postdata[0] : '';
+			}
+		}
+
+
+
+		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) $start_microtime = microtime(true);
+
+
+
+		// ***
+		// *** Clean-up per field search-index TABLES
 		// ***
 		
 		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
@@ -2594,17 +2617,26 @@ class ParentClassItem extends FCModelAdmin
 			$_field_id = str_replace($tbl_prefix, '', $tbl_name);
 			
 			// Drop the table of no longer filterable field 
-			if ( !isset($filterables[$_field_id]) )
+			if (!isset($filterables[$_field_id]))
+			{
 				$this->_db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
-			else {
-				// Remove item's old advanced search index entries
+			}
+
+			// Remove item's old advanced search index entries
+			else
+			{
 				$query = "DELETE FROM ".$tbl_name." WHERE item_id=". $item->id;
 				$this->_db->setQuery($query);
 				$this->_db->execute();
 			}
 		}
-		
-		// VERIFY all search tables exist
+
+
+
+		// ***
+		// *** VERIFY all search tables exist
+		// *** 
+
 		$tbl_names_flipped = array_flip($tbl_names);
 		foreach ($filterables as $_field_id => $_ignored)
 		{
@@ -2631,13 +2663,12 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
+
 		// ***
 		// *** Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
 		// *** event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
 		// ***
 
-		if ( $print_logging_info ) $start_microtime = microtime(true);
-		
 		$ai_query_vals = array();
 		$ai_query_vals_f = array();
 		
@@ -2650,7 +2681,7 @@ class ParentClassItem extends FCModelAdmin
 				if ( $data['vstate']==2 || $isNew)    // update (regardless of state!!) search indexes if document version is approved OR item is new
 				{
 					// Trigger plugin Event 'onIndexAdvSearch' to update field-item pair records in advanced search index
-					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexAdvSearch', array( &$field, &$postdata[$field->name], &$item ));
+					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexAdvSearch', array( &$field, &$field->postdata, &$item ));
 					if ( isset($field->ai_query_vals) ) {
 						foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
 						if ( isset($filterables[$field->id]) ) {  // Current for advanced index only
@@ -2660,7 +2691,7 @@ class ParentClassItem extends FCModelAdmin
 					//echo $field->name .":".implode(",", @$field->ai_query_vals ? $field->ai_query_vals : array() )."<br/>";
 					
 					// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record
-					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexSearch', array( &$field, &$postdata[$field->name], &$item ));
+					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexSearch', array( &$field, &$field->postdata, &$item ));
 					if ( isset($field->search[$item->id]) && strlen($field->search[$item->id]) ) $searchindex[] = $field->search[$item->id];
 					//echo $field->name .":".@$field->search[$item->id]."<br/>";
 				}
@@ -2706,6 +2737,7 @@ class ParentClassItem extends FCModelAdmin
 		if ( $print_logging_info ) @$fc_run_times['fields_value_indexing'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
+
 		// ***
 		// *** IF new version is approved, remove old version values from the field table
 		// ***
@@ -2729,17 +2761,22 @@ class ParentClassItem extends FCModelAdmin
 				if (count($assoc_item_ids) && $field->untranslatable)
 				{
 					// Delete field values in all translating items, if current field is untranslatable and current item version is approved
-					// NOTE: item itself is not include in associated translations, no need to check for it and skip itit 
-					if (! $mval_query) {
+					// NOTE: item itself is not include in associated translations, no need to check for it and skip it
+					if (! $mval_query)
+					{
 						$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id='.$field->id;
 						$this->_db->setQuery($query);
 						$this->_db->execute();
-					} else {
+					}
+					else
+					{
 						$untranslatable_fields[] = $field->id;
 					}
 				}
 			}
-			if ( count($untranslatable_fields) ) {
+
+			if (count($untranslatable_fields))
+			{
 				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id IN ('.implode(',',$untranslatable_fields) .')';
 				$this->_db->setQuery($query);
 				$this->_db->execute();
@@ -2760,14 +2797,13 @@ class ParentClassItem extends FCModelAdmin
 			$rel_query_vals = array();
 			$rel_update_objs = array();
 			
+			// Add the new values to the database 
 			foreach($fields as $field)
 			{
-				// -- Add the new values to the database 
-				$postvalues = $this->formatToArray( $postdata[$field->name] );
 				//$qindex_values = $qindex[$field->name];
 				$i = 1;
 				
-				foreach ($postvalues as $postvalue)
+				foreach ($field->postdata as $posted_value)
 				{
 					// Create field obj for DB insertion
 					$obj = new stdClass();
@@ -2779,10 +2815,10 @@ class ParentClassItem extends FCModelAdmin
 					$use_ingroup = $field->parameters->get('use_ingroup', 0);
 					
 					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
-					if ( !empty($field->use_suborder) && is_array($postvalue) )
+					if ( !empty($field->use_suborder) && is_array($posted_value) )
 						$obj->value = null;
 					else
-						$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
+						$obj->value = is_array($posted_value) ? serialize($posted_value) : $posted_value;
 					//$obj->qindex01 = isset($qindex_values['qindex01']) ? $qindex_values['qindex01'] : NULL;
 					//$obj->qindex02 = isset($qindex_values['qindex02']) ? $qindex_values['qindex02'] : NULL;
 					//$obj->qindex03 = isset($qindex_values['qindex03']) ? $qindex_values['qindex03'] : NULL;
@@ -2791,10 +2827,10 @@ class ParentClassItem extends FCModelAdmin
 					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting')
 					{
 						// Insert only if value non-empty
-						if ( !empty($field->use_suborder) && is_array($postvalue) )
+						if ( !empty($field->use_suborder) && is_array($posted_value) )
 						{
 							$obj->suborder = 1;
-							foreach ($postvalue as $v)
+							foreach ($posted_value as $v)
 							{
 								$obj->value = $v;
 								//echo "<pre>"; print_r($obj); echo "</pre>";
@@ -2824,9 +2860,9 @@ class ParentClassItem extends FCModelAdmin
 					{
 						// UNSET version it it used only verion data table, and insert only if value non-empty
 						unset($obj->version);
-						if ( !empty($field->use_suborder) && is_array($postvalue) ) {
+						if ( !empty($field->use_suborder) && is_array($posted_value) ) {
 							$obj->suborder = 1;
-							foreach ($postvalue as $v)
+							foreach ($posted_value as $v)
 							{
 								$obj->value = $v;
 
@@ -2935,7 +2971,8 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 
 			// a. Save a version of item properties that do not have a corresponding CORE Field
-			if ( $record_versioned_data ) {
+			if ( $record_versioned_data )
+			{
 				$obj = new stdClass();
 				$obj->field_id 		= -2;  // ID of Fake Field used to contain item properties not having a corresponding CORE field
 				$obj->item_id 		= $item->id;
@@ -2986,7 +3023,7 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$field_type = $field->iscore ? 'core' : $field->field_type;
 				$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
-				$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item ));
+				$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onAfterSaveField', array( &$field, &$field->postdata, &$file_data, &$item ));
 				// *** $result is ignored
 			}
 			if ( $print_logging_info ) @$fc_run_times['onAfterSaveField_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -3787,7 +3824,7 @@ class ParentClassItem extends FCModelAdmin
 	 * @return object
 	 * @since 1.5
 	 */
-	function getExtrafields($force = false, $lang_parent_id = 0, $old_item=null)
+	function getExtrafields($force = false, $original_content_id = 0, $old_item=null)
 	{
 		static $fields;
 		if ($fields && !$force)
@@ -3816,9 +3853,9 @@ class ParentClassItem extends FCModelAdmin
 		$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
 		
 		// Get values of language parent item (if not loading a specific version) to use them for untranslatable fields
-		if ( $lang_parent_id && !$this->_version)
+		if ( $original_content_id && !$this->_version)
 		{
-			$custom_vals[$lang_parent_id] = $this->getCustomFieldsValues($lang_parent_id, 0);
+			$custom_vals[$original_content_id] = $this->getCustomFieldsValues($original_content_id, 0);
 		}
 
 		foreach ($fields as $field)
@@ -3836,7 +3873,7 @@ class ParentClassItem extends FCModelAdmin
 			// while checking if current field is using untranslatable value from original content item
 			else
 			{
-				$item_id = ($lang_parent_id && $field->untranslatable && !$this->_version) ? $lang_parent_id : $this->_id;
+				$item_id = ($original_content_id && $field->untranslatable && !$this->_version) ? $original_content_id : $this->_id;
 				$field->value = isset($custom_vals[$item_id][$field->id]) ? $custom_vals[$item_id][$field->id] : array();
 
 				// Categories and Tags must have been serialized but some early versions did not do it, we will check before unserializing them
