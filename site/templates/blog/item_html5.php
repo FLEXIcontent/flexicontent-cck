@@ -72,8 +72,8 @@ $page_classes .= ' fcmaincat'.$item->catid;
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 
 // SEO
-$microdata_itemtype = $this->params->get( 'microdata_itemtype');
-$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+$microdata_itemtype = $this->params->get( 'microdata_itemtype', 'Article');
+$microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"';
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >

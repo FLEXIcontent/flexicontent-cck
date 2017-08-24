@@ -120,7 +120,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		
 		// Search's 'ADVANCED' link button
 		if ($linkadvsearch) :
-			$linkadvsearch_html = '<input type="button" onclick="location.href='.$action.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_advanced.'" value="'.$linkadvsearch_txt.'" />';
+			$linkadvsearch_html = '<input type="button" onclick="window.location.href=\''.$action.'\';" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_advanced.'" value="'.$linkadvsearch_txt.'" />';
 			
 			if ($linkadvsearch_html) switch ($linkadvsearch_pos) :
 				case 'top'   : $top_html[]    = $linkadvsearch_html;  break;
