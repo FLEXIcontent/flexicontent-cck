@@ -371,20 +371,54 @@ class plgFlexicontent_fieldsCore extends FCField
 		if($field->iscore != 1) return;
 		if(!is_array($post) && !strlen($post)) return;
 		
-		if ($field->field_type == 'title')
-		{
-			if ($item->parameters->get('auto_title', 0))  // AUTOMATIC TITLE, set to item ID
-			{
-				$post[0] = $item->title = $item->id;
-			}
-		}
-
 		if ($field->field_type == 'maintext')
 		{
 			// Field_type is not changed textarea so that field can handle this field type
 			FLEXIUtilities::call_FC_Field_Func('textarea', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 		}
 	}
+
+
+	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	// $item->fields['fieldname']->postdata contains values of other fields
+	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	function onAllFieldsPostDataValidated( &$field, &$item )
+	{
+		if($field->iscore != 1) return;
+		
+		if ($field->field_type == 'title')
+		{
+			$auto_title = (int) $item->parameters->get('auto_title', 0);
+			
+			// Check if using 'auto_title_code', clear 'auto_title', if function not set
+			$auto_title_code = $item->parameters->get('auto_title_code', '');
+			$auto_title = $auto_title === 2 && !$auto_title_code ? 0 : $auto_title;  
+
+			if ($auto_title)
+			{
+				$field->postdata = array();
+			}
+
+			switch($auto_title)
+			{
+				case 1:     // AUTOMATIC TITLE, set to item ID
+					$field->postdata[0] = $item->title = $item->id;
+					break;
+				case 2:     // AUTOMATIC TITLE, via function
+					try {
+						$field->postdata[0] = $item->title = @ eval($auto_title_code);
+					}
+					catch (ParseError $e) {
+						JFactory::getApplication()->enqueueMessage( "Automatic title custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+					}
+					if (!strlen($field->postdata[0]))
+					{
+						$field->postdata[0] = $item->title = $item->id;
+					}
+					break;
+			}
+		}
+	}	
 	
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB

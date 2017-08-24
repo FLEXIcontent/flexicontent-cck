@@ -482,7 +482,7 @@ if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1
 	<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title" id="container_fcfield_6">
 		
 	<?php if ( $this->params->get('auto_title', 0) ): ?>
-		<?php echo '<span class="badge badge-info">'.($this->row->id ? $this->row->id : JText::_('FLEXI_AUTO')).'</span>'; ?>
+		<?php echo $this->row->title . ' <div class="fc-nobgimage fc-info fc-mssg-inline hasTooltip" title="' . JText::_('FLEXI_SET_TO_AUTOMATIC_VALUE_ON_SAVE', true) . '"><span class="icon-info"></span> ' . JText::_('FLEXI_AUTO', true) . '</div>' ; ?>
 	<?php elseif ( isset($this->row->item_translations) ) :?>
 		
 		<?php

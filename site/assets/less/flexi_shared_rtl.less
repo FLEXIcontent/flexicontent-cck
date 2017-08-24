@@ -997,8 +997,8 @@ body input.fc_hidden_value {
 	box-sizing: border-box !important;
 }
 
-#flexicontent form div fieldset.panelform > div:not(.alert):not([class^="fcsep-"]),
-form div.container_fcfield > div:not(.alert):not([class^="fcsep-"]) {
+#flexicontent form div fieldset.panelform > div:not(.alert):not(.fc-mssg):not(.fc-mssg-inline):not([class^="fcsep_"]):not([class*=" fcsep_"]),
+form div.container_fcfield > div:not(.alert):not(.fc-mssg):not(.fc-mssg-inline):not([class^="fcsep_"]):not([class*=" fcsep_"]) {
 	margin: 0;
 }
 
@@ -2102,4 +2102,8 @@ fieldset legend .fc_legend_header_text {
 body .form-horizontal .control-group
 {
 	margin-bottom: 8px;
+}
+
+#flexicontent .fc-unset-width {
+	width: unset;
 }
