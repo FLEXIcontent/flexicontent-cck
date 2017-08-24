@@ -3510,8 +3510,8 @@ class flexicontent_html
 		<div class="'.$class.' '.$class.'_'.$xid.'">
 			<div class="fcvote fcvote-box-'.$xid.'">
 				<div class="nowrap_box fcvote-label-outer">
-					'.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '').'
-					<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
+					'.($label ? '<div class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '').'
+					<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
 						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '').
 						( $counter==-1 || $counter==0 ? '' :
 							($show_percentage && (int)$percent ? ' - ' : '').
@@ -3528,11 +3528,11 @@ class flexicontent_html
 					</span>').'
 				</div>
 				<ul class="fcvote_list">
-					<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>
+					<li class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>
 					'.$html_vote_links.'
 				</ul>
 
-				<div id="fcvote_message_'.$id.'_'.$xid.'" class="fcvote_message" ></div>
+				<div class="fcvote_message" ></div>
 
 				'.($add_review_form ? '
 				<input type="button" class="btn fcvote_toggle_review_form"
