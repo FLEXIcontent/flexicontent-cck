@@ -37,7 +37,7 @@
 			<field name="count_feat" type="text" filter="int" default="1" size="3" label="FLEXI_UMOD_COUNT_FEAT" description="FLEXI_UMOD_COUNT_FEAT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" level="level1" />
-			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
 						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexicontent/tmpl"  ext_name="mod_flexicontent"
 						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
@@ -391,7 +391,7 @@
 
 			<!-- STATIC BEHAVIOUR or CUSTOM OFFSET FOR DYNAMIC BEHAVIOUR -->
 			<field name="" type="separator" default="Custom offsets that shift the DYNAMIC date, e.g. -5 d (minus 5 days) &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: 0 d" level="level3" class="dynDateOffsets alert alert-info fcpadded" />
-			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23 &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: CURDATE() &lt;nbsp;&gt; , and set date type to 'SQL date expression'" level="level3" class="staticCustomDates dateStatic alert alert-info fcpadded" />
+			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23 &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: CURDATE() &amp;nbsp;&gt; , and set date type to 'SQL date expression'" level="level3" class="staticCustomDates dateStatic alert alert-info fcpadded" />
 			
 			<field name="bdate" type="fcdate" size="50" label="FLEXI_UMOD_BDATE_FROM" description="FLEXI_UMOD_BDATE_FROM_DESC" placeholder="No limit" class="method_dates_ops cDateLims" />
 			<field name="edate" type="fcdate" size="50" label="FLEXI_UMOD_EDATE_TO" description="FLEXI_UMOD_EDATE_TO_DESC" placeholder="No limit" class="method_dates_ops cDateLims" />
@@ -787,7 +787,7 @@
 				<option value="1" show_list="cats_do_cutdescr" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="cats_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="confpercat cats_desc cats_do_cutdescr" />
-			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat cats_desc btn-group">
+			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -852,7 +852,7 @@
 				<option value="1" show_list="currcat_do_cutdescr" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="currcat_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="confpercat currcat currcat_desc currcat_do_cutdescr" />
-			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat currcat currcat_desc btn-group">
+			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat currcat btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
