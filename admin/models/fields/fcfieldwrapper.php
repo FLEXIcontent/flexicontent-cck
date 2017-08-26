@@ -64,12 +64,28 @@ class JFormFieldFCFieldWrapper extends JFormField
 		$name = $this->element['name'];
 		$control_name = str_replace($name, '', $element_id);
 
+		$app = JFactory::getApplication();
+		$option = $app->input->get('option');
+		if (!empty($this->element['item_id']))
+		{
+			$unique_tmp_itemid = $this->element['item_id'];
+		}
+		else
+		{
+			$unique_tmp_itemid = $app->getUserState($option.'.edit.item.unique_tmp_itemid');
+			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
+		}
+		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
+		$app->input->set('unique_tmp_itemid', $unique_tmp_itemid);
+		$app->setUserState($option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+
 		global $form_fcitem;
 		$html = $this->renderFieldsForm($form_fcitem);
 		$html = $html ?: '<span class="alert alert-info">' . JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
 		return '</div></div>
 		<div class="flexicontent" id="flexicontent">'
 			. $html . '
+			<input type="hidden" name="unique_tmp_itemid" value="' . $unique_tmp_itemid . '" />
 		</div>
 		<div><div>';
 	}

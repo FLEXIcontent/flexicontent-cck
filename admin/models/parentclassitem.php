@@ -584,7 +584,7 @@ class ParentClassItem extends FCModelAdmin
 				// From content table, and extended item table, content type table, user table, rating table, categories relation table
 				$query->from('#__content AS i');
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
-				$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
+				$query->join('LEFT', '#__flexicontent_types AS ty ON (CASE WHEN ie.type_id = 0 THEN ' . (int) $this->_typeid . ' ELSE ie.type_id END) = ty.id');
 				$query->join('LEFT', '#__users AS u on u.id = i.created_by');
 				$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
 				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
@@ -627,9 +627,12 @@ class ParentClassItem extends FCModelAdmin
 				
 				$item = & $data;
 			}
-			$this->_typeid = $item->type_id;
+
+			// Use configured type if existing item has no type
+			$this->_typeid = $item->type_id ?: $this->_typeid;
+			$item->type_id = $this->_typeid;
 			$this->getComponentTypeParams();
-			
+
 			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
 			$item->text = $item->introtext;
 			$item->text .= StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
@@ -3574,6 +3577,14 @@ class ParentClassItem extends FCModelAdmin
 			. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
 			. ' WHERE ie.item_id = ' . (int) $this->_id;
 		$typeID = (int) $this->_db->setQuery($query)->loadResult();
+
+		// Use configured type if existing item has no type
+		if (!$typeID)
+		{
+			return isset($knownTypes[$this->_typeid])
+				? $knownTypes[$this->_typeid]
+				: $knownTypes[0];
+		}
 
 		$itemTypes[$this->_id] = isset($knownTypes[$typeID])
 			? $knownTypes[$typeID]

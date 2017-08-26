@@ -1697,6 +1697,11 @@ class plgSystemFlexisystem extends JPlugin
 		$user  = JFactory::getUser();
 		$option = $app->input->get('component', '', 'cmd');
 		
+		
+		// ***
+		// *** Handle syncing permissions between com_content and com_flexicontent assets
+		// ***
+
 		if ( $context=='com_config.component' && ($option == 'com_content' || $option == 'com_flexicontent') )
 		{
 			$rules_arr = @ $_POST['jform']['rules'];
@@ -1762,13 +1767,14 @@ class plgSystemFlexisystem extends JPlugin
 				}
 			}
 		}
-		
-		// ****************************************************************************************
-		// Add custom LAYOUT parameters to non-FC components (cleared during their validation)
-		// DONE modules, TODO: add support to menus,
-		// NOTE: We do validate (filter) submitted values according to XML files of the layout file
-		// ****************************************************************************************
-		
+
+
+		// ***
+		// *** Add custom LAYOUT parameters to non-FC components (cleared during their validation)
+		// *** DONE modules, TODO: add support to menus,
+		// *** NOTE: We do validate (filter) submitted values according to XML files of the layout file
+		// ***
+
 		// Check for com_modules context
 		if ($context=='com_modules.module' || $context=='com_advancedmodules.module' || substr($context, 0, 10) === "com_falang")
 		{
@@ -1859,7 +1865,6 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onContentPrepareForm($form, $data)
 	{
-		return true;
 		// Check we have a form.
 		if (!($form instanceof JForm))
 		{
@@ -1873,7 +1878,7 @@ class plgSystemFlexisystem extends JPlugin
 		$user       = JFactory::getUser();
 
 		// Check we are manipulating the languagecode plugin.
-		if (empty($data->id) || $form->getName() !== 'com_content.article' || JFactory::getApplication()->input->get('option', '', 'CMD')==='com_flexicontent')
+		if ($form->getName() !== 'com_content.article' || JFactory::getApplication()->input->get('option', '', 'CMD')==='com_flexicontent')
 		{
 			return true;
 		}
@@ -1884,7 +1889,7 @@ class plgSystemFlexisystem extends JPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item'.'.php');
+		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 
 
@@ -1892,18 +1897,43 @@ class plgSystemFlexisystem extends JPlugin
 		// *** Load item and its fields and its type parameters
 		// ***
 
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$default_type_id = $cparams->get('jarticle_form_typeid', 1);
+
+		// Get current type_id of the item
+		if ($data->id)
+		{
+			$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$record->load($data->id);
+		}
+		$data->type_id = !empty($record) && $record->type_id ? $record->type_id : 0;
+
+		// Get model and set default type if type not set already (new item or existing item with no type)
 		$model = new FlexicontentModelItem();
+		if (!$data->type_id)
+		{
+			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);		
+			$default_type = isset($types[$default_type_id])
+				? $types[$default_type_id]
+				: reset($types);
+			$data->type_id = $default_type->id;
+			$model->setId($data->id, $data->catid, $data->type_id);
+		}
+
+		// Get the item
 		$item = $model->getItem($data->id, $check_view_access=false);
 
+		// Get the item's fields
 		$fields = $model->getExtrafields();
 		$item->fields = & $fields;
 
+		// Get type parameters
 		$tparams = $model->getTypeparams();
 		$tparams = new JRegistry($tparams);
 		$item->tparams = & $tparams;
-		
+
+		// Set component + type as item parameters
 		$item->params = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$item->params->merge($cparams);
 		$item->params->merge($item->tparams);
 
@@ -1991,7 +2021,7 @@ class plgSystemFlexisystem extends JPlugin
 		global $form_fcitem; // TODO remove this global
 		$form_fcitem = $item;
 
-		// Get site languages.
+		// Get flexicontent fields
 		$form->load('
 			<form>
 				<fields name="attribs">
@@ -2012,6 +2042,7 @@ class plgSystemFlexisystem extends JPlugin
 							label="fcfields"
 							translate_label="false"
 							filter="cmd"
+							item_id="' . (int) $data->id . '"
 						/>
 					</fieldset>
 				</fields>
@@ -2246,23 +2277,56 @@ class plgSystemFlexisystem extends JPlugin
 			return true;
 		}
 
+
+		//***
+		//*** Call 'flexicontent' items model to update flexicontent item data: fields, version data, temporary data
+		//***
+
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+
+		// Needed for new items, since now an item has been created
+		$data['id'] = $isNew ? $item->id : $data['id'];
+		// Approve new version by default, Note: this is just the default value , ACL will decide real value
+		$data['vstate'] = 2;
+		// RAW (flexicontent) Custom fields data, validation will be done by each field
+		$data['custom'] = isset($_POST['custom']) ? $_POST['custom'] : array();
+
+		$model = new FlexicontentModelItem();
+		$model->store($data);
+
+		// Revert changes to data
+		unset($data['vstate']);
+		unset($data['custom']);
+		$data['id'] = $isNew ? 0 : $data['id'];  // restore ID to zero for new items
+
+
 		//***
 		//*** Call backend 'flexicontent' items model to update flexicontent temporary data
 		//***
-		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'items.php');
-		$model = new FlexicontentModelItems();
-		$model->updateItemCountingData(array($item));
 
-		//*** 
+		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'items.php');
+		$items_model = new FlexicontentModelItems();
+		$items_model->updateItemCountingData(array($item));
+
+
+		//***
 		//*** Maintain flexicontent-specific article parameters
-		//*** 
-		$data = JFactory::getSession()->get('flexicontent.item.data', null, 'flexicontent');
-		if ($data)
+		//***
+
+		$item_params = JFactory::getSession()->get('flexicontent.item.data', null, 'flexicontent');
+		if ($item_params)
 		{
 			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 			$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 			$record->load($item->id);
-			$record->bind($data);
+			$record->bind($item_params);
 			$record->store();
 		}
 
