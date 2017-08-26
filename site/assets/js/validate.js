@@ -619,6 +619,7 @@ var JFormValidator = function()
 	isValid = function(form)
 	{
 		var $form = jQuery(form);
+		var isFCvalidation = typeof window.fc_validateOnSubmitForm !== undefined ? window.fc_validateOnSubmitForm : 0;
 		var use_all_mssg_box = $form.data('use_all_mssg_box');
 
 		if ($form.length && $form.data('skip_validation'))
@@ -697,7 +698,7 @@ var JFormValidator = function()
 					added[label_text] = 1;
 				}
 			}
-			if (use_all_mssg_box)
+			if (use_all_mssg_box || !isFCvalidation)
 			{
 				Joomla.renderMessages(error);
 			}
@@ -711,6 +712,31 @@ var JFormValidator = function()
 		$form.data('fcform_input_sets', null);  // Clear to allow atomic calls to validate()
 
 		if (!!Joomla.fc_debug) window.console.log( 'isValid() time: ' + ((new Date())  - vTimeStart) + ' ms');
+		
+		// Do scrolling here if not an FC form
+		if (!valid && !isFCvalidation)
+		{
+			window.console.log('scrolling');
+			// Form is not invalid, focus the first invalid element, or focus the all errors container
+			var invalid = jQuery('.invalid').first();  // Get single element so that hidden check will work
+
+			setTimeout(function()   // This works without the timeout too ...
+			{
+				if (invalid.is(':hidden'))
+				{
+					invalid = jQuery('#system-message-container');
+				}
+				if (invalid.length)
+				{
+					var pos = invalid.offset().top - 80;
+					jQuery('html, body').animate({
+						scrollTop: pos
+					}, 400);
+					invalid[0].focus();
+				}
+			}, 20);
+		}
+		
 		return valid;
 	},
 
@@ -719,6 +745,8 @@ var JFormValidator = function()
 		// If given field has failed validation, and it is the FIRST field to fail the validation then check if it is inside a TAB, make sure the TAB get focused
 		if (state === false && !fcform_1st_invalid_found)
 		{
+			jQuery('[href="#attrib-fcfields"]').trigger('click');
+
 			var tab = $el.parent().closest("div.tabbertab");
 			var tabset = $el.parent().closest("div.tabberlive");
 			
