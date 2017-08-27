@@ -357,7 +357,22 @@ class ParentClassItem extends FCModelAdmin
 			$msg = $pk ?
 				JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk) :   // ID is set, indicate that it was not found
 				JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );  // ID is not set propably some bad URL so give a more general message
-			throw new Exception($msg, 404);
+
+			// In case of checking view access ONLY THEN throw a non found exception
+			if ($check_view_access)
+			{
+				throw new Exception($msg, 404);
+			}
+
+			// Return to caller indication that loading failed
+			else
+			{
+				if (!$this->getError())
+				{
+					$this->setError($msg);
+				}
+				return false;
+			}
 		}
 		
 		// --. Initialize new item, if not already initialized, currently this succeeds always
@@ -526,7 +541,8 @@ class ParentClassItem extends FCModelAdmin
 				$result = $item->load($pk);  // try loading existing item data
 				if ($result===false)
 				{
-					throw new Exception('Record # ' . $pk . ' not found', 500);
+					$this->setError('Record # ' . $pk . ' not found');
+					return false;
 				}
 			}
 
@@ -603,7 +619,7 @@ class ParentClassItem extends FCModelAdmin
 
 				$db->setQuery($query);  //echo $db->replacePrefix($query);
 				
-				// Do not translate, this is the Falang overridden method of a database extended Class
+				// Do not translate, this is the Falang overriden method of a database extended Class
 				// Try to execute query directly and load the data as an object
 				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) )
 				{
@@ -617,12 +633,13 @@ class ParentClassItem extends FCModelAdmin
 
 				if (!$data)
 				{
-					throw new Exception('Record # ' . $pk . ' not found', 500);
+					$this->setError('Record # ' . $pk . ' not found');
+					return false;
 				}
 
 				if ($version && !$data->version_id)
 				{
-					JError::raiseNotice(10, JText::sprintf('NOTICE: Requested item version %d was not found, loaded currently active version', $version));
+					$app->enqueueMessage(JText::sprintf('NOTICE: Requested item version %d was not found, loaded currently active version', $version), 'notice');
 				}
 				
 				$item = & $data;
@@ -679,22 +696,25 @@ class ParentClassItem extends FCModelAdmin
 				}
 			}
 			
-			// **********************************
-			// Retrieve and prepare JoomFish data
-			// **********************************
+			// ***
+			// *** Retrieve and prepare Falang data
+			// ***
+
 			if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' )
 			{
-				// -- Try to retrieve all joomfish data for the current item
-				$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
-						." FROM #__".$nn_content_tbl." as jfc "
-						." WHERE jfc.reference_table='content' AND jfc.reference_id = {$pk} ";
-				$db->setQuery($query);
-				$translated_fields = $db->loadObjectList();
-				
+				// -- Try to retrieve all Falang data for the current item
+				$query = 'SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published'
+					. ' FROM #__' . $nn_content_tbl . ' AS jfc '
+					. ' WHERE jfc.reference_table = ' . $db->Quote('content') . ' AND jfc.reference_id = ' . (int) $pk
+					;
+				$translated_fields = $db->setQuery($query)->loadObjectList();
+
 				if ( $editjf_translations == 0 && $translated_fields )  // 1:disable without warning about found translations
 				{
-					$app->enqueueMessage( "3rd party Joom!Fish/Falang translations detected for current item."
-						." You can either enable editing them or disable this message in FLEXIcontent component configuration", 'message' );
+					$app->enqueueMessage(
+						'3rd party Falang translations detected for current item. ' .
+						'You can either enable editing them or disable this message in FLEXIcontent component configuration'
+					, 'message');
 				}
 
 				else if ( $editjf_translations == 2 )
@@ -709,7 +729,7 @@ class ParentClassItem extends FCModelAdmin
 							$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field}->value = $field_data->value;
 							$found_languages[$field_data->language_id] = $item_translations->{$field_data->language_id}->name;
 						}
-						//echo "<br/>Joom!Fish translations found for: " . implode(",", $found_languages);
+						//echo "<br/>Falang translations found for: " . implode(",", $found_languages);
 					}
 					
 					foreach ($item_translations as $lang_id => $translation_data)
@@ -908,14 +928,7 @@ class ParentClassItem extends FCModelAdmin
 				$fc_list_items[$pk] = false;
 			}
 
-			if ($e->getCode() == 404)
-			{
-				throw new Exception($e->getMessage(), 404);
-			}
-			else
-			{
-				$this->setError($e);
-			}
+			$this->setError($e);
 		}
 
 		// Add to record to cache if it is non-versioned data
@@ -1330,7 +1343,8 @@ class ParentClassItem extends FCModelAdmin
 		$user		= JFactory::getUser();
 		
 		$cats = isset($data['cid']) ? $data['cid'] : array();
-		if ( !empty($data['catid']) && !in_array($data['catid'], $cats) ) {
+		if ( !empty($data['catid']) && !in_array($data['catid'], $cats) )
+		{
 			$cats[] =  $data['catid'];
 		}
 		
@@ -1344,7 +1358,8 @@ class ParentClassItem extends FCModelAdmin
 				$cat_allowed = $user->authorise('core.create', 'com_content.category.' . $currcatid);
 				if (!$cat_allowed)
 				{
-					return JError::raiseWarning( 500, "No access to add item to category with id " . $currcatid );
+					JFactory::getApplication()->enqueueMessage("No access to add item to category with id " . $currcatid, 'warning');
+					return false;
 				}
 				$allow &= $cat_allowed;
 			}
@@ -1680,99 +1695,38 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
-		// Create a copy of the old item
+		// ***
+		// *** Create a copy of the old item, to be able to reference previous values
+		// ***
+
 		$old_item = clone($item);
-		
-		
-		// ***
-		// *** Check and correct given item DATA
-		// ***
-		
-		// tags and cats will need some special manipulation, so set them into local variables and clear the posted variables, we will reassign these below
-		$tags = isset($data['tag']) ? $this->formatToArray($data['tag']) : array();
-		$cats = isset($data['cid']) ? $this->formatToArray($data['cid']) : array();
-		$featured_cats = isset($data['featured_cid']) ? $this->formatToArray($data['featured_cid']) : array();
-		unset($data['tag']);
-		unset($data['cid']);
-		unset($data['featured_cid']);
-		
-		// Make tags unique
-		$tags = array_keys(array_flip($tags));
-		
-		// Auto-assign a not set main category, to be the first out of secondary categories, 
-		if ( empty($data['catid']) && !empty($cats[0]) )
-		{
-			$data['catid'] = $cats[0];
-		}
-		
-		$cats_indexed = array_flip($cats);
-		// Add the primary cat to the array if it's not already in
-		if ( !empty($data['catid']) && !isset($cats_indexed[$data['catid']]) )
-		{
-			$cats_indexed[$data['catid']] = 1;
-		}
-		
-		// Add the featured cats to the array if it's not already in
-		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat )
-		{
-			if ( $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats_indexed[$featured_cat] = 1;
-		}
-		
-		// Reassign (unique) categories back to the cats array
-		$cats = array_keys($cats_indexed);
 
 
 		// ***
-		// *** Retrieve author configuration
+		// *** Process given tags, if none given then do not set $data['tags'] (current DB values for tags will be maintained)
 		// ***
 
-		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
-		
-		// At least one category needs to be assigned
-		if (!is_array( $cats ) || count( $cats ) < 1)
-		{
-			$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
-			return false;
-		}
+		$this->_prepareTags($item, $data);
 
-		// Check more than allowed categories
-		else
-		{
-			// Get author's maximum allowed categories per item and set js limitation
-			$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
-			
-			// Verify category limitation for current author
-			if ( $max_cat_assign && count($cats) > $max_cat_assign )
-			{
-				$existing_only = false;
-				if ( count($cats) <= count($item->categories) )
-				{
-					// Maximum number of categories is exceeded, but do not abort if only using existing categories
-					$existing_only = true;
-					foreach ($cats as $newcat)
-					{
-						$existing_only = $existing_only && in_array($newcat, $item->categories);
-					}
-				}
 
-				if (!$existing_only)
-				{
-					$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').$max_cat_assign);
-					return false;
-				}
-			}
-		}
+		// ***
+		// *** Process given categories, if none given then use their current DB value to make the processing
+		// ***
+
+		$this->_prepareCategories($item, $data);
+
+
+		// ***
+		// *** Check and process other item DATA like title, description, etc
+		// ***
 
 		// Trim title, but allow not setting it ... to maintain current value (but we will also need to override 'required' during validation)
 		if (isset($data['title']))
 		{
 			$data['title'] = trim($data['title']);
 		}
-		
-		// Set back the altered categories and tags to the form data
-		$data['categories']  = $cats;  // Set it to real name of field: 'categories' INSTEAD OF 'cid'
-		$data['tags']        = $tags;  // Set it to real name of field: 'tags'       INSTEAD OF 'tag'
-		
+
+
 		// Reconstruct 'text' (description) field if it has splitted up e.g. to seperate editors per tab
 		if (isset($data['text']) && is_array($data['text']))
 		{
@@ -1967,6 +1921,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** SECURITY concern: Check form tampering of allowed languages
 		// ***
 
+		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
 		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 
@@ -2305,10 +2260,9 @@ class ParentClassItem extends FCModelAdmin
 			if ( $app->isAdmin() || $cparams->get('approval_warning_aftersubmit_fe', 1) )
 			{
 				// Warn editor that his/her changes will need approval to before becoming active / visible
-				if ( $canEditState )
-					JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')));
-				else
-					JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')));
+				$canEditState
+					? JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')), 'notice')
+					: JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE'.($app->isAdmin() ? '_ADMIN' : '')), 'notice');
 			}
 			// Set modifier and modification time (as if item has been saved), so that we can use this information for updating the versioning tables
 			$datenow = JFactory::getDate();
@@ -2991,11 +2945,11 @@ class ParentClassItem extends FCModelAdmin
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
 			
-			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
+			// b. Finally save a version of the posted Falang translated data for J1.5, if such data are editted inside the item edit form
 			/*if ( FLEXI_FISH && !empty($data['jfdata']) && $record_versioned_data )
 			{
 				$obj = new stdClass();
-				$obj->field_id 		= -1;  // ID of Fake Field used to contain the Joomfish translated item data
+				$obj->field_id 		= -1;  // ID of Fake Field used to contain the Falang translated item data
 				$obj->item_id 		= $item->id;
 				$obj->valueorder	= 1;
 				$obj->suborder    = 1;
@@ -3049,10 +3003,10 @@ class ParentClassItem extends FCModelAdmin
 		$user = JFactory::getUser();
 		$cparams = $this->_cparams;
 		$editjf_translations = $cparams->get('editjf_translations', 0);
-		
-		// ******************************
-		// Check and store item in the db
-		// ******************************
+
+		// ***
+		// *** Check and store item in the db
+		// ***
 		
 		// Make sure the data is valid
 		if (!$item->check()) {
@@ -3070,85 +3024,109 @@ class ParentClassItem extends FCModelAdmin
 		$this->_record = & $item;
 		$this->_typeid = $item->type_id;
 		$this->getComponentTypeParams();
-		
-		
-		// ****************************
-		// Update language Associations
-		// ****************************
+
+
+		// ***
+		// *** Update language Associations
+		// ***
+
 		$this->saveAssociations($item, $data);
 		
 		
-		// ***********************
-		// Save access information
-		// ***********************
+		// ***
+		// *** Save access information
+		// ***
+
 		// Rules for J1.6+ are handled in the JTABLE class of the item with overriden JTable functions: bind() and store()
-		
-		
-		// ***************************
-		// If creating only return ...
-		// ***************************
+
+
+		// ***
+		// *** If creating only return ...
+		// ***
+
 		if ($createonly) return true;
 		
 		
-		// ****************************
-		// Save joomfish data in the db
-		// ****************************
+		// ***
+		// *** Save Falang data in the db
+		// ***
+
 		if ( FLEXI_FISH && $editjf_translations==2 )   // 0:disable with warning about found translations,  1:disable without warning about found translations,  2:edit-save translations, 
-			$this->_saveJFdata( $data['jfdata'], $item );
-		
-		
-		// ***********************************************
-		// Delete old tag relations and Store the new ones
-		// ***********************************************
-		$tags = $data['tags'];
-		$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
-		foreach($tags as $tag)
 		{
-			$query = 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`) VALUES(' . $tag . ',' . $item->id . ')';
-			$this->_db->setQuery($query);
-			$this->_db->execute();
+			$this->_saveJFdata( $data['jfdata'], $item );
 		}
+
+
+		// ***
+		// *** Delete old tag relations and Store the new ones
+		// ***
 		
-		// ***********************************************************************************************************
-		// Delete only category relations which are not part of the categories array anymore to avoid loosing ordering
-		// ***********************************************************************************************************
-		$cats = $data['categories'];
+		if (isset($data['tags']))
+		{
+			$tags = & $data['tags'];
+			$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int) $item->id;
+			$this->_db->setQuery($query)->execute();
+
+			$tag_vals = array();
+			foreach($tags as $tagid)
+			{
+				$tag_vals[] = '(' . (int) $tagid . ',' . (int) $item->id . ')';
+			}
+
+			if (count($tag_vals))
+			{
+				$query = 'INSERT INTO #__flexicontent_tags_item_relations'
+					. ' (tid, itemid)'
+					. ' VALUES ' . implode(',', $tag_vals)
+					;
+				$this->_db->setQuery($query)->execute();
+			}
+		}
+
+
+		// ***
+		// *** Delete only category relations which are not part of the categories array anymore to avoid loosing ordering
+		// ***
+
+		$cats = & $data['categories'];
 		$query 	= 'DELETE FROM #__flexicontent_cats_item_relations'
-			. ' WHERE itemid = '.$item->id
+			. ' WHERE itemid = ' . (int) $item->id
 			. ($cats ? ' AND catid NOT IN (' . implode(', ', $cats) . ')' : '')
 			;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
+		$this->_db->setQuery($query)->execute();
 
 		// Get an array of the item's used categories (already assigned in DB)
 		$query 	= 'SELECT catid'
 			. ' FROM #__flexicontent_cats_item_relations'
-			. ' WHERE itemid = '.$item->id
+			. ' WHERE itemid = ' . (int) $item->id
 			;
-		$this->_db->setQuery($query);
-		$used = $this->_db->loadColumn();
-		
+		$non_altered_cats = $this->_db->setQuery($query)->loadColumn();
+
 		// Insert only the new records
 		$cat_vals = array();
-		foreach($cats as $cat)
+		foreach($cats as $catid)
 		{
-			if (!in_array($cat, $used))  $cat_vals[] = '('. $cat .','. $item->id .')';
+			if (!in_array($catid, $non_altered_cats))
+			{
+				$cat_vals[] = '(' . (int) $catid . ',' . (int) $item->id . ')';
+			}
 		}
+
 		if ( !empty($cat_vals) )
 		{
-			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . implode(",", $cat_vals);
-			$this->_db->setQuery($query);
-			$this->_db->execute();
+			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations'
+				. ' (catid, itemid)'
+				. ' VALUES ' . implode(',', $cat_vals)
+				;
+			$this->_db->setQuery($query)->execute();
 		}
-		
+
 		return true;
 	}
 
 
 	/**
-	 * Method to save Joomfish item translation data
+	 * Method to save Falang item translation data
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -3178,13 +3156,26 @@ class ParentClassItem extends FCModelAdmin
 			$db_connection = $db->getConnection();
 			//echo "<pre>"; print_r($query); echo "\n\n";
 			
-			if ($dbtype == 'mysqli') {
+			if ($dbtype == 'mysqli')
+			{
 				$result = mysqli_query( $db_connection , $query );
-				if ($result===false) return JError::raiseError( 500, 'error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
-			} else if ($dbtype == 'mysql') {
+				if ($result===false)
+				{
+					$app->enqueueMessage(__FUNCTION__.'():: '.mysqli_error($db_connection), 'error');
+					return false;
+				}
+			}
+			else if ($dbtype == 'mysql')
+			{
 				$result = mysql_query( $query, $db_connection  );
-				if ($result===false) return JError::raiseError( 500, 'error '.__FUNCTION__.'():: '.mysql_error($db_connection));
-			} else {
+				if ($result===false)
+				{
+					$app->enqueueMessage(__FUNCTION__.'():: '.mysql_error($db_connection), 'error');
+					return false;
+				}
+			}
+			else
+			{
 				$msg = 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE';
 				throw new Exception($msg, 500);
 			}
@@ -3192,44 +3183,75 @@ class ParentClassItem extends FCModelAdmin
 		
 		$modified = $item->modified ? $item->modified : $item->created;
 		$modified_by = $item->modified_by ? $item->modified_by : $item->created_by;
-		
-		$langs	= FLEXIUtilities::getLanguages('shortcode');  // Get Joomfish active languages
-		
+
+		// Get active languages
+		$langs	= FLEXIUtilities::getLanguages('shortcode');
+
+		// Loop through Falang translations storing them
 		foreach($jfdata_arr as $shortcode => $jfdata)
 		{
-			//echo $shortcode." : "; print_r($jfdata);
-			
+			if (!isset($langs->$shortcode))
+			{
+				continue;
+			}
+
 			// Reconstruct (main)text field if it has splitted up e.g. to seperate editors per tab
-			if (@$jfdata['text'] && is_array($jfdata['text'])) {
+			if (!empty($jfdata['text']) && is_array($jfdata['text']))
+			{
 				// Force a readmore at the end of text[0] (=before TABs text) ... so that the before TABs text acts as introtext
 				$jfdata['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $jfdata['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 				$jfdata['text'] = implode('', $jfdata['text']);
-			} else if ( empty($jfdata['text']) ) {
+			}
+			else if ( empty($jfdata['text']) )
+			{
 				$jfdata['text'] = '';
 			}
 			
 			$jfdata['title'] = trim($jfdata['title']);
-			$jfdata['alias'] = $jfdata['title'] ? $this->verifyAlias($jfdata['alias'], $jfdata['title'], $item) : '';
-			
+
+			$jfdata['lang_code'] = $langs->$shortcode->lang_code;
+			$jfdata['alias'] = $this->getSafeUniqueAlias($item, $jfdata);
+
 			// Search for the {readmore} tag and split the text up accordingly.
 			$this->splitText($jfdata);
-			
-			// Delete existing Joom!Fish translation data for the current item
-			$query  = "DELETE FROM  #__".$nn_content_tbl." WHERE language_id={$langs->$shortcode->id} AND reference_table='content' AND reference_id={$item->id}";
-			$db->setQuery($query);
-			$db->execute();
-			
+
+			// Delete existing Falang translation data for the current item
+			$query = 'DELETE FROM  #__' . $nn_content_tbl
+				. ' WHERE language_id = ' . (int) $langs->$shortcode->id
+				. '  AND reference_table = ' . $db->Quote('content')
+				. '  AND reference_id = ' . (int) $item->id
+				;
+			$db->setQuery($query)->execute();
+
 			// Apply new translation data
-			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
-			foreach ($translated_fields as $fieldname) {
-				if ( !strlen( @$jfdata[$fieldname] ) ) continue;
-				//if ( !StringHelper::strlen(StringHelper::trim(str_replace("&nbsp;", "", strip_tags(@$jfdata[$fieldname])))) ) continue;   // skip empty content
-				//echo "<br/><b>#__".$nn_content_tbl."($fieldname) :</b><br/>";
-				$query = "INSERT INTO #__".$nn_content_tbl." (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
-					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote(@$jfdata[$fieldname]).", '".md5($item->{$fieldname})."', ".$db->Quote($item->{$fieldname}).", '$modified', '$modified_by', 1)";
-				//echo $query."<br/>\n";
-				$db->setQuery($query);
-				$db->execute();
+			$translated_fields = array(
+				'title',
+				'alias',
+				'introtext',
+				'fulltext',
+				'metadesc',
+				'metakey'
+			);
+			foreach ($translated_fields as $fieldname)
+			{
+				if ( !isset($jfdata[$fieldname]) || !is_string($jfdata[$fieldname]) )
+				{
+					continue;
+				}
+				$query = 'INSERT INTO #__' . $nn_content_tbl
+					. ' (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) '
+					. ' VALUES ( '
+						. (int) $langs->$shortcode->id . ', '
+						. (int) $item->id . ', '
+						. $db->Quote('content') . ', '
+						. $db->Quote($fieldname) . ', '
+						. $db->Quote($jfdata[$fieldname]) . ', '
+						. $db->Quote(md5($item->$fieldname)) . ', '
+						. $db->Quote($item->$fieldname) . ', '
+						. $db->Quote($modified) . ', '
+						. $db->Quote($modified_by) . ', '
+						. '1)';
+				$db->setQuery($query)->execute();
 			}
 		}
 		
@@ -4265,7 +4287,7 @@ class ParentClassItem extends FCModelAdmin
 		$nf_extra_properties  = FLEXIUtilities::paramToArray($nf_extra_properties);
 		
 		// ADD INFO for item title
-		$body  = '<u>'.JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</u>: ";
+		$body  = '<b>'.JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</b>: ";
 		if ( !$isNew ) {
 			$_changed = $oitem->title != $this->get('title');
 			$body .= " [ ". JText::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
@@ -4276,7 +4298,7 @@ class ParentClassItem extends FCModelAdmin
 		// ADD INFO about state
 		$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
 		
-		$body .= '<u>'.JText::_( 'FLEXI_NF_CONTENT_STATE' ) . "</u>: ";
+		$body .= '<b>'.JText::_( 'FLEXI_NF_CONTENT_STATE' ) . "</b>: ";
 		if ( !$isNew ) {
 			$_changed = $oitem->state != $this->get('state');
 			$body .= " [ ". JText::_( $_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
@@ -4287,7 +4309,7 @@ class ParentClassItem extends FCModelAdmin
 		// ADD INFO for author / modifier
 		if ( in_array('creator',$nf_extra_properties) )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATOR_LONG' ) . "</u>: ";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_CREATOR_LONG' ) . "</b>: ";
 			if ( !$isNew ) {
 				$_changed = $oitem->created_by != $this->get('created_by');
 				$body .= " [ ". JText::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
@@ -4297,7 +4319,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 		if ( in_array('modifier',$nf_extra_properties) && !$isNew )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFIER_LONG' ) . "</u>: ";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_MODIFIER_LONG' ) . "</b>: ";
 			$body .= $this->get('modifier'). "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
@@ -4315,7 +4337,7 @@ class ParentClassItem extends FCModelAdmin
 			$date_created = JFactory::getDate($this->get('created'));
 			$date_created->setTimezone($tz);
 			
-			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</u>: ";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</b>: ";
 			$body .= $date_created->format($format = 'D, d M Y H:i:s', $local = true);
 			$body .= $tz_offset_str. "<br/>\r\n";
 		}
@@ -4324,14 +4346,14 @@ class ParentClassItem extends FCModelAdmin
 			$date_modified = JFactory::getDate($this->get('modified'));
 			$date_modified->setTimezone($tz);
 			
-			$body .= '<u>' . JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . '</u>: '
+			$body .= '<b>' . JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . '</b>: '
 				. $date_modified->format($format = 'D, d M Y H:i:s', $local = true)
 				. $tz_offset_str. "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
 		
 		// ADD INFO about category assignments
-		$body .= '<u>'.JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS').'</u>';
+		$body .= '<b>'.JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS').'</b>';
 		$body .= !$isNew
 			? " [ ". JText::_( $cats_altered ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n"
 			: " : <br/>\r\n";
@@ -4347,7 +4369,7 @@ class ParentClassItem extends FCModelAdmin
 		// ADD INFO for category assignments added or removed
 		if ( !empty($cats_added_titles) )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . "</u> : <br/>\r\n";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_ADDED') . "</b> : <br/>\r\n";
 			foreach ($cats_added_titles as $i => $cats_title)
 			{
 				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
@@ -4355,7 +4377,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 		if ( !empty($cats_removed_titles) )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . "</u> : <br/>\r\n";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_ITEM_CATEGORIES_REMOVED') . "</b> : <br/>\r\n";
 			foreach ($cats_removed_titles as $i => $cats_title)
 			{
 				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
@@ -4382,21 +4404,21 @@ class ParentClassItem extends FCModelAdmin
 		// ADD INFO for view/edit link
 		if ( in_array('viewlink',$nf_extra_properties) )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . "</b> : <br/>\r\n &nbsp; ";
 			$link = $item_url;
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkfe',$nf_extra_properties) )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . "</b> : <br/>\r\n &nbsp; ";
 			$link = $item_url . (strstr($item_url, '?') ? '&amp;' : '?') . 'task=edit';
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkbe',$nf_extra_properties) )
 		{
-			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . "</u> : <br/>\r\n &nbsp; ";
+			$body .= '<b>'.JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . "</b> : <br/>\r\n &nbsp; ";
 			$fc_ctrl_task = 'task=items.edit';
 			$link = JRoute::_( JURI::root().'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id') );
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
@@ -4731,8 +4753,12 @@ class ParentClassItem extends FCModelAdmin
 		$this->cleanCache(null, 1);
 		return true;
 	}
-	
-	
+
+
+	/**
+	 * Method to split description text into 'introtext' and 'fulltext' so that these properties are ready for storing in the DB
+	 *
+	 */	
 	function splitText(& $data)
 	{
 		// The text field is stored in the db as to seperate fields: introtext & fulltext
@@ -4741,67 +4767,188 @@ class ParentClassItem extends FCModelAdmin
 		if (is_array($data))
 		{
 			$tagPos = preg_match($pattern, @ $data['text']);
-			if ($tagPos == 0) {
+			if ($tagPos == 0)
+			{
 				$data['introtext'] = @ $data['text'];
 				$data['fulltext']  = '';
-			} else {
+			}
+			else
+			{
 				list($data['introtext'], $data['fulltext']) = preg_split($pattern, $data['text'], 2);
 				$data['fulltext'] = StringHelper::strlen( StringHelper::trim($data['fulltext']) ) ? $data['fulltext'] : '';
 			}
 		}
-		else {
+
+		else
+		{
 			$item = & $data;
 			$tagPos = preg_match($pattern, $item->text);
-			if ($tagPos == 0) {
+			if ($tagPos == 0)
+			{
 				$item->introtext = $item->text;
 				$item->fulltext  = '';
-			} else {
+			}
+			else
+			{
 				list($item->introtext, $item->fulltext) = preg_split($pattern, $item->text, 2);
 				$item->fulltext = StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? $item->fulltext : '';
 			}
 		}
 	}
-	
-	
-	function verifyAlias($alias, $title, &$item)
+
+
+	/**
+	 * Check that alias is unique within item's categories
+	 */	
+	function getSafeUniqueAlias($item, $data)
 	{
-		$alias = trim($alias);
-		if ( empty($alias) )
+		// Set alias if not already set
+		$alias = trim($data['alias']);
+		$alias = strlen($alias) ? $alias : $data['title'];
+
+		// Make alias safe and transliterate it
+		$alias = JApplicationHelper::stringURLSafe($alias, $data['lang_code']);
+
+		// Check for almost empty alias and use date and seconds plugs language code
+		if (trim(str_replace('-', '', $alias)) == '')
 		{
-			$alias = $title;
+			return JFactory::getDate()->format('Y-m-d-H-i-s') . '-' . $data['lang_code'];
 		}
-		
-		if ( !JFactory::getConfig()->get('unicodeslugs') )
-		{
-			$alias = $item->transliterate($alias, $item);
-		}
-		
-		// Call the default conversion
-		$alias = JApplicationHelper::stringURLSafe($alias);
-		
-		if(trim(str_replace('-','',$alias)) == '')
-		{
-			$alias = JFactory::getDate()->format('Y-m-d-H-i-s');
-		}
-		
-		// Check for unique Alias
-		$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$item->id;
+
+		// Also check for unique Alias
+		$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid=' . (int) $item->id;
 		$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
 			.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
 			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
-			.' WHERE i.alias='.$this->_db->Quote($alias)
-			.'  AND (i.catid='.(int)$item->id.' OR rel.catid IN ('.$sub_q.') )'
-			.'  AND e.language = '.$this->_db->Quote($item->language)
-			.'  AND i.id <> '.(int)$item->id
+			.' WHERE i.alias=' . $this->_db->Quote($alias)
+			.'  AND (i.catid=' . (int)$item->id . ' OR rel.catid IN (' . $sub_q .') )'
+			.'  AND i.id <> ' . (int) $item->id
 			;
 		$this->_db->setQuery($query);
-		$duplicate_aliases = (boolean) $this->_db->loadResult();
-		
-		if ($duplicate_aliases)
+		$duplicates_found = (boolean) $this->_db->loadResult();
+
+		return !$duplicates_found
+			? $alias
+			: $alias . ' (' . $item->id . ')';
+	}
+
+
+	/**
+	 * Method to prepare categories in data array for being store in the DB
+	 *
+	 */
+	protected function _prepareCategories($item, & $data)
+	{
+		$cats = isset($data['categories'])
+			? $data['categories']
+			: (isset($data['cid']) ? $data['cid'] : $item->categories);
+		$featured_cats = isset($data['featured_cid'])
+			? $data['featured_cid']
+			: array();
+
+		// Force arrays of integers
+		JArrayHelper::toInteger($cats);
+		JArrayHelper::toInteger($featured_cats);	
+
+		// Auto-assign a not set main category, to be the first out of secondary categories, 
+		if ( empty($data['catid']) && !empty($cats[0]) )
 		{
-			$alias = $alias.'_'.$item->id;
+			$data['catid'] = $cats[0];
 		}
-		return $alias;
+		
+		$cats_indexed = array_flip($cats);
+		// Add the primary cat to the array if it's not already in
+		if ( !empty($data['catid']) && !isset($cats_indexed[$data['catid']]) )
+		{
+			$cats_indexed[$data['catid']] = 1;
+		}
+		
+		// Add the featured cats to the array if it's not already in
+		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat )
+		{
+			if ( $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats_indexed[$featured_cat] = 1;
+		}
+		
+		// Reassign (unique) categories back to the cats array
+		$cats = array_keys($cats_indexed);
+
+
+		// ***
+		// *** Retrieve author configuration, and apply category limitations
+		// ***
+
+		$user = JFactory::getUser();
+		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
+		
+		// At least one category needs to be assigned
+		if (!is_array( $cats ) || count( $cats ) < 1)
+		{
+			$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_SELECT_CATEGORY'));
+			return false;
+		}
+
+		// Check more than allowed categories
+		else
+		{
+			// Get author's maximum allowed categories per item and set js limitation
+			$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
+			
+			// Verify category limitation for current author
+			if ( $max_cat_assign && count($cats) > $max_cat_assign )
+			{
+				$existing_only = false;
+				if ( count($cats) <= count($item->categories) )
+				{
+					// Maximum number of categories is exceeded, but do not abort if only using existing categories
+					$existing_only = true;
+					foreach ($cats as $newcat)
+					{
+						$existing_only = $existing_only && in_array($newcat, $item->categories);
+					}
+				}
+
+				if (!$existing_only)
+				{
+					$this->setError(JText::_('FLEXI_OPERATION_FAILED') .", ". JText::_('FLEXI_REASON') .": ". JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES').$max_cat_assign);
+					return false;
+				}
+			}
+		}
+
+
+		// ***
+		// *** Set processed categories it to real name of field: 'categories' INSTEAD OF 'cid'
+		// ***
+
+		$data['categories']  = $cats;
+		unset($data['cid']);
+		unset($data['featured_cid']);
+	}
+
+
+	/**
+	 * Method to prepare tags in data array for being store in the DB
+	 *
+	 */
+	protected function _prepareTags($item, & $data)
+	{
+		if ( !isset($data['tag']) && ! isset($data['tags']) )
+		{
+			// Do not set $data['tags'] thus item will maintain its current tag assignments
+			return;
+		}
+		$tags = isset($data['tags'])
+			? $data['tags']
+			: $data['tag'];
+
+
+		// Make tags unique
+		JArrayHelper::toInteger($tags);
+		$tags = array_keys(array_flip($tags));
+		
+		// Set tags back using itsreal name of field: 'tags'       INSTEAD OF 'tag'
+		$data['tags'] = $tags;
+		unset($data['tag']);
 	}
 
 
