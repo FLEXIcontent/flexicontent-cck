@@ -28,69 +28,80 @@ foreach($_levels as $_level) {
 <?php endif;?>
 
 
-<div class="alert fc-small fc-iblock">
+<div class="fc-mssg-inline fc-info fc-nobgimage" style="margin: 0 2px">
 	<span class="fcimport_field_prop_list fcimport_field_prop_mainlist">
 		
-		<table>
+		<table class="fc-form-tbl">
 			<tr>
-				<td style="text-align:right">
-					<span class="label">Content type</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Content type <br/> (for new items)</span>
 				</td>
-				<td>
-					<span class="badge badge-success"><?php echo $this->types[$this->conf['type_id']]->name; ?></span>
+				<td class="data">
+					<span class="icon-lock"></span><b><?php echo $this->types[$this->conf['type_id']]->name; ?></b>
 				</td>
-				<td style="text-align:right">
-					<span class="label">Item ID</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Item ID</span>
 				</td>
-				<td>
-					<?php if ($this->conf['id_col']==1): ?>
-						<span class="badge badge-info"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_ITEMS");?> </span>
+				<td class="data">
+					<?php if (!$this->conf['id_col']): ?>
+						<span class="icon-lock"></span><b><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?></b>
+					<?php elseif ($this->conf['id_col']==1): ?>
+						<span class="icon-stack"></span><b><?php echo JText::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . JText::_("FLEXI_IMPORT_CREATE_ITEMS"); ?> </b>
 					<?php elseif ($this->conf['id_col']==2): ?>
-						<span class="badge badge-info"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_UPDATE_ITEMS");?> </span>
-					<?php else: ?>
-						<span class="badge badge-success"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?></span>
-					<?php endif; ?>
+						<span class="icon-stack"></span><b><?php echo JText::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . JText::_("FLEXI_IMPORT_CREATE_UPDATE_ITEMS"); ?> </b>
+					<?php elseif ($this->conf['id_col']==3): ?>
+						<span class="icon-stack"></span><b><?php echo JText::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . JText::_("FLEXI_IMPORT_UPDATE_ITEMS"); ?> </b>
+					<?php else:
+						$app = JFactory::getApplication();
+						$app->setHeader('status', 500);
+						$app->enqueueMessage('not implemented setting \'id_col\': ' . $this->conf['id_col'], 'error');
+						$app->redirect('index.php?option=com_flexicontent&view=import');
+					endif; ?>
 				</td>
 			</tr>
 			
 			<tr>
-				<td style="text-align:right">
-					<span class="label">Language</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Language</span>
 				</td>
-				<td>
-					<span class="badge badge-success"><?php echo !$this->conf['language'] ? 'Using column' : $this->languages->{$this->conf['language']}->name; ?></span>
+				<td class="data">
+					<?php if (!$this->conf['language']): ?>
+						<span class="icon-stack"><?php echo 'Using column'; ?></b>
+					<?php else: ?>
+						<span class="icon-lock"></span><b><?php echo $this->languages->{$this->conf['language']}->name; ?></b>
+					<?php endif; ?>
 				</td>
-				<td style="text-align:right">
-					<span class="label">Main category</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Main category</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php if ($this->conf['maincat_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo $this->categories[$this->conf['maincat']]->title; ?></span>
+						<span class="icon-lock"></span><b><?php echo $this->categories[$this->conf['maincat']]->title; ?></b>
 					<?php endif; ?>
 				</td>
 			</tr>
 			
 			<tr>
-				<td style="text-align:right">
-					<span class="label">State</span>
+				<td class="key">
+					<span class="fc-prop-lbl">State</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php
 						$tmpparams = new JRegistry();
 						$tmpparams->set('show_icons', '0');
 					?>
 					<?php if (!$this->conf['state']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo flexicontent_html::stateicon( $this->conf['state'], $tmpparams); ?></span>
+						<span class="icon-lock"></span><b><?php echo flexicontent_html::stateicon( $this->conf['state'], $tmpparams); ?></b>
 					<?php endif; ?>
 				</td>
-				<td style="text-align:right">
-					<span class="label">Secondary categories</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Secondary categories</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php
 						$seccats = array();
 						foreach($this->conf['seccats'] as $seccatid) {
@@ -98,27 +109,27 @@ foreach($_levels as $_level) {
 						}
 					?>
 					<?php if ($this->conf['seccats_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo !empty($seccats) ? implode(", ", $seccats) : '-'; ?></span>
+						<span class="icon-lock"></span><b><?php echo !empty($seccats) ? implode(", ", $seccats) : '-'; ?></b>
 					<?php endif; ?>
 				</td>
 			</tr>
 			
 			<tr>
-				<td style="text-align:right">
-					<span class="label">Access</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Access</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php if ($this->conf['access']===0): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo isset($access_levels[$this->conf['access']]) ? $access_levels[$this->conf['access']] : $this->conf['access']; ?></span>
+						<span class="icon-lock"></span><b><?php echo isset($access_levels[$this->conf['access']]) ? $access_levels[$this->conf['access']] : $this->conf['access']; ?></b>
 					<?php endif; ?>
 				</td>
-				<td style="text-align:right">
+				<td class="key">
 				</td>
-				<td>
+				<td class="data">
 				</td>
 			</tr>
 			
@@ -128,47 +139,47 @@ foreach($_levels as $_level) {
 			</tr>
 			
 			<tr>
-				<td style="text-align:right">
-					<span class="label">Created by (user)</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Created by (user)</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php if ($this->conf['created_by_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo 'Current user'; ?></span>
+						<span class="icon-lock"></span><b><?php echo 'Current user'; ?></b>
 					<?php endif; ?>
 				</td>
-				<td style="text-align:right">
-					<span class="label">Creation date</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Creation date</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php if ($this->conf['created_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo 'NOW'; ?></span>
+						<span class="icon-lock"></span><b><?php echo 'NOW'; ?></b>
 					<?php endif; ?>
 				</td>
 			</tr>
 			
 			<tr>
-				<td style="text-align:right">
-					<span class="label">Modified by (user)</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Modified by (user)</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php if ($this->conf['modified_by_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo 'NULL (none)'; ?></span>
+						<span class="icon-lock"></span><b><?php echo 'NULL (none)'; ?></b>
 					<?php endif; ?>
 				</td>
-				<td style="text-align:right">
-					<span class="label">Modification date</span>
+				<td class="key">
+					<span class="fc-prop-lbl">Modification date</span>
 				</td>
-				<td>
+				<td class="data">
 					<?php if ($this->conf['modified_col']): ?>
-						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+						<span class="icon-stack"></span><b><?php echo 'Using column'; ?></b>
 					<?php else: ?>
-						<span class="badge badge-success"><?php echo 'Never'; ?></span>
+						<span class="icon-lock"></span><b><?php echo 'Never'; ?></b>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -211,54 +222,83 @@ foreach($_levels as $_level) {
 			<?php
 			if ( !isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['thefields'][$fieldname]) )  continue;
 			?>
-			<td>
+			<td style="text-align: right;">
 				<?php
-					if ($fieldname=='id') {
+				switch ($fieldname)
+				{
+					case 'id':
 						$is_existing = isset($this->conf['existing_ids'][$field_values]);
-						echo ($is_existing ? ' <span class="badge badge-warning">Update</span> ' : '<span class="badge badge-success">Create</span>Create</span>');
-						echo $field_values;
-					} else if ($fieldname=='access') {
-						echo $field_values .' : ';
+						echo $field_values . ' &nbsp; ';
+						echo ($is_existing ? ' <span class="icon-redo" style="color: darkorange;" title="Update"></span> ' : '<span class="icon-new" style="color: darkgreen;" title="Create"></span>');
+						break;
+
+					case 'access':
+						echo $field_values . ' : ';
 						echo isset($access_levels[$field_values]) ? $access_levels[$field_values] : 'Invalid, no Access level with ID: '.$field_values;
-					} else if ($fieldname=='catid') {
+						break;
+
+					case 'catid':
 						echo $field_values .' : ';
 						echo isset($this->categories[$field_values]) ? $this->categories[$field_values]->title : 'Invalid, no Category with ID: '.$field_values;
-					} else if ($fieldname=='cid') {
+						break;
+
+					case 'cid':
 						$seccats = array();
-						foreach($field_values as $seccatid) {
+						foreach($field_values as $seccatid)
+						{
 							$seccats[] = isset($this->categories[$seccatid]) ? $this->categories[$seccatid]->title : 'Invalid, no Category with ID: '.$seccatid;
 						}
 						echo !empty($seccats) ? implode(", ", $seccats) : '-';
-					} else if ($fieldname=='language') {
+						break;
+
+					case 'language':
 						echo $this->languages->{$field_values}->name;
-					} else if ($fieldname=='state')
+						break;
+
+					case 'state':
 						echo flexicontent_html::stateicon( $field_values, $this->cparams);
-					else if (!is_array($field_values)) {
-						$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_values) && isset($this->conf['filenames_missing'][$fieldname][$field_values]);
-						echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
-						echo StringHelper::strlen($field_values) > 40  ?  StringHelper::substr(strip_tags($field_values), 0, 40) . ' ... '  :  $field_values;
-						echo $is_missing ? '</span>' : '';
-					} else {
-						echo '<ul class="fcimport_field_value_list">';
-						foreach($field_values as $field_value) {
-							echo '<li>';
-							if (!is_array($field_value)) {
-								$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_value) && isset($this->conf['filenames_missing'][$fieldname][$field_value]);
-								echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
-								echo StringHelper::strlen($field_value) > 40  ?  StringHelper::substr(strip_tags($field_value), 0, 40) . ' ... '  :  $field_value;
-								echo $is_missing ? '</span>' : '';
-							} else {
-								echo '<dl class="fcimport_field_prop_list">';
-								foreach($field_value as $prop_name => $prop_val) {
-									echo '<dt>'.$prop_name.'</dt>';
-									echo '<dd>'.print_r($prop_val,true).'</dd>';
-								}
-								echo "</dl>";
-							}
-							echo '</li>';
+						break;
+
+					default:
+						if (!is_array($field_values))
+						{
+							$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_values) && isset($this->conf['filenames_missing'][$fieldname][$field_values]);
+							echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
+							echo StringHelper::strlen($field_values) > 40  ?  StringHelper::substr(strip_tags($field_values), 0, 40) . ' ... '  :  $field_values;
+							echo $is_missing ? '</span>' : '';
 						}
-						echo "</ul>";
-					}
+
+						else
+						{
+							echo '<ul class="fcimport_field_value_list">';
+
+							foreach($field_values as $field_value)
+							{
+								echo '<li>';
+								if (!is_array($field_value))
+								{
+									$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_value) && isset($this->conf['filenames_missing'][$fieldname][$field_value]);
+									echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
+									echo StringHelper::strlen($field_value) > 40  ?  StringHelper::substr(strip_tags($field_value), 0, 40) . ' ... '  :  $field_value;
+									echo $is_missing ? '</span>' : '';
+								}
+								else
+								{
+									echo '<dl class="fcimport_field_prop_list">';
+									foreach($field_value as $prop_name => $prop_val)
+									{
+										echo '<dt>'.$prop_name.'</dt>';
+										echo '<dd>'.print_r($prop_val,true).'</dd>';
+									}
+									echo "</dl>";
+								}
+								echo '</li>';
+							}
+
+							echo "</ul>";
+						}
+						break;
+				}
 				?>
 			</td>
 		<?php endforeach; ?>

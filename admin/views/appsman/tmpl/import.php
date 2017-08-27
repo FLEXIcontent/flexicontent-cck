@@ -68,7 +68,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				</button>
 				<br/><br/>
 				
-				<table class="fc-form-tbl keytop">
+				<table class="fc-form-tbl align-top">
 					<tr>
 						<td class="key">
 							<label class="label" for="xmlfile"><?php echo JText::_( 'FLEXI_XMLFILE' ); ?></label>

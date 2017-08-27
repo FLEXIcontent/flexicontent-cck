@@ -100,15 +100,17 @@ class FlexicontentControllerImport extends FlexicontentController
 		);
 
 
-		// *************************
-		// Execute according to task
-		// *************************
-		switch ($task) {
-		
-		
-		// ***********************************************************************************************
-		// RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
-		// ***********************************************************************************************
+		// ***
+		// *** Execute according to task
+		// ***
+
+		switch ($task)
+		{
+
+
+		// ***
+		// *** RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
+		// ***
 		
 		case 'clearcsv':
 		
@@ -125,9 +127,9 @@ class FlexicontentControllerImport extends FlexicontentController
 			break;
 		
 		
-		// ****************************************************
-		// CONTINUE an already started (multi-step) import task
-		// ****************************************************
+		// ***
+		// *** CONTINUE an already started (multi-step) import task
+		// ***
 
 		case 'importcsv':
 		
@@ -146,9 +148,9 @@ class FlexicontentControllerImport extends FlexicontentController
 			break;
 		
 		
-		// *************************************************************************
-		// INITIALIZE (prepare) import by getting configuration and reading CSV file
-		// *************************************************************************
+		// ***
+		// *** INITIALIZE (prepare) import by getting configuration and reading CSV file
+		// ***
 		
 		case 'initcsv':
 		case 'testcsv':
@@ -202,9 +204,9 @@ class FlexicontentControllerImport extends FlexicontentController
 			$conf['debug_records']    = $jinput->get('debug_records', 0, 'int');  // Debug, print parsed data without importing
 			
 			
-			// ********************************************************************************************
-			// Obligatory form fields, js validation should have prevented form submission but check anyway
-			// ********************************************************************************************
+			// ***
+			// *** Obligatory form fields, js validation should have prevented form submission but check anyway
+			// ***
 			
 			// Check for the required Content Type Id
 			if( !$conf['type_id'] ) {
@@ -219,9 +221,10 @@ class FlexicontentControllerImport extends FlexicontentController
 			}
 			
 			
-			// ********************************************************************************************************************
-			// Check for (required) CSV file format variables, js validation should have prevented form submission but check anyway
-			// ********************************************************************************************************************
+			// ***
+			// *** Check for (required) CSV file format variables, js validation should have prevented form submission but check anyway
+			// ***
+
 			if( $conf['mval_separator']=='' || $conf['mprop_separator']=='') {
 				$app->enqueueMessage('CSV format not valid, please enter multi-value, and multi-property Separators', 'error');
 				$app->redirect($link);
@@ -240,9 +243,10 @@ class FlexicontentControllerImport extends FlexicontentController
 			}
 			
 			
-			// ******************************************************************************************************
-			// Retrieve CSV file format variables, EXPANDING the Escape Characters like '\n' ... provided by the form
-			// ******************************************************************************************************
+			// ***
+			// *** Retrieve CSV file format variables, EXPANDING the Escape Characters like '\n' ... provided by the form
+			// ***
+
 			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/i';
 			$replace = 'eval(\'return "$1";\')';
 			
@@ -291,11 +295,12 @@ class FlexicontentControllerImport extends FlexicontentController
 				},
 				$conf['record_separator']
 			);
-			
-			
-			// ****************************************************
-			// Read & Parse the CSV file according the given format
-			// ****************************************************
+
+
+			// ***
+			// *** Read & Parse the CSV file according the given format
+			// ***
+
 			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $conf['field_separator'], $conf['enclosure_char'], $conf['record_separator']);
 			
 			// Basic error checking, for empty data
@@ -303,11 +308,12 @@ class FlexicontentControllerImport extends FlexicontentController
 				$app->enqueueMessage('CSV file format is not correct!', 'error');
 				$app->redirect($link);
 			}
-			
-			
-			// ********************************************************************************
-			// Get field names (from the header line (row 0), and remove it form the data array
-			// ********************************************************************************
+
+
+			// ***
+			// *** Get field names (from the header line (row 0), and remove it form the data array
+			// ***
+
 			$conf['columns'] = flexicontent_html::arrayTrim($contents[0]);
 			unset($contents[0]);
 			$q = 'SELECT id, name, field_type, label FROM #__flexicontent_fields AS fi'
@@ -315,134 +321,166 @@ class FlexicontentControllerImport extends FlexicontentController
 			$db->setQuery($q);
 			$conf['thefields'] = $db->loadObjectList('name');
 			unset($conf['thefields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
-			
-			
-			// ******************************************************************
-			// Check for REQUIRED columns and decide CORE property columns to use
-			// ******************************************************************
+
+
+			// ***
+			// *** Check for REQUIRED columns and decide CORE property columns to use
+			// ***
+
 			$core_props = array();
-			if ( $conf['id_col'] && !in_array('id', $conf['columns']) ) {
+			if ( $conf['id_col'] && !in_array('id', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'id\'</b> (Item ID)', 'error');
 				$app->redirect($link);
-			} else if ($conf['id_col']) $core_props['id'] = 'Item ID';
-			
-			if(!in_array('title', $conf['columns'])) {
+			}
+			else if ($conf['id_col']) $core_props['id'] = 'Item ID';
+
+
+			if(!in_array('title', $conf['columns']))
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'title\'</b>', 'error');
 				$app->redirect($link);
 			}
-			
+
+
 			$core_props['title'] = 'Title (core)';
 			$core_props['text']  = 'Description (core)';
 			$core_props['alias'] = 'Alias (core)';
-			
-			if ( !$conf['language'] && !in_array('language', $conf['columns']) ) {
+
+
+			if ( !$conf['language'] && !in_array('language', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'language\'</b>', 'error');
 				$app->redirect($link);
-			} else if (!$conf['language']) $core_props['language'] = 'Language';
-			
-			if ( !strlen($conf['state']) && !in_array('state', $conf['columns']) ) {
+			}
+			else if (!$conf['language']) $core_props['language'] = 'Language';
+
+
+			if ( !strlen($conf['state']) && !in_array('state', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'state\'</b>', 'error');
 				$app->redirect($link);
-			} else if ( !strlen($conf['state']) ) $core_props['state'] = 'State';
-			
-			if ( $conf['access']===0 && !in_array('access', $conf['columns']) ) {
+			}
+			else if ( !strlen($conf['state']) ) $core_props['state'] = 'State';
+
+
+			if ( $conf['access']===0 && !in_array('access', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'access\'</b>', 'error');
 				$app->redirect($link);
-			} else if ( $conf['access']===0 ) $core_props['access'] = 'Access';
-			
-			if ( $conf['maincat_col'] && !in_array('catid', $conf['columns']) ) {
+			}
+			else if ( $conf['access']===0 ) $core_props['access'] = 'Access';
+
+
+			if ( $conf['maincat_col'] && !in_array('catid', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'catid\'</b> (Primary category)', 'error');
 				$app->redirect($link);
-			} else if ($conf['maincat_col']) $core_props['catid'] = 'Primary category';
-			
-			if ( $conf['seccats_col'] && !in_array('cid', $conf['columns']) ) {
+			}
+			else if ($conf['maincat_col']) $core_props['catid'] = 'Primary category';
+
+
+			if ( $conf['seccats_col'] && !in_array('cid', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'cid\'</b> (Secondary categories)', 'error');
 				$app->redirect($link);
-			} else if ($conf['seccats_col']) $core_props['cid'] = 'Secondary categories';
-			
-			if ( $conf['created_col'] && !in_array('created', $conf['columns']) ) {
+			}
+			else if ($conf['seccats_col']) $core_props['cid'] = 'Secondary categories';
+
+
+			if ( $conf['created_col'] && !in_array('created', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'created\'</b> (Creation date)', 'error');
 				$app->redirect($link);
-			} else if ($conf['created_col']) $core_props['created'] = 'Creation Date';
-			
-			if ( $conf['created_by_col'] && !in_array('created_by', $conf['columns']) ) {
+			}
+			else if ($conf['created_col']) $core_props['created'] = 'Creation Date';
+
+
+			if ( $conf['created_by_col'] && !in_array('created_by', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'created_by\'</b> (Creator - Author)', 'error');
 				$app->redirect($link);
-			} else if ($conf['created_by_col']) $core_props['created_by'] = 'Creator (Author)';
-			
-			if ( $conf['modified_col'] && !in_array('modified', $conf['columns']) ) {
+			}
+			else if ($conf['created_by_col']) $core_props['created_by'] = 'Creator (Author)';
+
+
+			if ( $conf['modified_col'] && !in_array('modified', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'modified\'</b> (Modification date)', 'error');
 				$app->redirect($link);
-			} else if ($conf['modified_col']) $core_props['modified'] = 'Modification Date';
-			
-			if ( $conf['modified_by_col'] && !in_array('modified_by', $conf['columns']) ) {
+			}
+			else if ($conf['modified_col']) $core_props['modified'] = 'Modification Date';
+
+
+			if ( $conf['modified_by_col'] && !in_array('modified_by', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'modified_by\'</b> (Last modifier)', 'error');
 				$app->redirect($link);
-			} else if ($conf['modified_by_col']) $core_props['modified_by'] = 'Last modifier';
-			
-			if ( $conf['metadesc_col'] && !in_array('metadesc', $conf['columns']) ) {
+			}
+			else if ($conf['modified_by_col']) $core_props['modified_by'] = 'Last modifier';
+
+
+			if ( $conf['metadesc_col'] && !in_array('metadesc', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'metadesc\'</b> (META Description)', 'error');
 				$app->redirect($link);
-			} else if ($conf['metadesc_col']) $core_props['metadesc'] = 'META Description';
-			
-			if ( $conf['metakey_col'] && !in_array('metakey', $conf['columns']) ) {
+			}
+			else if ($conf['metadesc_col']) $core_props['metadesc'] = 'META Description';
+
+
+			if ( $conf['metakey_col'] && !in_array('metakey', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'metakey\'</b> (META Keywords)', 'error');
 				$app->redirect($link);
-			} else if ($conf['metakey_col']) $core_props['metakey'] = 'META Keywords';
-			
-			if ( $conf['publish_up_col'] && !in_array('publish_up', $conf['columns']) ) {
+			}
+			else if ($conf['metakey_col']) $core_props['metakey'] = 'META Keywords';
+
+
+			if ( $conf['publish_up_col'] && !in_array('publish_up', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'publish_up\'</b> (Start publication date)', 'error');
 				$app->redirect($link);
-			} else if ($conf['publish_up_col']) $core_props['publish_up'] = 'Start publication date';
-			
-			if ( $conf['publish_down_col'] && !in_array('publish_down', $conf['columns']) ) {
+			}
+			else if ($conf['publish_up_col']) $core_props['publish_up'] = 'Start publication date';
+
+
+			if ( $conf['publish_down_col'] && !in_array('publish_down', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'publish_down\'</b> (End publication Date)', 'error');
 				$app->redirect($link);
-			} else if ($conf['publish_down_col']) $core_props['publish_down'] = 'End publication Date';
-			
-			if ( $conf['tags_col']==1 && !in_array('tags_names', $conf['columns']) ) {
+			}
+			else if ($conf['publish_down_col']) $core_props['publish_down'] = 'End publication Date';
+
+
+			if ( $conf['tags_col']==1 && !in_array('tags_names', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'tags_names\'</b> (Comma separated list of tag names)', 'error');
 				$app->redirect($link);
-			} else if ($conf['tags_col']==1) {
+			}
+			else if ($conf['tags_col']==1)
+			{
 				$core_props['tags_names'] = 'Tag names';
 				$tags_model	= $this->getModel('tags');
 			}
-			
-			if ( $conf['tags_col']==2 && !in_array('tags_raw', $conf['columns']) ) {
+
+
+			if ( $conf['tags_col']==2 && !in_array('tags_raw', $conf['columns']) )
+			{
 				$app->enqueueMessage('CSV file lacks column <b>\'tags_raw\'</b> (Comma separated list of tag ids)', 'error');
 				$app->redirect($link);
-			} else if ( $conf['tags_col']==2 ) {
+			}
+			else if ( $conf['tags_col']==2 )
+			{
 				$core_props['tags_raw'] = 'Tags';
 				$tags_model	= $this->getModel('tags');
 			}
 			$conf['core_props'] = & $core_props;
-			
-			
-			// *********************************************************
-			// Verify that all non core property columns are field names
-			// *********************************************************
-			$unused_columns = array();
-			foreach($conf['columns'] as $colname) {
-				if ( !isset($conf['core_props'][$colname]) && !isset($conf['thefields'][$colname]) ) {
-					$unused_columns[] = $colname;
-					if ($conf['ignore_unused_cols']) {
-						JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND (column will be ignored)" );
-					}
-				}
-			}
-			if ( count($unused_columns) && !$conf['ignore_unused_cols']) {
-				$app->enqueueMessage('
-					File has unused '.count($unused_columns).' columns: <b>'.implode(', ',$unused_columns).'</b>'.
-					' <br/>these field names are not assigned to choosen <b>content type</b>'.
-					' <br/><br/>please enable option: <b>\'Ignore unused columns\'</b>',
-				'error');
-				$app->redirect($link);
-			}
-			
-			
-			// **********************************************************
-			// Verify that custom specified item ids do not already exist
-			// **********************************************************
+
+
+			// ***
+			// *** Verify that custom specified item ids do not already exist
+			// ***
+
 			$conf['existing_ids'] = array();
 			if ( $conf['id_col'] )
 			{
@@ -461,35 +499,81 @@ class FlexicontentControllerImport extends FlexicontentController
 				$custom_id_arr = array();
 				foreach($contents as $fields)
 				{
-					$custom_id_arr[] = $fields[$id_col_no];
+					$custom_id_arr[] = (int) $fields[$id_col_no];
 				}
 				$custom_id_list = "'" . implode("','", $custom_id_arr) ."'";
-				
+
 				// Cross check them if they already exist in the DB
 				$q = "SELECT id FROM #__content WHERE id IN (".$custom_id_list.")";
 				$db->setQuery($q);
-				$conf['existing_ids'] = $db->loadObjectList('id');
+				$conf['existing_ids'] =  array_flip($db->loadColumn());
 
-				// Throw error if we are only importing new items but existing item ids were found
+				// Throw error if we are only IMPORTING (creating) new items but existing item ids were found
 				if ( $conf['id_col'] == 1 && $conf['existing_ids'] && count($conf['existing_ids']) )
 				{
-					$app->enqueueMessage('File has '.count($conf['existing_ids']).' item IDs that already exist: \''.implode("\' , \'",$conf['existing_ids']).'\', please fix or enable update existing items option', 'error');
+					$app->enqueueMessage('File has ' . count($conf['existing_ids']).' item IDs that already exist: ' . implode(", ",$conf['existing_ids']) . ', <br/>Please fix or enable -updating- of existing items too', 'error');
+					$app->redirect($link);
+				}
+
+				// Throw error if we are only UPDATING new items but not all item ids were found
+				if ( $conf['id_col'] == 3 && count($conf['existing_ids']) < count($custom_id_arr) )
+				{
+					$existing_ids = array_keys($conf['existing_ids']);
+					$missing_count = count($custom_id_arr) - count($existing_ids);
+					$missing_ids   = array_diff($custom_id_arr, $existing_ids);
+					$app->enqueueMessage('File has ' . $missing_count . ' item IDs that do not exist in DB : ' . implode(", ", $missing_ids) . ', <br/>Please fix or enable -creating- of existing items too', 'error');
 					$app->redirect($link);
 				}
 			}
-			
-			
+
+
+			// ***
+			// *** Verify that all non core property columns are field names
+			// ***
+
+			$unused_columns = array();
+			foreach($conf['columns'] as $colname)
+			{
+				if ( !isset($conf['core_props'][$colname]) && !isset($conf['thefields'][$colname]) )
+				{
+					$unused_columns[] = $colname;
+				}
+			}
+
+			if ( count($unused_columns) )
+			{
+				$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
+
+				if (!$conf['ignore_unused_cols'])
+				{
+					$app->enqueueMessage('
+						File has unused '.count($unused_columns).' columns : [ ' . implode(' ], [ ', $unused_columns) . ' ]' .
+						' <br/><br/>Their fields (fieldnames in column header) are not assigned to chosen content type : <b>' . $types[$conf['type_id']]->name . '</b>' .
+						' <br/><br/>Please enable option: <b>\'Ignore unused columns\'</b>',
+					'warning');
+					$app->redirect($link);
+				}
+				else
+				{
+					$app->enqueueMessage('
+						File has unused '.count($unused_columns).' columns: <b>'.implode(', ', $unused_columns).'</b>'.
+						' <br/>These columns will be ignored, because their fields (fieldnames in column header) are not assigned to chosen <b>content type</b> :' . $types[$conf['type_id']]->name,
+					'notice');
+				}
+			}
+
+
 			// Trim item's data
 			foreach($contents as $fields) $fields = flexicontent_html::arrayTrim($fields);
-			
+
 			// Set csvfile contens and columns information
 			$conf['contents']   = & $contents;
-			
-			
-			// ***************************************************************
-			// Verify that imported files exist in the media/documents folders
-			// ***************************************************************
-			
+
+
+			// ***
+			// *** Verify that imported files exist in the media/documents folders
+			// ***
+
 			// Get fields that use files
 			$conf['media_folder'] = $jinput->get('media_folder', '', 'string');
 			$conf['docs_folder']  = $jinput->get('docs_folder', '', 'string');
@@ -515,33 +599,35 @@ class FlexicontentControllerImport extends FlexicontentController
 				$this->setRedirect( $link );
 				return;
 			}
-			
-			else { // task == 'testcsv'
+
+			// ELSE -- task == 'testcsv'
+			else
+			{
 				$conf['debug_records'] = $conf['debug_records'] ? $conf['debug_records'] : 2;
 			}
 			
 			break;
-		
-		
-		// ************************
-		// UNKNWOWN task, terminate
-		// ************************
-		
+
+
+		// ***
+		// *** UNKNWOWN task, terminate
+		// ***
+
 		default:
-		
+
 			// Set an error message about unknown task and redirect
 			$app->enqueueMessage('Unknown task: '.$task, 'error');
 			$this->setRedirect( $link );
 			return;
-			
+
 			break;
 		}
-		
-		
-		
-		// *********************************************************************************
-		// Handle each row (item) using store() method of the item model to create the items
-		// *********************************************************************************
+
+
+		// ***
+		// *** Handle each row (item) using store() method of the item model to create the items
+		// ***
+
 		if ($conf['tags_col']) $tags_model = $this->getModel('tags');
 		
 		$colcount  = count($conf['columns']);
@@ -568,8 +654,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			$data['vstate']  = 2;
 			$data['state']   = $conf['state'];
 			$data['access']  = $conf['access'];
-			
-			
+
 			// Prepare request variable used by the item's Model
 			if ( $task != 'testcsv' ) foreach($_d as $fieldname => $field_values)
 			{
@@ -607,6 +692,7 @@ class FlexicontentControllerImport extends FlexicontentController
 						}
 					}
 				}
+
 				else if ( $fieldname=='tags_raw' )
 				{
 					if ($conf['tags_col']==2) {
@@ -622,39 +708,70 @@ class FlexicontentControllerImport extends FlexicontentController
 						$data['tag'] = $db->loadColumn();
 					}
 				}
+
 				else if ( isset($conf['core_props'][$fieldname]) ) {
 					$data[$fieldname] = $field_values;
 				}
+
 				else
 				{
 					$data['custom'][$fieldname] = $field_values;
 				}
 			}
 
-			// Before setting any new values try to load item if item ID was given and also updating is allowed
-			$c_item_id = @ $data['id'];
-			if ( $conf['id_col']==2 && !empty($data['id']) )
-			{
-				// EITHER Load existing item into the ITEM model
-				$item = $itemmodel->getItem($data['id'], $check_view_access=false, $no_cache=true, $force_version=0);
+			// Before setting any new values try to load item if item ID was given
+			$c_item_id = $conf['id_col'] && !empty($data['id'])
+				? $data['id']
+				: 0;
 
-				// You can use $item to get existing values
+
+			// ***
+			// *** CREATE CASE with / without ID column --OR-- item ID not given --OR-- item ID does not exist
+			// *** NOTE: we already check above,
+			// ***  that for create-only, none of the given item ID exists in the DB
+			// ***  that for update-only, all given item IDs exist in the DB
+			// ***
+
+			if ( $conf['id_col'] <= 1 || empty($c_item_id) || !isset($conf['existing_ids'][$c_item_id]) )
+			{
+				$data['id'] = 0;
+			}
+
+
+			// ***
+			// *** CREATE / UPDATE --OR-- UPDATE-only CASEs with item ID given
+			// ***
+
+			else
+			{
+				// Try to Load existing item into the ITEM model
+				$item = $itemmodel->getItem($c_item_id, $check_view_access=false, $no_cache=true, $force_version=0);
 				if ($item)
 				{
+					// Maintain content type for existing items
+					$data['type_id'] = $item->type_id;
+
 					// IMPORTANT: Get existing field values for the item
 					$items = array($item);
 					$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
 					$data_custom = $data['custom'];  // Backup field values from file
 					$data['custom'] = reset($items_custom_values); // Get data of first item
-					foreach($data_custom as $i => $v) $data['custom'][$i] = $v;  // Override existing item field values with those from file
+
+					// Override existing item field values with those from file
+					foreach($data_custom as $i => $v)
+					{
+						$data['custom'][$i] = $v;
+					}
+				}
+
+				// INTERNAL ERROR, item could not be loaded, but we have checked above that it does exist, so this indicates a bug in our code
+				else
+				{
+					$data['id'] = -1;
 				}
 			}
+			$isNew = $data['id'] == 0;
 
-			// Set/Force id to zero to indicate creation of new item, in case item 'id' column is being used
-			else if ( $conf['id_col']!=2 )
-			{
-				$data['id'] = 0;
-			}			
 
 			$session->set('csvimport_lineno', $lineno, 'flexicontent');
 
@@ -687,7 +804,15 @@ class FlexicontentControllerImport extends FlexicontentController
 					"<u>TEXT</u>: ". $_d['text'] ."<hr/>";
 				}
 			}
-			
+
+			// Internal error, this should not happen anyway, but continue with other items
+			else if ($data['id'] == -1)
+			{
+				$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
+				JLog::add($msg, JLog::WARNING, 'com_flexicontent.importcsv');
+				echo $msg."<br/>";
+			}
+
 			// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
 			else if ( !$itemmodel->store($data) )
 			{
@@ -706,7 +831,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				echo $msg."<br/>";
 				
 				// Remap 'ID' of item (when 'id' column is being used)
-				if ( $conf['id_col']==1 && $c_item_id )
+				if ( in_array($conf['id_col'], array(1, 2)) && $c_item_id && $isNew )
 				{
 					$item_id = $itemmodel->getId();
 					$q = "UPDATE #__content SET id='".$c_item_id."' WHERE id='".$item_id."'";
@@ -737,14 +862,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					$db->setQuery($q);
 					$db->execute();
 					
-					if (FLEXI_J16GE) {
-						$q = "UPDATE #__assets SET id='".$c_item_id."' WHERE id='".$item_id."'";
-					} else {
-						$q = "UPDATE #__flexiaccess_acl SET axo='".$c_item_id."'"
-							. " WHERE acosection = ". $db->Quote('com_content')
-							. " AND axosection = ". $db->Quote('item')
-							. " AND axo='".$item_id."'";
-					}
+					$q = "UPDATE #__assets SET id='".$c_item_id."' WHERE id='".$item_id."'";
 					$db->setQuery($q);
 					$db->execute();
 				}
@@ -753,12 +871,14 @@ class FlexicontentControllerImport extends FlexicontentController
 		//fclose($fp);
 		
 		// Done nothing more to do
-		if ( $task == 'testcsv' ) {
+		if ( $task == 'testcsv' )
+		{
 			echo $parse_log;
 			echo "\n\n\n".'<b>please click</b> <a href="'.$link.'">here</a> to return previous page'."\n\n\n";
 			jexit();
 		}
-		
+
+		// When import is finished clean cache
 		if ($lineno == $itemcount)
 		{
 			// Clean item's cache

@@ -2689,7 +2689,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
-table.fc-form-tbl.keytop td.key {
+table.fc-form-tbl.align-top td.key > *,
+table.fc-form-tbl.align-top td.data > * {
 	vertical-align: top;
 }
 table.fc-form-tbl td {
