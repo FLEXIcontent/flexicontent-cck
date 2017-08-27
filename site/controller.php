@@ -326,6 +326,13 @@ class FlexicontentController extends JControllerLegacy
 			$data['title'] = (int) $data['id'];  // item id or ZERO for new items
 		}
 
+		// Check for zero tags posted
+		$tagname = $this->input->get('tagname', null);
+		if (!isset($data['tag']) && $tagname !== null)
+		{
+			$data['tag'] = array();
+		}
+
 
 		// ***
 		// *** ENFORCE can change category ACL perms
