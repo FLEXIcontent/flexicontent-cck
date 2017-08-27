@@ -65,51 +65,58 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading"><?php echo JText::_("FLEXI_BASIC");?></h3>
 		
 		<br/>
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 			
 			<tr>
 				<td class="key"><label class="label">Id</label></td>
-				<td class="data">
+				<td class="data" style="width: 300px;">
 					<?php
 						$dv = $this->model->getState('id_col');
-						$checked0 = $dv==0 ? 'checked="checked"' : '';
-						$checked1 = $dv==1 ? 'checked="checked"' : '';
-						$checked2 = $dv==2 ? 'checked="checked"' : '';
 					?>
-					<input type="radio" id="id_col0" name="id_col" value="0" <?php echo $checked0; ?> />
-					<label for="id_col0"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?></label>
-					<input type="radio" id="id_col1" name="id_col" value="1" <?php echo $checked1; ?> />
-					<label for="id_col1"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_ITEMS");?> **</label>
-					<input type="radio" id="id_col2" name="id_col" value="2" <?php echo $checked2; ?> />
-					<label for="id_col2"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL_CREATE_UPDATE_ITEMS");?></label>
-					<span class="fc-mssg-inline fc-info fc-nobgimage">** <?php echo JText::_("FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT");?></span>
+					<input type="radio" id="id_col0" name="id_col" value="0" <?php echo $dv==0 ? 'checked="checked"' : ''; ?> />
+					<label for="id_col0"><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?> - <?php echo JText::_("FLEXI_IMPORT_CREATE_ITEMS");?></label> <br/>
+
+					<div style="border: 1px dashed; padding: 12px">
+						<b><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></b><br/>
+						<input type="radio" id="id_col1" name="id_col" value="1" <?php echo $dv==1 ? 'checked="checked"' : ''; ?> />
+						<label for="id_col1"><?php echo JText::_("FLEXI_IMPORT_CREATE_ITEMS");?></label> <br/>
+	
+						<input type="radio" id="id_col2" name="id_col" value="2" <?php echo $dv==2 ? 'checked="checked"' : ''; ?> />
+						<label for="id_col2"><?php echo JText::_("FLEXI_IMPORT_CREATE_UPDATE_ITEMS");?></label> <br/>
+	
+						<input type="radio" id="id_col3" name="id_col" value="3" <?php echo $dv==3 ? 'checked="checked"' : ''; ?> />
+						<label for="id_col3"><?php echo JText::_("FLEXI_IMPORT_UPDATE_ITEMS");?></label>
+					</div>
+				</td>
+				<td class="data">
+					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT");?></span>
 				</td>
 			</tr>
 
 			<tr>
 				<td class="key"><label class="label" id="type_id-lbl" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?></label></td>
-				<td class="data">
-					<?php echo $this->lists['type_id'];?>
+				<td class="data" colspan="2">
+					<?php echo $this->lists['type_id'];?> <span class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_("NOTE: This is ignored when updating existing items");?></span>
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_LANGUAGE");?></label></td>
-				<td class="data">
+				<td class="data" colspan="2">
 					<?php echo str_replace('<br />', '', $this->lists['languages']); ?>
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_STATE");?></label></td>
-				<td class="data">
+				<td class="data" colspan="2">
 					<?php echo str_replace('<br />', '', $this->lists['states']); ?>
 				</td>
 			</tr>
 			
 			<tr>
 				<td class="key"><label class="label" id="access-lbl" for="access"><?php echo JText::_("FLEXI_ACCESS_LEVEL");?></label></td>
-				<td class="data">
+				<td class="data" colspan="2">
 					<?php echo str_replace('<br />', '', $this->lists['access']); ?>
 				</td>
 			</tr>
@@ -139,7 +146,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading"><?php echo JText::_("FLEXI_PUBLISHING");?></h3>
 		
 		<br/>
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 			
 			<tr>
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_CREATOR_AUTHOR");?></label></td>
@@ -246,11 +253,11 @@ $tabCnt[$tabSetCnt] = 0;
 		
 		<br/>
 		<div class="fc-mssg-inline fc-info"><?php echo JText::_("FLEXI_IMPORT_INTO_CATEGORIES_WITH_OVERRIDE_DESC");?></div>
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 			
 			<tr>
 				<td class="" colspan="2">
-					<div class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_('Defaults'); ?></div>
+					<div class="fcsep_level2"><?php echo JText::_('Defaults'); ?></div>
 				</td>
 			</tr>
 			
@@ -266,7 +273,7 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="" colspan="2">
-					<br/><div class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_('Override defaults via file columns'); ?></div>
+					<br/><div class="fcsep_level2"><?php echo JText::_('Override defaults via file columns'); ?></div>
 				</td>
 			</tr>
 			
@@ -305,7 +312,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<br/>
 		<div class="fc-mssg-inline fc-info"><?php echo JText::_("FLEXI_IMPORT_TAGS_WILL_BE_CREATED_BEFORE_IMPORT");?></div>
 
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 			
 			<tr>
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_TAGS");?></label></td>
@@ -334,12 +341,12 @@ $tabCnt[$tabSetCnt] = 0;
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-images">
 		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( 'FLEXI_IMPORT_ABOUT_NEW_FILES' ); ?>">Media / Document fields</h3>
 		
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 			
 			<tr>
 				<td class="" colspan="3">
 					<br/>
-					<div class="fc-mssg-inline fc-info fc-nobgimage"> <?php echo JText::_( 'FLEXI_IMPORT_ABOUT_NEW_FILES' ); ?> </div>
+					<div class="fc-mssg fc-info"> <?php echo JText::_( 'FLEXI_IMPORT_ABOUT_NEW_FILES' ); ?> </div>
 				</td>
 			</tr>
 			
@@ -398,7 +405,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( '' ); ?>"><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_N_FORMAT' ); ?></h3>
 		
 		<br/>
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 			<tr>
 				<td class="key">
 					<label class="label" for="csvfile"><?php echo JText::_( 'FLEXI_CSVFILE' ); ?></label>
@@ -424,7 +431,7 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="" colspan="3">
-					<div class="fc-mssg-inline fc-info fc-nobgimage"> <?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT' ); ?> </div>
+					<div class="fcsep_level2"> <?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT' ); ?> </div>
 				</td>
 			</tr>
 			<tr>
@@ -464,7 +471,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<tr>
 				<td colspan="3">
 					<br/><br/>
-					<div class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_('FLEXI_IMPORT_MVAL_MPROP_FIELDS'); ?></div>
+					<div class="fcsep_level2"><?php echo JText::_('FLEXI_IMPORT_MVAL_MPROP_FIELDS'); ?></div>
 				</td>
 			</tr>
 
@@ -501,7 +508,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( '' ); ?>"><?php echo JText::_( 'FLEXI_ADVANCED' ); ?></h3>
 		
 		<br/>
-		<table class="fc-form-tbl keytop">
+		<table class="fc-form-tbl align-top">
 								
 			<tr>
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS");?></label></td>

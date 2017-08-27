@@ -77,7 +77,8 @@ class FlexicontentViewImport extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
-		
+		flexicontent_html::loadFramework('flexi-lib-form');
+
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
