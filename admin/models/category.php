@@ -184,6 +184,50 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 
 	/**
+	 * Method to get a table object, load it if necessary.
+	 *
+	 * @param   string  $type    The table name. Optional.
+	 * @param   string  $prefix  The class prefix. Optional.
+	 * @param   array   $config  Configuration array for model. Optional.
+	 *
+	 * @return  JTable  A JTable object
+	 *
+	 * @since   3.2.0
+	 */
+	public function getTable($type = 'Category', $prefix = 'CategoriesTable', $config = array())
+	{
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
+		return JTable::getInstance($type, $prefix, $config);
+	}
+
+
+	/**
+	 * Method rebuild the entire nested set tree.
+	 *
+	 * @return  boolean  False on failure or error, true otherwise.
+	 *
+	 * @since   3.2.0
+	 */
+	public function rebuild()
+	{
+		// Get an instance of the table object.
+		$table = $this->getTable();
+
+		if (!$table->rebuild())
+		{
+			$this->setError($table->getError());
+
+			return false;
+		}
+
+		// Clear the cache
+		$this->cleanCache();
+
+		return true;
+	}
+
+
+	/**
 	 * Method to load inherited parameters
 	 *
 	 * @access	private
