@@ -32,7 +32,6 @@ class FlexicontentViewTags extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-
 		// ***
 		// *** Initialise variables
 		// ***
@@ -70,10 +69,11 @@ class FlexicontentViewTags extends JViewLegacy
 		// Text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
-		
+
 		// Order and order direction
 		$filter_order     = $model->getState('filter_order');
 		$filter_order_Dir = $model->getState('filter_order_Dir');
+
 
 
 		// ***
@@ -90,9 +90,6 @@ class FlexicontentViewTags extends JViewLegacy
 		// *** Add css and js to document
 		// ***
 		
-		flexicontent_html::loadFramework('select2');
-		//JHTML::_('behavior.tooltip');
-		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
@@ -100,12 +97,20 @@ class FlexicontentViewTags extends JViewLegacy
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+
 
 
 		// ***
 		// *** Create Submenu & Toolbar
 		// ***
-		
+
 		// Get user's global permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 
@@ -119,7 +124,7 @@ class FlexicontentViewTags extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		$js = "jQuery(document).ready(function(){";
+		$js = '';
 
 		$contrl = "tags.";
 		$contrl_singular = "tag.";
@@ -168,7 +173,8 @@ class FlexicontentViewTags extends JViewLegacy
 
 		JToolbarHelper::checkin($contrl.'checkin');
 		
-		if ($perms->CanConfig) {
+		if ($perms->CanConfig)
+		{
 			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -178,13 +184,19 @@ class FlexicontentViewTags extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
-		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+
+
 		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rows = $this->get( 'Data');
+		$rows = $this->get( 'Data' );
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -205,11 +217,17 @@ class FlexicontentViewTags extends JViewLegacy
 		// Create pagination object
 		$pagination = $this->get( 'Pagination' );
 		$inline_ss_max = 50000;
-		$drag_reorder_max = 150;
+		$drag_reorder_max = 200;
+		if ( $pagination->limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
+
+
+		// ***
+		// *** Create List Filters
+		// ***
 
 		$lists = array();
 		
-		// Build orphaned/assigned filter
+		// build orphaned/assigned filter
 		$assigned 	= array();
 		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_('FLEXI_ALL_TAGS')*/);
 		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
@@ -233,15 +251,16 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		// text search filter
 		$lists['search']= $search;
-		
-		
+
+
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		
-		
+
+
 		//assign data to template
 		$this->count_filters = $count_filters;
+
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->pagination = $pagination;

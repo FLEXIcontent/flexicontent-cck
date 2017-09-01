@@ -36,34 +36,51 @@ class FlexicontentViewGroups extends JViewLegacy
 	
 	function display( $tpl = null )
 	{
-		$this->items		= $this->get('Items');
-		$this->pagination	= $this->get('Pagination');
-		$this->state		= $this->get('State');
-		
-		$app      = JFactory::getApplication();
+		// ***
+		// *** Initialise variables
+		// ***
+
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = $app->input->get('option', '', 'CMD');
-		$view     = $app->input->get('view', '', 'CMD');
 		
+		// Get model
+		$model = $this->getModel();
+
+		$this->items		= $model->getItems();
+		$this->pagination	= $this->get('Pagination');
+		$this->state		= $this->get('State');
+
 		// Check for errors.
-		if (count($errors = $this->get('Errors'))) {
-			JError::raiseError(500, implode("\n", $errors));
+		if (count($errors = $this->get('Errors')))
+		{
+			$app->setHeader('status', '500', true);
+			$app->enqueueMessage(implode("\n", $errors), 'error');
 			return false;
 		}
-		// Get filters
+
+
+
+		// ***
+		// *** Get filters
+		// ***
+
 		$count_filters = 0;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
-		
-		
-		
-		// **************************
-		// Add css and js to document
-		// **************************
+
+
+
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -71,21 +88,24 @@ class FlexicontentViewGroups extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+
+
+
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
 		
-		
-		
-		// *****************************
 		// Get user's global permissions
-		// *****************************
-		
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanGroups');
 		
@@ -94,7 +114,7 @@ class FlexicontentViewGroups extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'groups' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		// Create the toolbar
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		$this->addToolbar();
@@ -161,7 +181,7 @@ class FlexicontentViewGroups extends JViewLegacy
 		{
 			JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'delete');
 		}
-		
+
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
 		{

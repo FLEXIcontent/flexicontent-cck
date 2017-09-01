@@ -60,7 +60,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
-		
+
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
@@ -146,12 +146,10 @@ class FlexicontentViewItems extends JViewLegacy
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
 		
-		// **************************
-		// Add css and js to document
-		// **************************
 		
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.calendar');
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -159,8 +157,18 @@ class FlexicontentViewItems extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
-		$js = "jQuery(document).ready(function(){";
+
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.calendar');
+
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+
+		$js = '';
+
 		if ($filter_cats)   $js .= "jQuery('.col_cats').each(function(){ jQuery(this).addClass('yellow'); });";
 		if ($filter_type)   $js .= "jQuery('.col_type').each(function(){ jQuery(this).addClass('yellow'); });";
 		if ($filter_author) $js .= "jQuery('.col_authors').each(function(){ jQuery(this).addClass('yellow'); });";
@@ -377,13 +385,18 @@ class FlexicontentViewItems extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
-		
-		// ***********************
-		// Get data from the model
-		// ***********************
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+
+		// ***
+		// *** Get data from the model
+		// ***
 		
 		$badcatitems  = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
 		$unassociated = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false);
@@ -413,7 +426,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		
 		$inline_ss_max = 50000;
-		$drag_reorder_max = 150;
+		$drag_reorder_max = 200;
 		if ( $pagination->limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
 		
 		
