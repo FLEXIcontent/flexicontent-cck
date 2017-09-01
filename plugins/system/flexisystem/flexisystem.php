@@ -824,6 +824,9 @@ class plgSystemFlexisystem extends JPlugin
 			
 			foreach($form_data as $n => $v)
 			{
+				$_POST[$n] = $v;
+				$_REQUEST[$n] = $v;
+				$app->input->post->set($n, $v);
 				$app->input->set($n, $v);
 			}
 			

@@ -1064,7 +1064,7 @@
 		}
 	
 		// 8. Fill in 'column choose box'
-		str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true" /><span id="'+container_div_id+'_cols">' + str + '</span>' + end_text;
+		str = '<span id="'+container_div_id+'_cols">' + str + '</span>' + end_text;
 		document.getElementById(container_div_id).innerHTML=str;
 
 		// 9. Update cookie data and display data
