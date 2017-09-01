@@ -96,7 +96,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<tr>
 				<td class="key"><label class="label" id="type_id-lbl" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?></label></td>
 				<td class="data" colspan="2">
-					<?php echo $this->lists['type_id'];?> <span class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_("NOTE: This is ignored when updating existing items");?></span>
+					<?php echo $this->lists['type_id'];?> <span class="fc-mssg-inline fc-info fc-nobgimage"><?php echo JText::_("Used by NEW items only");?></span>
 				</td>
 			</tr>
 			

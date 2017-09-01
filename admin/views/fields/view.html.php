@@ -32,9 +32,9 @@ class FlexicontentViewFields extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		// ********************
-		// Initialise variables
-		// ********************
+		// ***
+		// *** Initialise variables
+		// ***
 
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
@@ -54,9 +54,9 @@ class FlexicontentViewFields extends JViewLegacy
 
 
 
-		// ***********
-		// Get filters
-		// ***********
+		// ***
+		// *** Get filters
+		// ***
 
 		$count_filters = 0;
 
@@ -76,15 +76,16 @@ class FlexicontentViewFields extends JViewLegacy
 		// Text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
-		
+
 		// Order and order direction
-		$filter_order     = $model->getState( 'filter_order' );
-		$filter_order_Dir = $model->getState( 'filter_order_Dir' );
+		$filter_order     = $model->getState('filter_order');
+		$filter_order_Dir = $model->getState('filter_order_Dir');
 
 
-		// ****************************
-		// Important usability messages
-		// ****************************
+
+		// ***
+		// *** Important usability messages
+		// ***
 
 		if ( $cparams->get('show_usability_messages', 1) )
 		{
@@ -108,12 +109,9 @@ class FlexicontentViewFields extends JViewLegacy
 		';
 		
 		
-		// **************************
-		// Add css and js to document
-		// **************************
-		
-		flexicontent_html::loadFramework('select2');
-		//JHTML::_('behavior.tooltip');
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -121,21 +119,24 @@ class FlexicontentViewFields extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
-		
-		
-		// *****************************
+
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+
+
+
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
+
 		// Get user's global permissions
-		// *****************************
-		
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanFields');
 		
@@ -181,7 +182,8 @@ class FlexicontentViewFields extends JViewLegacy
 
 		JToolbarHelper::publishList($contrl.'publish');
 		JToolbarHelper::unpublishList($contrl.'unpublish');
-		if ($perms->CanAddField) {
+		if ($perms->CanAddField)
+		{
 			JToolbarHelper::addNew($contrl.'add');
 		}
 		if ($perms->CanEditField)
@@ -199,6 +201,7 @@ class FlexicontentViewFields extends JViewLegacy
 				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
+
 		JToolbarHelper::checkin($contrl.'checkin');
 
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
@@ -260,23 +263,35 @@ class FlexicontentViewFields extends JViewLegacy
 		$rows       = $this->get( 'Items' );
 		$allrows    = $this->get( 'AllItems' );
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		$pagination = $this->get( 'Pagination' ); // Pagination
-		$types      = $this->get( 'Typeslist' );  // Content types
-		
-		
+
+
+		// Create pagination object
+		$pagination = $this->get( 'Pagination' );
+		$inline_ss_max = 50000;
+		$drag_reorder_max = 200;
+		if ( $pagination->limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
+
+		// Create content types
+		$types = $this->get( 'Typeslist' );
+
+
+		// ***
+		// *** Create List Filters
+		// ***
+
 		$lists = array();
 		
 		// build item-type filter
 		$lists['filter_type'] = ($filter_type|| 1 ? '<div class="add-on">'.JText::_('FLEXI_TYPE').'</div>' : '').
 			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
-		
-		
+
+
 		// build orphaned/assigned filter
 		$assigned 	= array();
 		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
 		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
 		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
-		
+
 		$lists['assigned'] = ($filter_assigned || 1 ? '<div class="add-on">'.JText::_('FLEXI_ASSIGNED').'</div>' : '').
 			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_assigned );
 		
@@ -324,20 +339,20 @@ class FlexicontentViewFields extends JViewLegacy
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-		
-		
+
+
 		// text search filter
 		$lists['search']= $search;
-		
-		
+
+
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 		$ordering = ($filter_type == '' || $filter_type == 0)
 			? ($lists['order'] == 't.ordering')
 			: ($lists['order'] == 'typeordering');
-		
-		
+
+
 		//assign data to template
 		$this->count_filters = $count_filters;
 		$this->permission = $perms;
@@ -347,13 +362,14 @@ class FlexicontentViewFields extends JViewLegacy
 		$this->rows = $rows;
 		$this->allrows = $allrows;
 		$this->types = $types;
-		
+
 		$this->ordering = $ordering;
 		$this->pagination = $pagination;
-		
+
+		$this->inline_ss_max = $inline_ss_max;
 		$this->option = $option;
 		$this->view = $view;
-		
+
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}

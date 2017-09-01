@@ -90,15 +90,20 @@ class FlexicontentViewReviews extends JViewLegacy
 		// *** Add css and js to document
 		// ***
 		
-		flexicontent_html::loadFramework('select2');
-		//JHTML::_('behavior.tooltip');
-		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
 
@@ -219,10 +224,10 @@ class FlexicontentViewReviews extends JViewLegacy
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->pagination = $pagination;
-		
+
 		$this->option = $option;
 		$this->view = $view;
-		
+
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}

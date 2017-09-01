@@ -30,19 +30,18 @@ jimport('joomla.application.component.helper' );
  */
 class FlexicontentViewAppsman extends JViewLegacy
 {
-
 	function display( $tpl = null )
 	{
-		// ********************
-		// Initialise variables
-		// ********************
-		
+		// ***
+		// *** Initialise variables
+		// ***
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		$task    = $jinput->get('task', '', 'cmd');
-		
+
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
@@ -62,9 +61,9 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$session->set('appsman_parse_log', null, 'flexicontent');  // This is the flag if XML file has been parsed (import form already submitted), thus to display the imported data
 		
 		
-		// **************************
-		// Add css and js to document
-		// **************************
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -72,31 +71,26 @@ class FlexicontentViewAppsman extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
-		
+
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		
-		
-		// *****************************
+
+
+
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
+
 		// Get user's global permissions
-		// *****************************
-		
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanAppsman');
 		
@@ -105,7 +99,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'appsman' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		// Create the toolbar
 		$toolbar = JToolbar::getInstance('toolbar');
 		
@@ -163,7 +157,6 @@ class FlexicontentViewAppsman extends JViewLegacy
 		*/
 		
 		
-		//JToolbarHelper::Back();
 		if ($perms->CanConfig) {
 			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
@@ -174,8 +167,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		
-			
+
 		// Get types
 		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		
@@ -187,10 +179,10 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$categories = $globalcats;
 		
 		
-		// ************************************
-		// Decide layout to load: 'import*.php'
-		// ************************************
-		
+		// ***
+		// *** Decide layout to load: 'import*.php'
+		// ***
+
 		$this->setLayout('import');
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		
@@ -340,4 +332,3 @@ class FlexicontentViewAppsman extends JViewLegacy
 		parent::display($tpl);
 	}
 }
-?>

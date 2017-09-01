@@ -593,12 +593,24 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Custom clean the cache
 	 *
+	 * @param   string   $group      Clean cache only in the given group
+	 * @param   integer  $client_id  Site Cache (0) / Admin Cache (1) or both Caches (-1)
+	 *
+	 * @return  void
+	 *
 	 * @since   3.2.0
 	 */
 	protected function cleanCache($group = NULL, $client_id = -1)
 	{
-		// -1 means both, but we will do both always
-		parent::cleanCache('com_flexicontent');
+		if ($client_id === -1)
+		{
+			parent::cleanCache($group ?: 'com_flexicontent', 0);
+			parent::cleanCache($group ?: 'com_flexicontent', 1);
+		}
+		else
+		{
+			parent::cleanCache($group ?: 'com_flexicontent', $client_id);
+		}
 	}
 	
 

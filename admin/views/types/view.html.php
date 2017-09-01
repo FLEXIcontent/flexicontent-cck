@@ -32,15 +32,15 @@ class FlexicontentViewTypes extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		// ********************
-		// Initialise variables
-		// ********************
-		
+		// ***
+		// *** Initialise variables
+		// ***
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
-		
+
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
@@ -51,69 +51,68 @@ class FlexicontentViewTypes extends JViewLegacy
 
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
-		
-		
-		// ***********
-		// Get filters
-		// ***********
-		
+
+
+
+		// ***
+		// *** Get filters
+		// ***
+
 		$count_filters = 0;
-		
-		// various filters
-		$filter_state   = $model->getState('filter_state');
-		$filter_access  = $model->getState('filter_access');
+
+		// Various filters
+		$filter_state     = $model->getState( 'filter_state' );
+		$filter_access    = $model->getState( 'filter_access' );
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
-		
-		// Order and order direction
-		$filter_order      = $model->getState('filter_order');
-		$filter_order_Dir  = $model->getState('filter_order_Dir');
 		
 		// Text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
-		
-		
-		
-		// ****************************
-		// Important usability messages
-		// ****************************
-		
+
+		// Order and order direction
+		$filter_order     = $model->getState('filter_order');
+		$filter_order_Dir = $model->getState('filter_order_Dir');
+
+
+
+		// ***
+		// *** Important usability messages
+		// ***
+
 		if ( $cparams->get('show_usability_messages', 1) )
 		{
 		}
 		
 		
 		
-		// **************************
-		// Add css and js to document
-		// **************************
-		
-		flexicontent_html::loadFramework('select2');
-		//JHTML::_('behavior.tooltip');
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
-		
-		
-		// *****************************
+
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+
+
+
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
+
 		// Get user's global permissions
-		// *****************************
-		
 		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanTypes');
 		
@@ -122,28 +121,39 @@ class FlexicontentViewTypes extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'types' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
+		// Create the toolbar
+		$js = '';
+
 		$contrl = "types.";
 		JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 		JToolbarHelper::divider(); JToolbarHelper::spacer();
 		JToolbarHelper::publishList($contrl.'publish');
 		JToolbarHelper::unpublishList($contrl.'unpublish');
-		JToolbarHelper::addNew($contrl.'add');
-		JToolbarHelper::editList($contrl.'edit');
-		
-		//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
-		$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
-		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
-		$btn_task    = $contrl.'remove';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-		
-		// Checkin
+		if (1)
+		{
+			JToolbarHelper::addNew($contrl.'add');
+		}
+
+		if (1)
+		{
+			JToolbarHelper::editList($contrl.'edit');
+		}
+
+		if (1)
+		{
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+
 		JToolbarHelper::checkin($contrl.'checkin');
-		
+
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
 		{
@@ -166,7 +176,8 @@ class FlexicontentViewTypes extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
 		
-		if ($perms->CanConfig) {
+		if ($perms->CanConfig)
+		{
 			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -176,17 +187,37 @@ class FlexicontentViewTypes extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+
+
 		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rows       = $this->get( 'Items' );
+		$rows = $this->get( 'Items' );
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		$pagination = $this->get( 'Pagination' ); // Pagination
+
+
+		// Create pagination object
+		$pagination = $this->get( 'Pagination' );
 		
 		// Create type's parameters
-		foreach($rows as $type) {
-			$type->config = FLEXI_J16GE ? new JRegistry($type->config) : new JParameter($type->config);
+		foreach($rows as $type)
+		{
+			$type->config = new JRegistry($type->config);
 		}
-		
+
+
+
+		// ***
+		// *** Create List Filters
+		// ***
+
 		$lists = array();
 		
 		// build publication state filter
@@ -212,25 +243,25 @@ class FlexicontentViewTypes extends JViewLegacy
 		
 		// text search filter
 		$lists['search']= $search;
-		
-		
+
+
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		
-		
+
+
 		//assign data to template
 		$this->CanTemplates = $perms->CanTemplates;
 		$this->count_filters = $count_filters;
+
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->pagination = $pagination;
-		
+
 		$this->option = $option;
 		$this->view = $view;
-		
+
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }
-?>
