@@ -162,11 +162,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 		
 		// Button for popup file selection
-		$autoselect = 1; //$field->parameters->get( 'autoselect', 1 ) ;
+		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
 		$addExistingURL = JURI::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
 			.'&amp;index=%s'
-			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect
+			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
 			.'&amp;filter_uploader='.$user->id
 			.'&amp;targetid=%s'
 			.'&amp;existing_class=fc_filedata_storage_name'

@@ -279,7 +279,25 @@ fc_plupload = function(options)
 				cancel: '.fc_zooming',
 				containment: 'parent',
 				tolerance: 'pointer',
-				distance: 12
+				distance: 12,
+				stop: function(event,ui)
+				{
+					var _files = new Array;
+
+					// Find new order
+					for ( var i = 0 ; i < uploader.files.length ; i++ )
+					{
+						var file_row_id = uploader.files[i].id;
+						var index = $('#'+file_row_id).index();
+						_files[index] = uploader.files[i];
+					}
+
+					// Apply new order (!Do not try to make an array assignment (object assignment) it will not work)
+					for ( var i = 0 ; i < _files.length ; i++ )
+					{
+						uploader.files[i] = _files[i];
+					}
+				}
 			});
 		}
 

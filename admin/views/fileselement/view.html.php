@@ -55,6 +55,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
 		
 		// Get model
 		$model = $this->getModel();
@@ -125,7 +126,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_stamp     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_stamp',     'filter_stamp',     '',          'word' );
 		
 		$target_dir = $layout=='image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
-		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage', 'stamp');
+		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
 		$cols = array();
 
 
@@ -190,8 +191,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 		// *** BOF FILESELEMENT view specific ***
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
-		$autoselect       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoselect',       'autoselect',       0, 				  'int' );
-		$autoassign       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       0, 				  'int' );
+
+		$autoassign = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       1, 				  'int' );
+
 		$existing_class   = $app->getUserStateFromRequest( $option.'.'.$_view.'.existing_class',   'existing_class', 'existingname','string' );
 		
 		$targetid					= $app->getUserStateFromRequest( $option.'.'.$_view.'.targetid',    		 'targetid',     		 '', 				  'string' );
@@ -208,36 +210,32 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_item      = $filter_item ? $filter_item : '';
 
 
-		// *** Get recently uploaded files
-		$newfileid		= $jinput->get('newfileid', 0, 'int');
-
+		// *** TODO: (enhancement) get recently deleted file(s), and remove their assignments from current form
 		$delfilename = $app->getUserState('delfilename', null);
 		$app->setUserState('delfilename', null);
 
-		$session = JFactory::getSession();
-		$context = 'fc_uploaded_files.item_'.$u_item_id.'_field_'.$fieldid.'.';
-
-		$new_file_ids = $session->get($context.'ids', array());
-		$new_file_names = $session->get($context.'names', array());
-		$new_file_names = array_flip($new_file_names);
-		if (count($new_file_names))
-		{
-			//$app->enqueueMessage(JText::_( 'Recently uploaded files were selected. Please click "Insert selected" to add them' ), 'notice');
-		}
-		$session->set($context.'ids', null);
-		$session->set($context.'names', null);
-
-
-
-		// **************************
-		// Add css and js to document
-		// **************************
+		$upload_context = 'fc_upload_history.item_' . $u_item_id . '_field_' . $fieldid;
+		$session_files = $session->get($upload_context, array());
 		
-		$app->isSite() ?
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
-			!JFactory::getLanguage()->isRtl()
+		$pending_file_ids = !empty($session_files['ids_pending']) ? $session_files['ids_pending'] : array();
+		$pending_file_names = !empty($session_files['names_pending']) ? $session_files['names_pending'] : array();
+
+		$pending_file_names = array_flip($pending_file_names);
+
+
+		// ***
+		// *** Add css and js to document
+		// ***
+		
+		if ($app->isSite())
+		{
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		}
+		else
+		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
@@ -245,9 +243,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Fields common CSS
 		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 
-		// This is not included automatically in frontend
+		
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
 		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		
 		// ************************
@@ -281,16 +286,36 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// DB mode
 		if ( !$folder_mode )
 		{
-			$rows  = $this->get('Data');
+			$rows_pending = $view=='fileselement'
+				? $model->getDataPending()
+				: false;
+			if (empty($rows_pending))
+			{
+				$rows = $model->getData();
+			}
 			$img_folder = '';
 		}
 
 		// FOLDER mode
 		else
 		{
-			$rows = $model->getFilesFromPath($u_item_id, $fieldid);
+			$rows_pending = $view=='fileselement'
+				? $model->getFilesFromPath($u_item_id, $fieldid, null, true)
+				: false;
+			if (empty($rows_pending))
+			{
+				$rows = $model->getFilesFromPath($u_item_id, $fieldid, null, false);
+			}
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid);
 		}
+
+		
+		// Clear pending
+		unset($session_files['ids_pending']);
+		unset($session_files['names_pending']);
+		$session->set($upload_context, $session_files);
+
+
 		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
 		//echo $upload_path_var . "<br>";
@@ -364,41 +389,20 @@ class FlexicontentViewFileselement extends JViewLegacy
 					jQuery(rows).addClass('striketext');
 				}
 
-				".($autoassign && count($new_file_names) ? "
-				jQuery('td.is-new-file input').next().trigger('click');
+				".($autoassign && count($pending_file_names) ? "
+				jQuery('td.is-pending-file input').next().trigger('click');
+				" : "")."
+
+				".($autoassign==1 && count($pending_file_names) ? "
 				jQuery('#insert_selected_btn').trigger('click');
 				" : "")."
 			});
 			";
 		}
 		
-		else {
-			if ($newfileid)
-			{
-				$_newfile = JTable::getInstance('flexicontent_files', '');
-				$_newfile->load($newfileid);
-				
-				if ($folder_mode) {
-					$file_path = $img_folder . DS . $_newfile->filename;
-				} else if (!$_newfile->url && substr($_newfile->filename, 0, 7)!='http://') {
-					$path = !empty($_newfile->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-					$file_path = $path . DS . $_newfile->filename;
-				} else {
-					$file_path = $_newfile->filename;
-				}
-				$file_path = str_replace('\\', '/', $file_path);
-				
-				$imageexts = array('jpg','gif','png','bmp','jpeg');
-				$ext = strtolower($_newfile->ext);
-				$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$file_preview = !in_array($ext, $imageexts)  ?  ''  :  JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&w='.$thumb_w.'&h='.$thumb_h.'&zc=1&ar=x';
-			}
-			
-			
-			$js = ($newfileid ?"
-			var newfile_data = ".json_encode($_newfile).";
-			" : "")."
-
+		else
+		{
+			$js = "
 			jQuery(document).ready(function()
 			{
 				// Find and mark file usage by filename search
@@ -422,8 +426,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 					jQuery(rows).addClass('striketext');
 				}
 
-				".($autoselect && count($new_file_names) ? "
-				jQuery('td.is-new-file input').next().trigger('click');
+				".($autoassign && count($pending_file_names) ? "
+				jQuery('td.is-pending-file input').next().trigger('click');
+				" : "")."
+
+				".($autoassign==1 && count($pending_file_names) ? "
 				jQuery('#insert_selected_btn').trigger('click');
 				" : "")."
 			});
@@ -495,9 +502,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 
 		$document->addScriptDeclaration($js);
-		if ($autoselect && $newfileid)
+		if ($autoassign==2 && count($pending_file_names))
 		{
-			$app->enqueueMessage(JText::_( 'FLEXI_UPLOADED_FILE_WAS_SELECTED' ), 'message');
+			$app->enqueueMessage(JText::_( 'FLEXI_UPLOADED_FILES_SELECTED_CLICK_TO_ASSIGN' ), 'message');
 		}
 
 		// *** BOF FOLDER MODE specific ***
@@ -621,7 +628,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 		$this->params = $cparams;
 		$this->lists  = $lists;
-		$this->rows   = $rows;
+		$this->rows   = $rows_pending ?: $rows ;
+		$this->is_pending = $rows_pending ? true : false;
 		$this->langs  = $langs;
 
 		$this->folder_mode = $folder_mode;
@@ -640,7 +648,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->field   = !empty($field) ? $field : null;
 		$this->fieldid = $fieldid;
 		$this->u_item_id  = $u_item_id;
-		$this->new_file_names = $new_file_names;
+		$this->pending_file_names = $pending_file_names;
 
 		$this->option = $option;
 		$this->view   = $view;

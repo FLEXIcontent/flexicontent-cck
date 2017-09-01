@@ -67,11 +67,20 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 $isFilesElement = $this->view == 'fileselement';
 
 // Calculate count of shown columns 
-$list_total_cols = $isFilesElement ? 14 : 16;
-if ($this->folder_mode) $list_total_cols -= 7;
+$list_total_cols = $isFilesElement ? 16 : 16;  // fileselement view has 1 more column the direct delete button column, and 1 ... less column the number of assigned items
 
-// Optional columns
-if (!$this->folder_mode && count($this->optional_cols) - count($this->cols) > 0)
+
+// Optional columns of DB-mode
+if (!$this->folder_mode || !$this->CanViewAllFiles)
+{
+	unset($this->cols['uploader']);
+}
+if (!$this->folder_mode)
+{
+	unset($this->cols['file_id']);
+}
+
+if (count($this->optional_cols) - count($this->cols) > 0)
 {
 	$list_total_cols -= (count($this->optional_cols) - count($this->cols));
 }
@@ -84,7 +93,7 @@ $_tmpl = $isFilesElement ? 'component' : '';
 
 
 $enable_multi_uploader = 1;
-$nonimg_message = $this->layout == 'image' ? '' : '-1';
+$nonimg_message = $this->layout == 'image' ? '\'\'' : '-1';
 $uploader_tag_id = 'fc_filesman_uploader';
 $up_sfx_n = $this->fieldid ?: '_';
 
@@ -416,9 +425,6 @@ if ($enable_multi_uploader)
 }
 
 
-
-flexicontent_html::loadFramework('flexi-lib');
-
 /*<div id="themeswitcher" class="pull-right"> </div>
 <script>
 	jQuery(function() {
@@ -635,7 +641,6 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						<?php endif; ?>
 					</th>
 					
-			<?php if (!$this->folder_mode) : ?>
 				<?php if (!empty($this->cols['state'])) : ?>
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 				<?php endif; ?>
@@ -645,15 +650,13 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<?php if (!empty($this->cols['lang'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_LANGUAGE' ); ?></th>
 				<?php endif; ?>
-			<?php endif; ?>
 				
 				<?php if ($this->folder_mode) : ?>
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 				<?php else : ?>
 					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_SIZE', 'f.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
-					
-			<?php if (!$this->folder_mode) : ?>
+
 				<?php if (!empty($this->cols['hits'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
@@ -674,16 +677,15 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
 				<?php endif; ?>
 					
-				<?php if ($this->CanViewAllFiles && !empty($this->cols['uploader'])) : ?>
+				<?php if (!empty($this->cols['uploader'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
-			<?php endif; ?>
-				
+
 				<?php if (!empty($this->cols['upload_time'])) : ?>
 					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 				
-				<?php if (!$this->folder_mode && !empty($this->cols['file_id'])) : ?>
+				<?php if (!empty($this->cols['file_id'])) : ?>
 					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
@@ -752,16 +754,18 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					$thumbs_icons_arr[] = $thumb_or_icon;
 
 
-					if (!$this->folder_mode)
+					if (!$this->folder_mode && !$this->is_pending)
 					{
 						$row->count_assigned = 0;
-						foreach($this->assigned_fields_labels as $field_type => $ignore) {
+						foreach($this->assigned_fields_labels as $field_type => $ignore)
+						{
 							$row->count_assigned += $row->{'assigned_'.$field_type};
 						}
 						if ($row->count_assigned)
 						{
 							$row->assigned = array();
-							foreach($this->assigned_fields_labels as $field_type => $field_label) {
+							foreach($this->assigned_fields_labels as $field_type => $field_label)
+							{
 								if ( $row->{'assigned_'.$field_type} )
 								{
 									$icon_name = $this->assigned_fields_icons[$field_type];
@@ -785,7 +789,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					if ($isFilesElement)
 					{
 						// File preview icon for content form
-						$file_is_selected = isset($this->new_file_names[$row->filename]);
+						$file_is_selected = isset($this->pending_file_names[$row->filename]);
 						$file_preview = !in_array($ext, $imageexts) ? '' : JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 
 						// Link to assign file value into the content form
@@ -806,7 +810,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
-					<td class="center <?php echo ($file_is_selected ? ' is-new-file' : ''); ?>">
+					<td class="center <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>">
 						<?php echo JHtml::_('grid.id', $i, !$this->folder_mode ? $row->id : rawurlencode($filename)); ?>
 						<label for="cb<?php echo $i; ?>" class="green single" onclick="fman_sync_cid(<?php echo $i; ?>, 1);"></label>
 					</td>
@@ -876,8 +880,6 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						?>
 					</td>
 					
-			<?php if (!$this->folder_mode) : ?>
-				
 				<?php if (!empty($this->cols['state'])) : ?>
 					<td class="center">
 						<?php echo JHTML::_('jgrid.published', $row->published, $i, 'filemanager.' ); ?>
@@ -909,13 +911,9 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						<?php endif; ?>
 					</td>
 				<?php endif; ?>
-				
-			<?php endif; ?>
-					
+
 					<td class="center"><?php echo $row->size; ?></td>
-					
-			<?php if (!$this->folder_mode) : ?>
-				
+
 				<?php if (!empty($this->cols['upload_time'])) : ?>
 					<td class="center hidden-phone"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
 				<?php endif; ?>
@@ -951,10 +949,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					<?php endif; ?>
 					</td>
 				<?php endif; ?>
-				
-			<?php endif; ?>
-			
-			
+
 				<?php if (!empty($this->cols['upload_time'])) : ?>
 					<td class="center hidden-tablet hidden-phone">
 						<?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
@@ -962,13 +957,9 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<?php endif; ?>
 			
 			
-			<?php if (!$this->folder_mode) : ?>
-			
 				<?php if (!empty($this->cols['file_id'])) : ?>
 					<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
 				<?php endif; ?>
-				
-			<?php endif; ?>
 				
 					<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 					<td>
@@ -986,13 +977,13 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				?>
 			</tbody>
 
-		<?php if (!$this->folder_mode) : ?>
 			<tfoot>
 
-				<?php
+			<?php if (!$this->folder_mode && !$this->is_pending) :
 				$field_legend = array();
 				$this->assigned_fields_labels;
-				foreach($this->assigned_fields_labels as $field_type => $field_label) {
+				foreach($this->assigned_fields_labels as $field_type => $field_label)
+				{
 					$icon_name = $this->assigned_fields_icons[$field_type];
 					$tip = $field_label;
 					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
@@ -1007,8 +998,15 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					</td>
 				</tr>
 
+			<?php else : ?>
+				<tr>
+					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
+						--
+					</td>
+				</tr>
+			<?php endif; ?>
+
 			</tfoot>
-		<?php endif; ?>
 
 			</table>
 
@@ -1372,9 +1370,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 								<input type="text" id="file-title" size="44" class="required input-xxlarge" name="file-title" />
 							</td>
 						</tr>
-					<?php endif; ?>
 
-					<?php if (!$this->folder_mode) : ?>
 						<tr>
 							<td id="file-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 								<label class="label" id="file-desc-lbl" for="file-desc_uploadFileForm">

@@ -132,10 +132,11 @@
 				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-on">FLEXI_NO</option>
 				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off">FLEXI_YES</option>
 			</field>
-			<!--field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC" depend_class="use-myfiles-on" class="btn-group btn-group-yesno">
+			<field name="autoassign" type="radio" default="1" label="FLEXI_UPLOADED_FILES_AUTO_ASSIGN" description="FLEXI_UPLOADED_FILES_AUTO_ASSIGN_DESC" depend_class="use-myfiles-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
+				<option value="1">FLEXI_UPLOADED_FILE_SELECT_N_ASSIGN</option>
+				<option value="2">FLEXI_UPLOADED_FILE_SELECT_ONLY</option>
+			</field>
 			<field name="target_dir" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="use-myfiles-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
