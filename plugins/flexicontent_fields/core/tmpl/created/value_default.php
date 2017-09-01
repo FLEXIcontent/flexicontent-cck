@@ -9,8 +9,7 @@ $field->{$prop} =
 $itemprop = $field->parameters->get('microdata_itemprop', 'dateCreated');
 if ($itemprop)
 {
-	$field->{$prop} = '
-		<div style="display:inline" itemprop="'.$itemprop.'" >
-			' . $field->{$prop} . '
-		</div>';
+	$field->{$prop} .= '
+		<meta itemprop="' . $itemprop . '" content="' . $item->created . '">
+	';
 }
