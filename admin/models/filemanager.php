@@ -41,6 +41,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @var object
 	 */
 	var $_data = null;
+	var $_data_pending = null;
 
 	/**
 	 * file total
@@ -48,6 +49,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @var integer
 	 */
 	var $_total = null;
+	var $_total_pending = null;
 
 	/**
 	 * Pagination object
@@ -70,6 +72,14 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @var bool
 	 */
 	var $sess_assignments = null;
+
+	
+	/**
+	 * flags to indicate return only the files pending to be assingned
+	 *
+	 * @var bool
+	 */
+	var $_pending = false;
 
 
 	/**
@@ -189,7 +199,32 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$this->_id	 = $id;
 		$this->_data = null;
 		$this->_total= null;
+		$this->_data_pending  = null;
+		$this->_total_pending = null;
 	}
+
+
+	/**
+	 * Method to get files data
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getDataPending()
+	{
+		$this->_pending = true;
+
+		// Get files pending to be assigned
+		if ($this->_data_pending === null)
+		{
+			$query = $this->_buildQuery();
+			$this->_data_pending = $this->_getList($query);
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total_pending = $this->_db->loadResult();
+		}
+		return $this->_data_pending;
+	}
+
 
 
 	/**
@@ -200,22 +235,27 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getData()
 	{
+		$this->_pending = false;
+
 		// Get items using files VIA (single property) field types (that store file ids) by using main query
 		$s_assigned_via_main = false;
-		
-		// Files usage my single / multi property Fields.
-		// (a) Single property field types: store file ids
-		// (b) Multi property field types: store file id or filename via some property name
+
+		// Files usage my single / multi property Fields, 
+		//  -- Single property field types: store file ids
+		//  -- Multi property field types: store file id or filename via some property name
+
 		$s_assigned_fields = array('file', 'minigallery');
 		$m_assigned_fields = array('image');
-		
+
 		$m_assigned_props = array('image'=>'originalname');
 		$m_assigned_vals = array('image'=>'filename');
-		
+
 		// Lets load the files if it doesn't already exist
-		if (empty($this->_data))
+		if ($this->_data === null)
 		{
-			$query = $s_assigned_via_main  ?  $this->_buildQuery($s_assigned_fields)  :  $this->_buildQuery();
+			$query = $s_assigned_via_main
+				? $this->_buildQuery($s_assigned_fields)
+				: $this->_buildQuery();
 			
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
@@ -283,13 +323,30 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function getTotal()
 	{
 		// Lets load the files if it doesn't already exist
-		if (empty($this->_total))
+		if ($this->_pending)
 		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
-		}
+			if (empty($this->_total_pending))
+			{
+				$query = $this->_buildQuery();
+				$this->_getList($query, 0, 1);
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total_pending = $this->_db->loadResult();
+			}
 
-		return $this->_total;
+			return $this->_total_pending;
+		}
+		else
+		{
+			if (empty($this->_total))
+			{
+				$query = $this->_buildQuery();
+				$this->_getList($query, 0, 1);
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total = $this->_db->loadResult();
+			}
+
+			return $this->_total;
+		}
 	}
 	
 	
@@ -319,8 +376,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getFilesFromPath($itemid, $fieldid, $exts=null)
+	function getFilesFromPath($itemid, $fieldid, $exts=null, $pending = false)
 	{
+		$this->_pending = $pending;
+
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
@@ -341,13 +400,26 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$exts = preg_replace("/[\s]*,[\s]*/", '|', $exts);
 		$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gallery_folder)), '#(.*\.)('.$exts.')#i');
 		$it->rewind();
-		
+
+		if ($this->_pending)
+		{
+			if (!$itemid) return array();
+			$upload_context = 'fc_upload_history.item_' . $itemid . '_field_' . $fieldid;
+			$session_files = JFactory::getSession()->get($upload_context, array());
+
+			$names_pending = isset($session_files['names_pending'])
+				? $session_files['names_pending']
+				: array();
+			$names_pending = array_flip($names_pending);
+		}
+
 		// Get file information
 		$rows = array();
 		$i = 1;
 		while($it->valid())
 		{
-			if ($it->isDot()) {
+			if ($it->isDot())
+			{
 				$it->next();
 				continue;
 			}
@@ -358,6 +430,16 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$row->ext = $pinfo['extension'];
 			// Convert directory separators inside the subpath
 			$row->filename = str_replace('\\', '/', $filesubpath);  //$pinfo['filename'].".".$pinfo['extension'];
+
+			// Lets load the files if it doesn't already exist
+			if ($this->_pending)
+			{
+				if ( isset($names_pending[$row->filename]))
+				{
+					continue;
+				}
+			}
+
 			// Try to create a UTF8 filename
 			$row->filename_original = iconv(mb_detect_encoding($row->filename, mb_detect_order(), true), "UTF-8", $row->filename);
 			$row->filename_original = $row->filename_original ? $row->filename_original : $row->filename;
@@ -434,7 +516,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @access public
 	 * @return object
 	 */
-	function getField($fieldid=0)
+	function getField($fieldid=0, $itemid=0)
 	{
 		static $fields = array();
 		
@@ -453,10 +535,34 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$fields[$fieldid] = $this->_db->loadObject();
 		}
 
-		// Parse field parameters and return field
+		// Parse field parameters and find currently active item id and verrify item is editable by current user
 		if (!empty($fields[$fieldid]))
 		{
 			$fields[$fieldid]->parameters = new JRegistry($fields[$fieldid]->attribs);
+
+			$app  = JFactory::getApplication();
+			$user = JFactory::getUser();
+			$option = $app->input->get('option', '', 'cmd');
+			$view   = $app->input->get('view', '', 'cmd');
+			$u_item_id = $itemid ?: $app->getUserStateFromRequest( $option.'.'.$view.'.u_item_id', 'u_item_id', 0, 'string' );
+			if (is_numeric($u_item_id))
+			{
+				$u_item_id = (int) $u_item_id;
+
+				JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+				$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+				if ($record->load($u_item_id))
+				{
+					$asset = 'com_content.article.' . $u_item_id;
+					$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $record->created_by == $user->get('id'));
+					$u_item_id = $has_edit ? $u_item_id : 0;
+				}
+				else
+				{
+					$u_item_id = 0;
+				}
+			}
+			$fields[$fieldid]->item_id = $u_item_id;
 		}
 		return $fields[$fieldid];
 	}
@@ -469,7 +575,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function _buildQuery( $assigned_fields=array(), $item_id=0, $ids_only=false )
+	function _buildQuery( $assigned_fields=array(), $ids_only=false, $item_id=0 )
 	{
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
@@ -477,8 +583,19 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$join    = $this->_buildContentJoin();
-		$where   = $this->_buildContentWhere();
-		$orderby = !$ids_only ? $this->_buildContentOrderBy() : '';
+		$where   = $this->_pending
+			? $this->_buildContentWherePending()
+			: $this->_buildContentWhere();
+		if ($ids_only)
+		{
+			$orderby = '';
+		}
+		else
+		{
+			$orderby = $this->_pending
+				? $this->_buildContentOrderByPending()
+				: $this->_buildContentOrderBy();
+		}
 		$having  = ''; //$this->_buildContentHaving();
 		
 		$filter_item = $item_id  ?  $item_id  :  $app->getUserStateFromRequest( $option.'.'.$this->viewid.'.item_id',   'item_id',   '',   'int' );
@@ -490,12 +607,15 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		if ( !$ids_only )
 		{
-			$join .= ' LEFT JOIN #__viewlevels AS level ON level.id=f.access';
+			$join .= ' LEFT JOIN #__viewlevels AS level ON level.id = f.access';
 		}
 		
-		if ( $ids_only ) {
+		if ( $ids_only )
+		{
 			$columns[] = 'f.id';
-		} else {
+		}
+		else
+		{
 			$columns[] = 'SQL_CALC_FOUND_ROWS f.*, u.name AS uploader,'
 				.' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END AS filename_displayed ';
 			if ( !empty($assigned_fields) )
@@ -537,7 +657,12 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getItemFiles($item_id=0)
 	{
-		$query = $this->_buildQuery( $assigned_fields=array(), $ids_only=true, $item_id );
+		if ($this->_pending)
+		{
+			return array();
+		}
+
+		$query = $this->_buildQuery($assigned_fields=array(), $ids_only=true, $item_id);
 		$this->_db->setQuery($query);
 
 		$items = $this->_db->loadColumn();
@@ -565,10 +690,68 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	}
 
 
+	/**
+	 * Method to build the orderby clause of the query for the files
+	 *
+	 * @access private
+	 * @return string
+	 * @since 1.0
+	 */
+	function _buildContentOrderByPending()
+	{
+		$field = $this->getField();
+
+		if (!$field || !$field->item_id)
+		{
+			return '';
+		}
+
+		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
+		$session_files = JFactory::getSession()->get($upload_context, array());
+
+		$file_ids = isset($session_files['ids_pending'])
+			? $session_files['ids_pending']
+			: array();
+
+		$orderby 	= $file_ids
+			? ' ORDER BY FIELD(f.id, '. implode(', ', $file_ids) .')'
+			: '';
+		return $orderby;
+	}
+
+
 	function _buildContentJoin()
 	{
 		$join = ' JOIN #__users AS u ON u.id = f.uploaded_by';
 		return $join;
+	}
+
+
+	/**
+	 * Method to build the where clause of the query for the records pending assignment
+	 *
+	 * @access private
+	 * @return string
+	 * @since 1.0
+	 */
+	function _buildContentWherePending()
+	{
+		$field = $this->getField();
+
+		if (!$field || !$field->item_id)
+		{
+			return ' WHERE 1=0 ';
+		}
+
+		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
+		$session_files = JFactory::getSession()->get($upload_context, array());
+
+		$file_ids = isset($session_files['ids_pending'])
+			? $session_files['ids_pending']
+			: array();
+
+		return ' WHERE ' .
+			(!$file_ids ? ' 1=0 ' : ' f.id IN ('.implode(', ', $file_ids).')');
 	}
 
 
@@ -739,15 +922,17 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function _buildQueryUsers()
 	{
 		// Get the WHERE and ORDER BY clauses for the query
-		$where = $this->_buildContentWhere();
+		$where = $this->_pending
+			? $this->_buildContentWherePending()
+			: $this->_buildContentWhere();
 		
 		$query = 'SELECT u.id,u.name'
-		. ' FROM #__flexicontent_files AS f'
-		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
-		. $where
-		. ' GROUP BY u.id'
-		. ' ORDER BY u.name'
-		;
+			. ' FROM #__flexicontent_files AS f'
+			. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
+			. $where
+			. ' GROUP BY u.id'
+			. ' ORDER BY u.name'
+			;
 		return $query;
 	}
 
@@ -799,12 +984,25 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		if (!$filenames) return '';  // No files found
 
 		$query = 'SELECT id'
-			.' FROM #__flexicontent_files'
-			.' WHERE '
-			.'  filename IN ('.implode(',', array_keys($filenames)).')'
-			.($target_dir != 2 ? '  AND secure = '. (int)$target_dir : '');
+			. ' FROM #__flexicontent_files'
+			. ' WHERE '
+			. '  filename IN ('.implode(',', array_keys($filenames)).')'
+			. ($target_dir != 2 ? '  AND secure = '. (int)$target_dir : '');
 		$this->_db->setQuery($query);
 		$file_ids = $this->_db->loadColumn();
+
+		// Also include files uploaded during current session for current field / item pair
+		if ($field->item_id)
+		{
+			$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
+			$session_files = JFactory::getSession()->get($upload_context, array());
+
+			$new_file_ids = isset($session_files['ids'])
+				? $session_files['ids']
+				: array();
+
+			$file_ids = array_merge($file_ids, $new_file_ids);
+		}
 
 		return !$file_ids ? '' : ' f.id IN ('.implode(', ', $file_ids).')';
 	}
@@ -1173,9 +1371,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		foreach($rows as $row)
 		{
-			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
-			if (@ $assigned_data[$row->id]->item_list)
+			$row->{'assigned_'.$field_type} = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
+			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
+			{
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+			}
 		}
 	}
 	
@@ -1207,9 +1407,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		foreach ($rows as $row)
 		{
-			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
-			if (@ $assigned_data[$row->id]->item_list)
+			$row->{'assigned_'.$field_type} = isset($assigned_data[$row->id]) ? (int) $assigned_data[$row->id]->count : 0;
+			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
+			{
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+			}
 		}
 	}
 	

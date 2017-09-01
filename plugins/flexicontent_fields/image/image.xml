@@ -98,9 +98,10 @@
 				<option value="0"  show_list="img-db-mode,img-common-conf,client-resize"  hide_list="img-fld-mode,img-joomla-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1"  show_list="img-fld-mode,img-common-conf,client-resize" hide_list="img-db-mode,img-joomla-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
-			<field name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES" description="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES_DESC" depend_class="img-common-conf" class="btn-group btn-group-yesno">
+			<field name="autoassign" type="radio" default="1" label="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES" description="FLEXI_FIELD_AUTO_INSERT_UPLOADED_IMAGES_DESC" depend_class="img-common-conf" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_UPLOADED_FILE_SELECT_N_ASSIGN</option>
+				<option value="2">FLEXI_UPLOADED_FILE_SELECT_ONLY</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_IMG_JOOMLA_MODE_NOTES" level="level3" depend_class="img-joomla-mode" class="alert alert-info fcpadded" />
 

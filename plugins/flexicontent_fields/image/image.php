@@ -107,7 +107,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
-		$autoassign = $field->parameters->get('autoassign', 0);
+		$autoassign = (int) $field->parameters->get( 'autoassign', 1 );
 		
 		$thumb_size_resizer = $field->parameters->get('thumb_size_resizer', 2);
 		$thumb_size_default = $field->parameters->get('thumb_size_default', 120);
