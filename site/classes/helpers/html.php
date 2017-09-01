@@ -3519,7 +3519,7 @@ class flexicontent_html
 							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')
 						).'
 					</div>'.
-					(!(int)$percent ? '' : '
+					(!(int)$percent || $int_xid ? '' : '
 					<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
 						<meta itemprop="itemReviewed" content="'.htmlspecialchars($field->item->title, ENT_QUOTES, 'UTF-8').'" />
 						<meta itemprop="ratingValue" content="'.round($percent).'" />
