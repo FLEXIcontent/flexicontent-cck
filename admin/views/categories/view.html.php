@@ -46,7 +46,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$order_property = 'c.lft';
+		$order_property = 'a.lft';
 		
 		// Get model
 		$model = $this->getModel();
