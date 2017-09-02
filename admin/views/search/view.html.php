@@ -208,10 +208,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$limitstart = $this->get('LimitStart');
 
 		if ($filter_fieldtype) {
-			$js .= "jQuery('.col_fieldtype').each(function(){ jQuery(this).addClass('yellow'); });";
+			$js .= "jQuery('.col_fieldtype').addClass('filtered_column');";
 		}		
 		if ($search) {
-			$js .= "jQuery('.col_search').each(function(){ jQuery(this).addClass('yellow'); });";
+			$js .= "jQuery('.col_search').addClass('filtered_column');";
 		}		
 		$js .= "});";
 		$document->addScriptDeclaration($js);

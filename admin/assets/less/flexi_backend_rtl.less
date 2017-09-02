@@ -1118,42 +1118,44 @@ img.btn.btn-small.fc-man-icon-s {
 	border-radius: 3px;
 	padding: 2px;
 }
-.adminlist.fcmanlist .btn.btn-small img.fc-man-icon-s {
-	float: right;
-}
-.adminlist.fcmanlist .btn.btn-small.fc-preview-btn img.fc-man-icon-s {
-	margin-top: 1px;
-	margin-bottom: -1px;
-}
-.adminlist.fcmanlist .btn.btn-small.fc-edit-layout-btn img.fc-man-icon-s,
-.adminlist.fcmanlist .btn.btn-small.fc-rss-list-btn img.fc-man-icon-s {
-}
 
-.adminlist.fcmanlist th :not(.btn-group) > [class^="icon-"],
-.adminlist.fcmanlist th :not(.btn-group) > [class*="icon-"] {
-	font-size: 14px;
-}
+.adminlist.fcmanlist
+{
+	.btn.btn-small img.fc-man-icon-s {
+		float: right;
+	}
+	.btn.btn-small.fc-preview-btn img.fc-man-icon-s {
+		margin-top: 1px;
+		margin-bottom: -1px;
+	}
+	.btn.btn-small.fc-edit-layout-btn img.fc-man-icon-s,
+	.btn.btn-small.fc-rss-list-btn img.fc-man-icon-s {
+	}
 
+	th :not(.btn-group) > [class^="icon-"],
+	th :not(.btn-group) > [class*="icon-"] {
+		font-size: 14px;
+	}
 
-// Some defaults for buttons inside backend lists
+	// Some defaults for buttons inside backend lists
 
-.adminlist.fcmanlist :not(.btn-group) > .btn.btn-small {
-	padding: 2px 2px 1px 3px;
-	font-size: 14px;
+	:not(.btn-group) > .btn.btn-small {
+		padding: 2px 2px 1px 3px;
+		font-size: 14px;
+	}
+	:not(.btn-group) > .btn.btn-micro {
+		padding: 2px 1px 1px 2px;
+		font-size: 12px;
+	}
+	:not(.btn-group) > .btn.btn-mini {
+		padding: 1px 1px 0px 2px;
+		font-size: 10px;
+	}
+	.btn.btn-small.fc-assignments-btn {
+		min-width: 50px;
+		box-sizing: border-box;
+	}
 }
-.adminlist.fcmanlist :not(.btn-group) > .btn.btn-micro {
-	padding: 2px 1px 1px 2px;
-	font-size: 12px;
-}
-.adminlist.fcmanlist :not(.btn-group) > .btn.btn-mini {
-	padding: 1px 1px 0px 2px;
-	font-size: 10px;
-}
-.adminlist.fcmanlist .btn.btn-small.fc-assignments-btn {
-	min-width: 50px;
-	box-sizing: border-box;
-}
-
 
 // Last option not shown due to overlayed toolbar at the bottom
 body .j-sidebar-container {

@@ -154,19 +154,19 @@ class FlexicontentViewUsers extends JViewLegacy
 			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		$js = "jQuery(document).ready(function(){";
-		if ($search)            $js .= "jQuery('.col_title').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_itemscount) $js .= "jQuery('.col_itemscount').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_usergrp)    $js .= "jQuery('.col_usergrp').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_logged)     $js .= "jQuery('.col_logged').each(function(){ jQuery(this).addClass('yellow'); });";
-		if (strlen($filter_state))    $js .= "jQuery('.col_state').each(function(){ jQuery(this).addClass('yellow'); });";
-		if (strlen($filter_active))   $js .= "jQuery('.col_active').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_id)         $js .= "jQuery('.col_id').each(function(){ jQuery(this).addClass('yellow'); });";
+		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
+		if ($filter_itemscount) $js .= "jQuery('.col_itemscount').addClass('filtered_column');";
+		if ($filter_usergrp)    $js .= "jQuery('.col_usergrp').addClass('filtered_column');";
+		if ($filter_logged)     $js .= "jQuery('.col_logged').addClass('filtered_column');";
+		if (strlen($filter_state))    $js .= "jQuery('.col_state').addClass('filtered_column');";
+		if (strlen($filter_active))   $js .= "jQuery('.col_active').addClass('filtered_column');";
+		if ($filter_id)         $js .= "jQuery('.col_id').addClass('filtered_column');";
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
-				$js .= "jQuery('.col_registered').each(function(){ jQuery(this).addClass('yellow'); });";
+				$js .= "jQuery('.col_registered').addClass('filtered_column');";
 			} else if ($date == 2) {
-				$js .= "jQuery('.col_visited').each(function(){ jQuery(this).addClass('yellow'); });";
+				$js .= "jQuery('.col_visited').addClass('filtered_column');";
 			}
 		}
 		$js .= "});";

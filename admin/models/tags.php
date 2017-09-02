@@ -235,8 +235,8 @@ class FlexicontentModelTags extends JModelLegacy
 		// Lets load the tags if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			jimport('cms.pagination.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
+			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 
 		return $this->_pagination;
