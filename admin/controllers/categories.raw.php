@@ -18,8 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
+// Import parent controller
+jimport('legacy.controller.admin');
 
 /**
  * FLEXIcontent Component Categories Controller
@@ -28,7 +28,7 @@ JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentControllerCategories extends FlexicontentController
+class FlexicontentControllerCategories extends JControllerAdmin
 {
 	/**
 	 * Constructor
@@ -37,13 +37,33 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function __construct()
 	{
-		if (FLEXI_J16GE) {
-			$this->text_prefix = 'com_content';
-		}
+		$this->text_prefix = 'com_content';
 		parent::__construct();
 
 		// Register Extra task
 		$this->registerTask( 'params', 			'params' );
+	}
+
+
+	/**
+	 * Proxy for getModel
+	 *
+	 * @param   string  $name    The model name. Optional.
+	 * @param   string  $prefix  The class prefix. Optional.
+	 * @param   array   $config  The array of possible config values. Optional.
+	 *
+	 * @return  JModelLegacy  The model.
+	 *
+	 * @since   1.6
+	 */
+	public function getModel($name = 'Categories', $prefix = 'FlexicontentModel', $config = array('ignore_request' => true))
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		$name = $name ?: 'Categories';
+		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS . strtolower($name) . '.php');
+
+		return parent::getModel($name, $prefix, $config);
 	}
 
 
@@ -67,35 +87,39 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$model 	= $this->getModel('category');		
 		$params = $model->getParams($copyid);
 		
-		if (!$destid) {
+		if (!$destid)
+		{
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_TARGET' ).'</div>';
-			print_r($destid);
 			return;
 		}
-		if ($copyid)
+
+		if (!$copyid)
 		{
-			$y = 0;
-			$n = 0;
-			$unauthorized = array();
-			foreach ($destid as $id)
-			{
-				// Check unauthorized categories is for J1.6+ only (categories have ACL edit action)
-				if ( FLEXI_J16GE && !$user->authorise('core.edit', 'com_content.category.'.$id) ) {
-					$unauthorized[] = $id;
-					continue;
-				}
-				if ($model->copyParams($id, $params)) {
-					$y++;
-				} else {
-					$n++;				
-				}
-			}
-			echo '<div class="copyok">'.JText::sprintf( 'FLEXI_CAT_PARAMS_COPIED', $y, $n ).'</div>';
-			if ( FLEXI_J16GE && count($unauthorized) ) {
-				echo '<div class="copyfailed">'.'Skipped '.count($unauthorized).' uneditable categories with ids: '.implode(', ',$unauthorized).'</div>';
-			}
-		} else {
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_SOURCE' ).'</div>';
+			return;
+		}
+
+		// Check for unauthorized categories
+		$y = 0;
+		$n = 0;
+		$unauthorized = array();
+		foreach ($destid as $id)
+		{
+			if ( !$user->authorise('core.edit', 'com_content.category.'.$id) )
+			{
+				$unauthorized[] = $id;
+				continue;
+			}
+
+			$model->copyParams($id, $params)
+				? $y++
+				: $n++;
+		}
+
+		echo '<div class="copyok">'.JText::sprintf( 'FLEXI_CAT_PARAMS_COPIED', $y, $n ).'</div>';
+		if ( count($unauthorized) )
+		{
+			echo '<div class="copyfailed">'.'Skipped '.count($unauthorized).' uneditable categories with ids: '.implode(', ',$unauthorized).'</div>';
 		}
 	}
 
@@ -110,5 +134,4 @@ class FlexicontentControllerCategories extends FlexicontentController
 	{
 		flexicontent_html::setitemstate($this, 'json', $_record_type = 'category');
 	}
-
 }

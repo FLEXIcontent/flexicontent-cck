@@ -215,38 +215,6 @@ class FlexicontentControllerCategories extends JControllerAdmin
 
 
 	/**
-	 * Logic to saver order of multiple categories at once
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function saveorder()
-	{
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		// Get the arrays from the Request
-		$order	= JRequest::getVar('order',	null, 'post', 'array');
-		$originalOrder = explode(',', JRequest::getString('original_order_values'));
-
-		// Make sure something has changed
-		if (!($order === $originalOrder))
-		{
-			parent::saveorder();
-		}
-		
-		// Nothing to reorder
-		else
-		{
-			$this->setRedirect(JRoute::_('index.php?option='.$this->option.'&view='.$this->view_list, false), 'Nothing to reorder');
-		}
-		
-		// Clean cache
-		$this->_cleanCache();
-	}
-
-
-	/**
 	 * Logic to delete categories
 	 *
 	 * @access public

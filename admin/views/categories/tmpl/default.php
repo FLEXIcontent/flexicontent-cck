@@ -52,7 +52,7 @@ $saveOrder = ($listOrder == 'a.lft' && strtolower($listDirn) == 'asc');
 
 if ($saveOrder)
 {
-	$saveOrderingUrl = 'index.php?option=com_categories&task=categories.saveOrderAjax&tmpl=component';
+	$saveOrderingUrl = 'index.php?option=com_flexicontent&task=categories.saveOrderAjax&format=raw';
 	JHtml::_('sortablelist.sortable', 'adminListTableFCcats', 'adminForm', strtolower($listDirn), $saveOrderingUrl, false, true);
 }
 
@@ -246,19 +246,19 @@ function delAllFilters() {
 			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
 			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass left">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
-				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top"></span>'; ?>
+				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass">
@@ -520,24 +520,31 @@ function delAllFilters() {
 				</a>
 			</td>*/ ?>
 			
-			<td>
-				<a href="<?php echo $items_link.'ALL_P'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
-					<span class="badge badge-success"><?php $c = (int)@$row->byStateTotals[1] + (int)@$row->byStateTotals[-5]; echo $c ? $c : '.'; ?></span>
+			<?php
+				$c_p = (int) @ $row->byStateTotals[1] + (int) @ $row->byStateTotals[-5];
+				$c_u = (int) @ $row->byStateTotals[0] + (int) @ $row->byStateTotals[-3] + (int) @ $row->byStateTotals[-4];
+				$c_a = (int) @ $row->byStateTotals[2];
+				$c_t = (int) @ $row->byStateTotals[-2];
+			?>
+			
+			<td style="padding: 0;">
+				<a href="<?php echo $items_link.'ALL_P'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_p ? ' badge-success' : ''; ?>">
+					<?php echo $c_p ? $c_p : '0'; ?>
 				</a>
 			</td>
-			<td>
-				<a href="<?php echo $items_link.'ALL_U'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
-					<span class="badge badge-warning"><?php $c = (int)@$row->byStateTotals[0] + (int)@$row->byStateTotals[-3] + (int)@$row->byStateTotals[-4]; echo $c ? $c : '.'; ?></span>
+			<td style="padding: 0;">
+				<a href="<?php echo $items_link.'ALL_U'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_u ? ' badge-important' : ''; ?>">
+					<?php echo $c_u ? $c_u : '0'; ?>
 				</a>
 			</td>
-			<td>
-				<a href="<?php echo $items_link.'A'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
-					<span class="badge badge-info"><?php $c = (int)@$row->byStateTotals[2]; echo $c ? $c : '.'; ?></span>
+			<td style="padding: 0;">
+				<a href="<?php echo $items_link.'A'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_a ? ' badge-info' : ''; ?>">
+					<?php echo $c_a ? $c_a : '0'; ?>
 				</a>
 			</td>
-			<td>
-				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
-					<span class="badge"><?php $c = (int)@$row->byStateTotals[-2]; echo $c ? $c : '.'; ?></span>
+			<td style="padding: 0;">
+				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_t ? ' badge-inverse' : ''; ?>">
+					<?php echo $c_t ? $c_t : '0'; ?>
 				</a>
 			</td>
 			<td>
