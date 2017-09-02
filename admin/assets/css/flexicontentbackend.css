@@ -1663,17 +1663,10 @@ table.adminlist input[type="text"] {
 	padding-left: 0px !important;
 	padding-right: 0px !important;
 }
-table.adminlist tr td.yellow,
-table.adminlist tbody tr.row0 td.yellow,
-table.adminlist tbody tr.row1 td.yellow {
-	background-color: #f0f0f0;
-	background-image: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
-	background-image: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
-}
-table.adminlist tr:hover td.yellow,
-table.adminlist tbody tr.row0:hover td.yellow,
-table.adminlist tbody tr.row1:hover td.yellow {
-	background: transparent !important;
+table.adminlist tbody tr td.filtered_column,
+table.adminlist tbody tr.row0 td.filtered_column,
+table.adminlist tbody tr.row1 td.filtered_column {
+	background: #F0F0F0;
 }
 table.adminlist tbody th {
 	font-weight: bold;
@@ -1696,7 +1689,12 @@ table.adminlist tbody tr td {
 	text-align: unset;
 }
 table.adminlist tbody tr.row1 td {
-	background: none repeat scroll 0 0 #f7f7f7;
+	background: none repeat scroll 0 0 #F7F7F7;
+}
+table.adminlist tbody tr.row0:hover td,
+table.adminlist tbody tr.row1:hover td,
+table.adminlist tr:hover td.filtered_column {
+	background: #F7F7E7 !important;
 }
 .adminlist-table-row {
 	position: absolute;
@@ -1708,10 +1706,6 @@ table.adminlist tbody tr.row1 td {
 	background-color: #f0f0f0;
 	background-image: -webkit-repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
 	background-image: repeating-linear-gradient(135deg,#e7e7e7,#e7e7e7 10px,#e0e0e0 10px,#e0e0e0 20px);
-}
-table.adminlist tbody tr.row0:hover td,
-table.adminlist tbody tr.row1:hover td {
-	background: transparent;
 }
 table.adminlist tfoot {
 	border-top: 1px solid #ddd !important;

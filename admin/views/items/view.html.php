@@ -169,23 +169,23 @@ class FlexicontentViewItems extends JViewLegacy
 
 		$js = '';
 
-		if ($filter_cats)   $js .= "jQuery('.col_cats').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_type)   $js .= "jQuery('.col_type').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_author) $js .= "jQuery('.col_authors').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_state)  $js .= "jQuery('.col_state').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_lang)   $js .= "jQuery('.col_lang').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_access) $js .= "jQuery('.col_access').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_tag)    $js .= "jQuery('.col_tag').each(function(){ jQuery(this).addClass('yellow'); });";
-		if ($filter_id)     $js .= "jQuery('.col_id').each(function(){ jQuery(this).addClass('yellow'); });";
+		if ($filter_cats)   $js .= "jQuery('.col_cats').addClass('filtered_column');";
+		if ($filter_type)   $js .= "jQuery('.col_type').addClass('filtered_column');";
+		if ($filter_author) $js .= "jQuery('.col_authors').addClass('filtered_column');";
+		if ($filter_state)  $js .= "jQuery('.col_state').addClass('filtered_column');";
+		if ($filter_lang)   $js .= "jQuery('.col_lang').addClass('filtered_column');";
+		if ($filter_access) $js .= "jQuery('.col_access').addClass('filtered_column');";
+		if ($filter_tag)    $js .= "jQuery('.col_tag').addClass('filtered_column');";
+		if ($filter_id)     $js .= "jQuery('.col_id').addClass('filtered_column');";
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
-				$js .= "jQuery('.col_created').each(function(){ jQuery(this).addClass('yellow'); });";
+				$js .= "jQuery('.col_created').addClass('filtered_column');";
 			} else if ($date == 2) {
-				$js .= "jQuery('.col_revised').each(function(){ jQuery(this).addClass('yellow'); });";
+				$js .= "jQuery('.col_revised').addClass('filtered_column');";
 			}
 		}
-		if (strlen($search)) $js .= "jQuery('.col_title').each(function(){ jQuery(this).addClass('yellow'); });";
+		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
 		
 		
 		// *****************************

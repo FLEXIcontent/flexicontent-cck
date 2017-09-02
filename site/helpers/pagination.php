@@ -42,7 +42,13 @@ class FCPagination extends JPagination
 	 * @return	string	Pagination result set counter string
 	 * @since	1.5
 	 */
-	function getResultsCounter() {
+	function getResultsCounter()
+	{
+		if ( JFactory::getApplication()->isAdmin() )
+		{
+			return parent::getResultsCounter();
+		}
+
 		// Initialize variables
 		$app  = JFactory::getApplication();
 		$view = JRequest::getCMD('view');
@@ -82,23 +88,30 @@ class FCPagination extends JPagination
 		
 		return $html;
 	}
-	
-	
+
+
 	/**
 	 * Create and return the pagination data object.
 	 *
 	 * @return  object  Pagination data object.
 	 *
-	 * @since   11.1
+	 * @since   3.0.0
 	 */
-	// **************************************************************************************************************************************
-	// Need to call parent function to avoid problems WITH SH404SEF as SH404SEF and other SEF components have custom pagination link creation
-	// **************************************************************************************************************************************
 	protected function _buildDataObject()
 	{
-		// Workaround for JRoute not allowing url-encoded ampersand %26 in values of variables
+		if ( JFactory::getApplication()->isAdmin() )
+		{
+			return parent::_buildDataObject();
+		}
+
+		// ***
+		// *** Need to call parent function to avoid problems WITH SH404SEF as SH404SEF and other SEF components have custom pagination link creation
+		// ***
 		$data = parent::_buildDataObject();
-		if (!empty($data->pages)) foreach($data->pages as $i => $page) {
+
+		// Workaround for JRoute not allowing url-encoded ampersand %26 in values of variables
+		if (!empty($data->pages)) foreach($data->pages as $i => $page)
+		{
 			$page->link = str_replace('__amp__', '%26', $page->link);
 		}
 		if (!empty($data->start->link)) $data->start->link = str_replace('__amp__', '%26', $data->start->link);
@@ -107,5 +120,48 @@ class FCPagination extends JPagination
 		if (!empty($data->previous->link)) $data->previous->link = str_replace('__amp__', '%26', $data->previous->link);
 		return $data;
 	}
-	
+
+
+	/**
+	 * Creates a dropdown box for selecting how many records to show per page.
+	 *
+	 * @return  string  The HTML for the limit # input box.
+	 *
+	 * @since   1.5
+	 */
+	public function getLimitBox()
+	{
+		if ( !JFactory::getApplication()->isAdmin() )
+		{
+			return parent::getLimitBox();
+		}
+
+		$limits = array();
+
+		// Make the option list.
+		for ($i = 5; $i <= 30; $i += 5)
+		{
+			$limits[] = \JHtml::_('select.option', "$i");
+		}
+
+		$limits[] = \JHtml::_('select.option', '50', \JText::_('J50'));
+		$limits[] = \JHtml::_('select.option', '100', \JText::_('J100'));
+		$limits[] = \JHtml::_('select.option', '200', \JText::_('J200'));
+		$limits[] = \JHtml::_('select.option', '500', \JText::_('J500'));
+		$limits[] = \JHtml::_('select.option', '0', \JText::_('JALL'));
+
+		$selected = $this->viewall ? 0 : $this->limit;
+
+		// Build the select list.
+		return \JHtml::_(
+			'select.genericlist',
+			$limits,
+			$this->prefix . 'limit',
+			'class="inputbox input-mini" size="1" onchange="Joomla.submitform();"',
+			'value',
+			'text',
+			$selected
+		);
+	}
+
 }

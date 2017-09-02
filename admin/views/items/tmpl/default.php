@@ -844,11 +844,11 @@ jQuery(document).ready(function(){
 			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_ilayout;
 			
 			// Set a row language, even if empty to avoid errors
-			$lang_default = !FLEXI_J16GE ? '' : '*';
-			$row->lang = @$row->lang ? $row->lang : $lang_default;
+			$lang_default = '*';
+			$row->lang = !empty($row->lang) ? $row->lang : $lang_default;
    		?>
 
-		<tr class="<?php echo 'row'.(1 - $i); ?>">
+		<tr class="<?php echo 'row'.($i % 2); ?>">
 
 			<!--td class="col_rowcount">
 				<div class="adminlist-table-row"></div>
@@ -867,12 +867,14 @@ jQuery(document).ready(function(){
 
 						$show_orderUp   = @$this->rows[$i-1]->$ord_catid == $this->rows[$i]->$ord_catid && $row_stategrp_prev == $row_stategrp;
 						$show_orderDown = $this->rows[$i]->$ord_catid == @$this->rows[$i+1]->$ord_catid && $row_stategrp == $row_stategrp_next;
+						$fcorder_lang_separately = true;
+						$jorder_lang_separately = true;
 						if (
-							($this->filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
-							(!$this->filter_order_type && FLEXI_J16GE)   // Joomla order does not support language in J1.5
+							($this->filter_order_type && $fcorder_lang_separately) ||
+							(!$this->filter_order_type && $jorder_lang_separately)
 						) {
-							$show_orderUp   = $show_orderUp   && @$this->rows[$i-1]->lang == $this->rows[$i]->lang;
-							$show_orderDown = $show_orderDown && $this->rows[$i]->lang == @$this->rows[$i+1]->lang;
+							$show_orderUp   = $show_orderUp   && @ $this->rows[$i-1]->lang == $this->rows[$i]->lang;
+							$show_orderDown = $show_orderDown && $this->rows[$i]->lang == @ $this->rows[$i+1]->lang;
 						}
 					}
 				?>
@@ -1186,9 +1188,7 @@ jQuery(document).ready(function(){
 			JToolbarHelper::spacer();
 			JToolbarHelper::divider();
 			JToolbarHelper::spacer();
-			FLEXI_J16GE ?
-				JToolbarHelper::custom( $ctrl_task, 'apply.png', 'apply.png', 'FLEXI_APPROVAL_REQUEST' ) :
-				JToolbarHelper::custom( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
+			JToolbarHelper::custom($ctrl_task, 'apply.png', 'apply.png', 'FLEXI_APPROVAL_REQUEST');
 		}
 		JToolbarHelper::spacer();
 		JToolbarHelper::spacer();
