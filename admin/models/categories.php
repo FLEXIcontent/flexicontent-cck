@@ -99,7 +99,7 @@ class FlexicontentModelCategories extends JModelList
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
 		
-		$default_order     = 'c.lft';
+		$default_order     = 'a.lft';
 		$default_order_dir = 'ASC';
 		
 		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
@@ -161,20 +161,20 @@ class FlexicontentModelCategories extends JModelList
 	 * @return	string
 	 * @since	1.6
 	 */
-	function getAssignedItems($cids) {
-		if (empty($cids)) return array();
-		
-		$db = JFactory::getDBO();
-		
-		// Select the required fields from the table.
-		$query = " SELECT rel.catid, COUNT(rel.itemid) AS nrassigned"
-			." FROM #__flexicontent_cats_item_relations AS rel"
-			." WHERE rel.catid IN (".implode(",", $cids).") "
-			." GROUP BY rel.catid";
-		
-		$db->setQuery( $query );
-		$assigned = $db->loadObjectList('catid');
-		return $assigned;
+	function getAssignedItems($cids)
+	{
+		if (empty($cids))
+		{
+			return array();
+		}
+
+		$query = ' SELECT rel.catid, COUNT(rel.itemid) AS nrassigned'
+			. ' FROM #__flexicontent_cats_item_relations AS rel'
+			. ' WHERE rel.catid IN (' . implode(',', $cids) . ')'
+			. ' GROUP BY rel.catid'
+			;
+
+		return $this->_db->setQuery($query)->loadObjectList('catid');
 	}
 	
 	
@@ -185,21 +185,21 @@ class FlexicontentModelCategories extends JModelList
 	 * @return	string
 	 * @since	1.6
 	 */
-	function getParentParams($cid) {
-		if (empty($cid)) return array();
-		
+	function getParentParams($cid)
+	{
+		if (empty($cid))
+		{
+			return array();
+		}
+
 		global $globalcats;
-		$db = JFactory::getDBO();
-		
-		// Select the required fields from the table.
-		$query = " SELECT id, params"
-			." FROM #__categories"
-			." WHERE id IN (".$globalcats[$cid]->ancestors.") "
-			." ORDER BY level ASC";
-		
-		$db->setQuery( $query );
-		$data = $db->loadObjectList('id');
-		return $data;
+
+		$query = ' SELECT id, params'
+			. ' FROM #__categories'
+			. ' WHERE id IN (' . $globalcats[$cid]->ancestors . ')'
+			. ' ORDER BY level ASC'
+			;
+		return $this->_db->setQuery($query)->loadObjectList('id');
 	}
 	
 	
@@ -210,25 +210,27 @@ class FlexicontentModelCategories extends JModelList
 	 * @return	string
 	 * @since	1.6
 	 */
-	function countItemsByState($cids) {
-		if (empty($cids)) return array();
-		
-		$db = JFactory::getDBO();
-		
-		// Select the required fields from the table.
-		$query  = " SELECT rel.catid, i.state, COUNT(rel.itemid) AS nrassigned";
-		$query .= " FROM #__flexicontent_cats_item_relations AS rel";
-		$query .= " JOIN #__content AS i ON i.id=rel.itemid ";
-		$query .= " WHERE rel.catid IN (".implode(",", $cids).") ";
-		$query .= " GROUP BY rel.catid, i.state";
-		
-		$db->setQuery( $query );
-		$data = $db->loadObjectList();
-		$assigned = array();
-		foreach($data as $catid => $d) {
-			$assigned[$d->catid][$d->state] = $d->nrassigned;
-			//if ($d==1 || $d==-5) $assigned[$d->catid][$d->state] = $d->nrassigned;
+	function countItemsByState($cids)
+	{
+		if (empty($cids))
+		{
+			return array();
 		}
+
+		$query = ' SELECT rel.catid, i.state, COUNT(rel.itemid) AS nrassigned'
+			. ' FROM #__flexicontent_cats_item_relations AS rel'
+			. ' JOIN #__content AS i ON i.id=rel.itemid'
+			. ' WHERE rel.catid IN (' . implode(',', $cids) . ')'
+			. ' GROUP BY rel.catid, i.state'
+			;
+		$data = $this->_db->setQuery($query)->loadObjectList();
+
+		$assigned = array();
+		foreach($data as $catid => $d)
+		{
+			$assigned[$d->catid][$d->state] = $d->nrassigned;
+		}
+
 		return $assigned;
 	}
 	
@@ -244,128 +246,144 @@ class FlexicontentModelCategories extends JModelList
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		global $globalcats;
-		
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
+		$user = JFactory::getUser();
+
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		$fcform  = $jinput->get('fcform', 0, 'int');
-		
-		$db   = JFactory::getDBO();
-		$user = JFactory::getUser();
-		
+
 		// various filters
 		$filter_cats      = $this->getState( 'filter_cats' );
 		$filter_state     = $this->getState( 'filter_state' );
 		$filter_access    = $this->getState( 'filter_access' );
 		$filter_level     = $this->getState( 'filter_level' );
 		$filter_language  = $this->getState( 'filter_language' );
-		
+
 		// filter id
 		$filter_id = $this->getState( 'filter_id' );
-		
+
 		// text search
 		$search = $this->getState( 'search' );
 		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
-		
+
 		// ordering filters
 		$filter_order     = $this->getState( 'filter_order' );
 		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
-		
+
 		// Create a new query object.
-		$query = $db->getQuery(true);
+		$query = $this->_db->getQuery(true);
 		
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*'
-				.', u.name AS editor, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', c.access) ELSE level.title END AS access_level'
+				'a.*'
+				.', u.name AS editor, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', a.access) ELSE level.title END AS access_level'
 				// because of multi-multi category-item relation it is faster to calculate ITEM COUNT with a seperate query
 				// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
 				// the more categories are listed (query LIMIT) the bigger the performance difference ...
-				//.', (SELECT COUNT(*) FROM #__flexicontent_cats_item_relations AS rel WHERE rel.catid = c.id) AS nrassigned '
-				.', c.params as config, ag.title AS access_level '
+				//.', (SELECT COUNT(*) FROM #__flexicontent_cats_item_relations AS rel WHERE rel.catid = a.id) AS nrassigned '
+				.', a.params AS config, ag.title AS access_level '
 			)
-		);
-		$query->from('#__categories AS c');
-		$query->select('l.title AS language_title');
-		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');
-		$query->join('LEFT', '#__viewlevels as level ON level.id=c.access');
-		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
-		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = c.access');
-		$query->where("c.extension = '".FLEXI_CAT_EXTENSION."' ");
-		
-		
+		)
+		->from('#__categories AS a')
+		->select('l.title AS language_title')
+		->join('LEFT', '#__languages AS l ON l.lang_code = a.language')
+		->join('LEFT', '#__viewlevels as level ON level.id = a.access')
+		->join('LEFT', '#__users AS u ON u.id = a.checked_out')
+		->join('LEFT', '#__viewlevels AS ag ON ag.id = a.access')
+		->where('a.extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION));
+
 		// Filter by publication state
-		if (is_numeric($filter_state)) {
-			$query->where('c.published = ' . (int) $filter_state);
+		if (is_numeric($filter_state))
+		{
+			$query->where('a.published = ' . (int) $filter_state);
 		}
-		elseif ( $filter_state === '') {
-			$query->where('c.published IN (0, 1)');
-		} else {  // $filter_state === '*', or any other will allow all states including: archive, trashed 
+
+		elseif ( $filter_state === '')
+		{
+			$query->where('a.published IN (0, 1)');
 		}
-		
+
+		// $filter_state === '*', or any other will allow all states including: archive, trashed 
+		else ;
+
 		// Filter by access level
-		if ( $filter_access ) {
-			$query->where('c.access = '.(int) $filter_access);
+		if ( $filter_access )
+		{
+			$query->where('a.access = '.(int) $filter_access);
 		}
-		
-		if ( $filter_cats ) {
-			// Limit category list to those contain in the subtree of the choosen category
-			$query->where(' c.id IN (SELECT cat.id FROM #__categories AS cat JOIN #__categories AS parent ON cat.lft BETWEEN parent.lft AND parent.rgt WHERE parent.id='. (int) $filter_cats.')' );
-		} else {
-			// Limit category list to those containing CONTENT (joomla articles)
-			$query->where(' (c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
+
+		// Limit category list to those contain in the subtree of the choosen category
+		if ( $filter_cats )
+		{
+			$query->where(' a.id IN (SELECT cat.id FROM #__categories AS cat JOIN #__categories AS parent ON cat.lft BETWEEN parent.lft AND parent.rgt WHERE parent.id='. (int) $filter_cats.')' );
 		}
-		
+
+		// Limit category list to those containing CONTENT (joomla articles)
+		else
+		{
+			$query->where(' (a.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND a.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
+		}
+
 		// Filter on the level.
-		if ( $filter_level ) {
-			$query->where('c.level <= '.(int) $filter_level);
+		if ( $filter_level )
+		{
+			$query->where('a.level <= '.(int) $filter_level);
 		}
-		
+
 		// Filter by language
-		if ( $filter_language ) {
-			$query->where('c.language = '.$db->Quote( $filter_language ));
+		if ( $filter_language )
+		{
+			$query->where('a.language = ' . $this->_db->Quote( $filter_language ));
 		}
 		
 		// Filter by id
-		if ( $filter_id ) {
-			$query->where('c.id = '.(int) $filter_id);
+		if ( $filter_id )
+		{
+			$query->where('a.id = '.(int) $filter_id);
 		}
 		
 		// Implement View Level Access
 		if (!$user->authorise('core.admin'))
 		{
 			$groups	= implode(',', JAccess::getAuthorisedViewLevels($user->id));
-			$query->where('c.access IN ('.$groups.')');
+			$query->where('a.access IN (' . $groups . ')');
 		}
 		
 		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
-		if (strlen($search)) {
-			if (stripos($search, 'id:') === 0) {
-				$query->where('c.id = '.(int) substr($search, 3));
+		if (strlen($search))
+		{
+			if (stripos($search, 'id:') === 0)
+			{
+				$query->where('a.id = ' . (int) substr($search, 3) );
 			}
-			elseif (stripos($search, 'author:') === 0) {
-				$search = $db->Quote('%'.$db->escape(substr($search, 7), true).'%');
-				$query->where('(u.name LIKE '.$search.' OR u.username LIKE '.$search.')');
+			elseif (stripos($search, 'author:') === 0)
+			{
+				$search_quoted = $this->_db->Quote('%' . $this->_db->escape(substr($search, 7), true) . '%');
+				$query->where('(u.name LIKE ' . $search_quoted . ' OR u.username LIKE ' . $search_quoted . ')');
 			}
-			else {
-				$search = $db->Quote('%'.$db->escape($search, true).'%');
-				$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
+			else
+			{
+				$search_quoted = $this->_db->Quote('%' . $this->_db->escape($search, true) . '%');
+				$query->where('(a.title LIKE ' . $search_quoted . ' OR a.alias LIKE ' . $search_quoted . ' OR a.note LIKE ' . $search_quoted . ')');
 			}
 		}
-		
-		$query->group('c.id');
+
+		$query->group('a.id');
+
 		// Add the list ordering clause.
-		$query->order($db->escape($filter_order.' '.$filter_order_Dir));
+		$query->order($this->_db->escape($filter_order.' '.$filter_order_Dir));
 		
 		//echo nl2br(str_replace('#__','jos_',$query));
 		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
 	}
-	
-	
+
+
 	/**
 	 * Method to (un)publish a category
 	 *
@@ -390,8 +408,8 @@ class FlexicontentModelCategories extends JModelList
 
 		// Get the owner of all categories
 		$query = 'SELECT id, created_user_id'
-			. ' FROM #__categories as c'
-			. ' WHERE c.extension=\'com_content\' '
+			. ' FROM #__categories'
+			. ' WHERE extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION)
 			;
 		$this->_db->setQuery( $query );
 		$cats = $this->_db->loadObjectList('id');
@@ -565,17 +583,20 @@ class FlexicontentModelCategories extends JModelList
 		$this->_db->setQuery( $query );
 		
 		$rows = $this->_db->loadObjectList();
-		if ( !$rows ) {
+		if ( !$rows )
+		{
 			$msg = $this->_db->getErrorNum() ? $this->_db->stderr() : 'Given category(ies) were not found';
 			$this->setError( $msg );
 			return false;
 		}
 		
 		// Check access to delete of categories, this may seem redundant, but it is a security check in case user manipulates the backend adminform ...
-		foreach ($rows as $row) {
+		foreach ($rows as $row)
+		{
 			$canDelete		= $user->authorise('core.delete', 'com_content.category.'.$row->id);
 			$canDeleteOwn	= $user->authorise('core.delete.own', 'com_content.category.'.$row->id) && $row->created_user_id == $user->get('id');
-			if	( !$canDelete && !$canDeleteOwn ) {
+			if	( !$canDelete && !$canDeleteOwn )
+			{
 				$this->setError(
 					'You are not authorised to delete category with id: '. $row->id
 					.'<br />NOTE: when deleting a category the children categories will get deleted too'
@@ -588,35 +609,44 @@ class FlexicontentModelCategories extends JModelList
 		$cid = array();
 		
 		//TODO: Categories and its childs without assigned items will not be deleted if another tree has any item entry 
-		foreach ($rows as $row) {
-			if ($row->numcat == 0) {				
+		foreach ($rows as $row)
+		{
+			if ($row->numcat == 0)
+			{
 				$cid[] = $row->id;
-			} else {
+			}
+			else
+			{
 				$err[] = $row->title;
 			}
 		}
-		
+
 		// Remove categories only if no errors were found
 		if (count( $cid ) && count($err) == 0)
 		{
 			// table' is object of 'JTableNested' extended class, which will also delete assets
 			$cids = $cid;
-			foreach ($cids as $id) {
-				$table-> id = $id;
+			foreach ($cids as $id)
+			{
+				$table->id = $id;
 				$table->delete($id);
 			}
 		}
-		
+
 		// Create result message and return it
-		if ( count($err) ) {
+		if ( count($err) )
+		{
 			$err_string = count($err)==1 ? 'FLEXI_ITEM_ASSIGNED_CATEGORY' : 'FLEXI_ITEMS_ASSIGNED_CATEGORY';
 			$msg = JText::sprintf( $err_string, implode( ', ', $err ) ) ."<br/>\n";
-		} else {
+		}
+		else
+		{
 			$msg = count( $cid ) .' '. JText::_( 'FLEXI_CATEGORIES_DELETED' );
 		}
 		return $msg;
 	}
-	
+
+
 	/**
 	 * Method to set the access level of the category
 	 *
@@ -635,49 +665,55 @@ class FlexicontentModelCategories extends JModelList
 		$cids[] = $id;
 		$this->_addCategories($id, $cids);   // Propagate access level to children
 		
-		foreach ($cids as $cid) {
-			
+		foreach ($cids as $cid)
+		{
 			$category->load( (int)$cid );
 			$category->access = $access;
-			
-			if ( !$category->check() ) {
+
+			if ( !$category->check() )
+			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			if ( !$category->store() ) {
+
+			if ( !$category->store() )
+			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-			
 		}
 
 		//handle parents
 		$pcids = array();
 		$this->_addCategories($id, $pcids, 'parents');
 				
-		foreach ($pcids as $pcid) {
-			
-			if($pcid == 0 || $pcid == $id) {
+		foreach ($pcids as $pcid)
+		{
+			if ($pcid == 0 || $pcid == $id)
+			{
 				continue;
 			}
-			
-			$category->load( (int)$pcid );
-			
-			if ($category->access > $access) {	
 
+			$category->load( (int) $pcid );
+
+			if ($category->access > $access)
+			{
 				$category->access = $access;
-				
-				if ( !$category->check() ) {
+
+				if ( !$category->check() )
+				{
 					$this->setError($this->_db->getErrorMsg());
 					return false;
 				}
-				if ( !$category->store() ) {
+
+				if ( !$category->store() )
+				{
 					$this->setError($this->_db->getErrorMsg());
 					return false;
 				}
-				
 			}
 		}
+
 		return true;
 	}
 
@@ -702,11 +738,11 @@ class FlexicontentModelCategories extends JModelList
 
 		// Get all rows with parent of $id
 		$query = 'SELECT ' . $get
-			. ' FROM #__categories as c'
-			. ' WHERE c.extension=\'com_content\' '
-			. ' AND ' . $source . ' = ' . (int) $id . ' AND ' . $get . ' <> 1';
-		$this->_db->setQuery( $query );
-		$rows = $this->_db->loadObjectList();
+			. ' FROM #__categories'
+			. ' WHERE extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION)
+			. '  AND ' . $source . ' = ' . (int) $id . ' AND ' . $get . ' <> 1'
+			;
+		$rows = $this->_db->setQuery($query)->loadObjectList();
 
 		// Recursively iterate through all children
 		foreach ($rows as $row)
