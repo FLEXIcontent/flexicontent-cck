@@ -715,7 +715,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$app  = JFactory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
-		$host = JURI::getInstance('SERVER')->gethost();
+		$host = JUri::getInstance('SERVER')->gethost();
 
 		// URL title (optional)
 		$usetitle   = $field->parameters->get( 'use_title', 0 ) ;
@@ -789,7 +789,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			else
 			{
 				if (substr($link, 0, 10) == '/index.php')  $link = substr($link, 1);
-				$prefix = (substr($link, 0, 9) == 'index.php') ? JURI::root() : 'http://';
+				$prefix = (substr($link, 0, 9) == 'index.php') ? JUri::root() : 'http://';
 			}
 
 			$prefixed_link = empty($link) ? '' : $prefix . $link;

@@ -120,7 +120,7 @@ class plgContentFlexiBreak extends JPlugin
 		
 		// Plugin base folder
 		$document = JFactory::getDocument();
-		$plgbase  = JURI::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
+		$plgbase  = JUri::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
 		
 		// Display configuration
 		$display_method = $this->params->get('display_method', 1);

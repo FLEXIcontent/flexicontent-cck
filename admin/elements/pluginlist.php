@@ -44,7 +44,7 @@ class JFormFieldPluginlist extends JFormFieldList
 	function getInput()
 	{
 		$doc = JFactory::getDocument();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -78,11 +78,11 @@ class JFormFieldPluginlist extends JFormFieldList
 		$plugins = array();
 		foreach ($plgs as $plg)
 		{
-			$plugins[] = JHTMLSelect::option($plg->name, $plg->name); 
+			$plugins[] = JHtmlSelect::option($plg->name, $plg->name); 
 		}
 		
 		$attribs = ' class="use_select2_lib" multiple="multiple" size="5" ';
 		
-		return JHTMLSelect::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtmlSelect::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

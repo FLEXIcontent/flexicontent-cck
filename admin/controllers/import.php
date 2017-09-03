@@ -66,8 +66,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		// Check for request forgeries
 		if (JRequest::getCmd( 'task' )!='importcsv') {
 			JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));	
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />';
-			$fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
+			echo '<link rel="stylesheet" href="'.JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />';
+			$fc_css = JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			echo '<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VHASH.'" />';
 		} else {
 			// output this before every other output
@@ -81,7 +81,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
 		$task  = $jinput->get('task', '', 'cmd');
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');

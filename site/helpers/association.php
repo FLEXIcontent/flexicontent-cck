@@ -77,7 +77,7 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 	{
 		if (!$item_id) return array();
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT i.language, ie.type_id, '
 			. '  CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as id, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as catid '
@@ -103,7 +103,7 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 	{
 		if (!$cat_id) return array();
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT c.language, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as catid '
 			. ' FROM #__associations AS a'

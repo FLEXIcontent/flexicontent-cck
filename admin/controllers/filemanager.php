@@ -328,7 +328,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$session = JFactory::getSession();
 
 		// Force interactive run mode, if given parameters
@@ -735,7 +735,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// we verifiy the url prefix and add http if any
 		if (!preg_match("#^http|^https|^ftp#i", $filename)) { $filename	= 'http://'.$filename; }
 		
-		$db 	= JFactory::getDBO();
+		$db 	= JFactory::getDbo();
 		$user	= JFactory::getUser();
 		
 		$obj = new stdClass();
@@ -798,7 +798,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file_ids = array();
 
 		$app    = JFactory::getApplication();
-		$db 		= JFactory::getDBO();
+		$db 		= JFactory::getDbo();
 		$user		= JFactory::getUser();
 		$params = JComponentHelper::getParams('com_flexicontent');
 		
@@ -1053,7 +1053,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$db     = JFactory::getDBO();
+		$db     = JFactory::getDbo();
 
 		$fieldid    = $this->input->get('fieldid', 0, 'int');
 		$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
@@ -1243,7 +1243,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		
 		// Calculate access
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');

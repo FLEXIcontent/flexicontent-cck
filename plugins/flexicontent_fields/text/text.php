@@ -277,7 +277,7 @@ class plgFlexicontent_fieldsText extends FCField
 			
 			$sel_fieldname = 'custom['.$field->name.'_sel][]';
 			$sel_options = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
-			$select_field = JHTML::_('select.genericlist', $sel_options, $sel_fieldname, $sel_attribs, 'value', 'text', array());
+			$select_field = JHtml::_('select.genericlist', $sel_options, $sel_fieldname, $sel_attribs, 'value', 'text', array());
 		} else {
 			$select_field='';
 		}
@@ -766,12 +766,12 @@ class plgFlexicontent_fieldsText extends FCField
 		$options = array();
 		$default_prompt = $select_field_mode==0 ? 'FLEXI_FIELD_SELECT_EXISTING_VALUE' : 'FLEXI_FIELD_SELECT_VALUE';
 		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
-		$options[] = JHTML::_('select.option', '', '-'.JText::_($field_prompt).'-');
+		$options[] = JHtml::_('select.option', '', '-'.JText::_($field_prompt).'-');
 		
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
 		if ($results) foreach($results as $result) {
 			if ( !strlen($result->value) ) continue;
-			$options[] = JHTML::_('select.option', $result->value, ($lang_filter_values ? JText::_($result->text) : $result->text));
+			$options[] = JHtml::_('select.option', $result->value, ($lang_filter_values ? JText::_($result->text) : $result->text));
 		}
 		return $options;
 	}

@@ -1,7 +1,7 @@
 <?php
 if ($params->get('display_favlist', 0))
 {
-	$document->addScript(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
+	$document->addScript(JUri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
 
 	echo '
 	<p class="news_favs_head">' . JText::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES') . '</p>

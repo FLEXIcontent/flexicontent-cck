@@ -49,7 +49,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 		if ($app->input->get('print', '', 'cmd')) return;
 
-		//$scheme = JURI::getInstance()->getScheme();  // we replaced http(s):// with //
+		//$scheme = JUri::getInstance()->getScheme();  // we replaced http(s):// with //
 		$document	= JFactory::getDocument();
 		
 		$lang = $document->getLanguage();
@@ -86,7 +86,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($load_css && !$css_loaded)
 		{
 			$css_loaded = true;
-			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+			$document->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 		
 		
@@ -98,7 +98,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https 
 			//$item_url_abs = JRoute::_($item_url, true, -1);
 			
-			$item_url_abs = JURI::getInstance()->toString(array('scheme', 'host', 'port')) . JRoute::_($item_url);
+			$item_url_abs = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . JRoute::_($item_url);
 			$item_title_escaped = htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' );
 		}
 		
@@ -182,7 +182,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		{
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
+				$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
 			} else {
 				$document->addScript('//vozme.com/get_text.js');
 			}
@@ -269,7 +269,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				// Add image if fould, making sure it is converted to ABSOLUTE URL
 				if ($imageurl) {
 					$is_absolute = (boolean) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
-					$imageurl = $is_absolute ? $imageurl : JURI::root().$imageurl;
+					$imageurl = $is_absolute ? $imageurl : JUri::root().$imageurl;
 					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
 				}
 			}
@@ -497,7 +497,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	
 	function _getCommentsCount($id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		static $jcomment_installed = null;
 		
 		if ($jcomment_installed===null) {
@@ -540,9 +540,9 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					$paths[] = $folder;
 				}
 				$imageurl = '/'.implode('/', $paths);
-				$imageurl = JURI::root(true).$imageurl;
+				$imageurl = JUri::root(true).$imageurl;
 			}elseif(substr($imageurl, 0, 7)=='images/') {
-				$imageurl = JURI::root(true).'/'.$imageurl;
+				$imageurl = JUri::root(true).'/'.$imageurl;
 			}
 		}
 		return $imageurl;

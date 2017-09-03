@@ -376,7 +376,7 @@ class flexicontent_tmpl
 		static $layout_params = array();
 		if ( !$force && isset($layout_params[$type][$folder][$cfgname]) ) return $layout_params[$type][$folder][$cfgname];
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT template as folder, cfgname, attribs, layout as type'
 			. ' FROM #__flexicontent_layouts_conf';
 		$db->setQuery($query);
@@ -471,7 +471,7 @@ class flexicontent_tmpl
 			$templates[$folder] = array();
 		}
 		if(!isset($templates[$folder][$type])) {
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query  = 'SELECT *'
 					. ' FROM #__flexicontent_templates'
 					. ' WHERE template = ' . $db->Quote($folder)

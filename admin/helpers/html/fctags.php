@@ -30,7 +30,7 @@ abstract class JHtmlFctags
 	public static function published($value = 0, $i, $canChange = true)
 	{
 		static $states = null;
-		//return JHTML::_('jgrid.published', $_published = $value, $i, 'tags.', $canChange);
+		//return JHtml::_('jgrid.published', $_published = $value, $i, 'tags.', $canChange);
 
 		if ($states === null)
 		{

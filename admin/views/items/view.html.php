@@ -63,7 +63,7 @@ class FlexicontentViewItems extends JViewLegacy
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 		
@@ -152,20 +152,20 @@ class FlexicontentViewItems extends JViewLegacy
 		// ***
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.calendar');
+		JHtml::_('behavior.calendar');
 
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 		$js = '';
 
@@ -246,7 +246,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ( $hasPublish )
 		{
 			$add_divider = true;
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
 
 			/*$btn_task = '';
 			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
@@ -337,7 +337,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($CanAddAny)
 		{
 			$btn_task = '';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
+			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=types&format=raw';
 			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
 			$js .= "
 				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
@@ -369,7 +369,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		if ( $cparams->get('show_csvbutton_be', 0) )
 		{
-			$full_js     = "window.location.replace('" .JURI::base().'index.php?option=com_flexicontent&view=items&format=csv'. "')";
+			$full_js     = "window.location.replace('" .JUri::base().'index.php?option=com_flexicontent&view=items&format=csv'. "')";
 			flexicontent_html::addToolBarButton(
 				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
@@ -507,10 +507,10 @@ class FlexicontentViewItems extends JViewLegacy
 
 		$attribs = 'class="use_select2_lib" multiple="multiple" size="3" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHTML::_('select.groupedlist', $states, 'filter_state[]',
+			JHtml::_('select.groupedlist', $states, 'filter_state[]',
 				array('id' => 'filter_state', 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $filter_state)
 			);
-			//JHTML::_('grid.state', $filter_state );
+			//JHtml::_('grid.state', $filter_state );
 
 
 		// include subcats boolean list
@@ -528,11 +528,11 @@ class FlexicontentViewItems extends JViewLegacy
 
 		// build the order type boolean list
 		$featured_ops = array();
-		$featured_ops[] = JHTML::_('select.option', '', '-');
-		$featured_ops[] = JHTML::_('select.option', '0', JText::_('FLEXI_NO'));
-		$featured_ops[] = JHTML::_('select.option', '1', JText::_('FLEXI_YES'));
+		$featured_ops[] = JHtml::_('select.option', '', '-');
+		$featured_ops[] = JHtml::_('select.option', '0', JText::_('FLEXI_NO'));
+		$featured_ops[] = JHtml::_('select.option', '1', JText::_('FLEXI_YES'));
 
-		$lists['filter_featured'] = JHTML::_('select.genericlist', $featured_ops, 'filter_featured', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_featured, 'filter_featured', $translate=true );
+		$lists['filter_featured'] = JHtml::_('select.genericlist', $featured_ops, 'filter_featured', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_featured, 'filter_featured', $translate=true );
 		$lists['filter_featured'] = ($filter_featured || 1 ? '<div class="add-on">'.JText::_('FLEXI_FEATURED').'</div>' : '').$lists['filter_featured'];
 
 		// build the include non-published cats boolean list
@@ -544,13 +544,13 @@ class FlexicontentViewItems extends JViewLegacy
 		$_catsinstate = array();
 		foreach ($catsinstate as $i => $v)
 		{
-			$_catsinstate[] = JHTML::_('select.option', $i, $v);
+			$_catsinstate[] = JHtml::_('select.option', $i, $v);
 		}
 
 		$catsinstate_attrs = ' class="add-on icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_LIST_ITEMS_IN_CATS', true), JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true), 0, 1).'" ';
 		$lists['filter_catsinstate'] = ($filter_catsinstate || 1 ? '<div '.$catsinstate_attrs.'>&nbsp;'.JText::_('FLEXI_IN_CAT_STATE').'</div>' : '').
-			JHTML::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib'.($filter_catsinstate!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
-		//$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
+			JHtml::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib'.($filter_catsinstate!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
+		//$lists['filter_catsinstate'] = JHtml::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
 		/*$lists['filter_catsinstate']  = '';
 		foreach ($catsinstate as $i => $v) {
 			$checked = $filter_catsinstate == $i ? ' checked="checked" ' : '';
@@ -560,10 +560,10 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build the order type boolean list
 		$order_types = array();
-		$order_types[] = JHTML::_('select.option', '0', JText::_('FLEXI_ORDER_JOOMLA').' ('.JText::_('FLEXI_ORDER_JOOMLA_ABOUT').')' );
-		$order_types[] = JHTML::_('select.option', '1', JText::_('FLEXI_ORDER_FLEXICONTENT').' ('.JText::_('FLEXI_ORDER_FLEXICONTENT_ABOUT').')' );
-		//$lists['filter_order_type'] = JHTML::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type );
-		$lists['filter_order_type'] = JHTML::_('select.genericlist', $order_types, 'filter_order_type', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type, 'filter_order_type', $translate=true );
+		$order_types[] = JHtml::_('select.option', '0', JText::_('FLEXI_ORDER_JOOMLA').' ('.JText::_('FLEXI_ORDER_JOOMLA_ABOUT').')' );
+		$order_types[] = JHtml::_('select.option', '1', JText::_('FLEXI_ORDER_FLEXICONTENT').' ('.JText::_('FLEXI_ORDER_FLEXICONTENT_ABOUT').')' );
+		//$lists['filter_order_type'] = JHtml::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type );
+		$lists['filter_order_type'] = JHtml::_('select.genericlist', $order_types, 'filter_order_type', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_order_type, 'filter_order_type', $translate=true );
 		
 		// build the categories select list for filter
 		$lists['filter_cats'] = ($filter_cats || 1 ? '<div class="add-on'. ($reOrderingActive ? ' fc-lbl-short' : '') .'">'.JText::_('FLEXI_CATEGORY').'</div>' : '').
@@ -586,12 +586,12 @@ class FlexicontentViewItems extends JViewLegacy
 		$scopes[4] = JText::_( 'FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX' );
 		$_scopes = array();
 		foreach ($scopes as $i => $v) {
-			$_scopes[] = JHTML::_('select.option', $i, $v);
+			$_scopes[] = JHtml::_('select.option', $i, $v);
 		}
-		//$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
+		//$lists['scope'] = JHtml::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
 		$lists['scope'] = '
 			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
-			'.JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope, 'scope' );
+			'.JHtml::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope, 'scope' );
 		
 		/*$lists['scope']  = '';
 		foreach ($scopes as $i => $v) {
@@ -607,11 +607,11 @@ class FlexicontentViewItems extends JViewLegacy
 		$dates[4] = JText::_( 'FLEXI_PUBLISH_DOWN' );
 		$_dates = array();
 		foreach ($dates as $i => $v) {
-			$_dates[] = JHTML::_('select.option', $i, $v);
+			$_dates[] = JHtml::_('select.option', $i, $v);
 		}
-		//$lists['date'] = JHTML::_('select.radiolist', $_dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
+		//$lists['date'] = JHtml::_('select.radiolist', $_dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
 		$lists['date'] = //'<div class="add-on">'.JText::_('FLEXI_DATE').'</div>'.
-			JHTML::_('select.genericlist', $_dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
+			JHtml::_('select.genericlist', $_dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
 		/*$lists['date']  = '';
 		foreach ($dates as $i => $v) {
 			$checked = $date == $i ? ' checked="checked" ' : '';
@@ -619,18 +619,18 @@ class FlexicontentViewItems extends JViewLegacy
 			$lists['date'] .= '<label class="" id="date'.$i.'-lbl" for="date'.$i.'">'.$v.'</label>';
 		}*/
 		
-		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
-		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));
+		$lists['startdate'] = JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
+		$lists['enddate'] 	= JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));
 
 		// search filter
 		$bind_limits = array();
-		$bind_limits[] = JHTML::_('select.option', 250, '250 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHTML::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHTML::_('select.option', 750, '750 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHTML::_('select.option', 1500,'1500 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$bind_limits[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$lists['bind_limits'] = JHTML::_('select.genericlist', $bind_limits, 'bind_limit', ' class="use_select2_lib" ', 'value', 'text', $bind_limit, 'bind_limit' );
+		$bind_limits[] = JHtml::_('select.option', 250, '250 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHtml::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHtml::_('select.option', 750, '750 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHtml::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHtml::_('select.option', 1500,'1500 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHtml::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$lists['bind_limits'] = JHtml::_('select.genericlist', $bind_limits, 'bind_limit', ' class="use_select2_lib" ', 'value', 'text', $bind_limit, 'bind_limit' );
 
 		// search filter
 		$lists['search'] = $search;
@@ -669,19 +669,19 @@ class FlexicontentViewItems extends JViewLegacy
 		$elementid = 'filter_access';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple"';
 		$lists['filter_access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
-			JHTML::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+			JHtml::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		
 		// filter by item usage a specific file
 		if ($fileid_to_itemids && count($fileid_to_itemids)) {
 			$files_data = $model->getFileData(array_keys($fileid_to_itemids));
 			$file_options = array();
-			$file_options[] = JHTML::_('select.option',  '', '-'/*.JText::_( 'FLEXI_SELECT' ).' '.JText::_( 'FLEXI_FILE' )*/ );
+			$file_options[] = JHtml::_('select.option',  '', '-'/*.JText::_( 'FLEXI_SELECT' ).' '.JText::_( 'FLEXI_FILE' )*/ );
 			foreach($files_data as $_file) {
-				$file_options[] = JHTML::_('select.option', $_file->id, $_file->altname );
+				$file_options[] = JHtml::_('select.option', $_file->id, $_file->altname );
 			}
 			flexicontent_html::loadFramework('select2');
 			$lists['filter_fileid'] = ($filter_fileid || 1 ? '<div class="add-on">'.JText::_('FLEXI_ITEMS_USING').' '.JText::_('FLEXI_FILE').'</div>' : '').
-				JHTML::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib'.($filter_fileid ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fileid );
+				JHtml::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib'.($filter_fileid ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fileid );
 		}
 		
 		//assign data to template
@@ -756,21 +756,21 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Add js to document
-		//JHTML::_('behavior.tooltip');
+		//JHtml::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
-		$document->addScriptVersion(JURI::base(true).'/components/com_flexicontent/assets/js/copymove.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::base(true).'/components/com_flexicontent/assets/js/copymove.js', FLEXI_VHASH);
 		
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		// Create document/toolbar titles
 		if ($behaviour == 'translate') {
@@ -815,7 +815,7 @@ class FlexicontentViewItems extends JViewLegacy
 		array_unshift($levels, JHtml::_('select.option', '', 'FLEXI_DO_NOT_CHANGE') );
 		$fieldname =  $elementid = 'access';
 		$attribs = 'class="use_select2_lib"';
-		$lists['access'] = JHTML::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $value='', $elementid, $translate=true );
+		$lists['access'] = JHtml::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $value='', $elementid, $translate=true );
 		
 		
 		

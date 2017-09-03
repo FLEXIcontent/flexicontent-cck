@@ -104,7 +104,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
-		$db      = JFactory::getDBO();
+		$db      = JFactory::getDbo();
 		$user    = JFactory::getUser();
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
@@ -963,7 +963,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
@@ -1050,7 +1050,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
 		
@@ -1362,7 +1362,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 		
 		$itemmodel = $this->getModel('item');
@@ -1495,7 +1495,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 		
 		$model = $this->getModel('items');
@@ -1749,7 +1749,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 			
 			// Get User Group / Author parameters
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$authorparams = flexicontent_db::getUserConfig($user->id);
 			$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // maximum number of content items the user can create
 			

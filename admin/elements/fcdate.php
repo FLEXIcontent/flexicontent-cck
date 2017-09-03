@@ -63,6 +63,6 @@ class JFormFieldFcdate extends JFormField
 		}
 
 		// Create JS calendar
-		return $value_holder . JHTML::_('calendar', $value, $fieldname, $elementid, $dateFormat, $attribs);
+		return $value_holder . JHtml::_('calendar', $value, $fieldname, $elementid, $dateFormat, $attribs);
 	}
 }

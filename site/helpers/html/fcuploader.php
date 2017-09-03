@@ -87,7 +87,7 @@ abstract class JHtmlFcuploader
 		$initialized[$up_tag_id] = true;
 
 		$defaults = array(
-			'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
+			'action' => JUri::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads'
 				. '&'.JSession::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id,
 			'upload_maxcount' => 0,
 			'autostart_on_select' => false,
@@ -110,14 +110,14 @@ abstract class JHtmlFcuploader
 		// *** Load plupload JS framework
 		// ***
 
-		$pluploadlib = JURI::root(true).'/components/com_flexicontent/librairies/plupload/';
+		$pluploadlib = JUri::root(true).'/components/com_flexicontent/librairies/plupload/';
 		$plupload_mode = 'runtime';  // 'runtime,ui'
 		flexicontent_html::loadFramework('plupload', $plupload_mode);
 		flexicontent_html::loadFramework('flexi-lib');
 
 		JText::script("FLEXI_FILE_PROPERTIES", true);
 		JText::script("FLEXI_APPLYING_DOT", true);
-		JFactory::getDocument()->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', FLEXI_VHASH);
+		JFactory::getDocument()->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', FLEXI_VHASH);
 
 		// Add plupload Queue handling functions and initialize a plupload Queue
 		$js = '

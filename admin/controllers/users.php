@@ -84,7 +84,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 
 		// Initialize some variables
 		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$me  = JFactory::getUser();
 		$acl = JFactory::getACL();
 		$config = JFactory::getConfig();
@@ -173,7 +173,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 			$adminName	= $me->get('name');
 
 			$subject = JText::_('NEW_USER_MESSAGE_SUBJECT');
-			$message = sprintf ( JText::_('NEW_USER_MESSAGE'), $user->get('name'), $SiteName, JURI::root(), $user->get('username'), $user->password_clear );
+			$message = sprintf ( JText::_('NEW_USER_MESSAGE'), $user->get('name'), $SiteName, JUri::root(), $user->get('username'), $user->password_clear );
 
 			if ($MailFrom != '' && $FromName != '')
 			{
@@ -215,7 +215,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$me    = JFactory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 		
@@ -306,7 +306,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$me  = JFactory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 		
@@ -391,7 +391,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$task   = $this->getTask();
 		$cids   = JRequest::getVar( 'cid', array(), '', 'array' );
 		$client = JRequest::getVar( 'client', 0, '', 'int' );

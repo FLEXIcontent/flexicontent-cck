@@ -31,7 +31,7 @@ class flexicontent_favs
 		}
 		catch (Exception $e)
 		{
-			$jcookie->set('fcfavs', '{}', time()+60*60*24*(365*5), JURI::base(true), '');
+			$jcookie->set('fcfavs', '{}', time()+60*60*24*(365*5), JUri::base(true), '');
 		}
 
 		// Make sure it is a class
@@ -105,7 +105,7 @@ class flexicontent_favs
 
 		// Clear any cookie set to current path, and set cookie at top-level folder of current joomla installation
 		$jcookie->set('fcfavs', null, 1, '', '');
-		$jcookie->set('fcfavs', json_encode(self::$fcfavs), time()+60*60*24*(365*5), JURI::base(true), '');
+		$jcookie->set('fcfavs', json_encode(self::$fcfavs), time()+60*60*24*(365*5), JUri::base(true), '');
 	}
 
 

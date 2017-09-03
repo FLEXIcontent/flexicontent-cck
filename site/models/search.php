@@ -120,7 +120,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$option = JRequest::getVar('option');
 		
 		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 			$_dbvariable = $db->loadObject();
 			$min_word_len = (int) @ $_dbvariable->Value;

@@ -25,7 +25,7 @@ if (empty($tMapTips))
 }
 
 JHtml::_('bootstrap.tooltip');
-JHTML::_('behavior.modal');
+JHtml::_('behavior.modal');
 $document = JFactory::getDocument();
 $document->addStyleSheet("./modules/mod_flexigooglemap/assets/css/style.css",'text/css',"screen");
 
@@ -69,7 +69,7 @@ if ($clustermode)
 	{
 		$imgcluster_w = $img_info[0];
 		$imgcluster_h = $img_info[1];
-		$imgcluster_url  = JURI::base().$imgcluster;
+		$imgcluster_url  = JUri::base().$imgcluster;
 	}
 	else
 	{

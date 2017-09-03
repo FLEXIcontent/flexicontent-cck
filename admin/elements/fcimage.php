@@ -49,7 +49,7 @@ JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 			array('value' => '', 'text' => JText::_('FLEXI_SELECT_IMAGE_FIELD'))
 		);
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];

@@ -49,7 +49,7 @@ class JFormFieldFclanguage extends JFormField
 	function getInput()
 	{
 		$doc	= JFactory::getDocument();
-		$db		= JFactory::getDBO();
+		$db		= JFactory::getDbo();
 		
 		// Get field configuration
 		$node = & $this->element;
@@ -70,24 +70,24 @@ class JFormFieldFclanguage extends JFormField
 		
 		// Add 'use global' (no value option)
 		if (@$attributes['use_global']) {
-			$langs[] = JHTML::_('select.option', '', JText::_('FLEXI_USE_GLOBAL') );
+			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_USE_GLOBAL') );
 		}
 		
 		// Add 'please select' (no value option)
 		if (@$attributes['please_select']) {
-			$langs[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
+			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
 		}
 		
 		foreach ($node->children() as $option)
 		{
 			$val  = $option->attributes()->value;
 			$text = JText::_( FLEXI_J30GE ? $option->__toString() : $option->data() );
-			$langs[] = JHTML::_('select.option', $val, $text );
+			$langs[] = JHtml::_('select.option', $val, $text );
 		}
 		
 		$languages = FLEXIUtilities::getlanguageslist();
 		foreach($languages as $lang) {
-			$langs[] = JHTML::_('select.option', $lang->code, $lang->name );
+			$langs[] = JHtml::_('select.option', $lang->code, $lang->name );
 		}
 		
 		// Create HTML tag parameters
@@ -103,6 +103,6 @@ class JFormFieldFclanguage extends JFormField
 		$attribs .= ' class="'.$classes.'" ';
 		
 		// Render the field's HTML
-		return JHTML::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

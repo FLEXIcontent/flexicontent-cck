@@ -54,10 +54,10 @@ $attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class
 $attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED_RSS', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
-$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
-$image_rsslist = JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
+$image_preview = JHtml::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"');
+$image_rsslist = JHtml::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"');
 $image_editlayout = 0 ?
-	JHTML::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
+	JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 
 $fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
@@ -162,10 +162,10 @@ function delAllFilters() {
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 			<th class="center hidden-phone"></th>
-			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'r.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_STATE', 'r.state', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'r.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'r.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title"><?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'r.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_STATE', 'r.state', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'r.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'r.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -182,7 +182,7 @@ function delAllFilters() {
 		{
 			$row  = & $this->rows[$i];
 			$link = 'index.php?option=com_flexicontent&amp;'.$edit_task.'edit&amp;view='.$this->view.'&amp;id='. $row->id;
-			$published	= JHTML::_('jgrid.published', $row->state, $i, 'reviews.' );
+			$published	= JHtml::_('jgrid.published', $row->state, $i, 'reviews.' );
 
 			$canEdit    = 1;
 			$canEditOwn = 1;
@@ -200,7 +200,7 @@ function delAllFilters() {
 				<?php
 				if ($row->type=='item') {
 					$review_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->content_id));
-					$review_link    = JRoute::_(JURI::root().$review_link, $xhtml=false)."#review_".$row->id;  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+					$review_link    = JRoute::_(JUri::root().$review_link, $xhtml=false)."#review_".$row->id;  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 					$previewlink = $review_link . $autologin;
 				}
 				else $previewlink="javascript:;";
@@ -276,7 +276,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

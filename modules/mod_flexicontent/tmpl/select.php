@@ -49,7 +49,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 	<?php
 	$attribs = array('class' => 'use_select2_lib', 'onchange' => 'window.location=this.form.select_list_'.$module->id.'.value;');
 	$options = array();
-	$options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
+	$options[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 	
 	$ord_count = 0;
 	foreach ($ordering as $ord) :
@@ -57,25 +57,25 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		
 		if ($ordering_addtitle && $ord) :
 			if ($ord_count > 1)
-				$options[] = JHTML::_('select.optgroup', '' );
-			$options[] = JHTML::_('select.optgroup', (isset($ord_titles[$ord]) ? $ord_titles[$ord] : $ord) );
+				$options[] = JHtml::_('select.optgroup', '' );
+			$options[] = JHtml::_('select.optgroup', (isset($ord_titles[$ord]) ? $ord_titles[$ord] : $ord) );
 		endif;
 		
 		if (isset($list[$ord]['featured'])) :
 			foreach ($list[$ord]['featured'] as $item) :
-				$options[] = JHTML::_('select.option', $item->link, $item->title);
+				$options[] = JHtml::_('select.option', $item->link, $item->title);
 			endforeach;
 		endif;
 		
 		if (isset($list[$ord]['standard'])) :
 			foreach ($list[$ord]['standard'] as $item) :
-				$options[] = JHTML::_('select.option', $item->link, $item->title);
+				$options[] = JHtml::_('select.option', $item->link, $item->title);
 			endforeach;
 		endif;
 		
 	endforeach;
 	
-	echo JHTML::_('select.genericlist', $options, 'select_list_'.$module->id, $attribs, 'value', 'text', null);
+	echo JHtml::_('select.genericlist', $options, 'select_list_'.$module->id, $attribs, 'value', 'text', null);
 	?>
 	</form>
 

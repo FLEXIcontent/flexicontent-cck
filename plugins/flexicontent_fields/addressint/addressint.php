@@ -502,7 +502,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
-			$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');	
+			$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');	
 
 			// Load google maps library
 			flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);

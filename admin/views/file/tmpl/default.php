@@ -845,7 +845,7 @@ if (!$this->row->url)
 	</table>
 
 
-<?php echo JHTML::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if (!$this->row->url) : ?>
 <input type="hidden" name="filename" value="<?php echo $this->row->filename; ?>" />
@@ -865,5 +865,5 @@ if (!$this->row->url)
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

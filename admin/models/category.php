@@ -625,7 +625,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		if (empty($cid)) return array();
 		
 		global $globalcats;
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// Select the required fields from the table.
 		$query = ' SELECT id, params '

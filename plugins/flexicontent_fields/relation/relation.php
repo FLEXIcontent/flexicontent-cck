@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$field->label = JText::_($field->label);
 		
 		// Initialize framework objects and other variables
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -665,7 +665,7 @@ jQuery(document).ready(function()
 		} else if (!empty($post)) {
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode(',', $_ids).')';
 			$db->setQuery($query);
 			$_values = $db->loadAssocList();
@@ -692,7 +692,7 @@ jQuery(document).ready(function()
 		} else if (!empty($post)) {
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID 
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode(',', $_ids).')';
 			$db->setQuery($query);
 			$_values = $db->loadAssocList();
@@ -972,7 +972,7 @@ jQuery(document).ready(function()
 		// *** Item retrieving query ... put together and execute it
 		// ***
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
 			.", GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist"
 			.' FROM #__content AS i '

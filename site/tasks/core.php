@@ -127,7 +127,7 @@ class FlexicontentTasksCore
 		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 
 		// Query CLAUSE for match the given text
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
 		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -246,7 +246,7 @@ class FlexicontentTasksCore
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl

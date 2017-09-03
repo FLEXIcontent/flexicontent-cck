@@ -35,7 +35,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		global $globalcats;
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$option   = JRequest::getVar('option');
 		$view     = JRequest::getVar('view');
 		$document	= JFactory::getDocument();
@@ -43,8 +43,8 @@ class FlexicontentViewItemelement extends JViewLegacy
 		// Get model
 		$model = $this->getModel();
 		
-		//JHTML::_('behavior.tooltip');
-		JHTML::_('behavior.modal');
+		//JHtml::_('behavior.tooltip');
+		JHtml::_('behavior.modal');
 
 		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
 		
@@ -77,20 +77,20 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
 		
 		$app->isSite() ?
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
+			$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH) :
 			!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		
 		// Include backend CSS template CSS file , access to backend folder may not be allowed but ...
 		//$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();
-		//$document->addStyleSheet(JURI::base(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
+		//$document->addStyleSheet(JUri::base(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 		
 		//Get data from the model
 		$rows     = $this->get( 'Data');
@@ -146,7 +146,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$fieldname =  $elementid = 'filter_state';
 		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_state'] = '<label class="label">'.JText::_('FLEXI_STATE').'</label>'.
-			JHTML::_('select.genericlist', $states, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid
+			JHtml::_('select.genericlist', $states, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid
 		, $translate=true );
 		
 		// build access level filter
@@ -155,7 +155,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$fieldname =  $elementid = 'filter_access';
 		$attribs = ' class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ';
 		$lists['filter_access']	= '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>'.
-			JHTML::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid
+			JHtml::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid
 		, $translate=true );
 		
 		// build language filter

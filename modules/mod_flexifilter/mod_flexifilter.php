@@ -173,7 +173,7 @@ if ($display_cat_list)
 	$_fld_classes = 'fc_field_filter use_select2_lib';
 	
 	$loader_html = '<span class=\"ajax-loader\"></span>';
-	$url_to_load = JURI::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
+	$url_to_load = JUri::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
 	$autosubmit_msg = '<span>'.JText::_('FLEXI_RELOADING_PLEASE_WAIT').'</span>';
 	
 	$_fld_onchange = $_fld_multiple = '';
@@ -333,17 +333,17 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
-		echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 	}
 	
@@ -353,17 +353,17 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', FLEXI_VHASH);
+			$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', FLEXI_VHASH);
 		}
 
 		// Module 's core CSS
-		$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VHASH);
 
 		// Component CSS with optional override
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}
 }
@@ -371,7 +371,7 @@ if ($add_ccs && $layout)
 $form_target = '';
 $default_mcats_target = $mcats_itemid
 	? JRoute::_('index.php?Itemid='.$mcats_itemid)
-	: JURI::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats';
+	: JUri::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats';
 
 // !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
 if ( ($display_cat_list && $mcats_selection) || !$catid)
@@ -382,7 +382,7 @@ if ( ($display_cat_list && $mcats_selection) || !$catid)
 // !! target (single) category view when selecting single category a category is currently selected
 else if ($catid)
 {
-	$db = JFactory::getDBO();
+	$db = JFactory::getDbo();
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );

@@ -681,7 +681,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	{
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$model = $this->getModel($this->record_name);
 
 		$cid = $this->input->get('cid', array(), 'array');

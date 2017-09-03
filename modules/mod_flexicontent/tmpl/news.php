@@ -150,7 +150,7 @@ switch ($content_layout) {
 // Default image and image fitting
 // *******************************
 $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
-$img_path = JURI::base(true) .'/'; 
+$img_path = JUri::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
 $img_auto_dims_css_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";

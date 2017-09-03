@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $ico_class = 'btn'; //'fc-man-icon-s';
-$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
+$commentimage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
 $loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 JText::script("FLEXI_UPDATING_CONTENTS", true);
@@ -62,15 +62,15 @@ JFactory::getDocument()->addScriptDeclaration($js);
 $edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 $edit_icon         = '<span class="icon-edit"></span>';
 $editSingle_icon   = $edit_icon . ' <span class="icon-file"></span>';
-	//JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ' );
+	//JHtml::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ' );
 $editMultiple_icon = $edit_icon . ' <span class="icon-stack"></span>';
-	//JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
+	//JHtml::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
 $editLayout_icon   = $editSingle_icon;
 $noEditLayout_icon = '<span class="icon-edit" title="' . JText::_( 'FLEXI_NOEDIT_LAYOUT', true ) .'"></span>';
 $copyTmpl_icon     = '<span class="icon-copy"></span>';
-	//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_DUPLICATE', true ).'" '  );
+	//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_DUPLICATE', true ).'" '  );
 $delTmpl_icon      = '<span class="icon-delete"></span>';
-	//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_REMOVE', true ).'" '  );
+	//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_REMOVE', true ).'" '  );
 
 $list_total_cols = 8;
 ?>
@@ -158,7 +158,7 @@ $list_total_cols = 8;
 			$description_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->description : '';
 			
 			$row->id = $row->name;
-			$checked	= JHTML::_('grid.checkedout', $row, $i );
+			$checked	= JHtml::_('grid.checkedout', $row, $i );
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td>
@@ -269,7 +269,7 @@ $list_total_cols = 8;
 	<input type="hidden" name="controller" value="templates" />
 	<input type="hidden" name="view" value="templates" />
 	<input type="hidden" name="task" value="" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

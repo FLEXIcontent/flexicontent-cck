@@ -114,9 +114,9 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		if ( $field->parameters->get( 'editform_field_type', 1 ) == 2 )
 		{
 			foreach ($elements as $li_title => $li_params) {
-				$options[] = JHTML::_('select.option', $li_title, $li_title);
+				$options[] = JHtml::_('select.option', $li_title, $li_title);
 			}
-			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="use_select2_lib'.$required.'" multiple="multiple"', 'value', 'text', $field->value, $elementid);
+			$field->html	= JHtml::_('select.genericlist', $options, $fieldname, 'class="use_select2_lib'.$required.'" multiple="multiple"', 'value', 'text', $field->value, $elementid);
 		}
 		
 		// Render as checkboxes
@@ -284,12 +284,12 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		$elements = $this->parseElements($filter, $field_elements);
 		
 		$options = array(); 
-		$options[] = JHTML::_('select.option', '', '-'.JText::_('FLEXI_ALL').'-');
+		$options[] = JHtml::_('select.option', '', '-'.JText::_('FLEXI_ALL').'-');
 		foreach ($elements as $val => $title) {
-			$options[] = JHTML::_('select.option', $val, $title); 
+			$options[] = JHtml::_('select.option', $val, $title); 
 		}
 		
-		$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+		$filter->html	= JHtml::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
 	}
 
 

@@ -974,7 +974,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		foreach($state as $shortname => $statedata) {
 			$css = "width:216px; margin:0px 24px 12px 0px; text-align: left;";
-			$link = JURI::base(true)."/index.php?option=com_flexicontent&task=fields.toggleprop&propname=".$shortname."&". JSession::getFormToken() ."=1";
+			$link = JUri::base(true)."/index.php?option=com_flexicontent&task=fields.toggleprop&propname=".$shortname."&". JSession::getFormToken() ."=1";
 			$icon = $statedata['icon'];
 			
 			if ($shortname=='issearch') echo '<br/><span class="label">'. JText::_( 'FLEXI_TOGGLE' ).'</span> '.JText::_( 'Content Lists' ).'<br/>';

@@ -271,7 +271,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// URL for modal fileselement view
 		$filesElementURL =
-			JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image'
+			JUri::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image'
 				.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid=%s_existingname&amp;thumb_w='.$preview_thumb_w.'&amp;thumb_h='.$preview_thumb_h.'&amp;autoassign='.$autoassign
 				.'&amp;'.JSession::getFormToken().'=1';
 
@@ -555,7 +555,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 		
 		// Common JS/CSS
-		$image_folder = JURI::root(true).'/'.$dir_url;
+		$image_folder = JUri::root(true).'/'.$dir_url;
 		$js .= "
 			var fc_db_img_path='".$image_folder."';
 
@@ -863,14 +863,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Calculate image preview link
 			if ( $image_source == -2 || $image_source == -1 )
 			{
-				//$img_link  = JURI::root(true).'/'.$image_subpath;
+				//$img_link  = JUri::root(true).'/'.$image_subpath;
 				$img_link = false;  // Joomla Media Manager / and Intro/Full use a popup preview
 			}
 			else if ( $image_subpath )
 			{
 				// $image_source >= 0, if 'existingname' is set then it is propably a form reload
 				$img_link = rawurlencode(
-					JURI::root(true).'/'.$dir_url
+					JUri::root(true).'/'.$dir_url
 					.($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '')
 					.($item->id && empty($value['existingname'])  ?  '/m_' .$extra_prefix .basename($image_subpath)  :  '/original/' .$image_subpath)
 				);
@@ -880,7 +880,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$ext = strtolower(flexicontent_upload::getExt($image_subpath));
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
-					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
+					$img_link = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 				}
 			}
 			else
@@ -1911,28 +1911,28 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($use_ingroup)
 			{
 				// In case of field displayed via in fieldgroup, this is an array
-				$field->{"display_backend_src"}[$n] = JURI::root(true).'/'.$srcb;
-				$field->{"display_small_src"}[$n] = JURI::root(true).'/'.$srcs;
-				$field->{"display_medium_src"}[$n] = JURI::root(true).'/'.$srcm;
-				$field->{"display_large_src"}[$n] = JURI::root(true).'/'.$srcl;
-				$field->{"display_original_src"}[$n] = JURI::root(true).'/'.$srco;
+				$field->{"display_backend_src"}[$n] = JUri::root(true).'/'.$srcb;
+				$field->{"display_small_src"}[$n] = JUri::root(true).'/'.$srcs;
+				$field->{"display_medium_src"}[$n] = JUri::root(true).'/'.$srcm;
+				$field->{"display_large_src"}[$n] = JUri::root(true).'/'.$srcl;
+				$field->{"display_original_src"}[$n] = JUri::root(true).'/'.$srco;
 			}
 
 			// Field displayed not via fieldgroup return only the 1st value
 			else if ($i==0)
 			{
-				$field->{"display_backend_src"} = JURI::root(true).'/'.$srcb;
-				$field->{"display_small_src"} = JURI::root(true).'/'.$srcs;
-				$field->{"display_medium_src"} = JURI::root(true).'/'.$srcm;
-				$field->{"display_large_src"} = JURI::root(true).'/'.$srcl;
-				$field->{"display_original_src"} = JURI::root(true).'/'.$srco;
+				$field->{"display_backend_src"} = JUri::root(true).'/'.$srcb;
+				$field->{"display_small_src"} = JUri::root(true).'/'.$srcs;
+				$field->{"display_medium_src"} = JUri::root(true).'/'.$srcm;
+				$field->{"display_large_src"} = JUri::root(true).'/'.$srcl;
+				$field->{"display_original_src"} = JUri::root(true).'/'.$srco;
 			}
 
-			$field->thumbs_src['backend'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcb;
-			$field->thumbs_src['small'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcs;
-			$field->thumbs_src['medium'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcm;
-			$field->thumbs_src['large'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srcl;
-			$field->thumbs_src['original'][$use_ingroup ? $n : $i] = JURI::root(true).'/'.$srco;
+			$field->thumbs_src['backend'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcb;
+			$field->thumbs_src['small'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcs;
+			$field->thumbs_src['medium'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcm;
+			$field->thumbs_src['large'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcl;
+			$field->thumbs_src['original'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srco;
 			
 			$field->thumbs_path['backend'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcb;
 			$field->thumbs_path['small'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcs;
@@ -1946,11 +1946,11 @@ class plgFlexicontent_fieldsImage extends FCField
 				if ( in_array($view, $ogpinview) ) {
 					switch ($ogpthumbsize)
 					{
-						case 1: $ogp_src = JURI::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
-						case 2: $ogp_src = JURI::root().$srcm; break;
-						case 3: $ogp_src = JURI::root().$srcl; break;
-						case 4: $ogp_src =  JURI::root().$srco; break;
-						default: $ogp_src = JURI::root().$srcm; break;
+						case 1: $ogp_src = JUri::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
+						case 2: $ogp_src = JUri::root().$srcm; break;
+						case 3: $ogp_src = JUri::root().$srcl; break;
+						case 4: $ogp_src =  JUri::root().$srco; break;
+						default: $ogp_src = JUri::root().$srcm; break;
 					}
 					$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
 					$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
@@ -1977,33 +1977,33 @@ class plgFlexicontent_fieldsImage extends FCField
 			switch ($prop)
 			{
 				case 'display_backend':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
+					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
+					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 
 				case 'display_small':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
+					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
+					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 
 				case 'display_medium':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
+					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
+					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 
 				case 'display_large':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
+					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
+					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 
 				case 'display_original':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
+					$img_legend   = '<img src="'.JUri::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
+					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 
 				case 'display': default:
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
+					$img_legend   = '<img src="'.JUri::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
+					$img_nolegend = '<img src="'.JUri::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
 					break;
 			}
 
@@ -2131,8 +2131,8 @@ class plgFlexicontent_fieldsImage extends FCField
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
 					$title_attr = $desc ? $desc : $title;
 					$img_legend_custom ='
-						 <img src="'.JURI::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
-						 	data-large="' . JURI::root(true).'/'.$srcl . '" data-description="'.$title_attr.'" itemprop="image"/>
+						 <img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
+						 	data-large="' . JUri::root(true).'/'.$srcl . '" data-description="'.$title_attr.'" itemprop="image"/>
 					';
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = '
@@ -2876,7 +2876,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				JError::raiseWarning(100, $field->label . ' : ' . JText::_('Error. Unable to upload file'));
 				return false;
 			} else {
-				$db     = JFactory::getDBO();
+				$db     = JFactory::getDbo();
 				$user   = JFactory::getUser();
 				$config = JFactory::getConfig();
 				
@@ -3067,7 +3067,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ************************************************
 	function removeOriginalFile( $field, $filename )
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.path');
 
@@ -3246,7 +3246,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	function canDeleteImage( &$field, $record, &$item )
 	{
 		// Retrieve available (and appropriate) images from the DB
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE filename='. $db->Quote($record)
@@ -3268,7 +3268,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ************************************************************
 	function listImageUses($field, $record)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT value, item_id'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = '. (int) $field->id
@@ -3299,8 +3299,8 @@ class plgFlexicontent_fieldsImage extends FCField
 	function getUploadLimitsTxt($field, $enable_multi_uploader = true)
 	{
 		$tooltip_class = 'hasTooltip';
-		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
-		$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
+		$hint_image = JHtml::image ( 'components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
+		$warn_image = JHtml::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
 
 		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 		$upConf = JHtml::_('fcuploader.getUploadConf', $field);
@@ -3359,7 +3359,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( count($new_ids) )
 		{
 			// Only query files that are not already cached
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 					. ' FROM #__flexicontent_files'
 					. ' WHERE id IN ('. implode(',', $new_ids) . ')'

@@ -137,7 +137,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$layout_name = JRequest::getVar( 'layout_name', '' ); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
 		$directory   = JRequest::getVar( 'directory', '' );   // Explicit path of XML file:  $layout_name.xml
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		if ($ext_view=='item')
 		{
 			$query = 'SELECT attribs FROM #__content WHERE id = '.$ext_id;

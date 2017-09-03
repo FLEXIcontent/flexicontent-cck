@@ -79,7 +79,7 @@ class FlexicontentlinksTags extends JObject {
 		$view = isset($args->view) ? $args->view : '';
 		if ($view && $view!='tags') return array();
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// Add tags
 		$query	= $db->getQuery(true);

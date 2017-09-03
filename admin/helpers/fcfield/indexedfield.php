@@ -676,7 +676,7 @@ class FCIndexedField extends FCField
 
 				$field->html[] = '
 					'.($display_as_select ?
-						$opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs . $this_val_attribs . ' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
+						$opentag . JHtml::_('select.genericlist', $options, $fieldname_n, $attribs . $this_val_attribs . ' class="'.$input_classes.'" data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag :
 						'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>'
 					).'
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
@@ -706,7 +706,7 @@ class FCIndexedField extends FCField
 			// Rendering field via AJAX call
 			else
 			{
-				$field->html = !$display_as_select ? $form_field : JHTML::_('select.options', $options, 'value', 'text', $value, $translate = false);
+				$field->html = !$display_as_select ? $form_field : JHtml::_('select.options', $options, 'value', 'text', $value, $translate = false);
 			}
 			
 			$n++;
@@ -830,7 +830,7 @@ class FCIndexedField extends FCField
 				$elements = array();
 				if (!$ajax)
 				{
-					//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+					//$prompt = JHtml::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
 					$prompt = (object) array(
 						'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 						'text' => $cascade_prompt,
@@ -853,7 +853,7 @@ class FCIndexedField extends FCField
 			if ($cascade_after)
 			{
 				// Filter out values not in the the value group, this is done by modifying the SQL query
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				$_elements = array();
 				foreach($valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);
@@ -869,7 +869,7 @@ class FCIndexedField extends FCField
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props, $item_pros, false, $and_clause);
 			if ( !is_array($elements) )
 			{
-				//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+				//$prompt = JHtml::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array(
 					'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 					'text' => JText::_('FLEXI_FIELD_INVALID_QUERY'),
@@ -886,7 +886,7 @@ class FCIndexedField extends FCField
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 			if ( !is_array($elements) )
 			{
-				//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+				//$prompt = JHtml::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
 				$prompt = (object) array(
 					'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 					'text' => JText::_('FLEXI_FIELD_INVALID_ELEMENTS'),
@@ -966,7 +966,7 @@ class FCIndexedField extends FCField
 		// ***
 		if (empty($elements))
 		{
-			//$prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+			//$prompt = JHtml::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
 			$prompt = (object) array(
 				'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 				'text' => JText::_('FLEXI_FIELD_NO_DATA_FOUND'),
@@ -987,7 +987,7 @@ class FCIndexedField extends FCField
 
 		if ($usefirstoption)   // Add selection prompt
 		{
-			//prompt = JHTML::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
+			//prompt = JHtml::_('select.option', (static::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (static::$valueIsArr ? 'disabled' : null));
 			$prompt = (object) array(
 				'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 				'text' => $firstoptiontext,
@@ -1010,7 +1010,7 @@ class FCIndexedField extends FCField
 			if ($image_type==0)
 			{
 				$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-				$imgpath  = JURI::root(true) .'/'. $imagedir;
+				$imgpath  = JUri::root(true) .'/'. $imagedir;
 				$imgfolder = JPATH_SITE .DS. $imagedir;
 			}
 			else {
@@ -1126,7 +1126,7 @@ class FCIndexedField extends FCField
 		if (static::$usesImages)
 		{
 			$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-			$imgpath  = JURI::root(true) .'/'. $imagedir;
+			$imgpath  = JUri::root(true) .'/'. $imagedir;
 
 			$image_type = (int)$field->parameters->get( 'image_type', 0 ) ;
 			$icon_size = (int)$field->parameters->get( 'icon_size', $field->parameters->get( 'icon_size_form') ) ;
@@ -1386,7 +1386,7 @@ class FCIndexedField extends FCField
 			{
 				// image specific variables
 				$imagedir = preg_replace('#^(/)*#', '', $filter->parameters->get( 'imagedir' ) );
-				$imgpath  = JURI::root(true) .'/'. $imagedir;
+				$imgpath  = JUri::root(true) .'/'. $imagedir;
 				foreach($elements as $element) {
 					$element->image_url = $imgpath . $element->image;
 				}

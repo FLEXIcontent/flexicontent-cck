@@ -129,7 +129,7 @@ foreach ($values as $value)
 		</tr>
 		<tr '.($use_usstate ? '' : 'style="display:none;"').' class="fc_gm_usstate_row">
 			<td class="key"><label class="fc-prop-lbl fc_gm_usstate-lbl" for="'.$elementid_n.'_state">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</label></td>
-			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', ' class="use_select2_lib fc_gm_usstate ' . ($use_usstate && in_array('us_state', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr, 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
+			<td>'.JHtml::_('select.genericlist', $list_states, $fieldname_n.'[state]', ' class="use_select2_lib fc_gm_usstate ' . ($use_usstate && in_array('us_state', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr, 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
 		</tr>
 		<tr '.($use_province ? '' : 'style="display:none;"').' class="fc_gm_province_row">
 			<td class="key"><label class="fc-prop-lbl fc_gm_province-lbl" for="'.$elementid_n.'_province">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</label></td>
@@ -145,7 +145,7 @@ foreach ($values as $value)
 		<tr '.($use_country ? '' : 'style="display:none;"').' class="fc_gm_country_row">
 			<td class="key"><label class="fc-prop-lbl fc_gm_country-lbl" for="'.$elementid_n.'_country">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</label></td>
 			<td>
-				'.JHTML::_('select.genericlist', $allowed_countries, $fieldname_n.'[country]', $countries_attribs . ' class="use_select2_lib fc_gm_country ' . ($use_country && in_array('country', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr, 'value', 'text', ($value['country'] ? $value['country'] : $ac_country_default), $elementid_n.'_country').'
+				'.JHtml::_('select.genericlist', $allowed_countries, $fieldname_n.'[country]', $countries_attribs . ' class="use_select2_lib fc_gm_country ' . ($use_country && in_array('country', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr, 'value', 'text', ($value['country'] ? $value['country'] : $ac_country_default), $elementid_n.'_country').'
 			</td>
 		</tr>
 	') .

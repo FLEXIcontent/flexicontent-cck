@@ -111,7 +111,7 @@ class JFormFieldQfcategory extends JFormField
 			}
 			";
 			JFactory::getDocument()->addScriptDeclaration($js);
-			//JHTML::_('behavior.modal', 'a.modal');
+			//JHtml::_('behavior.modal', 'a.modal');
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 		

@@ -152,7 +152,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	
 	function _getSubscribers($itemid)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query	= 'SELECT u.* '
 				.' FROM #__flexicontent_favourites AS f'
@@ -224,7 +224,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 
 		// Make URL absolute since this URL will be emailed
-		$item_url = JURI::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 		
 		
 		
@@ -232,7 +232,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		// Create parameters passed to mail helper function
 		// ************************************************
 		
-		$sitename = $app->getCfg('sitename') . ' - ' . JURI::root();
+		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
 		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
 		$sendermail	= JMailHelper::cleanAddress($sendermail);
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));

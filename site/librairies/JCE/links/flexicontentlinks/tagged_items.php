@@ -86,7 +86,7 @@ class FlexicontentlinksTagged_items extends JObject {
 
 		if ($layout && $layout!='tags') return array();
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// Add tagged items
 		$query	= $db->getQuery(true);

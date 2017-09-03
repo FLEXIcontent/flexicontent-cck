@@ -48,7 +48,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		
 		global $globalcats;
 		$app  = JFactory::getApplication();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', 'item', 'cmd');
@@ -255,7 +255,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		if ($load_css)
 		{
-			JFactory::getDocument()->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
+			JFactory::getDocument()->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
 		}
 
 		$field->{$prop} = $html;
@@ -287,7 +287,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				if ( !empty($item->fields[$img_field_name]) )
 				{
 					$img_field = $item->fields[$img_field_name];
-					$src = str_replace(JURI::root(), '', @ $img_field->{'display_'.$img_field_size.'_src'});
+					$src = str_replace(JUri::root(), '', @ $img_field->{'display_'.$img_field_size.'_src'});
 				}
 			}
 			else {
@@ -307,8 +307,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;
@@ -338,7 +338,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$cat->fulltext = "";
 		
 		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-			$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+			$src = JUri::base(true) ."/". $joomla_image_url . $cat->image;
 			
 			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
 			$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
@@ -350,7 +350,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-			$image_src = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			$image_src = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 			// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
@@ -363,8 +363,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-			$image_src = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+			$image_src = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		$cat->image_src = $image_src;
 		return $image_src;
@@ -374,7 +374,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	function getItemList(&$ids=null, $cid=null, &$userid=0)
 	{
 		$app  = JFactory::getApplication();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		if ($ids===null)
 		{
@@ -448,7 +448,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	function &_getDataCats($id_arr, &$cparams)
 	{
 		global $globalcats;
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$ordering = 'c.lft ASC';
 

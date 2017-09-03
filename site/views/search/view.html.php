@@ -44,7 +44,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$option= JRequest::getVar('option');
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = JUri::getInstance();
@@ -348,9 +348,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if( $canseltypes )
 		{
 			$types = array();
-			if ($show_filters) $types[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
+			if ($show_filters) $types[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 			foreach($typeData as $type) {
-				$types[] = JHTML::_('select.option', $type->id, JText::_($type->name));
+				$types[] = JHtml::_('select.option', $type->id, JText::_($type->name));
 			}
 			
 			$multiple_param = $show_filters ? ' onchange="adminFormPrepare(this.form); this.form.submit();" ' : ' multiple="multiple" ';
@@ -358,7 +358,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$attribs  = $multiple_param.' size="5" class="fc_field_filter use_select2_lib fc_prompt_internal '.$multiple_class.'"';  // class="... fc_label_internal" data-fc_label_text="..."
 			$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
 			$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
-			$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', $attribs, 'value', 'text', (empty($form_contenttypes) ? '' : $form_contenttypes), 'contenttypes');
+			$lists['contenttypes'] = JHtml::_('select.genericlist', $types, 'contenttypes[]', $attribs, 'value', 'text', (empty($form_contenttypes) ? '' : $form_contenttypes), 'contenttypes');
 			
 			/*
 			$checked = !count($form_contenttypes) || !strlen($form_contenttypes[0]);
@@ -404,7 +404,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$attribs  = ' multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal fc_is_selmultiple"';  // class="... fc_label_internal" data-fc_label_text="..."
 			$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
 			$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
-			$lists['txtflds'] = JHTML::_('select.genericlist', $fields_text, 'txtflds[]', $attribs, 'name', 'label', $form_txtflds, 'txtflds');
+			$lists['txtflds'] = JHtml::_('select.genericlist', $fields_text, 'txtflds[]', $attribs, 'name', 'label', $form_txtflds, 'txtflds');
 			
 			/*
 			$checked = !count($form_txtflds) || !strlen($form_txtflds[0]);
@@ -453,12 +453,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		{
 			// built select lists
 			$orders = array();
-			$orders[] = JHTML::_('select.option',  'newest', JText::_( 'FLEXI_ADV_NEWEST_FIRST' ) );
-			$orders[] = JHTML::_('select.option',  'oldest', JText::_( 'FLEXI_ADV_OLDEST_FIRST' ) );
-			$orders[] = JHTML::_('select.option',  'popular', JText::_( 'FLEXI_ADV_MOST_POP' ) );
-			$orders[] = JHTML::_('select.option',  'alpha', JText::_( 'FLEXI_ADV_ALPHA' ) );
-			$orders[] = JHTML::_('select.option',  'category', JText::_( 'FLEXI_ADV_SEARCH_SEC_CAT' ) );
-			$lists['ordering'] = JHTML::_('select.genericlist', $orders, 'o',
+			$orders[] = JHtml::_('select.option',  'newest', JText::_( 'FLEXI_ADV_NEWEST_FIRST' ) );
+			$orders[] = JHtml::_('select.option',  'oldest', JText::_( 'FLEXI_ADV_OLDEST_FIRST' ) );
+			$orders[] = JHtml::_('select.option',  'popular', JText::_( 'FLEXI_ADV_MOST_POP' ) );
+			$orders[] = JHtml::_('select.option',  'alpha', JText::_( 'FLEXI_ADV_ALPHA' ) );
+			$orders[] = JHtml::_('select.option',  'category', JText::_( 'FLEXI_ADV_SEARCH_SEC_CAT' ) );
+			$lists['ordering'] = JHtml::_('select.genericlist', $orders, 'o',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchordering, 'ordering' );
 		}		
 		
@@ -478,7 +478,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$_obj->text  = $searchphrase_name;
 				$phrases[] = $_obj;
 			}
-			$lists['searchphrase'] = JHTML::_('select.genericlist', $phrases, 'p',
+			$lists['searchphrase'] = JHtml::_('select.genericlist', $phrases, 'p',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 			
 			/*$lists['searchphrase']  = '<ul class="fc_field_filter fc_checkradio_group">';
@@ -502,9 +502,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$default_filtersop = $params->get('default_filtersop', 'all');
 			$filtersop = JRequest::getVar('filtersop', $default_filtersop);
 			$filtersop_arr		= array();
-			$filtersop_arr[] = JHTML::_('select.option',  'all', JText::_( 'FLEXI_SEARCH_ALL' ) );
-			$filtersop_arr[] = JHTML::_('select.option',  'any', JText::_( 'FLEXI_SEARCH_ANY' ) );
-			$lists['filtersop']= JHTML::_('select.radiolist',  $filtersop_arr, 'filtersop', '', 'value', 'text', $filtersop );
+			$filtersop_arr[] = JHtml::_('select.option',  'all', JText::_( 'FLEXI_SEARCH_ALL' ) );
+			$filtersop_arr[] = JHtml::_('select.option',  'any', JText::_( 'FLEXI_SEARCH_ANY' ) );
+			$lists['filtersop']= JHtml::_('select.radiolist',  $filtersop_arr, 'filtersop', '', 'value', 'text', $filtersop );
 		}*/
 		
 		
@@ -532,7 +532,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$attribs  = ' multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal fc_is_selmultiple"';  // class="... fc_label_internal" data-fc_label_text="..."
 			$attribs .= ' data-placeholder="'.htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';
 			$attribs .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')).'"';
-			$lists['areas'] = JHTML::_('select.genericlist', $options, 'areas[]', $attribs, 'value', 'text', $form_areas, 'areas', $do_jtext=true);
+			$lists['areas'] = JHtml::_('select.genericlist', $options, 'areas[]', $attribs, 'value', 'text', $form_areas, 'areas', $do_jtext=true);
 			/*
 			$lists['areas']  = '<ul class="fc_field_filter fc_checkradio_group">';
 			$lists['areas'] .= ' <li class="fc_checkradio_option fc_checkradio_special">';
@@ -695,7 +695,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$result->text = str_replace('[[[', '<', $result->text);
 				$result->text = str_replace(']]]', '>', $result->text);
 				
-				$result->created	= $result->created ? JHTML::Date( $result->created ) : '';
+				$result->created	= $result->created ? JHtml::Date( $result->created ) : '';
 				$result->count		= $i + 1;
 			}
 		}

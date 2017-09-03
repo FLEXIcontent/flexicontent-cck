@@ -118,14 +118,14 @@ function delAllFilters() {
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_MAIN_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="title"><?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_MAIN_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="" nowrap="nowrap"><?php echo JText::_( 'FLEXI_STATE' ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'lang', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 

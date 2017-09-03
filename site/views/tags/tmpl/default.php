@@ -19,7 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $params =  $this->params;
-$db     =  JFactory::getDBO();
+$db     =  JFactory::getDbo();
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;
@@ -184,7 +184,7 @@ $items	= & $this->items;
 				if ( !empty($img_field->thumbs_src['large'][0]) )
 				{
 					!$img_field_size
-						? $src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0])
+						? $src = str_replace(JUri::root(), '',  $img_field->thumbs_src['large'][0])
 						: $thumb = $img_field->thumbs_src[ $img_field_size ][0];
 				}
 			}
@@ -206,8 +206,8 @@ $items	= & $this->items;
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 			}
@@ -263,7 +263,7 @@ $items	= & $this->items;
 			</td>
 		<?php if ($use_date) : ?>
 			<td headers="fc_modified">
-				<?php echo JHTML::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
+				<?php echo JHtml::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
 			</td>
 		<?php endif; ?>
 		

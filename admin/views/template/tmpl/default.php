@@ -25,8 +25,8 @@ jimport('joomla.filesystem.path');
 if ( !$this->layout->name ) die('Template folder does not exist');
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
@@ -807,7 +807,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				
 				<br/>
 				
-				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHTML::_( 'form.token' )); ?>
+				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHtml::_( 'form.token' )); ?>
 				<input type="hidden" name="load_mode" id="editor__load_mode" form="layout_file_editor_form"/>
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
@@ -859,7 +859,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 	<input type="hidden" name="type" value="<?php echo $this->type; ?>" />
 	<input type="hidden" name="folder" value="<?php echo $this->folder; ?>" />
 	<input type="hidden" name="task" value="" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 
 <form id="layout_file_editor_form" name="layout_file_editor_form" action="index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw" method="POST"></form>

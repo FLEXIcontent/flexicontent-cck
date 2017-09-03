@@ -98,7 +98,7 @@ class FLEXIUtilities
 	static function getlanguageslist($published_only=false, $add_all = true)
 	{
 		$app = JFactory::getApplication();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		static $pub_languages = null;
 		static $all_languages = null;
 		
@@ -230,7 +230,7 @@ class FLEXIUtilities
 		) {
 			if (!$id) $all_retrieved = true;
 			$g_lastversions =  array();
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = "SELECT item_id as id, max(version_id) as version"
 									." FROM #__flexicontent_versions"
 									." WHERE 1"
@@ -264,7 +264,7 @@ class FLEXIUtilities
 
 		if( $g_currentversions==NULL || $force )
 		{
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			if (!FLEXI_J16GE) {
 				$query = "SELECT i.id, i.version FROM #__content AS i"
 					." WHERE i.sectionid=".FLEXI_SECTION
@@ -302,7 +302,7 @@ class FLEXIUtilities
 
 	static function &getLastItemVersion($id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -320,7 +320,7 @@ class FLEXIUtilities
 
 		if ($status === null)
 		{
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
 				." JOIN #__categories as cat ON c.catid=cat.id"
@@ -345,7 +345,7 @@ class FLEXIUtilities
 	 */
 	static function &getFirstVersion($id, $max, $current_version)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -366,7 +366,7 @@ class FLEXIUtilities
 	 */
 	static function &getVersionsCount($id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -583,7 +583,7 @@ class FLEXIUtilities
 	 */
 	static function isSqlValidDate($date)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$q = "SELECT day(".$db->Quote($date).")";
 		$db->setQuery($q);
 		$num = $db->loadResult();
@@ -724,7 +724,7 @@ class FLEXIUtilities
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
-		$db      = JFactory::getDBO();
+		$db      = JFactory::getDbo();
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 

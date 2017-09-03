@@ -182,7 +182,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$use_tmp = true;
 		
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$orderby = $this->_buildCatOrderBy('cat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -348,7 +348,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$use_tmp = true;
 		
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$cat_orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),

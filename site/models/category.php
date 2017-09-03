@@ -258,7 +258,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 		
 		// Get minimum word search length
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 		$_dbvariable = $db->loadObject();
 		$min_word_len = (int) @ $_dbvariable->Value;
@@ -910,7 +910,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$jinput = $app->input;
 		$option = $this->getState('option');
 		$user		= JFactory::getUser();
-		$db     = JFactory::getDBO();
+		$db     = JFactory::getDbo();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
@@ -1404,7 +1404,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		global $globalcats;
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		
 		// Get the view's parameters
 		$use_tmp = true;
@@ -2292,13 +2292,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			else if ( !$return_sql )
 			{
 				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
 			}
 			else if ($return_sql===2)
 			{
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				static $iids_tblname  = array();
 				if ( !isset($iids_tblname[$filter->id]) ) {
 					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
@@ -2415,7 +2415,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
 		}
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
 		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'

@@ -169,7 +169,7 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		if (empty($tids)) return array();
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// Select the required fields from the table.
 		$query  = " SELECT rel.tid, COUNT(rel.itemid) AS nrassigned";
@@ -196,7 +196,7 @@ class FlexicontentModelTags extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}

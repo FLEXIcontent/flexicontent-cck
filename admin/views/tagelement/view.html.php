@@ -36,12 +36,12 @@ class FlexicontentViewTagelement extends JViewLegacy {
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$template = $mainframe->getTemplate();
 		
-		//JHTML::_('behavior.tooltip');
-		JHTML::_('behavior.modal');
+		//JHtml::_('behavior.tooltip');
+		JHtml::_('behavior.modal');
 
 		//get var
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
@@ -51,8 +51,8 @@ class FlexicontentViewTagelement extends JViewLegacy {
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet(JURI::root(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
-		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheet(JUri::root(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
+		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 
 		//Get data from the model
 		$rows    = $this->get( 'Data');

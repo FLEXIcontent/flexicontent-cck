@@ -24,7 +24,7 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, tru
 
 $app = JFactory::getApplication();
 $document = JFactory::getDocument();
-$this->baseurl = isset($this->baseurl) ? $this->baseurl : JURI::base(true);
+$this->baseurl = isset($this->baseurl) ? $this->baseurl : JUri::base(true);
 
 // Allow css override
 if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {

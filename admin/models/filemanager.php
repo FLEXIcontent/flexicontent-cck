@@ -450,11 +450,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$row->id = $i;
 			
 			if ( in_array(strtolower($row->ext), $imageexts)) {
-				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
+				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
 			} elseif (file_exists(JPATH_SITE."/components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png")) {
-				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png";
+				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png";
 			} else {
-				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/unknown.png";
+				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/unknown.png";
 			}
 			$rows[] = $row;
 			

@@ -107,7 +107,7 @@
 				$class = '
 					<div class="' . $box_classes . ' fc-lbl-external-box">
 						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
-						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $elementid_n.'_class').'
+						'.JHtml::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $elementid_n.'_class').'
 					</div>';
 			}
 		}
@@ -146,7 +146,7 @@
 			$target = '
 			<div class="' . $box_classes . ' fc-lbl-external-box">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl ulrtarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTARGET' ).'</label>
-				'.JHTML::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
+				'.JHtml::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
 			</div>';
 		}
 

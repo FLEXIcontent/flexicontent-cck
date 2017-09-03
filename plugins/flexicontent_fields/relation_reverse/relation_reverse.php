@@ -94,7 +94,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 			// Check if also configuration is proper
 			if ($auto_relate_curritem && $auto_relate_menu_itemid)
 			{
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				$db->setQuery(
 					'SELECT title, id, catid, state, alias '
 					. ' FROM #__content '
@@ -166,7 +166,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 					$master_item_id = (int) reset($post);
 					if ($master_item_id)
 					{
-						$db = JFactory::getDBO();
+						$db = JFactory::getDbo();
 						$db->setQuery(
 							'SELECT MAX(valueorder) '
 							. ' FROM #__flexicontent_fields_item_relations '

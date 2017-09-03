@@ -31,7 +31,7 @@ JHtml::_('behavior.keepalive');
 	</div-->
 	<div class="fcclear"></div>
 
-	<form action="<?php echo JURI::base() ?>index.php?tmpl=component" id="mailtoForm" method="post">
+	<form action="<?php echo JUri::base() ?>index.php?tmpl=component" id="mailtoForm" method="post">
 		<div class="formelm">
 			<label for="mailto_field"><?php echo JText::_('FLEXI_FIELD_FILE_EMAIL_TO'); ?></label>
 			<input type="text" id="mailto_field" name="mailto" class="inputbox" value="<?php echo flexicontent_html::escape($data->mailto); ?>" size="52" />

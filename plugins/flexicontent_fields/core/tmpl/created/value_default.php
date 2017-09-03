@@ -2,7 +2,7 @@
 // Add prefix / suffix
 $field->{$prop} =
 	$pretext
-		. JHTML::_( 'date', $item->created, $dateformat ) .
+		. JHtml::_( 'date', $item->created, $dateformat ) .
 	$posttext;
 
 // Add microdata property

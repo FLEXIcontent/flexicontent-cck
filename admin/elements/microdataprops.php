@@ -43,18 +43,18 @@ class JFormFieldMicrodataprops extends JFormField
 
 		// Initialize the options array
 		$options = array();
-		$options[] = JHTML::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --');
+		$options[] = JHtml::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --');
 		
 		foreach($jm_types as $type => $tdata)
 		{
-			$options[] = JHTML::_('select.optgroup', JText::_( $type ) );
+			$options[] = JHtml::_('select.optgroup', JText::_( $type ) );
 			foreach($tdata['properties'] as $propname => $props) {
-				$options[] = JHTML::_('select.option', $propname, $propname);
+				$options[] = JHtml::_('select.option', $propname, $propname);
 			}
-			$options[] = JHTML::_('select.optgroup', '' );
+			$options[] = JHtml::_('select.optgroup', '' );
 		}
 
 		// Render and return the drop down select
-		return JHTML::_('select.genericlist', $options, $this->name, 'class="use_select2_lib inputbox"', 'value', 'text', $this->value, $this->id);
+		return JHtml::_('select.genericlist', $options, $this->name, 'class="use_select2_lib inputbox"', 'value', 'text', $this->value, $this->id);
 	}
 }

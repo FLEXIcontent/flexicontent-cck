@@ -58,7 +58,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		//$value = $value ? $value : @$attributes['default'];
 		
 		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$jinput  = $app->input;
 		$view	= $jinput->get('view', '', 'cmd');
@@ -259,14 +259,14 @@ jQuery(document).ready(function() {
 		$layouts = array();
 		if ($view != 'type') {
 			$type_layout = ($attributes['name'] == 'ilayout_mobile') ? $type_default_layout_mobile : $type_default_layout;
-			$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
+			$layouts[] = JHtmlSelect::option('', JText::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
 		}
 		else
 		if (  @$attributes['firstoption'] ) {
-			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
+			$layouts[] = JHtmlSelect::option('', JText::_( $attributes['firstoption'] ));
 		}
 		foreach ($tmpls as $tmpl) {
-			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
+			$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;
@@ -286,7 +286,7 @@ jQuery(document).ready(function() {
 			$attribs .= ' onchange="ilayout_activatePanel(this.value);"';
 		}
 		
-		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+		return JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 	
 	

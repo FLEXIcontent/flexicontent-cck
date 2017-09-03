@@ -25,11 +25,11 @@ class FlexicontentViewTypes extends JViewLegacy{
 	
 	function display( $tpl = null ) {
 		
-		$fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
+		$fc_css = JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 		echo '
-		<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />
+		<link rel="stylesheet" href="'.JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />
 		<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VHASH.'" />
-		<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="'.JUri::root(true).'/media/jui/css/bootstrap.min.css" />
 		';
 		
 		$user = JFactory::getUser();

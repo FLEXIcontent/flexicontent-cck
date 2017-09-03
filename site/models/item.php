@@ -69,7 +69,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$cparams = $this->_cparams;
 		
 		$referer  = @ $_SERVER['HTTP_REFERER'];                                    // The previously viewed page (refer)
-		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base(); // Ignore it if potentially non safe URL, e.g. non-internal
+		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JUri::base(); // Ignore it if potentially non safe URL, e.g. non-internal
 		
 		// a basic item title string
 		$title_str = ' ' . JText::_('FLEXI_ID') .' : '.$this->_record->id;

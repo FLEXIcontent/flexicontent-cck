@@ -80,7 +80,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		// Search's GO button
 		if ($button) :
 			if ($button_as) :
-				$button_html = '<input type="image" title="'.$button_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.q.focus();"/>';
+				$button_html = '<input type="image" title="'.$button_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_go.'" src="'.JUri::base().$button_image.'" onclick="this.form.q.focus();"/>';
 			else :
 				$button_html = '<input type="submit" value="'.$button_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_go.'" onclick="this.form.q.focus();"/>';
 			endif;
@@ -103,7 +103,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 				// hidden field, is workaround for image button not being able to submit a value
 				$direct_html = '
 					<input type="hidden" name="direct" value="" />
-					<input type="image" title="'.$direct_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.q.focus();"/>
+					<input type="image" title="'.$direct_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_direct.'" src="'.JUri::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.q.focus();"/>
 					';
 			else :
 			 $direct_html = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_direct.'" onclick="this.form.q.focus();"/>';

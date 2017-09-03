@@ -162,13 +162,13 @@ class JFormFieldCategorytree extends JFormFieldList
 						// Only disable cats in the list else don't show them at all
 						if ($viewallcats)
 						{
-							$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+							$catlist[] = JHtml::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
 					}
 					else
 					{
 						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
-						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
+						$catlist[] = JHtml::_( 'select.option', $item->id, $item->treename );
 					}
 				}
 				else

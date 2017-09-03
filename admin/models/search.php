@@ -433,7 +433,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function purge( $del_fieldids=null )
 	{
 		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		
 		// ******************************
 		// Empty Common text-search index

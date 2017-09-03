@@ -83,13 +83,13 @@ if ($add_ccs)
 	{
 
 		// Module 's core CSS
-		echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VHASH.'">';
+		echo '<link rel="stylesheet" href="'.JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VHASH.'">';
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 	}
 	
@@ -98,13 +98,13 @@ if ($add_ccs)
 	{
 
 		// Module 's core CSS
-		$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VHASH);
 
 		// Component CSS with optional override
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}
 }

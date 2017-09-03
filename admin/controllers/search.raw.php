@@ -75,7 +75,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 
 		$session = JFactory::getSession();
-		$db      = JFactory::getDBO();
+		$db      = JFactory::getDbo();
 		$app     = JFactory::getApplication();
 		$model = $this->getModel('search');
 
@@ -203,7 +203,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$start_microtime = microtime(true);
 
 		$session = JFactory::getSession();
-		$db      = JFactory::getDBO();
+		$db      = JFactory::getDbo();
 		
 		$has_zlib      = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix

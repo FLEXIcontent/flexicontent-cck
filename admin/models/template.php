@@ -263,7 +263,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 	 */
 	function getFieldTypesList()
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query = 'SELECT element AS type_name, REPLACE(name, "FLEXIcontent - ", "") AS field_name '
 		. ' FROM #__extensions'

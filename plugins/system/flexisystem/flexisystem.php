@@ -48,7 +48,7 @@ class plgSystemFlexisystem extends JPlugin
 		$this->cparams = JComponentHelper::getParams($this->extension);
 
 		// Temporary workaround until code is updated
-		if (FLEXI_J40GE) JFactory::getDBO()->setQuery("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
+		if (FLEXI_J40GE) JFactory::getDbo()->setQuery("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))")->execute();
 	}
 	
 	
@@ -443,7 +443,7 @@ class plgSystemFlexisystem extends JPlugin
 	function redirectSiteComContent()
 	{
 		$app    = JFactory::getApplication();
-		$db     = JFactory::getDBO();
+		$db     = JFactory::getDbo();
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -594,7 +594,7 @@ class plgSystemFlexisystem extends JPlugin
 	static function getCategoriesTree()
 	{
 		global $globalcats;
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$ROOT_CATEGORY_ID = 1;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
@@ -863,7 +863,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		jimport('joomla.user.helper');
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query 	= 'SELECT id, password'
 				. ' FROM #__users'
 				. ' WHERE username = ' . $db->Quote( $username )
@@ -918,7 +918,7 @@ class plgSystemFlexisystem extends JPlugin
 				if ($cid = $app->input->get('cid', 0, 'int'))          $css[] = "item-catid-".$cid;  // Item's category id
 				if ($id)
 				{
-					$db = JFactory::getDBO();
+					$db = JFactory::getDbo();
 					$query 	= 'SELECT t.id, t.alias'
 						. ' FROM #__flexicontent_items_ext AS e'
 						. ' JOIN #__flexicontent_types AS t ON e.type_id = t.id'
@@ -1144,7 +1144,7 @@ class plgSystemFlexisystem extends JPlugin
 			function fc_setCookie(cookieName, cookieValue, nDays) {
 				var today = new Date();
 				var expire = new Date();
-				var path = "'.JURI::base(true).'";
+				var path = "'.JUri::base(true).'";
 				if (nDays==null || nDays<0) nDays=0;
 				if (nDays) {
 					expire.setTime(today.getTime() + 3600000*24*nDays);
@@ -1195,7 +1195,7 @@ class plgSystemFlexisystem extends JPlugin
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$app = JFactory::getApplication();
 
 		$max_checkout_hours = $this->params->get('max_checkout_hours', 24);
@@ -1297,7 +1297,7 @@ class plgSystemFlexisystem extends JPlugin
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$app = JFactory::getApplication();
 		
 		// Get current seconds
@@ -1341,7 +1341,7 @@ class plgSystemFlexisystem extends JPlugin
 			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id && $this->count_new_hit($item_id) )
 			{
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				$db->setQuery('UPDATE #__content SET hits=hits+1 WHERE id = '.$item_id );
 				$db->execute();
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
@@ -1355,7 +1355,7 @@ class plgSystemFlexisystem extends JPlugin
 			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id )
 			{
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				$db->setQuery('
 					UPDATE #__flexicontent_items_tmp AS t
 					JOIN #__content AS i ON i.id=t.id
@@ -1388,7 +1388,7 @@ class plgSystemFlexisystem extends JPlugin
 				{
 					$hit_arr[$cat_id] = $timestamp = time();  // Current time as seconds since Unix epoc;
 					$session->set('cats_hit', $hit_arr, 'flexicontent');
-					$db = JFactory::getDBO();
+					$db = JFactory::getDbo();
 					$db->setQuery('UPDATE #__categories SET hits=hits+1 WHERE id = '.$cat_id );
 					$db->execute();
 				}
@@ -1402,7 +1402,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		if (!$this->cparams->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
 		if ($item_id==0) {
@@ -1946,19 +1946,19 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', FLEXI_VHASH);
 
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', FLEXI_VHASH);
 
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', FLEXI_VHASH);
 
 		// Fields common CSS
-		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 
 
 		// ***
@@ -1984,12 +1984,12 @@ class plgSystemFlexisystem extends JPlugin
 		flexicontent_html::loadFramework('flexi-lib-form');
 		
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 
 
 		// ***
@@ -2166,7 +2166,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$jcookie = $app->input->cookie;
 
 		// Set id for client-side (browser) caching via unique URLs (logged users)
@@ -2350,7 +2350,7 @@ class plgSystemFlexisystem extends JPlugin
 
 	private function _addfavs($type, $item_ids, $user_id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		if (!is_array($item_ids))
 		{

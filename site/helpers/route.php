@@ -252,7 +252,7 @@ class FlexicontentHelperRoute
 		if ($types !== null) return $types;
 		
 		// Retrieve item's Content Type parameters
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT t.attribs, t.id '
 				. ' FROM #__flexicontent_types AS t'
 				;

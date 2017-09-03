@@ -79,7 +79,7 @@ class JFormFieldClayoutlist extends JFormFieldList
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
-			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
 		}
 		
@@ -96,11 +96,11 @@ class JFormFieldClayoutlist extends JFormFieldList
 		
 		if ($tmpls !== false) {
 			foreach ($tmpls as $tmpl) {
-				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
+				$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name); 
 			}
 		}
 		
-		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 	
 }

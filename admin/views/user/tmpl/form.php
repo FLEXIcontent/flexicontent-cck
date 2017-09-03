@@ -32,12 +32,12 @@ JFilterOutput::objectHTMLSafe( $this->user, ENT_QUOTES, $exclude_keys = '' );
 if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 	$lvisit = JText::_( 'Never' );
 } else {
-	$lvisit	= JHTML::_('date', $this->user->get('lastvisitDate'), $date_format);
+	$lvisit	= JHtml::_('date', $this->user->get('lastvisitDate'), $date_format);
 }
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
@@ -126,7 +126,7 @@ $this->document->addScriptDeclaration($js);
 
 				// DB Query to get -mulitple- user group ids for all authors,
 				// Get user-To-usergoup mapping for users in current page
-				$db = JFactory::getDBO();
+				$db = JFactory::getDbo();
 				
 				$query = 'SELECT group_id FROM #__user_usergroup_map WHERE user_id = '.(int) $this->form->getValue('id');
 				$db->setQuery( $query );
@@ -267,7 +267,7 @@ $this->document->addScriptDeclaration($js);
 							<?php echo JText::_( 'Image' ); ?>
 						</td>
 						<td style="vertical-align:top; text-align:center;">
-							<img src="<?php echo JURI::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" alt="<?php echo JText::_( 'Contact' ); ?>" />
+							<img src="<?php echo JUri::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" alt="<?php echo JText::_( 'Contact' ); ?>" />
 						</td>
 					</tr>
 					<?php } ?>
@@ -683,7 +683,7 @@ $this->document->addScriptDeclaration($js);
 	<?php if (FLEXI_J16GE ? !$this->me->authorise( 'com_users', 'email_events' ) : !$this->me->authorize( 'com_users', 'email_events' )) { ?>
 	<input type="hidden" name="sendEmail" value="0" />
 	<?php } ?>
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 </form>
 </div><!-- id:flexicontent -->
