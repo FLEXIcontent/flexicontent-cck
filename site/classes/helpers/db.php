@@ -15,7 +15,7 @@ class flexicontent_db
 	 */
 	static function setValues_commonDataTypes($obj, $all=false)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'UPDATE #__flexicontent_fields_item_relations'
 			. ' SET value_integer = CAST(value AS SIGNED), value_decimal = CAST(value AS DECIMAL(65,15)), value_datetime = CAST(value AS DATETIME) '
 			. (!$all ? ' WHERE item_id = ' . (int) $obj->item_id . ' AND field_id = ' . (int) $obj->field_id . ' AND valueorder = ' . (int) $obj->valueorder. ' AND suborder = ' . (int) $obj->suborder : '');
@@ -32,7 +32,7 @@ class flexicontent_db
 	 */
 	static function check_fix_JSON_column($colname, $tblname, $idname, $id, & $attribs=null)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
 		$db->setQuery('SELECT '.$colname.' FROM #__'.$tblname.' WHERE '.$idname.' = ' . $db->Quote($id));
@@ -70,7 +70,7 @@ class flexicontent_db
 		
 		if ( $accessid!==null && isset($access_names[$accessid]) ) return $access_names[$accessid];
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery('SELECT id, title FROM #__viewlevels');
 		$_arr = $db->loadObjectList();
 		$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
@@ -95,7 +95,7 @@ class flexicontent_db
 		
 		if ( !$force && isset($typeparams[$typeid]) ) return $typeparams[$typeid];
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query	= 'SELECT t.id, t.attribs'
 			. ' FROM #__flexicontent_types AS t'
 			.( $typeid ? ' WHERE t.id = ' . (int)$typeid : '')
@@ -128,7 +128,7 @@ class flexicontent_db
 	 */
 	static function getFavourites($type, $item_id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query = '
 			SELECT COUNT(id) AS favs
@@ -149,7 +149,7 @@ class flexicontent_db
 	 */
 	static function getFavoured($type, $item_id, $user_id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query = '
 			SELECT COUNT(id) AS fav
@@ -172,7 +172,7 @@ class flexicontent_db
 	 */
 	static function removefav($type, $item_id, $user_id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query = '
 			DELETE FROM #__flexicontent_favourites
@@ -194,7 +194,7 @@ class flexicontent_db
 	 */
 	static function addfav($type, $item_id, $user_id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$obj = new stdClass();
 		$obj->itemid = (int)$item_id;
@@ -220,7 +220,7 @@ class flexicontent_db
 			return $userConfig[$user_id];
 		}
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT author_basicparams'
 			. ' FROM #__flexicontent_authors_ext'
 			. ' WHERE user_id = ' . $user_id;
@@ -240,7 +240,7 @@ class flexicontent_db
 	 */
 	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index', $isprefix=1)
 	{
-		$db     = JFactory::getDBO();
+		$db     = JFactory::getDbo();
 		$app    = JFactory::getApplication();
 		$option = $app->input->get('option', '', 'cmd');
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
@@ -278,7 +278,7 @@ class flexicontent_db
 		$queries = file_get_contents( $sql_file );
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		foreach ($queries as $query) {
 			$query = trim($query);
 			if (!$query) continue;
@@ -298,7 +298,7 @@ class flexicontent_db
 	 */
 	static function & directQuery($query, $assoc = false, $unbuffered = false)
 	{
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$app  = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbtype   = $app->getCfg('dbtype');
@@ -779,7 +779,7 @@ class flexicontent_db
 	 */
 	static function getFieldTypes($group=false, $usage=false, $published=false)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT plg.element AS field_type, plg.name as title'
 			.($usage ? ', count(f.id) as assigned' : '')
 			.' FROM #__extensions AS plg'
@@ -839,7 +839,7 @@ class flexicontent_db
 		if ( isset($cached[$contenttypes_list]) ) return $cached[$contenttypes_list];
 		
 		// Retrieve item's Content Type parameters
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT * '
 				. ' FROM #__flexicontent_types AS t'
 				. ($contenttypes_list ? ' WHERE id IN('.$contenttypes_list.')' : '')
@@ -869,7 +869,7 @@ class flexicontent_db
 		}
 		
 		// Get associated translations
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT a.id as id, k.id as original_id'
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
@@ -889,7 +889,7 @@ class flexicontent_db
 		
 	static function getLangAssocs($ids)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.created, i.modified, i.language as language, i.language as lang'
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
@@ -1094,7 +1094,7 @@ class flexicontent_db
 	 */
 	private static function _getUserGroupIDs()
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		$query = $db->getQuery(true);
 		$query
@@ -1121,7 +1121,7 @@ class flexicontent_db
 		}
 
 		// Find usergroups with Super Admin privilege
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$groupIDs = flexicontent_db::_getUserGroupIDs();
 		$suGroupIDs = array();
 

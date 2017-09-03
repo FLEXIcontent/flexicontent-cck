@@ -38,7 +38,7 @@ class FlexicontentViewArchive extends JViewLegacy
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document	= JFactory::getDocument();
 		
 
@@ -54,14 +54,14 @@ class FlexicontentViewArchive extends JViewLegacy
 		// Add css and js to document
 		// **************************
 		
-		//JHTML::_('behavior.tooltip');
+		//JHtml::_('behavior.tooltip');
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		
 		

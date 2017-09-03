@@ -39,7 +39,7 @@ class FlexicontentViewCategory extends JViewLegacy
 	function display( $tpl = null )
 	{
 		// Initialize framework variables
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		
@@ -115,7 +115,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$uri = clone JUri::getInstance();
 		$domain = $uri->toString(array('scheme', 'host', 'port'));
-		$site_base_url = JURI::base(true).'/';
+		$site_base_url = JUri::base(true).'/';
 		foreach ($items as $item)
 		{
 			// strip html from feed item title
@@ -136,7 +136,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
 					$img_field = $item->fields[$img_field_name];
-					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 				} else {
 					$src = flexicontent_html::extractimagesrc($item);
 				}
@@ -155,7 +155,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $site_base_url : '';
-					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
+					$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$thumb = $src;

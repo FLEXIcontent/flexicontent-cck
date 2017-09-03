@@ -270,7 +270,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			}
 			
 			$xml = simplexml_load_string($conf['xml']);
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$nullDate = $db->getNullDate();
 			
 			$remap = array();

@@ -119,15 +119,15 @@ function delAllFilters() {
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="title"><?php echo JHtml::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="" class="nowrap">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'c.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<th width="" nowrap="nowrap">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 		</tr>
 	</thead>
@@ -139,7 +139,7 @@ function delAllFilters() {
 		$n = count($this->rows);
 		foreach ($this->rows as $row)
 		{
-			$published = JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange=0 );
+			$published = JHtml::_('jgrid.published', $row->published, $i, 'categories.', $canChange=0 );
    	?>
 		<tr class="<?php echo "row$k"; ?>">
 

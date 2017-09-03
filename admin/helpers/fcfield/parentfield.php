@@ -503,10 +503,10 @@ class FCField extends JPlugin
 
 		// Create the options for select drop down
 		$options = array();
-		$options[] = JHTML::_('select.option', '', '-');
+		$options[] = JHtml::_('select.option', '', '-');
 		foreach ($elements as $element)
 		{
-			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+			$options[] = JHtml::_('select.option', $element->value, JText::_($element->text));
 		}
 		return $options;
 	}
@@ -515,7 +515,7 @@ class FCField extends JPlugin
 	// Get existing field values
 	function getExistingFieldValues()
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT value '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '
@@ -533,7 +533,7 @@ class FCField extends JPlugin
 	function renameLegacyFieldParameters($map)
 	{
 		// Load parameters directly from DB
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT attribs'
 			. ' FROM #__flexicontent_fields'
 			. ' WHERE '

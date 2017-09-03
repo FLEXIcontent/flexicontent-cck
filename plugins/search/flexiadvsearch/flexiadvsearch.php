@@ -101,7 +101,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		}
 		
 		// Initialize some variables
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 		$menu  = $app->getMenu()->getActive();
 		

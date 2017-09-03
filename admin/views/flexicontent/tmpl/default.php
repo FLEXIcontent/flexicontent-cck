@@ -539,7 +539,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					}
 					?>
 					</td>
-					<td><?php echo JHTML::_('date',  $row->created); ?></td>
+					<td><?php echo JHtml::_('date',  $row->created); ?></td>
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
@@ -598,7 +598,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					}
 					?>
 					</td>
-					<td><?php echo JHTML::_('date',  $row->modified); ?></td>
+					<td><?php echo JHtml::_('date',  $row->modified); ?></td>
 					<td><?php echo $row->modifier; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
@@ -658,7 +658,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					}
 					?>
 					</td>
-					<td><?php echo JHTML::_('date',  $row->created); ?></td>
+					<td><?php echo JHtml::_('date',  $row->created); ?></td>
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
@@ -719,7 +719,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					}
 					?>
 					</td>
-					<td><?php echo JHTML::_('date',  $row->created); ?></td>
+					<td><?php echo JHtml::_('date',  $row->created); ?></td>
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
@@ -771,8 +771,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<?php
 					$logo_style = ';';
 					if (!$disable_fc_logo) echo (FLEXI_J16GE ?
-						JHTML::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ') :
-						JHTML::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' id="fc-dash-logo" '));
+						JHtml::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ') :
+						JHtml::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' id="fc-dash-logo" '));
 				?>
 					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
 						FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2016
@@ -839,7 +839,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		<input type="hidden" name="controller" value="" />
 		<input type="hidden" name="view" value="" />
 		<input type="hidden" name="task" value="" />
-		<?php echo JHTML::_( 'form.token' ); ?>
+		<?php echo JHtml::_( 'form.token' ); ?>
 		
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

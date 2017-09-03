@@ -243,7 +243,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	
 	function _getModuleObject($id)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query 	= 'SELECT * FROM #__modules'
 				. ' WHERE id = ' . (int)$id

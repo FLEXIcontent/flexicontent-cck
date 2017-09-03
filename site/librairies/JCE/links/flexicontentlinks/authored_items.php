@@ -87,7 +87,7 @@ class FlexicontentlinksAuthored_items extends JObject {
 
 		if ($layout && $layout!='author') return array();
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// Add authored items
 		$query	= $db->getQuery(true);

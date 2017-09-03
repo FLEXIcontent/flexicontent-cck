@@ -49,9 +49,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$id 		= JRequest::getInt('id', 0);
 		$active 	= JRequest::getInt('active', 0);
 		if(!$id) return;
-		$revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
-		$view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
-		$comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
+		$revert 	= JHtml::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
+		$view 		= JHtml::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
+		$comment 	= JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
 
 		$model 	= $this->getModel('item');
 		$model->setId($id);
@@ -79,7 +79,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			echo '
 			<tr'.$class.'>
 				<td class="versions">#'.$v->nr.'</td>
-				<td class="versions">'.JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format ).'</td>
+				<td class="versions">'.JHtml::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format ).'</td>
 				<td class="versions">'.(($v->nr == 1) ? $item->creator : $v->modifier).'</td>
 				<td class="versions" align="center">
 					<a href="javascript:;" class="hasTooltip" title="'.JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($v->comment ? $v->comment : 'No comment written'), 0, 1).'">'.$comment.'</a>
@@ -215,11 +215,11 @@ class FlexicontentControllerItems extends FlexicontentController
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 			
-			$fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
+			$fc_css = JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			echo '
-			<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />
+			<link rel="stylesheet" href="'.JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />
 			<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VHASH.'" />
-			<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
+			<link rel="stylesheet" href="'.JUri::root(true).'/media/jui/css/bootstrap.min.css" />
 			';
 			?>
 	<div id="flexicontent" class="flexicontent">
@@ -247,7 +247,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		<?php
 			foreach($state as $shortname => $statedata) {
 				$css = "width:216px; margin:0px 12px 12px 0px;";
-				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&". JSession::getFormToken() ."=1";
+				$link = JUri::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&". JSession::getFormToken() ."=1";
 				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
 		?>
 			<span class="fc-filter nowrap_box">

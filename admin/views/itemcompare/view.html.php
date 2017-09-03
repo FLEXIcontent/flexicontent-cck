@@ -35,7 +35,7 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$template   = $mainframe->getTemplate();
 		$dispatcher = JEventDispatcher::getInstance();
@@ -43,7 +43,7 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$codemode = JRequest::getInt('codemode',0);
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		
-		JHTML::_('behavior.modal');
+		JHtml::_('behavior.modal');
 
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; } .novalue { color: gray; font-style: italic; }';

@@ -475,7 +475,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			? in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'))
 			: false;
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$formfieldname = 'filter_'.$filter->id;
 		
 		$_s = $isSearchView ? '_s' : '';
@@ -553,14 +553,14 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			case 'state':
 				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
-				$options[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-				$options[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-				$options[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-				$options[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-				$options[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-				$options[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-				//$options[] = JHTML::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
+				$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+				$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+				$options[] = JHtml::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
+				$options[] = JHtml::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
+				$options[] = JHtml::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
+				$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+				//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
 			break;
 			
 			case 'categories':
@@ -574,12 +574,12 @@ class plgFlexicontent_fieldsCore extends FCField
 				{
 					if ($label_filter==2)
 					{
-						$options[] = JHTML::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+						$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 					}
 				}
 				// SINGLE-select does not has an internal label a drop-down list option
 				else
-					$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
+					$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
 				
 				// Get categories
 				global $globalcats;
@@ -601,14 +601,14 @@ class plgFlexicontent_fieldsCore extends FCField
 					$cids = count($cids)
 						? $cids
 						: array($cid);
-					//$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
+					//$options[] = JHtml::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
 					//$cats = $globalcats[$cid]->childrenarray;
 				}
 				else if ( $rootcatid )
 				{
 					// If configured ... limit to subcategory tree of a specified category
 					$cids = array($rootcatid);
-					//$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
+					//$options[] = JHtml::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
 					//$cats = $globalcats[$rootcatid]->childrenarray;
 				}
 				
@@ -640,7 +640,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				
 				if (!empty($cats) ) foreach ($cats as $k => $list)
 				{
-					$options[] = JHTML::_('select.option', $list->id, $list->treename . ($faceted_filter ? '&nbsp; (<'. $list->totalitems.')' : ''));
+					$options[] = JHtml::_('select.option', $list->id, $list->treename . ($faceted_filter ? '&nbsp; (<'. $list->totalitems.')' : ''));
 				}
 				
 				$extra_classes = '';
@@ -748,12 +748,12 @@ class plgFlexicontent_fieldsCore extends FCField
 			{
 				if ($label_filter==2)
 				{
-					$options[] = JHTML::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+					$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 				}
 			}
 			else
-				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
-			foreach ($lists as $list) $options[] = JHTML::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
+				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
+			foreach ($lists as $list) $options[] = JHtml::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
 		
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
@@ -790,11 +790,11 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			// Create filter
 			if ($display_filter_as != 6)
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
+				$filter->html	.= JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
 			else
 				$filter->html	.=
 					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
-					JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+					JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 		}
 		
 		// Special CASE for some filters, do some replacements
@@ -910,7 +910,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			return array();
 		}
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$_s = $for_advsearch ? '_s' : '';
 
 		$values = array();

@@ -150,7 +150,7 @@ switch ($content_layout) {
 // Default image and image fitting
 // *******************************
 $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
-$img_path = JURI::base(true) .'/'; 
+$img_path = JUri::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
 $img_auto_dims_css_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
@@ -289,8 +289,8 @@ if ($transition)
 {
 	$file_path = JPath::clean(JPATH_SITE.'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
 	if (file_exists($file_path)) {
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
 	}
 }
 $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
@@ -536,7 +536,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		<?php	$rowcount = 0; ?>
 		
 		<div id="mod_fc_carousel_mask_<?php echo $uniq_ord_id; ?>_loading" class="mod_fc_carousel_mask_loading">
-			... <?php echo  JText::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo JURI::root(); ?>components/com_flexicontent/assets/images/ajax-loader.gif"/>
+			... <?php echo  JText::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo JUri::root(); ?>components/com_flexicontent/assets/images/ajax-loader.gif"/>
 		</div>
 		
 <div class="mod_fc_carousel" id="mod_fc_carousel_container_<?php echo $uniq_ord_id; ?>" >
@@ -780,7 +780,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 					onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 				>
 				
-				<?php $img_path = JURI::base(true) .'/'; ?>
+				<?php $img_path = JUri::base(true) .'/'; ?>
 				<?php $handle_classes = 'mod_fc_item_handle' . ($item_handles_dir=='horizontal' ? ' fc_scrollitem_h' : ' fc_scrollitem_v'); ?>
 				<?php foreach ($list[$ord]['standard'] as $item) : ?>
 					<?php

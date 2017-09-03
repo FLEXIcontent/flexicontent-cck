@@ -200,7 +200,7 @@ class FlexicontentHelperPerm
 	static function _getAllowedCats( $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first)
 	{
 		global $globalcats;
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$usercats = array();
 		
 		// -- passing user_id parameter to this function allows to cache per user
@@ -286,7 +286,7 @@ class FlexicontentHelperPerm
 		
 		if(!isset($elements[$uid][$section][$action]) || $force) {
 			// Get database and use objects
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$user = JFactory::getUser($uid);
 			
 			// Query the assets table to retrieve the asset names for the specified section

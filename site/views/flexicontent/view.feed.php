@@ -37,7 +37,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$doc = JFactory::getDocument();
 		$app = JFactory::getApplication();
 		$params = $this->get('Params');
@@ -72,7 +72,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		
 		$uri = clone JUri::getInstance();
 		$domain = $uri->toString(array('scheme', 'host', 'port'));
-		$site_base_url = JURI::base(true).'/';
+		$site_base_url = JUri::base(true).'/';
 		foreach ( $cats as $cat )
 		{
 			// strip html from feed item title
@@ -117,7 +117,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 					$cat->fulltext = "";
 					
 					if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-						$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+						$src = JUri::base(true) ."/". $joomla_image_url . $cat->image;
 				
 						$h		= '&amp;h=' . $cat_image_height;
 						$w		= '&amp;w=' . $cat_image_width;
@@ -129,7 +129,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-						$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 					} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 			
 						$h		= '&amp;h=' . $feed_image_height;
@@ -142,10 +142,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-						$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+						$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
 						$src = $base_url.$src;
 						
-						$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 					}
 				}
 	  		if ($thumb) {

@@ -88,7 +88,7 @@ class FLEXIadvsearchHelper
 	{
 		$mainframe = JFactory::getApplication();
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		$params = JComponentHelper::getParams( 'com_search' );
 		$enable_log_searches = $params->get('enabled');
@@ -97,7 +97,7 @@ class FLEXIadvsearchHelper
 
 		if ( @$enable_log_searches )
 		{
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT hits'
 			. ' FROM #__core_log_searches'
 			. ' WHERE LOWER( search_term ) = '.$search_term

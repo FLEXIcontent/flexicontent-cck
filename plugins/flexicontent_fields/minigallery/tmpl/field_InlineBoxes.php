@@ -17,9 +17,9 @@ foreach($field->value as $file_id)
 		if ($form_file_preview==2 && $fields_box_placing) $preview_css .= 'display:none;';  // 2: Automatic, so if not an image hide the preview elements
 	} else {
 		$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
-			JURI::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename :
+			JUri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename :
 			$file_data->filename ;
-		$preview_src = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
+		$preview_src = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
 	}
 	
 	$info_txt_classes = $file_data->published ? '' : 'file_unpublished '.$tooltip_class;
@@ -97,7 +97,7 @@ foreach($field->value as $file_id)
 			<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
 				'.JText::_( 'FLEXI_ACCESS' ).'
 			</label>
-				'.JHTML::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
+				'.JHtml::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
 		</div>' : '').
 	
 	( $iform_desc ? '

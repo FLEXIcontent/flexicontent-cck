@@ -171,11 +171,11 @@ class JFormFieldIconlist extends JFormField
 
 		foreach($icons as $key=>$value) :
 		## Create $value ##
-		$options[] = JHTML::_('select.option', $key, $value);
+		$options[] = JHtml::_('select.option', $key, $value);
 		endforeach;
 
 		## Create <select name="icons" class="inputbox"></select> ##
-		$dropdown = JHTML::_('select.genericlist', $options, $this->name, 'class="inputbox"', 'value', 'text', $this->value, $this->id);
+		$dropdown = JHtml::_('select.genericlist', $options, $this->name, 'class="inputbox"', 'value', 'text', $this->value, $this->id);
 
 		## Output created <select> list ##
 		return $dropdown;

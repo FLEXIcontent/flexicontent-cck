@@ -65,7 +65,7 @@ window.addEvent('domready', function(){
 	</table>
 	<div id="log-bind"></div>
 
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 
 <?php if (FLEXI_J16GE) : ?>

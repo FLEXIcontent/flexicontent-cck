@@ -22,7 +22,7 @@ if ( $users_list_type )
 {
   $uname = $users_list_type==1 ? "u.username" : "u.name";
 
-  $db	= JFactory::getDBO();
+  $db	= JFactory::getDbo();
   $query = 'SELECT '.($users_list_type==1 ? "u.username" : "u.name")
     .' FROM #__flexicontent_favourites AS ff'
     .' LEFT JOIN #__users AS u ON u.id=ff.userid '

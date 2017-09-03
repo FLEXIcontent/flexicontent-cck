@@ -313,7 +313,7 @@ foreach($_levels as $_level) {
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 		</div>  <!-- j-main-container -->
 	</div>  <!-- spanNN -->

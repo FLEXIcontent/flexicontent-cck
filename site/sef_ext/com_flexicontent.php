@@ -11,7 +11,7 @@ if ( !class_exists('sh404_fc_helper') )
 	{
 		function getCats( $ids = false )
 		{
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT id, title, alias'
 				. ' FROM #__categories'
 				. (empty($ids) ? '' : ' WHERE id IN (' . implode(', ', $ids) .')');

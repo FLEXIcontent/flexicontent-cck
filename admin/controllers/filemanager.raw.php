@@ -102,7 +102,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 
 		$session = JFactory::getSession();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$app = JFactory::getApplication();
 
 		// Actions according to rebuildmode
@@ -158,7 +158,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$start_microtime = microtime(true);
 
 		$session = JFactory::getSession();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$indexer = JRequest::getVar('indexer','fileman_default');
 		$rebuildmode = JRequest::getVar('rebuildmode','');

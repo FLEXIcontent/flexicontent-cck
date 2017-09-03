@@ -56,7 +56,7 @@ $usetags_fe = $this->params->get('usetags_fe', 1);
 $tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe==2) ) ;
 
 // Create reusable html code
-$infoimage = $this->params->get('use_font_icons', 1) ? '<i class="icon-comment" style="color:darkgray"></i>' : JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ) );
+$infoimage = $this->params->get('use_font_icons', 1) ? '<i class="icon-comment" style="color:darkgray"></i>' : JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ) );
 $close_btn = '<a class="close" data-dismiss="alert">&#215;</a>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>';  // '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = 'btn';  // 'fc_button';
@@ -93,19 +93,19 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 {
-	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
-	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
-	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
-	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', FLEXI_VHASH);     // e.g. pagination for item versions
-	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
+	//$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
+	//$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
+	//$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
+	$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', FLEXI_VHASH);     // e.g. pagination for item versions
+	$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
 
-	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
+	//$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
 
 	JText::script("FLEXI_DELETE_TAG", true);
 	JText::script("FLEXI_ENTER_TAG", true);
@@ -156,7 +156,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 					var term = request.term;
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&". JSession::getFormToken() ."=1',
+						url: '".JUri::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: request.term
@@ -237,7 +237,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 			}
 			
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, '".JURI::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
+			tag.addtag( id, tagname, '".JUri::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
 		}
 		
 		function deleteTag(obj)
@@ -1903,7 +1903,7 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<?php endif; ?>
 		
 		<br class="clear" />
-		<?php echo JHTML::_( 'form.token' ); ?>
+		<?php echo JHtml::_( 'form.token' ); ?>
 		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
 		<input type="hidden" name="referer" value="<?php echo $referer_encoded; ?>" />
@@ -1925,4 +1925,4 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');

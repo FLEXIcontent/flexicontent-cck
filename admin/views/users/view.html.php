@@ -46,7 +46,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		
 		$model = $this->getModel();
@@ -143,15 +143,15 @@ class FlexicontentViewUsers extends JViewLegacy
 		// **************************
 		
 		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.calendar');
-		//JHTML::_('behavior.tooltip');
+		JHtml::_('behavior.calendar');
+		//JHtml::_('behavior.tooltip');
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		$js = "jQuery(document).ready(function(){";
 		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
@@ -220,41 +220,41 @@ class FlexicontentViewUsers extends JViewLegacy
 		$usergroups = $db->loadObjectList('id');
 		
 		
-		$types[]		= JHTML::_('select.option',  '', '-' /*JText::_( 'Select Group' )*/ );
+		$types[]		= JHtml::_('select.option',  '', '-' /*JText::_( 'Select Group' )*/ );
 		foreach( $usergroups as $ugrp )
 		{
-			$types[]	= JHTML::_('select.option',  $ugrp->value, JText::_( $ugrp->text ) );
+			$types[]	= JHtml::_('select.option',  $ugrp->value, JText::_( $ugrp->text ) );
 		}
 		
-		$itemscount_options[] = JHTML::_('select.option',  '', '-');
-		$itemscount_options[] = JHTML::_('select.option',  1, JText::_( 'None' ) );
-		$itemscount_options[] = JHTML::_('select.option',  2, JText::_( 'One or more' ) );
+		$itemscount_options[] = JHtml::_('select.option',  '', '-');
+		$itemscount_options[] = JHtml::_('select.option',  1, JText::_( 'None' ) );
+		$itemscount_options[] = JHtml::_('select.option',  2, JText::_( 'One or more' ) );
 		$lists['filter_itemscount'] = ($filter_itemscount || 1 ? '<div class="add-on"># '.JText::_('FLEXI_ITEMS').'</div>' : '').
-			JHTML::_('select.genericlist', $itemscount_options, 'filter_itemscount', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemscount );
+			JHtml::_('select.genericlist', $itemscount_options, 'filter_itemscount', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemscount );
 		
 		$lists['filter_usergrp'] = ($filter_usergrp || 1 ? '<div class="add-on">'.JText::_('Select Group').'</div>' : '').
-			JHTML::_('select.genericlist', $types, 'filter_usergrp', 'class="use_select2_lib" style="width:auto;" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_usergrp );
+			JHtml::_('select.genericlist', $types, 'filter_usergrp', 'class="use_select2_lib" style="width:auto;" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_usergrp );
 
 		// get list of Log Status for dropdown filter
-		$logged[] = JHTML::_('select.option',  '', '-' /*JText::_( 'Select Log Status' )*/);
-		$logged[] = JHTML::_('select.option',  '1', JText::_( 'JYES' ) );
-		$logged[] = JHTML::_('select.option',  '0', JText::_( 'JNO' ) );
+		$logged[] = JHtml::_('select.option',  '', '-' /*JText::_( 'Select Log Status' )*/);
+		$logged[] = JHtml::_('select.option',  '1', JText::_( 'JYES' ) );
+		$logged[] = JHtml::_('select.option',  '0', JText::_( 'JNO' ) );
 		$lists['filter_logged'] = ($filter_logged || 1 ? '<div class="add-on">'.JText::_('FLEXI_USER_LOGGED').'</div>' : '').
-			JHTML::_('select.genericlist', $logged, 'filter_logged', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_logged );
+			JHtml::_('select.genericlist', $logged, 'filter_logged', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_logged );
 
 		// get list of Log Status for dropdown filter
-		$state[] = JHTML::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_STATE' )*/);
+		$state[] = JHtml::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_STATE' )*/);
 		$state[] = JHtml::_('select.option', '0', JText::_('JENABLED'));
 		$state[] = JHtml::_('select.option', '1', JText::_('JDISABLED'));
 		$lists['filter_state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('COM_USERS_HEADING_ENABLED').'</div>' : '').
-			JHTML::_('select.genericlist', $state, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+			JHtml::_('select.genericlist', $state, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
 
 		// get list of Log Status for dropdown filter
-		$active[] = JHTML::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_ACTIVE' )*/);
+		$active[] = JHtml::_('select.option',  '', '-' /*JText::_( 'COM_USERS_FILTER_ACTIVE' )*/);
 		$active[] = JHtml::_('select.option', '0', JText::_('COM_USERS_ACTIVATED'));
 		$active[] = JHtml::_('select.option', '1', JText::_('COM_USERS_UNACTIVATED'));
 		$lists['filter_active'] = ($filter_active || 1 ? '<div class="add-on">'.JText::_('COM_USERS_HEADING_ACTIVATED').'</div>' : '').
-			JHTML::_('select.genericlist', $active, 'filter_active', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_active );
+			JHtml::_('select.genericlist', $active, 'filter_active', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_active );
 
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
@@ -262,14 +262,14 @@ class FlexicontentViewUsers extends JViewLegacy
 
 		// build dates option list
 		$dates = array();
-		$dates[] = JHTML::_('select.option',  '1', JText::_( 'Registered' ) );
-		$dates[] = JHTML::_('select.option',  '2', JText::_( 'Last Visit' ) );
+		$dates[] = JHtml::_('select.option',  '1', JText::_( 'Registered' ) );
+		$dates[] = JHtml::_('select.option',  '2', JText::_( 'Last Visit' ) );
 		
 		$lists['date'] = //'<div class="add-on">'.JText::_('FLEXI_DATE').'</div>'.
-			JHTML::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
+			JHtml::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
 		
-		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
-		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));
+		$lists['startdate'] = JHtml::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
+		$lists['enddate'] 	= JHtml::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));
 		
 		// search filter
 		$lists['search']= $search;

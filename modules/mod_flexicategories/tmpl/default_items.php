@@ -35,13 +35,13 @@ if ($show_cat_image) {
 	$q		= '&amp;q=95';
 	$ar 	= '&amp;ar=x';
 	$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-	$phpThumbURL = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
+	$phpThumbURL = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
 }
 
 
 if ($cat_default_image)
 {
-	$src = JURI::base(true) ."/". $joomla_image_url . $cat_default_image;
+	$src = JUri::base(true) ."/". $joomla_image_url . $cat_default_image;
 	
 	$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 	$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -70,7 +70,7 @@ foreach ($list as $cat) :
 		$cat->fulltext = "";
 		
 		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-			$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+			$src = JUri::base(true) ."/". $joomla_image_url . $cat->image;
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -82,7 +82,7 @@ foreach ($list as $cat) :
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
 			$src = $base_url.$src;
 		}
 		

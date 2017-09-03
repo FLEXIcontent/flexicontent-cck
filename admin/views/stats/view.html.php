@@ -70,17 +70,17 @@ class FlexicontentViewStats extends JViewLegacy
 		// **************************
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		

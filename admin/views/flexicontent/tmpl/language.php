@@ -198,7 +198,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 						</td>
 						<td>
 							<?php
-							$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', @$this->row->published );
+							$html = JHtml::_('select.booleanlist', 'published', 'class="inputbox"', @$this->row->published );
 							echo $html;
 							?>
 						</td>
@@ -254,5 +254,5 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

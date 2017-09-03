@@ -65,7 +65,7 @@ JFactory::getDocument()->addScriptDeclaration($js);
 	</table>
 	<div id="log-bind"></div>
 
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="task" value="templates.duplicate" />
 	<input type="hidden" name="layout" value="templates.duplicate" />

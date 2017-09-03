@@ -44,7 +44,7 @@ class FlexicontentViewAppsman extends JViewLegacy
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 		
@@ -66,11 +66,11 @@ class FlexicontentViewAppsman extends JViewLegacy
 		// ***
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
@@ -78,9 +78,9 @@ class FlexicontentViewAppsman extends JViewLegacy
 		flexicontent_html::loadFramework('flexi-lib');
 
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
 

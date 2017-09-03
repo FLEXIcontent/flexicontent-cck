@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		
 		// Button for popup file selection
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
-		$addExistingURL = JURI::base(true)
+		$addExistingURL = JUri::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
 			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
@@ -689,18 +689,18 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		
 		if (!$js_and_css_added)
 		{
-			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
+			$document->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
 		  JHtml::_('behavior.framework', true);
-		  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
+		  $document->addScript(JUri::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
 		  if($slideshowtype!='slideshow')
 			{
-		  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+		  	$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
 		  	$slideshowClass .= '.'.$slideshowtype;
 		  }
 		  // this allows you to override the default css files
 		  $csspath = JPATH_ROOT.'/templates/'.$app->getTemplate().'/css/minigallery.css';
 		  if(file_exists($csspath)) {
-				$document->addStyleSheet(JURI::root(true).'/templates/'.$app->getTemplate().'/css/minigallery.css');
+				$document->addStyleSheet(JUri::root(true).'/templates/'.$app->getTemplate().'/css/minigallery.css');
 		  }
 			if ($usepopup && $popuptype==4) flexicontent_html::loadFramework('fancybox');
 		}
@@ -779,10 +779,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		{
 			if ($file_data) {
 				$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
-					JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
+					JUri::root(true) . '/' . $mediapath . '/' . $file_data->filename :
 					$file_data->filename ;
-				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1&amp;q=95&amp;ar=x';
-				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1&amp;q=95&amp;ar=x';
+				$srcs	= JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1&amp;q=95&amp;ar=x';
+				$srcb	= JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1&amp;q=95&amp;ar=x';
 				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
 				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
 					$srcs .= '&amp;f='. $ext;
@@ -1004,7 +1004,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					// Update DB data of the file 
 					if ( !$row->check() || !$row->store() )
 					{
-						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDBO()->getErrorMsg(), 'warning' );
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDbo()->getErrorMsg(), 'warning' );
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1128,7 +1128,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		if ( count($new_ids) )
 		{
 			// Only query files that are not already cached
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 					. ' FROM #__flexicontent_files'
 					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
@@ -1162,7 +1162,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	function canDeleteFile( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE id='. $db->Quote($file_id)
@@ -1184,7 +1184,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	function checkFileAssignment( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$query = 'SELECT item_id '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '

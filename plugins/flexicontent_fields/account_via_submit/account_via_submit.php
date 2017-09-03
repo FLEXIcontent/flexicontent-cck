@@ -301,7 +301,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$this->initialize($field);
 		
 		// Check email already used
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
 		$existingUserID = $db->loadResult();
 		
@@ -390,7 +390,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$attribs->initialized = 1;
 		$attribs = json_encode($attribs);
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
 		$db->setQuery($query);
 		$result = $db->execute();
@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		JFactory::getLanguage()->load('com_users', JPATH_SITE, null, true);
 		
 		$app = JFactory::getApplication();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$usersConf = JComponentHelper::getParams( 'com_users' );
 		
 		$useractivation = $field->parameters->get('useractivation', $usersConf->get('useractivation', 2)); // Default: use Joomla com_users setting (2=user self-activation)
@@ -592,7 +592,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$subject = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_YOUR_NEW_ITEM_AT', $SiteName);
 		$desc    = JText::_( $field->parameters->get('coupon_desc'), '...' );
 		$link = JRoute::_( 
-			JURI::root(false).
+			JUri::root(false).
 			//'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$item->catid.'&id='.$item->id.
 			FlexicontentHelperRoute::getItemRoute($item->id, $item->catid).
 			'&task=edit&edittok='.$token

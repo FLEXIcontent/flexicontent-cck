@@ -380,7 +380,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	function _buildItemWhere( )
 	{
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)

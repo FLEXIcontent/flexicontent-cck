@@ -22,8 +22,8 @@ use Joomla\String\StringHelper;
 
 $tip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
-$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
+$hint_image = JHtml::image ( 'components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), '' );
+$warn_image = JHtml::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -31,7 +31,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $ctrl_task  = 'task=filemanager.';
 $ctrl_task_authors = 'task=users.';
-$action_url = JURI::base() . 'index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
+$action_url = JUri::base() . 'index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
 
 $app  = JFactory::getApplication();
 $jinput = $app->input;
@@ -58,8 +58,8 @@ $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : 
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 
 // Load JS tabber lib
-$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 //$this->folder_mode = 1; // test
@@ -370,7 +370,7 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => JURI::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
+		'action' => JUri::base() . 'index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
 			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,
@@ -633,9 +633,9 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
 						<?php if (!$this->folder_mode) : ?>
-							<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							<?php echo JHtml::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 							&nbsp; -- &nbsp;
-							<?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							<?php echo JHtml::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 						<?php else: ?>
 							<?php echo JText::_('FLEXI_FILENAME'); ?>
 						<?php endif; ?>
@@ -654,19 +654,19 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<?php if ($this->folder_mode) : ?>
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 				<?php else : ?>
-					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_SIZE', 'f.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_SIZE', 'f.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['hits'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 					
 				<?php if (!empty($this->cols['target'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo JHTML::_('grid.sort', 'FLEXI_URL_SECURE', 'f.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_URL_SECURE', 'f.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 					
 				<?php if (!empty($this->cols['stamp'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo JHTML::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'f.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'f.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 					
 				<?php if (!empty($this->cols['usage'])) : ?>
@@ -678,15 +678,15 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<?php endif; ?>
 					
 				<?php if (!empty($this->cols['uploader'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
-					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 				
 				<?php if (!empty($this->cols['file_id'])) : ?>
-					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
@@ -727,7 +727,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						if ( $this->layout == 'image' )
 							continue;
 						else
-							$thumb_or_icon = JHTML::image($row->icon, $row->filename);
+							$thumb_or_icon = JHtml::image($row->icon, $row->filename);
 					}
 					
 					if ($this->folder_mode) {
@@ -746,7 +746,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					if ( empty($thumb_or_icon) )
 					{
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
+							$thumb_or_icon = '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-box badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
@@ -770,7 +770,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 								{
 									$icon_name = $this->assigned_fields_icons[$field_type];
 									$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-									$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+									$image = JHtml::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
 									$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 								}
 							}
@@ -790,7 +790,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					{
 						// File preview icon for content form
 						$file_is_selected = isset($this->pending_file_names[$row->filename]);
-						$file_preview = !in_array($ext, $imageexts) ? '' : JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
+						$file_preview = !in_array($ext, $imageexts) ? '' : JUri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 
 						// Link to assign file value into the content form
 						$file_assign_link = $this->assign_mode ?
@@ -882,7 +882,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					
 				<?php if (!empty($this->cols['state'])) : ?>
 					<td class="center">
-						<?php echo JHTML::_('jgrid.published', $row->published, $i, 'filemanager.' ); ?>
+						<?php echo JHtml::_('jgrid.published', $row->published, $i, 'filemanager.' ); ?>
 					</td>
 				<?php endif; ?>
 					
@@ -952,7 +952,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
 					<td class="center hidden-tablet hidden-phone">
-						<?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
+						<?php echo JHtml::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
 					</td>
 				<?php endif; ?>
 			
@@ -986,7 +986,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				{
 					$icon_name = $this->assigned_fields_icons[$field_type];
 					$tip = $field_label;
-					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
+					$image = JHtml::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
 					$field_legend[$field_type] = $image. " ".$field_label;
 				}
 				?>
@@ -1019,7 +1019,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				$n = count($this->rows);
 				foreach ($this->rows as $row)
 				{
-					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+					$checked 	= @ JHtml::_('grid.checkedout', $row, $i );
 
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
@@ -1053,7 +1053,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 								{
 									$icon_name = $this->assigned_fields_icons[$field_type];
 									$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-									$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+									$image = JHtml::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
 									$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 								}
 							}
@@ -1097,7 +1097,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 			<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 			<input type="hidden" name="fcform" value="1" />
-			<?php echo JHTML::_( 'form.token' ); ?>
+			<?php echo JHtml::_( 'form.token' ); ?>
 
 			<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 			<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
@@ -1308,7 +1308,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 							</td>
 							<td id="file-props-secure-container">
 								<?php
-								//echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_filePropsForm' );
+								//echo JHtml::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_filePropsForm' );
 								$_options = array();
 								$_options['0'] = JText::_( 'FLEXI_MEDIA' );
 								$_options['1'] = JText::_( 'FLEXI_SECURE' );
@@ -1329,7 +1329,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						</tr>
 					</table>
 										
-					<?php echo JHTML::_( 'form.token' ); ?>
+					<?php echo JHtml::_( 'form.token' ); ?>
 					<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 					<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
@@ -1413,7 +1413,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 							</td>
 							<td id="secure-container">
 								<?php
-								//echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' );
+								//echo JHtml::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' );
 								$_options = array();
 								$_options['0'] = JText::_( 'FLEXI_MEDIA' );
 								$_options['1'] = JText::_( 'FLEXI_SECURE' );
@@ -1428,7 +1428,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					
 					<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>" style="margin: 16px 48px 0 48px;" />
 					
-					<?php echo JHTML::_( 'form.token' ); ?>
+					<?php echo JHtml::_( 'form.token' ); ?>
 					<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 					<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
@@ -1640,7 +1640,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 							</td>
 							<td>
 								<?php
-								//echo JHTML::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
+								//echo JHtml::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
 								$_options = array();
 								$_options['0'] = JText::_( 'FLEXI_NO' );
 								$_options['1'] = JText::_( 'FLEXI_YES' );
@@ -1657,7 +1657,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 							</td>
 							<td>
 								<?php
-								//echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
+								//echo JHtml::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
 								$_options = array();
 								$_options['0'] = JText::_( 'FLEXI_MEDIA' );
 								$_options['1'] = JText::_( 'FLEXI_SECURE' );

@@ -94,7 +94,7 @@ $popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
 if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 JPath::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
-if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', JURI::root().$params->get($path, 'images/stories'));
+if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', JUri::root().$params->get($path, 'images/stories'));
 
 // J1.5 Section or J1.7 category type
 if (!FLEXI_J16GE) {
@@ -104,7 +104,7 @@ if (!FLEXI_J16GE) {
 	if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
 	if (!defined('FLEXI_CAT_EXTENSION')) {
 		define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 		$db->setQuery($query);
 		$obj = $db->loadObject();

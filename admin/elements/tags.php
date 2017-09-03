@@ -46,7 +46,7 @@ class JFormFieldTags extends JFormField
 	function getInput()
 	{
 		$doc = JFactory::getDocument();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -73,7 +73,7 @@ class JFormFieldTags extends JFormField
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
-			array_unshift($tags, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			array_unshift($tags, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 		}
 		$classes = 'use_select2_lib';
 		if ($class = @$attributes['class']) {
@@ -85,6 +85,6 @@ class JFormFieldTags extends JFormField
 
 		$attribs .= ' class="'.$classes.'" ';
 
-		return JHTML::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

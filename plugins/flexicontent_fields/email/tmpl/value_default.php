@@ -31,7 +31,7 @@ foreach ($values as $value)
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 	if($format != 'feed' && $email_cloaking)
 	{
-		$html = JHTML::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
+		$html = JHtml::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
 	}
 	else
 	{

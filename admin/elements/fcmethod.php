@@ -86,11 +86,11 @@ window.addEvent('domready', function(){
 		
 		// prepare the options 
 		$options = array(); 
-		$options[] = JHTML::_('select.option', '1', JText::_('FLEXI_ALL')); 
-		$options[] = JHTML::_('select.option', '2', JText::_('FLEXI_EXCLUDE')); 
-		$options[] = JHTML::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
+		$options[] = JHtml::_('select.option', '1', JText::_('FLEXI_ALL')); 
+		$options[] = JHtml::_('select.option', '2', JText::_('FLEXI_EXCLUDE')); 
+		$options[] = JHtml::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
 		
-		$html = JHTML::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
+		$html = JHtml::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
 		$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
 		
 		return $html;

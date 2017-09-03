@@ -19,8 +19,8 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
@@ -292,7 +292,7 @@ $this->document->addScriptDeclaration($js);
 	
 </div> <!-- end of tab set -->
 
-<?php echo JHTML::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php echo $this->form->getInput('id'); ?>
 <input type="hidden" name="controller" value="types" />
@@ -304,5 +304,5 @@ $this->document->addScriptDeclaration($js);
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

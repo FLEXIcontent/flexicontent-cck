@@ -29,7 +29,7 @@ class modFlexiTagCloudHelper
 		// Initialize
 		$app = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$db				= JFactory::getDBO();
+		$db				= JFactory::getDbo();
 		$user			= JFactory::getUser();
 		
 		//$now    = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();

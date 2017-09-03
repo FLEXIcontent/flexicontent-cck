@@ -57,7 +57,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		
 		// Get model
@@ -111,14 +111,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// **************************
 		
 		flexicontent_html::loadFramework('select2');
-		//JHTML::_('behavior.tooltip');
+		//JHtml::_('behavior.tooltip');
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		$js = "jQuery(document).ready(function(){";
 		
@@ -156,15 +156,15 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		//build backend visible filter
 		if ($isADV) {
 			$fftypes = array();
-			$fftypes[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-			$fftypes[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
-			$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
+			$fftypes[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+			$fftypes[] = JHtml::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
+			$fftypes[] = JHtml::_('select.option',  'NC', JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
 			foreach ($fieldtypes as $field_type => $ftdata) {
-				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+				$fftypes[] = JHtml::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 			}
 			
 			$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<div class="add-on">'.JText::_('FLEXI_FIELD_TYPE').'</div>' : '').
-				JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fieldtype );
+				JHtml::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fieldtype );
 		}
 		
 		//build type select list
@@ -173,19 +173,19 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		//publish unpublished filter
 		$ffstates = array();
-		$ffstates[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$ffstates[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$ffstates[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$ffstates[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$ffstates[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$ffstates[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 		
 		$lists['filter_itemstate'] = ($filter_itemstate || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHTML::_('select.genericlist', $ffstates, 'filter_itemstate', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemstate );
+			JHtml::_('select.genericlist', $ffstates, 'filter_itemstate', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_itemstate );
 		
 		// build filter index type record listing
 		$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
-		//foreach ($itn as $i => $v) $indextypes[] = JHTML::_('select.option', $i, $v);
-		//$lists['filter_indextype'] = JHTML::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
+		//foreach ($itn as $i => $v) $indextypes[] = JHtml::_('select.option', $i, $v);
+		//$lists['filter_indextype'] = JHtml::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
 		$lists['filter_indextype'] = '';
 		foreach ($itn as $i => $v) {
 			$checked = $filter_indextype == $i ? ' checked="checked" ' : '';
@@ -279,7 +279,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
+		$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
 		//$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 350);
 		$js .= "
 			jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
@@ -291,7 +291,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		JToolbarHelper::divider();  JToolbarHelper::spacer();
 
 		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
+		$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
 		//$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 350);
 		$js .= "
 			jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
@@ -301,7 +301,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		JToolbarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
 
 		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
+		$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
 		//$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 350);
 		$js .= "
 			jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button').attr('href', '".$popup_load_url."')

@@ -339,7 +339,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		$query 	=	'
 		INSERT INTO `#__flexicontent_types`
@@ -389,7 +389,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
 		$flexi_comp_id = $db->loadResult();	
 		
@@ -461,7 +461,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query 	=	'
 		INSERT INTO `#__flexicontent_fields`
@@ -507,7 +507,7 @@ class FlexicontentController extends JControllerLegacy
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$format = strtolower($this->input->get('format', 'html', 'CMD'));
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$query	= 'UPDATE #__extensions'
 				. ' SET enabled = 1'
@@ -585,7 +585,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function syncItemsLang()
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// This should be match items that come from J1.5 upgrade only
 		// and copy the J1.5 language from items_ext table into the content table
@@ -620,7 +620,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function setItemsDefaultLang($lang)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// Set default language for items that do not have their language set
 		$query 	= 'UPDATE #__flexicontent_items_ext'
@@ -657,7 +657,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function addmcatitemrelations()
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// 1st: remove orphan relations
 		$query = "DELETE rel.*"
@@ -706,7 +706,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nullDate	= $db->getNullDate();
 		
 		// Add language column
@@ -790,7 +790,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nullDate	= $db->getNullDate();
 		
 		$model  = $this->getModel('flexicontent');
@@ -903,7 +903,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$cache_tbl = "#__flexicontent_items_tmp";
 		
 		// Truncate the table, this will handle redudant columns too
@@ -933,7 +933,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_versions (
@@ -972,7 +972,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
@@ -1007,7 +1007,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nullDate	= $db->getNullDate();
 
 		$query 	= 'SELECT item_id, version FROM #__flexicontent_items_versions'
@@ -1121,7 +1121,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$app = JFactory::getApplication();
 
 		$queries 	= array();
@@ -1322,7 +1322,7 @@ class FlexicontentController extends JControllerLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 		if ( !$perms->CanFields ) return;
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// GET fields having dirty field properties, NOTE: a dirty field property means that search index must be updated,
 		// even if the field was unpublished, because the field values may still exists in the search index for some items

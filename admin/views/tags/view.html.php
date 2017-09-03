@@ -43,7 +43,7 @@ class FlexicontentViewTags extends JViewLegacy
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		
 		// Get model
@@ -91,19 +91,19 @@ class FlexicontentViewTags extends JViewLegacy
 		// ***
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
 
@@ -134,7 +134,7 @@ class FlexicontentViewTags extends JViewLegacy
 		if ($perms->CanConfig)
 		{
 			$btn_task = '';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
+			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
 			//$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
 			$js .= "
 				jQuery('#toolbar-import a.toolbar, #toolbar-import button')
@@ -229,24 +229,24 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		// build orphaned/assigned filter
 		$assigned 	= array();
-		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_('FLEXI_ALL_TAGS')*/);
-		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
-		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
+		$assigned[] = JHtml::_('select.option',  '', '-'/*JText::_('FLEXI_ALL_TAGS')*/);
+		$assigned[] = JHtml::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
+		$assigned[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
 
 		$lists['assigned'] = ($filter_assigned || 1 ? '<div class="add-on">'.JText::_('FLEXI_ASSIGNED').'</div>' : '').
-			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_assigned );
+			JHtml::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_assigned );
 		
 		// build publication state filter
 		$states 	= array();
-		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$states[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-		$states[] = JHTML::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$states[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		$states[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
 		
 		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
-			//JHTML::_('grid.state', $filter_state );
+			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+			//JHtml::_('grid.state', $filter_state );
 		
 		
 		// text search filter

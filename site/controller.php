@@ -50,7 +50,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$this->input = empty($this->input) ? JFactory::getApplication()->input : $this->input;
 		$this->task  = $this->input->get('task', '', 'cmd');
-		$this->returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base();
+		$this->returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
 	}
 
 
@@ -66,7 +66,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Initialize variables
 		$app  = JFactory::getApplication();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 
 		$view = $this->input->get('view', '', 'cmd');
 		$cid  = $this->input->get('cid', 0, 'int');
@@ -96,7 +96,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$app     = JFactory::getApplication();
 
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('id', array(), 'array');
@@ -187,7 +187,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
-		$db      = JFactory::getDBO();
+		$db      = JFactory::getDbo();
 		$user    = JFactory::getUser();
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
@@ -976,11 +976,11 @@ class FlexicontentController extends JControllerLegacy
 					$msg = $newly_submitted_item ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
 				
 					// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
-					$link = $this->input->get('referer', JURI::base(), 'string');
+					$link = $this->input->get('referer', JUri::base(), 'string');
 					if ( ! flexicontent_html::is_safe_url($link) )
 					{
 						if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$link, 'notice' );
-						$link = JURI::base();
+						$link = JUri::base();
 					}
 				}
 				break;
@@ -1028,7 +1028,7 @@ class FlexicontentController extends JControllerLegacy
 			$msg = $model->approval( array($cid) );
 		}
 
-		$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base(), $msg );
+		$this->setRedirect( flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base(), $msg );
 	}
 
 
@@ -1317,7 +1317,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$id   = $this->input->get('id', 0, 'int');
@@ -1384,7 +1384,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 
 		$html_tagid  = $this->input->get('tagid', '', 'cmd');
 		$content_id  = $this->input->get('content_id', 0, 'int');
@@ -1488,7 +1488,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 
 		$review_id   = $this->input->get('review_id', 0, 'int');
 		$content_id  = $this->input->get('content_id', 0, 'int');
@@ -1629,7 +1629,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
@@ -2140,7 +2140,7 @@ class FlexicontentController extends JControllerLegacy
 		jimport('joomla.filesystem.file');
 
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -2904,7 +2904,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Import and Initialize some joomla API variables
 		$app   = JFactory::getApplication();
-		$db    = JFactory::getDBO();
+		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 
 		// Get HTTP REQUEST variables
@@ -2992,7 +2992,7 @@ class FlexicontentController extends JControllerLegacy
 		$protocol = parse_url($url, PHP_URL_SCHEME);
 		if (!$protocol)
 		{
-			$url .= (substr($url, 0, 1) == '/')  ?  ''  :  JURI::root(true) . '/';
+			$url .= (substr($url, 0, 1) == '/')  ?  ''  :  JUri::root(true) . '/';
 		}
 
 		// update the hit count
@@ -3215,13 +3215,13 @@ class FlexicontentController extends JControllerLegacy
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$referer = $this->input->get('referer', JURI::base(), 'string');
+		$referer = $this->input->get('referer', JUri::base(), 'string');
 
 		// Check that referer URL is 'safe' (allowed), e.g. not an offsite URL, otherwise set referer to HOME page
 		if ( ! flexicontent_html::is_safe_url($referer) )
 		{
 			if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$referer, 'notice' );
-			$referer = JURI::base();
+			$referer = JUri::base();
 		}
 
 		return $referer;

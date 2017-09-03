@@ -16,18 +16,18 @@ if (!$js_and_css_added)
 	$use_font = $cparams->get('use_font_icons', 1);
 
 	$icon_del_fav = !$use_font
-		? JHTML::image('components/com_flexicontent/assets/images/'.'cancel.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
+		? JHtml::image('components/com_flexicontent/assets/images/'.'cancel.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
 		: '<span class="icon-remove fcfav_icon_delete"></span>';
 	$icon_is_fav = !$use_font
-		? JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
+		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
 		: '<span class="icon-heart fcfav_icon_on"></span>';
 	$icon_not_fav = !$use_font
-		? JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL)
+		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL)
 		: '<span class="icon-heart fcfav_icon_off"></span>';
 
 	$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
 	$icon_disabled_fav = !$use_font
-		? JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs)
+		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $_attribs)
 		: '<span class="icon-heart fcfav_icon_disabled"></span>';
 
 	// Get Favourites field configuration (if FIELD is empty then retrieve it)
@@ -51,7 +51,7 @@ if (!$js_and_css_added)
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	flexicontent_html::loadFramework('flexi-lib');
 
-	$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VHASH);
+	$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VHASH);
 
 	JText::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
 	JText::script('FLEXI_LOADING',true);
@@ -65,7 +65,7 @@ if (!$js_and_css_added)
 	JText::script('FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true);
 	JText::script('FLEXI_TOTAL',true);
 	$document->addScriptDeclaration('
-		var fcfav_rfolder = "'.JURI::root(true).'";
+		var fcfav_rfolder = "'.JUri::root(true).'";
 	');
 
 	$js_and_css_added = true;

@@ -285,7 +285,7 @@ class FlexicontentModelFields extends JModelList
 		$orderby	= trim($this->_buildContentOrderBy());
 		$having		= trim($this->_buildContentHaving());
 		
-		$db =  JFactory::getDBO();
+		$db =  JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select(
 			$this->getState( 'list.select',
@@ -784,7 +784,7 @@ class FlexicontentModelFields extends JModelList
 	{
 		if ( !count( $ids_map ) ) return false;
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		foreach ($ids_map as $source_id => $target_id) {
 			// Copy field - content type assignments
 			$query = 'INSERT INTO #__flexicontent_fields_type_relations (field_id, type_id, ordering)'
@@ -835,13 +835,13 @@ class FlexicontentModelFields extends JModelList
 		$typelist 	= array();
 		
 		if($top) {
-			$typelist[] 	= JHTML::_( 'select.option', '0', JText::_( 'FLEXI_SELECT_TYPE' ) );
+			$typelist[] 	= JHtml::_( 'select.option', '0', JText::_( 'FLEXI_SELECT_TYPE' ) );
 		}
 		
 		foreach ($list as $item) {
-			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
+			$typelist[] = JHtml::_( 'select.option', $item->id, $item->name);
 		}
-		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected );
+		return JHtml::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected );
 	}
 
 	/**

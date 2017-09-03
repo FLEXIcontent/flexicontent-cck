@@ -102,8 +102,8 @@ class JFormFieldFclayout extends JFormFieldList
 		$groups['_']['items'] = array();
 
 		// Prepend some default options based on field attributes.
-		if (!$hideNone)   $groups['_']['items'][] = JHTML::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
-		if (!$hideDefault) $groups['_']['items'][] = JHTML::_('select.option', '', JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideNone)   $groups['_']['items'][] = JHtml::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideDefault) $groups['_']['items'][] = JHtml::_('select.option', '', JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
 		
 		// Get a list of files in the search path with the given filter.
 		$files = JFolder::files($path, $filter);
@@ -118,7 +118,7 @@ class JFormFieldFclayout extends JFormFieldList
 			// If the extension is to be stripped, do it.
 			if ($stripExt)  $file = JFile::stripExt($file);
 			
-			$groups['_']['items'][] = JHTML::_('select.option', $file, $file);
+			$groups['_']['items'][] = JHtml::_('select.option', $file, $file);
 			$module_layouts[] = $file;
 		}
 		// Merge any additional options in the XML definition.
@@ -372,7 +372,7 @@ window.addEvent('domready', function(){
 		$selected = array($this->value);
 
 		// Create form element
-		return JHTML::_('select.groupedlist', $groups, $fieldname,
+		return JHtml::_('select.groupedlist', $groups, $fieldname,
 			array('id' =>  $element_id, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $selected)
 		);
 	}

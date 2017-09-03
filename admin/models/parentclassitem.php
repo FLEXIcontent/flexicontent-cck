@@ -4082,7 +4082,7 @@ class ParentClassItem extends FCModelAdmin
 			return $nConf;
 		}
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nConf = new stdClass();
 
 		// (b) Get Content Type specific notifications (that override global)
@@ -4213,7 +4213,7 @@ class ParentClassItem extends FCModelAdmin
 		if ( !count($notify_emails) ) return true;
 		
 		$app     = JFactory::getApplication();
-		$db      = JFactory::getDBO();
+		$db      = JFactory::getDbo();
 		$user    = JFactory::getUser();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		
@@ -4399,7 +4399,7 @@ class ParentClassItem extends FCModelAdmin
 			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 
 		// Make URL absolute since this URL will be emailed
-		$item_url = JURI::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 
 		// ADD INFO for view/edit link
 		if ( in_array('viewlink',$nf_extra_properties) )
@@ -4420,7 +4420,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$body .= '<b>'.JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . "</b> : <br/>\r\n &nbsp; ";
 			$fc_ctrl_task = 'task=items.edit';
-			$link = JRoute::_( JURI::root().'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id') );
+			$link = JRoute::_( JUri::root().'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id') );
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}

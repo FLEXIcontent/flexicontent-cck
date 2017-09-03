@@ -122,7 +122,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$app->enqueueMessage("Fist record in list does not have any fields that supports CSV export and that are also marked as CSV exportable in their configuration", "notice");
 
 			$referer = @$_SERVER['HTTP_REFERER'];
-			$referer = flexicontent_html::is_safe_url($referer) ? $referer : JURI::base();
+			$referer = flexicontent_html::is_safe_url($referer) ? $referer : JUri::base();
 			$app->redirect($referer);
 		}
 

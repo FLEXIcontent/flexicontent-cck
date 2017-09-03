@@ -77,7 +77,7 @@ class FlexicontentModelTagelement extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}

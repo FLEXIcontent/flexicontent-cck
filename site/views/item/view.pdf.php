@@ -117,7 +117,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($params->get('show_create_date')) {
 			// Display Created Date
 			if (intval($item->created)) {
-				$create_date = JHTML::_('date', $item->created, JText::_( 'DATE_FORMAT_LC2' ));
+				$create_date = JHtml::_('date', $item->created, JText::_( 'DATE_FORMAT_LC2' ));
 				$text .= $create_date;
 			}
 		}
@@ -130,7 +130,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($params->get('show_modify_date')) {
 			// Display Modified Date
 			if (intval($item->modified)) {
-				$mod_date = JHTML::_('date', $item->modified);
+				$mod_date = JHtml::_('date', $item->modified);
 				$text .= JText::_( 'FLEXI_LAST_REVISED' ).' '.$mod_date;
 			}
 		}

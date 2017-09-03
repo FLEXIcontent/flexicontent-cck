@@ -72,16 +72,16 @@ class JFormFieldMicrodatatype extends JFormField {
 			$prompt_text = StringHelper::strtoupper($prompt_text). ' ... '. $this->_inherited;
 		}
 		$options = array();
-		$options[] = JHTML::_('select.option', '', $prompt_text);
+		$options[] = JHtml::_('select.option', '', $prompt_text);
 
 		foreach($types as $v) :
 			## Create $value ##
 			if (!$v) continue;
-			$options[] = JHTML::_('select.option', $v, $v);
+			$options[] = JHtml::_('select.option', $v, $v);
 		endforeach;
 
 		## Create <select name="icons" class="inputbox"></select> ##
-		$dropdown = JHTML::_('select.genericlist', $options, $this->name, 'class="use_select2_lib"', 'value', 'text', $this->value, $this->id);
+		$dropdown = JHtml::_('select.genericlist', $options, $this->name, 'class="use_select2_lib"', 'value', 'text', $this->value, $this->id);
 
 		## Output created <select> list ##
 		return $dropdown;

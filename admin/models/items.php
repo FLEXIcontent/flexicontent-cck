@@ -650,7 +650,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$item_ids = array();
 		foreach($this->_data as $item) $item_ids[] = $item->id;
 		$field_ids = array_keys($this->_extra_cols);
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
 				.' FROM #__flexicontent_fields_item_relations'
 				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
@@ -892,7 +892,7 @@ class FlexicontentModelItems extends JModelLegacy
 	function updateItemCountingData($rows = false)
 	{
 		$app = JFactory::getApplication();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
@@ -2154,7 +2154,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$lang->load('com_messages');
 		
 		$ctrl_task = FLEXI_J16GE ? '&task=items.edit' : '&controller=items&task=edit';
-		$item->url = JURI::base() . 'index.php?option=com_flexicontent'.$ctrl_task .'&cid[]=' . $item->id;
+		$item->url = JUri::base() . 'index.php?option=com_flexicontent'.$ctrl_task .'&cid[]=' . $item->id;
 
 		foreach ($users as $user)
 		{

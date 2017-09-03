@@ -308,7 +308,7 @@ if ( $format == 'html' )
 	}
 	
 	// Add flexi-lib JS
-	//JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
+	//JFactory::getDocument()->addScriptVersion( JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
 	
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '
@@ -322,7 +322,7 @@ if ( $format == 'html' )
 
 	// Load icomoon CSS
 	if ( $cparams->get('loadfw_icomoon_css', 2)==1 )
-		JFactory::getDocument()->addStyleSheet(JURI::root(true).'/media/jui/css/icomoon.css');
+		JFactory::getDocument()->addStyleSheet(JUri::root(true).'/media/jui/css/icomoon.css');
 }
 
 

@@ -86,7 +86,7 @@ class FlexicontentlinksItems extends JObject {
 
 		if ($view && $view!='category') return array();
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// Add categories
 		$query	= $db->getQuery(true);

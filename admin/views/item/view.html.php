@@ -70,7 +70,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$config     = JFactory::getConfig();
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
-		$db         = JFactory::getDBO();
+		$db         = JFactory::getDbo();
 		$uri        = JUri::getInstance();
 		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
@@ -145,7 +145,7 @@ class FlexicontentViewItem extends JViewLegacy
 		if (!$form)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');
-			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JURI::base();
+			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
 			$app->redirect( $returnURL );
 		}
 
@@ -228,14 +228,14 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Fields common CSS
-		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
 		$has_J2S = JPluginHelper::isEnabled('content', 'j2store');
@@ -257,15 +257,15 @@ class FlexicontentViewItem extends JViewLegacy
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 
 
 		// ***
@@ -571,7 +571,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** SET INTO THE FORM, parameter values for various parameter groups
 		// ***
 
-		if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
+		if ( JHtml::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
 		{
 			$item->publish_down = '';//JText::_( 'FLEXI_NEVER' );
 			$form->setValue('publish_down', null, ''/*JText::_( 'FLEXI_NEVER' )*/);  // Setting to text will break form date element 
@@ -695,7 +695,7 @@ class FlexicontentViewItem extends JViewLegacy
 	{
 		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$user     = JFactory::getUser();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
@@ -847,7 +847,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$elementid = 'jform_state';
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		$lists['state'] = JHTML::_('select.groupedlist', $state, $fieldname,
+		$lists['state'] = JHtml::_('select.groupedlist', $state, $fieldname,
 			array('id' => $elementid, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $item->state)
 		);
 
@@ -862,10 +862,10 @@ class FlexicontentViewItem extends JViewLegacy
 			$elementid = 'jform_featured';
 			/*
 			$options = array();
-			$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
-			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
+			$options[] = JHtml::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+			$options[] = JHtml::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
 			$attribs = '';
-			$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
+			$lists['featured'] = JHtml::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
 			*/
 			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 			$attribs = ' class="'.$classes.'" ';
@@ -890,10 +890,10 @@ class FlexicontentViewItem extends JViewLegacy
 		$elementid = 'jform_vstate';
 		/*
 		$options = array();
-		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-		$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+		$options[] = JHtml::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$options[] = JHtml::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
 		$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-		$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		$lists['vstate'] = JHtml::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
 		*/
 		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 		$attribs = ' class="'.$classes.'" ';
@@ -1130,10 +1130,10 @@ class FlexicontentViewItem extends JViewLegacy
 			$elementid = 'jform_attribs_comments';
 			/*
 			$options = array();
-			$options[] = JHTML::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
-			$options[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
+			$options[] = JHtml::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
+			$options[] = JHtml::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
 			$attribs = '';
-			$lists['disable_comments'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
+			$lists['disable_comments'] = JHtml::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
 			*/
 			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 			$attribs = ' class="'.$classes.'" ';

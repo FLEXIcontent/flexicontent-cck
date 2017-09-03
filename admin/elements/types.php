@@ -45,7 +45,7 @@ class JFormFieldTypes extends JFormField
 	function getInput()
 	{
 		$doc = JFactory::getDocument();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -73,9 +73,9 @@ class JFormFieldTypes extends JFormField
 			$attribs .= @ $attributes['size'] ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
 			if ( @ $attributes['user_selection'] )
-				array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_MENU_ALLOW_CONTENT_TYPE_SELECTION')));
+				array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_MENU_ALLOW_CONTENT_TYPE_SELECTION')));
 			else
-				array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+				array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 		}
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
@@ -84,6 +84,6 @@ class JFormFieldTypes extends JFormField
 			$attribs .= ' class="'.$class.'"';
 		}
 
-		return JHTML::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

@@ -36,7 +36,7 @@ class modFlexicontentHelper
 		global $modfc_jprof, $mod_fc_run_times;
 		
 		$forced_itemid = $params->get('forced_itemid');
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
 
@@ -125,8 +125,8 @@ class modFlexicontentHelper
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-			$thumb_default = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+			$thumb_default = JUri::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			
 			// Default image standard
 			$h		= '&amp;h=' . $mod_height_feat;
@@ -139,8 +139,8 @@ class modFlexicontentHelper
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-			$thumb_default_feat = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+			$thumb_default_feat = JUri::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		
 		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
@@ -357,13 +357,13 @@ class modFlexicontentHelper
 		// *** OPTIMIZATION: we should create some variables outside the loop ... TODO MORE
 		if (($display_hits_feat || $display_hits) && $has_access_hits) {
 			$hits_icon = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
-				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
+				JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
+				JHtml::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 		}
 		if ($display_comments_feat || $display_comments) {
 			$comments_icon = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
-				JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
+				JHtml::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
+				JHtml::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 		}
 		
 		$id = $jinput->get('id', 0, 'int');   // id of current item
@@ -439,7 +439,7 @@ class modFlexicontentHelper
 							{
 								if ($mod_use_image_feat==1)
 								{
-									$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0]);
+									$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src['large'][0]);
 								}
 								else
 								{
@@ -472,8 +472,8 @@ class modFlexicontentHelper
 							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 							
-    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+    					$thumb = JUri::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		    		}
 					}
 					$lists[$ord]['featured'][$i] = new stdClass();
@@ -494,12 +494,12 @@ class modFlexicontentHelper
 	 			  	$lists[$ord]['featured'][$i]->date_created = "";
 						if (in_array('created',$date_fields_feat)) { // Created
 							$lists[$ord]['featured'][$i]->date_created .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_CREATED').'</span> ' : '';
-							$lists[$ord]['featured'][$i]->date_created .= '<span class="date_value_feat">' . JHTML::_('date', $row->created, $dateformat) . '</span>';
+							$lists[$ord]['featured'][$i]->date_created .= '<span class="date_value_feat">' . JHtml::_('date', $row->created, $dateformat) . '</span>';
 						}
 	 			  	$lists[$ord]['featured'][$i]->date_modified = "";
 						if (in_array('modified',$date_fields_feat)) { // Modified
 							$lists[$ord]['featured'][$i]->date_modified .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_MODIFIED').'</span> ' : '';
-							$modified_date = ($row->modified != $db->getNullDate()) ? JHTML::_('date', $row->modified, $dateformat) : JText::_( 'FLEXI_DATE_NEVER' );
+							$modified_date = ($row->modified != $db->getNullDate()) ? JHtml::_('date', $row->modified, $dateformat) : JText::_( 'FLEXI_DATE_NEVER' );
 							$lists[$ord]['featured'][$i]->date_modified .= '<span class="date_value_feat">' . $modified_date . '</span>';
 						}
 					}
@@ -592,7 +592,7 @@ class modFlexicontentHelper
 							{
 								if ($mod_use_image==1)
 								{
-									$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
+									$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src['large'][0] );
 								}
 								else
 								{
@@ -625,8 +625,8 @@ class modFlexicontentHelper
 							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 							
-    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-    					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+    					$thumb = JUri::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		    		}
 					}
 					
@@ -650,12 +650,12 @@ class modFlexicontentHelper
 	 			  	$lists[$ord]['standard'][$i]->date_created = "";
 						if (in_array('created',$date_fields)) { // Created
 							$lists[$ord]['standard'][$i]->date_created .= $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_CREATED').'</span> ' : '';
-							$lists[$ord]['standard'][$i]->date_created .= '<span class="date_value">' . JHTML::_('date', $row->created, $dateformat) . '</span>';
+							$lists[$ord]['standard'][$i]->date_created .= '<span class="date_value">' . JHtml::_('date', $row->created, $dateformat) . '</span>';
 						}
 	 			  	$lists[$ord]['standard'][$i]->date_modified = "";
 						if (in_array('modified',$date_fields)) { // Modified
 							$lists[$ord]['standard'][$i]->date_modified .= $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_MODIFIED').'</span> ' : '';
-							$modified_date = ($row->modified != $db->getNullDate()) ? JHTML::_('date', $row->modified, $dateformat) : JText::_( 'FLEXI_DATE_NEVER' );
+							$modified_date = ($row->modified != $db->getNullDate()) ? JHtml::_('date', $row->modified, $dateformat) : JText::_( 'FLEXI_DATE_NEVER' );
 							$lists[$ord]['standard'][$i]->date_modified .= '<span class="date_value_feat">' . $modified_date . '</span>';
 						}
 					}
@@ -755,7 +755,7 @@ class modFlexicontentHelper
 		}
 
 		// Initialize variables
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
 
@@ -852,7 +852,7 @@ class modFlexicontentHelper
 		$nullDate	= $db->getNullDate();
 		if ($use_local_time)
 		{
-			$nowDate = JHTML::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
+			$nowDate = JHtml::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
 		}
 
 		// Server date
@@ -2001,7 +2001,7 @@ class modFlexicontentHelper
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$app  = JFactory::getApplication();
 
 		$jinput  = $app->input;
@@ -2122,7 +2122,7 @@ class modFlexicontentHelper
 
 				if ( $catconf->image_source && $catdata->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image ) )
 				{
-					$src = JURI::base(true)."/".$joomla_image_path."/".$catdata->image;
+					$src = JUri::base(true)."/".$joomla_image_path."/".$catdata->image;
 
 					$h		= '&amp;h=' . $catconf->image_height;
 					$w		= '&amp;w=' . $catconf->image_width;
@@ -2133,7 +2133,7 @@ class modFlexicontentHelper
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-					$catimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$catimage = JUri::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				}
 				else if ( $catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata) )
 				{
@@ -2146,8 +2146,8 @@ class modFlexicontentHelper
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-					$catimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+					$catimage = JUri::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				}
 
 				$catdata->image = $catimage;
@@ -2219,7 +2219,7 @@ class modFlexicontentHelper
 	 */
 	public static function getComments(&$params, &$items)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$list_comments = $params->get('list_comments');
 		$list_comments_feat = $params->get('list_comments_feat');

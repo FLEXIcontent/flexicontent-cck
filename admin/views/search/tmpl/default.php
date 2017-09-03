@@ -182,18 +182,18 @@ function delAllFilters() {
 				<label for="checkall-toggle" class="green single"></label>
 			</th-->
 
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left title"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_TITLE'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left title"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_ITEM_TITLE'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			
 			<?php if ($this->isADV) : ?>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'f.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'f.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<?php endif; ?>
 			
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -223,7 +223,7 @@ function delAllFilters() {
 				<?php echo $this->pagination->getRowOffset( $i ); ?>
 			</td>
 			<!--td>
-				<?php echo JHTML::_('grid.id', $i, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
+				<?php echo JHtml::_('grid.id', $i, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td-->
 			<td>
@@ -287,7 +287,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

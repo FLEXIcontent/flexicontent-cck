@@ -45,7 +45,7 @@ class JFormFieldFcpositions extends JFormField
 	protected function getInput()
 	{
 		$doc = JFactory::getDocument();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -77,6 +77,6 @@ class JFormFieldFcpositions extends JFormField
 		
 		$attribs = '';
 		
-		return JHTML::_('select.genericlist', $positions, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $positions, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

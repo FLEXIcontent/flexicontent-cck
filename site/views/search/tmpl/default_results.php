@@ -152,7 +152,7 @@ if ( $use_infoflds && count($infoflds) ) {
 			if (!empty($img_field_name)) :
 				FlexicontentFields::getFieldDisplay($fcitems[$i], $img_field_name, $values=null, $method='display');
 				$img_field = & $fcitems[$i]->fields[$img_field_name];
-				$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+				$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 			else :
 				$src = flexicontent_html::extractimagesrc($fcitems[$i]);
 			endif;
@@ -170,8 +170,8 @@ if ( $use_infoflds && count($infoflds) ) {
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;

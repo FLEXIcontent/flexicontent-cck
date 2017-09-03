@@ -352,7 +352,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				// Use indexes of existing values to keep track of field values being re-ordered, this (partly) avoids form tampering
 				if ($value) {
 					try {
-						$timestamp = '<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_existing">'. JHTML::_('date', $value, $dateformat, $timezone ).$tz_info.'</span> ';
+						$timestamp = '<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_existing">'. JHtml::_('date', $value, $dateformat, $timezone ).$tz_info.'</span> ';
 					} catch ( Exception $e ) {
 						$timestamp = '';
 					}
@@ -456,7 +456,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		{
 			static $nullDate, $never_date;
 			if ($nullDate == null) {
-				$nullDate = JFactory::getDBO()->getNullDate();
+				$nullDate = JFactory::getDbo()->getNullDate();
 				$never_date = ''; //JText::_('FLEXI_NEVER');
 			}
 			
@@ -715,7 +715,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$filter->date_valformat = $date_valformat;
 		$filter->date_txtformat = $date_txtformat;
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$nullDate_quoted = $db->Quote($db->getNullDate());
 
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
@@ -894,7 +894,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$values = null;
 		} else {
 			$values = array();
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			if ( $date_source==1 || $date_source==2 ) {
 				$post = array($date_source == 1 ? $item->publish_up : $item->publish_down);
 			}

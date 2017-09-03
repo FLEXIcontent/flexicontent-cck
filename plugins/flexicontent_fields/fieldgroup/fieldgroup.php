@@ -50,7 +50,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
 		$isAdmin = $app->isAdmin();
@@ -825,7 +825,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			return $grouped_fields[$field->id] = array();  
 		}
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT f.* '
 			. ' FROM #__flexicontent_fields AS f '
 			. ' WHERE f.published = 1'

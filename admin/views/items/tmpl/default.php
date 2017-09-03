@@ -37,7 +37,7 @@ $btn_class = 'btn';  //'fc_button fcsimple';
 $ico_class   = 'fc-man-icon-s';
 $btn_s_class = 'btn btn-small';
 
-$featimg = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
+$featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; ';
 $end_text = '<div class="icon-arrow-up-2 btn" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -49,7 +49,7 @@ $ctrl  = 'items.';
 $items_task = 'task=items.';
 $cats_task  = 'task=category.';
 
-$db 			= JFactory::getDBO();
+$db 			= JFactory::getDbo();
 $config		= JFactory::getConfig();
 $nullDate	= $db->getNullDate();
 $user 		= JFactory::getUser();
@@ -91,11 +91,11 @@ $attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
 $image_preview = 0
-	? JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
+	? JHtml::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
 	: '<span class="icon-screen"></span>';
 
 $image_editlayout = 0
-	? JHTML::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"')
+	? JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"')
 	: '<span class="icon-edit"></span>';
 
 
@@ -171,7 +171,7 @@ $tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 $tz_info .= ' ('.$user_zone.')';
 $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 $date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
-//$date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
+//$date_zone_tip   = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
 
 
@@ -659,7 +659,7 @@ jQuery(document).ready(function(){
 			<th class="hideOnDemandClass left nowrap">
 				<?php
 				echo $this->CanOrder ? $image_ordering_tip : '';
-				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHTML::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
+				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHtml::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
 
 				/*if ($this->CanOrder && $this->reOrderingActive) :
 					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
@@ -674,7 +674,7 @@ jQuery(document).ready(function(){
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_STATUS', 'i.state', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'i.state', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
@@ -683,7 +683,7 @@ jQuery(document).ready(function(){
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('search');document.adminForm.submit();" />
@@ -692,7 +692,7 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'i.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'i.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_author) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_author');document.adminForm.submit();" />
@@ -701,7 +701,7 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
@@ -716,7 +716,7 @@ jQuery(document).ready(function(){
 		<?php endif; ?>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
@@ -735,7 +735,7 @@ jQuery(document).ready(function(){
 		<?php endforeach; ?>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_access) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_access');document.adminForm.submit();" />
@@ -763,7 +763,7 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_CREATED', 'i.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_CREATED', 'i.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
@@ -778,7 +778,7 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_REVISED', 'i.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_REVISED', 'i.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
@@ -793,19 +793,19 @@ jQuery(document).ready(function(){
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'JGLOBAL_HITS', 'i.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'JGLOBAL_HITS', 'i.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="left hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'JGRID_HEADING_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
@@ -1156,11 +1156,11 @@ jQuery(document).ready(function(){
 			</td>
 
 			<td class="col_created">
-				<?php echo JHTML::_('date',  $row->created, $date_format ); ?>
+				<?php echo JHtml::_('date',  $row->created, $date_format ); ?>
 			</td>
 
 			<td class="col_revised">
-				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHTML::_('date', $row->modified, $date_format) : $_NEVER_; ?>
+				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHtml::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
 
 			<td>
@@ -1243,7 +1243,7 @@ jQuery(document).ready(function(){
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 	</form>
 

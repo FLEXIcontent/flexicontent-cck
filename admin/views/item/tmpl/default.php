@@ -39,8 +39,8 @@ $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class_be', '');
 $noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
-$hint_image = '<i class="icon-info"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
-$warn_image = '<i class="icon-warning"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$hint_image = '<i class="icon-info"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = '<i class="icon-warning"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
 $add_on_class    = $this->params->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -53,19 +53,19 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js_be'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_be'));
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ($this->perms['cantags'] || $this->perms['canversion'])
 {
-	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
-	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
-	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
-	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', FLEXI_VHASH);     // e.g. pagination for item versions
-	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
+	//$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
+	//$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
+	//$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
+	$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', FLEXI_VHASH);     // e.g. pagination for item versions
+	$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
 
-	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
+	//$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
 
 	JText::script("FLEXI_DELETE_TAG", true);
 	JText::script("FLEXI_ENTER_TAG", true);
@@ -116,7 +116,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 					var term = request.term;
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&". JSession::getFormToken() ."=1',
+						url: '".JUri::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: request.term
@@ -197,7 +197,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 			}
 			
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, '".JURI::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
+			tag.addtag( id, tagname, '".JUri::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
 		}
 		
 		function deleteTag(obj)
@@ -209,7 +209,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 		
 		
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->item->id."&active=".$this->item->version."&". JSession::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
+			jQuery.ajax({ url: '".JUri::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->item->id."&active=".$this->item->version."&". JSession::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
 				jQuery(this).html(\"\\
 				<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
 				\"+str+\"\\
@@ -271,7 +271,7 @@ $this->document->addScriptDeclaration("
 	function reseter(task, id, div){
 		var res = new itemscreen();
 		task = '".$ctrl_items."' + task;
-		res.reseter( task, id, div, '".JURI::base(true)."/index.php?option=com_flexicontent&controller=items' );
+		res.reseter( task, id, div, '".JUri::base(true)."/index.php?option=com_flexicontent&controller=items' );
 	}
 	
 	function clickRestore(link) {
@@ -285,10 +285,10 @@ $this->document->addScriptDeclaration("
 
 
 // Create info images
-$infoimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ) );
-$revertimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
-$viewimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
-$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
+$infoimage    = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ) );
+$revertimage  = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
+$viewimage    = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
+$commentimage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
 
 // Create some variables
 $itemlang = substr($this->item->language ,0,2);
@@ -1670,7 +1670,7 @@ if ( count($FC_jfields_html) ) : ?>
 				if ( $this->item->created == $this->nullDate ) {
 					echo JText::_( 'FLEXI_NEW_ITEM' );
 				} else {
-					echo JHTML::_('date',  $this->item->created,  JText::_( 'DATE_FORMAT_LC2' ) );
+					echo JHtml::_('date',  $this->item->created,  JText::_( 'DATE_FORMAT_LC2' ) );
 				}
 				?>
 			</td>
@@ -1692,7 +1692,7 @@ if ( count($FC_jfields_html) ) : ?>
 					if ( $this->item->modified == $this->nullDate ) {
 						echo JText::_( 'FLEXI_NOT_MODIFIED' );
 					} else {
-						echo JHTML::_('date',  $this->item->modified, JText::_( 'DATE_FORMAT_LC2' ));
+						echo JHtml::_('date',  $this->item->modified, JText::_( 'DATE_FORMAT_LC2' ));
 					}
 				?>
 			</td>
@@ -1736,12 +1736,12 @@ if ( count($FC_jfields_html) ) : ?>
 				?>
 				<tr<?php echo $class; ?>>
 					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->item->created : $version->date), $date_format ); ?></span></td>
+					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHtml::_('date', (($version->nr == 1) ? $this->item->created : $version->date), $date_format ); ?></span></td>
 					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->item->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 					<td class="versions"><a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $commentimage;?></a>
 					<?php
 					if((int)$version->nr==(int)$this->item->current_version) { ?>
-						<a onclick="javascript:return clickRestore('<?php echo JURI::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;cid=<?php echo $this->item->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+						<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;cid=<?php echo $this->item->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 					<?php }else{
 					?>
 						<a class="modal-versions"
@@ -1750,7 +1750,7 @@ if ( count($FC_jfields_html) ) : ?>
 						>
 							<?php echo $viewimage; ?>
 						</a>
-						<a onclick="javascript:return clickRestore('<?php echo JURI::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=<?php echo $this->item->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
+						<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=<?php echo $this->item->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
 							href="javascript:;"
 							title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
 						>
@@ -1793,7 +1793,7 @@ if ( count($FC_jfields_html) ) : ?>
 <?php $tabSetCnt = array_pop($tabSetStack); ?>
 
 
-<?php echo JHTML::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="jform[id]" value="<?php echo $this->item->id; ?>" />
 <input type="hidden" name="controller" value="items" />
@@ -1808,5 +1808,5 @@ if ( count($FC_jfields_html) ) : ?>
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

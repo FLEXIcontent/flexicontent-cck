@@ -47,6 +47,6 @@ class JFormFieldBooleanlist extends JFormField
 		// Initialize some field attributes.
 		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 
-		return JHTML::_('select.booleanlist', $this->name, $attr, $this->value );
+		return JHtml::_('select.booleanlist', $this->name, $attr, $this->value );
 	}
 }

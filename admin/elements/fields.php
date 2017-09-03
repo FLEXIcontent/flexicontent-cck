@@ -60,7 +60,7 @@ class JFormFieldFields extends JFormField
 		
 		$app  = JFactory::getApplication();
 		$doc	= JFactory::getDocument();
-		$db		= JFactory::getDBO();
+		$db		= JFactory::getDbo();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		
 		$node = & $this->element;
@@ -286,8 +286,8 @@ class JFormFieldFields extends JFormField
 			
 			if ((boolean) @ $attributes['display_useglobal'] && !$issortable)
 			{
-				array_unshift($options, JHTML::_('select.option', '' , '- '.JText::_('FLEXI_USE_GLOBAL').' -'));
-				array_unshift($options, JHTML::_('select.option', '0', '- '.JText::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
+				array_unshift($options, JHtml::_('select.option', '' , '- '.JText::_('FLEXI_USE_GLOBAL').' -'));
+				array_unshift($options, JHtml::_('select.option', '0', '- '.JText::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
 			}
 			
 			else
@@ -296,7 +296,7 @@ class JFormFieldFields extends JFormField
 				$custom_prompt = JText::_($custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT');
 				$custom_value = isset($attributes['custom_value']) ? (string) @ $attributes['custom_value'] : ($issortable ? '' : '0');
 				
-				array_unshift($options, JHTML::_('select.option', $custom_value, '- '.$custom_prompt.' -'));
+				array_unshift($options, JHtml::_('select.option', $custom_value, '- '.$custom_prompt.' -'));
 			}
 		}
 		
@@ -362,8 +362,8 @@ class JFormFieldFields extends JFormField
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class'];
 			$tip_class .= ' hasTooltip';
-			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
+			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
 		
@@ -376,7 +376,7 @@ class JFormFieldFields extends JFormField
 		<div class="container_fcfield-inner">
 			' : '').
 			
-			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id).'
+			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id).'
 			'.$tip_text.'
 			'.$sorter_html
 		

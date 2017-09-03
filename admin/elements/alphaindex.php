@@ -54,7 +54,7 @@ class JFormFieldAlphaindex extends JFormField
 	function getInput()
 	{
 		$doc  = JFactory::getDocument();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -101,6 +101,6 @@ class JFormFieldAlphaindex extends JFormField
 
 		$doc->addScriptDeclaration($js);
 		
-		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }

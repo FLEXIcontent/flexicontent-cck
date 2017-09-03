@@ -56,11 +56,11 @@ if($this->check['connect'] == 0) {
 			<td colspan="2" style="text-align: center;">
 			<?php
 				if ($this->check['current'] == 0 ) {		  				
-					echo JHTML::image( 'components/com_flexicontent/assets/images/'.'accept.png', JText::_('FLEXI_LATEST_VERSION_INSTALLED'),  '');
+					echo JHtml::image( 'components/com_flexicontent/assets/images/'.'accept.png', JText::_('FLEXI_LATEST_VERSION_INSTALLED'),  '');
 				} elseif( $this->check['current'] == -1 ) {
-					echo JHTML::image( 'components/com_flexicontent/assets/images/'.'note.gif', JText::_('FLEXI_OLD_VERSION_INSTALLED'),  '');
+					echo JHtml::image( 'components/com_flexicontent/assets/images/'.'note.gif', JText::_('FLEXI_OLD_VERSION_INSTALLED'),  '');
 				} else {
-					echo JHTML::image( 'components/com_flexicontent/assets/images/'.'note.gif', JText::_('You have installed a newer version than the latest officially stable version'),  '');
+					echo JHtml::image( 'components/com_flexicontent/assets/images/'.'note.gif', JText::_('You have installed a newer version than the latest officially stable version'),  '');
 				}
 			?> &nbsp;
 			<?php
@@ -100,7 +100,7 @@ if($this->check['connect'] == 0) {
 					try {
 						$timezone = 'UTC';
 						$dateformat = 'Y-m-d';
-						$date = JHTML::_('date', $this->check['current_creationDate'], $dateformat, $timezone );
+						$date = JHtml::_('date', $this->check['current_creationDate'], $dateformat, $timezone );
 					} catch ( Exception $e ) {
 						$date = $this->check['current_creationDate'];
 					}

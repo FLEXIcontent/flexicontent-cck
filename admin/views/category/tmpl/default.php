@@ -21,11 +21,11 @@ defined('_JEXEC') or die('Restricted access');
 $useAssocs = flexicontent_db::useAssociations();
 
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
@@ -573,7 +573,7 @@ $this->document->addScriptDeclaration($js);
 	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<?php echo $this->form->getInput('extension'); ?>
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 </form>
 </div><!-- id:flexicontent -->

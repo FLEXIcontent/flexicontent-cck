@@ -117,7 +117,7 @@ class flexicontent_html
 
 	static function gridOrderBtn($rows, $image = 'filesave.png', $task = 'saveorder')
 	{
-		//return str_replace('rel="tooltip"', '', JHTML::_('grid.order', $rows, $image, $task));
+		//return str_replace('rel="tooltip"', '', JHtml::_('grid.order', $rows, $image, $task));
 		return '<a href="javascript:saveorder('
 			. (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn btn-small btn-primary pull-right"><span class="icon-menu-2"></span> '.JText::_('JLIB_HTML_SAVE_ORDER') .'</a>';
 	}
@@ -171,7 +171,7 @@ class flexicontent_html
 		// Get global include folders
 		if ($check_global) {
 			if ($less_folders===null) {
-				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDBO()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
+				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDbo()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
 				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less/ :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
 				$_reps = array(
 					'JPATH_COMPONENT_SITE' => JPATH_SITE.DS.'components'.DS.'com_flexicontent', 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent',
@@ -434,7 +434,7 @@ class flexicontent_html
 				{
 					$fc_columnchooser = new stdClass();
 					$fc_columnchooser->vhash = FLEXI_VHASH;
-					$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JURI::base(true), '');
+					$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
 				}
 				else if (isset($fc_columnchooser->$data_tbl_id))
 				{
@@ -449,7 +449,7 @@ class flexicontent_html
 			{
 				$fc_columnchooser = new stdClass();
 				$fc_columnchooser->vhash = FLEXI_VHASH;
-				$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JURI::base(true), '');
+				$jinput->cookie->set('fc_columnchooser', json_encode($fc_columnchooser), time()+60*60*24*30, JUri::base(true), '');
 				$columnchoose = null;
 			}
 		}
@@ -510,11 +510,11 @@ class flexicontent_html
 
 		// Require baseonly internal url: (HOST only)
 		if ( $baseonly || $allowed_redirecturls == 'internal_base' )
-			return flexicontent_html::get_basedomain($url) == flexicontent_html::get_basedomain(JURI::base());
+			return flexicontent_html::get_basedomain($url) == flexicontent_html::get_basedomain(JUri::base());
 
 		// Require full internal url: (HOST + this JOOMLA folder)
 		else // if ( $allowed_redirecturls == 'internal_full' )
-			return parse_url($url, PHP_URL_HOST) == parse_url(JURI::base(), PHP_URL_HOST);
+			return parse_url($url, PHP_URL_HOST) == parse_url(JUri::base(), PHP_URL_HOST);
 
 		// Allow any URL, (external too) this may be considered a vulnerability for unlogged/logged users, since
 		// users may be redirected to an offsite URL despite clicking an internal site URL received e.g. by an email
@@ -681,7 +681,7 @@ class flexicontent_html
 			$outside_label = '<span class="flexi label limit_override_label">'.JText::_('FLEXI_PER_PAGE').'</span>';
 		}
 
-		return $outside_label.JHTML::_('select.genericlist', $limiting, 'limit', $attribs);
+		return $outside_label.JHtml::_('select.genericlist', $limiting, 'limit', $attribs);
 	}
 
 
@@ -742,7 +742,7 @@ class flexicontent_html
 		foreach ($extra_order_types as $value => $text)
 		{
 			$text = JText::_( $text );
-			//$ordering[] = JHTML::_('select.option',  $value,  $text);
+			//$ordering[] = JHtml::_('select.option',  $value,  $text);
 			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
 			$ordering[] = array(
 				'value' => $value,
@@ -755,7 +755,7 @@ class flexicontent_html
 			if ($orderby_option=='__SAVED__') continue;
 			$value = ($orderby_option!='_preconfigured_') ? $orderby_option : '';
 			$text = JText::_( $orderby_names[$orderby_option] );
-			//$ordering[] = JHTML::_('select.option',  $value,  $text);
+			//$ordering[] = JHtml::_('select.option',  $value,  $text);
 			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
 			$ordering[] = array(
 				'value' => $value,
@@ -796,7 +796,7 @@ class flexicontent_html
 			} else {
 				$text = JText::_( $field->label ) .' '. JText::_(strtolower($op[2])=='asc' ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
 			}
-			//$ordering[] = JHTML::_('select.option', $value,  $text);
+			//$ordering[] = JHtml::_('select.option', $value,  $text);
 			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
 			$ordering[] = array(
 				'value' => $value,
@@ -805,7 +805,7 @@ class flexicontent_html
 			);
 		}
 
-		return JHTML::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs);
+		return JHtml::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs);
 	}
 
 
@@ -886,7 +886,7 @@ class flexicontent_html
 			foreach($layout_names as $layout_name)
 			{
 				$layout_title = !empty($layout_texts->$layout_name->title)  ?  $layout_texts->$layout_name->title  :  $layout_name;
-				//$options[] = JHTML::_('select.option', $layout_name, $layout_title .$inside_label);
+				//$options[] = JHtml::_('select.option', $layout_name, $layout_title .$inside_label);
 				$attr_arr = $default_layout == $layout_name ? array('data-is-default-value' => '1') : array();
 				$options[] = array(
 					'value' => $layout_name,
@@ -894,7 +894,7 @@ class flexicontent_html
 					'attr'  => $attr_arr
 				);
 			}
-			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs);
+			$html = JHtml::_('select.genericlist', $options, $layout_type, $attribs);
 		}
 		else
 		{
@@ -945,7 +945,7 @@ class flexicontent_html
 				$_obj->text  = $searchphrase_name;
 				$searchphrases[] = $_obj;
 			}
-			$searchphrase = JHTML::_('select.genericlist', $searchphrases, 'p',
+			$searchphrase = JHtml::_('select.genericlist', $searchphrases, 'p',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text',
 				$searchphrase, 'searchphrase', $_translate=true
 			);
@@ -991,10 +991,10 @@ class flexicontent_html
 			} else {
 				FLEXI_J30GE ?
 					JHtml::_('jquery.framework') :
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
+					$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
 			}
 			// The 'noConflict()' statement must be inside a js file, to make sure it executed immediately
-			if (!FLEXI_J30GE) $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-no-conflict.js');
+			if (!FLEXI_J30GE) $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-no-conflict.js');
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');  // not placed in proper place
 			$jquery_added = 1;
 		}
@@ -1012,12 +1012,12 @@ class flexicontent_html
 			} else {
 				if (FLEXI_J30GE) {
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
-					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
-					if ( !$params || $params->get('load-ui-menu', 1) )          $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
-					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
-					if ( !$params || $params->get('load-ui-progressbar', 1) )   $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.progressbar.min.js');
+					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
+					if ( !$params || $params->get('load-ui-menu', 1) )          $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
+					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+					if ( !$params || $params->get('load-ui-progressbar', 1) )   $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.progressbar.min.js');
 				} else {
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
+					$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
 				}
 			}
 			$jquery_ui_added = 1;
@@ -1029,7 +1029,7 @@ class flexicontent_html
 			if ($add_remote) {
 				$document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
 			} else {
-				$document->addStyleSheet(JURI::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+				$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 			}
 			$jquery_ui_css_added = 1;
 		}
@@ -1105,7 +1105,7 @@ class flexicontent_html
 		{
 			if ( method_exists($document, 'addCustomTag') ) $document->addCustomTag('
 				<!--[if IE 8]>
-				<link href="'.JURI::root(true).'/components/com_flexicontent/assets/css/ie8.css?' . FLEXI_VHASH . '" rel="stylesheet" />
+				<link href="'.JUri::root(true).'/components/com_flexicontent/assets/css/ie8.css?' . FLEXI_VHASH . '" rel="stylesheet" />
 				<![endif]-->
 			');
 			$specific_browser_support = true;
@@ -1115,9 +1115,9 @@ class flexicontent_html
 		if ( $shared_js_added === null )
 		{
 			$js .= "
-				var jbase_url_fc = ".json_encode(JURI::base()).";
-				var jroot_url_fc = ".json_encode(JURI::root()).";
-				var jclient_path_fc = ".json_encode(JURI::base(true)).";
+				var jbase_url_fc = ".json_encode(JUri::base()).";
+				var jroot_url_fc = ".json_encode(JUri::root()).";
+				var jclient_path_fc = ".json_encode(JUri::base(true)).";
 			";
 			$shared_js_added = true;
 		}
@@ -1134,14 +1134,14 @@ class flexicontent_html
 				if ($isMobile)
 				{
 					if ($load_jquery) flexicontent_html::loadJQuery();
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
+					$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
 				}
 				break;
 
 			case 'mCSB':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/mCSB';
+				$framework_path = JUri::root(true).$lib_path.'/mCSB';
 				$document->addScript($framework_path.'/jquery.mCustomScrollbar.min.js');
 				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.css');
 				$js .= "
@@ -1162,13 +1162,13 @@ class flexicontent_html
 			case 'image-picker':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/image-picker';
+				$framework_path = JUri::root(true).$lib_path.'/image-picker';
 				$document->addScript($framework_path.'/image-picker.min.js');
 				$document->addStyleSheet($framework_path.'/image-picker.css');
 				break;
 
 			case 'masonry':
-				$framework_path = JURI::root(true).$lib_path.'/masonry';
+				$framework_path = JUri::root(true).$lib_path.'/masonry';
 				$document->addScript($framework_path.'/masonry.pkgd.min.js');
 				break;
 
@@ -1211,7 +1211,7 @@ class flexicontent_html
 				";
 
 				$ver = '3.5.4';
-				$framework_path = JURI::root(true).$lib_path.'/select2';
+				$framework_path = JUri::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
 				$document->addScriptVersion($framework_path.'/select2.min.js', $ver);
 				$document->addScriptVersion($framework_path.'/select2.sortable.js', $ver);
@@ -1254,7 +1254,7 @@ class flexicontent_html
 			case 'inputmask':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/inputmask';
+				$framework_path = JUri::root(true).$lib_path.'/inputmask';
 				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
 
 				// Extra inputmask declarations definitions, e.g. ...
@@ -1382,7 +1382,7 @@ class flexicontent_html
 			case 'prettyCheckable':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/prettyCheckable';
+				$framework_path = JUri::root(true).$lib_path.'/prettyCheckable';
 				$document->addScript($framework_path.'/dev/prettyCheckable.js');
 				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
 				$js .= "
@@ -1405,7 +1405,7 @@ class flexicontent_html
 			case 'jmultibox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/jmultibox';
+				$framework_path = JUri::root(true).$lib_path.'/jmultibox';
 
 				// Add JS
 				$document->addScript($framework_path.'/js/jmultibox.js');
@@ -1424,9 +1424,9 @@ class flexicontent_html
 
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
+				$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
-				$framework_path = JURI::root(true).$lib_path.'/fancybox';
+				$framework_path = JUri::root(true).$lib_path.'/fancybox';
 
 				// Add mousewheel plugin (this is optional)
 				$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js');
@@ -1459,7 +1459,7 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				//flexicontent_html::loadFramework('fancybox');
 
-				$framework_path = JURI::root(true).$lib_path.'/galleriffic';
+				$framework_path = JUri::root(true).$lib_path.'/galleriffic';
 				//$document->addStyleSheet($framework_path.'/css/basic.css');  // This is too generic and should not be loaded
 				$document->addStyleSheet($framework_path.'/css/galleriffic-3.css');
 				$document->addScript($framework_path.'/js/jquery.galleriffic.js');
@@ -1470,7 +1470,7 @@ class flexicontent_html
 			case 'elastislide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/elastislide';
+				$framework_path = JUri::root(true).$lib_path.'/elastislide';
 				$document->addStyleSheet($framework_path.'/css/style.css');
 				$document->addStyleSheet($framework_path.'/css/elastislide.css');
 
@@ -1483,7 +1483,7 @@ class flexicontent_html
 			case 'photoswipe':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/photoswipe';
+				$framework_path = JUri::root(true).$lib_path.'/photoswipe';
 
 				//$document->addStyleSheet($framework_path.'/lib/jquery.mobile/jquery.mobile.css');
 				$document->addStyleSheet($framework_path.'/photoswipe.css');
@@ -1503,14 +1503,14 @@ class flexicontent_html
 			case 'fcxSlide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/fcxSlide';
+				$framework_path = JUri::root(true).$lib_path.'/fcxSlide';
 				$document->addScriptVersion($framework_path.'/class.fcxSlide.js', FLEXI_VHASH);
 				$document->addStyleSheetVersion($framework_path.'/fcxSlide.css', FLEXI_VHASH);
 				//$document->addScriptVersion($framework_path.'/class.fcxSlide.packed.js', FLEXI_VHASH);
 				break;
 
 			case 'imagesLoaded':
-				$framework_path = JURI::root(true).$lib_path.'/imagesLoaded';
+				$framework_path = JUri::root(true).$lib_path.'/imagesLoaded';
 				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
 				break;
 
@@ -1518,7 +1518,7 @@ class flexicontent_html
 				// Make sure mootools are loaded
 				JHtml::_('behavior.framework', true);
 
-				$framework_path = JURI::root(true).$lib_path.'/noobSlide';
+				$framework_path = JUri::root(true).$lib_path.'/noobSlide';
 				//$document->addScript($framework_path.'/_class.noobSlide.js');
 				$document->addScript($framework_path.'/_class.noobSlide.packed.js');
 				break;
@@ -1526,7 +1526,7 @@ class flexicontent_html
 			case 'zTree':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/zTree';
+				$framework_path = JUri::root(true).$lib_path.'/zTree';
 				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');
 				$document->addStyleSheet($framework_path.'/css/zTreeStyle/zTreeStyle.css');
 				$document->addScript($framework_path.'/js/jquery.ztree.all-3.5.min.js');
@@ -1538,7 +1538,7 @@ class flexicontent_html
 			case 'plupload':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = JURI::root(true).$lib_path.'/plupload';
+				$framework_path = JUri::root(true).$lib_path.'/plupload';
 				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'plupload';
 				$document->addScript($framework_path.'/js/plupload.full.min.js');
 
@@ -1574,7 +1574,7 @@ class flexicontent_html
 
 			case 'nouislider':
 
-				$framework_path = JURI::root(true).$lib_path.'/nouislider';
+				$framework_path = JUri::root(true).$lib_path.'/nouislider';
 				$document->addStyleSheet($framework_path.'/nouislider.min.css');
 				$document->addScript($framework_path.'/nouislider.min.js');
 				break;
@@ -1592,8 +1592,8 @@ class flexicontent_html
 				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
 				";
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
+				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
+				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
 				JText::script("FLEXI_APPLYING_FILTERING", true);
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
@@ -1605,7 +1605,7 @@ class flexicontent_html
 
 				$js .= "";
 
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
+				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				JText::script('FLEXI_LOADING_IMAGES',true);
 				JText::script('FLEXI_THUMBNAILS',true);
@@ -1616,7 +1616,7 @@ class flexicontent_html
 			case 'flexi-lib-form':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH);
+				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH);
 				JText::script("FLEXI_EDIT", true);
 				JText::script("FLEXI_ADD", true);
 				JText::script("FLEXI_NA", true);
@@ -1997,7 +1997,7 @@ class flexicontent_html
 		else
 		{
 			// Get owner and other record data
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$db->setQuery($q);
 			$record = $db->loadObject();
 
@@ -2056,7 +2056,7 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_feed_icon', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 
-		$uri    = JURI::getInstance();
+		$uri    = JUri::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
@@ -2093,7 +2093,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs);
+			$image = JHtml::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2155,7 +2155,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image('components/com_flexicontent/assets/images/'.'delete.png', JText::_( 'FLEXI_DELETE' ), $attribs);
+			$image = JHtml::image('components/com_flexicontent/assets/images/'.'delete.png', JText::_( 'FLEXI_DELETE' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2200,7 +2200,7 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_csvbutton', 0) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 
-		$uri    = JURI::getInstance();
+		$uri    = JUri::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
@@ -2237,7 +2237,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image('components/com_flexicontent/assets/images/'.'csv.png', JText::_( 'FLEXI_CSV_EXPORT' ), $attribs);
+			$image = JHtml::image('components/com_flexicontent/assets/images/'.'csv.png', JText::_( 'FLEXI_CSV_EXPORT' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2295,7 +2295,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs);
+			$image = JHtml::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2341,7 +2341,7 @@ class flexicontent_html
 		if ($initialize === null) {
 			if (file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )) {
 				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
-				$uri  = JURI::getInstance();
+				$uri  = JUri::getInstance();
 				$base = $uri->toString( array('scheme', 'host', 'port'));
 				$initialize = true;
 			} else {
@@ -2384,7 +2384,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs);
+			$image = JHtml::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2437,7 +2437,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
+			$image = JHtml::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2489,10 +2489,10 @@ class flexicontent_html
 		if ($has_archive === null)
 		{
 			$user = JFactory::getUser();
-			$nullDate = JFactory::getDBO()->getNullDate();
+			$nullDate = JFactory::getDbo()->getNullDate();
 			$isAdmin  = JFactory::getApplication()->isAdmin();
 			$isPrint  = JFactory::getApplication()->input->get('print', 0, 'INT');
-			$img_path = JURI::root(true) . '/components/com_flexicontent/assets/images/';
+			$img_path = JUri::root(true) . '/components/com_flexicontent/assets/images/';
 			$use_font_icons = $isAdmin || ($params && $params->get('use_font_icons', 1));
 
 			$has_archive = FlexicontentHelperPerm::getPerm()->CanArchives;
@@ -2561,7 +2561,7 @@ class flexicontent_html
 			JText::script('FLEXI_ARCHIVE_THIS_ITEM', true);
 			JText::script('FLEXI_TRASH_THIS_ITEM', true);
 			$doc = JFactory::getDocument();
-			$doc->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
+			$doc->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
 					task: ' . json_encode($isAdmin ? $ops['controller'] . '.setitemstate' : 'setitemstate') . ',
@@ -2638,7 +2638,7 @@ class flexicontent_html
 			$publish_up->setTimezone($tz);
 			$publish_info[] = $item->publish_up == $nullDate
 				? $jtext['start_always']
-				: $jtext['start'] .": ". JHTML::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
+				: $jtext['start'] .": ". JHtml::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 		}
 		if (isset($item->publish_down))
 		{
@@ -2646,7 +2646,7 @@ class flexicontent_html
 			$publish_down->setTimezone($tz);
 			$publish_info[] = $item->publish_down == $nullDate
 				? $jtext['finish_no_expiry']
-				: $jtext['finish'] .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
+				: $jtext['finish'] .": ". JHtml::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
 		}
 
 
@@ -2761,7 +2761,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs);
+			$image = JHtml::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2824,7 +2824,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons ) {
 			$attribs = '';
-			$image = JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs);
+			$image = JHtml::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -2852,7 +2852,7 @@ class flexicontent_html
 			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
 			$targetLink = "_self";
 		} else if ( $params->get('show_editbutton', 1) == '2' ) {
-			$link = JURI::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
+			$link = JUri::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
 			$targetLink = "_blank";
 		}
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
@@ -2976,7 +2976,7 @@ class flexicontent_html
 			$image = '<i class="'.$icon_class.'"></i>';
 		} else if ( $show_icons && !$auto_relations ) {
 			$attribs = '';
-			$image = JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $btn_desc, $attribs);
+			$image = JHtml::image('components/com_flexicontent/assets/images/'.'plus-button.png', $btn_desc, $attribs);
 		} else {
 			$image = '';
 		}
@@ -3081,7 +3081,7 @@ class flexicontent_html
 		{
 			$data['html'] = $use_font
 				? '<span class="'.$data['class'].'"></span>'
-				: JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '');
+				: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '');
 			unset($data['class']);
 			return json_encode($data);
 		}
@@ -3091,7 +3091,7 @@ class flexicontent_html
 		foreach($data as $key => $val) $tag_attribs .= ' ' . $key . '="' . $val . '" ';
 		$state_icons[$state][$popup_type] = $use_font
 			? '<span '.$tag_attribs.'></span>'
-			: JHTML::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs);
+			: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs);
 
 		return $state_icons[$state][$popup_type];
 	}
@@ -3137,8 +3137,8 @@ class flexicontent_html
 			$tooltip_class = ' hasTooltip';
 			$show_icons = $params->get('show_icons');
 			if ( $show_icons ) {
-				$voteup = JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL);
-				$votedown = JHTML::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL);
+				$voteup = JHtml::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL);
+				$votedown = JHtml::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL);
 			} else {
 				$voteup = JText::_( 'FLEXI_GOOD' ). '&nbsp;';
 				$votedown = '&nbsp;'.JText::_( 'FLEXI_BAD' );
@@ -3273,7 +3273,7 @@ class flexicontent_html
 		static $star_tooltips = null;
 		static $star_classes  = null;
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		flexicontent_html::__DEV_check_reviews_table();
@@ -3376,14 +3376,14 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$document = JFactory::getDocument();
-			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
-			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
+			$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
 			$document->addScriptDeclaration('
-				var fcvote_rfolder = "'.JURI::root(true).'";
+				var fcvote_rfolder = "'.JUri::root(true).'";
 			');
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
-			$img_path	= JURI::root(true).'/'.$image;
+			$img_path	= JUri::root(true).'/'.$image;
 
 			$dim = $field->parameters->get( 'main_dimension', 24 );
 			$element_width = $rating_resolution * $dim;
@@ -3412,7 +3412,7 @@ class flexicontent_html
 
 			// Always add image configuration for composite (extra) votes in case some type is using them
 			$image = $field->parameters->get( 'extra_image', 'components/com_flexicontent/assets/images/star-medium.png' );
-			$img_path	= JURI::root(true).'/'.$image;
+			$img_path	= JUri::root(true).'/'.$image;
 
 			$dim = $field->parameters->get( 'extra_dimension', 24 );
 			$element_width = $rating_resolution * $dim;
@@ -3555,7 +3555,7 @@ class flexicontent_html
 		$check_review_table_dev = 1;
 
 		$app = JFactory::getApplication();
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$dbprefix = $app->getCfg('dbprefix');
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
@@ -3686,9 +3686,9 @@ class flexicontent_html
 		$_list = array();
 
 		if (!is_numeric($displaytype) && is_string($displaytype))
-			$_list[] = JHTML::_( 'select.option', '', $displaytype );
+			$_list[] = JHtml::_( 'select.option', '', $displaytype );
 		else if ($displaytype)
-			$_list[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
+			$_list[] = JHtml::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
 
 		if ($check_perms)
 			$user = JFactory::getUser();
@@ -3703,13 +3703,13 @@ class flexicontent_html
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 
 			if ( !$allowed && $type->itemscreatable == 2 )
-				$_list[] = JHTML::_( 'select.option', $type->id, $type->name, 'value', 'text', $disabled = true );
+				$_list[] = JHtml::_( 'select.option', $type->id, $type->name, 'value', 'text', $disabled = true );
 			else
-				$_list[] = JHTML::_( 'select.option', $type->id, $type->name);
+				$_list[] = JHtml::_( 'select.option', $type->id, $type->name);
 		}
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
-		return JHTML::_('select.genericlist', $_list, $name, $attribs, 'value', 'text', $selected, $tagid );
+		return JHtml::_('select.genericlist', $_list, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 
@@ -3724,17 +3724,17 @@ class flexicontent_html
 		$_list = array();
 
 		if (!is_numeric($displaytype) && is_string($displaytype))
-			$_list[] = JHTML::_( 'select.option', '', $displaytype );
+			$_list[] = JHtml::_( 'select.option', '', $displaytype );
 		else if ($displaytype)
-			$_list[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
+			$_list[] = JHtml::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
 
 		$user_id_str = JText::_('FLEXI_ID') .': ';
 		foreach ($list as $item) {
-			$_list[] = JHTML::_( 'select.option', $item->id, $item->name ? $item->name : $user_id_str . $item->id );
+			$_list[] = JHtml::_( 'select.option', $item->id, $item->name ? $item->name : $user_id_str . $item->id );
 		}
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
-		return JHTML::_('select.genericlist', $_list, $name, $attribs, 'value', 'text', $selected, $tagid );
+		return JHtml::_('select.genericlist', $_list, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 
@@ -3746,7 +3746,7 @@ class flexicontent_html
 	 */
 	static function buildtagsselect($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT id, name'
 		. ' FROM #__flexicontent_tags'
 		. ' ORDER BY name ASC'
@@ -3756,15 +3756,15 @@ class flexicontent_html
 
 		$options = array();
 		if (!is_numeric($displaytype) && is_string($displaytype))
-			$options[] = JHTML::_( 'select.option', '', $displaytype);
+			$options[] = JHtml::_( 'select.option', '', $displaytype);
 		else if ($displaytype)
-			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TAG' ));
+			$options[] = JHtml::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TAG' ));
 
 		foreach ($data as $val)
-			$options[] = JHTML::_( 'select.option', $val->id, $val->name);
+			$options[] = JHtml::_( 'select.option', $val->id, $val->name);
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
-		return JHTML::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
+		return JHtml::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 
@@ -3782,7 +3782,7 @@ class flexicontent_html
 		if (!$displaytype)
 		{
 			ksort( $list, SORT_STRING );
-			return JHTML::_('select.genericlist', $list, $name, $attribs, 'value', 'text', $selected, $tagid );
+			return JHtml::_('select.genericlist', $list, $name, $attribs, 'value', 'text', $selected, $tagid );
 		}
 
 		// $displaytype: 1, is grouped
@@ -3821,7 +3821,7 @@ class flexicontent_html
 				'list.select'=>$selected, // value of the SELECTED field
 			);
 
-			return JHTML::_('select.groupedlist', $field_types, $name, $attribs);
+			return JHtml::_('select.groupedlist', $field_types, $name, $attribs);
 		}
 	}
 
@@ -3834,7 +3834,7 @@ class flexicontent_html
 	 */
 	static function buildfilesextlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT DISTINCT ext'
 		. ' FROM #__flexicontent_files'
 		. ' ORDER BY ext ASC'
@@ -3843,15 +3843,15 @@ class flexicontent_html
 		$data = $db->loadColumn();
 
 		if (!is_numeric($displaytype) && is_string($displaytype))
-			$options[] = JHTML::_( 'select.option', '', $displaytype);
+			$options[] = JHtml::_( 'select.option', '', $displaytype);
 		else if ($displaytype)
-			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_ALL_EXT' ));
+			$options[] = JHtml::_( 'select.option', '', JText::_( 'FLEXI_ALL_EXT' ));
 
 		foreach ($data as $val)
-			$options[] = JHTML::_( 'select.option', $val, $val);
+			$options[] = JHtml::_( 'select.option', $val, $val);
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
-		return JHTML::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
+		return JHtml::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 	/**
@@ -3862,7 +3862,7 @@ class flexicontent_html
 	 */
 	static function builduploaderlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT DISTINCT f.uploaded_by AS uid, u.name AS name'
 		. ' FROM #__flexicontent_files AS f'
 		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
@@ -3872,15 +3872,15 @@ class flexicontent_html
 		$data = $db->loadObjectList();
 
 		if (!is_numeric($displaytype) && is_string($displaytype))
-			$options[] = JHTML::_( 'select.option', '', $displaytype);
+			$options[] = JHtml::_( 'select.option', '', $displaytype);
 		else if ($displaytype)
-			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_ALL_UPLOADERS' ));
+			$options[] = JHtml::_( 'select.option', '', JText::_( 'FLEXI_ALL_UPLOADERS' ));
 
 		foreach ($data as $val)
-			$options[] = JHTML::_( 'select.option', $val->uid, $val->name);
+			$options[] = JHtml::_( 'select.option', $val->uid, $val->name);
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
-		return JHTML::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
+		return JHtml::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 
@@ -3892,7 +3892,7 @@ class flexicontent_html
 	 */
 	static function buildlanguageslist($name, $attribs, $selected, $displaytype=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, $conf=false)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$tagid = null; // ... not provided
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 
@@ -3944,16 +3944,16 @@ class flexicontent_html
 			case 1: case 2: default:
 				if (!is_numeric($displaytype) && is_string($displaytype))
 					// WITH custom prompt to select language
-					$langs[] = JHTML::_('select.option',  '', $displaytype);
+					$langs[] = JHtml::_('select.option',  '', $displaytype);
 
 				else if ($displaytype==2)
 					// WITH empty prompt to select language, e.g. used in items/category manager
-					$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
+					$langs[] = JHtml::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
 
 				foreach ($user_langs as $lang) {
-					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
+					$langs[] = JHtml::_('select.option',  $lang->code, $lang->name );
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $tagid);
+				$list = JHtml::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $tagid);
 				break;
 
 			// RADIO selection of ALL languages , e.g. item form,
@@ -4077,19 +4077,19 @@ class flexicontent_html
 			$state_imgs = array(1=>'accept.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 
-		$state[] = JHTML::_('select.option',  '', JText::_( !is_numeric($displaytype) && is_string($displaytype) ? $displaytype : 'FLEXI_DO_NOT_CHANGE' ) );
-		$state[] = JHTML::_('select.option',  -4, $state_names[-4] );
-		$state[] = JHTML::_('select.option',  -3, $state_names[-3] );
-		$state[] = JHTML::_('select.option',  -5, $state_names[-5] );
-		$state[] = JHTML::_('select.option',   1, $state_names[1] );
-		$state[] = JHTML::_('select.option',   0, $state_names[0] );
-		$state[] = JHTML::_('select.option',   2, $state_names[2] );
-		$state[] = JHTML::_('select.option',  -2, $state_names[-2] );
+		$state[] = JHtml::_('select.option',  '', JText::_( !is_numeric($displaytype) && is_string($displaytype) ? $displaytype : 'FLEXI_DO_NOT_CHANGE' ) );
+		$state[] = JHtml::_('select.option',  -4, $state_names[-4] );
+		$state[] = JHtml::_('select.option',  -3, $state_names[-3] );
+		$state[] = JHtml::_('select.option',  -5, $state_names[-5] );
+		$state[] = JHtml::_('select.option',   1, $state_names[1] );
+		$state[] = JHtml::_('select.option',   0, $state_names[0] );
+		$state[] = JHtml::_('select.option',   2, $state_names[2] );
+		$state[] = JHtml::_('select.option',  -2, $state_names[-2] );
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 
 		if ( $displaytype==1 || (!is_numeric($displaytype) && is_string($displaytype)) )
-			$list = JHTML::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected, $tagid);
+			$list = JHtml::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected, $tagid);
 
 		else if ($displaytype==2)
 		{
@@ -4098,7 +4098,7 @@ class flexicontent_html
 			$state_ids[] = -2;  // trashed
 			$state_colors= array(1=>'darkgreen', -5=>'darkgreen', 0=>'darkred', -3=>'darkred', -4=>'darkred', 2=>'darkblue', -2=>'gray');
 
-			$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
+			$img_path = JUri::root(true)."/components/com_flexicontent/assets/images/";
 
 			$list = '';
 
@@ -4460,7 +4460,7 @@ class flexicontent_html
 		if ($type_ids_list)
 			$where[] = 'id IN ('. $type_ids_list .' ) ';
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT * '
 				. ' FROM #__flexicontent_types'
 				. ($where ? ' WHERE ' . implode(' AND ', $where) : '')
@@ -4678,7 +4678,7 @@ class flexicontent_html
 		global $globalnoroute;
 		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
 
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$user = JFactory::getUser();
 		$aids = JAccess::getAuthorisedViewLevels($user->id);
 
@@ -5053,7 +5053,7 @@ class flexicontent_html
 
 		// Return date
 		try {
-			return JHTML::_('date', $date, $dateformat, $timezone ) . $tz_info;
+			return JHtml::_('date', $date, $dateformat, $timezone ) . $tz_info;
 		} catch ( Exception $e ) {
 			return '';
 		}
@@ -5130,7 +5130,7 @@ class flexicontent_html
 		// Check if we are in the backend again and remove administrator from URL as it is added even though we've set the application to the site app
 		if ( $isAdmin )
 		{
-			$url = str_replace(JURI::base(true), JURI::root(true), $url);
+			$url = str_replace(JUri::base(true), JUri::root(true), $url);
 		}
 
 		return $url;

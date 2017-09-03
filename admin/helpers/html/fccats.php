@@ -30,7 +30,7 @@ abstract class JHtmlFccats
 	public static function published($value = 0, $i, $canChange = true)
 	{
 		static $states = null;
-		//return JHTML::_('jgrid.published', $_published = $value, $i, 'categories.', $canChange);
+		//return JHtml::_('jgrid.published', $_published = $value, $i, 'categories.', $canChange);
 
 		if ($states === null)
 		{

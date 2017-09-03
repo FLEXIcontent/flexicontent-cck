@@ -71,7 +71,7 @@ if($autodisplayadvoptions) {
 
 $this->document->addScriptDeclaration($js);
 
-$infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/information.png', '', ' style="float:left; margin: 0px 8px 0px 2px;" ' );
+$infoimage = JHtml::image ( 'components/com_flexicontent/assets/images/information.png', '', ' style="float:left; margin: 0px 8px 0px 2px;" ' );
 $text_search_title_tip   = ' title="'.flexicontent_html::getToolTip('FLEXI_TEXT_SEARCH', 'FLEXI_TEXT_SEARCH_INFO', 1).'" ';
 $field_filters_title_tip = ' title="'.flexicontent_html::getToolTip('FLEXI_FIELD_FILTERS', 'FLEXI_FIELD_FILTERS_INFO', 1).'" ';
 $other_search_areas_title_tip = ' title="'.flexicontent_html::getToolTip('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS', 'FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS_TIP', 1).'" ';

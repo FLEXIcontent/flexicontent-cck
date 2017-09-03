@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// Button for popup file selection
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
-		$addExistingURL = JURI::base(true)
+		$addExistingURL = JUri::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
 			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
@@ -728,7 +728,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
 		if ($allowaddtocart && $mod_is_enabled === null) {
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
 			$db->setQuery($query);
 			$mod_is_enabled = $db->loadResult();
@@ -807,7 +807,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				$_attribs = ' class="fcicon-hits"';
 			}
 			
-			$hits_icon = JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
+			$hits_icon = JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
 		}
 		
 		$show_filename = $display_filename || $prop=='namelist';
@@ -1024,7 +1024,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Update DB data of the file 
 					if ( !$row->check() || !$row->store() )
 					{
-						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDBO()->getErrorMsg(), 'warning' );
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDbo()->getErrorMsg(), 'warning' );
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1233,7 +1233,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( count($new_ids) )
 		{
 			// Only query files that are not already cached
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 					. ' FROM #__flexicontent_files'
 					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
@@ -1267,7 +1267,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	function canDeleteFile( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE id='. $db->Quote($file_id)
@@ -1289,7 +1289,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	function checkFileAssignment( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$query = 'SELECT item_id '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '
@@ -1355,7 +1355,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	function share_file_form($tpl = null)
 	{
 		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$app  = JFactory::getApplication();
 
 		$session  = JFactory::getSession();
@@ -1409,7 +1409,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -1534,13 +1534,13 @@ class plgFlexicontent_fieldsFile extends FCField
 			$coupon_vars = '&conid='.$coupon_id.'&contok='.$coupon_token;
 		}
 		
-		$uri  = JURI::getInstance();
+		$uri  = JUri::getInstance();
 		$base = $uri->toString( array('scheme', 'host', 'port'));
 		$vars = '&id='.$file_id.'&cid='.$content_id.'&fid='.$field_id . $coupon_vars;
 		$link = $base . JRoute::_( 'index.php?option=com_flexicontent&task=download'.$vars, false );
 		
 		// Verify that this is a local link
-		if (!$link || !JURI::isInternal($link))
+		if (!$link || !JUri::isInternal($link))
 		{
 			//Non-local url...
 			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
@@ -1630,7 +1630,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			return $this->share_file_form();
 		}
 		
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		include('file'.DS.'share_result.php');
 	}
 

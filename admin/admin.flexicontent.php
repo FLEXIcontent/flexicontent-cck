@@ -395,8 +395,8 @@ if ( $format == 'html' )
 		JHtml::_('bootstrap.tooltip');
 	}
 	// Add flexi-lib JS
-	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
-	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
+	JFactory::getDocument()->addScriptVersion( JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
+	JFactory::getDocument()->addScriptVersion( JUri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
 	
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '

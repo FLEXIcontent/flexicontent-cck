@@ -24,8 +24,8 @@ use Joomla\String\StringHelper;
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
-JFactory::getDocument()->addScriptVersion(JURI::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-JFactory::getDocument()->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+JFactory::getDocument()->addScriptVersion(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+JFactory::getDocument()->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 // MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)

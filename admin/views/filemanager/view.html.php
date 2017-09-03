@@ -50,7 +50,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$session  = JFactory::getSession();
 		
@@ -68,9 +68,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
-		//JHTML::_('behavior.tooltip');
+		//JHtml::_('behavior.tooltip');
 		// Load the form validation behavior
-		JHTML::_('behavior.formvalidation');
+		JHtml::_('behavior.formvalidation');
 		
 		
 		// Get user's global permissions
@@ -215,19 +215,19 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		if ($app->isSite())
 		{
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+			$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		}
 		else
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Fields common CSS
-		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 
 		
 		// Add JS frameworks
@@ -236,9 +236,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		flexicontent_html::loadFramework('flexi-lib');
 		
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		
 		// ************************
@@ -336,12 +336,12 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', 'class="use_select2_lib"', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
 		
 		// Build access list
-		//$lists['file-access'] = JHTML::_('access.assetgrouplist', 'access', null, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
+		//$lists['file-access'] = JHtml::_('access.assetgrouplist', 'access', null, $attribs=' class="use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => 'access'));
 
 		$options = JHtml::_('access.assetgroups');
 		$elementid = $fieldname = 'file-access';
 		$attribs = 'class="use_select2_lib"';
-		$lists['file-access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', null, $elementid, $translate=true );
+		$lists['file-access'] = JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', null, $elementid, $translate=true );
 
 
 		/*************
@@ -357,42 +357,42 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		//search filter
 		$filters = array();
-		$filters[] = JHTML::_('select.option', '0', '- '.JText::_( 'FLEXI_ALL' ).' -' );
-		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
-		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ) );
-		$filters[] = JHTML::_('select.option', '3', JText::_( 'FLEXI_DESCRIPTION' ) );
+		$filters[] = JHtml::_('select.option', '0', '- '.JText::_( 'FLEXI_ALL' ).' -' );
+		$filters[] = JHtml::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
+		$filters[] = JHtml::_('select.option', '2', JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ) );
+		$filters[] = JHtml::_('select.option', '3', JText::_( 'FLEXI_DESCRIPTION' ) );
 		$lists['scope'] = '
 			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
-			'.JHTML::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
+			'.JHtml::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope );
 		
 		if (1)
 		{
 			//build url/file filterlist
 			$url 	= array();
-			$url[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
-			$url[] 	= JHTML::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
-			$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
+			$url[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
+			$url[] 	= JHtml::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
+			$url[] 	= JHtml::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
 			$lists['url'] = ($filter_url || 1 ? '<div class="add-on">'.JText::_('FLEXI_ALL_FILES').'</div>' : '').
-				JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_url );
+				JHtml::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_url );
 
 			//build stamp filterlist
 			$stamp 	= array();
-			$stamp[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
-			$stamp[] 	= JHTML::_('select.option',  '0', JText::_( 'FLEXI_NO' ) );
-			$stamp[] 	= JHTML::_('select.option',  '1', JText::_( 'FLEXI_YES' ) );
+			$stamp[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
+			$stamp[] 	= JHtml::_('select.option',  '0', JText::_( 'FLEXI_NO' ) );
+			$stamp[] 	= JHtml::_('select.option',  '1', JText::_( 'FLEXI_YES' ) );
 
 			$lists['stamp'] = ($filter_stamp || 1 ? '<div class="add-on">'.JText::_('FLEXI_DOWNLOAD_STAMPING').'</div>' : '').
-				JHTML::_('select.genericlist', $stamp, 'filter_stamp', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_stamp );
+				JHtml::_('select.genericlist', $stamp, 'filter_stamp', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_stamp );
 		}
 
 		//item lists
 		/*$items_list = array();
-		$items_list[] = JHTML::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
+		$items_list[] = JHtml::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
 		foreach($items as $item) {
-			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
+			$items_list[] = JHtml::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
 		}
-		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_item );*/
+		$lists['item_id'] = JHtml::_('select.genericlist', $items_list, 'item_id', 'size="1" class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_item );*/
 		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
@@ -401,12 +401,12 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($target_dir==2)
 		{
 			$secure 	= array();
-			$secure[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
-			$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
-			$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
+			$secure[] 	= JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
+			$secure[] 	= JHtml::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
+			$secure[] 	= JHtml::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
 			
 			$lists['secure'] .=
-				JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
+				JHtml::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
 		}
 		else
 			$lists['secure'] .= '<span class="badge badge-info">'.JText::_($target_dir==0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR').'</span>';
@@ -503,7 +503,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($perms->CanConfig)
 		{
 			$btn_task = '';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
+			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
 			//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 			$js .= "
 				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')

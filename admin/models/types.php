@@ -170,7 +170,7 @@ class FlexicontentModelTypes extends JModelList
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$app  = JFactory::getApplication();
-		$db   = JFactory::getDBO();
+		$db   = JFactory::getDbo();
 		$option = $app->input->get('option', '', 'CMD');
 		$view   = $app->input->get('view', '', 'CMD');
 		

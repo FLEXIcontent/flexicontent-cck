@@ -43,7 +43,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$document	= JFactory::getDocument();
 		$session  = JFactory::getSession();
 		$user     = JFactory::getUser();		
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$print_logging_info = $params->get('print_logging_info');
 		
 		// Special displaying when getting flexicontent version
@@ -59,7 +59,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		jimport('joomla.filesystem.file');
 		
 		// activate the tooltips
-		//JHTML::_('behavior.tooltip');
+		//JHtml::_('behavior.tooltip');
 		
 		// Get model
 		$model = $this->getModel('flexicontent');
@@ -143,11 +143,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// **************************
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 
 
@@ -183,7 +183,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			if (0) // FLEXI_J37GE
 			{
 				$btn_task = '';
-				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=import&tmpl=component';
+				$popup_load_url = JUri::base().'index.php?option=com_flexicontent&layout=import&tmpl=component';
 				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
 				$js .= "
 					jQuery('#toolbar-download a.toolbar, #toolbar-download button').attr('href', '".$popup_load_url."')
@@ -196,7 +196,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			if (0) // TODO evaluate for e.g. submiting a template
 			{
 				$btn_task = '';
-				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
+				$popup_load_url = JUri::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
 				//$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
 				$js .= "
 					jQuery('#toolbar-language a.toolbar, #toolbar-language button').attr('href', '".$popup_load_url."')
@@ -225,9 +225,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$activelang = JComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
 		
 		foreach ($langs as $lang) {
-			$options[] = JHTML::_('select.option', $lang, $lang);		
+			$options[] = JHtml::_('select.option', $lang, $lang);		
 		}
-		$lists['languages'] = JHTML::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
+		$lists['languages'] = JHtml::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
 		// Missing files
 		$lists['missing_lang'] = $model->processlanguagefiles();
@@ -310,7 +310,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			<span class="fc-board-button-inner">
 
 				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
-					<?php echo JHTML::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs); ?>
+					<?php echo JHtml::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs); ?>
 					<span class="fc-board-btn-text <?php echo $link ? '' : ' fcdisabled'; ?>"><?php echo $text; ?></span>
 				<?php if ($link) : ?></a><?php endif; ?>
 

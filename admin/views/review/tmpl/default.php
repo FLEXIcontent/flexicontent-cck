@@ -54,7 +54,7 @@ $form = $this->form;
 
 	<?php endforeach; ?>
 
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="reviews" />
 	<input type="hidden" name="view" value="review" />
@@ -66,5 +66,5 @@ $form = $this->form;
 
 <?php
 //keep session alive while editing
-JHTML::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

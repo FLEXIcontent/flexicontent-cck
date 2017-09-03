@@ -28,8 +28,8 @@ $tabCnt = array();
 $tabSetStack = array();
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+$this->document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 ?>
@@ -96,7 +96,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<input type="hidden" name="view" value="appsman" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="fcform" value="1" />
-				<?php echo JHTML::_( 'form.token' ); ?>
+				<?php echo JHtml::_( 'form.token' ); ?>
 				
 			</form>
 			
@@ -163,7 +163,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<input type="hidden" name="view" value="appsman" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="fcform" value="1" />
-				<?php echo JHTML::_( 'form.token' ); ?>
+				<?php echo JHtml::_( 'form.token' ); ?>
 				
 			</form>
 		</div>

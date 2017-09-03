@@ -246,11 +246,11 @@ function delAllFilters() {
 				<?php
 				echo $image_ordering_tip;
 				echo !$this->filter_type
-					? JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'])
-					: JHTML::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order']);
+					? JHtml::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'])
+					: JHtml::_('grid.sort', 'FLEXI_TYPE_ORDER', 'typeordering', $this->lists['order_Dir'], $this->lists['order']);
 
 				if ($this->permission->CanOrderFields && $this->ordering):
-					//echo str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder'));
+					//echo str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder'));
 				endif;
 				?>
 			</th>
@@ -260,31 +260,31 @@ function delAllFilters() {
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
-			<?php /*<th style="padding:0px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
+			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
 
-			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass nowrap">
 				<?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?><br/>
 				<small>
-					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
-					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</small>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?></span>
 			</th>
 			<th class="hideOnDemandClass nowrap">
 				<?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?><br/>
 				<small>
-					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
-					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_FILTERABLE', 't.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_ADVANCED_FILTERABLE', 't.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</small>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?></span>
 			</th>
-			<th class="hideOnDemandClass left" colspan="2"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left" colspan="2"><?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -330,13 +330,13 @@ function delAllFilters() {
 			
 			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;view=field&amp;id='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
-				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
+				$published 	= JHtml::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else if (!$canPublish && $row->published) {   // No privilige published
-				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
+				$published 	= JHtml::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else if (!$canPublish && !$row->published) {   // No privilige unpublished
-				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
+				$published 	= JHtml::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else {
-				$published 	= JHTML::_('jgrid.published', $row->published, $i, $ctrl );
+				$published 	= JHtml::_('jgrid.published', $row->published, $i, $ctrl );
 			}
 			
 			//check which properties are supported by current field
@@ -388,7 +388,7 @@ function delAllFilters() {
 
 			$orphan_warning	= '
 				<span class="'.$tip_class.'" title="'. flexicontent_html::getToolTip('FLEXI_WARNING', 'FLEXI_NO_TYPES_ASSIGNED', 1, 1) .'">
-					'.JHTML::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ), ' class="fc-man-icon-s" ' ).'
+					'.JHtml::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ), ' class="fc-man-icon-s" ' ).'
 				</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
@@ -674,7 +674,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

@@ -62,10 +62,10 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'i.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="title"><?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'i.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></th>
-			<th><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -157,7 +157,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

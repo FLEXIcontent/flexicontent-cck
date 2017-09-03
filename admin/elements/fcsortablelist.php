@@ -78,7 +78,7 @@ class JFormFieldFcSortableList extends JFormField
 		}
 		
 		$doc	= JFactory::getDocument();
-		$db		= JFactory::getDBO();
+		$db		= JFactory::getDbo();
 		$attributes = $this->element->attributes();
 
 		$iselements = $attributes->subtype =='elements';
@@ -151,10 +151,10 @@ class JFormFieldFcSortableList extends JFormField
 				$attribs .= ' multiple="multiple" size="'.$size.'" ';
 			}
 			else if ($issortable) {
-				array_unshift($options, JHTML::_('select.option', '', JText::_($attributes->prompt_label ? $attributes->prompt_label : 'FLEXI_ADD_MORE')));
+				array_unshift($options, JHtml::_('select.option', '', JText::_($attributes->prompt_label ? $attributes->prompt_label : 'FLEXI_ADD_MORE')));
 			}
 			else {  // Single drop down select
-				array_unshift($options, JHTML::_('select.option', '', JText::_($attributes->prompt_label ? $attributes->prompt_label : 'FLEXI_SELECT')));
+				array_unshift($options, JHtml::_('select.option', '', JText::_($attributes->prompt_label ? $attributes->prompt_label : 'FLEXI_SELECT')));
 			}
 			$selector_classes[] = 'use_select2_lib';
 			if (!empty($selector_classes)) $attribs .= ' class ="'.implode(' ', $selector_classes).'"';
@@ -324,7 +324,7 @@ class JFormFieldFcSortableList extends JFormField
 		}
 
 		return
-			($iselements ? '' : JHTML::_('select.genericlist', $options, $fieldname_selector, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id_selector) )
+			($iselements ? '' : JHtml::_('select.genericlist', $options, $fieldname_selector, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id_selector) )
 			.$sorter_html;
 	}
 }

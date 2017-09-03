@@ -34,7 +34,7 @@ class FlexicontentViewUser extends JViewLegacy
 		$document = JFactory::getDocument();
 		$jinput   = $app->input;
 
-		$db  = JFactory::getDBO();
+		$db  = JFactory::getDbo();
 		$me  = JFactory::getUser();
 
 		$cid = $jinput->get('cid', array(0), 'array');
@@ -57,20 +57,20 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('flexi-lib-form');
 		
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		// load language file for com_users component
 		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -256,10 +256,10 @@ class FlexicontentViewUser extends JViewLegacy
 		}
 
 		// build the html select list
-		$lists['block'] 	= JHTML::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $user->get('block') );
+		$lists['block'] 	= JHtml::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $user->get('block') );
 
 		// build the html select list
-		$lists['sendEmail'] = JHTML::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $user->get('sendEmail') );
+		$lists['sendEmail'] = JHtml::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $user->get('sendEmail') );
 
 
 

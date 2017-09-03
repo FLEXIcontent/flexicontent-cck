@@ -97,7 +97,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			$extra_options[] = $tmp;
 		}
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .
@@ -140,7 +140,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs .= ' class="'.$classes.'"';
 		
-		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 	
 }

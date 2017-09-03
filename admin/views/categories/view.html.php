@@ -44,7 +44,7 @@ class FlexicontentViewCategories extends JViewLegacy
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$order_property = 'a.lft';
 		
@@ -105,19 +105,19 @@ class FlexicontentViewCategories extends JViewLegacy
 		// ***
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 
 		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
 
 
@@ -147,7 +147,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// Copy Parameters
 		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
+		$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
 		//$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		$js .= "
 			jQuery('#toolbar-params a.toolbar, #toolbar-params button').attr('href', '".$popup_load_url."')
@@ -156,7 +156,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		";
 		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 
-		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
+		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JUri::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 		JToolbarHelper::divider();
 		
 		$add_divider = false;
@@ -311,7 +311,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$fieldname =  $elementid = 'filter_level';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['level']	= ($filter_level || 1 ? '<div class="add-on">'.JText::_('FLEXI_MAX_DEPTH').'</div>' : '').
-			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
+			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
 		// build publication state filter
 		$options = JHtml::_('jgrid.publishedOptions');
@@ -319,7 +319,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$fieldname =  $elementid = 'filter_state';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
+			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
 		
 		// build access level filter
 		$options = JHtml::_('access.assetgroups');
@@ -327,7 +327,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$fieldname =  $elementid = 'filter_access';
 		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
-			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		
 		// build language filter
 		$lists['language'] = ($filter_language || 1 ? '<div class="add-on">'.JText::_('FLEXI_LANGUAGE').'</div>' : '').

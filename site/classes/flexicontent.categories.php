@@ -63,7 +63,7 @@ class flexicontent_cats
 	 */
 	protected function getParentCats($all_cols=false)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		$this->parentcats_data = array();
 		if (empty($this->parentcats_ids)) return;
@@ -88,7 +88,7 @@ class flexicontent_cats
 	 */
 	protected function buildParentCats($cid)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// ALTERNATIVE 1
 		/*$currcat = JCategories::getInstance('Content')->get($cid);
@@ -147,7 +147,7 @@ class flexicontent_cats
 	public static function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
 		global $globalcats;
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		if ($published_only) {
 			$where[] = 'published = 1';
@@ -370,18 +370,18 @@ class flexicontent_cats
 		// A tree to select: e.g. a parent category
 		if (!is_numeric($top) && strlen($top))
 		{
-			$catlist[] 	= JHTML::_( 'select.option', '', $top );
+			$catlist[] 	= JHtml::_( 'select.option', '', $top );
 		}
 		
 		else if ($top == 1)
 		{
-			$catlist[] 	= JHTML::_( 'select.option', 1, JText::_( 'FLEXI_TOPLEVEL' ));
+			$catlist[] 	= JHtml::_( 'select.option', 1, JText::_( 'FLEXI_TOPLEVEL' ));
 		}
 		
 		// A tree to select a category
 		else if($top == 2 || $top == -1)
 		{
-			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
+			$catlist[] 	= JHtml::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
 		}
 		
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
@@ -398,7 +398,7 @@ class flexicontent_cats
 		// Extra custom options ... applies to all top parameters
 		foreach ($custom_options as $custom_value => $custom_option)
 		{
-			$catlist[] 	= JHTML::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
+			$catlist[] 	= JHtml::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
 		}
 		
 		
@@ -453,7 +453,7 @@ class flexicontent_cats
 					$parent_title = htmlspecialchars($parent_title, ENT_COMPAT, 'UTF-8');
 				}
 
-				//$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, array( 'attr' => array('title' => $parent_title), 'disable' => false) );
+				//$catlist[] = JHtml::_( 'select.option', $cat->id, $cat_title, array( 'attr' => array('title' => $parent_title), 'disable' => false) );
 				$catlist[] = (object) array(
 					'value' => $cat->id,
 					'text'  => $cat_title,
@@ -484,7 +484,7 @@ class flexicontent_cats
 
 		$html = $empty_errmsg && $cats_count==0 ? 
 			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
-			JHTML::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
+			JHtml::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
 			;
 
 		// Restore first category element
@@ -563,7 +563,7 @@ class flexicontent_cats
 		}
 		
 		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT DISTINCT c.id'
 			.' FROM #__categories AS c'
 			.$joinaccess

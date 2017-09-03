@@ -35,7 +35,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		// Initialise variables
 		$app = JFactory::getApplication();
 		$option   = JRequest::getVar('option');
-		$db       = JFactory::getDBO();
+		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		
@@ -66,13 +66,13 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			$field->type_ids = !empty($field->reltypes)  ?  explode("," , $field->reltypes)  :  array();
 		}
 		$options = array();
-		$options[] = JHTML::_('select.option',  '',  JText::_( 'FLEXI_ALL' ) );
+		$options[] = JHtml::_('select.option',  '',  JText::_( 'FLEXI_ALL' ) );
 		foreach ($contentTypes as $contentType) {
-			$options[] = JHTML::_('select.option', $contentType->id, JText::_( $contentType->name ) );
+			$options[] = JHtml::_('select.option', $contentType->id, JText::_( $contentType->name ) );
 		}
 		$fieldname = $elementid = 'content_type__au__';
 		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="use_select2_lib" ';
-		$content_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
+		$content_type_select = JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 		
 		
 		// Create FIELD TYPE SELECTOR
@@ -189,14 +189,14 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');
-		//JHTML::_('behavior.tooltip');
+		//JHtml::_('behavior.tooltip');
 		
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		
 		

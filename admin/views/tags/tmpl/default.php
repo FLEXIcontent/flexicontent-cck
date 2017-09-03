@@ -53,14 +53,14 @@ $attribs_rsslist    = ' class="fc-rss-list-btn ntxt '.$btn_s_class.' '.$tip_clas
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
 $image_preview = 0
-	? JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
+	? JHtml::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'), ' class="'.$ico_class.'"')
 	: '<span class="icon-screen"></span>';
 $image_rsslist = 0
-	? JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"')
+	? JHtml::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), ' class="'.$ico_class.'"')
 	: '<span class="icon-feed"></span>';
 
 $image_editlayout = 0 ?
-	JHTML::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
+	JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 
 $fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
@@ -170,11 +170,11 @@ function delAllFilters() {
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', 'FLEXI_STATUS', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass alias hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title"><?php echo JHtml::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass alias hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -226,7 +226,7 @@ function delAllFilters() {
 					$previewlink = $record_url;
 					$rsslink = $record_url  . (strstr($record_url, '?') ? '&amp;' : '?') . 'format=feed&amp;type=rss';
 
-					//echo JHTML::_('jgrid.published', $row->published, $i, 'tags.', $canChange);
+					//echo JHtml::_('jgrid.published', $row->published, $i, 'tags.', $canChange);
 					//echo JHtml::_('fctags.published', $row->published, $i, $canChange);
 
 					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small', array('controller'=>'tags', 'state_propname'=>'published') );
@@ -312,7 +312,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

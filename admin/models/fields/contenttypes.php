@@ -63,13 +63,13 @@ class JFormFieldContenttypes extends JFormFieldList
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
 		return JHtml::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
-		//return JHTMLSelect::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
+		//return JHtmlSelect::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
 	}
 	
 	
 	protected function getOptions()
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'

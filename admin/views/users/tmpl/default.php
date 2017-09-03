@@ -40,7 +40,7 @@ $tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 $tz_info .= ' ('.$user_zone.')';
 $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 $date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
-//$date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
+//$date_zone_tip   = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
 $list_total_cols = 14;
 
@@ -234,7 +234,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass left nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_NAME', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_NAME', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('search');document.adminForm.submit();" />
@@ -243,11 +243,11 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass nowrap" >
-				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LOGGED', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_LOGGED', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_logged) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_logged');document.adminForm.submit();" />
@@ -256,7 +256,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'COM_USERS_HEADING_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'COM_USERS_HEADING_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->filter_state)) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_state');document.adminForm.submit();" />
@@ -265,7 +265,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass nowrap hidden-phone">
-				<?php echo JHTML::_('grid.sort',   'COM_USERS_HEADING_ACTIVATED', 'a.activation', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'COM_USERS_HEADING_ACTIVATED', 'a.activation', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->filter_active)) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_active');document.adminForm.submit();" />
@@ -283,7 +283,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_itemscount) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_itemscount');document.adminForm.submit();" />
@@ -292,7 +292,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (@$this->filter_uploadssize) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_uploadssize');document.adminForm.submit();" />
@@ -301,11 +301,11 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass left nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_EMAIL', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_EMAIL', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 
 			<th style="width:110px;" class="hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_REGISTRED_DATE', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_REGISTRED_DATE', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
@@ -320,7 +320,7 @@ function delAllFilters() {
 			</th>
 
 			<th style="width:110px;" class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LAST_VISIT', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_USER_LAST_VISIT', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
@@ -335,7 +335,7 @@ function delAllFilters() {
 			</th>
 
 			<th class="hideOnDemandClass nowrap">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort',   'FLEXI_ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_id');document.adminForm.submit();" />
@@ -376,9 +376,9 @@ function delAllFilters() {
 				if ($row->lastvisitDate == "0000-00-00 00:00:00") {
 					$lvisit = JText::_( 'Never' );
 				} else {
-					$lvisit	= JHTML::_('date', $row->lastvisitDate, 'Y-m-d H:i:s');
+					$lvisit	= JHtml::_('date', $row->lastvisitDate, 'Y-m-d H:i:s');
 				}
-				$registered	= JHTML::_('date', $row->registerDate, 'Y-m-d H:i:s');
+				$registered	= JHtml::_('date', $row->registerDate, 'Y-m-d H:i:s');
 
 				$itemscount = '<span class="badge badge-info" title="'.$view_entry.'">'.$row->itemscount.'</span>';
 				if ($row->itemscount) {
@@ -394,7 +394,7 @@ function delAllFilters() {
 					<?php echo $i+1+$this->pagination->limitstart;?>
 				</td>
 				<td class="center">
-					<?php echo JHTML::_('grid.id', $i, $row->id); ?>
+					<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 					<label for="cb<?php echo $i; ?>" class="green single"></label>
 				</td>
 				<td class="col_title">
@@ -467,7 +467,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->

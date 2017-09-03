@@ -185,7 +185,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$formfieldname = 'filter_'.$filter->id;
 		
 		$_s = $isSearchView ? '_s' : '';
@@ -258,12 +258,12 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			{
 				if ($label_filter==2)
 				{
-					$options[] = JHTML::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+					$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 				}
 			}
 			else
-				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
-			foreach ($lists as $list) $options[] = JHTML::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
+				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
+			foreach ($lists as $list) $options[] = JHtml::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
 		
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
@@ -300,11 +300,11 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			
 			// Create filter
 			if ($display_filter_as != 6)
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
+				$filter->html	.= JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
 			else
 				$filter->html	.=
 					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
-					JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+					JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 		}
 		
 		// Special CASE for some filters, do some replacements
@@ -318,7 +318,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{
@@ -366,7 +366,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{

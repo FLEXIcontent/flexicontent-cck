@@ -257,7 +257,7 @@ class com_flexicontentInstallerScript
 		$session->set('unbounded_noext', false, 'flexicontent');
 		$session->set('unbounded_badcat', false, 'flexicontent');
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
@@ -430,7 +430,7 @@ class com_flexicontentInstallerScript
 		}
 
 		$app = JFactory::getApplication();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
@@ -1302,7 +1302,7 @@ class com_flexicontentInstallerScript
 		// init vars
 		$error = false;
 		$extensions = array();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 		
@@ -1566,7 +1566,7 @@ class com_flexicontentInstallerScript
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
 		
@@ -1582,7 +1582,7 @@ class com_flexicontentInstallerScript
 		if ( count($param_array) > 0 )
 		{
 			// read the existing component value(s)
-			$db = JFactory::getDBO();
+			$db = JFactory::getDbo();
 			$db->setQuery('SELECT params FROM #__extensions WHERE element = "com_flexicontent"');
 			$params = json_decode( $db->loadResult(), true );
 			// add the new variable(s) to the existing one(s)
@@ -1603,7 +1603,7 @@ class com_flexicontentInstallerScript
 	function renameLegacyRecordParameters($map, $dbtbl_name, $dbcol_name, $record_id)
 	{
 		// Load parameters directly from DB
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = 'SELECT ' . $dbcol_name
 			. ' FROM #__' . $dbtbl_name . ' '
 			. ' WHERE '
