@@ -115,22 +115,23 @@ jQuery(document).ready(function() {
 <?php endif; ?>
 
 
-<?php if(!$this->existlang) : ?>
-	jQuery('#existlang').on('click', function(e, data)
+<?php if(!$this->langsynced) : ?>
+	jQuery('#langsynced').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createlangcolumn&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=updatelanguagedata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
-		jQuery('#existlang-log').html(ajaxloader);
+		jQuery('#langsynced-log').html(ajaxloader);
 		jQuery.ajax({
 			type: 'GET',
 			url: url,
 			data: {}
 		}).done( function(data) {
-			jQuery('#existlang-log').html(data);
+			jQuery('#langsynced-log').html(data);
 		});
 
 	});
 <?php endif; ?>
+
 
 
 <?php if(!$this->existdbindexes) : ?>
@@ -372,11 +373,15 @@ jQuery(document).ready(function() {
 			<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
 		</td>
 		<td>
-			<div id="existlang-log" class="install-task">
-				<?php echo $this->existlang ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existlang" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+			<div id="langsynced-log" class="install-task">
+				<?php echo $this->langsynced ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="langsynced" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 			</div>
 		</td>
 	</tr>
+
+
+
+
 	<tr>
 		<td class="key">
 			<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>

@@ -240,7 +240,7 @@ function delAllFilters() {
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title"><?php echo JHtml::_('grid.sort', 'FLEXI_CATEGORY', 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass title"><?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->

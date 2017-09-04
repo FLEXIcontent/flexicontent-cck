@@ -90,10 +90,8 @@ class FlexicontentViewUser extends JViewLegacy
 		JToolbarHelper::cancel( $ctrl.'cancel' );
 		JToolbarHelper::help( 'screen.users.edit' );
 		
-		$user   = $cid  ?  JUser::getInstance($cid)  :  JUser::getInstance();
-		$myuser = JFactory::getUser();
-		$acl    = JFactory::getACL();
-		
+		$user = $cid ? JUser::getInstance($cid) : JUser::getInstance();
+
 		JText::script("FLEXI_UPDATING_CONTENTS", true);
 		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )

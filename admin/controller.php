@@ -120,7 +120,7 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'createdefaultfields'	, 'createDefaultFields' );
 		$this->registerTask( 'publishplugins'				, 'publishplugins' );
 		$this->registerTask( 'addmcatitemrelations'	, 'addMcatItemRelations' );
-		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
+		$this->registerTask( 'updatelanguageData'		, 'updateLanguageData' );
 		$this->registerTask( 'createdbindexes'			, 'createDBindexes' );
 		$this->registerTask( 'createversionstbl'		, 'createVersionsTable' );
 		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
@@ -140,7 +140,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
-	
+
+
 	function processLanguageFiles() 
 	{
 		// Check for request forgeries
@@ -240,9 +241,9 @@ class FlexicontentController extends JControllerLegacy
 		//printf('<br/>-- [getItemsNoCat: %.2f s] ', $fc_run_times['getItemsNoCat']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$existlang				= $model->getExistLanguageColumns() && !$model->getItemsNoLang();
-		if ( $print_logging_info ) @$fc_run_times['getItemsNoLang'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		//printf('<br/>-- [getItemsNoLang: %.2f s] ', $fc_run_times['getItemsNoLang']/1000000);
+		$langsynced				= $model->getExistLanguageColumns() && !$model->getItemsBadLang();
+		if ( $print_logging_info ) @$fc_run_times['getItemsBadLang'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		//printf('<br/>-- [getItemsBadLang: %.2f s] ', $fc_run_times['getItemsBadLang']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existversions 		= $model->getExistVersionsTable();
@@ -299,7 +300,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		//echo "(!$existtype) || (!$existmenuitems) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
-		//echo "     (!$existcats)  || (!$existlang) || (!$existdbindexes) || (!$itemcountingdok) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
+		//echo "     (!$existcats)  || (!$langsynced) || (!$existdbindexes) || (!$itemcountingdok) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
 		//echo "     (!$deprecatedfiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
 	
@@ -308,7 +309,7 @@ class FlexicontentController extends JControllerLegacy
 		if (
 			!$existtype || !$existmenuitems || !$existfields ||
 			//!$existfplg || !$existseplg || existsyplg ||
-			!$existcats || !$existlang || !$existversions || !$existversionsdata || !$existauthors ||
+			!$existcats || !$langsynced || !$existversions || !$existversionsdata || !$existauthors ||
 			!$deprecatedfiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
 			!$existdbindexes || !$itemcountingdok || !$initialpermission
 		) {
@@ -693,7 +694,8 @@ class FlexicontentController extends JControllerLegacy
 
 		echo '<span class="install-ok"></span>';
 	}
-	
+
+
 	/**
 	 * Method to create the language datas
 	 * 
@@ -701,7 +703,7 @@ class FlexicontentController extends JControllerLegacy
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function createLangColumn()
+	function updateLanguageData()
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
@@ -732,7 +734,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Add default language for items that do not have one, and add translation group to items that do not have one set
 		$model = $this->getModel('flexicontent');
-		if ($model->getItemsNoLang())
+		if ($model->getItemsBadLang())
 		{
 			// 1. copy language from __flexicontent_items_ext table into __content
 			$this->syncItemsLang();

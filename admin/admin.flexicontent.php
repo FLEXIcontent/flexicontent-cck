@@ -447,8 +447,8 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 			$msg .= '<small>';
 			if (isset($fc_run_times['getExistMenuItems']))
 				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Default menu item for URLs : %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
-			if (isset($fc_run_times['getItemsNoLang']))
-				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items language and translation associations: %.2f s ', $fc_run_times['getItemsNoLang']/1000000);
+			if (isset($fc_run_times['getItemsBadLang']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items language and translation associations: %.2f s ', $fc_run_times['getItemsBadLang']/1000000);
 			if (isset($fc_run_times['getItemsNoCat']))
 				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items multi-category relations: %.2f s ', $fc_run_times['getItemsNoCat']/1000000);
 			if (isset($fc_run_times['checkCurrentVersionData']))
