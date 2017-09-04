@@ -700,7 +700,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since 1.5
 	 */
-	function getItemsNoLang()
+	function getItemsBadLang()
 	{
 		static $return;
 		if ($return !== NULL) return $return;
@@ -1120,7 +1120,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$deprecated['folders'] = array();
 		
 		$files = array(
-			'/administrator/components/com_flexicontent/helpers/html/users.php'
+			'/administrator/components/com_flexicontent/helpers/html/users.php',
+			'/administrator/components/com_flexicontent/installation/install.mysql.nonutf8.sql'
 		);
 		foreach ($files as $file)
 		{

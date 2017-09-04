@@ -111,7 +111,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existsyplg 		= $model->getExistSystemPlugin();
 			
 			$existcats					= !$model->getItemsNoCat();
-			$existlang	 				= $model->getExistLanguageColumns() && !$model->getItemsNoLang();
+			$langsynced	 				= $model->getExistLanguageColumns() && !$model->getItemsBadLang();
 			$existversions 			= $model->getExistVersionsTable();
 			$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
 			$existauthors			= $model->getExistAuthorsTable();
@@ -130,7 +130,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		{
 			$existtype = $existmenuitems = $existfields = true;
 			$existfplg = $existseplg = $existsyplg = true;
-		  $existcats = $existlang = $existversions = $existversionsdata = $existauthors = true;
+		  $existcats = $langsynced = $existversions = $existversionsdata = $existauthors = true;
 		  $deprecatedfiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
 		  $existdbindexes = $itemcountingdok = $initialpermission = true;
 		  $missingindexes = array();
@@ -266,7 +266,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->existsyplg = isset($existsyplg) ? $existsyplg : null;
 		
 		$this->existcats = isset($existcats) ? $existcats : null;
-		$this->existlang = isset($existlang) ? $existlang : null;
+		$this->langsynced = isset($langsynced) ? $langsynced : null;
 		$this->existversions = isset($existversions) ? $existversions : null;
 		$this->existversionsdata = isset($existversionsdata) ? $existversionsdata : null;
 		$this->existauthors = isset($existauthors) ? $existauthors : null;
