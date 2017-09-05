@@ -338,8 +338,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 		// *** BOF FOLDER MODE specific ***
 
-		$files_selected = $model->getItemFiles($u_item_id);
-		
 		// Add JS to document to initialize the file list
 		// eg Find and mark file usage by fileid / filename search (respectively: DB mode / Folder mode)
 		if ($folder_mode)
@@ -659,7 +657,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 			$this->thumb_w    = $thumb_w;
 			$this->thumb_h    = $thumb_h;
 			$this->targetid   = $targetid;
-			$this->files_selected = $files_selected;
 		}
 		else
 		{

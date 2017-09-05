@@ -414,7 +414,7 @@ if ($enable_multi_uploader)
 			'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
 
 			// Uploader does not initialize properly when hidden in IE8 / IE9 with "runtime": "html4" (it does if using "runtime": "flash")
-			if (!is_IE8_IE9 && !fc_has_flash_addon()) fctabber["fileman_tabset"].tabShow(0);
+			if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fileman_tabset"].tabShow(0);
 
 			// Hide basic uploader form if using multi-uploader script
 			jQuery("#filemanager-1").hide();
