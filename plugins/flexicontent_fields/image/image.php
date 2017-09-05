@@ -5,7 +5,7 @@
  * 
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
- * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2017, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -2176,10 +2176,10 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// JCE popup image popup
 				case 3:
-					$title_attr = $desc ? $title.': '.$desc : $title;  // does not support HTML
-					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
+					$title_attr = $desc ? $title.'::'.$desc : $title;
+					$group_str = $group_name ? 'group['.$group_name.'];' : '';
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb jcepopup" '.$group_str.' title="'.$title_attr.'">
+						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb jcepopup" data-mediabox="'.$group_str.'title['.$title_attr.']">
 							'.$img_nolegend.'
 						</a>'
 						.$inline_info.$posttext;
