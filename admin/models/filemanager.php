@@ -398,11 +398,53 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 
 	/**
+	 * Method to get remove old temporary folders of fields in "folder mode"
+	 *
+	 * @access public
+	 * @return array
+	 * @since 3.0.0
+	 */
+	function cleanUpFolderModeFolders($path)
+	{
+		// Get file list according to filtering
+		$it = new RegexIterator(new IteratorIterator(new DirectoryIterator($path)), '#item__[0-9]{4}_[0-9]{2}_[0-9]{2}_(.*)#i');
+		$it->rewind();
+		
+		$now_date = time();
+	
+		while($it->valid())
+		{
+			if ($it->isDot())
+			{
+				$it->next();
+				continue;
+			}
+			$subpath = $it->getPathName();  // filename including the folder subpath
+			$dirname = basename($subpath);
+			$date_str = str_replace('_', '-', substr($dirname, 6, 10));
+
+			$directory_date = strtotime($date_str);
+			$date_diff = $now_date - $directory_date;
+			$days_diff = floor($date_diff / (60 * 60 * 24));
+			//echo $subpath . ' ---- ' . $date_str . ' ---- Days DIFF: ' . $days_diff . '<br/>';
+
+			// Remove old folders
+			if ($days_diff > 2)
+			{
+				JFolder::delete($subpath);
+			}
+
+			$it->next();
+		}
+	}
+
+
+	/**
 	 * Method to get files having the given extensions from a given folder
 	 *
-	 * @access private
-	 * @return integer
-	 * @since 1.0
+	 * @access public
+	 * @return array
+	 * @since 3.0.0
 	 */
 	function getFilesFromPath($itemid, $fieldid, $exts=null, $pending = false)
 	{
@@ -420,9 +462,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		$exts = $exts ?: $cparams->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
 		$imageexts = array('jpg','gif','png','bmp','jpeg');  // Common image extensions
-		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid);
+		$options = array();
+		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $options);
 		//echo $gallery_folder ."<br />";
-		
+
 		// Create folder for current language
 		if (!is_dir($gallery_folder))
 		{
@@ -449,7 +492,13 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$names_pending = array_flip($names_pending);
 		}
 
+		if ( $options['image_source'] === 1 )
+		{
+			$this->cleanUpFolderModeFolders($options['base_path']);
+		}
+
 		// Get file information
+		static $mime_icons = array();
 		$rows = array();
 		$i = 1;
 		while($it->valid())
@@ -464,6 +513,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$pinfo = pathinfo($filepath);
 			$row = new stdClass();
 			$row->ext = $pinfo['extension'];
+
 			// Convert directory separators inside the subpath
 			$row->filename = str_replace('\\', '/', $filesubpath);  //$pinfo['filename'].".".$pinfo['extension'];
 
@@ -486,15 +536,28 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$row->uploaded = date("F d Y H:i:s.", filectime($filepath) );
 			$row->id = $i;
 			
-			if ( in_array(strtolower($row->ext), $imageexts)) {
+			if ( in_array(strtolower($row->ext), $imageexts))
+			{
 				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
-			} elseif (file_exists(JPATH_SITE."/components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png")) {
-				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png";
-			} else {
-				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/unknown.png";
+			}
+			else
+			{
+				$exists = $row->ext && isset($mime_icons[$row->ext])
+					? $mime_icons[$row->ext]
+					: null;
+
+				// Check exists only once
+				if ($row->ext && $exists === null)
+				{
+					$exists = $mime_icons[$row->ext] = file_exists(JPATH_SITE . '/components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png');
+				}
+
+				$row->icon = $exists
+					? JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png'
+					: JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 			}
 			$rows[] = $row;
-			
+
 			$i++;
 			$it->next();
 		}
@@ -508,7 +571,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 *
 	 * @access	public
 	 */
-	function getFieldFolderPath($itemid, $fieldid, $options = array())
+	function getFieldFolderPath($itemid, $fieldid, & $options = array())
 	{
 		$field = $this->getField($fieldid);
 
@@ -523,16 +586,17 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$form->load(file_get_contents($plugin_path), false, '/extension/config');
 
 		$image_source_exists = (bool) $form->getField('image_source', 'attribs');
-		$image_source = $image_source_exists ? (int) $field->parameters->get('image_source', 1) : null;
+		$options['image_source'] = $image_source = $image_source_exists ? (int) $field->parameters->get('image_source', 1) : null;
 
 		// Currently we only handle image_source '1'
 		if ($image_source===1)
 		{
-			$gallery_path_arr[] = 'item_' . $itemid;
-			$gallery_path_arr[] = 'field_' . $fieldid;
-			$gallery_path =
-				JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent')
-				. DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
+			$gallery_path_arr = array(
+				'item_' . $itemid,
+				'field_' . $fieldid
+			);
+			$options['base_path'] = JPATH::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
+			$gallery_path = $options['base_path'] . DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
 		}
 		else if ($image_source===0 || $image_source===null)
 		{
