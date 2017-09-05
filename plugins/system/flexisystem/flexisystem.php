@@ -286,7 +286,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
 		
 		// Exclude pagebreak outputing dialog from redirection
-		if ( $option=='com_content' && $layout=='pagebreak' ) return;
+		if ( $option=='com_content' && ($layout=='pagebreak' || $layout=='modal') ) return;
 		
 		// Redirect backend article / category management, and frontend article view
 		$app->isAdmin() ?
@@ -333,7 +333,8 @@ class plgSystemFlexisystem extends JPlugin
 		// Get URLs excluded from redirection
 		$excluded_urls = $this->params->get('excluded_redirect_urls');
 		$excluded_urls = preg_split("/[\s]*%%[\s]*/", $excluded_urls);
-		if (empty($excluded_urls[count($excluded_urls)-1])) {
+		if (empty($excluded_urls[count($excluded_urls)-1]))
+		{
 			unset($excluded_urls[count($excluded_urls)-1]);
 		}
 		
@@ -512,7 +513,7 @@ class plgSystemFlexisystem extends JPlugin
 		}
 
 
-		if (!$in_limits)
+		if (!$in_limits || empty($type_params))
 		{
 			return;
 		}
@@ -522,7 +523,6 @@ class plgSystemFlexisystem extends JPlugin
 		// *** Do re-routing (no page reloading)
 		// ***
 
-		//if ($this->params->get('redirect_method_fe', 1) == 1)
 		if ( $type_params->get('allow_jview') == 0 ) // 0: Reroute, 1: Allow, 2: Redirect
 		{
 			// Set new request variables
