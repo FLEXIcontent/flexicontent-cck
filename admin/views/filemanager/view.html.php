@@ -469,7 +469,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			$this->thumb_w    = $thumb_w;
 			$this->thumb_h    = $thumb_h;
 			$this->targetid   = $targetid;
-			$this->files_selected = $files_selected;
 		}
 		else
 		{
