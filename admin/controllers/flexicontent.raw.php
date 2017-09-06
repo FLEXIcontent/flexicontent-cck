@@ -750,7 +750,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 		// Delete deprecated files that were found
 		foreach ($deprecated['files'] as $file)
 		{
-			if (!JFile::delete(JPATH_ROOT . $file))
+			if (!JFile::delete($file))
 			{
 				echo 'Cannot delete legacy file: ' . $file . '<br />';
 			}
@@ -759,7 +759,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 		// Delete deprecated folders that were found
 		foreach ($deprecated['folders'] as $folder)
 		{
-			if (!JFolder::delete(JPATH_ROOT . $folder))
+			if (!JFolder::delete($folder))
 			{
 				echo 'Cannot delete legacy folder: ' . $folder . '<br />';
 			}

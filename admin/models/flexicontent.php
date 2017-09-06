@@ -1193,12 +1193,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$deprecated['folders'] = array();
 		
 		$files = array(
-			'/administrator/components/com_flexicontent/helpers/html/users.php',
-			'/administrator/components/com_flexicontent/installation/install.mysql.nonutf8.sql'
+			JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/users.php',
+			JPATH_ADMINISTRATOR . '/components/com_flexicontent/installation/install.mysql.nonutf8.sql',
+			JPATH_ADMINISTRATOR . '/components/com_flexicontent/installation/uninstall.mysql.nonutf8.sql'
 		);
 		foreach ($files as $file)
 		{
-			if (JFile::exists(JPATH_ROOT . $file))
+			if (JFile::exists($file))
 			{
 				$deprecated['files'][] = $file;
 			}
@@ -1208,7 +1209,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		);
 		foreach ($folders as $folder)
 		{
-			if (JFolder::exists(JPATH_ROOT . $folder))
+			if (JFolder::exists($folder))
 			{
 				$deprecated['folders'][] = $folder;
 			}
