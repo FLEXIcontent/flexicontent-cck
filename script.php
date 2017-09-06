@@ -765,8 +765,11 @@ class com_flexicontentInstallerScript
 					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__'.$tbl_name])) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
 					}
+					if ( $files_tbl_exists && !array_key_exists('assignments', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `assignments` INT(11) unsigned NOT NULL default '0' AFTER `size`";
+					}
 					if ( $files_tbl_exists && !array_key_exists('stamp', $tbl_fields['#__'.$tbl_name])) {
-						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `size`";
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `assignments`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";

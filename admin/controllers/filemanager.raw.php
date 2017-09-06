@@ -98,8 +98,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$start_microtime = microtime(true);
 
 		$has_zlib    = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
-		$indexer     = JRequest::getVar('indexer','fileman_default');
-		$rebuildmode = JRequest::getVar('rebuildmode','');
+		$indexer     = $this->input->getCmd('indexer','fileman_default');
+		$rebuildmode = $this->input->getCmd('rebuildmode','');
 
 		$session = JFactory::getSession();
 		$db  = JFactory::getDbo();
@@ -113,7 +113,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Get ids of files to index
 		$model = $this->getModel('filemanager');
-		$file_ids = $model->getFileIds($skip_urls=true);
+		$file_ids = $model->getFileIds($skip_urls=false);  // include URLs to be able to check their usage too
 		
 		// Set file ids into session to avoid recalculation ...
 		$session->set($indexer.'_items_to_index', $file_ids, 'flexicontent');
@@ -160,11 +160,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$session = JFactory::getSession();
 		$db = JFactory::getDbo();
 		
-		$indexer = JRequest::getVar('indexer','fileman_default');
-		$rebuildmode = JRequest::getVar('rebuildmode','');
+		$indexer = $this->input->getCmd('indexer','fileman_default');
+		$rebuildmode = $this->input->getCmd('rebuildmode','');
 		
-		$items_per_call = JRequest::getVar('items_per_call', 20);  // Number of item to index per HTTP request
-		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
+		$items_per_call = $this->input->getInt('items_per_call', 20);  // Number of item to index per HTTP request
+		$itemcnt = $this->input->getInt('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
 		
 		// Actions according to rebuildmode
 		if ($indexer!='fileman_default') {
@@ -188,7 +188,15 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$max_execution_time = ini_get("max_execution_time");
 		//echo 'fail|'.$max_execution_time; exit;
 		
-		
+		// Get model
+		$model = $this->getModel('filemanager');
+
+		// Find usage in fields
+		$s_assigned_fields = array('file', 'minigallery');
+		$m_assigned_fields = array('image');
+		$m_assigned_props = array('image'=>'originalname');
+		$m_assigned_vals = array('image'=>'filename');
+
 		$query_count = 0;
 		$max_items_per_query = 100;
 		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
@@ -206,24 +214,52 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$db->setQuery($data_query);
 			$file_data = $db->loadObjectList('id');
 			
-			$vindex = array();
+			$size_index = array();
+			$usage_index = array();
 			
 			// For current item: Loop though all searchable fields according to their type
 			foreach($file_data as $file_id => $file)
 			{
+				$file->total_usage = 0;
 				$path = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 				$file_path = $path . DS . $file->filename;		
 				$file->size = !$file->url && file_exists($file_path) ? filesize($file_path) : 0;
-				$vindex[] = ' WHEN '.$file->id.' THEN '.$file->size;
+				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 			}
-			
+
+
+			// Single property fields, get file usage (# assignments)
+			if ($s_assigned_fields)
+			{
+				foreach ($s_assigned_fields as $field_type)
+				{
+					$model->countFieldRelationsSingleProp($file_data, $field_type);
+				}
+			}
+
+			// Multi property fields, get file usage (# assignments)
+			if ($m_assigned_fields)
+			{
+				foreach ($m_assigned_fields as $field_type)
+				{
+					$field_prop = $m_assigned_props[$field_type];
+					$value_prop = $m_assigned_vals[$field_type];
+					$model->countFieldRelationsMultiProp($file_data, $value_prop, $field_prop, $field_type);
+				}
+			}
+
+			foreach($file_data as $file_id => $file)
+			{
+				$usage_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->total_usage;
+			}
+
 			// Create query that will update/insert data into the DB
 			unset($query);
 			$query = 'UPDATE #__flexicontent_files '
-				.'  SET size = CASE id '
-				.  implode('', $vindex)
-				. '  END '
-				.' WHERE id IN ('.implode(', ',$query_itemids).')';
+				. ' SET '
+				. ' ' . $db->quoteName('size'). ' = CASE id ' . implode('', $size_index) . '  END, '
+				. ' ' . $db->quoteName('assignments'). ' = CASE id ' . implode('', $usage_index) . '  END '
+				. ' WHERE id IN ('.implode(', ',$query_itemids).')';
 			$db->setQuery($query);
 			$db->execute();
 			$query_count++;

@@ -290,7 +290,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			{
 				foreach ($s_assigned_fields as $field_type)
 				{
-					$this->countFieldRelationsSingleProp( $this->_data, $field_type );
+					$this->countFieldRelationsSingleProp($this->_data, $field_type);
 				}
 			}
 			// Multi property fields, get file usage (# assignments)
@@ -300,7 +300,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 				{
 					$field_prop = $m_assigned_props[$field_type];
 					$value_prop = $m_assigned_vals[$field_type];
-					$this->countFieldRelationsMultiProp($this->_data, $value_prop, $field_prop, $field_type='image');
+					$this->countFieldRelationsMultiProp($this->_data, $value_prop, $field_prop, $field_type);
 				}
 			}
 
@@ -1490,6 +1490,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
 			{
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+				if (isset($row->total_usage))
+				{
+					$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+					$row->total_usage += count($item_ids);
+				}
 			}
 		}
 	}
@@ -1526,6 +1531,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			if (isset($assigned_data[$row->id]) && $assigned_data[$row->id]->item_list)
 			{
 				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+				if (isset($row->total_usage))
+				{
+					$item_ids = explode(',', $assigned_data[$row->id]->item_list);
+					$row->total_usage += count($item_ids);
+				}
 			}
 		}
 	}

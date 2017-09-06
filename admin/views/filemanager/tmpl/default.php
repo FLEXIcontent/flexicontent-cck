@@ -67,7 +67,7 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 $isFilesElement = $this->view == 'fileselement';
 
 // Calculate count of shown columns 
-$list_total_cols = $isFilesElement ? 16 : 16;  // fileselement view has 1 more column the direct delete button column, and 1 ... less column the number of assigned items
+$list_total_cols = $isFilesElement ? 17 : 17;  // fileselement view has 1 more column the direct delete button column, and 1 ... less column the number of assigned items
 
 
 // Optional columns of DB-mode
@@ -83,6 +83,11 @@ if (!$this->folder_mode)
 if (count($this->optional_cols) - count($this->cols) > 0)
 {
 	$list_total_cols -= (count($this->optional_cols) - count($this->cols));
+}
+
+if (empty($this->cols['usage']))  // This is 2 columns so remove 1 more
+{
+	$list_total_cols--;
 }
 
 
@@ -670,7 +675,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<?php endif; ?>
 					
 				<?php if (!empty($this->cols['usage'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_FILE_USAGE' ); ?> </th>
+					<th class="left hideOnDemandClass hidden-phone" colspan="2">&nbsp; <?php echo JHtml::_('grid.sort', 'FLEXI_USAGE', 'f.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!$isFilesElement) : ?>
@@ -927,6 +932,9 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<?php endif; ?>
 				
 				<?php if (!empty($this->cols['usage'])) : ?>
+					<td class="center hidden-phone">
+						<span class="badge"><?php echo $row->assignments; ?></span>
+					</td>
 					<td class="center hidden-phone">
 						<span class="nowrap_box"><?php echo $row->assigned; ?></span>
 					</td>
