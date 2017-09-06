@@ -464,7 +464,80 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		return $return;
 	}
+
+
 	
+	/**
+	 * Method to sync language between Joomla and FLEXIcontent tables
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function syncItemsLang()
+	{
+		$db = JFactory::getDbo();
+		
+		// This should be match items that come from J1.5 upgrade only
+		// and copy the J1.5 language from items_ext table into the content table
+		$query 	= 'UPDATE #__content AS i'
+					.' LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id'
+				. ' SET i.language = ie.language'
+				. ' WHERE ie.language<>"" AND ('
+				. '  i.language="" OR (i.language="*" AND i.language<>ie.language)'
+				. ' )'
+				;
+		$db->setQuery($query);
+		$result1 = $db->execute();
+		
+		// Sync language of items_ext table using the language from Joomla content table
+		$query 	= 'UPDATE #__flexicontent_items_ext AS ie'
+					.' LEFT JOIN #__content as i ON i.id=ie.item_id'
+				. ' SET ie.language = i.language'
+				. ' WHERE i.language<>ie.language'
+				;
+		$db->setQuery($query);
+		$result1 = $db->execute();
+	}
+
+
+	/**
+	 * Method to set the default site language the items with no language
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function setItemsDefaultLang($lang)
+	{
+		$db = JFactory::getDbo();
+		
+		// Set default language for items that do not have their language set
+		$query 	= 'UPDATE #__flexicontent_items_ext'
+				. ' SET language = ' . $db->Quote($lang)
+				. ' WHERE language = ""'
+				;
+		$db->setQuery($query);
+		$result1 = $db->execute();
+		
+		$query 	= 'UPDATE #__flexicontent_items_tmp'
+				. ' SET language = ' . $db->Quote($lang)
+				. ' WHERE language = ""'
+				;
+		$db->setQuery($query);
+		$result1a = $db->execute();
+		
+		$query 	= 'UPDATE #__content'
+				. ' SET language = ' . $db->Quote($lang)
+				. ' WHERE language = ""'
+				;
+		$db->setQuery($query);
+		$result2 = $db->execute();
+		
+		return $result1 && $result1a && $result2;
+	}
+
+
 	/**
 	 * Method to get if main category of items exists in both category table and in flexicontent category-items relation table
 	 * 
@@ -1026,7 +1099,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getCacheThumbChmod()
+	function getCacheThumbPerms()
 	{
 		static $return;
 		if ($return!==null) return $return;
@@ -1601,7 +1674,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}*/
 	}
 
-	function processLanguageFiles($code = 'en-GB', $method = '', $params = array())
+	function createLanguagePack($code = 'en-GB', $method = '', $params = array())
 	{
 		jimport('joomla.filesystem.file');
 		
@@ -1617,7 +1690,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$adminfiles = array(
 		// component files
 			'com_flexicontent',
-			(FLEXI_J16GE ? 'com_flexicontent.sys' : ''),
+			'com_flexicontent.sys',
 		// plugin files  --  flexicontent_fields
 			'plg_flexicontent_fields_addressint',
 			'plg_flexicontent_fields_checkbox',
@@ -1892,7 +1965,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	}
 	
 	
-	function initialPermission()
+	function updateInitialPermission()
 	{
 		$app = JFactory::getApplication();
 		$component_name	= $app->input->get('option', '', 'CMD');
@@ -2193,8 +2266,49 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		return true;
 	}
-	
-	
+
+
+	/**
+	 * Method to check if search indexes need to be updated because of changing publication state or search flags of fields
+	 *
+	 * @access public
+	 * @return array
+	*/
+	function checkDirtyFields()
+	{
+		$perms = FlexicontentHelperPerm::getPerm();
+		if ( !$perms->CanFields ) return;
+		
+		$db = JFactory::getDbo();
+		
+		// GET fields having dirty field properties, NOTE: a dirty field property means that search index must be updated,
+		// even if the field was unpublished, because the field values may still exists in the search index for some items
+		
+		$query = 'SELECT COUNT(*) '
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE (issearch=-1 || issearch=2)'  // Regardless publication state
+			;
+		$db->setQuery($query);
+		$dirty_basic = $db->loadResult();
+		
+		$query = 'SELECT COUNT(*) '
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE (isadvsearch=-1 OR isadvsearch=2 OR isadvfilter=-1 OR isadvfilter=2)'  // Regardless publication state
+			;
+		$db->setQuery($query);
+		$dirty_advanced = $db->loadResult();
+		
+		if ($dirty_basic)
+		{
+			JFactory::getApplication()->enqueueMessage( JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_BASIC', $dirty_basic, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '), 'notice' );
+		}
+		if ($dirty_advanced)
+		{
+			JFactory::getApplication()->enqueueMessage( JText::sprintf( 'FLEXI_ALERT_UPDATE_SINDEX_ADVANCED', $dirty_advanced, ' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;" '), 'notice' );
+		}
+	}
+
+
 	/**
 	 * Creates initial component actions based on global config and on some ... logic
 	 *
@@ -2473,4 +2587,3 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 	}
 }
-?>

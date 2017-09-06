@@ -28,7 +28,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existfields) : /*@TODO must write a class for all following cases */ ?>
 	jQuery('#existfields').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createdefaultfields&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultfields&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existfields-log').html(ajaxloader);
 		jQuery.ajax({
@@ -46,7 +46,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existmenuitems) : ?>
 	jQuery('#existmenuitems').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createMenuItems&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createmenuitems&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existmenuitems-log').html(ajaxloader);
 		jQuery.ajax({
@@ -64,7 +64,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existtype) : ?>
 	jQuery('#existtype').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createdefaultype&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultype&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existtype-log').html(ajaxloader);
 		jQuery.ajax({
@@ -82,7 +82,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->allplgpublish) : ?>
 	jQuery('#publishplugins').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=publishplugins&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.publishplugins&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#publishplugins-log').html(ajaxloader);
 		jQuery.ajax({
@@ -100,7 +100,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existcats) : ?>
 	jQuery('#existcats').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=addmcatitemrelations&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.addmcatitemrelations&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existcats-log').html(ajaxloader);
 		jQuery.ajax({
@@ -118,7 +118,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->langsynced) : ?>
 	jQuery('#langsynced').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=updatelanguagedata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updatelanguagedata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#langsynced-log').html(ajaxloader);
 		jQuery.ajax({
@@ -137,7 +137,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existdbindexes) : ?>
 	jQuery('#existdbindexes').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createdbindexes&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdbindexes&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existdbindexes-log').html(ajaxloader);
 		jQuery.ajax({
@@ -155,7 +155,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existversions) : ?>
 	jQuery('#existversions').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createversionstbl&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createversionstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existversions-log').html(ajaxloader);
 		jQuery.ajax({
@@ -173,7 +173,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existversionsdata) : ?>
 	jQuery('#existversionsdata').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=populateversionstbl&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.populateversionstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existversionsdata-log').html(ajaxloader);
 		jQuery.ajax({
@@ -191,7 +191,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->existauthors) : ?>
 	jQuery('#existauthors').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=createauthorstbl&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createauthorstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existauthors-log').html(ajaxloader);
 		jQuery.ajax({
@@ -209,7 +209,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->cachethumb) : ?>
 	jQuery('#cachethumb').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=cachethumbchmod&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.setcachethumbperms&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#cachethumb-log').html(ajaxloader);
 		jQuery.ajax({
@@ -227,7 +227,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->itemcountingdok) : ?>
 	jQuery('#itemcountingdok').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=updateitemcounting&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updateitemcountingdata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#itemcountingdok-log').html(ajaxloader);
 		jQuery.ajax({
@@ -245,7 +245,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->deprecatedfiles) : ?>
 	jQuery('#deprecatedfiles').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=deletedeprecatedfiles&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.deletedeprecatedfiles&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#deprecatedfiles-log').html(ajaxloader);
 		jQuery.ajax({
@@ -263,7 +263,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->nooldfieldsdata) : ?>
 	jQuery('#oldfieldsdata').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=cleanupoldtables&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.cleanupoldtables&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#oldfieldsdata-log').html(ajaxloader);
 		jQuery.ajax({
@@ -281,7 +281,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->missingversion) : ?>
 	jQuery('#missingversion').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=addcurrentversiondata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.addcurrentversiondata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#missingversion-log').html(ajaxloader);
 		jQuery.ajax({
@@ -299,7 +299,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->initialpermission) : ?>
 	jQuery('#initialpermission').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=initialpermission&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updateinitialpermission&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#initialpermission-log').html(ajaxloader);
 		jQuery.ajax({
