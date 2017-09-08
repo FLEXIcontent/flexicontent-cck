@@ -239,7 +239,7 @@ class flexicontent_fields extends _flexicontent_fields
 
 		if (!empty($bad_alias))
 		{
-			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $_alias, $this->$alias);
+			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $bad_alias, $this->$alias);
 			JFactory::getApplication()->enqueueMessage($msg, 'notice');
 		}
 
