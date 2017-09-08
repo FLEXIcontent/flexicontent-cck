@@ -520,7 +520,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			// Lets load the files if it doesn't already exist
 			if ($this->_pending)
 			{
-				if ( isset($names_pending[$row->filename]))
+				if ( !isset($names_pending[$row->filename]))
 				{
 					$it->next();
 					continue;
@@ -556,10 +556,29 @@ class FlexicontentModelFilemanager extends JModelLegacy
 					? JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png'
 					: JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 			}
-			$rows[] = $row;
+
+			if ($this->_pending)
+			{
+				$rows[$row->filename] = $row;
+			}
+			else
+			{
+				$rows[] = $row;
+			}
 
 			$i++;
 			$it->next();
+		}
+
+		// Lets load the files if it doesn't already exist
+		if ($this->_pending)
+		{
+			$_rows = array();
+			foreach($names_pending as $filename => $file)
+			{
+				$_rows[] = $rows[$filename];
+			}
+			$rows = $_rows;
 		}
 
 		return $rows;
