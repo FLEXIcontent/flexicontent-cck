@@ -822,9 +822,17 @@ jQuery(document).ready(function()
 		
 		$field = JTable::getInstance( $_type = 'flexicontent_fields', $_prefix = '', $_config = array() );
 		
+
 		if ( !$field->load( $field_id ) )           $response['error'] = 'field not found';
 		else if ( $field->field_type!='relation' )  $response['error'] = 'field id is not a relation field';
-		else if ( !isset($uacc[$field->access]) )   $response['error'] = 'you do not have access level to use this field';
+		else
+		{
+			$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+			if ( !$is_editable )
+			{
+				$response['error'] = 'you do not have permission to edit lthis field';
+			}
+		}
 		
 		if ( $response['error'] )
 		{
