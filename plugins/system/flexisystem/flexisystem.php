@@ -494,7 +494,7 @@ class plgSystemFlexisystem extends JPlugin
 		// *** Allow Joomla article view for non-bound items or for specific content types (also 
 		// ***
 
-		if ($in_limits && ($view == 'article' || $view == 'form'))
+		if ($in_limits)
 		{
 			$db->setQuery('SELECT	attribs'
 				. ' FROM #__flexicontent_types AS ty '
