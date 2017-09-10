@@ -4017,7 +4017,7 @@ class FlexicontentFields
 		$format_output = (int) $filter->parameters->get('format_output', 0);
 		if ($format_output > 0)  // 1: decimal, 2: integer
 		{
-			$decimal_digits_displayed = $format_output==2 ? 0 : (int)$filter->parameters->get('decimal_digits_displayed', 2);
+			$decimal_digits_displayed = $format_output === 2 ? 0 : (int)$filter->parameters->get('decimal_digits_displayed', 2);
 			$decimal_digits_sep    = $filter->parameters->get('decimal_digits_sep', '.');
 			$decimal_thousands_sep = $filter->parameters->get('decimal_thousands_sep', ',');
 			$output_prefix = JText::_($filter->parameters->get('output_prefix', ''));
