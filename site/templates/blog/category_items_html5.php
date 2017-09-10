@@ -142,7 +142,7 @@ FlexicontentFields::getFieldDisplay($items, 'text', $values=null, $method='displ
 
 if ($leadnum) :
 	//added to intercept more columns (see also css changes)
-	$lead_cols = $this->params->get('lead_cols', 2);
+	$lead_cols = $this->params->get('lead_cols', 1);
 	$lead_cols_classes = array(1=>'one',2=>'two',3=>'three',4=>'four');
 	$classnum = $lead_cols_classes[$lead_cols];
 ?>
