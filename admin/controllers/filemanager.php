@@ -553,6 +553,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			$_options = array('secure' => $secure);
 			$path = $model->getFieldFolderPath($u_item_id, $fieldid, $_options);
+
+			// Create field's folder if it does not exist already
+			if (!is_dir($path))
+			{
+				mkdir($path, $mode = 0755, $recursive=true);
+			}
 		}
 		else
 		{
