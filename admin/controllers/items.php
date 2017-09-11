@@ -108,6 +108,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user    = JFactory::getUser();
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
+		$perms   = FlexicontentHelperPerm::getPerm();
 
 		$ctrl_task = 'task=items.';
 		$original_task = $this->task;
@@ -237,26 +238,50 @@ class FlexicontentControllerItems extends FlexicontentController
 		$unique_tmp_itemid = $this->input->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 
+
+		// ***
+		// *** Some default values (further checks for these will be done later)
+		// ***
+
 		// Auto title for some content types, set it to pass validation. NOTE real value will be created via onBeforeSaveField event
 		if ( $params->get('auto_title', 0) )
 		{
 			$data['title'] = (int) $data['id'];  // item id or ZERO for new items
 		}
 
-		// Check for zero tags posted		
-		$tagname = $this->input->get('tagname', null);
-		if (!isset($data['tag']) && $tagname !== null)
+		// Check of empty tags, (later we will check if these are allowed to be changed or they were not shown !)
+		if (!isset($data['tag']))
 		{
 			$data['tag'] = array();
+		}
+
+		// Check of empty categories, (later we will check if these are allowed to be changed or they were not shown !)
+		if (!isset($data['cid']))
+		{
+			$data['cid'] = array();
+		}
+
+
+		// ***
+		// *** Check for zero tags posted (also considering if tags editing is permitted to current user)
+		// ***
+
+		// No permission to change tags or tags were not displayed
+		$tags_shown = $app->isAdmin()
+			? 1
+			: (int) $params->get('usetags_fe', 1) === 1;
+
+		if (!$perms->CanUseTags || ! $tags_shown)
+		{
+			unset($data['tag']);
 		}
 
 
 		// ***
 		// *** ENFORCE can change category ACL perms
 		// ***
-		
-		$perms = FlexicontentHelperPerm::getPerm();
-		
+
+
 		// Per content type change category permissions
 		$current_type_id  = $model->get('type_id') ?: (int) @ $data['type_id'];
 		$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
@@ -288,6 +313,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$data['featured_cid'] = $featured_cid;
 		}
 
+
 		// Enforce maintaining secondary categories if user is not allowed to changed
 		if (
 			!$enable_cid_selector   // user can not change / set secondary cats
@@ -313,7 +339,8 @@ class FlexicontentControllerItems extends FlexicontentController
 				$data['cid'] = $model->get('cats');
 			}
 		}
-		
+
+
 		// Enforce maintaining main category if user is not allowed to change
 		if (
 			!$enable_catid_selector   // user can not change / set main category
@@ -330,7 +357,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!isset($data['rules']) || !is_array($data['rules']))
 		{
 			$data['rules'] = array();
-		}		
+		}
 
 
 		// ***
@@ -412,7 +439,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$canAdd  = $itemAccess->get('access-create');  // includes check of creating in at least one category
 		$canEdit = $itemAccess->get('access-edit');    // includes privileges edit and edit-own
 
-		$type_id = (int) @ $validated_data['type_id'];  // Typecast to int, (already done for J2.5 via validating)
+		$type_id = (int) $validated_data['type_id'];
 
 		// Existing item with Type not being ALTERED, content type can be maintained regardless of privilege
 		if ( !$isnew && $model->get('type_id') == $type_id )
