@@ -551,7 +551,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		if ($fieldid)
 		{
-			$path = $model->getFieldFolderPath($u_item_id, $fieldid, $_options=array('secure' => $secure));
+			$_options = array('secure' => $secure);
+			$path = $model->getFieldFolderPath($u_item_id, $fieldid, $_options);
 		}
 		else
 		{

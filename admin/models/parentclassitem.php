@@ -4390,7 +4390,7 @@ class ParentClassItem extends FCModelAdmin
 		
 		// Create the non-SEF URL
 		$item_url =
-			FlexicontentHelperRoute::getItemRoute($this->_record->id, $this->_record->catid, 0, $this->_record)
+			FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)
 			. ( $this->_record->language != '*' ? '&lang=' . substr($this->_record->language, 0, 2) : '' );
 
 		// Create the SEF URL
@@ -5251,6 +5251,13 @@ class ParentClassItem extends FCModelAdmin
 		}
 		// Force to public access if category access level is empty
 		$record->category_access = !empty($record->category_access) ? $record->category_access : $public_acclevel;
+
+
+		// ***
+		// *** Item's slug
+		// ***
+
+		$record->slug = isset($record->slug) ? $record->slug : $record->id . ':' . $record->alias ;
 
 
 		// ***
