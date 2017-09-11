@@ -466,7 +466,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $options);
 		//echo $gallery_folder ."<br />";
 
-		// Create folder for current language
+		// Create field's folder if it does not exist already
 		if (!is_dir($gallery_folder))
 		{
 			mkdir($gallery_folder, $mode = 0755, $recursive=true);
