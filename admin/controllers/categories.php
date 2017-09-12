@@ -67,7 +67,10 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	{
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		
-		parent::save();  // this will also clean cache
+		parent::save();
+
+		// Clean cache
+		$this->_cleanCache();
 	}
 
 

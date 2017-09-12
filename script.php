@@ -481,6 +481,11 @@ class com_flexicontentInstallerScript
 			<tbody>
 			
 		<?php
+		// Fix for categories with wrong extension
+		$query = 'UPDATE #__categories SET extension = "com_content", published = 0 WHERE  extension = "com_flexicontent"';
+		$db->setQuery($query);
+		$db->execute();
+
 		$deprecated_fields = array(
 			'hidden'=>'text',
 			'relateditems'=>'relation',

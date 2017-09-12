@@ -379,7 +379,9 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
+		$this->setState($this->getName().'.extension', 'com_content');
 		$extension = $this->getState($this->getName().'.extension');
+
 		$jinput = JFactory::getApplication()->input;
 
 		// A workaround to get the extension and other data into the model for save requests.
