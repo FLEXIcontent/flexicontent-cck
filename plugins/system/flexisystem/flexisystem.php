@@ -496,7 +496,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		if ($in_limits)
 		{
-			$db->setQuery('SELECT	attribs'
+			$db->setQuery('SELECT attribs'
 				. ' FROM #__flexicontent_types AS ty '
 				. ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = ty.id '
 				. ' WHERE ie.item_id = ' . $id);
@@ -507,13 +507,20 @@ class plgSystemFlexisystem extends JPlugin
 			{
 				$type_params = new JRegistry($type_params);
 			}
-
-			// Allow viewing by Joomla article view, if so configured
-			$in_limits = $type_params && $type_params->get('allow_jview') != 1;   // allow_jview, 0: Reroute, 1: Allow, 2: Redirect
 		}
 
+		// Allow viewing by Joomla article view, if so configured
+		// CASES--  0: Reroute, 1: Allow, 2: Redirect
+		$allow_jview = $view === 'item' || empty($type_params)   // NOTE case: view === 'item' (flexicontent view with com_content MENU item)
+			? 0  // Force reroute
+			: (int) $type_params->get('allow_jview', 0);
 
-		if (!$in_limits || empty($type_params))
+
+		// ***
+		// *** Joomla article view / form allowed
+		// ***
+
+		if ($allow_jview === 1)
 		{
 			return;
 		}
@@ -523,7 +530,7 @@ class plgSystemFlexisystem extends JPlugin
 		// *** Do re-routing (no page reloading)
 		// ***
 
-		if ( $type_params->get('allow_jview') == 0 ) // 0: Reroute, 1: Allow, 2: Redirect
+		elseif ($allow_jview === 0)
 		{
 			// Set new request variables
 			// NOTE: we only need to set HTTP request variable that must be changed, but setting any other variables to same value will not hurt
@@ -556,9 +563,10 @@ class plgSystemFlexisystem extends JPlugin
 		// ***
 		// *** Do redirection (using page reloading)
 		// ***
-		else
+
+		else  // $allow_jview === 2
 		{
-			if ($view=='form')
+			if ($view === 'form')
 			{
 				$urlItem = 'index.php?option=' . $this->extension . '&view=item&id='.$id.'&task=edit';
 			}
