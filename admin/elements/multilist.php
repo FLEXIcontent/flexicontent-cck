@@ -262,7 +262,7 @@ class JFormFieldMultiList extends JFormField
 			$val = key($V2L);
 			if ( $val === '' && $this->_inherited!==null && !is_array($this->_inherited) && isset($V2L[$this->_inherited]) )
 			{
-				$this->_options[0]->text = StringHelper::strtoupper($this->_options[0]->text). ' ... '. $V2L[$this->_inherited];
+				$this->_options[0]['items'][0]->text = StringHelper::strtoupper($this->_options[0]['items'][0]->text). ' ... '. $V2L[$this->_inherited];
 			}
 			$html = JHtml::_('select.groupedlist', $this->_options, $fieldname, $attribs);
 		}
