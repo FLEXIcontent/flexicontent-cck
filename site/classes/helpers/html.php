@@ -927,11 +927,12 @@ class flexicontent_html
 
 	static function searchphrase_selector(&$params, $formname='adminForm')
 	{
-		$searchphrase = '';
-		if($show_searchphrase = $params->get('show_searchphrase', 1))
+		$default_searchphrase = $params->get('default_searchphrase', 'all');
+		$app = JFactory::getApplication();
+		$p = $app->input->getWord('searchphrase', $app->input->getWord('p', $default_searchphrase));
+
+		if ($show_searchphrase = $params->get('show_searchphrase', 1))
 		{
-			$default_searchphrase = $params->get('default_searchphrase', 'all');
-			$searchphrase = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
 			$searchphrase_names = array(
 				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'natural'=>'FLEXI_NATURAL_PHRASE',
 				'exact'=>'FLEXI_EXACT_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT'
@@ -945,13 +946,17 @@ class flexicontent_html
 				$_obj->text  = $searchphrase_name;
 				$searchphrases[] = $_obj;
 			}
-			$searchphrase = JHtml::_('select.genericlist', $searchphrases, 'p',
+			$html = JHtml::_('select.genericlist', $searchphrases, 'p',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text',
-				$searchphrase, 'searchphrase', $_translate=true
+				$p, 'searchphrase', $_translate=true
 			);
 		}
+		else
+		{
+			$html = '<input type="hidden" name="p" value="' . $p . '" />';
+		}
 
-		return $searchphrase;
+		return $html;
 	}
 
 
