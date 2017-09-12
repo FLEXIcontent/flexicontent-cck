@@ -154,7 +154,7 @@ function delAllFilters() {
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<span class="btn-group fc-filter">
 			<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);"><?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?></span>
-			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
+			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
 		</span>
 		<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
 		
@@ -166,7 +166,7 @@ function delAllFilters() {
 				?>
 			</span>
 			
-			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage hidden-phone hidden-tablet">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 			</span>
 			
@@ -211,8 +211,8 @@ function delAllFilters() {
 			  <?php echo $this->lists['language']; ?>
 			</div>
 		</div>
-		
-		<div class="fc-filter nowrap_box">
+
+		<div class="fc-filter nowrap_box hidden-phone">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<div class="add-on"><?php echo JText::_('FLEXI_ID'); ?></div>
 				<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
@@ -241,34 +241,34 @@ function delAllFilters() {
 			</th>
 			<th class="hideOnDemandClass left"><?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title"><?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
+			<th class="hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left hidden-phone hidden-tablet" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_P'].'" title="'.$state_names['ALL_P'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['ALL_U'].'" title="'.$state_names['ALL_U'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['A'].'" title="'.$state_names['A'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
 				<?php echo '<span class="'.$tip_class.' icon-'.$state_icons['T'].'" title="'.$state_names['T'].' '.JText::_ ('FLEXI_ITEMS').'" data-placement="top" style="font-size: 16px;"></span>'; ?>
 			</th>
-			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_REORDER', 'a.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHtml::_('grid.order', $this->rows, 'filesave.png', 'categories.saveorder' )) : ''; ?>
 			</th-->
-			<th class="hideOnDemandClass">
+			<th class="hideOnDemandClass hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			<th class="hideOnDemandClass">
+			<th class="hideOnDemandClass center hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 		</tr>
@@ -440,7 +440,7 @@ function delAllFilters() {
 				</div>
 			</td>
 
-			<td style="text-align:left;" class="col_title">
+			<td class="col_title left">
 				<?php
 				if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
 				
@@ -495,7 +495,7 @@ function delAllFilters() {
 				
 			</td>
 			
-			<td>
+			<td class="hidden-phone hidden-tablet">
 				<?php
 				echo StringHelper::strlen($row->alias) > 25
 					? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
@@ -503,14 +503,14 @@ function delAllFilters() {
 				?>
 			</td>
 
-			<td class="col_edit_layout">
+			<td class="col_edit_layout hidden-phone hidden-tablet">
 				<?php if ($this->CanTemplates && $row_clayout) : ?>
 				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
 					<?php echo $image_editlayout;?>
 				</a>
 				<?php endif; ?>
 			</td>
-			<td class="col_template">
+			<td class="col_template hidden-phone hidden-tablet">
 				<?php echo $row->config->get('clayout') ? $row->config->get('clayout') : ($row_clayout ? $row_clayout : '...').'<span class="badge">inherited</span>'; ?>
 			</td>
 			
@@ -527,27 +527,27 @@ function delAllFilters() {
 				$c_t = (int) @ $row->byStateTotals[-2];
 			?>
 			
-			<td style="padding: 0;">
+			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
 				<a href="<?php echo $items_link.'ALL_P'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_p ? ' badge-success' : ''; ?>">
 					<?php echo $c_p ? $c_p : '0'; ?>
 				</a>
 			</td>
-			<td style="padding: 0;">
+			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
 				<a href="<?php echo $items_link.'ALL_U'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_u ? ' badge-important' : ''; ?>">
 					<?php echo $c_u ? $c_u : '0'; ?>
 				</a>
 			</td>
-			<td style="padding: 0;">
+			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
 				<a href="<?php echo $items_link.'A'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_a ? ' badge-info' : ''; ?>">
 					<?php echo $c_a ? $c_a : '0'; ?>
 				</a>
 			</td>
-			<td style="padding: 0;">
+			<td style="padding: 0;" class="center hidden-phone hidden-tablet">
 				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:white; margin: 0;" class="badge <?php echo $c_t ? ' badge-inverse' : ''; ?>">
 					<?php echo $c_t ? $c_t : '0'; ?>
 				</a>
 			</td>
-			<td>
+			<td class="hidden-phone">
 				<?php echo $access; ?>
 			</td>
 
@@ -566,14 +566,14 @@ function delAllFilters() {
 			<?php endif; ?>
 			</td-->
 
-			<td class="left nowrap">
+			<td class="left nowrap hidden-phone">
 			<?php if ($row->language=='*'):?>
 				<?php echo JText::alt('JALL','language'); ?>
 			<?php else:?>
 				<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
 			<?php endif;?>
 			</td>
-			<td>
+			<td class="center hidden-phone">
 				<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
 				<?php echo $row->id; ?>
 				</span>
