@@ -202,6 +202,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// Get model
 		$model = $this->getModel('filemanager');
+		$file_model = $this->getModel('file');
 
 		// Find usage in fields
 		$s_assigned_fields = array('file', 'minigallery');
@@ -247,7 +248,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				{
 					if ($file->filename_original)
 					{
-						$file->size = $model->get_file_size_from_url($file->filename_original, $error_msg);
+						$file->size = $file_model->get_file_size_from_url($file->filename_original, $error_msg);
 					}
 					if ($error_msg)
 					{
