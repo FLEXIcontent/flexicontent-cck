@@ -98,11 +98,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$start_microtime = microtime(true);
 
 		$has_zlib    = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
-		$indexer     = $this->input->getCmd('indexer','fileman_default');
-		$rebuildmode = $this->input->getCmd('rebuildmode','');
+		$indexer     = $this->input->getCmd('indexer', 'fileman_default');
+		$rebuildmode = $this->input->getCmd('rebuildmode', '');
+		$index_urls  = $this->input->getInt('index_urls', 0);
 
 		$session = JFactory::getSession();
-		$db  = JFactory::getDbo();
+		$db = JFactory::getDbo();
 		$app = JFactory::getApplication();
 
 		// Actions according to rebuildmode
@@ -110,6 +111,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 			die("'rebuildmode': '".$rebuildmode."'. not supported");
 		}
+		
+		// Clear previous log file
+		$log_filename = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . 'filemanager_index_stats_' . \JFactory::getUser()->id . '.php');
+		if (file_exists($log_filename))
+		{
+			@ unlink($log_filename);
+		}
+		$session->set('filemanager.log_filename', $log_filename, 'flexicontent');
 
 		// Get ids of files to index
 		$model = $this->getModel('filemanager');
@@ -130,9 +139,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$_total_queries = 0;
 		echo sprintf( '|0| Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
 		
-		$session->set($indexer.'_total_runtime', $elapsed_microseconds ,'flexicontent');
-		$session->set($indexer.'_total_queries', 0 ,'flexicontent');
-		exit;
+		$session->set($indexer.'_total_runtime', $elapsed_microseconds , 'flexicontent');
+		$session->set($indexer.'_total_queries', 0 , 'flexicontent');
+		jexit();
 	}
 	
 	
@@ -159,20 +168,23 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$session = JFactory::getSession();
 		$db = JFactory::getDbo();
+		$app = JFactory::getApplication();
 		
-		$indexer = $this->input->getCmd('indexer','fileman_default');
-		$rebuildmode = $this->input->getCmd('rebuildmode','');
+		$indexer     = $this->input->getCmd('indexer', 'fileman_default');
+		$rebuildmode = $this->input->getCmd('rebuildmode', '');
+		$index_urls  = $this->input->getInt('index_urls', 0);
 		
 		$items_per_call = $this->input->getInt('items_per_call', 20);  // Number of item to index per HTTP request
 		$itemcnt = $this->input->getInt('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
 		
 		// Actions according to rebuildmode
-		if ($indexer!='fileman_default') {
+		if ($indexer!='fileman_default')
+		{
 			die("'rebuildmode': '".$rebuildmode."'. not supported");
 		}
 		
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
-		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
+		$itemids = $session->get($indexer.'_items_to_index', array(), 'flexicontent');
 		
 		
 		// Get query size limit
@@ -182,11 +194,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);
 		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256*1024;
 		$query_lim = (int) (3 * $max_allowed_packet / 4);
-		//echo 'fail|'.$query_lim; exit;
+		//echo 'fail|'.$query_lim; jexit();
 		
 		// Get script max
 		$max_execution_time = ini_get("max_execution_time");
-		//echo 'fail|'.$max_execution_time; exit;
+		//echo 'fail|'.$max_execution_time; jexit();
 		
 		// Get model
 		$model = $this->getModel('filemanager');
@@ -216,15 +228,57 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			
 			$size_index = array();
 			$usage_index = array();
+			$errors = array();
 			
 			// For current item: Loop though all searchable fields according to their type
 			foreach($file_data as $file_id => $file)
 			{
 				$file->total_usage = 0;
 				$path = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-				$file_path = $path . DS . $file->filename;		
-				$file->size = !$file->url && file_exists($file_path) ? filesize($file_path) : 0;
+				$file_path = $path . DS . $file->filename;
+				$error_msg = null;
+
+				if (!$file->url)
+				{
+					$file->size = file_exists($file_path) ? filesize($file_path) : 0;
+				}
+
+				elseif($index_urls)
+				{
+					if ($file->filename_original)
+					{
+						$file->size = $model->get_file_size_from_url($file->filename_original, $error_msg);
+					}
+					if ($error_msg)
+					{
+						$errors[] = $file->filename_original . ' -- ' . $error_msg['message'];
+					}
+				}
+
 				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
+			}
+			if (count($errors))
+			{
+				$log_filename = 'filemanager_index_stats_' . \JFactory::getUser()->id . '.php';
+				jimport('joomla.log.log');
+				JLog::addLogger(
+					array(
+						'text_file' => $log_filename,  // Sets the target log file
+            'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+					),
+					JLog::ALL,  // Sets messages of all log levels to be sent to the file
+					array('com_flexicontent.filemanager.stats_indexer')  // category of logged messages
+				);
+
+				$stats_indexer_error_count = $session->get('filemanager.stats_indexer_error_count', 0, 'flexicontent');
+				$session->set('filemanager.stats_indexer_error_count', $stats_indexer_error_count + count($errors), 'flexicontent');
+				/*$stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', array(), 'flexicontent');
+				foreach($errors as $error_message)
+				{
+					$stats_indexer_errors[] = $error_message;
+					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.filemanager.stats_indexer');
+				}
+				$session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');*/
 			}
 
 
@@ -271,23 +325,22 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		if ( $session->has($indexer.'_total_runtime', 'flexicontent')) {
-			$_total_runtime = $session->get($indexer.'_total_runtime', 0,'flexicontent');
+			$_total_runtime = $session->get($indexer.'_total_runtime', 0, 'flexicontent');
 		} else {
 			$_total_runtime = 0;
 		}
 		$_total_runtime += $elapsed_microseconds;
-		$session->set($indexer.'_total_runtime', $_total_runtime ,'flexicontent');
+		$session->set($indexer.'_total_runtime', $_total_runtime, 'flexicontent');
 		
 		if ( $session->has($indexer.'_total_queries', 'flexicontent')) {
-			$_total_queries = $session->get($indexer.'_total_queries', 0,'flexicontent');
+			$_total_queries = $session->get($indexer.'_total_queries', 0, 'flexicontent');
 		} else {
 			$_total_queries = 0;
 		}
 		$_total_queries += $query_count;
-		$session->set($indexer.'_total_queries', $_total_queries ,'flexicontent');
+		$session->set($indexer.'_total_queries', $_total_queries , 'flexicontent');
 		
-		echo sprintf( $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
-		exit;
+		jexit(printf( $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries);
 	}
 	
 	

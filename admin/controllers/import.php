@@ -92,7 +92,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		jimport('joomla.log.log');
 		JLog::addLogger(
 			array(
-				'text_file' => $log_filename,  // Sets the format of each line
+				'text_file' => $log_filename,  // Sets the target log file
         'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
 			JLog::ALL,  // Sets messages of all log levels to be sent to the file
