@@ -273,13 +273,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				$stats_indexer_error_count = $session->get('filemanager.stats_indexer_error_count', 0, 'flexicontent');
 				$session->set('filemanager.stats_indexer_error_count', $stats_indexer_error_count + count($errors), 'flexicontent');
-				/*$stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', array(), 'flexicontent');
+				//stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', array(), 'flexicontent');
 				foreach($errors as $error_message)
 				{
-					$stats_indexer_errors[] = $error_message;
+					//$stats_indexer_errors[] = $error_message;
 					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.filemanager.stats_indexer');
 				}
-				$session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');*/
+				//$session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');
 			}
 
 
