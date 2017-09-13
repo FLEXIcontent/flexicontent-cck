@@ -1636,40 +1636,4 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$file_ids = $this->_db->loadColumn();
 		return $file_ids;
 	}
-
-
-	/**
-	 * Returns the size of a file without downloading it, or -1 if the file size could not be determined.
-	 *
-	 * @param $url - The location of the remote file to download. Cannot be null or empty.
-	 *
-	 * @return The size of the file referenced by $url,
-	 * or -1 if the size could not be determined
-	 * or -999 if there was an error
-	 */
-	function get_file_size_from_url($url, & $error_msg = null)
-	{
-		// clear last error
-		$ignore_last_error = error_get_last();
-
-		try {
-			$headers = @ get_headers($url, 1);
-			$error_msg = error_get_last();
-
-			// Follow the Location headers until the actual file URL is known
-			while (isset($headers['Location']))
-			{
-				$url = $headers['Location'];
-				$headers = get_headers($url, 1);
-			}
-		}
-		catch (RuntimeException $e) {
-			return -999;  // indicate a fatal error
-		}
-
-		// Get file size
-		$filesize = isset($headers["Content-Length"]) ? $headers["Content-Length"] : -1;  // indicate that the size could not be determined
-		return $filesize;
-	}
-
 }
