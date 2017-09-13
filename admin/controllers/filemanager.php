@@ -211,7 +211,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			if ( empty($data['size']) )
 			{
-				$data['size'] = $this->get_file_size_from_url($data['filename_original']);
+				$data['size'] = $model->get_file_size_from_url($data['filename_original']);
 				if ($data['size'] < 0 || empty($data['size']))
 				{
 					$data['size'] = 0;
@@ -692,6 +692,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$app = JFactory::getApplication();
 		$session = JFactory::getSession();
+		$model = $this->getModel($this->record_name);
 
 		// Force interactive run mode, if given parameters
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
@@ -725,7 +726,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (empty($filesize))
 		{
-			$filesize = $this->get_file_size_from_url($filename);
+			$filesize = $model->get_file_size_from_url($filename);
 			if ($filesize < 0) $filesize = 0;
 		}
 
@@ -1477,7 +1478,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				jimport('joomla.log.log');
 				JLog::addLogger(
 					array(
-						'text_file' => $log_filename,  // Sets the format of each line
+						'text_file' => $log_filename,  // Sets the target log file
             'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 					),
 					JLog::ALL,  // Sets messages of all log levels to be sent to the file
@@ -1514,39 +1515,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$app->redirect($this->returnURL . ($httpStatus == '403 Forbidden' ? '' : '&'. JSession::getFormToken() . '=1'));
 		else
 			return ! $this->exitSuccess ? false : null;
-	}
-
-
-	/**
-	 * Returns the size of a file without downloading it, or -1 if the file size could not be determined.
-	 *
-	 * @param $url - The location of the remote file to download. Cannot be null or empty.
-	 *
-	 * @return The size of the file referenced by $url,
-	 * or -1 if the size could not be determined
-	 * or -999 if there was an error
-	 */
-	function get_file_size_from_url($url)
-	{
-		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
-
-		try {
-			$headers = get_headers($url, 1);
-
-			// Follow the Location headers until the actual file URL is known
-			while (isset($headers['Location']))
-			{
-				$url = $headers['Location'];
-				$headers = get_headers($url, 1);
-			}
-		}
-		catch (RuntimeException $e) {
-			return -999;  // indicate a fatal error
-		}
-
-		// Get file size
-		$filesize = isset($headers["Content-Length"]) ? $headers["Content-Length"] : -1;  // indicate that the size could not be determined
-		return $filesize;
 	}
 
 

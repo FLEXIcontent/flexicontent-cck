@@ -19,14 +19,15 @@
 defined('_JEXEC') or die('Restricted access');
 
 $ctrl_task = FLEXI_J16GE ? 'task=filemanager.' : 'controller=filemanager&task=';
-$pdf_parser = FlexicontentFields::getPDFParser();
 
-$indexer_name = JFactory::getApplication()->input->get('indexer', 'fileman_default', 'cmd');
-$rebuildmode  = JFactory::getApplication()->input->get('rebuildmode', '', 'cmd');
+$app = JFactory::getApplication();
+$indexer_name = $app->input->get('indexer', 'fileman_default', 'cmd');
+$rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
+$index_urls   = $app->input->get('index_urls', 0, 'int');
 ?>
 <div>&nbsp;</div>
 <div style="heading">
-	Indexer Running ... <?php echo $pdf_parser ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
+	Indexer Running ... <br/>
 	
 <script type="text/javascript">
 jQuery(document).ready(function() {
@@ -50,7 +51,7 @@ jQuery(document).ready(function() {
 		var start_time = new Date().getTime();
 		
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>",
+			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>"+"&index_urls=<?php echo $index_urls; ?>",
 			success: function(response, status2, xhr2) {
 				var request_time = new Date().getTime() - start_time;
 				total_time += request_time;
@@ -83,7 +84,7 @@ jQuery(document).ready(function() {
 	
 	var start_time = new Date().getTime();
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows"+"&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
 		success: function(response, status, xhr) {
 			var request_time = new Date().getTime() - start_time;
 			total_time += request_time;

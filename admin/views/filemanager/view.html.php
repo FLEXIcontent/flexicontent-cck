@@ -492,6 +492,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
+		$session = JFactory::getSession();
 
 		$contrl = "filemanager.";
 		JToolbarHelper::editList($contrl.'edit');
@@ -510,7 +511,40 @@ class FlexicontentViewFilemanager extends JViewLegacy
 						.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
 			";
 			JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ' )', false );
+
+			$btn_task = '';
+			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default&index_urls=1';
+			//$toolbar->appendButton('Popup', 'advindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
+			$js .= "
+				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
+			";
+			JToolbarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ', ' . JText::_('FLEXI_URL') . ' )', false );
 		}
+
+		/*$stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', null, 'flexicontent');
+		if ($stats_indexer_errors !== null)
+		{
+			foreach($stats_indexer_errors as $error_message)
+			{
+				JFactory::getApplication()->enqueueMessage($error_message, 'warning');
+			}
+			$session->set('filemanager.stats_indexer_errors', null, 'flexicontent');
+		}*/
+
+		$stats_indexer_error_count = $session->get('filemanager.stats_indexer_error_count', 0, 'flexicontent');
+		if ($stats_indexer_error_count)
+		{
+			JFactory::getApplication()->enqueueMessage('Could not calculate file stats for: ' . $stats_indexer_error_count . ' cases (e.g. bad URLs)', 'warning');
+			$session->set('filemanager.stats_indexer_error_count', null, 'flexicontent');
+
+			if ($log_filename = $session->get('filemanager.log_filename', null, 'flexicontent'))
+			{
+				JFactory::getApplication()->enqueueMessage('You may see log file : <b>' . JPATH::clean($log_filename) . '</b> for messages and errors', 'warning');
+			}
+		}
+		$session->set('filemanager.log_filename', null, 'flexicontent');
 
 		if ($perms->CanConfig)
 		{
