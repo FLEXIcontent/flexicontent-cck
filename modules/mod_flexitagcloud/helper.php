@@ -27,10 +27,10 @@ class modFlexiTagCloudHelper
 	static function getTags(&$params, &$module)
 	{
 		// Initialize
-		$app = JFactory::getApplication();
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		$db				= JFactory::getDbo();
-		$user			= JFactory::getUser();
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDbo();
+		$user = JFactory::getUser();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		//$now    = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
@@ -42,8 +42,12 @@ class modFlexiTagCloudHelper
 		$maxsize 	= (int)$params->get('max_size', '10');
 		$limit 		= (int)$params->get('count', '25');
 		$method		= (int)$params->get('method', '1');
-		$scope		= $params->get('categories');
-		$scope		= is_array($scope) ? implode(',', $scope) : $scope;
+		$cids = $params->get('categories');
+		$cids = is_array($cids)
+			? $cids
+			: ((int) $cids ? array((int) $cids) : array());
+		$treeinclude 		= $params->get('treeinclude');
+
 		$tagitemid	= (int)$params->get('force_itemid', 0);
 
 		$where 	= !FLEXI_J16GE ? ' WHERE i.sectionid = ' . FLEXI_SECTION : ' WHERE 1 ';
@@ -53,18 +57,70 @@ class modFlexiTagCloudHelper
 		$where .= ' AND c.published = 1';
 		$where .= ' AND tag.published = 1';
 
-		// filter by permissions
-		if (!$show_noauth) {
+		// access scope
+		if (!$show_noauth)
+		{
 			$aid_arr  = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where  .= ' AND i.access IN ('.$aid_list.')';
 		}
 
 		// category scope
-		if ($method == 2) { // include method
-			$where .= ' AND c.id NOT IN (' . $scope . ')';		
-		} else if ($method == 3) { // exclude method
-			$where .= ' AND c.id IN (' . $scope . ')';		
+
+		// Find current category
+		if ($method == 1)
+		{
+			$option  = $app->input->get('option', '', 'cmd');
+			$view    = $app->input->get('view', '', 'cmd');
+
+			$id   = $app->input->get('id', 0, 'int');   // id of current item
+			$cid  = $app->input->get(($option == 'com_content' ? 'id' : 'cid'), 0, 'int');   // current category ID or category ID of current item
+			$rootcatid = $app->input->get('rootcatid', 0, 'int');   // root category ID for directory view
+	
+			$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
+			$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
+			$isflexi_catview  = $is_content_ext && $view == 'category' && $cid;
+			$isflexi_dirview  = $view == 'flexicontent' && $rootcatid;
+			
+			if ($isflexi_itemview)
+			{
+				$query = 'SELECT catid FROM #__content WHERE id = ' . $id;
+				$db->setQuery($query);
+				$cid = $db->loadResult();
+				$cids = $cid ? array($cid) : array(0);
+			}
+
+			elseif($isflexi_catview)
+			{
+				$cids = array($cid);
+			}
+
+			elseif($isflexi_dirview)
+			{
+				$cids = array($rootcatid);
+			}
+
+			else
+			{
+				$cids = array();
+			}
+		}
+
+		// Retrieve extra categories, such children or parent categories
+		$cids = empty($cids)
+			? array(0)
+			: flexicontent_cats::getExtraCats($cids, $treeinclude, array(0));
+
+		// EXCLUDE method
+		if ($method == 2)
+		{
+			$where .= ' AND c.id NOT IN (' . implode(',', $cids) . ')';		
+		}
+
+		// INCLUDE method (specified categories or current category)
+		elseif ($method == 3 || $method == 1)
+		{
+			$where .= ' AND c.id IN (' . implode(',', $cids) . ')';		
 		}
 
 		// count Tags
