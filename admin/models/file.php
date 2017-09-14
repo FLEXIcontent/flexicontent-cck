@@ -305,14 +305,13 @@ class FlexicontentModelFile extends FCModelAdmin
 	 * or -1 if the size could not be determined
 	 * or -999 if there was an error
 	 */
-	function get_file_size_from_url($url, & $error_msg = null)
+	function get_file_size_from_url($url)
 	{
 		// clear last error
 		$ignore_last_error = error_get_last();
 
 		try {
-			$headers = @ get_headers($url, 1);
-			$error_msg = error_get_last();
+			$headers = array('Location' => $url);
 
 			// Follow the Location headers until the actual file URL is known
 			while (isset($headers['Location']))
@@ -320,15 +319,45 @@ class FlexicontentModelFile extends FCModelAdmin
 				$url = is_array($headers['Location'])
 					? end($headers['Location'])
 					: $headers['Location'];
-				$headers = get_headers($url, 1);
+
+				$headers = @ get_headers($url, 1);
+
+				// Check for get headers failing to execute
+				if ($headers === false)
+				{
+					$error = error_get_last();
+
+					$error_message = is_array($error) && isset($error['message'])
+						? $error['message']
+						: 'Error retrieving headers of URL';
+					$this->setError($error_message);
+
+					return -999;
+				}
+
+				// Check for bad response from server, e.g. not found 404 , or 403 no access
+				$n = 0;
+				while(isset($headers[$n]))
+				{
+					$code = (int) substr($headers[$n], 9, 3);
+					if ($code < 200 || $code >= 400 )
+					{
+						$this->setError($headers[$n]);
+						return -999;
+					}
+					$n++;
+				}
 			}
 		}
+
 		catch (RuntimeException $e) {
+			$this->setError($e->getMessage());
 			return -999;  // indicate a fatal error
 		}
-
-		// Get file size
-		$filesize = isset($headers["Content-Length"]) ? $headers["Content-Length"] : -1;  // indicate that the size could not be determined
-		return $filesize;
+		
+		// Get file size, -1 indicates that the size could not be determined
+		return isset($headers["Content-Length"])
+			? $headers["Content-Length"]
+			: -1;
 	}
 }

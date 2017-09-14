@@ -41,17 +41,6 @@ function submitbutton(pressbutton)
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $disabled = $this->row->url ? '' : ' disabled="disabled"';
-
-if (!$this->row->url)
-{
-	$path = $this->row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-	$file_path = $path . DS . $this->row->filename;
-	
-	$file_size = file_exists($file_path) ? filesize($file_path) : 0;
-	$file_size_str = $file_size < 1024 * 1024 ?
-		number_format(filesize($file_path) / (1024), 2) .' KBs' :
-		number_format(filesize($file_path) / (1024 * 1024), 2) .' MBs';
-}
 ?>
 
 
@@ -837,6 +826,10 @@ if (!$this->row->url)
 					<option value="GBs">GBs</option>
 				</select>
 				<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>"><i class="icon-info"></i></span>
+
+				<?php if ($this->row->calculated_size !== $this->row->size) : ?>
+					<span class="fc-mssg fc-mssg-inline fc-nobgimage fc-warning"><?php echo JText::_('FLEXI_REAL_SIZE') . ' : ' . $this->row->calculated_size; ?></span>
+				<?php endif; ?>
 			</td>
 		</tr>
 		
