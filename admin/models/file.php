@@ -317,7 +317,9 @@ class FlexicontentModelFile extends FCModelAdmin
 			// Follow the Location headers until the actual file URL is known
 			while (isset($headers['Location']))
 			{
-				$url = $headers['Location'];
+				$url = is_array($headers['Location'])
+					? end($headers['Location'])
+					: $headers['Location'];
 				$headers = get_headers($url, 1);
 			}
 		}

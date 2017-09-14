@@ -208,6 +208,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		{
 		  // Validate file URL
 			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
+			$data['filename'] = $data['filename_original'];
 
 			if ( empty($data['size']) )
 			{
@@ -748,6 +749,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$obj = new stdClass();
 		$obj->filename    = $filename;
+		$obj->filename_original = $filename;
 		$obj->altname     = $altname;
 
 		$obj->url         = 1;

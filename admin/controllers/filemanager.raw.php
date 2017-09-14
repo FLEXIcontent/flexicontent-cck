@@ -246,9 +246,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				elseif($index_urls)
 				{
-					if ($file->filename_original)
+					$url = $file->filename_original ?: $file->filename;
+					if ($url)
 					{
-						$file->size = $file_model->get_file_size_from_url($file->filename_original, $error_msg);
+						$file->size = $file_model->get_file_size_from_url($url, $error_msg);
 					}
 					if ($error_msg)
 					{
