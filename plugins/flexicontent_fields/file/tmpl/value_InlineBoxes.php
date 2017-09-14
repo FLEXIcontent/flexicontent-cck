@@ -49,6 +49,12 @@ foreach($values as $file_id)
 		$file_data->size = (int) $_size;
 	}
 
+	// Force new window for URLs that have zero file size
+	if ($file_data->url && !$file_data->size)
+	{
+		$non_file_url = 1;
+	}
+
 
 	// ***
 	// *** Check user access on the file
@@ -303,7 +309,7 @@ foreach($values as $file_id)
 			
 			// The download button in a mini form ...
 			$actions_arr[] = ''
-				.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >'
+				.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.$file_data_fields
 				.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' btn-success fcfile_downloadFile" title="'.$downloadsinfo.'" value="'.$downloadstext.'"/>'
 				.'</form>'."\n";
@@ -379,7 +385,7 @@ foreach($values as $file_id)
 			// The download link, if filename/title not shown, then display a 'download' prompt text
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
-				.'<a href="' . $dl_link . '" class="'.$file_classes.' fcfile_downloadFile" title="'.$downloadsinfo.'" >'
+				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile" title="' . $downloadsinfo . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.($filename_shown && $link_filename ? $name_str : $downloadstext)
 				.'</a>';
 		}
