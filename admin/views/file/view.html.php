@@ -214,6 +214,39 @@ class FlexicontentViewFile extends JViewLegacy
 		}
 
 
+		// ***
+		// *** Get real file size (currently)
+		// ***
+
+		if (!$row->url)
+		{
+			$path = $this->row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+			$file_path = $path . DS . $this->row->filename;
+			
+			$file_size = file_exists($file_path) ? filesize($file_path) : 0;
+			$file_size_str = $file_size < 1024 * 1024 ?
+				number_format(filesize($file_path) / (1024), 2) .' KBs' :
+				number_format(filesize($file_path) / (1024 * 1024), 2) .' MBs';
+		}
+
+		else
+		{
+			$url = $row->filename_original ?: $row->filename;
+			$filesize = $model->get_file_size_from_url($url);
+
+			if ($filesize === -999)
+			{
+				$app->enqueueMessage($model->getError(), 'warning');
+			}
+
+			if (empty($row->size))
+			{
+				$row->size = $filesize < 0 ? 0 : $filesize;
+			}
+
+			$row->calculated_size = $filesize < 0 ? 0 : $filesize;
+		}
+
 
 		//***
 		//*** Build access level list

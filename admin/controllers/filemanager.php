@@ -207,23 +207,27 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		else
 		{
 		  // Validate file URL
-			$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
-			$data['filename'] = $data['filename_original'];
+			$url = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
+			$data['filename'] = $data['filename_original'] = $url;
 
-			if ( empty($data['size']) )
+			// Get file size from submitted field (file URL), set to zero if no size unit specified
+			if ( !empty($data['size']) )
 			{
-				$data['size'] = $model->get_file_size_from_url($data['filename_original']);
-				if ($data['size'] < 0 || empty($data['size']))
-				{
-					$data['size'] = 0;
-				}
-			}
-			else
-			{
-				// Get file size from submitted field (file URL), set to zero if no size unit specified
 				$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
 				$size_unit = (int) @ $arr_sizes[$data['size_unit']];
 				$data['size'] = ((int)$data['size']) * $size_unit;
+			}
+
+			else
+			{
+				$data['size'] = $model->get_file_size_from_url($url);
+
+				if ($data['size'] === -999)
+				{
+					$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
+				}
+
+				$data['size'] = $data['size'] < 0 ? 0 : $data['size'];
 			}
 		}
 
@@ -699,8 +703,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
 		$file_id = 0;
 
-		$filename = $this->input->get('file-url-data', null, 'string');
-		$filename = flexicontent_html::dataFilter($filename, 4000, 'URL', 0);  // Validate file URL
+		$url = $this->input->get('file-url-data', null, 'string');
+		$url = flexicontent_html::dataFilter($url, 4000, 'URL', 0);  // Validate file URL
 		$altname  = $this->input->get('file-url-title', null, 'string');
 
 		$filedesc   = flexicontent_html::dataFilter($this->input->get('file-url-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
@@ -715,7 +719,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		jimport('joomla.utilities.date');
 
 		// check if the form fields are not empty
-		if (!$filename || !$altname)
+		if (!$url || !$altname)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
 			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARNFILEURLFORM') );
@@ -727,8 +731,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (empty($filesize))
 		{
-			$filesize = $model->get_file_size_from_url($filename);
-			if ($filesize < 0) $filesize = 0;
+			$filesize = $model->get_file_size_from_url($url);
+
+			if ($filesize === -999)
+			{
+				$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
+			}
+
+			$filesize = $filesize < 0 ? 0 : $filesize;
 		}
 
 		else
@@ -742,14 +752,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 		
 		// we verifiy the url prefix and add http if any
-		if (!preg_match("#^http|^https|^ftp#i", $filename)) { $filename	= 'http://'.$filename; }
+		if (!preg_match("#^http|^https|^ftp#i", $url))
+		{
+			$url	= 'http://'.$url;
+		}
 		
 		$db 	= JFactory::getDbo();
 		$user	= JFactory::getUser();
 		
 		$obj = new stdClass();
-		$obj->filename    = $filename;
-		$obj->filename_original = $filename;
+		$obj->filename    = $url;
+		$obj->filename_original = $url;
 		$obj->altname     = $altname;
 
 		$obj->url         = 1;
@@ -778,9 +791,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			$session_files = $session->get($upload_context, array());
 			$session_files['ids'][] = $file_id;
-			$session_files['names'][] = $filename;
+			$session_files['names'][] = $url;
 			$session_files['ids_pending'][] = $file_id;
-			$session_files['names_pending'][] = $filename;
+			$session_files['names_pending'][] = $url;
 			$session->set($upload_context, $session_files);
 		}
 

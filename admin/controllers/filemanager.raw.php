@@ -237,7 +237,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$file->total_usage = 0;
 				$path = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 				$file_path = $path . DS . $file->filename;
-				$error_msg = null;
 
 				if (!$file->url)
 				{
@@ -249,11 +248,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					$url = $file->filename_original ?: $file->filename;
 					if ($url)
 					{
-						$file->size = $file_model->get_file_size_from_url($url, $error_msg);
-					}
-					if ($error_msg)
-					{
-						$errors[] = $file->filename_original . ' -- ' . $error_msg['message'];
+						$filesize = $file_model->get_file_size_from_url($url);
+
+						if ($filesize === -999)
+						{
+							$errors[] = $url . ' -- ' . $file_model->getError();
+						}
+
+						$file->size = $filesize < 0 ? 0 : $filesize;
 					}
 				}
 
