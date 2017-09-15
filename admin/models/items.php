@@ -2090,12 +2090,14 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		// Add the primary cat to the array if it's not already in
-		if (!in_array($maincat, $seccats)) {
-			$seccats[] = $maincat;
+		if (!in_array($item->catid, $seccats))
+		{
+			$seccats[] = $item->catid;
 		}
 
 		//At least one category needs to be assigned
-		if (!is_array( $seccats ) || count( $seccats ) < 1) {
+		if (!is_array( $seccats ) || count( $seccats ) < 1)
+		{
 			$this->setError(JText::_('FLEXI_SELECT_CATEGORY'));
 			return false;
 		}
