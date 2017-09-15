@@ -68,7 +68,7 @@ fc_plupload = function(options)
 
 		if (!this.uploader_instances[sfx] && is_IE8_IE9 && !fc_has_flash_addon())
 		{
-			$('<div class="alert alert-warning fc-iblock">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</div>').insertBefore(uploader_container);
+			$('<span class="alert alert-warning fc-iblock">You have Internet explorer 8 / 9. Please install and activate (allow) FLASH add-on, for image preview to work</span>').insertBefore(uploader_container);
 		}
 
 		// Already initialized
@@ -541,9 +541,9 @@ fc_plupload = function(options)
 			if ( image_already_loaded) return;
 
 
-			// Create an instance of the mOxie Image object.  --  Wiki: https://github.com/moxiecode/moxie/wiki/Image
+			// Create an instance of the window.moxie.image (Image object) --  Wiki: https://github.com/moxiecode/moxie/wiki/Image
 			// This utility object provides several means of reading in and loading image data from various sources.
-			file.preloader = new mOxie.Image();
+			file.preloader = new window.moxie.image.Image();
 
 			// Define the onload BEFORE you execute the load() command as load() does not execute async.
 			file.preloader.onload = function()
@@ -560,7 +560,7 @@ fc_plupload = function(options)
 				//if (fc_file_count==0) $('.fc-uploader-loading').hide();
 			};
 
-			// Calling the .getSource() on the file will return an instance of mOxie.File, which is a unified file wrapper that can be used across the various runtimes.
+			// Calling the .getSource() on the file will return an instance of window.moxie.file (File object), which is a unified file wrapper that can be used across the various runtimes.
 			// Wiki: https://github.com/moxiecode/plupload/wiki/File
 			file.preloader.load( file.getSource() );
 		}
