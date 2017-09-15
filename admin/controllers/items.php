@@ -1113,13 +1113,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
 		$lang    = $this->input->get('language', '', 'string');
 		
-		$state   = $this->input->get('state', '', 'int');
-		$state   = strlen($state) ? (int)$state : null;
+		$state   = $this->input->get('state', '', 'string');
+		$state   = strlen($state) ? (int) $state : null;
 		
 		$type_id = $this->input->get('type_id', '', 'int');
 		
-		$access  = $this->input->get('access', '', 'int');
-		$access  = strlen($access) ? (int)$access : null;
+		$access  = $this->input->get('access', '', 'string');
+		$access  = strlen($access) ? (int) $access : null;
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;

@@ -23,7 +23,7 @@ function moveonly() {
 	jQuery('#copynr').attr('disabled', 'disabled'); jQuery('#row_copynr').slideUp(600);
 	jQuery('#language').removeAttr('disabled'); jQuery('#row_language').slideDown(600);
 	jQuery('.lang').removeAttr('disabled');
-	jQuery('#state').removeAttr('disabled'); jQuery('#row_state').slideDown(600);
+	jQuery('#state').removeAttr('disabled'); jQuery('#row_state').slideDown(600); jQuery('#state').val('').trigger('change');
 	jQuery('#type_id').removeAttr('disabled'); jQuery('#row_type_id').slideDown(600);
 	jQuery('#access').removeAttr('disabled'); jQuery('#row_access').slideDown(600);
 	toggle_importlang_info();
@@ -46,7 +46,7 @@ function copymove() {
 	jQuery('#copynr').removeAttr('disabled'); jQuery('#row_copynr').slideDown(600);
 	jQuery('#language').removeAttr('disabled'); jQuery('#row_language').slideDown(600);
 	jQuery('.lang').removeAttr('disabled');
-	jQuery('#state').removeAttr('disabled'); jQuery('#row_state').slideDown(600);
+	jQuery('#state').removeAttr('disabled'); jQuery('#row_state').slideDown(600); jQuery('#state').val('0').trigger('change');
 	jQuery('#type_id').removeAttr('disabled'); jQuery('#row_type_id').slideDown(600);
 	jQuery('#access').removeAttr('disabled'); jQuery('#row_access').slideDown(600);
 	toggle_importlang_info();
@@ -67,7 +67,7 @@ function copyonly() {
 	jQuery('#copynr').removeAttr('disabled'); jQuery('#row_copynr').slideDown(600);
 	jQuery('#language').removeAttr('disabled'); jQuery('#row_language').slideDown(600);
 	jQuery('.lang').removeAttr('disabled');
-	jQuery('#state').removeAttr('disabled'); jQuery('#row_state').slideDown(600);
+	jQuery('#state').removeAttr('disabled'); jQuery('#row_state').slideDown(600);  jQuery('#state').val('0').trigger('change');
 	jQuery('#type_id').attr('disabled', 'disabled'); jQuery('#row_type_id').slideUp(600);
 	jQuery('#access').attr('disabled', 'disabled'); jQuery('#row_access').slideUp(600);
 	toggle_importlang_info();

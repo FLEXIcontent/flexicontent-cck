@@ -239,12 +239,12 @@ defined('_JEXEC') or die('Restricted access');
 				<fieldset class="panelform" id="row_keepseccats">
 					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></span>
 					<div class="container_fcfield">
-						<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_off();" />
+						<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_on();" />
 						<label for="keepseccats0">
 							<?php echo JText::_( 'FLEXI_NO' ); ?>
 						</label>
 
-						<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_on();" />
+						<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_off();" />
 						<label for="keepseccats1">
 							<?php echo JText::_( 'FLEXI_YES' ); ?>
 						</label>
