@@ -147,7 +147,7 @@
 	$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
 	
 	// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
-	if ( $is_FE_html_view && $useogp )
+	if ( $isHtmlViewFE && $useogp )
 	{
 		if ( in_array($view, $ogpinview) ) {
 			switch ($ogpthumbsize)
@@ -240,3 +240,5 @@
 			</div>';
 		}
 	}
+	
+	return 0;
