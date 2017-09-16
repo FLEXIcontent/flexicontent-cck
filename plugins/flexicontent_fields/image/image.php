@@ -105,8 +105,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		
 
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
-		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
+		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 		
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 );
 		
@@ -1170,9 +1170,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$realview = $app->input->get('view', 'item', 'cmd');
 		$view = $app->input->get('flexi_callview', $realview, 'cmd');
+
 		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
-		$isSite = $app->isSite();
-		$is_FE_html_view = $app->input->get('format', 'html', 'cmd') == 'html' && $isSite;
+		$is_FE_html_view = $app->input->get('format', 'html', 'cmd') == 'html' && $app->isSite();
 		
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -1184,8 +1184,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
-		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
+		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 		
 		$usealt      = $field->parameters->get( 'use_alt', 1 ) ;
 		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
@@ -1389,7 +1389,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
 				$multiple_image_usages = true;
-				$extra_prefix = 'fld'.$field->id.'_';
+				$extra_prefix = 'fld' . $field->id . '_';
 				$field->using_default_value = true;
 			}
 		}
@@ -1413,11 +1413,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Default display method depends on view
 		// ***
 
-		if ($prop=='display' && ($view==FLEXI_ITEMVIEW || $view=='category'))
+		if ($prop=='display' && ($view=='item' || $view=='category'))
 		{
-			$_method = $view==FLEXI_ITEMVIEW ?
-				$field->parameters->get( 'default_method_item',  'display' ) :
-				$field->parameters->get( 'default_method_cat',  'display_single_total') ;
+			$_method = $view=='item' ?
+				$field->parameters->get( 'default_method_item', 'display' ) :
+				$field->parameters->get( 'default_method_cat', 'display_single_total') ;
 		}
 		else
 		{
@@ -1427,7 +1427,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Calculate some flags, SINGLE image display and Link-to-Item FLAG
 		$isSingle = isset(self::$single_displays[$_method]);
-		$linkToItem = $_method == 'display_link' || $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
+		$linkto_item = $_method == 'display_link' || $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
 
 
 		// ***
@@ -1439,29 +1439,40 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Different for mobile clients
 		$popuptype_mobile = (int)$field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
-		$popuptype = $useMobile ? $popuptype_mobile : $popuptype;
+		$popuptype = $useMobile
+			? $popuptype_mobile
+			: $popuptype;
 
 		// Enable/Disable GALLERY JS according to current view and according to other parameters
-		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category','backend'));
-		$popupinview  = FLEXIUtilities::paramToArray($popupinview);
-		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
-		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
-		if ($view=='module' && !in_array('module',$popupinview)) $usepopup = 0;
-		if ($isItemsManager && !in_array('backend',$popupinview)) $usepopup = 0;
+		$popupinview = FLEXIUtilities::paramToArray($field->parameters->get('popupinview', array('item', 'category', 'backend')));
 
-		// Enable/Disable GALLERY JS if linking to item view
-		if ($linkToItem) $usepopup = 0;
+		if (
+			($view=='item' && !in_array('item', $popupinview)) ||
+			($view=='category' && !in_array('category', $popupinview)) ||
+			($view=='module' && !in_array('module', $popupinview)) ||
+			($isItemsManager && !in_array('backend', $popupinview)) ||
+			$linkto_item ||
+			$prop=='display_large' ||
+			$prop=='display_original'
+		)
+		{
+			$usepopup = 0;
+		}
 
-		// Only allow multibox and fancybox in items manager, in other cases force fancybox
-		if ($isItemsManager && !in_array($popuptype, array(1,4))) $popuptype = 4;
+		// If using a non allowed gallery JS, then force fancybox
+		$iManager_containers = array(1,4);  // Only allow multibox and fancybox in items manager
+		$no_container_needed = array(1,2,3,4,6);  // Display types that need special container are not allowed when field in a group
+		if (
+			($isItemsManager && !in_array($popuptype, $iManager_containers)) ||
+			($is_ingroup && !in_array($popuptype, $no_container_needed))
+		)
+		{
+			$popuptype = 4;
+		}
 
-		// Displays that need special container are not allowed when field in a group, force fancybox
-		$no_container_needed = array(1,2,3,4,6);
-		if ( $is_ingroup && !in_array($popuptype, $no_container_needed) ) $popuptype = 4;
 
 		// Optionally group images from all image fields of current item ... or of all items in view too
 		$grouptype  = $field->parameters->get( 'grouptype', 1 ) ;
-		//$grouptype = $multiple ? 0 : $grouptype;  // Field in gallery mode: Force grouping of images per field (current item)
 
 		// Needed by some js galleries
 		$thumb_w_s = $field->parameters->get( 'w_s', 120);
@@ -1474,24 +1485,36 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Hovering ToolTip configuration
 		// ***
 
-		$uselegend  = $field->parameters->get( 'uselegend', 1 ) ;
+		$uselegend = $field->parameters->get( 'uselegend', 1 ) ;
 		$tooltip_class = 'hasTooltip';
 
 		// Enable/disable according to current view
-		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
-		$legendinview  = FLEXIUtilities::paramToArray($legendinview);
-		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$legendinview)) $uselegend = 0;
-		if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
-		if ($isItemsManager && !in_array('backend',$legendinview)) $uselegend = 0;
+		$legendinview = FLEXIUtilities::paramToArray($field->parameters->get('legendinview', array('item', 'category')));
 
-		// Load the tooltip library according to configuration, FLAG is an array to have a different check per field ID
-		// This is needed ONLY for fields that also have a configuration parameter, for this field is NEEDED 
-		static $tooltips_added = array();
-		if ( empty($tooltips_added[$field->id]) )
+		if (
+			($view=='item' && !in_array('item', $legendinview)) ||
+			($view=='category' && !in_array('category', $legendinview)) ||
+			($isItemsManager && !in_array('backend', $legendinview))
+		)
 		{
-			$add_tooltips = JComponentHelper::getParams( 'com_flexicontent' )->get('add_tooltips', 1);
-			if ($add_tooltips && $uselegend) JHtml::_('bootstrap.tooltip');
-			$tooltips_added[$field->id] = true;
+			$uselegend = 0;
+		}
+
+		// Check only once per field, if tooltip JS is both needed and has been loaded
+		static $tooltips_loaded = false;
+		static $tooltips_checked = array();
+		if ( !$tooltips_loaded && !isset($tooltips_checked[$field->id]) )
+		{
+			if ($uselegend)
+			{
+				$add_tooltips = JComponentHelper::getParams( 'com_flexicontent' )->get('add_tooltips', 1);
+				if ($add_tooltips)
+				{
+					JHtml::_('bootstrap.tooltip');
+					$tooltips_loaded = true;
+				}
+			}
+			$tooltips_checked[$field->id] = true;
 		}
 
 
@@ -1508,16 +1531,32 @@ class plgFlexicontent_fieldsImage extends FCField
 		// ***
 
 		$linkto_url	= $field->parameters->get('linkto_url',0);
-		$url_target = $field->parameters->get('url_target','_self');
-		$isLinkToPopup = $linkto_url && ($url_target=='multibox' || $url_target=='fancybox');
 
-		// Force opening in new window in backend, if URL target is _self
-		if ($isItemsManager && $url_target=='_self') $url_target = "_blank";
+		if ($linkto_url)
+		{
+			$url_target = $field->parameters->get('url_target','_self');
+			$isLinkToPopup = $url_target=='multibox' || $url_target=='fancybox';
 
-		// Only allow multibox (and TODO: add fancybox) when linking to URL, in other cases force fancybox
-		if ($isLinkToPopup && $url_target=='multibox') $popuptype = 1;
-		if ($isLinkToPopup && $url_target=='fancybox') $popuptype = 4;
-		else if ($linkto_url) $usepopup = 0;
+			// Force opening in new window in backend, if URL target is _self
+			if ($isItemsManager && $url_target=='_self')
+			{
+				$url_target = "_blank";
+			}
+
+			// Linking to URL in popup, enable gallery JS and select appropriate gallery type
+			if ($isLinkToPopup)
+			{
+				$usepopup = 1;
+				if ($url_target == 'multibox') $popuptype = 1;
+				if ($url_target == 'fancybox') $popuptype = 4;
+			}
+
+			// Not linking in popup, disable adding gallery JS
+			else
+			{
+				$usepopup = 0;
+			}
+		}
 
 
 		// ***
@@ -1525,9 +1564,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		// ***
 
 		$useogp     = $field->parameters->get('useogp', 0);
-		$ogpinview  = $field->parameters->get('ogpinview', array());
-		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-		$ogpthumbsize= $field->parameters->get('ogpthumbsize', 2);
+		$ogpinview  = FLEXIUtilities::paramToArray($field->parameters->get('ogpinview', array()));
+		$ogpthumbsize = $field->parameters->get('ogpthumbsize', 2);
 
 
 		// ***
@@ -1600,59 +1638,54 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Do not load JS, for value only displays
 		if ( !isset(self::$value_only_displays[$prop]) )
 		{
-			// MultiBox maybe added in extra cases besides popup
-			// (a) in Item manager, (b) When linking to URL in popup target
-			$view_allows_mb  = $isItemsManager || $is_FE_html_view;
-			$config_needs_mb = $isLinkToPopup  || ($usepopup && $popuptype == 1);
-			if ( $view_allows_mb && $config_needs_mb )
+			// Skip gallery JS if:  (1) NOT frontend view with format === 'html'  and  (2) NOT items manager
+			if ( !$is_FE_html_view && !$isItemsManager)
 			{
-				if (!$multiboxadded)
-				{
-					flexicontent_html::loadFramework('jmultibox');  //echo $field->name.": multiboxadded";
-					$js = "
-					jQuery(document).ready(function() {
-						jQuery('a.mb').jmultibox({
-							initialWidth: 250,  //(number) the width of the box when it first opens while loading the item. Default: 250
-							initialHeight: 250, //(number) the width of the box when it first opens while loading the item. Default: 250
-							container: document.body, //(element) the element that the box will take it coordinates from. Default: document.body
-							contentColor: '#000', //(string) the color of the content area inside the box. Default: #000
-							showNumbers: ".($isItemsManager ? 'false' : 'true').",    //(boolean) show the number of the item e.g. 2/10. Default: true
-							showControls: ".($isItemsManager ? 'false' : 'true').",   //(boolean) show the navigation controls. Default: true
-							descClassName: 'multiBoxDesc',  //(string) the classname of the divs that contain the description for the item. Default: false
-							descMinWidth: 400,     //(number) the min width of the description text, useful when the item is small. Default: 400
-							descMaxWidth: 600,     //(number) the max width of the description text, so it can wrap to multiple lines instead of being on a long single line. Useful when the item is large. Default: 600
-							movieWidth: 576,    //(number) the default width of the box that contains content of a movie type. Default: 576
-							movieHeight: 324,   //(number) the default height of the box that contains content of a movie type. Default: 324
-							offset: {x: 0, y: 0},  //(object) containing x & y coords that adjust the positioning of the box. Default: {x:0, y:0}
-							fixedTop: false,       //(number) gives the box a fixed top position relative to the container. Default: false
-							path: '',            //(string) location of the resources files, e.g. flv player, etc. Default: ''
-							openFromLink: true,  //(boolean) opens the box relative to the link location. Default: true
-							opac:0.7,            //(decimal) overlay opacity Default: 0.7
-							useOverlay:false,    //(boolean) use a semi-transparent background. Default: false
-							overlaybg:'01.png',  //(string) overlay image in 'overlays' folder. Default: '01.png'
-							onOpen:function(){},   //(object) a function to call when the box opens. Default: function(){} 
-							onClose:function(){},  //(object) a function to call when the box closes. Default: function(){} 
-							easing:'swing',        //(string) effect of jQuery Default: 'swing'
-							useratio:false,        //(boolean) windows size follows ratio. (iframe or Youtube) Default: false
-							ratio:'90'             //(number) window ratio Default: '90'
-						});
-					});";
-					$document->addScriptDeclaration($js);
-					
-					$multiboxadded = true;
-				}
-			}
-			
-			// Regardless if above has added multibox , we will add a different JS gallery if so configured because it maybe needed
-			if ( !$is_FE_html_view )
-			{
-				// Is backend OR it is not an HTML view, do not add any JS library
 			}
 
 			else if ( $usepopup )
 			{
 				switch ($popuptype)
 				{
+				// Add Multibox image popup
+				case 1:
+					if (!$multiboxadded)
+					{
+						flexicontent_html::loadFramework('jmultibox');  //echo $field->name.": multiboxadded";
+						$js = "
+						jQuery(document).ready(function() {
+							jQuery('a.mb').jmultibox({
+								initialWidth: 250,  //(number) the width of the box when it first opens while loading the item. Default: 250
+								initialHeight: 250, //(number) the width of the box when it first opens while loading the item. Default: 250
+								container: document.body, //(element) the element that the box will take it coordinates from. Default: document.body
+								contentColor: '#000', //(string) the color of the content area inside the box. Default: #000
+								showNumbers: ".($isItemsManager ? 'false' : 'true').",    //(boolean) show the number of the item e.g. 2/10. Default: true
+								showControls: ".($isItemsManager ? 'false' : 'true').",   //(boolean) show the navigation controls. Default: true
+								descClassName: 'multiBoxDesc',  //(string) the classname of the divs that contain the description for the item. Default: false
+								descMinWidth: 400,     //(number) the min width of the description text, useful when the item is small. Default: 400
+								descMaxWidth: 600,     //(number) the max width of the description text, so it can wrap to multiple lines instead of being on a long single line. Useful when the item is large. Default: 600
+								movieWidth: 576,    //(number) the default width of the box that contains content of a movie type. Default: 576
+								movieHeight: 324,   //(number) the default height of the box that contains content of a movie type. Default: 324
+								offset: {x: 0, y: 0},  //(object) containing x & y coords that adjust the positioning of the box. Default: {x:0, y:0}
+								fixedTop: false,       //(number) gives the box a fixed top position relative to the container. Default: false
+								path: '',            //(string) location of the resources files, e.g. flv player, etc. Default: ''
+								openFromLink: true,  //(boolean) opens the box relative to the link location. Default: true
+								opac:0.7,            //(decimal) overlay opacity Default: 0.7
+								useOverlay:false,    //(boolean) use a semi-transparent background. Default: false
+								overlaybg:'01.png',  //(string) overlay image in 'overlays' folder. Default: '01.png'
+								onOpen:function(){},   //(object) a function to call when the box opens. Default: function(){} 
+								onClose:function(){},  //(object) a function to call when the box closes. Default: function(){} 
+								easing:'swing',        //(string) effect of jQuery Default: 'swing'
+								useratio:false,        //(boolean) windows size follows ratio. (iframe or Youtube) Default: false
+								ratio:'90'             //(number) window ratio Default: '90'
+							});
+						});";
+						$document->addScriptDeclaration($js);
+					
+						$multiboxadded = true;
+					}
+					break;
+
 				// Add Fancybox image popup
 				case 4:
 					if (!$fancyboxadded) {
@@ -1660,7 +1693,7 @@ class plgFlexicontent_fieldsImage extends FCField
 						flexicontent_html::loadFramework('fancybox');
 					}
 					break;
-				
+
 				// Add Galleriffic inline slideshow gallery
 				case 5:
 					$inline_gallery = 1; // unused
@@ -1799,25 +1832,33 @@ class plgFlexicontent_fieldsImage extends FCField
 		
 		// Decide thumbnail to use
 		$thumb_size = 0;
+
 		if ($isItemsManager)
+		{
 			$thumb_size = -1;
+		}
 		else if ($view == 'category')
+		{
 			$thumb_size = $field->parameters->get('thumbincatview',1);
-		else if ($view == FLEXI_ITEMVIEW)
+		}
+		else if ($view == 'item')
+		{
 			$thumb_size = $field->parameters->get('thumbinitemview',2);
+		}
 
 		// Cutoff title to a max length
 		$alt_image_prefix = flexicontent_html::striptagsandcut($item->title, 60) . ' ' . JText::_('FLEXI_IMAGE') . ' ';
 
 
+
 		// ***
-		// *** The values loop
+		// *** Get layout name
 		// ***
 
-		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
-		$i = -1;
-		foreach ($values as $n => $value)
+		// CASE 0: Add single image display information (e.g. image count)
+		if ( $linkto_item )
 		{
+<<<<<<< HEAD
 			// Include common layout code for preparing values, but you may copy here to customize
 			//$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
 			//if ($result === _FC_CONTINUE_) continue;
@@ -2154,28 +2195,32 @@ class plgFlexicontent_fieldsImage extends FCField
 							<br/>'.$desc.'
 						</div>';
 					break;
+=======
+			$viewlayout = 'value_link_to_item';
+		}
+	
+		// CASE 1: Handle linking to a URL instead of image zooming popup
+		elseif ( $linkto_url )
+		{
+			$viewlayout = 'value_link_to_url';
+		}
+>>>>>>> eb35278f7... (WIP) Added view layouts to image gallery field for all built-in display cases
 
-				// Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
-				case 7:
-					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
-					$title_attr = $desc ? $desc : $title;
-					$img_legend_custom ='
-						 <img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
-						 	data-large="' . JUri::root(true).'/'.$srcl . '" data-description="'.$title_attr.'" itemprop="image"/>
-					';
-					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
-					$field->{$prop}[] = '
-						<li><a href="javascript:;" class="fc_image_thumb">
-							'.$img_legend_custom.'
-						</a></li>';
-					break;
+		// CASE 2: // No gallery JS ... just append inline info and apply pretext, posttext
+		elseif ( !$usepopup )
+		{
+			$viewlayout = 'value_thumb_basic';
+		}
 
-				// ERROR unhandled INLINE GALLERY case
-				default:
-					$field->{$prop}[] = ' Unhandled INLINE GALLERY case in image with field name: {$field->name} '; break;
-				}
-			}
+		// CASE 3: // Built-in JS gallery
+		elseif ( $usepopup != -1 )
+		{
+			$built_in_gallery_names = array(
+				// Inline slideshow galleries
+				5 => 'galleriffic',
+				7 => 'elastislide',
 
+<<<<<<< HEAD
 			// CASE 4: Popup galleries
 			else
 			{
@@ -2249,13 +2294,34 @@ class plgFlexicontent_fieldsImage extends FCField
 						.$inline_info.$posttext;
 					break;
 
-				// Unknown / Other Gallery Type, just add thumbails ... maybe pretext/posttext/separator/opentag/closetag will add a gallery
-				default:
-					$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
-					break;
-				}
-			}
+				// Popup galleries
+				1 => 'multibox',
+				2 => 'rokbox',
+				3 => 'jce_mediabox',
+				4 => 'fancybox',
+				6 => 'widgetkit',
+				8 => 'photoSwipe',
+			);
+
+			$viewlayout = isset($built_in_gallery_names[$popuptype])
+				? 'value_gal_' . $built_in_gallery_names[$popuptype]
+				: 'value_thumb_basic';
 		}
+
+		// CASE 4: // Custom layout
+		else
+		{
+			$viewlayout = $field->parameters->get('viewlayout', '');
+			$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+		}
+
+
+		// ***
+		// *** Create field's HTML, using layout file, note full display code is included into each layout (not just the values loop)
+		// ***
+
+		$field->{$prop} = array();
+		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 
 
 		// ***
@@ -2336,7 +2402,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 		
 		// PhotoSwipe popup carousel gallery
-		else if ($usepopup && $popuptype == 8) {
+		else if ($usepopup && $popuptype == 8)
+		{
 			$field->{$prop} = '
 			<span class="photoswipe_fccontainer" >
 				'. implode($separatorf, $field->{$prop}) .'
@@ -2345,7 +2412,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 		
 		// OTHER galleries need no special enclosing, only apply separator
-		else {
+		else
+		{
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 		}
 		
@@ -2859,8 +2927,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
-		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
+		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 		
 		if ( isset($file['name']) && $file['name'] != '' )
 		{
@@ -3223,9 +3291,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 
 		// *** FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
 		$multiple_image_usages = $multiple_image_usages || @ $value['default_image'];
-		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
+		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 
 
 		// ***
@@ -3249,15 +3317,23 @@ class plgFlexicontent_fieldsImage extends FCField
 			$thumbname = $size . '_' . ($check_small ? '' : $extra_prefix) . $filename;
 			$path	= JPath::clean( $dest_path .DS. $thumbname);
 			
-			$thumbnail_exists = false;
-			if (file_exists($path)) {
+			if (file_exists($path))
+			{
 				$filesize = getimagesize($path);
 				$filesize_w = $filesize[0];
 				$filesize_h = $filesize[1];
 				$thumbnail_exists = true;
 			}
-			if ($thumbnail_exists && $check_small) continue;
-			
+			else
+			{
+				$thumbnail_exists = false;
+			}
+
+			if ($thumbnail_exists && $check_small)
+			{
+				continue;
+			}
+
 			$param_w = $field->parameters->get( 'w_'.$size, $default_widths[$size] );
 			$param_h = $field->parameters->get( 'h_'.$size, $default_heights[$size] );
 			$crop = $field->parameters->get('method_'.$size);
@@ -3288,8 +3364,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		
 		return ($images_processed[$field_index][$file_path] = $thumbres);
 	}
-	
-	
+
+
 
 	/**
 	 * Returns an array of images that can be deleted
