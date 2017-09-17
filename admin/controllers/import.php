@@ -348,20 +348,20 @@ class FlexicontentControllerImport extends FlexicontentController
 			$core_props['alias'] = 'Alias (core)';
 
 
-			if ( !$conf['language'] && !in_array('language', $conf['columns']) )
+			if ( $conf['language'] == '-99' && !in_array('language', $conf['columns']) )
 			{
 				$app->enqueueMessage('CSV file lacks column <b>\'language\'</b>', 'error');
 				$app->redirect($link);
 			}
-			else if (!$conf['language']) $core_props['language'] = 'Language';
+			else if ($conf['language'] == '-99') $core_props['language'] = 'Language';
 
 
-			if ( !strlen($conf['state']) && !in_array('state', $conf['columns']) )
+			if ( $conf['state'] == '-99' && !in_array('state', $conf['columns']) )
 			{
 				$app->enqueueMessage('CSV file lacks column <b>\'state\'</b>', 'error');
 				$app->redirect($link);
 			}
-			else if ( !strlen($conf['state']) ) $core_props['state'] = 'State';
+			else if ( $conf['state'] == '-99' ) $core_props['state'] = 'State';
 
 
 			if ( $conf['access']===0 && !in_array('access', $conf['columns']) )
@@ -1084,11 +1084,11 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				else if ( $fieldname=='language' )
 				{
-					if ( !$conf['language'] ) $data[$fieldname] = $field_values;
+					if ( $conf['language'] == '-99' ) $data[$fieldname] = $field_values;
 				}
 				else if ( $fieldname=='state' )
 				{
-					if ( !strlen($conf['state']) ) $data[$fieldname] = $field_values;
+					if ( $conf['state'] == '-99' ) $data[$fieldname] = $field_values;
 				}
 				else if ( $fieldname=='access' )
 				{
