@@ -2021,7 +2021,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// CASE 2: // No gallery JS ... just append inline info and apply pretext, posttext
 		elseif ( !$usepopup )
 		{
-			$viewlayout = 'value_thumb_basic';
+			$viewlayout = 'value_thumbnail_basic';
 		}
 
 		// CASE 3: // Built-in JS gallery
@@ -2116,8 +2116,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			);
 
 			$viewlayout = isset($built_in_gallery_names[$popuptype])
-				? 'value_gal_' . $built_in_gallery_names[$popuptype]
-				: 'value_thumb_basic';
+				? 'value_gallery_' . $built_in_gallery_names[$popuptype]
+				: 'value_thumbnail_basic';
 		}
 
 		// CASE 4: // Custom layout
