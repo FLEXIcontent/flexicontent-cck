@@ -29,7 +29,7 @@ foreach($_levels as $_level) {
 
 
 <div class="fc-mssg-inline fc-info fc-nobgimage" style="margin: 0 2px">
-	<span class="fcimport_field_prop_list fcimport_field_prop_mainlist">
+	<div class="fcimport_field_prop_list fcimport_field_prop_mainlist">
 		
 		<table class="fc-form-tbl">
 			<tr>
@@ -186,7 +186,7 @@ foreach($_levels as $_level) {
 			
 		</table>
 						
-	</span>
+	</div>
 </div>
 
 <table class="adminlist">
@@ -195,7 +195,7 @@ foreach($_levels as $_level) {
 		<th>#</th>
 		<?php foreach($this->conf['contents_parsed'][1] as $fieldname => $contents_parsed) :?>
 			<?php	if ( !isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['thefields'][$fieldname]) )  continue; ?>
-			<th style="text-align:left;">
+			<th style="text-align: left;">
 			<?php
 			if ( isset($this->conf['thefields'][$fieldname]) ) {
 				echo $this->conf['thefields'][$fieldname]->label."<br/>";
@@ -222,7 +222,7 @@ foreach($_levels as $_level) {
 			<?php
 			if ( !isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['thefields'][$fieldname]) )  continue;
 			?>
-			<td style="text-align: right;">
+			<td style="text-align: left;">
 				<?php
 				switch ($fieldname)
 				{

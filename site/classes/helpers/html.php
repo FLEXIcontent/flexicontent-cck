@@ -4038,11 +4038,11 @@ class flexicontent_html
 			case 6:   // RADIO selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
 				$list		= '';
 
-				$checked = $selected==='' ? 'checked="checked"' : '';
-				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" '.$checked.' data-element-grpid="'.$tagid.'" />';
+				$checked = $selected == '-99' ? 'checked="checked"' : '';
+				$list 	.= '<input id="lang-99" type="radio" name="'.$name.'" class="'.$required.'" value="-99" '.$checked.' data-element-grpid="'.$tagid.'" />';
 				$tooltip_class = ' hasTooltip';
 				$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_LANGUAGE_COLUMN', 'FLEXI_USE_LANGUAGE_COLUMN_TIP', 1, 1);
-				$list 	.= '<label class="lang_box'.$tooltip_class.'" for="lang9999" title="'.$tooltip_title.'">';
+				$list 	.= '<label class="lang_box'.$tooltip_class.'" for="lang-99" title="'.$tooltip_title.'">';
 				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
 				$list 	.= '</label>';
 
@@ -4107,11 +4107,11 @@ class flexicontent_html
 
 			$list = '';
 
-			$checked = $selected==='' ? ' checked="checked"' : '';
-			$list 	.= '<input id="state9999" type="radio" name="state" class="state" value="" '.$checked.'/>';
+			$checked = $selected == '-99' ? ' checked="checked"' : '';
+			$list 	.= '<input id="state-99" type="radio" name="state" class="state" value="-99" '.$checked.'/>';
 			$tooltip_class = ' hasTooltip';
 			$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_STATE_COLUMN', 'FLEXI_USE_STATE_COLUMN_TIP', 1, 1);
-			$list 	.= '<label class="state_box'.$tooltip_class.'" for="state9999" title="'.$tooltip_title.'">';
+			$list 	.= '<label class="state_box'.$tooltip_class.'" for="state-99" title="'.$tooltip_title.'">';
 			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
 			$list 	.= '</label>';
 
