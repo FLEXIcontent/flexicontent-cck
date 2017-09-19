@@ -180,6 +180,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   KEY `name` (`name`),
+  KEY `alias` (`alias`),
+  KEY `published` (`published`),
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
@@ -202,6 +204,10 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
   `attribs` mediumtext NOT NULL,
+  KEY `name` (`name`),
+  KEY `alias` (`alias`),
+  KEY `published` (`published`),
+  KEY `access` (`access`),
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 

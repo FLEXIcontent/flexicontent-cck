@@ -19,8 +19,14 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 
 class modFlexiTagCloudHelper
 {
@@ -107,9 +113,10 @@ class modFlexiTagCloudHelper
 		}
 
 		// Retrieve extra categories, such children or parent categories
+		$cids = flexicontent_cats::getExtraCats($cids, $treeinclude, array(0));
 		$cids = empty($cids)
 			? array(0)
-			: flexicontent_cats::getExtraCats($cids, $treeinclude, array(0));
+			: $cids;
 
 		// EXCLUDE method
 		if ($method == 2)
