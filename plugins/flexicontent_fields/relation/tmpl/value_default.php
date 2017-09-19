@@ -61,17 +61,11 @@ $HTML->total_info = '';
 if ($disp->total_info)
 {
 	$total_count = isset($options->total) ? $options->total : count($related_items);
-	$total_append_text = $field->parameters->get('total_append_text', '');
+	$total_append_text = JText::_($field->parameters->get('total_append_text', ''));
 	$HTML->total_info = '
 		<div class="fcrelation_field_total">
 			' . $total_count . ' ' . $total_append_text . '
 		</div>';
-
-	// Override the item list HTML parameter ... with the one meant to be used when showing total
-	if ($field->parameters->get('total_relitem_html', null))
-	{
-		$field->parameters->set('relitem_html_override', 'total_relitem_html');
-	}
 }
 
 
