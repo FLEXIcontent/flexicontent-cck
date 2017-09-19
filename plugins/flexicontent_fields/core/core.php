@@ -480,7 +480,7 @@ class plgFlexicontent_fieldsCore extends FCField
 		
 		$_s = $isSearchView ? '_s' : '';
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
-		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 0 );  // Filter Type of Display
+		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2 );  // Filter Type of Display
 		$disable_keyboardinput = $filter->parameters->get('disable_keyboardinput', 0);
 		$filter_as_range = in_array($display_filter_as, array(2,3,8)) ;
 		
@@ -538,11 +538,11 @@ class plgFlexicontent_fieldsCore extends FCField
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' ict.id AS value, ict.name AS text';
-				$filter->filter_valuesjoin   = ''
-					. ' JOIN #__flexicontent_items_ext AS iext ON iext.item_id = i.id'
-					. ' JOIN #__flexicontent_types AS ict ON iext.type_id = ict.id'
-					;
+				$filter->filter_valuesfrom   = ' FROM #__flexicontent_items_ext AS i ';
+				$filter->filter_valuesjoin   = ' JOIN #__flexicontent_types AS ict ON i.type_id = ict.id';
 				$filter->filter_valueswhere  = ' ';  // ... a space, (indicates not needed and prevents using default)
+				$filter->filter_item_id_col = ' i.item_id ';  // ID column
+
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY ict.id';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty

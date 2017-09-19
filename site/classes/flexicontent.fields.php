@@ -4411,7 +4411,7 @@ class FlexicontentFields
 			//if ($filter->id==NN) { echo "<pre>"; print_r($results); echo "</pre>"; }
 		}
 		catch (Exception $e) {
-			JFactory::getApplication()->enqueueMessage(__FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .nl2br(JDEBUG ? $e->getMessage() : 'Joomla Debug is OFF'), 'warning');
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .nl2br(JDEBUG ? $e->getMessage() . '<br/>' . $query : 'Joomla Debug is OFF'), 'warning');
 			$results = array();
 		}
 
@@ -4568,7 +4568,7 @@ class FlexicontentFields
 			//if ($filter->id==NN) { echo "<pre>"; print_r($results); echo "</pre>"; }
 		}
 		catch (Exception $e) {
-			JFactory::getApplication()->enqueueMessage(__FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .nl2br(JDEBUG ? $e->getMessage() : 'Joomla Debug is OFF'), 'warning');
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .nl2br(JDEBUG ? $e->getMessage() . '<br/>' . $query : 'Joomla Debug is OFF'), 'warning');
 			$results = array();
 		}
 
