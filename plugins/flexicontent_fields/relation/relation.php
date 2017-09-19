@@ -530,6 +530,12 @@ jQuery(document).ready(function()
 			// 2: same as 1 but also means do not create HTML display, 3: same as 2 but also do not get any item data
 			$options->return_items_array = $disp->item_list ? 1 : 3;
 
+			// Override the item list HTML parameter ... with the one meant to be used when showing total
+			if ($disp->total_info && $field->parameters->get('total_relitem_html', null))
+			{
+				$field->parameters->set('relitem_html_override', 'total_relitem_html');
+			}
+
 			// Get related items data and also create the item's HTML display per item (* see above)
 			$related_items = FlexicontentFields::getItemsList($field->parameters, $related_items, $field, $item, $options);
 		}
