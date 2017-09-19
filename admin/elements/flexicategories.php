@@ -85,27 +85,10 @@ class JFormFieldFlexicategories extends JFormField
 		$attribs = '';
 		
 		// Steps needed for multi-value select field element, e.g. code to maximize select field
-		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' )
+		{
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			/*$onclick = ""
-				."${element_id} = document.getElementById(\"${element_id}\");"
-				."if (${element_id}.size<40) {"
-				."	${element_id}_oldsize = ${element_id}.size;"
-				."	${element_id}.size=40;"
-				."} else {"
-				."	${element_id}.size = ${element_id}_oldsize;"
-				."}"
-				."parent = ${element_id}.getParent(); upcnt=0;"
-				."while(upcnt<10 && !parent.hasClass(\"jpane-slider\")) {"
-				."	upcnt++; parent = parent.getParent();"
-				."}"
-				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
-			;
-			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
-			*/
-		} else {
 		}
 		
 		$top = @$attributes['top'] ? $attributes['top'] : false;
