@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Image field layout -- Fancybox</name>
+	<author>ggppdk</author>
+	<creationDate>September 2017</creationDate>
+	<copyright>Copyright (C) 2017 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - Image field layout - Fancybox parameters</description>
+	
+	<fields name="params">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" level="level3" default="This layout does not have any layout-specific parameters (yet)" class="alert alert-info fcpadded" />
+		</fieldset>
+
+	</fields>
+	
+</form>
