@@ -175,7 +175,7 @@ class modFlexigooglemapHelper
 
 				// Skip value that has no cordinates
 				if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;
-				if ( !strlen($coord['lat']) && !strlen($coord['lon']) ) continue;
+				if ( !strlen($coord['lat']) || !strlen($coord['lon']) ) continue;
 
 				$title = addslashes($address->title);
 
