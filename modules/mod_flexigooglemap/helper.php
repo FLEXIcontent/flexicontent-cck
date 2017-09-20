@@ -162,10 +162,20 @@ class modFlexigooglemapHelper
 			}
 			foreach ($fc_list_items as $address)
 			{
-				if ( !isset($address->fieldvalues[$fieldaddressid][0]) ) continue;   // skip empty value
+				// Skip item if it has no address value
+				if ( empty($address->fieldvalues[$fieldaddressid]) )
+				{
+					continue;
+				}
 
-				$coord = unserialize($address->fieldvalues[$fieldaddressid][0]);
-				if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;    // skip empty value
+				// Get first value, typically this is value [0], and unserialize it
+				$coord = reset($address->fieldvalues[$fieldaddressid]);
+				$coord = flexicontent_db::unserialize_array($coord, false, false);
+				if (!$coord) continue;
+
+				// Skip value that has no cordinates
+				if ( !isset($coord['lat']) || !isset($coord['lon']) ) continue;
+				if ( !strlen($coord['lat']) && !strlen($coord['lon']) ) continue;
 
 				$title = addslashes($address->title);
 
