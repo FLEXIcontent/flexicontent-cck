@@ -2,7 +2,7 @@
 <extension type="component" version="3.4.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
-	<creationDate>13 September 2017</creationDate>
+	<creationDate>21 September 2017</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, FLEXIcontent Team</author>
 	<authorEmail>noreply@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
