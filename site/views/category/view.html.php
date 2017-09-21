@@ -48,9 +48,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$jinput   = JFactory::getApplication()->input;
 		$session  = JFactory::getSession();
-		$option   = JRequest::getVar('option');
-		$format   = JRequest::getCmd('format', 'html');
-		$print    = JRequest::getCmd('print');
+
+		$option   = $jinput->get('option', '', 'cmd');
+		$format   = $jinput->get('format', 'html', 'cmd');
+		$print    = $jinput->get('print', '', 'cmd');
+
 		$document = JFactory::getDocument();
 		
 		// Check for Joomla issue with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
@@ -80,7 +82,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params   = $category->parameters;
 		
 		if ($category->id)
+		{
 			$meta_params = new JRegistry($category->metadata);
+		}
 		
 		
 		// ***********************
@@ -96,7 +100,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$alpha   = !$print && $params->get('show_alpha', 1)  ?  $this->get('Alphaindex')  :  array();  // This is somewhat expensive so calculate it only if required
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
-		$limitstart = JRequest::getInt('limitstart');
+		$limitstart = $jinput->get('limitstart', 0, 'int');
 		
 		
 		// ************************
@@ -382,7 +386,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($params->get('add_canonical'))
 		{
 			// Create desired REL canonical URL
-			$start = JRequest::getInt('start', '');
+			$start = $jinput->get('start', '', 'int');
 			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars).($start ? "&start=".$start : ''));
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
@@ -439,19 +443,25 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$tmpl = '.category.default';
 		}
-		
+
 		// @TODO trigger the plugin selectively
 		// and delete the plugins tags if not active
-		if ($params->get('trigger_onprepare_content_cat')) // just check if the parameter is active
+		if ($category->id && $params->get('trigger_onprepare_content_cat')) // just check if the parameter is active
 		{
 			JPluginHelper::importPlugin('content');
-	
+
 			// Allow to trigger content plugins on category description
 			// NOTE: for J2.5, we will trigger the plugins as if description text was an article text, using ... 'com_content.article'
 			$category->text = $category->description;
+
+			$_id = $jinput->get('id');
+			$jinput->set('id', $category->id);   // compatibility for plugin that will try to use this variable
+
 			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$category, &$params, 0));
-			JRequest::setVar('layout', $layout);  // Restore LAYOUT variable should some plugin have modified it
-			
+
+			$jinput->set('layout', $layout);  // Restore LAYOUT variable should some plugin have modified it
+			$jinput->set('id', $_id);   // Restore previous value of this variable 
+
 			$category->description 	= $category->text;
 		}
 
@@ -838,13 +848,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$lists = array();
 		
 		//ordering
-		$lists['filter_order']     = JRequest::getCmd('filter_order', 'i.title', 'default');
-		$lists['filter_order_Dir'] = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
-		$lists['filter']           = JRequest::getString('filter', '', 'default');
+		$lists['filter_order']     = $jinput->get('filter_order', 'i.title', 'cmd');
+		$lists['filter_order_Dir'] = $jinput->get('filter_order_Dir', 'ASC', 'cmd');
+		$lists['filter']           = $jinput->get('filter', '', 'string');
 		
 		// Add html to filter objects
 		$form_name = 'adminForm';
-		if ($filters) {
+		if ($filters)
+		{
 			FlexicontentFields::renderFilters( $params, $filters, $form_name );
 		}
 		
