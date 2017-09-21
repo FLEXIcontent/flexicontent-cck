@@ -408,6 +408,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function cleanUpFolderModeFolders($path)
 	{
+		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.path');
+
 		// Get file list according to filtering
 		$it = new RegexIterator(new IteratorIterator(new DirectoryIterator($path)), '#item__[0-9]{4}_[0-9]{2}_[0-9]{2}_(.*)#i');
 		$it->rewind();
