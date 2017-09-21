@@ -1902,7 +1902,7 @@ class flexicontent_html
 						'.JText::_($options['more_txt']).'
 					</a>
 					<span class="fc_cutted_text" style="display: none;">
-						' . htmlspecialchars(StringHelper::substr($cleantext, $chars), ENT_QUOTES, 'UTF-8') . '
+						' . htmlspecialchars(StringHelper::substr($cleantext, $chars), ENT_COMPAT, 'UTF-8') . '
 					</span>';
 				break;
 			default:
@@ -1918,7 +1918,7 @@ class flexicontent_html
 
 		// Reencode HTML special characters, (but do not encode UTF8 characters)
 		// and RETURN cutted text, optionally adding a show all text button
-		return htmlspecialchars($text1, ENT_QUOTES, 'UTF-8') . $text2;
+		return htmlspecialchars($text1, ENT_COMPAT, 'UTF-8') . $text2;
 	}
 
 
