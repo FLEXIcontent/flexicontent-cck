@@ -3216,9 +3216,11 @@ class FlexicontentFields
 			$filtered = $db->loadColumn();
 			return $filtered;
 		}
-		else if ($return_sql===2) {
+		else if ($return_sql===2)
+		{
 			static $iids_tblname  = array();
-			if ( !isset($iids_tblname[$filter->id]) ) {
+			if ( !isset($iids_tblname[$filter->id]) )
+			{
 				$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
 			}
 			$tmp_tbl = $iids_tblname[$filter->id];
@@ -4374,7 +4376,7 @@ class FlexicontentFields
 				? $filter->filter_item_id_col
 				: ($filter->iscore || $filter->field_type=='coreprops' ? 'i.id' : 'fi.item_id');
 			
-			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', $item_id_col, $filter_where_curr);
+			$filter_where_curr = preg_replace('/\bi.id\b/', $item_id_col, $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				//.', GROUP_CONCAT('.$item_id_col.' SEPARATOR ",") AS idlist '   // enable FOR DEBUG purposes only
 				. $valuesfrom."\n"
@@ -4481,7 +4483,8 @@ class FlexicontentFields
 			. $view_join."\n"
 			. $view_where."\n"
 			;
-		if ( !isset($iids_tblname[$view_n_text]) ) {
+		if ( !isset($iids_tblname[$view_n_text]) )
+		{
 			$iids_tblname[$view_n_text] = 'fc_view_iids_'.count($iids_tblname);
 		}
 		$tmp_tbl = $iids_tblname[$view_n_text];

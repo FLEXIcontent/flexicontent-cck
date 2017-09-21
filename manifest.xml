@@ -9,7 +9,7 @@
 	<copyright>(C) 2009-2017 Emmanuel Danan, Georgios Papadakis</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<!--  The version string is recorded in the components table -->
-	<version>3.2.1.3</version>
+	<version>3.2.1.4</version>
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
 	
