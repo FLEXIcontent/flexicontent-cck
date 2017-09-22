@@ -2,17 +2,6 @@
 //No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$map_width  = (int) $field->parameters->get('map_width_form', 350);
-$map_height = (int) $field->parameters->get('map_height_form', 250);
-
-// Get required properties from field configuration
-$required_props = $addr_edit_mode != 'plaintext'
-	? $field->parameters->get('required_props', array())
-	: $field->parameters->get('required_props_plaintext', array());
-
-$required_props = $required && !$required_props
-	? array('address')
-	: $required_props;
 
 $dom_ready_js = '';
 
@@ -46,7 +35,7 @@ foreach ($values as $value)
 		empty($value['city']) && empty($value['state']) && empty($value['province']) &&
 		(empty($value['lat']) || empty($value['lon'])) && empty($value['url']);
 
-	$value_is_disabled = !$required && $value_is_empty;
+	$value_is_disabled = $enable_disable_btns && $value_is_empty;
 	$field->fc_form_data[$n] = (object) array('value_disabled' => $value_is_disabled);
 
 	$disabled_class = $value_is_disabled ? ' fc-field-prop-disabled' : '';
