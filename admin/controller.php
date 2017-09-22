@@ -66,6 +66,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		$format = strtolower($this->input->get('format', 'html', 'CMD'));
 		$task   = strtolower($this->input->get('task', '', 'CMD'));
+		$tmpl   = strtolower($this->input->get('tmpl', '', 'CMD'));
 
 		if ($format == 'html' && !$task)
 		{
@@ -99,7 +100,8 @@ class FlexicontentController extends JControllerLegacy
 			// NOTE, we choose to have this separate from REQUIRED POSTINSTALL tasks,
 			// because WE DON'T WANT TO FORCE the user to enable all plugins but rather recommend it
 			$allplgpublish = $session->get('flexicontent.allplgpublish');
-			if(($allplgpublish===NULL) || ($allplgpublish===false)) {
+			if (($allplgpublish===NULL) || ($allplgpublish===false))
+			{
 				// NULL means ALLPLGPUBLISH task has not been checked YET (current PHP user session),
 				// false means it has been checked during current session but has failed
 				// In both cases we must evaluate the ALLPLGPUBLISH task,  and set the session variable
@@ -107,12 +109,18 @@ class FlexicontentController extends JControllerLegacy
 				$session->set('flexicontent.allplgpublish', $allplgpublish);
 			}
 			
-			if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok) {
+			if ($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok)
+			{
 				$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 				$link 	= 'index.php?option=com_flexicontent';
 				$this->setRedirect($link, $msg);
-			} else if ($postinst_integrity_ok && $config_saved) {
-				$model->checkDirtyFields();
+			}
+			else if ($postinst_integrity_ok && $config_saved)
+			{
+				if (!$tmpl)
+				{
+					$model->checkDirtyFields();
+				}
 			}
 		}
 		
