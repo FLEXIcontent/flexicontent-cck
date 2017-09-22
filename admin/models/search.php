@@ -270,7 +270,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$query .= $isADV ? ' FROM #__flexicontent_advsearch_index as ai' : ' FROM #__flexicontent_items_ext as ext';
 		if ($query_ids) {
 			$query .= ''
-				.' JOIN #__content as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id'
+				.' JOIN #__flexicontent_items_tmp as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id'
 				.(!$isADV ? '' : ''
 					.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'
 					.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'
@@ -280,14 +280,14 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		} else {
 			if ( $isADV && (in_array($filter_order, array('f.label','f.name','f.field_type')) || $filter_fieldtype) )
 				$query .= ''
-					.' JOIN #__content as a ON ai.item_id=a.id'
+					.' JOIN #__flexicontent_items_tmp as a ON ai.item_id=a.id'
 					.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'
 					.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'
 					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
 					;
 			else {
 				if ($filter_order == 'a.id' || $filter_order == 'a.title' || $filter_itemstate || $filter_itemtype || $search_itemtitle || $search_itemid)
-					$query .= ' JOIN #__content as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id';
+					$query .= ' JOIN #__flexicontent_items_tmp as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id';
 				if ($isADV && $filter_itemtype)
 					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id';
 			}
