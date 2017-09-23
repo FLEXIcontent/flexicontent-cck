@@ -39,11 +39,15 @@ class FlexicontentViewTags extends JViewLegacy
 	{
 		//initialize variables
 		$app      = JFactory::getApplication();
+		$jinput   = JFactory::getApplication()->input;
+
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+
 		$document = JFactory::getDocument();
-		$menus = $app->getMenu();
-		$menu  = $menus->getActive();
-		$uri   = JUri::getInstance();
-		$view  = JRequest::getCmd('view');
+		$menus    = $app->getMenu();
+		$menu     = $menus->getActive();
+		$uri      = JUri::getInstance();
 		
 		// Get view's Model
 		$model  = $this->getModel();
@@ -61,15 +65,20 @@ class FlexicontentViewTags extends JViewLegacy
 		// Get parameters via model
 		$params  = $model->getParams();
 		
-		// Get various data from the model
+
+
+		// ***
+		// *** Get data from the model
+		// ***
+		
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
 		
 		
-		// ****************************************************************************************************************
-		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
-		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
-		// ****************************************************************************************************************
+		// ***
+		// *** Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
+		// *** plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
+		// ***
 		
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
 		
@@ -215,39 +224,49 @@ class FlexicontentViewTags extends JViewLegacy
 		$params->set('show_alpha',0);
 		$params->set('clayout_switcher',0);
 		
+		$lists = array();
+		
 		//ordering
-		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
-		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
-		$filter				= JRequest::getString('filter');
-		
-		$lists						= array();
-		$lists['filter_order']		= $filter_order;
-		$lists['filter_order_Dir'] 	= $filter_order_Dir;
-		$lists['filter']			= $filter;
+		$lists['filter_order']     = $jinput->get('filter_order', 'i.title', 'cmd');
+		$lists['filter_order_Dir'] = $jinput->get('filter_order_Dir', 'ASC', 'cmd');
+		$lists['filter']           = $jinput->get('filter', '', 'string');
 		
 		
-		// ****************************
-		// Create the pagination object
-		// ****************************
+		
+		// ***
+		// *** Create the pagination object
+		// ***
 		
 		$pageNav = $this->get('pagination');
 		
-		// URL-encode filter values
 		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-		foreach($_GET as $i => $v) {
-			if (substr($i, 0, 6) === "filter") {
-				if (is_array($v)) {
-					foreach($v as $ii => &$vv) {
+		foreach($_GET as $i => $v)
+		{
+			// URL-encode filter values
+			if (substr($i, 0, 6) === "filter")
+			{
+				if (is_array($v))
+				{
+					foreach($v as $ii => &$vv)
+					{
 						$vv = str_replace('&', '__amp__', $vv);
 						$vv = strtr(rawurlencode($vv), $_revert);
 						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
 					}
 					unset($vv);
-				} else {
+				}
+				else
+				{
 					$v = str_replace('&', '__amp__', $v);
 					$v = strtr(rawurlencode($v), $_revert);
 					$pageNav->setAdditionalUrlParam($i, $v);
 				}
+			}
+
+			// Make sure all URL variables are added to the pagination URLs
+			else
+			{
+				$pageNav->setAdditionalUrlParam($i, $v);
 			}
 		}
 		
