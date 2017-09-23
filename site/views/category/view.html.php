@@ -67,7 +67,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$user     = JFactory::getUser();
 		$aid      = JAccess::getAuthorisedViewLevels($user->id);
 		
-		// Get model
+		// Get view's Model
 		$model  = $this->getModel();
 		
 		// Allow clayout from HTTP request, this will be checked during loading category parameters
@@ -85,11 +85,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$meta_params = new JRegistry($category->metadata);
 		}
-		
-		
-		// ***********************
-		// Get data from the model
-		// ***********************
+
+
+		// ***
+		// *** Get data from the model
+		// ***
 		
 		$categories = $this->get('Childs'); // this will also count sub-category items is if  'show_itemcount'  is enabled
 		$peercats   = $this->get('Peers');  // this will also count sub-category items is if  'show_subcatcount_peercat'  is enabled
@@ -101,11 +101,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = $jinput->get('limitstart', 0, 'int');
-		
-		
-		// ************************
-		// CATEGORY LAYOUT handling
-		// ************************
+
+
+		// ***
+		// *** CATEGORY LAYOUT handling
+		// ***
 		
 		// Get category 's layout as this may have been altered by model's decideLayout()
 		$clayout = $params->get('clayout');
@@ -298,7 +298,6 @@ class FlexicontentViewCategory extends JViewLegacy
 				break;
 			default        : ;
 		}
-
 		
 		
 		
@@ -860,28 +859,40 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		
-		// ****************************
-		// Create the pagination object
-		// ****************************
+		// ***
+		// *** Create the pagination object
+		// ***
 		
 		$pageNav = $this->get('pagination');
 		
-		// URL-encode filter values
 		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-		foreach($_GET as $i => $v) {
-			if (substr($i, 0, 6) === "filter") {
-				if (is_array($v)) {
-					foreach($v as $ii => &$vv) {
+		foreach($_GET as $i => $v)
+		{
+			// URL-encode filter values
+			if (substr($i, 0, 6) === "filter")
+			{
+				if (is_array($v))
+				{
+					foreach($v as $ii => &$vv)
+					{
 						$vv = str_replace('&', '__amp__', $vv);
 						$vv = strtr(rawurlencode($vv), $_revert);
 						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
 					}
 					unset($vv);
-				} else {
+				}
+				else
+				{
 					$v = str_replace('&', '__amp__', $v);
 					$v = strtr(rawurlencode($v), $_revert);
 					$pageNav->setAdditionalUrlParam($i, $v);
 				}
+			}
+
+			// Make sure all URL variables are added to the pagination URLs
+			else
+			{
+				$pageNav->setAdditionalUrlParam($i, $v);
 			}
 		}
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter

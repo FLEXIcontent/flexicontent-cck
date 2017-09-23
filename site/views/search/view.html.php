@@ -41,17 +41,21 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	function display( $tpl = null )
 	{
 		//initialize variables
-		$option= JRequest::getVar('option');
 		$app      = JFactory::getApplication();
+		$jinput   = JFactory::getApplication()->input;
+
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+
 		$document = JFactory::getDocument();
 		$db    = JFactory::getDbo();
-		$menus = $app->getMenu();
-		$menu  = $menus->getActive();
-		$uri   = JUri::getInstance();
-		$pathway = $app->getPathway();
+		$menus    = $app->getMenu();
+		$menu     = $menus->getActive();
+		$uri      = JUri::getInstance();
+		$pathway  = $app->getPathway();
 		
 		// Get view's Model
-		$model = $this->getModel();
+		$model  = $this->getModel();
 		
 		$error	= '';
 		$rows	= null;
@@ -61,7 +65,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Get parameters via model
 		$params  = $model->getParams();
 		
-		// Get various data from the model
+
+
+		// ***
+		// *** Get data from the model
+		// ***
+		
 		$areas	=  $this->get('areas');
 		$state	=  $this->get('state');
 		$searchword     = $state->get('keyword');
@@ -110,48 +119,54 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
 		// **********************************************************
-		
+
 		// Verify menu item points to current FLEXIcontent object
-		if ( $menu ) {
+		if ( $menu )
+		{
 			$view_ok     = 'search' == @$menu->query['view'];
 			$menu_matches = $view_ok;
 			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
-		} else {
+		}
+		else
+		{
 			$menu_matches = false;
 		}
-		
+
 		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
-		if ( $menu_matches ) {
-			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
-			
+		if ( $menu_matches )
+		{
+			$default_heading = $menu->title;
+
 			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
 			$params->def('page_heading', $params->get('page_title',   $default_heading));
 			$params->def('page_title',   $params->get('page_heading', $default_heading));
 		  $params->def('show_page_heading', $params->get('show_page_title',   0));
 		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
 		}
-		
+
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
-		else {
+		else
+		{
 			// Clear some menu parameters
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-			
+
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			// meta_params->get('page_title') is meant for <title> but let's use as ... default page heading
 			$default_heading = JText::_( 'FLEXI_SEARCH' );
-			
+
 			// Decide to show page heading (=J1.5 page title), this default to no
 			$show_default_heading = 0;
-			
+
 			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
 			$params->set('page_title',   $default_heading);
 			$params->set('page_heading', $default_heading);
 		  $params->set('show_page_heading', $show_default_heading);
 			$params->set('show_page_title',   $show_default_heading);
 		}
-		
+
 		// Prevent showing the page heading if ... currently no reason
-		if ( 0 ) {
+		if ( 0 )
+		{
 			$params->set('show_page_heading', 0);
 			$params->set('show_page_title',   0);
 		}
@@ -607,20 +622,32 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			
 			// URL-encode filter values
 			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-			foreach($_GET as $i => $v) {
-				if (substr($i, 0, 6) === "filter") {
-					if (is_array($v)) {
-						foreach($v as $ii => &$vv) {
+			foreach($_GET as $i => $v)
+			{
+				if (substr($i, 0, 6) === "filter")
+				{
+					if (is_array($v))
+					{
+						foreach($v as $ii => &$vv)
+						{
 							$vv = str_replace('&', '__amp__', $vv);
 							$vv = strtr(rawurlencode($vv), $_revert);
 							$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
 						}
 						unset($vv);
-					} else {
+					}
+					else
+					{
 						$v = str_replace('&', '__amp__', $v);
 						$v = strtr(rawurlencode($v), $_revert);
 						$pageNav->setAdditionalUrlParam($i, $v);
 					}
+				}
+
+				// Make sure all URL variables are added to the pagination URLs
+				else
+				{
+					$pageNav->setAdditionalUrlParam($i, $v);
 				}
 			}
 			
