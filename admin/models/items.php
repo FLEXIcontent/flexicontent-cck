@@ -2556,29 +2556,30 @@ class FlexicontentModelItems extends JModelLegacy
 			foreach ($cid as $item_id)
 			{
 				$item = $itemmodel->getItem($item_id);
-				
-				// *****************************************************************
-				// Trigger Event 'onContentBeforeDelete' of Joomla's Content plugins
-				// *****************************************************************
+
+				// ***
+				// *** Trigger Event 'onContentBeforeDelete' of Joomla's Content plugins
+				// ***
 				$event_before_delete = 'onContentBeforeDelete';  // NOTE: $itemmodel->event_before_delete is protected property
 				$dispatcher->trigger($event_before_delete, array('com_content.article', $item));
-				$item_arr[] = clone($item);  // store object so that we can call after delete event
-				
-				// **********************************************************************************
-				// Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
-				// **********************************************************************************
+				$item_arr[] = $item;  // store object so that we can call after delete event
+
+				// ***
+				// *** Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
+				// ***
 				$fields = $itemmodel->getExtrafields($force=true);
-				foreach ($fields as $field) {
+				foreach ($fields as $field)
+				{
 					$field_type = $field->iscore ? 'core' : $field->field_type;
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeDeleteField', array( &$field, &$item ));
 				}
 			}
 		}
-		
-		
-		// *********************************************
-		// Retrieve J2.5 asset before deleting the items
-		// *********************************************
+
+
+		// ***
+		// *** Retrieve asset before deleting the items
+		// ***
 		$query = 'SELECT asset_id FROM #__content'
 				. ' WHERE id IN ('. $cids .')';
 		$this->_db->setQuery( $query );
@@ -2589,11 +2590,11 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 		$assetids = $this->_db->loadColumn();
 		$assetidslist = implode(',', $assetids );
-		
-		
-		// **********************
-		// Remove basic item data
-		// **********************
+
+
+		// ***
+		// *** Remove basic item data
+		// ***
 		$query = 'DELETE FROM #__content'
 				. ' WHERE id IN ('. $cids .')'
 				;
@@ -2603,11 +2604,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// *************************
-		// Remove extended item data
-		// *************************
+
+
+		// ***
+		// *** Remove extended item data
+		// ***
 		$query = 'DELETE FROM #__flexicontent_items_ext'
 				. ' WHERE item_id IN ('. $cids .')'
 				;
@@ -2617,11 +2618,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// **************************
-		// Remove temporary item data
-		// **************************
+
+
+		// ***
+		// *** Remove temporary item data
+		// ***
 		$query = 'DELETE FROM #__flexicontent_items_tmp'
 				. ' WHERE id IN ('. $cids .')'
 				;
@@ -2631,11 +2632,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// ******************************
-		// Remove assigned tag references
-		// ******************************
+
+
+		// ***
+		// *** Remove assigned tag references
+		// ***
 		$query = 'DELETE FROM #__flexicontent_tags_item_relations'
 				.' WHERE itemid IN ('. $cids .')'
 				;
@@ -2645,11 +2646,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// ***********************************
-		// Remove assigned category references
-		// ***********************************
+
+
+		// ***
+		// *** Remove assigned category references
+		// ***
 		$query = 'DELETE FROM #__flexicontent_cats_item_relations'
 				.' WHERE itemid IN ('. $cids .')'
 				;
@@ -2659,11 +2660,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// ****************************************************************
-		// Delete field data in flexicontent_fields_item_relations DB Table
-		// ****************************************************************
+
+
+		// ***
+		// *** Delete field data in flexicontent_fields_item_relations DB Table
+		// ***
 		$query = 'DELETE FROM #__flexicontent_fields_item_relations'
 				. ' WHERE item_id IN ('. $cids .')'
 				;
@@ -2673,11 +2674,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// **************************************************************************
-		// Delete VERSIONED field data in flexicontent_fields_item_relations DB Table
-		// **************************************************************************
+
+
+		// ***
+		// *** Delete VERSIONED field data in flexicontent_fields_item_relations DB Table
+		// ***
 		$query = 'DELETE FROM #__flexicontent_items_versions'
 				. ' WHERE item_id IN ('. $cids .')'
 				;
@@ -2687,11 +2688,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// ****************************
-		// Delete item version METADATA
-		// ****************************
+
+
+		// ***
+		// *** Delete item version METADATA
+		// ***
 		$query = 'DELETE FROM #__flexicontent_versions'
 				. ' WHERE item_id IN ('. $cids .')'
 				;
@@ -2701,44 +2702,48 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		
-		// **********************************
-		// Delete favoured record of the item
-		// **********************************
+
+
+		// ***
+		// *** Delete favoured records of the item
+		// ***
 		$query = 'DELETE FROM #__flexicontent_favourites'
 				. ' WHERE itemid IN ('. $cids .')'
 				;
 		$this->_db->setQuery( $query );
 
-		if(!$this->_db->execute()) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
-		}
-		
-		
-		// *****************************
-		// Delete item asset/ACL records
-		// *****************************
+
+		// ***
+		// *** Delete item asset/ACL records
+		// ***
 		$query 	= 'DELETE FROM #__assets'
 			. ' WHERE id in ('.$assetidslist.')'
 			;
 		$this->_db->setQuery( $query );
-		
-		if(!$this->_db->execute()) {
-			$this->setError($this->_db->getErrorMsg());
-			return false;
+
+
+		// ***
+		// *** Delete record (if it exist) from language associations table
+		// ***
+		foreach($item_arr as $item)
+		{
+			if ($item->associations && $item->language && $item->language !== '*')
+			{
+				unset($item->associations[$item->language]);
+				flexicontent_db::saveAssociations($item, $_data, $context = 'com_content.item');
+			}
 		}
-		
-		
-		// ****************************************************************
-		// Trigger Event 'onContentAfterDelete' of Joomla's Content plugins
-		// ****************************************************************
+
+
+		// ***
+		// *** Trigger Event 'onContentAfterDelete' of Joomla's Content plugins
+		// ***
 		$event_after_delete = 'onContentAfterDelete';  // NOTE: $itemmodel->event_after_delete is protected property
-		foreach($item_arr as $item) {
+		foreach($item_arr as $item)
+		{
 			$dispatcher->trigger($event_after_delete, array('com_content.article', $item));
 		}
-		
+
 		return true;
 	}
 	

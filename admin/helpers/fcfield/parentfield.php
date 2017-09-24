@@ -191,7 +191,6 @@ class FCField extends JPlugin
 	public function onBeforeDeleteField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		if ( !is_array($post) && !strlen($post) ) return;
 	}
 	
 	
