@@ -938,36 +938,39 @@ class flexicontent_db
 		
 		// Make sure that current item id, is the association id of the language of the current item
 		$associations[$item->language] = $item->id;
-		
+
 		// Make sure associations ids are integers
 		JArrayHelper::toInteger($associations);
 		
-		
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->select($db->quoteName('key'))
+			->from('#__associations')
+			->where($db->quoteName('context') . ' = ' . $db->quote($context))
+			->where($db->quoteName('id') . ' = ' . (int) $item->id);
+		$db->setQuery($query)->execute();
+		$key = $db->setQuery($query)->loadResult();
+
+
 		// ***
 		// *** Delete old associations
 		// ***
-		
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true)
-			->delete('#__associations')
-			->where($db->quoteName('context') . ' = ' . $db->quote($context))
-			->where($db->quoteName('id') . ' IN (' . implode(',', $associations) . ')');
-		$db->setQuery($query);
-		$db->execute();
-		
-		if ($error = $db->getErrorMsg())
+		if ($key)
 		{
-			$this->setError($error);
-			return false;
+			$query = $db->getQuery(true)
+				->delete('#__associations')
+				->where($db->quoteName('context') . ' = ' . $db->quote($context))
+				->where($db->quoteName('key') . ' = ' . $db->quote($key));
+			$db->setQuery($query)->execute();
 		}
-		
-		
-		// ********************
-		// Add new associations
-		// ********************
-		
+
+
+		// ***
+		// *** Add new associations
+		// ***
+
 		// Only add language associations if item language is not '*' (ALL)
-		if ($all_language || !count($associations)) return true;
+		if ($all_language || count($associations)<=1) return true;
 		
 		$key = md5(json_encode($associations));
 		$query->clear()
@@ -981,11 +984,6 @@ class flexicontent_db
 		$db->setQuery($query);
 		$db->execute();
 
-		if ($error = $db->getErrorMsg())
-		{
-			$this->setError($error);
-			return false;
-		}
 		return true;
 	}
 	
