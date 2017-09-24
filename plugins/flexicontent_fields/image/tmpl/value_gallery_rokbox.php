@@ -22,7 +22,7 @@ foreach ($values as $n => $value)
 	$title_attr = $desc ? $desc : $title;
 	$group_str = $group_name ? 'data-rokbox-album="'.$group_name.'"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" class="fc_image_thumb" data-rokbox data-rokbox-caption="'.$title_attr.'">
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" class="fc_image_thumb" data-rokbox data-rokbox-caption="'.$title_attr.'">
 			'.$img_legend.'
 		</a>'
 		.$inline_info.$posttext;

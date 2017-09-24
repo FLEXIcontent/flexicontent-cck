@@ -410,7 +410,7 @@ function fc_getLayout_".$_name."(el)
 	
 	if (!panel_header.length)
 	{
-		alert('Layout container: ".$tmpl_container." not found');
+		//alert('Layout container: ".$tmpl_container." not found');
 		return;
 	}
 	

@@ -21,7 +21,7 @@ foreach ($values as $n => $value)
 
 	$group_str = '';   // image grouping: not needed / not applicatble
 	$field->{$prop}[] =
-		'<a href="'.$srcl.'" class="fc_image_thumb thumb" name="drop">
+		'<a href="'.JUri::root(true).'/'.$srcl.'" class="fc_image_thumb thumb" name="drop">
 			'.$img_legend.'
 		</a>
 		<div class="caption">

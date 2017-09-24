@@ -191,7 +191,7 @@
 
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/weblink/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label label-warning" />
 			
-			<field name="" type="separator" default="FLEXI_NOTE_NEW_WINDOW_FORCED_FOR_EXTERNAL_LINKS" description="" level="-" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="FLEXI_FIELD_NOTE_NEW_WINDOW_FORCED_FOR_EXTERNAL_LINKS" description="" level="-" class="alert alert-info fcpadded" />
 			<field name="target" type="list" default="" label="FLEXI_FIELD_WEBLINK_URLTARGET_DEFAULT" description="FLEXI_FIELD_WEBLINK_URLTARGET_DEFAULT_DESC" >
 				<option value="">FLEXI_FIELD_LINK_NOTARGET</option>
 				<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>

@@ -380,7 +380,7 @@
 			<field name="closetag" type="text" default="" filter="raw" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" icon_class="icon-list" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_LAYOUT" icon_class="icon-palette" level="tab_open" box_type="1" />
 			
 			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level2" />
 			<field name="default_method_item" type="multilist" subtype="radio" default="display" label="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD_DESC"
@@ -516,8 +516,8 @@
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 
 
-			<field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-screen" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-mobile" level="tab_open" box_type="1" />
+			<!--field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-screen" level="tab_open" box_type="1" /-->
+			<!--field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-mobile" level="tab_open" box_type="1" /-->
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>

@@ -21,7 +21,7 @@ foreach ($values as $n => $value)
 
 	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" '.$group_str.' >
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" '.$group_str.' >
 			'.$img_legend.'
 		</a>
 		<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? '<span class="badge">'.$title.'</span> '.$desc : $title).'</div>'
