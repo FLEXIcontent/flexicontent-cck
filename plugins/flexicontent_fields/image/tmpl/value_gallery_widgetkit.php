@@ -22,7 +22,7 @@ foreach ($values as $n => $value)
 	$title_attr = $desc ? $desc : $title;
 	$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
 			'.$img_legend.'
 			<div class="overlay">
 				'.'<b>'.$title.'</b>: '.$desc.'
