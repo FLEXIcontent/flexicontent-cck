@@ -17,6 +17,10 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+if ($this->behaviour === 'translate' && !flexicontent_db::useAssociations())
+{
+	JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_LANGUAGE_ASSOCS_IS_OFF_ENABLE_HERE'));
+}
 ?>
 
 <div id="flexicontent" class="flexicontent">

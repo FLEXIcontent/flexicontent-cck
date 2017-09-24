@@ -1632,19 +1632,19 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
-		if ($method == 99) {
-			$translate_method = $jinput->get('translate_method', 1, 'int');
-		} else {
-			$translate_method = 0;
-		}
-		
+		$translate_method = $method == 99
+			? $jinput->get('translate_method', 1, 'int')
+			: $translate_method = 0;
+
 		// If translation method import the translator class
-		if ($translate_method==3 || $translate_method==4) {
+		if ($translate_method==3 || $translate_method==4)
+		{
 			require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php');
 		}
 		
 		// If translation method load description field to allow some parsing according to parameters
-		if ($translate_method==3 || $translate_method==4) {
+		if ($translate_method==3 || $translate_method==4)
+		{
 			$this->_db->setQuery('SELECT id FROM #__flexicontent_fields WHERE name = "text" ');
 			$desc_field_id = $this->_db->loadResult();
 			$desc_field = JTable::getInstance('flexicontent_fields', '');
@@ -1693,7 +1693,8 @@ class FlexicontentModelItems extends JModelLegacy
 				$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
 				
 				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
-				if ($translate_method == 2 || $translate_method == 4) {
+				if ($translate_method == 2 || $translate_method == 4)
+				{
 					// a. Try to get joomfish/falang translation from the item
 					$jfitemfields = false;
 					
@@ -1753,10 +1754,11 @@ class FlexicontentModelItems extends JModelLegacy
 				
 
 				// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
-				if ($translate_method == 3 || $translate_method == 4) {
-					
+				if ($translate_method == 3 || $translate_method == 4)
+				{
 					// Translate fulltext item property, using the function for which handles custom fields TYPES: text, textarea, ETC
-					if ($doauto['fulltext']) {
+					if ($doauto['fulltext'])
+					{
 						$desc_field->value = $row->fulltext;
 						$fields = array( &$desc_field );
 						$this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
@@ -1768,7 +1770,8 @@ class FlexicontentModelItems extends JModelLegacy
 					
 					$fieldnames_arr = array();
 					$fieldvalues_arr = array();
-					foreach($translatables as $translatable) {
+					foreach($translatables as $translatable)
+					{
 						if ( !$doauto[$translatable] ) continue;
 						
 						$fieldnames_arr[] = $translatable;
@@ -1778,12 +1781,15 @@ class FlexicontentModelItems extends JModelLegacy
 						$fieldvalues_arr[] = $translatable_obj;
 					}
 					
-					if (count($fieldvalues_arr)) {
+					if (count($fieldvalues_arr))
+					{
 						$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
-						
-						if (intval($result)) {
+
+						if (intval($result))
+						{
 							$n = 0;
-							foreach($fieldnames_arr as $fieldname) {
+							foreach($fieldnames_arr as $fieldname)
+							{
 								$row->{$fieldname} = $fieldvalues_arr[$n]->translationValue;
 								$n++;
 							}
@@ -1791,13 +1797,13 @@ class FlexicontentModelItems extends JModelLegacy
 					}
 				}
 				//print_r($row->fulltext); exit;
-				
-				
+
 				// Create a new item in the content fc_items_ext table
 				$row->store();
 				
 				// Not doing a translation, we start a new language group for the new item
-				if ($translate_method == 0) {
+				if ($translate_method == 0)
+				{
 					$row->lang_parent_id = 0; //$row->id;
 					$row->store();
 				}
@@ -1927,7 +1933,7 @@ class FlexicontentModelItems extends JModelLegacy
 					}
 					$_data['associations'][$row->language]  = $row->id;  // Add new item itself
 					$_data['associations'][$item->language] = $item->id; // unneeded, done by saving ...
-					$context = 'com_content';
+					$context = 'com_content.item';
 					flexicontent_db::saveAssociations($row, $_data, $context);  // Save associations, adding the new item
 					//$app->enqueueMessage( print_r($_data, true), 'message' );
 				}
