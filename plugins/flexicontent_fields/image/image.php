@@ -2146,7 +2146,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				case 5:
 					$group_str = '';   // image grouping: not needed / not applicatble
 					$field->{$prop}[] =
-						'<a href="'.$srcl.'" class="fc_image_thumb thumb" name="drop">
+						'<a href="'.JUri::root(true).'/'.$srcl.'" class="fc_image_thumb thumb" name="drop">
 							'.$img_legend.'
 						</a>
 						<div class="caption">
@@ -2185,7 +2185,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				case 1:
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb" '.$group_str.' >
+						'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb" '.$group_str.' >
 							'.$img_legend.'
 						</a>
 						<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? '<span class="badge">'.$title.'</span> '.$desc : $title).'</div>'
@@ -2197,7 +2197,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$title_attr = $desc ? $desc : $title;
 					$group_str = '';   // no support for image grouping
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" class="fc_image_thumb" data-rokbox data-rokbox-caption="'.$title_attr.'">
+						'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" class="fc_image_thumb" data-rokbox data-rokbox-caption="'.$title_attr.'">
 							'.$img_legend.'
 						</a>'
 						.$inline_info.$posttext;
@@ -2208,7 +2208,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$title_attr = $desc ? $title.'::'.$desc : $title;
 					$group_str = $group_name ? 'group['.$group_name.'];' : '';
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb jcepopup" data-mediabox="'.$group_str.'title['.$title_attr.']">
+						'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'"  class="fc_image_thumb jcepopup" data-mediabox="'.$group_str.'title['.$title_attr.']">
 							'.$img_nolegend.'
 						</a>'
 						.$inline_info.$posttext;
@@ -2219,7 +2219,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$title_attr = $desc ? '<span class=\'badge\'>'.$title.'</span> '.$desc : $title;
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb fancybox" '.$group_str.' title="'.$title_attr.'">
+						'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'"  class="fc_image_thumb fancybox" '.$group_str.' title="'.$title_attr.'">
 							'.$img_legend.'
 						</a>'
 						.$inline_info.$posttext;
@@ -2230,7 +2230,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$title_attr = $desc ? $desc : $title;
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
+						'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
 							'.$img_legend.'
 							<div class="overlay">
 								'.'<b>'.$title.'</b>: '.$desc.'
@@ -2243,7 +2243,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				case 8:
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" '.$group_str.' class="fc_image_thumb">
+						'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" '.$group_str.' class="fc_image_thumb">
 							'.$img_legend.'
 						</a>'
 						.$inline_info.$posttext;
