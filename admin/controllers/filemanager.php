@@ -447,7 +447,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		$file_mode = 'db_mode';
-		if ($field && $field->field_type =='image' && $field->parameters->get('image_source', 0) == 1)
+		if ($field && $field->field_type =='image' && $field->parameters->get('image_source') == 1)
 		{
 			$file_mode = 'folder_mode';
 		}
