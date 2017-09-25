@@ -62,10 +62,16 @@ if ($disp->total_info)
 {
 	$total_count = isset($options->total) ? $options->total : count($related_items);
 	$total_append_text = JText::_($field->parameters->get('total_append_text', ''));
-	$HTML->total_info = '
-		<div class="fcrelation_field_total">
-			' . $total_count . ' ' . $total_append_text . '
-		</div>';
+
+	// show_total_only: 2 , dictates to hide if empty, thus skip display if zero items were found
+	// (e.g. according to configuration we may not include unpublished items)
+	if ($show_total_only !== 2 || $total_count)
+	{
+		$HTML->total_info = '
+			<div class="fcrelation_field_total">
+				' . $total_count . ' ' . $total_append_text . '
+			</div>';
+	}
 }
 
 

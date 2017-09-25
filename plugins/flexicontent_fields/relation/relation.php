@@ -427,19 +427,15 @@ jQuery(document).ready(function()
 		$HTML = new stdClass();
 
 		// Total information
-		$show_total_only     = $field->field_type != 'relation' ? 0 : $field->parameters->get('show_total_only', 0);
-		$total_show_auto_btn = $field->field_type != 'relation' ? 0 : $field->parameters->get('total_show_auto_btn', 0);
-		$total_show_list     = $field->field_type != 'relation' ? 0 : $field->parameters->get('total_show_list', 0);
+		$show_total_only     = (int) $field->parameters->get('show_total_only', 0);
+		$total_show_auto_btn = $field->field_type != 'relation' ? 0 : (int) $field->parameters->get('total_show_auto_btn', 0);
+		$total_show_list     = $field->field_type != 'relation' ? 0 : (int) $field->parameters->get('total_show_list', 0);
 		
-		if ($field->field_type != 'relation')  // not supported by field type
-		{
-			$disp->total_info = false;
-		}
-		elseif ($prop=='display_total')  // Explicetely requested
+		if ($prop=='display_total')  // Explicitly requested
 		{
 			$disp->total_info = true;
 		}
-		elseif ( $show_total_only==1 || ($show_total_only == 2 && count($values)) )
+		elseif ( $show_total_only==1 || ($show_total_only == 2 && (count($values) || $field->field_type == 'relation_reverse')) )  // For relation reverse we will count items inside the layout
 		{
 			$app = JFactory::getApplication();
 			$option = $app->input->get('option', '', 'cmd');
@@ -555,7 +551,7 @@ jQuery(document).ready(function()
 
 		// Create field's HTML, using layout file
 		$field->{$prop} = '';
-		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($field->field_type, $viewlayout));
 	}
 
 

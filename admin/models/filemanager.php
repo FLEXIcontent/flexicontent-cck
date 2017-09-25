@@ -610,7 +610,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$form->load(file_get_contents($plugin_path), false, '/extension/config');
 
 		$image_source_exists = (bool) $form->getField('image_source', 'attribs');
-		$options['image_source'] = $image_source = $image_source_exists ? (int) $field->parameters->get('image_source', 1) : null;
+		$options['image_source'] = $image_source = $image_source_exists ? (int) $field->parameters->get('image_source') : null;
 
 		// Currently we only handle image_source '1'
 		if ($image_source===1)
@@ -927,7 +927,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$target_dir = $params->get('target_dir', $default_dir);
 		
 		// Handles special cases of fields, that have special rules for listing specific files only
-		if ($field && $field->field_type =='image' && $params->get('image_source', 0) == 0)
+		if ($field && $field->field_type =='image' && $params->get('image_source') == 0)
 		{
 			$limit_by_uploader = (int) $params->get('limit_by_uploader', 0);
 			if ($params->get('list_all_media_files', 0))

@@ -1200,7 +1200,7 @@ class FCIndexedField extends FCField
 		$field->{$prop} = array();
 		$display_index = array();
 		
-		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($field->field_type, $viewlayout));
 
 
 		// Add microdata to every group of values if field -- is -- in a field group
