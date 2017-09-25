@@ -101,9 +101,21 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_province = (int) $field->parameters->get('use_province', 1);
 		$use_zip_suffix = (int) $field->parameters->get('use_zip_suffix', 1);
 		$use_country  = (int) $field->parameters->get('use_country',  1);
+
+		// Map configuration
 		$map_type = $field->parameters->get('map_type', 'roadmap');
 		$map_zoom = (int) $field->parameters->get('map_zoom', 16);
+		$map_width  = (int) $field->parameters->get('map_width_form', 350);
+		$map_height = (int) $field->parameters->get('map_height_form', 250);
 
+		// Get required properties from field configuration
+		$required_props = $addr_edit_mode != 'plaintext'
+			? $field->parameters->get('required_props', array())
+			: $field->parameters->get('required_props_plaintext', array());
+
+		$required_props = $required && !$required_props
+			? array('address')
+			: $required_props;
 
 		// Google autocomplete search types drop down list (for geolocation)
 		$list_ac_types = array(
@@ -481,14 +493,15 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			}
 		";
 
-		$enable_disable_btns = $required ? '' : '
+		// Check if not required, and add buttons  Edit / Skip to allow skipping the value block
+		$enable_disable_btns = !$required /*&& count($required_props)*/ ? '
 			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_ENABLE_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_ENABLE_VALUE' ).'</span>
+				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_ENABLE_N_EDIT_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_EDIT' ).'</span>
 			</div>
 			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_SKIP_VALUE' ).'</span>
+				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_SKIP' ).'</span>
 			</div>
-		';
+		' : '';
 
 
 		// Add needed JS/CSS
@@ -519,9 +532,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 
 
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
+		// ***
+		// *** Create field's HTML display for item form
+		// ***
 
 		$field->html = array();  // Make sure this is an array
 

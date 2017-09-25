@@ -50,10 +50,7 @@ foreach($values as $file_id)
 	}
 
 	// Force new window for URLs that have zero file size
-	if ($file_data->url && !$file_data->size)
-	{
-		$non_file_url = 1;
-	}
+	$non_file_url = $file_data->url && !$file_data->size;
 
 
 	// ***
