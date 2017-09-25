@@ -4885,7 +4885,7 @@ class FlexicontentFields
 			else
 			{
 				// instead of items array contains the total 
-				$total = $rows;
+				$total = $rows ? $rows[0]->total : 0;
 			}
 			$options->total = $total;
 		}
@@ -5094,7 +5094,8 @@ class FlexicontentFields
 		// Only count found items
 		if ($return_items_array == 3)
 		{
-			$query = 'SELECT COUNT(i.id)'
+			$query = 'SELECT COUNT(*) AS total FROM ('
+				.' SELECT 1'
 				.' FROM #__content AS i '
 				.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
 				. @ $item_join
@@ -5110,7 +5111,7 @@ class FlexicontentFields
 				.' GROUP BY i.id '
 				//. $orderby
 				//.@ $limit
-				;
+				.') AS sq';
 		}
 		else
 		{
