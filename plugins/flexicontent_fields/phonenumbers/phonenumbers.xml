@@ -101,9 +101,12 @@
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="tabset_close" box_type="1" />
 		</fieldset>
 		<fieldset name="group-phonenumbers-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_BASIC" icon_class="icon-vcard" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -113,18 +116,17 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
+
+			<field name="" type="separator" default="FLEXI_EXPORT" level="level2" />
 			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="" level="level_br" />
-
-			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_start" box_type="1" />
-			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
-
-			<!--field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_OPTIONAL_PROPERTIES_EVERY_VALUE" description="" level="level2" /-->
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" icon_class="icon-file-2" level="tab_open" box_type="1" />
 			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_DISPLAY" level="level2" />
+			<!--field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_OPTIONAL_PROPERTIES_EVERY_VALUE" description="" level="level2" /-->
 			<field name="display_phone_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
