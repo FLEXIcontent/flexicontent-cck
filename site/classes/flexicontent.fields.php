@@ -4422,11 +4422,12 @@ class FlexicontentFields
 		{
 			$date_txtformat = str_replace('%', '', $filter->date_txtformat);
 			$nullDate = $db->getNullDate();
+			$is_year_group = $filter->parameters->get('date_filter_group', 'month') === 'year';
 			foreach($results as &$r)
 			{
 				if ($r->value && $r->value !== $nullDate)
 				{
-					$date = new JDate($r->value);
+					$date = new JDate($is_year_group ? $r->value . '-0' : $r->value);   // JDate can not handle just year (YYYY)
 					$r->text = $date->format($date_txtformat);
 				}
 			}
@@ -4580,11 +4581,12 @@ class FlexicontentFields
 		{
 			$date_txtformat = str_replace('%', '', $filter->date_txtformat);
 			$nullDate = $db->getNullDate();
+			$is_year_group = $filter->parameters->get('date_filter_group_s', 'month') === 'year';
 			foreach($results as &$r)
 			{
 				if ($r->value && $r->value !== $nullDate)
 				{
-					$date = new JDate($r->value);
+					$date = new JDate($is_year_group ? $r->value . '-0' : $r->value);   // JDate can not handle just year (YYYY)
 					$r->text = $date->format($date_txtformat);
 				}
 			}
