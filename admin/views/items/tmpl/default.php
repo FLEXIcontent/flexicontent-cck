@@ -21,6 +21,16 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
+//ADD SOME STYLES
+$document = JFactory::getDocument();
+// Add styles
+$style = '@media (max-width: 1280px) {
+	.col_hits, .col_votes, .col_ratings {
+		display: none !important;
+	}
+}'; 
+$document->addStyleDeclaration($style);
+//
 
 // Create custom field columns
 foreach($this->extra_fields as $_field):
@@ -32,15 +42,15 @@ endforeach;
 $app = JFactory::getApplication();
 $jinput = $app->input;
 $tip_class = ' hasTooltip';
-$btn_class = 'btn';  //'fc_button fcsimple';
+$btn_class = 'btn'; 
 
 $ico_class   = 'fc-man-icon-s';
-$btn_s_class = 'btn btn-small';
+$btn_s_class = 'btn btn-micro';
 
 $featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; ';
-$end_text = '<div class="icon-arrow-up-2 btn" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+$end_text = '<div class="icon-arrow-up-2 btn btn-primary" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $start_text, $end_text);
 
 global $globalcats;
@@ -107,13 +117,12 @@ $image_editlayout = 0
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->reOrderingActive)
 {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
-	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></span>';
+	$image_ordering_tip = '<i class="icon-info '.$tip_class.'"title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'"></i>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 }
 else
 {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<i class="con-info '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'"></i>';
 	//$image_ordering_tip = '<span class="icon-info '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'"></span>';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
@@ -126,8 +135,8 @@ $drag_handle_html['downonly'] = sprintf($drag_handle_box, ' fc_drag_handle_downo
 $drag_handle_html['none']     = sprintf($drag_handle_box, '_none');
 
 $_img_title = JText::_('MAIN category shown in bold', true);
-$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="'.$ico_class.' '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
-
+$categories_tip  = '<i class="icon-info '.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'"></i>';
+//class="" title="Order" data-content="Select to sort by this column" data-placement="top"
 if ( !$this->filter_order_type )
 {
 	$_img_title = JText::_('FLEXI_ORDER_JOOMLA');
@@ -361,23 +370,19 @@ jQuery(document).ready(function(){
 <div id="flexicontent" class="flexicontent">
 
 
-<?php if (!empty( $this->sidebar)) : ?>
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div id="j-sidebar-container" class="span2 col-md-2">
-		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
+	<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+	<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
-<?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
-<?php endif;?>
-
-
-	<?php if ($this->unassociated && !$this->badcatitems) : ?>
-		<div class="fc-mssg fc-success" style="margin-bottom: 32px;">
-			
+	<div id="j-main-container" class="span10">
+	<?php else : ?>
+	<div id="j-main-container" class="span12">
+	<?php endif;?>
+<!--ERRORS-->
+<?php if ($this->unassociated && !$this->badcatitems) : ?>
+		<div class="fc-mssg fc-error" style="margin-bottom: 32px;">
+			<div class="alert-message">
 			<?php echo JText::_( 'FLEXI_UNASSOCIATED_WARNING' ); ?>
 
 			<br/><br/>
@@ -388,7 +393,7 @@ jQuery(document).ready(function(){
 			<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw" method="post" name="bindForm" id="bindForm" style="display: inline-block;">
 
 				<input id="button-bind" type="button"
-					class="<?php echo $btn_class; ?> btn-primary" style='float:none !important; box-sizing: border-box; min-width: 200px;'
+					class="<?php echo $btn_class; ?> btn-success" style='float:none !important; box-sizing: border-box; min-width: 200px;'
 					value="<?php echo JText::_( 'FLEXI_BIND' ); ?>" onclick="jQuery(this.form).hide(); bindItems();"
 				/>
 
@@ -403,39 +408,42 @@ jQuery(document).ready(function(){
 				?>
 
 			</form>
-		</div>
+		</div></div>
 	<?php endif; ?>
-
-
+	
 	<?php if ($this->badcatitems) : ?>
 	<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw" method="post" name="fixcatForm" id="fixcatForm">
 		<div class="fc-mssg fc-warning">
-		<table>
-			<tr>
-				<td>
-				<span style="font-size:115%;">
-				<?php echo JText::_( 'Item with invalid or missing main category' ); ?>
-				</span>
-				</td>
-				<td width="35%">
+		<div class="alert-message">
+		
+
+      <div class="row-fluid">
+        <div class="span7">
+          <h4 class="warning">
+				<i class="icon-remove"></i><?php echo JText::_( 'Item with invalid or missing main category' ); ?>
+			</h4>
+
 					<span style="font-size:150%;"><span id="badcat_items_count"><?php echo $this->badcatitems; ?></span></span>&nbsp;
 					<br/>
 					<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
 					<input id="button-fixcat" type="submit" class="<?php echo $btn_class; ?>" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_FIX' ); ?>"
 					onclick="" />
-					<div id="log-fixcat"></div>
-				</td>
-			</tr>
-		</table>
+				          <div id="log-fixcat"></div>
+        </div>
+      </div>
+      
+      </div>
+		
 		</div>
 	</form>
 	<?php endif; ?>
+<!--/ERRORS-->	
 
 
 	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm" style="<?php echo ($this->unassociated && !count($this->rows) ? 'display: none;' : ''); ?>">
 	
-	<div id="fc-filters-header">
-		<span class="fc-filter nowrap_box" style="margin: 1px;">
+	<div id="fc-filters-header" class="clearfix">
+		<span class="fc-filter nowrap_box remove-info-icon">
 			<?php echo $this->lists['scope']; ?>
 		</span>
 		<span class="btn-group input-append fc-filter filter-search">
@@ -445,101 +453,51 @@ jQuery(document).ready(function(){
 		</span>
 
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-		<span class="fc-filter nowrap_box" style="margin: 1px;">
-			<span class="hasTooltip" title="<?php echo JText::_('FLEXI_IMAN_ABOUT_ADDING_MORE_COLUMNS_AND_FILTERS'); ?>" style="display: inline-block; margin-top: 3px;" >
-				<i class="icon-cog" style="font-size: 14px; margin-top: 2px;"></i>
-			</span>
-			<span class="btn-group fc-filter">
-				<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
-					<?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?> &nbsp;
-				</span>
-				<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');">
-					<?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup>
-				</span>
-				<span id="fc-toggle-cats_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></span>
-				<span id="fc-toggle-tags_btn" class="<?php echo $_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></span>
-				<span id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" ><span class="icon-help"></span></span>
-			</span>
-			<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
+		<span class="btn-group fc-filter ml40">
+			<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?> hidden-phone" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);"><?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?></span>
+			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
+			<span id="fc-toggle-cats_btn" class="<?php echo $_class; ?> hasTooltip hidden-phone hidden-tablet" title="<?php echo JText::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></span>
+			<span id="fc-toggle-tags_btn" class="<?php echo $_class; ?> hasTooltip hidden-phone hidden-tablet h_tags" title="<?php echo JText::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></span>
 		</span>
+		<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
 		
-		<span class="fc-filter nowrap_box">
+		<div class="btn-group pull-right hidden-tablet hidden-phone">
+
 			<span class="limit nowrap_box">
 				<?php
 				$pagination_footer = $this->pagination->getListFooter();
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
-			</span>
+							<span id="fc-mini-help_btn" class="<?php echo $_class; ?> hidden" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" ><span class="icon-help"></span></span>
 			
-			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-			</span>
 			
-			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
-			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-				<?php echo $getPagesCounter; ?>
-			</span>
-			<?php endif; ?>
-		</span>
+
+			
+
+		</span></div>
 	</div>
 	
 	
-	<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="">
+	<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="clearfix">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
-		
-		<?php if (@$this->lists['filter_fileid']): ?>
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_fileid']; ?>
-			</div>
-		</div>
-		<?php endif; ?>
+		<!--FILTERS ROW 1-->
+		<div class="block-flat-s category-style">
 
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_author']; ?>
-			</div>
-		</div>
-
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_tag']; ?>
-			</div>
-		</div>
-
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_type']; ?>
-			</div>
-		</div>
-
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_lang']; ?>
-			</div>
-		</div>
-
-		<div class="fc-filter nowrap_box">
+			<?php if (!$this->reOrderingActive): ?>
+			<div class="fc-filter nowrap_box h_state">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_state']; ?>
 			</div>
 		</div>
 
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_access']; ?>
-			</div>
-		</div>
-
-	<?php if (!$this->reOrderingActive): ?>
-
-		<div class="fc-filter nowrap_box">
+		
+		<div class="fc-filter nowrap_box h_cats">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_cats']; ?>
 			</div>
 		</div>
 
-		<div class="fc-filter nowrap_box">
+		<div class="fc-filter nowrap_box h_subcats">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_subcats']; ?>
 			</div>
@@ -547,26 +505,87 @@ jQuery(document).ready(function(){
 
 	<?php endif; ?>
 		
-		<div class="fc-filter nowrap_box">
+				<div class="fc-filter nowrap_box h_catsinstate">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_catsinstate']; ?>
+			</div>
+		</div>
+		
+			
+		</div>
+				<!--/FILTERS ROW 1-->
+				
+				<!--FILTERS ROW 2-->
+					<div class="block-flat-s category-style">
+
+				<div class="fc-filter nowrap_box h_access">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_access']; ?>
+			</div>
+		</div>
+		
+				<div class="fc-filter nowrap_box h_author">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_author']; ?>
+			</div>
+		</div>
+	
+		
+							<div class="fc-filter nowrap_box h_type">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_type']; ?>
+			</div>
+		</div>	
+		
+				<div class="fc-filter nowrap_box h_tag">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_tag']; ?>
+			</div>
+		</div>
+</div>
+<!--/FILTERS ROW 2-->
+<!--FILTERS ROW 3-->
+						<div class="block-flat-s category-style">
+		<?php if (@$this->lists['filter_fileid']): ?>
+		<div class="fc-filter nowrap_box h_fileid">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_fileid']; ?>
+			</div>
+		</div>
+						<?php endif; ?>
+						
+
+
+
+
+		<div class="fc-filter nowrap_box h_lang">
+			<div <?php echo $fcfilter_attrs_row; ?> >
+				<?php echo $this->lists['filter_lang']; ?>
+			</div>
+		</div>
+
+
+
+
+
+
+		
+		<div class="fc-filter nowrap_box h_featured">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<?php echo $this->lists['filter_featured']; ?>
 			</div>
 		</div>
 		
-		<div class="fc-filter nowrap_box">
-			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_catsinstate']; ?>
-			</div>
-		</div>
 
-		<div class="fc-filter nowrap_box">
+
+		<div class="fc-filter nowrap_box h_flexi_id">
 			<div <?php echo $fcfilter_attrs_row; ?> >
 				<div class="add-on"><?php echo JText::_('FLEXI_ID'); ?></div>
 				<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
 			</div>
 		</div>
 
-		<div class="fc-filter nowrap_box">
+		<div class="fc-filter nowrap_box h_date">
 			<div <?php echo $date_note_attrs; ?> >
 				<?php echo $this->lists['date']; ?>
 			</div>
@@ -581,8 +600,9 @@ jQuery(document).ready(function(){
 			</div>
 		</div>
 		<?php endforeach; ?>
+		</div>
 		
-		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-primary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
@@ -593,14 +613,16 @@ jQuery(document).ready(function(){
 	<?php if ($this->reOrderingActive): ?>
 
 		<?php if ($this->CanOrder): ?>
-		<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
-			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') . flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder'); ?>
-		</div>
+		<div id="fcorder_save_warn_box" class="alert fc-mssg-inline fc-nobgimage alert-info">
+		<div class="alert-message">
+			<?php echo '<span class="space-vc">'.JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .'</span>'. flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder'); ?>
+		</div></div>
 
 		<?php else: ?>
-		<div class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
-			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_ONLY_VIEW') ; ?>
-		</div>
+		<div class="alert fc-mssg-inline fc-nobgimage alert-info">
+		<div class="alert-message">
+			<?php echo JText::_('FLEXI_FCORDER_ONLY_VIEW') ; ?>
+		</div></div>
 		<?php endif; ?>
 
 		<?php
@@ -610,7 +632,7 @@ jQuery(document).ready(function(){
 		{
 			$order_msg .= JText::_('FLEXI_FCORDER_JOOMLA_ORDER_GROUPING_BY_MAINCAT');
 			$msg_class = 'fc-mssg-inline fc-nobgimage fc-success';
-			$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
+		//	$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
 			$msg_icon  = '<span class="icon-checkbox"></span>';
 		}
 		else
@@ -619,14 +641,14 @@ jQuery(document).ready(function(){
 			{
 				$order_msg .= JText::_('FLEXI_FCORDER_FC_ORDER_PLEASE_SET_CATEGORY_FILTER');
 				$msg_class = 'fc-mssg-inline fc-nobgimage fc-warning';
-				$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
+			//	$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
 				$msg_icon  = '<span class="icon-warning"></span>';
 			}
 			else
 			{
 				$order_msg .= JText::_('FLEXI_FCORDER_FC_ORDER_GROUPING_BY_SELECTED_CATEGORY');
 				$msg_class = 'fc-mssg-inline fc-nobgimage fc-success';
-				$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
+			//	$msg_style = 'padding: 4px 8px; margin: 12px 0 6px 0;';
 				$msg_icon  = '<span class="icon-checkbox"></span>';
 			}
 		}
@@ -636,7 +658,7 @@ jQuery(document).ready(function(){
 			<div '.  $fcfilter_attrs . ' style="margin: 0 12px !important;">' . $this->lists['filter_subcats'] . ' </div>';
 		?>
 
-		<div class="fc-filter nowrap_box" id="order_type_selector" style="margin: 8px 0 0 0;">
+		<div class="fc-filter nowrap_box" id="order_type_selector">
 			<div <?php echo $fcfilter_attrs; ?> >
 				<div <?php echo $ordering_type_attrs; ?> > <?php echo JText::_('FLEXI_ORDER_TYPE'); ?></div>
 				<?php echo $this->lists['filter_order_type']; ?>
@@ -645,8 +667,8 @@ jQuery(document).ready(function(){
 
 		<?php if (!empty($order_msg)): ?>
 			<div class="clear"></div>
-			<div id="fcorder_notes_box" class="<?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset;">
-				<?php echo $msg_icon; ?> <?php echo $order_msg;?>
+			<div id="fcorder_notes_box" class="<?php echo $msg_class; ?>">
+				<?php /*?><?php echo $msg_icon; ?><?php */?> <?php echo $order_msg;?>
 			</div>
 
 		<?php endif; ?>
@@ -656,7 +678,7 @@ jQuery(document).ready(function(){
 
 
 	<div class="fcclear"></div>
-
+		<div class="block-flat no-padding-bottom">
 	<table id="adminListTableFCitems" class="adminlist fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
@@ -665,9 +687,10 @@ jQuery(document).ready(function(){
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="hideOnDemandClass left nowrap">
+			<th class="hideOnDemandClass left nowrap hidden-phone">
 				<?php
-				echo $this->CanOrder ? $image_ordering_tip : '';
+				// Do we need this as we already have it on the icon-menu-2
+				// echo $this->CanOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHtml::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
 
 				/*if ($this->CanOrder && $this->reOrderingActive) :
@@ -677,12 +700,12 @@ jQuery(document).ready(function(){
 				<span class="column_toggle_lbl" style="display:none;"><?php echo JText::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
-			<th class="left">
+			<th class="text-center checker hidden-phone">
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-center col_state hideOnDemandClass">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'i.state', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -691,7 +714,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_title hideOnDemandClass">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -700,7 +723,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_authors hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'i.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_author) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -709,7 +732,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_lang hideOnDemandClass hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -719,12 +742,12 @@ jQuery(document).ready(function(){
 			</th>
 
 		<?php if ( $useAssocs ) : ?>
-			<th class="left hideOnDemandClass">
+			<th class="text-center col_associations hideOnDemandClass hidden-phone">
 				<?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?>
 			</th>
 		<?php endif; ?>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_type hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -733,17 +756,17 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="left hideOnDemandClass" colspan="2">
+			<th class="text-left col_template hideOnDemandClass hidden-tablet hidden-phone" colspan="2">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
 		
 		<?php foreach($this->extra_fields as $field) :?>
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_extra_fields hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo $field->label; ?>
 			</th>
 		<?php endforeach; ?>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-center col_access hideOnDemandClass hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_access) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -752,7 +775,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_cats hideOnDemandClass hidden-phone">
 				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->filter_cats) : ?>
@@ -762,7 +785,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_tag hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->filter_tag) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -771,7 +794,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_created hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_CREATED', 'i.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -786,7 +809,7 @@ jQuery(document).ready(function(){
 				?>
 			</th>
 			
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_revised hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort',   'FLEXI_REVISED', 'i.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -801,19 +824,19 @@ jQuery(document).ready(function(){
 				?>
 			</th>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_hits hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_HITS', 'i.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_votes hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-left col_ratings hideOnDemandClass hidden-tablet hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="left hideOnDemandClass">
+			<th class="text-center col_id hideOnDemandClass hidden-phone">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -866,7 +889,7 @@ jQuery(document).ready(function(){
 
 		<?php if ($this->CanOrder) : ?>
 
-			<td class="order center">
+			<td class="order center hidden-phone">
 				<?php
 					if ($this->reOrderingActive)
 					{
@@ -911,7 +934,7 @@ jQuery(document).ready(function(){
 
 		<?php else : ?>
 
-			<td class="center">
+			<td class="center hide- hidden-phone">
 				<?php
 				echo !$this->reOrderingActive
 					? '<span class="icon-move" style="color: #d0d0d0"></span>'
@@ -921,12 +944,13 @@ jQuery(document).ready(function(){
 
 		<?php endif; ?>
 
-			<td>
+			<td class="checker hidden-phone">
 				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
 
-			<td class="col_state" style="padding-right: 8px;">
+		
+			<td class="col_state text-center">
 				<div class="btn-group fc-group fc-items">
 					<?php
 					$record_url =
@@ -941,7 +965,7 @@ jQuery(document).ready(function(){
 
 					$previewlink = $record_url;
 
-					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-small' );
+					echo flexicontent_html::statebutton( $row, null, $addToggler = ($this->pagination->limit <= $this->inline_ss_max), 'top', 'btn btn-micro' );
 					echo JHtml::_('fcitems.featured', $row->featured, $i, $row->canEditState);
 					echo '<a '.$attribs_preview.' href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 					?>
@@ -973,11 +997,11 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_authors">
+			<td class="col_authors small hidden-tablet hidden-phone">
 				<?php echo $row->author; ?>
 			</td>
 
-			<td class="col_lang" title="<?php echo ($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
+			<td class="col_lang small hidden-phone" title="<?php echo ($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
 				<?php if ( 0 && !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
@@ -987,7 +1011,7 @@ jQuery(document).ready(function(){
 
 
 			<?php if ( $useAssocs ) : ?>
-			<td>
+			<td class="col_associations text-center small hidden-phone">
 				<?php
 				if ( !empty($this->lang_assocs[$row->id]) )
 				{
@@ -1027,24 +1051,24 @@ jQuery(document).ready(function(){
 			<?php endif ; ?>
 
 
-			<td class="col_type">
+			<td class="col_type small hidden-tablet hidden-phone">
 				<?php echo $row->type_name; ?>
 			</td>
 
-			<td class="col_edit_layout">
+			<td class="col_edit_layout small hidden-tablet hidden-phone">
 				<?php if ($this->CanTemplates && $row_ilayout) : ?>
 				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
 					<?php echo $image_editlayout;?>
 				</a>
 				<?php endif; ?>
 			</td>
-			<td class="col_template">
+			<td class="col_template small hidden-tablet hidden-phone">
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 
     <?php foreach($this->extra_fields as $field) :?>
 
-			<td>
+			<td class="col_extra_fields hidden-tablet hidden-phone">
 		    <?php
 				// Output the field's display HTML
 				echo isset( $row->fields[$field->name]->{$field->methodname} ) ? $row->fields[$field->name]->{$field->methodname} : '';
@@ -1052,13 +1076,13 @@ jQuery(document).ready(function(){
 			</td>
 		<?php endforeach; ?>
 
-			<td class="col_access">
+			<td class="col_access text-center hidden-phone">
 				<?php echo $row->canEdit && $this->CanAccLvl
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"')
 					: $row->access_level; ?>
 			</td>
 
-			<td class="col_cats">
+			<td class="col_cats small hidden-phone">
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
@@ -1140,7 +1164,7 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_tag">
+			<td class="col_tag small hidden-tablet hidden-phone">
 				<?php
 					$row_tags  = array();
 					$tag_names = array();
@@ -1164,27 +1188,27 @@ jQuery(document).ready(function(){
 				?>
 			</td>
 
-			<td class="col_created">
+			<td class="col_created small hidden-tablet hidden-phone">
 				<?php echo JHtml::_('date',  $row->created, $date_format ); ?>
 			</td>
 
-			<td class="col_revised">
+			<td class="col_revised small hidden-tablet hidden-phone">
 				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? JHtml::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
 
-			<td>
-				<?php echo $row->hits; ?>
+			<td class="col_hits hidden-tablet hidden-phone">
+				<span class="badge badge-info"><?php echo $row->hits; ?></span>
 			</td>
 
-			<td>
-				<?php echo $row->rating_count; ?>
+			<td class="col_votes hidden-tablet hidden-phone">
+				<span class="badge badge-success"><?php echo $row->rating_count; ?></span>
 			</td>
 
-			<td>
-				<?php echo sprintf('%.1f', (float) $row->rating); ?>%
+			<td class="col_ratings hidden-tablet hidden-phone">
+				<span class="badge badge-warning"><?php echo sprintf('%.1f', (float) $row->rating); ?>%</span>
 			</td>
 
-			<td class="col_id">
+			<td class="col_id text-center small hidden-phone">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -1204,13 +1228,20 @@ jQuery(document).ready(function(){
 		?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-		
+	
+
+	</table></div>
+			
+				
+	<div class="row-fluid mb-20">
+		<div class="span6"><?php echo $pagination_footer; ?></div>
+		<div class="span6 small text-right"><?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?></div>
+	</div>
+
+		<div class="block-flat">			
+<table>
+
+	<tfoot>	
 		<tr>
 			<td colspan="<?php echo $list_total_cols; ?>" style="margin: 0 auto !important; background-color: white;">
 				<table class="admintable" style="margin: 0 auto !important; background-color: unset; font-size: 12px">
@@ -1237,8 +1268,8 @@ jQuery(document).ready(function(){
 			</td>
 		</tr>
 	</tfoot>
-
-	</table>
+	
+</table></div>	
 
 	<div class="fcclear"></div>
 
@@ -1256,8 +1287,7 @@ jQuery(document).ready(function(){
 
 	</form>
 
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
+</div>  <!-- .j-main-container -->
+
 </div>  <!-- row -->
 </div><!-- #flexicontent end -->
