@@ -31,7 +31,7 @@ require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'dat
 
 class modFlexicontentHelper
 {	
-	public static function getList(&$params)
+	public static function getList(&$params, &$totals = null)
 	{
 		global $modfc_jprof, $mod_fc_run_times;
 		
@@ -144,7 +144,8 @@ class modFlexicontentHelper
 		}
 		
 		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
-		if ($display_hits || $display_hits_feat || $display_voting || $display_voting_feat) {
+		if ($display_hits || $display_hits_feat || $display_voting || $display_voting_feat)
+		{
 			$query = 'SELECT * FROM #__flexicontent_fields';
 			
 			$disp_field_where = array();
@@ -216,7 +217,7 @@ class modFlexicontentHelper
 		}
 		foreach ($ordering as $ord)
 		{
-			$items_arr = modFlexicontentHelper::getItems($params, $ord);
+			$items_arr = modFlexicontentHelper::getItems($params, $ord, $totals);
 			if ( empty($items_arr) ) continue;
 			foreach ($items_arr as $catid => $items)
 			{
@@ -338,14 +339,18 @@ class modFlexicontentHelper
 			}
 			
 			$mod_fc_run_times['empty_fields_filter'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['empty_fields_filter'];
-		} else {
+		}
+
+		else
+		{
 			$filtered_rows_arr = & $cat_items_arr;
 		}
 		
 		$mod_fc_run_times['item_list_creation'] = $modfc_jprof->getmicrotime();
 		
 		// *** OPTIMIZATION: we only render the fields after skipping unwanted items
-		if ( ($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)) ) {
+		if ( ($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)) )
+		{
 			$all_fields = array();
 		  if ($use_fields && count($fields))           $all_fields = array_merge($all_fields, $fields);
 		  if ($use_fields_feat && count($fields_feat)) $all_fields = array_merge($all_fields, $fields_feat);
@@ -355,12 +360,15 @@ class modFlexicontentHelper
 		}
 		
 		// *** OPTIMIZATION: we should create some variables outside the loop ... TODO MORE
-		if (($display_hits_feat || $display_hits) && $has_access_hits) {
+		if (($display_hits_feat || $display_hits) && $has_access_hits)
+		{
 			$hits_icon = FLEXI_J16GE ?
 				JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
 				JHtml::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 		}
-		if ($display_comments_feat || $display_comments) {
+
+		if ($display_comments_feat || $display_comments)
+		{
 			$comments_icon = FLEXI_J16GE ?
 				JHtml::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
 				JHtml::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
@@ -724,7 +732,7 @@ class modFlexicontentHelper
 		return $lists_arr;
 	}
 
-	public static function getItems(&$params, $ordering)
+	public static function getItems(&$params, $ordering, &$totals=null)
 	{
 		global $dump, $globalcats;
 		global $modfc_jprof, $mod_fc_run_times;
@@ -1128,7 +1136,8 @@ class modFlexicontentHelper
 			
 			else if ($method_cat == 3) { // include method
 				
-				if (!$apply_config_per_category) {
+				if (!$apply_config_per_category)
+				{
 					if ($cat_combine)
 					{
 						$where .= ' AND i.id IN ('
@@ -1139,13 +1148,19 @@ class modFlexicontentHelper
 						;
 					}
 					else
+					{
 						$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
+					}
 				}
 				
-				else {
-					// *** Applying configuration per category ***
-					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
+				// *** Applying configuration per category ***
+				else
+				{
+					// The items retrieval query will be executed ... once per EVERY category
+					foreach($catids_arr as $catid)
+					{
 						$multiquery_cats[$catid] = ' AND c.id = '.$catid;
+					}
 					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
 				
@@ -1851,10 +1866,13 @@ class modFlexicontentHelper
 			//$dynamic_filter_ids = preg_split("/[\s]*,[\s]*/", $dynamic_filters);
 			
 			$dynamic_filter_ids = FLEXIUtilities::paramToArray($dynamic_filters, "/[\s]*,[\s]*/", "intval");
-			if ( empty($dynamic_filter_ids) ) {
+			if ( empty($dynamic_filter_ids) )
+			{
 				echo "Please enter at least 1 field in Custom field filtering SCOPE, or set behaviour to static";
-			} else {
-			
+			}
+
+			else
+			{
 				// 2. Get values of dynamic filters
 				$where2 = (count($dynamic_filter_ids) > 1) ? ' AND field_id IN ('.implode(',', $dynamic_filter_ids).')' : ' AND field_id = '.$dynamic_filter_ids[0];
 				// select the item ids related to current item via the relation fields
@@ -1869,7 +1887,8 @@ class modFlexicontentHelper
 				
 				// 3. Group values by field
 				$_vals = array();
-				foreach ($curritem_vals as $v) {
+				foreach ($curritem_vals as $v)
+				{
 					$_vals[$v->field_id][] = $v->value;
 				}
 				
@@ -1879,9 +1898,10 @@ class modFlexicontentHelper
 					if ( !isset($_vals[$filter_id]) ) {
 						$where_field_filters .= ' AND reldyn'.$filter_id.'.value IS NULL';
 					}
-					
+
 					// Single or Multi valued filter , handle by requiring ANY value
-					else {
+					else
+					{
 						$in_values = array();
 						foreach ($_vals[$filter_id] as $v) $in_values[] = $db->Quote( $v );
 						$where_field_filters .= ' AND reldyn'.$filter_id.'.value IN ('.implode(',', $in_values).') ' ."\n";
@@ -1893,78 +1913,93 @@ class modFlexicontentHelper
 			}
 		}
 
-		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
-			$items_query 	= 'SELECT '
-				. ' i.id '
-				. (in_array('commented', $ordering) ? $select_comments : '')
-				. (in_array('rated', $ordering) ? $select_rated : '')
-				. ' FROM #__flexicontent_items_tmp AS i'
-				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
-				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
-				. ' JOIN #__categories AS mc ON mc.id = i.catid'
-				. $joinaccess
-				. $join_favs
-				. $join_date
-				. (in_array('commented', $ordering) ? $join_comments : '')
-				. (in_array('rated', $ordering) ? $join_rated : '')
-				. $orderby_join
-				. $join_field_filters
-				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
-				. $where_field_filters
-				. ' GROUP BY i.id'
-				. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby)
-				;
-			
-			// if using CATEGORY SCOPE INCLUDE ... then link though them ... otherwise via main category
-			$_cl = (!$behaviour_cat && $method_cat == 3) ? 'c' : 'mc';
-			
-			$items_query_data 	= 'SELECT '
-				. ' i.*, ie.*, ty.name AS typename'
-				. $select_comments
-				. $select_rated
-				. ', mc.title AS maincat_title, mc.alias AS maincat_alias'   // Main category data
-				. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
-				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug'
-				. ', GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats'
-				. ' FROM #__content AS i'
-				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
-				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
-				. ' JOIN #__categories AS mc ON mc.id = i.catid'
-				. $joinaccess
-				. $join_favs
-				. $join_date
-				. $join_comments
-				. $join_rated
-				. $orderby_join
-				. ' WHERE i.id IN (__content__)'
-				. ' GROUP BY i.id'
-				;
-		}
+
+		// ***
+		// *** Create query to get item ids
+		// ***
+
+		$items_query 	= 'SELECT ' . ($totals !== null ? 'SQL_CALC_FOUND_ROWS' : '')
+			. ' i.id '
+			. (in_array('commented', $ordering) ? $select_comments : '')
+			. (in_array('rated', $ordering) ? $select_rated : '')
+			. ' FROM #__flexicontent_items_tmp AS i'
+			. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__categories AS  c ON  c.id = rel.catid'
+			. ' JOIN #__categories AS mc ON mc.id = i.catid'
+			. $joinaccess
+			. $join_favs
+			. $join_date
+			. (in_array('commented', $ordering) ? $join_comments : '')
+			. (in_array('rated', $ordering) ? $join_rated : '')
+			. $orderby_join
+			. $join_field_filters
+			. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
+			. $where_field_filters
+			. ' GROUP BY i.id'
+			. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby)
+			;
+
 		
-		
-		// **********************************
-		// Execute query once OR per category
-		// **********************************
-		
+		// ***
+		// *** Create query to get item data
+		// ***
+
+		// if using CATEGORY SCOPE INCLUDE ... then link though them ... otherwise via main category
+		$_cl = (!$behaviour_cat && $method_cat == 3) ? 'c' : 'mc';
+		$items_query_data 	= 'SELECT '
+			. ' i.*, ie.*, ty.name AS typename'
+			. $select_comments
+			. $select_rated
+			. ', mc.title AS maincat_title, mc.alias AS maincat_alias'   // Main category data
+			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
+			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug'
+			. ', GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats'
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__categories AS  c ON  c.id = rel.catid'
+			. ' JOIN #__categories AS mc ON mc.id = i.catid'
+			. $joinaccess
+			. $join_favs
+			. $join_date
+			. $join_comments
+			. $join_rated
+			. $orderby_join
+			. ' WHERE i.id IN (__content__)'
+			. ' GROUP BY i.id'
+			;
+
+
+		// ***
+		// *** Execute query once OR per category
+		// ***
+
 		if (!isset($multiquery_cats)) $multiquery_cats = array(0 => "");
 		foreach($multiquery_cats as $catid => $cat_where)
 		{
 			$_microtime = $modfc_jprof->getmicrotime();
+
 			// Get content list per given category
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
 			//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
 			$db->setQuery($per_cat_query, 0, $count);
 			$content = $db->loadColumn(0);
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+
+			if ($totals !== null)
+			{
+				$db->setQuery("SELECT FOUND_ROWS()");
+				$totals[$catid] = $db->loadResult();
+			}
+
 			@ $mod_fc_run_times['query_items'] += $modfc_jprof->getmicrotime() - $_microtime;
 			
 			// Check for no content found for given category
-			if ( empty($content) ) {
+			if ( empty($content) )
+			{
 				$cat_items_arr[$catid] = array();
 				continue;
 			}
@@ -1974,7 +2009,6 @@ class modFlexicontentHelper
 			$per_cat_query = str_replace('__content__', implode(',',$content), $items_query_data);
 			$db->setQuery($per_cat_query, 0, $count);
 			$_rows = $db->loadObjectList('item_id');
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			@ $mod_fc_run_times['query_items_sec'] += $modfc_jprof->getmicrotime() - $_microtime;
 			
 			// Secondary content list ordering and assign content list per category
@@ -2100,7 +2134,6 @@ class modFlexicontentHelper
 					;
 		$db->setQuery($query);
 		$catdata_arr = $db->loadObjectList('id');
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		if (!$catdata_arr)  return false;
 		
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );

@@ -165,7 +165,8 @@ $custom4 				= $params->get('custom4');
 $custom5 				= $params->get('custom5');
 
 // Create Item List Data
-$list_arr = modFlexicontentHelper::getList($params);
+$list_totals = $params->get('show_found_items', 0) ? array() : null;   // NULL indicates not to calculate totals
+$list_arr = modFlexicontentHelper::getList($params, $list_totals);
 
 // Get comments for the items (if enabled), NOTE !! TODO: modify templates and XML file so that this used
 $comments_arr = modFlexicontentHelper::getComments($params, $list_arr);
@@ -238,14 +239,16 @@ if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'header.php') )
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/header'));
 
 // Render Layout, (once per category if apply per category is enabled ...)
-foreach ($catdata_arr as $i => $catdata) {
+foreach ($catdata_arr as $i => $catdata)
+{
 	$list = & $list_arr[$i];
 
 	// Check items exist
 	$items_exist = false;
 	foreach ($ordering as $ord)
 	{
-		if ( !empty($list[$ord]['featured']) || !empty($list[$ord]['standard']) ) {
+		if ( !empty($list[$ord]['featured']) || !empty($list[$ord]['standard']) )
+		{
 			$items_exist = true;
 			break;
 		}

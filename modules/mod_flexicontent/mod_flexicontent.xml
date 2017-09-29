@@ -738,8 +738,16 @@
 		</fieldset>
 		
 		
-		<fieldset name="FLEXI_CATEGORY_LIST" label="FLEXI_CATEGORY_LIST" description="FLEXI_CATEGORY_LIST_DESC">
+		<fieldset name="FLEXI_CATEGORY_LIST" label="FLEXI_ITEM_LIST_HEADER_OPTIONS" description="FLEXI_ITEM_LIST_HEADER_OPTIONS_DESC">
 			
+			<field name="" type="separator" default="FLEXI_UMOD_STATISTICS" level="level1" />
+
+			<field name="show_found_items" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_UMOD_SHOW_TOTAL_ITEMS" description="FLEXI_UMOD_SHOW_TOTAL_ITEMS_DESC" class="btn-group" inline_text="FLEXI_UMOD_ABOUT_TOTAL_NEXT_TO_TITLE" text_class="fc-mssg-inline fc-info fc-small total_next_to_title">
+				<option value="0" show_list="" hide_list="total_next_to_title">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="total_next_to_title">FLEXI_UMOD_YES_SEPARATE_LINE</option>
+				<option value="2" show_list="total_next_to_title" hide_list="">FLEXI_UMOD_YES_NEXT_TO_TITILE</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_CATS" level="level1" />
 			
 			<field name="apply_config_per_category" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_APPLY_CON_PER_CAT" description="FLEXI_MOD_APPLY_CON_PER_CAT_DESC" class="btn-group group-fcmethod fcoffactive">
