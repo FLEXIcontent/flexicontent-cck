@@ -3575,16 +3575,18 @@ class FlexicontentFields
 				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 			}
 
-			if ($display_filter_as==0)
-			{
-				$filter->html	.= JHtml::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid);
-			}
-			else if ($display_filter_as==6)
+			// Calculate if field has value
+			$has_value = (!is_array($value) && strlen($value)) || (is_array($value) && count($value));
+			$filter->html	.= $label_filter==2 && $has_value
+				? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
+				: '';
+
+			if ($display_filter_as==0 || $display_filter_as==6)
 			{
 				// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
-				$filter->html	.=
-					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
-					JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+				$filter->html	.= $display_filter_as != 6
+					? JHtml::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid)
+					: JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 			}
 			else
 			{
@@ -5096,7 +5098,7 @@ class FlexicontentFields
 		{
 			$query = 'SELECT COUNT(*) AS total FROM ('
 				.' SELECT 1'
-				.' FROM #__content AS i '
+				.' FROM #__flexicontent_items_tmp AS i '
 				.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
 				. @ $item_join
 				. @ $orderby_join
