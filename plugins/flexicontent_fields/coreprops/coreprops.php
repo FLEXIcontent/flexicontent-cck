@@ -290,23 +290,27 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
 			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="5" ' : '';
 			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
-			
+
 			// Filter name and id
 			$filter_ffname = 'filter_'.$filter->id;
 			$filter_ffid   = $formName.'_'.$filter->id.'_val';
-			
+
 			if ( !is_array($value) )  $value = array($value);
 			if ( count($value==1) && !strlen( reset($value) ) )  $value = array();
-			
+
+			// Calculate if field has value
+			$has_value = (!is_array($value) && strlen($value)) || (is_array($value) && count($value));
+			$filter->html	.= $label_filter==2 && $has_value
+				? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
+				: '';
+
 			// Create filter
-			if ($display_filter_as != 6)
-				$filter->html	.= JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
-			else
-				$filter->html	.=
-					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
-					JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+			// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
+			$filter->html	.= $display_filter_as != 6
+				? JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid)
+				: JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 		}
-		
+
 		// Special CASE for some filters, do some replacements
 		//if ( $props_type == 'alias') $filter->html = str_replace('_', ' ', $filter->html);
 	}

@@ -1378,9 +1378,8 @@
 
 		if (window.skip_select2_js)
 		{
-			s2_elems
-				//.filter(function(){return !jQuery(this).attr('multiple');})
-				.removeClass('use_select2_lib').addClass('fc_isselect fc_ismobile fc_no_js_attach');
+			s2_elems.removeClass('use_select2_lib').addClass('fc_isselect fc_ismobile fc_no_js_attach');
+			//s2_elems.filter(function(){return !jQuery(this).attr('multiple');})
 			sbox.find('.fc_mobile_label').show();
 			return;
 		}
