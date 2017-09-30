@@ -28,8 +28,9 @@ foreach ($values as $value)
 		continue;
 	}
 	
-	// Check if link is 'internal' aka 'safer'
-	$isInternal = JUri::isInternal($value['link']);
+	// Check if link is 'internal' aka 'safer', but make it absolute before checking it !
+	$link = $this->make_absolute_url($value['link']);
+	$isInternal = JUri::isInternal($link);
 
 	// If not using property or property is empty, then use default property value
 	// NOTE: default property values have been cleared, if (propertyname_usage != 2)
@@ -73,7 +74,7 @@ foreach ($values as $value)
 	// Direct access to the web-link, hits counting not possible
 	if ( $field->parameters->get('use_direct_link', 0) || $field->parameters->get('link_source', 0) ==-1 )
 	{
-		$href = $value['link'];
+		$href = $link;
 	}
 
 	// Indirect access to the web-link, via calling FLEXIcontent component, thus counting hits too
@@ -85,7 +86,7 @@ foreach ($values as $value)
 	// If linking text is  URL convert from Punycode to UTF8
 	if ( empty($linktext) )
 	{
-		$linktext = $title ? $title : $this->cleanurl( JStringPunycode::urlToUTF8($value['link']) );
+		$linktext = $title ? $title : $this->cleanurl( JStringPunycode::urlToUTF8($link) );
 	}
 
 	// Create indirect link to web-link address with custom displayed text

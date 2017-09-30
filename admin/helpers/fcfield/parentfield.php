@@ -472,7 +472,7 @@ class FCField extends JPlugin
 
 
 	// Create once the options for every field property that has specific selection options (e.g. drop down-selection)
-	function getPropertyOptions($choices)
+	function getPropertyOptions($choices, $default_option = null)
 	{
 		// Parse the elements used by field unsetting last element if empty
 		$choices = preg_split("/[\s]*%%[\s]*/", $choices);
@@ -503,7 +503,22 @@ class FCField extends JPlugin
 
 		// Create the options for select drop down
 		$options = array();
-		$options[] = JHtml::_('select.option', '', '-');
+		if ($default_option === null)
+		{
+			$options[] = JHtml::_('select.option', '', '-');
+		}
+		else
+		{
+			foreach ($elements as $element)
+			{
+				$default_label = $default_option->label;
+				if ($element->value === $default_option->value)
+				{
+					$default_label .= ' - (' . JText::_($element->text) . ')';
+				}
+			}
+			$options[] = JHtml::_('select.option', '', $default_label);
+		}
 		foreach ($elements as $element)
 		{
 			$options[] = JHtml::_('select.option', $element->value, JText::_($element->text));

@@ -89,7 +89,8 @@
 		$class = '';
 		if ($useclass)
 		{
-			$value['class'] = !empty($value['class']) ? $value['class'] : $default_class;
+			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
+			$value['class'] = !empty($value['class']) ? $value['class'] : '';  //$default_class;
 			$value['class'] = htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['class'] ? ' fc-has-value' : '';
 
@@ -129,23 +130,23 @@
 		$target = '';
 		if ($usetarget)
 		{
-			// Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time ...
-			$value['target'] = !empty($value['target']) ? $value['target'] : '';
+			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
+			$value['target'] = !empty($value['target']) ? $value['target'] : '';  //$default_target;
 			$value['target'] = htmlspecialchars($value['target'], ENT_COMPAT, 'UTF-8');
 			$has_value_class = $value['target'] ? ' fc-has-value' : '';
 
 			$target_attribs = ' class="urltarget use_select2_lib" ';
 			$target_options = array(
 				(object) array('value'=>'', 'text'=>JText::_('FLEXI_DEFAULT')),
-				(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_NEW_WIN_TAB')),
-				(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_PARENT_FRM')),
-				(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_SAME_FRM_WIN_TAB')),
-				(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_TOP_FRM')),
-				(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_FIELD_WEBLINK_MODAL_POPUP_WIN'))
+				(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_FIELD_LINK_NEW_WIN_TAB')),
+				(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_FIELD_LINK_PARENT_FRM')),
+				(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB')),
+				(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_FIELD_LINK_TOP_FRM')),
+				(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_FIELD_LINK_MODAL_POPUP_WIN'))
 			);
 			$target = '
 			<div class="' . $box_classes . ' fc-lbl-external-box">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl ulrtarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTARGET' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urltarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTARGET' ).'</label>
 				'.JHtml::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
 			</div>';
 		}
