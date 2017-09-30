@@ -389,6 +389,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					elem.removeAttr('disabled');
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][stamp]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr);
+					elem.next().removeClass('active');
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_stamp_'+nr).attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-stamp'+nr+'-lbl');
 					nr++;
 				});

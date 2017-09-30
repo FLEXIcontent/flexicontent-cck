@@ -4,6 +4,9 @@ $field->{$prop} = array();
 $n = 0;
 foreach ($values as $value)
 {
+	// Basic sanity check for a valid email address
+	$value['addr'] = !empty($value['addr']) && strpos($value['addr'], '@') !== false ? $value['addr'] : '';
+
 	// Skip empty value, adding an empty placeholder if field inside in field group
 	if ( empty($value['addr']) )
 	{
@@ -20,16 +23,19 @@ foreach ($values as $value)
 	$text = @$value['text'];
 	$text = ($usetitle && strlen($text))  ?  $text  :  $default_title;
 	
-	if ( !strlen($text) || !$usetitle ) {
-		$text = FLEXI_J30GE ? JStringPunycode::emailToUTF8($addr) : $addr;  // email in Punycode to UTF8, for the purpose of displaying it
+	if ( !strlen($text) || !$usetitle )
+	{
+		$text = JStringPunycode::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
 		$text_is_email = 1;
-	} else {
+	}
+	else
+	{
 		$text_is_email = strpos($text,'@') !== false;
 	}
 	
 	// Create field's display
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
-	if($format != 'feed' && $email_cloaking)
+	if ($format != 'feed' && $email_cloaking)
 	{
 		$html = JHtml::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
 	}
