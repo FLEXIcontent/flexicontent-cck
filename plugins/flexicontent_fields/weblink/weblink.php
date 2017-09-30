@@ -75,7 +75,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
-		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
+		$allow_relative_addrs = (int) $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		$inputmask	= $allow_relative_addrs ? '' : $field->parameters->get( 'inputmask', '' ) ;
 		
 		// create extra HTML TAG parameters for the form field
@@ -128,8 +128,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
 		$default_class = ($item->version == 0 || $class_usage > 0) ? $field->parameters->get( 'default_class', '' ) : '';
-		$default_class = $default_class ? JText::_($default_class) : '';
-
 
 		// URL id (optional)
 		$useid      = $field->parameters->get( 'use_id', 0 ) ;
@@ -148,7 +146,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$class_choices = $field->parameters->get( 'class_choices', '') ;
 		if ($useclass==2)
 		{
-			$class_options = $this->getPropertyOptions($class_choices);
+			$default_option = (object) array('value' => $default_class, 'label' => JText::_('FLEXI_DEFAULT'));
+			$class_options = $this->getPropertyOptions($class_choices, $default_option);
 		}
 
 		// Initialise property with default value
@@ -158,9 +157,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$field->value[0]['link']  = $default_link;
 			$field->value[0]['title'] = $default_title;
 			$field->value[0]['linktext']= $default_text;
-			$field->value[0]['class'] = $default_class;
 			$field->value[0]['id']    = $default_id;
-			$field->value[0]['target']= ''; // Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time
+
+			$field->value[0]['class'] = '';  // Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
+			$field->value[0]['target']= '';  // Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
 			$field->value[0]['hits']  = 0;
 			$field->value[0] = serialize($field->value[0]);
 		}
@@ -243,13 +243,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
 			
-			if ($allow_relative_addrs==2) $js .= "
+			if ($allow_relative_addrs === 2) $js .= "
 				var nr = 0;
 				newField.find('input.autoprefix').each(function() {
 					var elem = jQuery(this);
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autoprefix]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
-					elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					elem.next().removeClass('active');
+					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
 					nr++;
 				});
 				";
@@ -270,10 +271,11 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
 				newField.find('.urllinktext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
 				";
-			
+
+			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time			
 			if ($useclass) $js .= "
 				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
-				theField.val(".json_encode($default_class).");
+				theField.val('');
 				theField.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
 				theField.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
 				newField.find('.urlclass-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
@@ -287,13 +289,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				newField.find('.urlid-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
 				";
 			
-			// Do not load the default target from viewing configuration !, this will allow re-configuring default in viewing at any time
+			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
 			if ($usetarget) $js .= "
-				theInput = newField.find('input.ulrtarget').first();
+				theInput = newField.find('select.urltarget').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][target]');
 				theInput.attr('target','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
-				newField.find('.ulrtarget-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
+				newField.find('.urltarget-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_target');
 				";
 			
 			if ($usehits) $js .="
@@ -517,7 +519,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
 		$default_class = ($class_usage == 2)  ?  $field->parameters->get( 'default_class', '' ) : '';
-		$default_class = $default_class ? JText::_($default_class) : '';
 		
 		// URL id (optional)
 		$useid      = $field->parameters->get( 'use_id', 0 ) ;
@@ -714,8 +715,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Get configuration
 		$app  = JFactory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
-		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
-		$host = JUri::getInstance('SERVER')->gethost();
+		$allow_relative_addrs = (int) $field->parameters->get( 'allow_relative_addrs', 0 ) ;
+		$domain = JUri::getInstance('SERVER')->gethost();
 
 		// URL title (optional)
 		$usetitle   = $field->parameters->get( 'use_title', 0 ) ;
@@ -760,39 +761,84 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				);
 			}
 
+			// Sanitize the URL as absolute or relative
+			$force_absolute = $allow_relative_addrs === 0 || ($allow_relative_addrs === 2 && (int) @ $v['autoprefix']);
+			$double_slash_without_proto = strpos($v['link'], '//') === 0;
+
+
 			// ***
 			// *** Validate data, skipping values that are empty after validation
 			// ***
-			
+
 			$link = flexicontent_html::dataFilter($v['link'], $maxlength, 'URL', 0);  // Clean bad text/html
-			
+
+			// Restore double slash without protocol, if this was removed
+			$link = $link && $double_slash_without_proto && strpos($link, '//') !== 0
+				? '//' . $link
+				: $link;
+
+			// Remove joomla uri root to make it relative if relative allowed but an absolute URL was given
+			//echo $link . '<br/>';
+			if ( !$force_absolute )
+			{
+				if (strpos($link, JUri::root(true) . '/') === 0)
+				{
+					$link = str_replace(JUri::root(true) . '/', '', $link);
+				}
+				if (strpos($link, JUri::root()) === 0)
+				{
+					$link = str_replace(JUri::root(), '', $link);
+				}
+			}
+
+			// Force full joomla uri root to make it absolute
+			else
+			{
+				if (strpos($link, JUri::root(true) . '/') === 0)
+				{
+					$link = str_replace(JUri::root(true) . '/', JUri::root(), $link);
+				}
+			}
+
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($link))
 			{
 				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
 			}
-			
-			// Sanitize the URL as absolute or relative
-			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int) @$v['autoprefix']);
 
-			// Has protocol nothing to do
+			// Is absolute with protocol, NOTHING TO DO
 			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
 
-			// Has current domain but no protocol just add http://
-			else if (strpos($link, $host) === 0) $prefix = 'http://';
+			// Is absolute without protocol, NOTHING TO DO
+			else if (strpos($link, '//') === 0) $prefix = '';
 
-			// Relative URLs allowed, do to not add Joomla ROOT, to allow website to be moved and change subfolder
+			// Has current domain but no protocol
+			// - just add // instead of 'http://' (to allow using current protocol)
+			else if (strpos($link, $domain) === 0) $prefix = '//';
+
+			// Relative URL and Relative URLs are allowed (and no-autoprefix flag was set in the form)
+			// - do not add Joomla ROOT, to allow website to be moved and change subfolder
 			else if ( !$force_absolute ) $prefix = '';
 
-			// Absolute URLs are forced
+			// Relative URL but absolute URLs are forced, 
+			// - either add Joomla uri root (if prefixed with 'index.php')
+			// - or add the default protocol 'http://' (assuming the URL is a domain+path)
 			else
 			{
-				if (substr($link, 0, 10) == '/index.php')  $link = substr($link, 1);
-				$prefix = (substr($link, 0, 9) == 'index.php') ? JUri::root() : 'http://';
+				if (substr($link, 0, 10) === '/index.php')
+				{
+					$link = substr($link, 1);
+				}
+				$prefix = substr($link, 0, 9) === 'index.php'
+					? JUri::root()
+					: 'http://';
 			}
 
 			$prefixed_link = empty($link) ? '' : $prefix . $link;
+			//echo $v['link'] . ($force_absolute ? ' (ABSOLUTE)' : ' (RELATIVE)') . '<br/>';
+			//echo $link . '<br/>';
+			//echo $prefixed_link  . '<br/><br/>';
 			
 			$newpost[$new] = array();
 			$newpost[$new]['link'] = $prefixed_link;
@@ -933,5 +979,12 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				'default_value_title'=>'default_title'
 			));
 		}
+	}
+
+
+	// Prefix a url with protocol and with current host if not already absolute
+	function make_absolute_url($link)
+	{
+		return flexicontent_html::make_absolute_url($link);
 	}
 }

@@ -523,6 +523,38 @@ class flexicontent_html
 	}
 
 
+	static function make_absolute_url($link)
+	{
+		static $domain = null;
+		if ($domain === null)
+		{
+			$uri = JUri::getInstance('SERVER');
+			$domain   = $uri->gethost();
+		}
+
+		// Is absolute with protocol, NOTHING TO DO
+		if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
+
+		// Is absolute without protocol, NOTHING TO DO
+		else if (strpos($link, '//') === 0) $prefix = '';
+
+		// Has current domain but no protocol, ADD '//' (so that it is treated as absolute URL)
+		else if (strpos($link, $domain) === 0) $prefix = '//';
+
+		// Is absolute without protocol - host - port, NOTHING TO DO
+		else if (strpos($link, '/') === 0) $prefix = '';
+
+		// Anything else is relative, prepend full joomla root uri
+		else
+		{
+			$prefix = JUri::root();
+		}
+
+		$link = empty($link) ? '' : $prefix . $link;
+		return $link;
+	}
+
+
 	/**
 	 * Function to render the item view of a given item id
 	 *
