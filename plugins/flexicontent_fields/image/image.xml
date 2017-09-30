@@ -164,9 +164,9 @@
 				<option value="1" show_list="img-link-url-mode" hide_list="img-link-nourl-mode">FLEXI_YES</option>
 			</field>
 			<field name="url_target" type="groupedlist" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC" depend_class="img-link-url-mode" >
-				<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
-				<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
-				<group label="FLEXI_FIELD_MODAL_POPUP_WIN">
+				<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
+				<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
+				<group label="FLEXI_FIELD_LINK_MODAL_POPUP_WIN">
 					<option value="multibox">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
 					<option value="fancybox">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
 				</group>
