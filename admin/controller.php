@@ -125,8 +125,6 @@ class FlexicontentController extends JControllerLegacy
 			$this->input->set('task', 'copy');
 			$this->input->set('copy_behaviour', 'translate');
 		}
-		
-		if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
 
