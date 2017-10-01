@@ -122,7 +122,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($tagid) $tag = $this->get('Tag');
 		
 		$authordescr_item = false;
-		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
+		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed')
+		{
 			$authordescr_itemid = $params->get('authordescr_itemid');
 		}
 		
@@ -374,9 +375,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
 		
 		
-		// **********************************************************************************************************
-		// Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
-		// **********************************************************************************************************
+		// ***
+		// *** Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
+		// ***
 		
 		if ($params->get('add_canonical'))
 		{
@@ -385,34 +386,40 @@ class FlexicontentViewCategory extends JViewLegacy
 			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars).($start ? "&start=".$start : ''));
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
-		
-		if ($params->get('show_feed_link', 1) == 1) {
-			//add alternate feed link
-			$link	= $non_sef_link.'&format=feed';
+
+		// ***
+		// *** Add feed link
+		// ***
+
+		if ($params->get('show_feed_link', 1) == 1)
+		{
+			$link	= $non_sef_link . '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
 			$document->addHeadLink(JRoute::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
 			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
 			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
-		
-		
-		// *********************
-		// Author "profile" item
-		// *********************
-		
+
+
+		// ***
+		// *** Author "profile" item
+		// ***
+
 		$authordescr_item_html = false;
-		if ($authordescr_item) {
+		if ($authordescr_item)
+		{
 			$flexi_html_helper = new flexicontent_html();
 			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
 		}
 		//echo $authordescr_item_html; exit();
-		
-		
-		// ***************************************************
-		// Load template css/js and set template data variable
-		// ***************************************************
-		
-		if ($clayout) {
+
+
+		// ***
+		// *** Load template css/js and set template data variable
+		// ***
+
+		if ($clayout)
+		{
 			// Add the templates css files if availables
 			if (isset($themes->category->{$clayout}->css)) {
 				foreach ($themes->category->{$clayout}->css as $css) {
@@ -427,7 +434,9 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 			// Set the template var
 			$tmpl = $themes->category->{$clayout}->tmplvar;
-		} else {
+		}
+		else
+		{
 			$tmpl = '.category.default';
 		}
 		

@@ -2097,20 +2097,32 @@ class flexicontent_html
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
-		if($view == 'category')
+		if ($view == 'category')
 		{
 			$non_sef_link = null;
 			flexicontent_html::createCatLink($slug, $non_sef_link);
-			$link = $base . JRoute::_($non_sef_link.'&format=feed&type=rss');
+			$link = $base . JRoute::_($non_sef_link . '&format=feed&type=rss');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
-		} elseif($view == FLEXI_ITEMVIEW) {
+		}
+		elseif ($view == FLEXI_ITEMVIEW)
+		{
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item).'&format=feed&type=rss');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
-		} elseif($view == 'tags') {
-			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug).'&format=feed&type=rss');
+		}
+		elseif ($view == 'tags')
+		{
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug) . '&format=feed&type=rss');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
-		} else {
+		}
+		else
+		{
 			$link = $base . JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
+		}
+
+		// Workaround for bug due 3rd party plugin calling methods that force JDocument format to be HTML
+		if (strpos($link, 'format=feed') === false)
+		{
+			$link = $link . (strpos($link, '?') !== false ? '&' : '?') . 'format=feed';
 		}
 
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
@@ -2216,7 +2228,7 @@ class flexicontent_html
 		//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 		$Itemid = 0;
 		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
-		$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=remove';
+		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=remove';
 		$targetLink = "_self";
 		$confirm_text = JText::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
@@ -2886,7 +2898,7 @@ class flexicontent_html
 			//$Itemid = JFactory::getApplication()->input->get('Itemid', 0, 'int');  // Maintain menu item ? e.g. current category view,
 			$Itemid = 0;
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
-			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
+			$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=edit';
 			$targetLink = "_self";
 		} else if ( $params->get('show_editbutton', 1) == '2' ) {
 			$link = JUri::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
@@ -3185,7 +3197,7 @@ class flexicontent_html
 		}
 
 		$item_url = JRoute::_('index.php?task=vote&vote=1&cid='.$item->categoryslug.'&id='.$item->slug.'&layout='.$params->get('ilayout'));
-		$link = $item_url .(strstr($item_url, '?') ? '&' : '?');
+		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?');
 		$output = '<a href="'.$link.'vote=1" class="fc_vote_up'.$tooltip_class.'" title="'.$tip_vote_up.'">'.$voteup.'</a>';
 		$output .= ' - ';
 		$output .= '<a href="'.$link.'vote=1" class="fc_vote_down'.$tooltip_class.'" title="'.$tip_vote_down.'">'.$votedown.'</a>';
