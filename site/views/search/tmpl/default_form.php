@@ -1,5 +1,6 @@
 <?php defined('_JEXEC') or die('Restricted access');
 
+$app = JFactory::getApplication();
 $form_id = $this->form_id;
 $form_name = $this->form_name;
 
@@ -14,21 +15,24 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 
 // Whether to show advanced options,  (a) the filters, (b) the text search fields, which these depend on content types selected/configured
 $autodisplayadvoptions = $this->params->get('autodisplayadvoptions', 1);
-if (empty($this->contenttypes) && !count($this->filters)) $autodisplayadvoptions = 0;
+$autodisplayadvoptions = empty($this->contenttypes) && !count($this->filters)
+	? 0
+	: $autodisplayadvoptions;
 
 // Whether to show advanced options or hide them, initial behaviour depends on $autodisplayadvoptions, which is calculated above
-$use_advsearch_options = JRequest::getInt('use_advsearch_options', $autodisplayadvoptions==2);
+$use_advsearch_options = $app->input->get('use_advsearch_options', (int) ($autodisplayadvoptions==2), 'int');
 
 //$show_filtersop = $this->params->get('show_filtersop', 1);
 //$default_filtersop = $this->params->get('default_filtersop', 'all');
 
 $show_searchareas = $this->params->get( 'show_searchareas', 0 );
 $type_class = isset($this->contenttypes[0]) ? 'contenttype_'.$this->contenttypes[0] : '';
-$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+$tooltip_class = 'hasTooltip';
 
 $js ="";
 
-if($autodisplayadvoptions) {
+if ($autodisplayadvoptions)
+{
  $js .= '
 	jQuery(document).ready(function() {
 	  var status = {
@@ -155,25 +159,26 @@ $r = 0;
 							
 						<?php echo $append_buttons ? '</span>' : ''; ?>
 						
-						<?php if ($autodisplayadvoptions) {
+						<?php if ($autodisplayadvoptions)
+						{
 							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 							$checked_class = $use_advsearch_options ? 'btn-primary' : '';
-							$use_advsearch_options_ff = '&nbsp;';
-							$use_advsearch_options_ff .= '<input type="checkbox" id="use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />';
-							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="btn '.$checked_class.' hasTooltip" for="use_advsearch_options" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">';
-							$use_advsearch_options_ff .= '<span class="icon-list"></span>'.JText::_('FLEXI_SEARCH_ADVANCED');
-							$use_advsearch_options_ff .= '</label>';
-							echo $use_advsearch_options_ff;
+							echo '
+								<input type="checkbox" id="use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />
+								<label id="use_advsearch_options_lbl" class="btn '.$checked_class.' hasTooltip" for="use_advsearch_options" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
+									<span class="icon-list"></span>' . JText::_('FLEXI_SEARCH_ADVANCED') . '
+								</label>
+							';
 						} ?>
 						
-						<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>
+						<?php echo $this->lists['searchphrase']; ?>
 						
 						<?php
-						$ignoredwords = JRequest::getVar('ignoredwords');
-						$shortwords = JRequest::getVar('shortwords');
-						$shortwords_sanitize = JRequest::getVar('shortwords_sanitize');
+						$ignoredwords = $app->input->get('ignoredwords', '', 'string');
+						$shortwords = $app->input->get('shortwords', '', 'string');
+						$shortwords_sanitize = $app->input->get('shortwords_sanitize', '', 'string');
 						$shortwords .= $shortwords_sanitize ? ' '.$shortwords_sanitize : '';
-						$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
+						$min_word_len = $app->getUserState( $app->input->get('option', '', 'cmd').'.min_word_len', 0 );
 						$msg = '';
 						$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
 						$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
@@ -236,7 +241,7 @@ $r = 0;
 				</legend>
 				
 			<?php	
-			$filter_messages = JRequest::getVar('filter_messages', array());
+			$filter_messages = $app->input->get('filter_messages', array(), 'array');
 			$msg = '';
 			$msg = implode(' <br/> ', $filter_messages);
 			if ( $msg ) :
@@ -423,7 +428,7 @@ $r = 0;
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="view" value="search" />
 <input type="hidden" name="task" value="search" />
-<input type="hidden" name="Itemid" value="<?php echo JRequest::getVar("Itemid");?>" />
+<input type="hidden" name="Itemid" value="<?php echo $app->input->get('Itemid', '', 'int');?>" />
 </form>
 
 <?php
