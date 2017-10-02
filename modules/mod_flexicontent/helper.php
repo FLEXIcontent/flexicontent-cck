@@ -736,29 +736,44 @@ class modFlexicontentHelper
 	{
 		global $dump, $globalcats;
 		global $modfc_jprof, $mod_fc_run_times;
-		$app = JFactory::getApplication();
-		
+
+		// ***
+		// *** Get module fetching parameters
+		// ***
+
+		$skiponempty_fields = $params->get('skip_items', 0)
+			? $params->get('skiponempty_fields')
+			: array();
+
+		$count = count($skiponempty_fields)
+			? (int) $params->get('maxskipcount', 50)
+			: (int) $params->get('count', 5);
+
+		// Now check if no items need to be retrieved
+		if ( $count === 0 && $totals === null )
+		{
+			return;
+		}
+
+
 		// For specific cache issues
 		if (empty($globalcats))
 		{
-			if (FLEXI_SECTION || FLEXI_CAT_EXTENSION)
+			JPluginHelper::importPlugin('system', 'flexisystem');
+			if (FLEXI_CACHE)
 			{
-				JPluginHelper::importPlugin('system', 'flexisystem');
-				if (FLEXI_CACHE)
-				{
-					// add the category tree to categories cache
-					$catscache 	= JFactory::getCache('com_flexicontent_cats');
-					$catscache->setCaching(1); 		//force cache
-					$catscache->setLifeTime(84600); //set expiry to one day
-					$globalcats = $catscache->get(
-						array('plgSystemFlexisystem', 'getCategoriesTree'),
-						array()
-					);
-				}
-				else
-				{
-					$globalcats = plgSystemFlexisystem::getCategoriesTree();
-				}
+				// add the category tree to categories cache
+				$catscache 	= JFactory::getCache('com_flexicontent_cats');
+				$catscache->setCaching(1); 		//force cache
+				$catscache->setLifeTime(84600); //set expiry to one day
+				$globalcats = $catscache->get(
+					array('plgSystemFlexisystem', 'getCategoriesTree'),
+					array()
+				);
+			}
+			else
+			{
+				$globalcats = plgSystemFlexisystem::getCategoriesTree();
 			}
 		}
 
@@ -866,38 +881,46 @@ class modFlexicontentHelper
 		// Server date
 		$sdate = explode(' ', $nowDate);
 		$cdate = $sdate[0] . ' 00:00:00';
+
 		// Set date comparators
-		if ($date_type == 0) {        // created
-			$comp = 'i.created';
-		} else if ($date_type == 1) { // modified
-			$comp = 'i.modified';
-		} else if ($date_type == 2) { // publish up
-			$comp = 'i.publish_up';
-		} else if ($date_type == 4) { // publish down
-			$comp = 'i.publish_down';
-		} else { // $date_type == 3
-			$comp = 'dfrel.value';
+		switch($date_type)
+		{
+			case 0:
+				$comp = 'i.created';
+				break;
+			case 1:
+				$comp = 'i.modified';
+				break;
+			case 2:
+				$comp = 'i.publish_up';
+				break;
+			case 4:
+				$comp = 'i.publish_down';
+				break;
+			case 3:
+			default:
+				$comp = 'dfrel.value';
+				break;
 		}
-		
+
 		// custom field scope
 		$method_filt			= (int)$params->get('method_filt', 1);  // parameter added later, maybe not to break compatibility this should be INCLUDE=3 by default ?
 		$behaviour_filt		= (int)$params->get('behaviour_filt', 0);
 		$static_filters		= $params->get('static_filters', '');
 		$dynamic_filters	= $params->get('dynamic_filters', '');
-		
-		
-		// get module fetching parameters
-		$skiponempty_fields = $params->get('skip_items', 0) ? $params->get('skiponempty_fields') : array();
-		$count = count($skiponempty_fields) ? (int) $params->get('maxskipcount', 50) : (int) $params->get('count', 5);
 
-		// get module display parameters
+
+		// ***
+		// *** Get module display parameters
+		// ***
+
 		$mod_image 			= $params->get('mod_image');
 		
 		
-		// ************************************************************************************
-		// filter by publication state, (except for item state which is a special scope, below)
-		// ************************************************************************************
-		
+		// ***
+		// *** Filter by publication state, (except for item state which is a special scope, below)
+		// ***
+
 		$where  = ' WHERE c.published = 1';
 		$where .= FLEXI_J16GE ? '' : ' AND i.sectionid = ' . FLEXI_SECTION;
 		
@@ -909,24 +932,25 @@ class modFlexicontentHelper
 			$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($nowDate).' )';
 		
 		
-		// *********************
-		// filter by permissions
-		// *********************
+		// ***
+		// *** Filter by permissions
+		// ***
 		
 		$joinaccess = '';
-		if (!$show_noauth) {
+		if (!$show_noauth)
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND mc.access IN (0,'.$aid_list.')';
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
-		
-		
-		// *******************************************************
-		// NON-STATIC behaviors that need current item information
-		// *******************************************************
-		
+
+
+		// ***
+		// *** NON-STATIC behaviors that need current item information
+		// ***
+
 		$id   = $jinput->get('id', 0, 'int');   // id of current item
 		$cid  = $jinput->get(($option == 'com_content' ? 'id' : 'cid'), 0, 'int');   // current category ID or category ID of current item
 		
@@ -1235,9 +1259,6 @@ class modFlexicontentHelper
 				$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
 			}
 		}
-		
-		// Now check if no items need to be retrieved
-		if ($count==0) return;
 		
 		
 		// ***********
@@ -1977,7 +1998,11 @@ class modFlexicontentHelper
 		// *** Execute query once OR per category
 		// ***
 
-		if (!isset($multiquery_cats)) $multiquery_cats = array(0 => "");
+		if (!isset($multiquery_cats))
+		{
+			$multiquery_cats = array(0 => '');
+		}
+
 		foreach($multiquery_cats as $catid => $cat_where)
 		{
 			$_microtime = $modfc_jprof->getmicrotime();
@@ -1986,8 +2011,17 @@ class modFlexicontentHelper
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
 			//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
-			$db->setQuery($per_cat_query, 0, $count);
-			$content = $db->loadColumn(0);
+			$db->setQuery($per_cat_query, 0, $count ? $count : 1);
+
+			if ($count)
+			{
+				$content = $db->loadColumn(0);
+			}
+			else
+			{
+				$db->execute();
+				$content = array();
+			}
 
 			if ($totals !== null)
 			{
@@ -1996,14 +2030,14 @@ class modFlexicontentHelper
 			}
 
 			@ $mod_fc_run_times['query_items'] += $modfc_jprof->getmicrotime() - $_microtime;
-			
+
 			// Check for no content found for given category
 			if ( empty($content) )
 			{
 				$cat_items_arr[$catid] = array();
 				continue;
 			}
-			
+
 			$_microtime = $modfc_jprof->getmicrotime();
 			// Get content list data per given category
 			$per_cat_query = str_replace('__content__', implode(',',$content), $items_query_data);
@@ -2134,8 +2168,11 @@ class modFlexicontentHelper
 					;
 		$db->setQuery($query);
 		$catdata_arr = $db->loadObjectList('id');
-		if (!$catdata_arr)  return false;
-		
+		if (!$catdata_arr)
+		{
+			return false;
+		}
+
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		foreach( $catdata_arr as $i => $catdata )
 		{

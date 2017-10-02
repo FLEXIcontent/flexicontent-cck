@@ -175,7 +175,7 @@ $mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime();
 
 // Get Category List Data
 $catdata_arr = modFlexicontentHelper::getCategoryData($params);
-$catdata_arr = $catdata_arr ? $catdata_arr : array (false);
+$catdata_arr = $catdata_arr ? $catdata_arr : array(0 => false);
 
 $mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['category_data_retrieval'];
 
@@ -239,9 +239,9 @@ if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'header.php') )
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/header'));
 
 // Render Layout, (once per category if apply per category is enabled ...)
-foreach ($catdata_arr as $i => $catdata)
+foreach ($catdata_arr as $catid => $catdata)
 {
-	$list = & $list_arr[$i];
+	$list = & $list_arr[$catid];
 
 	// Check items exist
 	$items_exist = false;
@@ -254,9 +254,21 @@ foreach ($catdata_arr as $i => $catdata)
 		}
 	}
 
+	// Check if we should skip empty categories (if catid is 0 (apply per category disabled) then we can skip)
+	$can_skip_category = !$catid
+		? true
+		: $params->get('skip_category_if_noitems', 0);
+
+	// Show total if total enabled and ... EITHER total is non-zero  OR total is set with skip category on-empty disabled
+	$showing_total = !$list_totals
+		? false
+		: !empty($list_totals[$catid]) || (!$can_skip_category && isset($list_totals[$catid]));
+
 	// Decide whether to skip rendering of the layout
-	$can_skip_category = !$catdata || $params->get('skip_category_if_noitems', 0);
-	if ( !$items_exist && $can_skip_category && !$params->get('display_favlist', 0) ) continue;
+	if ( !$items_exist && $can_skip_category && !$showing_total && !$params->get('display_favlist', 0) )
+	{
+		continue;
+	}
 
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
 }
@@ -264,7 +276,9 @@ foreach ($catdata_arr as $i => $catdata)
 // Include module footer, e.g. includes module's Read More, because otherwise the Joomla module helper will include ... 'default.php'
 // module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
 if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'footer.php') )
+{
 	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/footer'));
+}
 
 
 $mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
