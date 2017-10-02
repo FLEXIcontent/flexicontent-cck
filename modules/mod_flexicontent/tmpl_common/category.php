@@ -8,6 +8,7 @@ $show_found_items = (int) $params->get('show_found_items', 0);
 $total_info = $show_found_items
 	? $list_totals[$catdata ? $catdata->id : false]
 	: '';
+$show_total = strlen($total_info);
 
 
 // ***
@@ -25,14 +26,14 @@ if ( $catdata )
 // ***
 // *** If neither return
 // ***
-if ( !$show_cat_data && !$total_info ) return;
+if ( !$show_cat_data && !$show_total ) return;
 
 
 // ***
 // *** Showing only total information
 // ***
 
-if ( $total_info && !$show_cat_data ) : ?>
+if ( $show_total && !$show_cat_data ) : ?>
 
 	<div class="umod_list_totals" >
 		<span class="icon-stack"></span>
@@ -72,17 +73,17 @@ else :
 					<?php	if ($catdata->conf->link_title) : ?>
 						<a class="cattitle_link" href="<?php echo $catdata->titlelink; ?>">
 							<?php echo $catdata->title; ?>
-							<?php echo $show_found_items === 2 && $total_info ? '<span class="umod_title_list_totals fc-nowrap-box"><span class="icon-stack"></span> (' . $total_info . ')</span>' : ''; ?>
+							<?php echo $show_found_items === 2 && $show_total ? '<span class="umod_title_list_totals fc-nowrap-box"><span class="icon-stack"></span> (' . $total_info . ')</span>' : ''; ?>
 						</a>
 					<?php else : ?>
 						<?php echo $catdata->title; ?>
-						<?php echo $show_found_items === 2 && $total_info ? '<span class="umod_title_list_totals fc-nowrap-box"><span class="icon-stack"></span> (' . $total_info . ')</span>' : ''; ?>
+						<?php echo $show_found_items === 2 && $show_total ? '<span class="umod_title_list_totals fc-nowrap-box"><span class="icon-stack"></span> (' . $total_info . ')</span>' : ''; ?>
 					<?php endif; ?>
 				</div>
 			</div>
 		<?php endif; ?>
 		
-		<?php if ($show_found_items === 1 && $total_info ) : ?>
+		<?php if ($show_found_items === 1 && $show_total ) : ?>
 			<div class="umod_list_totals" >
 				<span class="icon-stack"></span>
 				<?php echo '<i>' . JText::_('FLEXI_UMOD_TOTAL_ITEMS') . '</i> ' . ' (' . $total_info . ')'; ?>
