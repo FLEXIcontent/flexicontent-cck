@@ -464,7 +464,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		
 		// *** Selector for usage of Search Text
-		if($show_searchphrase = $params->get('show_searchphrase', 1))
+		$show_searchphrase = $params->get('show_searchphrase', 1);
+		if ($show_searchphrase)
 		{
 			$searchphrase_names = array(
 				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'natural'=>'FLEXI_NATURAL_PHRASE',
@@ -472,7 +473,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			);
 
 			$phrases = array();
-			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
+			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name)
+			{
 				$_obj = new stdClass();
 				$_obj->value = $searchphrase_value;
 				$_obj->text  = $searchphrase_name;
@@ -495,8 +497,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			}
 			$lists['searchphrase']  .= '</ul>';*/
 		}
-		
-		
+		else
+		{
+			$lists['searchphrase'] = '<input type="hidden" name="p" value="' . $searchphrase . '" />';
+		}
+
+
 		// *** Selector for filter combination
 		/*if($show_filtersop = $params->get('show_filtersop', 1)) {
 			$default_filtersop = $params->get('default_filtersop', 'all');
