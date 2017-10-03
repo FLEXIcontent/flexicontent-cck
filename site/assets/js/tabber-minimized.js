@@ -216,26 +216,33 @@ tabberObj.prototype.init = function(e)
     t.headingPrefixTxt = t.div.getAttribute('data-prefix-text');
     
     /* Remove the title attribute to prevent a tooltip from appearing */
-    if (this.removeTitle) { t.div.title = ''; }
+    if (this.removeTitle)
+    {
+    	t.div.title = '';
+   	}
 
     var tab_classes = '';
-    if (!t.headingText) {
-
+    if (!t.headingText)
+    {
       /* Title was not defined in the title of the DIV,
          So try to get the title from an element within the DIV.
          Go through the list of elements in this.titleElements
         (typically heading elements ['h2','h3','h4'])
       */
-      for (i2=0; i2<this.titleElements.length; i2++) {
+      for (i2=0; i2<this.titleElements.length; i2++)
+      {
         headingElement = t.div.getElementsByTagName(this.titleElements[i2])[0];
-        if (headingElement) {
+        if (headingElement)
+        {
           decode_entities.innerHTML = headingElement.innerHTML;
 					t.headingText = decode_entities.value;
           t.headingTitle = headingElement.title;
-          if (typeof jQuery != 'undefined') {
+          if (typeof jQuery != 'undefined')
+          {
             tab_classes=jQuery(headingElement).attr('class');
           }
-          if (this.titleElementsStripHTML) {
+          if (this.titleElementsStripHTML)
+          {
             t.headingText.replace(/<br>/gi,"[br]");
             t.headingText.replace(/<br\/>/gi,"[br]");
             t.headingText.replace(/<br \/>/gi,"[br]");
@@ -247,11 +254,12 @@ tabberObj.prototype.init = function(e)
       }
     }
 
-    if (!t.headingText) {
+    if (!t.headingText)
+    {
       /* Title was not found (or is blank) so automatically generate a
          number for the tab.
       */
-      t.headingText = i + 1;
+      t.headingText = '' + (i + 1);
     }
 
     /* Create a list element for the tab */
@@ -263,7 +271,8 @@ tabberObj.prototype.init = function(e)
 
     /* Create a link to activate the tab */
     DOM_a = document.createElement("a");
-    if (t.headingIconClass) {
+    if (t.headingIconClass)
+    {
     	var icon = document.createElement("i");
     	icon.setAttribute('class', t.headingIconClass);
     	DOM_a.appendChild(icon);
@@ -273,7 +282,8 @@ tabberObj.prototype.init = function(e)
     DOM_a.href = "javascript:void(null);";
     DOM_a.title = t.headingTitle;
     DOM_a.onclick = this.navClick;
-    if (typeof jQuery != 'undefined') {
+    if (typeof jQuery != 'undefined')
+    {
     	jQuery(DOM_a).addClass(tab_classes);
     }
 
@@ -284,8 +294,8 @@ tabberObj.prototype.init = function(e)
     DOM_a.tabberIndex = i;
 
     /* Do we need to add an id to DOM_a? */
-    if (this.addLinkId && this.linkIdFormat) {
-
+    if (this.addLinkId && this.linkIdFormat)
+    {
       /* Determine the id name */
       aId = this.linkIdFormat;
       aId = aId.replace(/<tabberid>/gi, this.id);
