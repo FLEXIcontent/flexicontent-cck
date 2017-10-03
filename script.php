@@ -330,11 +330,15 @@ class com_flexicontentInstallerScript
 			}
 		}
 		
-		echo JHtml::_('bootstrap.startAccordion', 'additional-extensions', array());
-		echo JHtml::_('bootstrap.addSlide', 'additional-extensions', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
+		//echo JHtml::_('bootstrap.startAccordion', 'additional-extensions', array());
+		//echo JHtml::_('bootstrap.addSlide', 'additional-extensions', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
 		?>
 
-		<table class="adminlist">
+		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_additional_extensions_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
+			<?php echo JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ); ?>
+		</span>
+
+		<table class="adminlist" id="fc_additional_extensions_log" style="display: none;">
 			<thead>
 				<tr>
 					<th style="text-align:left; width:500px;">
@@ -384,8 +388,8 @@ class com_flexicontentInstallerScript
 		</table>
 
 		<?php
-		echo JHtml::_('bootstrap.endSlide');
-		echo JHtml::_('bootstrap.endAccordion');
+		//echo JHtml::_('bootstrap.endSlide');
+		//echo JHtml::_('bootstrap.endAccordion');
 
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
 		if ($error)
@@ -458,11 +462,15 @@ class com_flexicontentInstallerScript
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
 
-		echo JHtml::_('bootstrap.startAccordion', 'upgrade-tasks', array());
-		echo JHtml::_('bootstrap.addSlide', 'upgrade-tasks', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
+		//echo JHtml::_('bootstrap.startAccordion', 'upgrade-tasks', array());
+		//echo JHtml::_('bootstrap.addSlide', 'upgrade-tasks', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
 		?>
-		
-		<table class="adminlist">
+
+		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_upgrade_tasks_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
+			<?php echo JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ); ?>
+		</span>
+
+		<table class="adminlist" id="fc_upgrade_tasks_log" style="display: none;">
 			<thead>
 				<tr>
 					<th style="text-align:left; width:500px;">
@@ -1259,8 +1267,8 @@ class com_flexicontentInstallerScript
 			</tbody>
 		</table>
 		<?php
-		echo JHtml::_('bootstrap.endSlide');
-		echo JHtml::_('bootstrap.endAccordion');
+		//echo JHtml::_('bootstrap.endSlide');
+		//echo JHtml::_('bootstrap.endAccordion');
 		?>
 
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
