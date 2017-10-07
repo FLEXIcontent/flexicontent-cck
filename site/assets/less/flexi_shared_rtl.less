@@ -2085,10 +2085,23 @@ fieldset legend .fc_legend_header_text {
 }
 
 #flexicontent .form-horizontal .control-label {
-	width: 110px;
+	/*text-align: left;
+	padding-left: 10px;*/
 }
 #flexicontent .form-horizontal .controls {
-	margin-right: 130px;
+	/*margin-left: 10px;*/
+}
+
+#flexicontent .form-inline.form-inline-header {
+	.control-label {
+		text-align: left;
+		width: 120px;
+		display: block;
+	}
+	.controls {
+		margin-left: 140px;
+		display: block;
+	}
 }
 
 body .form-horizontal .control-group
