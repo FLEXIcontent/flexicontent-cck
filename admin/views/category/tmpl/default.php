@@ -75,19 +75,20 @@ $this->document->addScriptDeclaration($js);
 			<div class="container-fluid" style="padding: 0px !important;">
 
 				<!--LEFT COLUMN-->
-				<div class="span6 full_width_980 off-white" style="max-width: 640px;">
+				<div class="span8 full_width_980 off-white">
 
-					<div>
+					<div class="fcclear"></div>
+					<div class="flexi_params">
+						<?php echo $this->form->getInput('description'); ?>
+					</div>
 
-						<div class="control-group">
-							<div class="control-label">
-								<?php echo $this->form->getLabel('language'); ?>
-							</div>
-							<div class="controls">
-								<?php echo $this->form->getInput('language'); ?>
-							</div>
-						</div>
-	
+				</div>
+
+				<!--RIGHT COLUMN-->
+				<div class="span4 full_width_980 off-white">
+
+					<div class="form-vertical">
+
 						<div class="control-group">
 							<div class="control-label">
 								<?php echo $this->form->getLabel('parent_id'); ?>
@@ -96,7 +97,7 @@ $this->document->addScriptDeclaration($js);
 								<?php echo $this->Lists['parent_id']; ?>
 							</div>
 						</div>
-	
+
 						<div class="control-group">
 							<div class="control-label">
 								<?php echo $this->form->getLabel('published'); ?>
@@ -105,7 +106,7 @@ $this->document->addScriptDeclaration($js);
 									<?php echo $this->form->getInput('published'); ?>
 							</div>
 						</div>
-	
+
 						<div class="control-group">
 							<div class="control-label">
 								<?php echo $this->form->getLabel('access'); ?>
@@ -115,107 +116,106 @@ $this->document->addScriptDeclaration($js);
 							</div>
 						</div>
 
+						<div class="control-group">
+							<div class="control-label">
+								<?php echo $this->form->getLabel('language'); ?>
+							</div>
+							<div class="controls">
+								<?php echo $this->form->getInput('language'); ?>
+							</div>
+						</div>
+
+						<div class="control-group">
+							<div class="control-label">
+								<?php echo $this->form->getLabel('image'); ?>
+							</div>
+							<div class="controls">
+									<?php echo $this->form->getInput('image'); ?>
+							</div>
+						</div>
+
+						<div class="control-group">
+							<div class="control-label">
+								<?php echo $this->form->getLabel('note'); ?>
+							</div>
+							<div class="controls">
+									<?php echo $this->form->getInput('note'); ?>
+							</div>
+						</div>
+
 					</div>
 
 				</div>
 
-
-				<!--RIGHT COLUMN-->
-				<div class="span6 full_width_980 off-white">
-
-				<!--START RIGHT ACCORDION-->
-				<?php echo JHtml::_('bootstrap.startAccordion', 'right-accordion-1', array('active' => 'none', 'parent' => 'right-accordion-1')); ?>
-
-
-				<?php if ($useAssocs) : ?>
-					<?php echo JHtml::_('bootstrap.addSlide', 'right-accordion-1', JText::_('FLEXI_ASSOCIATIONS'), 'slide1_id', 'accordion-toggle'); ?>
-
-						<?php echo $this->loadTemplate('associations'); ?>
-					<?php echo JHtml::_('bootstrap.endSlide'); ?>
-
-				<?php endif; ?>
-
-					<?php echo JHtml::_('bootstrap.addSlide', 'right-accordion-1', JText::_('FLEXI_PUBLISHING'), 'slide2_id', 'accordion-toggle'); ?>
-
-						<?php /* No inheritage needed for these */ ?>
-						<?php echo JLayoutHelper::render('joomla.edit.publishingdata', $this); ?>
-
-					<?php echo JHtml::_('bootstrap.endSlide'); ?>
-
-				<!--END RIGHT ACCORDION-->
-				<?php echo JHtml::_('bootstrap.endAccordion'); ?>
-
-				</div>
-
-			</div><!--.row-fluid-->
-
-			<div class="fcclear"></div>
-			<div class="flexi_params">
-				<?php echo $this->form->getInput('description'); ?>
-			</div>
+			</div><!--.container-fluid-->
 
 		</div><!-- tabbertab FLEXI_BASIC -->
 
 
-		<div class="tabbertab" id="tabset_cat_props_image_tab" data-icon-class="icon-image" >
-			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_IMAGE'); ?> </h3>
-
-			<?php
-			$fieldSet = $this->form->getFieldset('cat_basic');
-
-			if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
-			endif;
-			?>
-
-			<?php foreach ($fieldSet as $field) :
-				echo ($field->getAttribute('type') == 'separator' || $field->hidden) ? $field->input : '
-				<div class="control-group">
-					<div class="control-label">' . $field->label . '</div>
-					<div class="controls">
-						' . $field->input /* non-inherited */ . '
-					</div>
-				</div>
-				';
-			endforeach; ?>
-
-		</div><!-- tabbertab FLEXI_IMAGE -->
-
-
 		<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
-			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING') . ', ' . JText::_('FLEXI_META'); ?> </h3>
 
-			<?php /*echo JLayoutHelper::render('joomla.edit.metadata', $this);*/ ?>
-			<?php
-			$fieldnames_arr = array(
-				'metadesc' => null,
-				'metakey' => null
-			);
-			foreach ($this->form->getGroup('metadata') as $field)
-			{
-				$fieldnames_arr[ $field->fieldname ] = 'metadata';
-			}
+			<div class="container-fluid" style="padding: 0px !important;">
 
-			foreach ($fieldnames_arr as $fieldnames => $groupname)
-			{
-				foreach ((array) $fieldnames as $f)
-				{
-					$field = $this->form->getField($f, $groupname);
-					if (!$field) continue;
+				<div class="span6 full_width_980" style="max-width: 980px;">
+					<div class="fcsep_level1"><?php echo JText::_('FLEXI_PUBLISHING'); ?></div>
 
-					echo ($field->getAttribute('type') == 'separator' || $field->hidden) ? $field->input : '
-					<div class="control-group">
-						<div class="control-label">' . $field->label . '</div>
-						<div class="controls">
-							' . $field->input /* non-inherited */ . '
-						</div>
-					</div>
-					';
-				}
-			}
-			?>
+					<?php /* No inheritage needed for these */ ?>
+					<?php echo JLayoutHelper::render('joomla.edit.publishingdata', $this); ?>
+				
+				</div>
 
-		</div><!-- tabbertab FLEXI_META_SEO -->
+				<!--RIGHT COLUMN-->
+				<div class="span6 full_width_980" style="max-width: 980px;">
+					<div class="fcsep_level1"><?php echo JText::_('FLEXI_META_SEO'); ?></div>
+
+					<?php /*echo JLayoutHelper::render('joomla.edit.metadata', $this);*/ ?>
+					<?php
+					$fieldnames_arr = array(
+						'metadesc' => null,
+						'metakey' => null
+					);
+					foreach ($this->form->getGroup('metadata') as $field)
+					{
+						$fieldnames_arr[ $field->fieldname ] = 'metadata';
+					}
+
+					foreach ($fieldnames_arr as $fieldnames => $groupname)
+					{
+						foreach ((array) $fieldnames as $f)
+						{
+							$field = $this->form->getField($f, $groupname);
+							if (!$field) continue;
+
+							echo ($field->getAttribute('type') == 'separator' || $field->hidden) ? $field->input : '
+							<div class="control-group">
+								<div class="control-label">' . $field->label . '</div>
+								<div class="controls">
+									' . $field->input /* non-inherited */ . '
+								</div>
+							</div>
+							';
+						}
+					}
+					?>
+
+				</div>
+
+			</div>
+
+		</div><!-- tabbertab FLEXI_PUBLISHING , FLEXI_META -->
+
+
+		<?php if ($useAssocs) : ?>
+
+		<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-tree-2" >
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_ASSOCIATIONS'); ?> </h3>
+
+			<?php echo $this->loadTemplate('associations'); ?>
+		</div><!-- tabbertab FLEXI_ASSOCIATIONS -->
+
+		<?php endif; ?>
+
 
 
 		<div class="tabbertab" id="tabset_cat_params_display_tab" data-icon-class="icon-screen fc-display-params-icon" >
