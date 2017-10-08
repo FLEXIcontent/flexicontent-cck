@@ -75,7 +75,7 @@ $this->document->addScriptDeclaration($js);
 			<div class="container-fluid" style="padding: 0px !important;">
 
 				<!--LEFT COLUMN-->
-				<div class="span6 full_width_980 off-white" style="max-width: 640px;">
+				<div class="span6 full_width_980" style="max-width: 640px;">
 
 					<div>
 
@@ -121,7 +121,7 @@ $this->document->addScriptDeclaration($js);
 
 
 				<!--RIGHT COLUMN-->
-				<div class="span6 full_width_980 off-white">
+				<div class="span6 full_width_980 off-white pull-right">
 
 				<!--START RIGHT ACCORDION-->
 				<?php echo JHtml::_('bootstrap.startAccordion', 'right-accordion-1', array('active' => 'none', 'parent' => 'right-accordion-1')); ?>
