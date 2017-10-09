@@ -413,14 +413,15 @@ class FlexicontentFields
 	*/
 	static function getFieldFormDisplay($field, $item, $user)
 	{
-		// *****************************************************************************************
-		// Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type-specific label & description
-		// *****************************************************************************************
+		// ***
+		// *** Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type-specific label & description
+		// *** for CUSTOM fields only do basic initialization like language filtering on label & description
+		// ***
+
+		FlexicontentFields::loadFieldConfig($field, $item);
 
 		if ($field->iscore)
 		{
-			// Load field customization per CONTENT TYPE. NOTE: this is only for CORE fields, CUSTOM fields do not have per CONTENT TYPE customizations
-			FlexicontentFields::loadFieldConfig($field, $item);
 
 			// Special case: create MAINTEXT field (description field), by calling the display function of the textarea field (will also check for tabs)
 			if ($field->field_type == 'maintext')
@@ -1622,18 +1623,33 @@ class FlexicontentFields
 		static $fdata   = array();
 
 		static $no_typeparams = null;
-		if ($no_typeparams) $no_typeparams = new JRegistry();
+		if ($no_typeparams)
+		{
+			$no_typeparams = new JRegistry();
+		}
 
 		static $is_form=null;
-		if ($is_form===null) $is_form = $app->input->get('task', '', 'cmd')=='edit' && $app->input->get('option', '', 'cmd')=='com_flexicontent';
+		if ($is_form===null)
+		{
+			$is_form = $app->input->get('task', '', 'cmd')=='edit' && $app->input->get('option', '', 'cmd')=='com_flexicontent';
+		}
 		
 		// Create basic field data if no field given
-		if (!empty($name)) {
-			$field->iscore = $iscore;  $field->name = $name;  $field->field_type = $field_type;  $field->label = $label;  $field->description = $desc;  $field->attribs = '';
+		if (!empty($name))
+		{
+			$field->iscore = $iscore;
+			$field->name = $name;
+			$field->field_type = $field_type;
+			$field->label = $label;
+			$field->description = $desc;
+			$field->attribs = '';
 		}
 		
 		// Get Content Type parameters if not already retrieved
-		$type_id = $item ? $item->type_id : 0;
+		$type_id = $item
+			? $item->type_id
+			: 0;
+
 		if ($type_id && ( !isset($tinfo[$type_id]) || !isset($tparams[$type_id]) ) )
 		{
 			$tinfo[$type_id] = $tparams[$type_id] = null;
@@ -1651,10 +1667,10 @@ class FlexicontentFields
 
 		// Create the (CREATED ONCE per field) SHARED object that will contain: (a) label, (b) description, (c) all (merged) field parameters
 		// Create parameters once per custom field OR once per pair of:  Core FIELD type - Item CONTENT type
-		if ( !isset($fdata[$tindex][$field->name]) ) {
-			
-			if ( !$field->iscore || !$type_id ) {
-				
+		if ( !isset($fdata[$tindex][$field->name]) )
+		{
+			if ( !$field->iscore || !$type_id )
+			{
 				// CUSTOM field or CORE field with no type
 				$fdata[$tindex][$field->name] = new stdClass();
 				$fdata[$tindex][$field->name]->parameters = new JRegistry($field->attribs);
@@ -1662,9 +1678,10 @@ class FlexicontentFields
 				{
 					$fdata[$tindex][$field->name]->parameters->set('trigger_onprepare_content', 1);  // Default for maintext (description field) is to trigger plugins
 				}
-				
-			} else {
-				
+			}
+
+			else
+			{
 				$pn_prefix = $field->field_type!='maintext' ? $field->name : $field->field_type;
 				
 				// Initialize an empty object, and create parameters object of the field
@@ -1678,8 +1695,10 @@ class FlexicontentFields
 				FlexicontentFields::_getLangSpecificValue ($type_id, $field_desc_type, 'description', $fdata[$tindex][$field->name]);
 				
 				// Override field parameters with Type specific Parameters
-				if ( isset($tinfo[$type_id]['params'][$pn_prefix]) ) {
-					foreach ($tinfo[$type_id]['params'][$pn_prefix] as $param_name => $param_value) {
+				if ( isset($tinfo[$type_id]['params'][$pn_prefix]) )
+				{
+					foreach ($tinfo[$type_id]['params'][$pn_prefix] as $param_name => $param_value)
+					{
 						$fdata[$tindex][$field->name]->parameters->set( $param_name, $param_value) ;
 					}
 				}
