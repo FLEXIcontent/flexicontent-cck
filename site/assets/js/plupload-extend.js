@@ -62,7 +62,7 @@ fc_plupload = function(options)
 		var uploader_container = $('#' + this.options.tag_id + sfx);
 		var toggle_action = forced_action || (!this.uploader_instances[sfx] || uploader_container.is(':hidden') ? 'show' : 'hide');
 
-		var IEversion = isIE();
+		var IEversion = fc_isIE();
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 		var runtimes = !is_IE8_IE9  ?  'html5,flash,silverlight,html4'  : 'flash,html4';  //,silverlight,html5
 
@@ -417,7 +417,7 @@ fc_plupload = function(options)
 		// Get 'fc_plupload' class instance from uploader
 		var _this = $(uploader).data('fc_plupload_instance');
 
-		var IEversion = isIE();
+		var IEversion = fc_isIE();
 		var is_IE8_IE9 = IEversion && IEversion < 10;
 
 		edit_properties = uploader.getOption('edit_properties');
@@ -503,7 +503,7 @@ fc_plupload = function(options)
 			imgpreview_handle.add(fc_plupload_loaded_imgs[file_row_id]).on( "click", function()
 			{
 				// Close any open previews
-				var IEversion = isIE();
+				var IEversion = fc_isIE();
 				var file_row, btn, img_box, img;
 				file_row = $(this).closest('li');
 				btn = file_row.find('.fc_img_preview_btn');
@@ -581,7 +581,7 @@ fc_plupload = function(options)
 		fc_file_props_handle.dialog('close');
 
 		// Get form, form data
-		var IEversion = isIE();
+		var IEversion = fc_isIE();
 		var form = (!IEversion || IEversion > 8) ? $(obj.form) : $(obj).closest('form');
 		var data = form.serialize();	
 
