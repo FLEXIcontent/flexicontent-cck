@@ -149,7 +149,7 @@ function fman_zoom_thumb(e, obj)
 	var btn = box.find('.fc-fileman-preview-btn');
 
 	if (img.length==0) return;
-	var IEversion = isIE();
+	var IEversion = fc_isIE();
 
 	if (img.hasClass('fc_zoomed'))
 	{
@@ -404,7 +404,7 @@ if ($enable_multi_uploader)
 	$js = '
 		jQuery(document).ready(function()
 		{
-			var IEversion = isIE();
+			var IEversion = fc_isIE();
 			var is_IE8_IE9 = IEversion && IEversion < 10;
 			if (is_IE8_IE9) fctabber["fileman_tabset"].tabShow(1);
 	

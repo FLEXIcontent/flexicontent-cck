@@ -1723,10 +1723,10 @@
 	}
 
 
-	if (typeof isIE == "undefined")
+	if (typeof fc_isIE == "undefined")
 	{
 		window.fc_ie_version_number = null;
-		isIE = function()
+		fc_isIE = function()
 		{
 			if (window.fc_ie_version_number === null)
 			{
@@ -1788,7 +1788,7 @@
 		var isSingle = 1;
 		!!type || (type = 2);  // 1: drop-down select , 2: slider (default type)
 
-		var IEversion = isIE();
+		var IEversion = fc_isIE();
 		var is_IE8 = IEversion && IEversion < 9;
 		var use_select = is_IE8 || type == 1;
 		if (use_select)

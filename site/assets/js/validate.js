@@ -36,7 +36,7 @@ var JFormValidator = function()
 		// Initialize variables
 		handlers = {};
 		custom = custom || {};
-		IEversion = isIE();
+		IEversion = fc_isIE();
 		isIE8 = IEversion ? IEversion < 9 : false;
 		isIE9 = IEversion ? IEversion < 10 : false;
 		isRTL = jQuery(document.querySelector("html")).attr('dir') === 'rtl' ? true : false;
@@ -921,18 +921,23 @@ var JFormValidator = function()
 			if ($el.data('use_fcfield_box')) $el.closest('.fcfield_box.required_box').removeClass('invalid');
 		}
 	},
-	
-	isIE = function() {
-		var userAgent = navigator.userAgent.toLowerCase();
-		return (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
+
+	fc_isIE = function()
+	{
+		if (typeof window.fc_ie_version_number === 'undefined' || window.fc_ie_version_number === null)
+		{
+			var userAgent = navigator.userAgent.toLowerCase();
+			window.fc_ie_version_number = (userAgent.indexOf('msie') != -1) ? parseInt(userAgent.split('msie')[1]) : false;
+		}
+		return window.fc_ie_version_number;
 	},
-	
+
 	hasClass = function(el, class_name)
 	{
 		return isIE8 || isIE9 ? jQuery(el).hasClass(class_name) : el.classList.contains(class_name);
 	}
 
-	
+
 	// Initialize handlers and attach validation to form
 	initialize();
 
