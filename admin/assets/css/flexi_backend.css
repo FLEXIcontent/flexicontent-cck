@@ -881,6 +881,10 @@ img.btn.btn-small.fc-man-icon-s {
 .adminlist.fcmanlist th :not(.btn-group) > [class*="icon-"] {
 	font-size: 14px;
 }
+.adminlist.fcmanlist .col_template,
+.adminlist.fcmanlist .col_alias {
+	font-family: verdana;
+}
 .adminlist.fcmanlist :not(.btn-group) > .btn.btn-small {
 	padding: 2px 2px 1px 3px;
 	font-size: 14px;
