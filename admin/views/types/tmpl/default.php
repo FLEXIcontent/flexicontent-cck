@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -109,14 +109,14 @@ function delAllFilters() {
 			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 		</span>
-		
+
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<span class="btn-group fc-filter">
 			<span id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);"><?php echo JText::_( 'FLEXI_FILTERS' ) . ($this->count_filters  ? ' <sup>'.$this->count_filters.'</sup>' : ''); ?></span>
 			<span id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');"><?php echo JText::_( 'FLEXI_COLUMNS' ); ?><sup id="columnchoose_totals"></sup></span>
 		</span>
 		<input type="hidden" id="fc-filters-box-disp" name="fc-filters-box-disp" value="<?php echo $tools_cookies['fc-filters-box-disp']; ?>" />
-		
+
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box">
 				<?php
@@ -124,11 +124,11 @@ function delAllFilters() {
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
 			</span>
-			
+
 			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 			</span>
-			
+
 			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
 			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo $getPagesCounter; ?>
@@ -136,8 +136,8 @@ function delAllFilters() {
 			<?php endif; ?>
 		</span>
 	</div>
-	
-	
+
+
 	<div id="fc-filters-box" <?php if (!$this->count_filters || !$tools_cookies['fc-filters-box-disp']) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 
@@ -155,12 +155,12 @@ function delAllFilters() {
 
 		<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
-	
+
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
-	
+
 	<div class="fcclear"></div>
-	
-  
+
+
 	<table id="adminListTableFCtypes" class="adminlist fcmanlist">
 	<thead>
 		<tr class="header">
@@ -186,9 +186,9 @@ function delAllFilters() {
 	<tbody>
 		<?php
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
-		
+
 		$k = 0;
-		
+
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
@@ -214,7 +214,7 @@ function delAllFilters() {
 			</td>
 			<td class="left">
 				<?php
-				
+
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
 					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
@@ -237,17 +237,19 @@ function delAllFilters() {
 						echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
 					}
 				}
-				
+				$translated_label = JText::_($row->name);
+				$original_label_text = ($translated_label != $row->name) ? '<br/><small>'.$row->name.'</small>' : '';
 				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit ) ) {
-					echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8');
-				
+					echo htmlspecialchars(JText::_($row->name), ENT_QUOTES, 'UTF-8');
+
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<a href="<?php echo $link; ?>" title="<?php echo $edit_entry; ?>">
-						<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
+						<?php echo htmlspecialchars(JText::_($row->name), ENT_QUOTES, 'UTF-8'); ?>
 					</a>
+					<?php echo $original_label_text;?>
 				<?php
 				}
 				?>
@@ -265,7 +267,7 @@ function delAllFilters() {
 					echo JHtml::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="listItemTask(\'cb'.$i.'\',\'types.toggle_jview\'); Joomla.submitform()"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
 				?>
 			</td>
-			
+
 			<td class="hidden-phone col_edit_layout">
 				<?php if ($this->CanTemplates) : ?>
 				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
@@ -276,7 +278,7 @@ function delAllFilters() {
 			<td class="hidden-phone col_template">
 				<small><?php echo $row->config->get("ilayout"); ?></small>
 			</td>
-			
+
 			<td class="hidden-tablet hidden-phone col_alias">
 				<small><?php
 				if (StringHelper::strlen($row->alias) > 25) {
@@ -316,7 +318,7 @@ function delAllFilters() {
 	</tfoot>
 
 	</table>
-	
+
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
@@ -326,7 +328,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHtml::_( 'form.token' ); ?>
-	
+
 		<!-- fc_perf -->
 		</div>  <!-- j-main-container -->
 	</div>  <!-- spanNN -->
