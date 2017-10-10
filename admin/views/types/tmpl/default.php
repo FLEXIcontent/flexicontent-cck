@@ -161,7 +161,7 @@ function delAllFilters() {
 	<div class="fcclear"></div>
 	
   
-	<table id="adminListTableFCtypes" class="adminlist fcmanlist">
+<table id="adminListTableFCtypes" class="adminlist fcmanlist">
 	<thead>
 		<tr class="header">
 			<th class="hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -174,12 +174,12 @@ function delAllFilters() {
 			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ) .' / '. JText::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass text-center"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass text-center"><?php echo JHtml::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass"><?php // echo JHtml::_('grid.sort', 'ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
 			<th class="hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center hidden-phone"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass text-center hidden-phone"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
+			<th class="hideOnDemandClass col_id text-center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -274,35 +274,35 @@ function delAllFilters() {
 				<?php endif; ?>
 			</td>
 			<td class="hidden-phone col_template">
-				<?php echo $row->config->get("ilayout"); ?>
+				<small><?php echo $row->config->get("ilayout"); ?></small>
 			</td>
 			
 			<td class="hidden-tablet hidden-phone">
-				<?php
+				<small><?php
 				if (StringHelper::strlen($row->alias) > 25) {
 					echo StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 				} else {
 					echo htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				}
-				?>
+				?></small>
 			</td>
-			<td class="right">
-				<a class="btn btn-small fc-assignments-btn" href="<?php echo $fields_url; ?>">
+			<td class="text-center">
+				<a class="badge fc-assignments-btn" href="<?php echo $fields_url; ?>">
 					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
-			<td class="right">
-				<a class="btn btn-small btn-info fc-assignments-btn" href="<?php echo $items_url; ?>">
+			<td class="text-center">
+				<a class="badge badge-info fc-assignments-btn" href="<?php echo $items_url; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
 			</td>
 			<td>
 				<?php echo $access; ?>
 			</td>
-			<td class="center hidden-phone">
+			<td class="text-center hidden-phone">
 				<?php echo $published; ?>
 			</td>
-			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
+			<td class="text-center hidden-tablet hidden-phone col_id"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>
