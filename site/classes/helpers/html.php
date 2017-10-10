@@ -1859,7 +1859,7 @@ class flexicontent_html
 			'modal_title'=>'...',
 			'keep_jplugins_code' => false
 		);
-		
+
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
 		$cleantext = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
 
@@ -3753,9 +3753,9 @@ class flexicontent_html
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 
 			if ( !$allowed && $type->itemscreatable == 2 )
-				$_list[] = JHtml::_( 'select.option', $type->id, $type->name, 'value', 'text', $disabled = true );
+				$_list[] = JHtml::_( 'select.option', $type->id, JText::_($type->name), 'value', 'text', $disabled = true );
 			else
-				$_list[] = JHtml::_( 'select.option', $type->id, $type->name);
+				$_list[] = JHtml::_( 'select.option', $type->id, JText::_($type->name));
 		}
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
@@ -4690,7 +4690,7 @@ class flexicontent_html
 	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null)
 	{
 		$toolbar = JToolbar::getInstance('toolbar');
-		
+
 		if (!count($btn_arr))
 		{
 			return;
@@ -4698,7 +4698,7 @@ class flexicontent_html
 		if (count($btn_arr) == 1)
 		{
 			$button_html = end($btn_arr);
-			$btn_name = key($btn_arr); 
+			$btn_name = key($btn_arr);
 			$toolbar->appendButton('Custom', $button_html, $btn_name);
 			return;
 		}
