@@ -130,9 +130,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$authordescr_itemid = $params->get('authordescr_itemid');
 		}
-		
-		//Set layout
-		$this->setLayout('category');
+
 
 
 		// ***
@@ -941,20 +939,26 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Despite layout variable not being empty, there may be missing some sub-layout files,
 		// e.g. category_somefilename.php for this reason we will use a fallback layout that surely has these files
 		$fallback_layout = $params->get('category_fallback_layout', 'blog');  // parameter does not exist yet
-		if ($clayout != $fallback_layout) {
+		if ($clayout != $fallback_layout)
+		{
 			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$fallback_layout);
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$fallback_layout);
 		}
 		
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
-		
-		
-		// **************************************************
-		// increment the hit counter ONLY once per user visit
-		// **************************************************
+
+		// Set layout
+		$this->isInfinite = 0;
+		$this->setLayout('category');
+
+
+
+		// ***
+		// *** Increment the hit counter ONLY once per user visit
+		// ***
 		// MOVED to flexisystem plugin due to ...
-		
+
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 		
@@ -963,4 +967,3 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }
-?>

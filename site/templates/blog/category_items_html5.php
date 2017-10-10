@@ -1,26 +1,24 @@
 <?php
 /**
- * HTML5 Template
- * @version 1.5 stable $Id: category_items_html5.php 0001 2012-09-23 14:00:28Z Rehne $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
  * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * FLEXIcontent is a derivative work of QuickFAQ component @copyright (C) 2008 Christoph Lukes
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * FLEXIcontent is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
+
+$btn_class = 'btn';
+$tooltip_class = 'hasTooltip';
 
 $lead_use_image        = $this->params->get('lead_use_image', 1);
 $lead_link_image_to    = $this->params->get('lead_link_image_to', 0);
@@ -33,7 +31,8 @@ $intro_use_description = $this->params->get('intro_use_description', 1);
 $lead_link_to_popup  = $this->params->get('lead_link_to_popup', 0);
 $intro_link_to_popup = $this->params->get('intro_link_to_popup', 0);
 
-if ($lead_link_to_popup || $intro_link_to_popup) {
+if ($lead_link_to_popup || $intro_link_to_popup)
+{
 	flexicontent_html::loadFramework('flexi-lib');
 }
 
@@ -79,42 +78,47 @@ if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this
 	";
 	JFactory::getDocument()->addScriptDeclaration($js);
 }
-?>
 
-<?php
-	ob_start();
-	
-	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
-	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
-	
-	$filter_form_html = trim(ob_get_contents());
-	ob_end_clean();
-	if ( $filter_form_html ) {
-		echo '<aside class="group">'."\n".$filter_form_html."\n".'</aside>';
-	}
-?>
+// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 
-<div class="fcclear"></div>
+ob_start();
+include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+$filter_form_html = trim(ob_get_contents());
+ob_end_clean();
 
-<?php
-if (!$this->items) {
+if ( $filter_form_html )
+{
+	echo '
+	<div class="fcclear"></div>
+	<aside class="group">
+		' . $filter_form_html . '
+	</aside>';
+}
+
+// -- Check matching items found
+if (!$this->items)
+{
 	// No items exist
-	if ($this->getModel()->getState('limit')) {
+	if ($this->getModel()->getState('limit'))
+	{
 		// Not creating a category view without items
-		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '</div>';
+		echo '
+		<div class="fcclear"></div>
+		<div class="noitems group">
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+		</div>';
 	}
 	return;
 }
 
-$items	= & $this->items;
-$count 	= count($items);
+$items = & $this->items;
+$count = count($items);
+
 // Calculate common data outside the item loops
-if ($count) {
-	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
-	$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
-	$_comments_container_params = 'class="fc_comments_count '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
-}
+$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
+$_comments_container_params = 'class="fc_comments_count '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
+
 ?>
 <div class="content group">
 
