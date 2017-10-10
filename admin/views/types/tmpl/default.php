@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -237,17 +237,19 @@ function delAllFilters() {
 						echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
 					}
 				}
+
 				$translated_label = JText::_($row->name);
 				$original_label_text = ($translated_label != $row->name) ? '<br/><small>'.$row->name.'</small>' : '';
+
 				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit ) ) {
-					echo htmlspecialchars(JText::_($row->name), ENT_QUOTES, 'UTF-8');
+					echo htmlspecialchars($translated_label, ENT_QUOTES, 'UTF-8');
 
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<a href="<?php echo $link; ?>" title="<?php echo $edit_entry; ?>">
-						<?php echo htmlspecialchars(JText::_($row->name), ENT_QUOTES, 'UTF-8'); ?>
+						<?php echo htmlspecialchars($translated_label, ENT_QUOTES, 'UTF-8'); ?>
 					</a>
 					<?php echo $original_label_text;?>
 				<?php
