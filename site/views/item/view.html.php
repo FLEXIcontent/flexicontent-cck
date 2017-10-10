@@ -527,7 +527,7 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		// Try type from active menu
-		else if ( $menu && isset($menu->query['typeid']) )
+		else if ( !empty($menu) && isset($menu->query['typeid']) )
 		{
 			// This also forces zero if value not set
 			$jinput->set('typeid', (int) $menu->query['typeid']);
@@ -563,6 +563,12 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			$jinput->set('typeid', $new_typeid);
 			$canCreateType = true;
+		}
+
+		// For new items, set into the model the decided item type
+		if (!$model->_id)
+		{
+			$model->setId(0, null, $new_typeid, null);
 		}
 		
 		// Indicate to model to merge menu parameters if menu matches
