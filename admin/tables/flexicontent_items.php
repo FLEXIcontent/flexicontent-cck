@@ -20,8 +20,9 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
+require_once('flexicontent_basetable.php');
 
-class _flexicontent_items_common extends JTable
+class _flexicontent_items_common extends flexicontent_basetable
 {
 	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
@@ -82,7 +83,8 @@ else {
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class flexicontent_items extends _flexicontent_items {
+class flexicontent_items extends _flexicontent_items
+{
 	/** @var int Primary key */
 	var $id					= null;
 	/** @var string */
@@ -680,28 +682,36 @@ class flexicontent_items extends _flexicontent_items {
 		
 		$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
 		$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
-		
-		
-		// workaround for old joomla versions (Joomla <=3.5.x) that do not allowing to set transliteration language to be element's language
-		if ( !$unicodeslugs && !$supports_content_language_transliteration )
+
+
+		// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
+		$language = $this->language && $this->language != '*' ?
+			$this->language :
+			JComponentHelper::getParams('com_languages')->get('site', '*') ;
+
+		if ($language !== '*' && !JLanguage::getInstance($language)->getTransliterator())
 		{
-			// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
-			$language = $this->language && $this->language != '*' ?
-				$this->language :
-				JComponentHelper::getParams('com_languages')->get('site', '*') ;
-			
 			// Remove any '-' from the string since they will be used as concatenaters
 			$this->alias = str_replace('-', ' ', $this->alias);
-			
+
+			$this->alias = $this->transliterate($this->alias, $language);
+		}
+
+		// workaround for old joomla versions (Joomla <=3.5.x) that do not allowing to set transliteration language to be element's language
+		elseif ( !$unicodeslugs && !$supports_content_language_transliteration )
+		{
+			// Remove any '-' from the string since they will be used as concatenaters
+			$this->alias = str_replace('-', ' ', $this->alias);
+
 			// Do the transliteration accorting to ELEMENT's language
 			$this->alias = JLanguage::getInstance($language)->transliterate($this->alias);
 		}
-		
-		
+
+
 		// make alias safe and transliterate it
 		$this->alias = JApplicationHelper::stringURLSafe($this->alias, $this->language);
-		
-		
+
+
 		// check for empty alias and fallback to using current date
 		if (trim(str_replace('-', '', $this->alias)) == '')
 		{
