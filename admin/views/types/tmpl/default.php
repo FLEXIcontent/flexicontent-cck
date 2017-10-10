@@ -161,7 +161,7 @@ function delAllFilters() {
 	<div class="fcclear"></div>
 	
   
-<table id="adminListTableFCtypes" class="adminlist fcmanlist">
+	<table id="adminListTableFCtypes" class="adminlist fcmanlist">
 	<thead>
 		<tr class="header">
 			<th class="hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -277,7 +277,7 @@ function delAllFilters() {
 				<small><?php echo $row->config->get("ilayout"); ?></small>
 			</td>
 			
-			<td class="hidden-tablet hidden-phone">
+			<td class="hidden-tablet hidden-phone col_alias">
 				<small><?php
 				if (StringHelper::strlen($row->alias) > 25) {
 					echo StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
