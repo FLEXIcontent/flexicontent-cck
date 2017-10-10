@@ -1,29 +1,24 @@
 <?php
 /**
- * HTML5 Template
- * @version 1.5 stable $Id: category_items_html5.php 0001 2012-09-23 14:00:28Z Rehne $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
  * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * FLEXIcontent is a derivative work of QuickFAQ component @copyright (C) 2008 Christoph Lukes
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * FLEXIcontent is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
-$btn_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall';
-$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = 'btn';
+$tooltip_class = 'hasTooltip';
 
 // MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
 $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
@@ -35,33 +30,43 @@ if ($this->params->get('togglable_table_cols', 1))
 	$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 	flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCcategory', $start_text, $end_text);
 }
-?>
 
-<?php
-	ob_start();
-	
-	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
-	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
-	
-	$filter_form_html = trim(ob_get_contents());
-	ob_end_clean();
-	if ( $filter_form_html ) {
-		echo '<aside class="group">'."\n".$filter_form_html."\n".'</aside>';
-	}
-?>
+// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 
-<div class="fcclear"></div>
+ob_start();
+include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+$filter_form_html = trim(ob_get_contents());
+ob_end_clean();
 
-<?php
-if (!$this->items) {
+if ( $filter_form_html )
+{
+	echo '
+	<div class="fcclear"></div>
+	<aside class="group">
+		' . $filter_form_html . '
+	</aside>';
+}
+
+// -- Check matching items found
+if (!$this->items)
+{
 	// No items exist
-	if ($this->getModel()->getState('limit')) {
+	if ($this->getModel()->getState('limit'))
+	{
 		// Not creating a category view without items
-		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '</div>';
+		echo '
+		<div class="fcclear"></div>
+		<div class="noitems group">
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+		</div>';
 	}
 	return;
 }
+
+$items = & $this->items;
+$count = count($items);
+
 
 // routine to determine all used columns for this table
 $show_title  = $this->params->get('show_title', 1);
@@ -70,23 +75,34 @@ $link_titles = $this->params->get('link_titles', 0);
 $layout = $this->params->get('clayout', 'default');
 $fbypos = flexicontent_tmpl::getFieldsByPositions($layout, 'category');
 $columns = array();
-foreach ($this->items as $item) :
-	if (isset($item->positions['table'])) :
-		foreach ($fbypos['table']->fields as $f) :
-			if ( empty($columns[$f]) && isset($item->fields[$f]) ) :
-				$columns[$f] = $item->fields[$f]->label;
-			endif;
-		endforeach;
-	endif;
-endforeach;
+foreach ($items as $item)
+{
+	if (isset($item->positions['table']))
+	{
+		foreach ($fbypos['table']->fields as $f)
+		{
+			// Column (label) already added
+			if ( !empty($columns[$f]) )
+			{
+				continue;
+			}
 
-$items = & $this->items;
-$count 	= count($items);
-// Calculate common data outside the item loops
-if ($count) {
-	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
-	$_comments_container_params = 'class="fc_comments_count_nopad '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
+			if ( isset($item->fields[$f]) )
+			{
+				$columns[$f] = $item->fields[$f]->label;
+			}
+			elseif (!empty($this->isInfinite))
+			{
+				$columns[$f] = '';
+			}
+		}
+	}
 }
+
+// Calculate common data outside the item loops
+$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
+$_comments_container_params = 'class="fc_comments_count_nopad '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
+
 
 // Decide whether to show the edit column
 $buttons_exists = false;
