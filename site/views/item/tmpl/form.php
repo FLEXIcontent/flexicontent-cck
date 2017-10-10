@@ -25,7 +25,7 @@ $session = JFactory::getSession();
 // Create some variables
 $this->row = & $this->item;
 $isnew = !$this->row->id;
-$typeid = $isnew ? JRequest::getInt('typeid') : $this->row->type_id;
+$typeid = $this->row->type_id;
 $this->menuCats = $isnew ? $this->menuCats : false;  // just make sure ...
 
 $newly_submitted = $session->get('newly_submitted', array(), 'flexicontent');
@@ -64,12 +64,13 @@ $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class_fe', '');
 
 // Calculate refer parameter for returning to this page when user ends editing/submitting
-$return = JRequest::getString('return', '', 'get');
+$return = JFactory::getApplication()->input->getString('return', '');
 $referer = $return ? base64_decode( $return ) : @ $_SERVER['HTTP_REFERER'];
 $referer_encoded = htmlspecialchars($referer, ENT_COMPAT, 'UTF-8');
 
 // Print message about zero allowed categories
-if ( !$this->lists['catid'] && !$this->menuCats ) {
+if ( !$this->lists['catid'] && !$this->menuCats )
+{
 	echo sprintf( $alert_box, '', 'warning', '', JText::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS") );
 	return;
 }
