@@ -2275,6 +2275,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filtered = ! @ $method_exists ?
 					FlexicontentFields::getFiltered($filter, $value, $return_sql) :
 					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value, &$return_sql ));
+				//print_r($filtered); echo '<br/><br/>';
 				break; 
 		}
 		

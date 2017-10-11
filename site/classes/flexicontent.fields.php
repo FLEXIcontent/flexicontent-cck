@@ -2961,7 +2961,10 @@ class FlexicontentFields
 				: array ( $value );
 		}
 
+		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
+
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
@@ -2984,8 +2987,45 @@ class FlexicontentFields
 		if ( !count($value) ) return '';
 		
 		// For text input format the strings, if this was requested by the filter
-		$istext_input = $display_filter_as==1 || $display_filter_as==3;
-		if ($istext_input && isset($filter->filter_valueformat))
+		if ($isDate && (isset($value[1]) || isset($value[2])))
+		{
+			if (
+				(isset($value[1]) && strpos(trim($value[1]), 'now') === 0) ||
+				(isset($value[2]) && strpos(trim($value[2]), 'now') === 0)
+			) {
+				require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
+				$v = array();
+
+				if (!empty($value[1]))
+				{
+					$value[1] = preg_replace('/now\s*/', '', $value[1]);
+					$shift = array(
+						0 => preg_replace("/[^-+0-9\s]/", "", $value[1]),
+						1 => preg_replace("/[0-9-+\s]/", "", $value[1])
+					);
+					$v[1] = date_time::shift_dates('', $shift[0], $shift[1]);
+					$value[1] = $db->Quote($v[1]);
+				}
+
+				if (!empty($value[2]))
+				{
+					$value[2] = preg_replace('/now\s*/', '', $value[2]);
+					$shift = array(
+						0 => preg_replace("/[^-+0-9\s]/", "", $value[2]),
+						1 => preg_replace("/[0-9-+\s]/", "", $value[2])
+					);
+					$v[2] = date_time::shift_dates('', $shift[0], $shift[1]);
+					$value[2] = $db->Quote($v[2]);
+				}
+
+				$quoted=true;
+				$isTextInput = false;
+
+				// Update filter value to calculated value
+				JFactory::getApplication()->input->set('filter_'.$filter->id, $v);
+			}
+		}
+		if ($isTextInput && isset($filter->filter_valueformat))
 		{
 			foreach($value as $i => $val)
 			{
@@ -2996,7 +3036,6 @@ class FlexicontentFields
 			}
 			$quoted=true;
 		}
-		//print_r($value);
 		
 		$valueswhere = '';
 		switch ($display_filter_as) {
@@ -3017,10 +3056,11 @@ class FlexicontentFields
 			$value_empty = !strlen(@$value[1]) && strlen(@$value[2]) ? ' OR _v_="" OR _v_ IS NULL' : '';
 			if ( strlen($value1) ) $valueswhere .= ' AND (_v_ >=' . $value1 . ')';
 			if ( strlen($value2) ) $valueswhere .= ' AND (_v_ <=' . $value2 . $value_empty . ')';
+			//echo $valueswhere . '<br/><br/>';
 			break;
 		// SINGLE TEXT select value cases
 		case 1:
-			if ($filter->filter_valueexact)
+			if (!empty($filter->filter_valueexact))
 			{
 				$valueswhere .= ' AND _v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $value[0]) );
 			}
@@ -3192,13 +3232,14 @@ class FlexicontentFields
 		
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
+
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 		
-		$istext_input = $display_filter_as==1 || $display_filter_as==3;
-		$colname = (!empty($filter->isindexed) && !$istext_input) || $isDate
+		$colname = (!empty($filter->isindexed) && !$isTextInput) || $isDate
 			? 'fs.value_id'
 			: 'fs.search_index';
 		
