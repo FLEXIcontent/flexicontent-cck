@@ -201,7 +201,7 @@ $items	= & $this->items;
 				$ar 	= '&amp;ar=x';
 				$zc		= $image_method ? '&amp;zc=' . $image_method : '';
 				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';

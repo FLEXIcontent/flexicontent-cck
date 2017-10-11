@@ -784,11 +784,12 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$file_data->filename ;
 				$srcs	= JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1&amp;q=95&amp;ar=x';
 				$srcb	= JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1&amp;q=95&amp;ar=x';
-				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
-				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
-					$srcs .= '&amp;f='. $ext;
-					$srcb .= '&amp;f='. $ext;
-				}
+
+				$ext = strtolower(pathinfo($img_path, PATHINFO_EXTENSION));
+				$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
+
+				$srcs .= '&amp;f='. $ext;
+				$srcb .= '&amp;f='. $ext;
 
 				if ($usecaptions===1) $captions = htmlspecialchars('<b>'.$file_data->altname.($file_data->description ? "</b> <br/> ".$file_data->description : ""), ENT_COMPAT, 'UTF-8');
 				if ($usepopup && $popuptype == 4)
