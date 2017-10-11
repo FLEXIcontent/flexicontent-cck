@@ -126,7 +126,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 						$ar 	= '&amp;ar=x';
 						$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 						$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+						$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 						$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
@@ -139,7 +139,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 						$ar 	= '&amp;ar=x';
 						$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
 						$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+						$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 						$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
