@@ -94,11 +94,25 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 ?>
 
 <div id="mod_fleximap_default<?php echo $module->id;?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;">
-	<div id="map" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
+	<div id="fc_module_map_<?php echo $module->id;?>" style="width:<?php echo $width; ?>;height:<?php echo $height; ?>;"></div>
 
 	<script type="text/javascript" src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script type="text/javascript">
 
+	function fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers)
+	{
+		//  Create a new viewpoint bound
+		var bounds = new google.maps.LatLngBounds();
+		//  Go through each...
+		for (var i = 0; i < markers.length; i++) {
+			bounds.extend(markers[i].position);
+		}
+		//  Fit these bounds to the map
+		map.fitBounds(bounds);
+	}
+
+	function fc_MapMod_initialize_<?php echo $module->id;?>()
+	{
 		// Define your locations: HTML content for the info window, latitude, longitude
 		var locations = [ <?php echo implode(",",  $tMapTips); ?>  ];
 
@@ -112,7 +126,7 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 		];
 		var iconsLength = icons.length;
 
-		var map = new google.maps.Map(document.getElementById('map'), {
+		var map = new google.maps.Map(document.getElementById('fc_module_map_<?php echo $module->id;?>'), {
 			maxZoom: [<?php echo $maxzoommarker; ?>],
 			center: new google.maps.LatLng(-37.92, 151.25),
 			mapTypeId: google.maps.MapTypeId.<?php echo $maptype;?>,
@@ -166,18 +180,6 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 			}
 		}
 
-		function autoCenter()
-		{
-			//  Create a new viewpoint bound
-			var bounds = new google.maps.LatLngBounds();
-			//  Go through each...
-			for (var i = 0; i < markers.length; i++) {
-				bounds.extend(markers[i].position);
-			}
-			//  Fit these bounds to the map
-			map.fitBounds(bounds);
-		}
-
 		<?php if ($clustermode)
 		{
 			echo "
@@ -195,7 +197,9 @@ flexicontent_html::loadFramework('google-maps', '', $params);
 			";
 		}
 		?>
-		autoCenter();
+		fc_MapMod_autoCenter_<?php echo $module->id;?>(map, markers);
+	}
+	fc_MapMod_initialize_<?php echo $module->id;?>();
 
 	</script>
 </div>
