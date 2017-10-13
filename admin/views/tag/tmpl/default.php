@@ -23,7 +23,6 @@ $form = $this->form;
 
 <div class="flexicontent" id="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
-
 	<?php
 	$fieldSets = $this->form->getFieldsets();
 	foreach ($fieldSets as $name => $fieldSet) :
@@ -32,25 +31,22 @@ $form = $this->form;
 		//echo '<h2>' . JText::_($label) . '</h2>';
 	?>
 
-	<table class="fc-form-tbl">
+
 
 		<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 			<?php if ($field->hidden): ?>
-				<tr style="display:none !important;">
-					<td colspan="2"><?php echo $field->input; ?></td>
-				</tr>
-			<?php else: ?>
-			<tr>
-				<td class="key">
-					<?php echo $field->label; ?>
-				</td>
-				<td>
+				<div style="display:none !important;">
 					<?php echo $field->input; ?>
-				</td>
-			</tr>
+				</div>
+			<?php else: ?>
+<div class="control-group"> 
+<div class="control-label"><?php echo $field->label; ?></div>
+<div class="controls"><?php echo $field->input; ?></div>
+</div>
 			<?php endif; ?>
 		<?php endforeach; ?>
-	</table>
+
+	
 
 	<?php endforeach; ?>
 
@@ -59,7 +55,6 @@ $form = $this->form;
 	<input type="hidden" name="controller" value="tags" />
 	<input type="hidden" name="view" value="tag" />
 	<input type="hidden" name="task" value="" />
-
 </form>
 </div>
 <div style="margin-bottom:24px;"></div>
