@@ -42,27 +42,32 @@ jQuery(document).ready(function() {
 JFactory::getDocument()->addScriptDeclaration($js);
 ?>
 
-<form action="index.php?option=com_flexicontent&<?php echo $ctrl_task; ?>duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&<?php echo $ctrl_task; ?>duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<fieldset>
 		<legend>
 			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
-			<span class="hasTooltip" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>" style="text-decoration: none; color: #333;">
-				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
-			</span>
+<i class="ml-10 small icon-info hasTooltip" data-placement="right" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>"></i>		
 		</legend>
-		<?php echo FLEXI_J16GE ? '<br />' : ''; ?>
+		
+		<div class="control-group text-center">
+			<div class="controls">
 		<input type="text" id="dest" name="dest" value="<?php echo $this->dest; ?>" size="52" />
 		<input type="hidden" id="source" name="source" value="<?php echo $this->source; ?>" />
+		</div>
+		</div>
 	</fieldset>
-	<table width="100%">
-		<tr>
-			<td>
-			<input id="import" type="submit" class="btn" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
-			<input type="button" class="btn" onclick="window.parent.fc_tmpls_modal.dialog('close');" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
-			</td>
-		</tr>
-	</table>
+	
+	<div class="control-group text-center">
+			<div class="controls">
+	<div class="btn-group">
+	<input id="import" type="submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
+	<input type="button" class="btn btn-danger" onclick="window.parent.fc_tmpls_modal.dialog('close');" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />
+			</div>
+		</div>
+</div>
+
+
 	<div id="log-bind"></div>
 
 	<?php echo JHtml::_( 'form.token' ); ?>
