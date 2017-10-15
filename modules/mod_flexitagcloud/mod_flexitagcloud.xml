@@ -47,7 +47,7 @@
 			
 			<field name="" type="separator" default="FLEXI_CATEGORIES" level="level2" />
 			<field name="" type="separator" default="Show tags of items in the following categories. &lt;br/&gt; &lt;b&gt;Current category&lt;/b&gt; is &lt;br/&gt;- either currently viewed category &lt;br/&gt;- or main category of the item currently viewed" level="level3" class="alert alert-info" />
-			<field name="method" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" toggle_related="1">
+			<field name="method" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group" >
 				<option value="1" show_list="" hide_list="method_cats_ops">Current category</option>
 				<option value="2" show_list="method_cats_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_cats_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -61,6 +61,13 @@
 				<!--option value="2">FLEXI_ANCESTORS</option-->
 				<!--option value="3">FLEXI_CHILDREN_ANCESTORS</option-->
 				<!--option value="4">FLEXI_OTHER_CATS_OF_ITEM</option-->
+			</field>
+
+			<field name="" type="separator" default="FLEXI_TYPE" level="level2" />
+			<field name="" type="separator" default="FLEXI_MOD_TAGS_LIMITING_TO_CURRENT_TYPE_ABOUT" level="level3" class="alert alert-info fcpadded" />
+			<field name="method_types" type="multilist" subtype="radio" default="1" label="FLEXI_MOD_TAGS_LIMITING_TO_CURRENT_TYPE" description="FLEXI_MOD_TAGS_LIMITING_TO_CURRENT_TYPE_DESC" toggle_related="1" class="btn-group" inline_tip="FLEXI_MOD_TAGS_LIMITING_TO_CURRENT_TYPE_INFO" tip_img2="warning.png" inline_tip2="FLEXI_MOD_TAGS_LIMITING_TO_CURRENT_TYPE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 
 		</fieldset>
@@ -89,6 +96,8 @@
 		</fieldset>
 		
 		<fieldset name="tags_view_items_list" label="FLEXI_PARAMETERS_TAGS_VIEW_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_MOD_TAGS_ABOUT_CONFIGURING_TAGS_VIEW" level="level3" class="alert alert-warning" />
 			
 			<field name="" type="separator" default="FLEXI_FIELDS" level="level1" />
 			
@@ -202,6 +211,8 @@
 		</fieldset>
 
 		<fieldset name="tags_view_item_filtering" label="FLEXI_PARAMETERS_TAGS_VIEW_ITEM_FILTERING" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_MOD_TAGS_ABOUT_CONFIGURING_TAGS_VIEW" level="level3" class="alert alert-warning" />
 			
 			<!--field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" />
 			<field name="show_alpha" type="alphaindex" default="1" use_global="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
