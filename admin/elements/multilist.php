@@ -80,7 +80,7 @@ class JFormFieldMultiList extends JFormField
 		// *** HTML Tag parameters
 		// ***
 
-		$tooltip_class = 'hasTooltip';
+		$popover_class = 'hasPopover';
 
 		if ($this->element['multiple']=='multiple' || $this->element['multiple']=='true' )
 		{
@@ -278,13 +278,13 @@ class JFormFieldMultiList extends JFormField
 		{
 			$tip_img = $this->element['tip_img'] ? $this->element['tip_img'] : 'comments.png';
 			$preview_img = $this->element['preview_img'] ? $this->element['preview_img'] : '';
-			$tip_class = $this->element['tip_class'] . ' ' . $tooltip_class;
+			$tip_class = $this->element['tip_class'] . ' ' . $popover_class;
 
 			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
 			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">
-					' . $hintmage.$previewimage . '
+				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . flexicontent_html::escape(JText::_($inline_tip)). '">
+					' . $hintmage . $previewimage . '
 				</span>';
 		}
 
@@ -302,13 +302,13 @@ class JFormFieldMultiList extends JFormField
 		{
 			$tip_img = $this->element['tip_img2'] ? $this->element['tip_img2'] : 'comments.png';
 			$preview_img = $this->element['preview_img2'] ? $this->element['preview_img2'] : '';
-			$tip_class = $this->element['tip_class2'] . ' ' . $tooltip_class;
+			$tip_class = $this->element['tip_class2'] . ' ' . $popover_class;
 
 			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
 			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text2 .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">
-					' . $hintmage.$previewimage . '
+				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . flexicontent_html::escape(JText::_($inline_tip)) . '">
+					' . $hintmage . $previewimage . '
 				</span>';
 		}
 
