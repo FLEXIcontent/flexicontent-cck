@@ -283,7 +283,7 @@ class JFormFieldMultiList extends JFormField
 			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
 			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . flexicontent_html::escape(JText::_($inline_tip)). '">
+				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(JText::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
 					' . $hintmage . $previewimage . '
 				</span>';
 		}
@@ -307,7 +307,7 @@ class JFormFieldMultiList extends JFormField
 			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
 			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text2 .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . flexicontent_html::escape(JText::_($inline_tip)) . '">
+				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(JText::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
 					' . $hintmage . $previewimage . '
 				</span>';
 		}

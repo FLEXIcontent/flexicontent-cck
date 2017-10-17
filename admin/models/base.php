@@ -32,6 +32,13 @@ use Joomla\String\StringHelper;
 abstract class FCModelAdmin extends JModelAdmin
 {
 	/**
+	 * Array of URL variable names that should be tried for getting record id
+	 *
+	 * @var array
+	 */
+	var $record_keys = array('id', 'cid');
+
+	/**
 	 * Record name
 	 *
 	 * @var string
@@ -131,26 +138,21 @@ abstract class FCModelAdmin extends JModelAdmin
 		$jinput = JFactory::getApplication()->input;
 		$pk = null;
 
-		if ($pk === null)
-		{
-			$id = $jinput->get('id', array(), 'array');
-			if (count($id))
+		// Try all key in prefered order
+ 		foreach($this->record_keys as $key)
+ 		{
+			if ($pk === null)
 			{
-				JArrayHelper::toInteger($id);
-				$pk = (int) $id[0];
+				$id = $jinput->get($key, array(), 'array');
+				if (count($id))
+				{
+					JArrayHelper::toInteger($id);
+					$pk = (int) $id[0];
+				}
 			}
 		}
 
-		if ($pk === null)
-		{
-			$cid = $jinput->get('cid', array(), 'array');
-			if (count($cid))
-			{
-				JArrayHelper::toInteger($cid);
-				$pk = (int) $cid[0];
-			}
-		}
-
+		// Finally try getting id from JForm submitted data
 		if ($pk === null)
 		{
 			$data = $jinput->get('jform', array(), 'array');
