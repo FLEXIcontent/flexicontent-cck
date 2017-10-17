@@ -1111,6 +1111,17 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 		}
 
+
+		// Force com_content buttons on editor for description field
+		/*
+		$jinput->set('option', 'com_content');
+		$jinput->set('view', 'article');
+		$form->getField('description');
+		$jinput->set('option', 'com_flexicontent');
+		$jinput->set('view', 'item');
+		*/
+
+
 		// ***
 		// *** Assign data to VIEW's template
 		// ***
