@@ -157,6 +157,11 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function __construct()
 	{
+		if (JFactory::getApplication()->isSite())
+		{
+			$this->record_keys = array('id');
+		}
+
 		parent::__construct();
 
 		$jinput = JFactory::getApplication()->input;
