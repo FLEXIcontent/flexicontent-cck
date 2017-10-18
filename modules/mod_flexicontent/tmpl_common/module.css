@@ -90,19 +90,19 @@
 	float:left;
 	font-weight:normal;
 	
-	background: url("../tmpl/news/images/readmore.png") transparent no-repeat scroll 0px 2px;
-	border:solid gray;
-	border-width:0px 0px;
+	background: url("../tmpl/news/images/readmore.png") transparent no-repeat scroll 0px 3px;
+	border:solid transparent;
+	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
 	margin: 0px 0px 3px 4px;
 }
 
 .mod_flexicontent_wrapper .cat_readon:hover,
 .mod_flexicontent_wrapper .module_readon:hover { /* style of external container of link */
-	background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 1px;
+	background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 3px;
 	border: solid gray;
 	border-width:1px 0px;
-	padding: 0px 6px 0px 20px;
+	padding: 1px 6px 1px 20px;
 	margin: 0px 0px 3px 4px;
 }
 
