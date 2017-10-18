@@ -1740,6 +1740,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		$app  = JFactory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$import_media_folder = $app->input->get('import_media_folder', '', 'string');
+		$id_col = $app->input->get('id_col', 0, 'int');
+
 		$unique_tmp_itemid = $app->input->get('unique_tmp_itemid', '', 'string');
 		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
 		
@@ -1858,8 +1860,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 			// Add system message if upload error
-			$err_code = isset($files[$n]['error']) ? $files[$n]['error'] : UPLOAD_ERR_NO_FILE;
-			if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
+			$err_code = isset($files[$n]['error'])
+				? $files[$n]['error']
+				: UPLOAD_ERR_NO_FILE;
+
+			if ( $err_code && $err_code !== UPLOAD_ERR_NO_FILE )
 			{
 				$err_msg = array(
 					UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
@@ -1877,7 +1882,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Handle uploading a new original file
 			$new_file = $err_code === 0;
 			$new_file_uploaded = null;
-			if ($new_file) {
+			if ($new_file)
+			{
 				$new_file_uploaded = $this->uploadOriginalFile($field, $v, $files[$n]);
 			}
 			
@@ -1892,39 +1898,73 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					$src_file_path  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$dest_file_path = JPath::clean( $dest_path_original . $filename );
-					if ( JFile::exists($src_file_path) ) {
+					$result = false;
+					if ( JFile::exists($src_file_path) )
+					{
 						$result = JFile::copy( $src_file_path,  $dest_file_path );
-						if ( $result && JPath::canChmod($dest_file_path) )  chmod($dest_file_path, 0644);
+						if ( $result && JPath::canChmod($dest_file_path) )
+						{
+							chmod($dest_file_path, 0644);
+						}
 					}
-					$v['originalname'] = $filename; // make sure filename is WITHOUT subfolder
+					elseif ( JFile::exists($dest_file_path) )
+					{
+						$result = true;
+					}
+					$v['originalname'] = $result
+						? $filename  // make sure filename is WITHOUT subfolder
+						: '';
 				}
 
-				else if ( $image_source == -2 )
+				elseif ( $image_source == -2 )
 				{
 					$src_file_path  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$dest_file_path = JPath::clean( $dest_path_media_full . $filename );
-					if ( JFile::exists($src_file_path) ) {
+					$result = false;
+					if ( JFile::exists($src_file_path) )
+					{
 						$result = JFile::copy( $src_file_path,  $dest_file_path );
-						if ( $result && JPath::canChmod($dest_file_path) )  chmod($dest_file_path, 0644);
+						if ( $result && JPath::canChmod($dest_file_path) )
+						{
+							chmod($dest_file_path, 0644);
+						}
 					}
-					$v['originalname'] = $dest_path_media . $filename; // make sure filename is WITH subfolder
+					elseif ( JFile::exists($dest_file_path) )
+					{
+						$result = true;
+					}
+					$v['originalname'] = $result
+						? $dest_path_media . $filename  // make sure filename is WITH subfolder
+						: '';
 				}
 
+				elseif ( $image_source == 0 )
+				{
+					if ($v['originalname'] == (int) $v['originalname'] && $id_col >= 2)
+					{
+						// Keep existing value
+					}
+					else
+					{
+						$fman = new FlexicontentControllerFilemanager();
+						$fman->runMode = 'interactive';
+
+						$app->input->set('return-url', null);
+						$app->input->set('file-dir-path', DS.$import_media_folder . $sub_folder);
+						$app->input->set('file-filter-re', preg_quote($filename));
+						$app->input->set('secure', 1);
+						$app->input->set('keep', 1);
+
+						$upload_err = null;
+						$file_ids = $fman->addlocal(null, $upload_err);
+						reset($file_ids);  // Reset array to point to first element
+						$v['originalname'] = key($file_ids);  // The (first) key of file_ids array is the cleaned up filename
+					}
+				}
 				else
 				{
-					$fman = new FlexicontentControllerFilemanager();
-					$fman->runMode = 'interactive';
-
-					$app->input->set('return-url', null);
-					$app->input->set('file-dir-path', DS.$import_media_folder . $sub_folder);
-					$app->input->set('file-filter-re', preg_quote($filename));
-					$app->input->set('secure', 1);
-					$app->input->set('keep', 1);
-
-					$upload_err = null;
-					$file_ids = $fman->addlocal(null, $upload_err);
-					reset($file_ids);  // Reset array to point to first element
-					$v['originalname'] = key($file_ids);  // The (first) key of file_ids array is the cleaned up filename
+					// keep value only cleaning it
+					$v['originalname'] = JPath::clean( $v['originalname'] );
 				}
 			}
 			
@@ -1936,7 +1976,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ( $v['originalname'] || $v['existingname'] )
 			{
 				// Handle replacing image with a new existing image
-				if ( $v['existingname'] ) {
+				if ( $v['existingname'] )
+				{
 					$v['originalname'] = $v['existingname'];
 					$v['existingname'] = '';
 				}				
@@ -1963,9 +2004,12 @@ class plgFlexicontent_fieldsImage extends FCField
     if ( $image_source == 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0)) )
     {
 			// Get existing field values, 
-			if (!isset($item->fieldvalues)) {
+			if (!isset($item->fieldvalues))
+			{
 				$_fieldvalues = FlexicontentFields::getFieldValsById(null, array($item->id));
-				$item->fieldvalues = isset($_fieldvalues[$item->id]) ? $_fieldvalues[$item->id] : array();
+				$item->fieldvalues = isset($_fieldvalues[$item->id])
+					? $_fieldvalues[$item->id]
+					: array();
 			}
 			$db_values = !empty($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 			//echo "<pre>"; print_r($new_filenames); print_r($db_values);
