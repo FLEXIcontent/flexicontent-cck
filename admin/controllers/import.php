@@ -635,6 +635,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$items_per_call = $jinput->get('items_per_call', 0, 'int');
 		$jinput->set('import_media_folder', $conf['media_folder']);
 		$jinput->set('import_docs_folder', $conf['docs_folder']);
+		$jinput->set('id_col', $conf['id_col']);
 		
 		$lineno  = $task=='testcsv'  ?  1  :  $lineno + 1;
 		$linelim = $items_per_call ?  $lineno + $items_per_call - 1 : $itemcount;
