@@ -93,10 +93,10 @@ class modFlexigooglemapHelper
 		$useadress = $params->get('useadress', '');
 
 		$linkmode = $params->get('linkmode', '');
-		$readmore = $params->get('readmore', '');
+		$readmore = JText::_($params->get('readmore', 'MOD_FLEXIGOOGLEMAP_READMORE_TXT'));
 
 		$usedirection = $params->get('usedirection', '');
-		$directionname = $params->get('directionname', '');
+		$directionname = JText::_($params->get('directionname', 'MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT'));
 
 		$infotextmode = $params->get('infotextmode', '');
 		$relitem_html = $params->get('relitem_html','');
@@ -123,14 +123,13 @@ class modFlexigooglemapHelper
 				if ($uselink)
 				{
 					$link = $itemLoc->link;
-					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">'.JText::_($readmore).'</a></p>';
+					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">' . $readmore . '</a></p>';
 					$link = addslashes($link);
 				}
 
 				$addr = '';
-				if ($useadress)
+				if ($useadress && !empty($coord['addr_display']))
 				{
-					if ( !isset($coord['addr_display']) ) $coord['addr_display'] = '';
 					$addr = '<p>'.$coord['addr_display'].'</p>';
 					$addr = addslashes($addr);
 					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
@@ -139,8 +138,28 @@ class modFlexigooglemapHelper
 				$linkdirection = '';
 				if ($usedirection)
 				{
-					$adressdirection = $addr;
-					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
+					// generate link to google maps directions
+					$map_link = empty($coord['url'])  ?  false  :  $coord['url'];
+					
+					// if no url, compatibility with old values
+					if (empty($map_link))
+					{
+						$map_link = "http://maps.google.com/maps?q=";
+						if (!empty($coord['addr1']) && !empty($coord['city']) && (!empty($coord['province']) || !empty($coord['state']))  && !empty($coord['zip']))
+						{
+							$map_link .= urlencode(($coord['addr1'] ? $coord['addr1'].',' : '')
+								.($coord['city'] ? $coord['city'].',' : '')
+								.($coord['state'] ? $coord['state'].',' : ($coord['province'] ? $coord['province'].',' : ''))
+								.($coord['zip'] ? $coord['zip'].',' : '')
+								.($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$coord['country']) : ''));
+						}
+						else
+						{
+							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']); 
+						}
+					}
+
+					$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction">' . $directionname . '</a></div>';
 				}
 
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
@@ -182,14 +201,13 @@ class modFlexigooglemapHelper
 				if ($uselink)
 				{
 					$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($address->id, $address->catid, $forced_itemid, $address));
-					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">'.JText::_($readmore).'</a></p>';
+					$link = '<p class="link"><a href="'.$link.'" target="'.$linkmode.'">' . $readmore . '</a></p>';
 					$link = addslashes($link);
 				}
 
 				$addr = '';
-				if ($useadress)
+				if ($useadress && !empty($coord['addr_display']))
 				{
-					if ( !isset($coord['addr_display']) ) $coord['addr_display'] = '';
 					$addr = '<p>'.$coord['addr_display'].'</p>';
 					$addr = addslashes($addr);
 					$addr = preg_replace("/(\r\n|\n|\r)/", " ", $addr);
@@ -198,8 +216,28 @@ class modFlexigooglemapHelper
 				$linkdirection = '';
 				if ($usedirection)
 				{
-					$adressdirection = $addr;
-					$linkdirection= '<div class="directions"><a href="https://maps.google.com/maps?q='.$adressdirection.'" target="_blank" class="direction">'.JText::_($directionname).'</a></div>';
+					// generate link to google maps directions
+					$map_link = empty($coord['url'])  ?  false  :  $coord['url'];
+					
+					// if no url, compatibility with old values
+					if (empty($map_link))
+					{
+						$map_link = "http://maps.google.com/maps?q=";
+						if (!empty($coord['addr1']) && !empty($coord['city']) && (!empty($coord['province']) || !empty($coord['state']))  && !empty($coord['zip']))
+						{
+							$map_link .= urlencode(($coord['addr1'] ? $coord['addr1'].',' : '')
+								.($coord['city'] ? $coord['city'].',' : '')
+								.($coord['state'] ? $coord['state'].',' : ($coord['province'] ? $coord['province'].',' : ''))
+								.($coord['zip'] ? $coord['zip'].',' : '')
+								.($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$coord['country']) : ''));
+						}
+						else
+						{
+							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']); 
+						}
+					}
+
+					$linkdirection= '<div class="directions"><a href="' . $map_link . '" target="_blank" class="direction">' . $directionname . '</a></div>';
 				}
 
 				$contentwindows = $infotextmode  ?  $relitem_html  :  $addr .' '. $link;
