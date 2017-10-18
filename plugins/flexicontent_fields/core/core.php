@@ -561,6 +561,10 @@ class plgFlexicontent_fieldsCore extends FCField
 				$options[] = JHtml::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 				$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
 				//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+				$filter->filter_options = $options;
+				unset($options);
+
+				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
 			
 			case 'categories':
