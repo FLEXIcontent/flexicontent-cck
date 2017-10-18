@@ -3472,12 +3472,16 @@ class FlexicontentFields
 			}
 
 			// Get filter values considering PAGE configuration (regardless of ACTIVE filters)
-			if ( $apply_cache )
+			if (isset($filter->filter_options))
+			{
+				$results_page = $filter->filter_options;
+			}
+			elseif ( $apply_cache )
 				$results_page = $itemcache->get(
 					array('FlexicontentFields', $createFilterValues),
 					array($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code)
 				);
-			else if (!$isSearchView)
+			elseif (!$isSearchView)
 				$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
 			else
 				$results_page = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
@@ -3486,7 +3490,13 @@ class FlexicontentFields
 			$faceted_max_item_limit = 10000;
 			if ( $faceted_filter==2 )
 			{
-				if ($view_total <= $faceted_max_item_limit)
+				if (isset($filter->filter_options))
+				{
+					$faceted_filter = 0;
+					$results_active = $filter->filter_options;
+				}
+
+				elseif ($view_total <= $faceted_max_item_limit)
 				{
 					// DO NOT cache at this point the filter combinations are endless, so they will produce big amounts of cached data, that will be rarely used ...
 					// but if only a single filter is active we can get the cached result of it ... because its own filter_where is not used for the filter itself
@@ -3498,7 +3508,7 @@ class FlexicontentFields
 						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join_n_text, $view_where, $filters_where, $indexed_elements, $search_prop, $lang_code);
 				}
 
-				else if ($faceted_overlimit_msg === null)
+				elseif ($faceted_overlimit_msg === null)
 				{
 					// Set a notice message about not counting item per filter values and instead showing item TOTAL of current category / view
 					$faceted_overlimit_msg = 1;
