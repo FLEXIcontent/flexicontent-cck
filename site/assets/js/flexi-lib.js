@@ -657,19 +657,20 @@
 
 		// Turn radios into btn-group
 		sbox.find('.radio.btn-group label').addClass('btn');
-		
+
 		sbox.find('fieldset.btn-group').each(function() {
+			// Handle disabled, prevent clicks on the container, and add disabled style to each button
 			if (jQuery(this).prop('disabled')) {
 				jQuery(this).css('pointer-events', 'none').off('click');
 				jQuery(this).find('.btn').addClass('disabled');
 			}
 		});
-		
+
 		sbox.find('.btn-group label:not(.active)').click(function()
 		{
 			var label = jQuery(this);
 			var input = jQuery('#' + label.attr('for'));
-	
+
 			if (!input.prop('checked')) {
 				label.closest('.btn-group').find('label').removeClass('active btn-success btn-danger btn-primary');
 				if (input.val() == '') {
@@ -683,7 +684,7 @@
 				input.trigger('change');
 			}
 		});
-		
+
 		sbox.find('.btn-group input[checked="checked"]').each(function()
 		{
 			var input = jQuery(this);
