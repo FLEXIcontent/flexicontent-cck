@@ -157,9 +157,9 @@ class flexicontent_basetable extends JTable
 			if ($language !== '*' && !JLanguage::getInstance($language)->getTransliterator())
 			{
 				// Remove any '-' from the string since they will be used as concatenaters
-				$this->alias = str_replace('-', ' ', $this->alias);
+				$string = str_replace('-', ' ', $string);
 
-				$this->alias = $this->transliterate($this->alias, $language);
+				$string = $this->transliterate($string, $language);
 			}
 
 			$output = JFilterOutput::stringURLSafe($string, $language);

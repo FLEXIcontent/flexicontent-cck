@@ -606,7 +606,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (!$validated_data['id'] && $validated_data['iscore'])
+		if (!$validated_data['id'] && !empty($validated_data['iscore']))
 		{
 			$this->setError('Field\'s "iscore" property is ON, but creating new fields as CORE is not allowed');
 			return false;
