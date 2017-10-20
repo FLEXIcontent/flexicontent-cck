@@ -371,7 +371,7 @@ class FlexicontentModelField extends FCModelAdmin
 			}
 		}
 
-		if (!$data['id'] && $data['iscore'])
+		if (!$data['id'] && !empty($data['iscore']))
 		{
 			$this->setError('Field\'s "iscore" property is ON, but creating new fields as CORE is not allowed');
 			return false;
