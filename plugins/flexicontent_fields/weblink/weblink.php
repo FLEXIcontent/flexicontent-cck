@@ -250,6 +250,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autoprefix]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
 					elem.next().removeClass('active');
+					elem.prop('checked', false);
 					elem.next().attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
 					nr++;
 				});
