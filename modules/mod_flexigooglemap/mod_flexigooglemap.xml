@@ -40,7 +40,15 @@
 				<option value="AND">FLEXI_AND</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level3" />
+			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
+					checkvals="desktop,tablet,mobile"
+					defaultvals="desktop,tablet,mobile"
+					label="FLEXI_MOD_SHOW_IN_CLIENTS" description="FLEXI_MOD_SHOW_IN_CLIENTS_DESC"
+			/>
+
+			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" />
 			<field name="show_in_views" type="fccheckbox" default=""
 					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_DIRECTORY_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V"
 					checkvals="category,item,favourites,tags,flexicontent,search,others"
@@ -48,7 +56,7 @@
 					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
 			/>
 
-			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level3" />
+			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" />
 			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
