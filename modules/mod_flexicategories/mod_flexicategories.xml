@@ -21,163 +21,195 @@
 	</languages>
 	<help key="JHELP_EXTENSIONS_MODULE_MANAGER_ARTICLES_CATEGORIES" />
 	<config>
-		<fields name="params">
-			<fieldset name="basic" addfieldpath="/modules/mod_flexicategories/elements">
-				<field
-					name="parent"
-					type="category"
-					extension="com_content"
-					published=""
-					label="MOD_FLEXICATEGORIES_FIELD_PARENT_LABEL"
-					description="MOD_FLEXICATEGORIES_FIELD_PARENT_DESC"/>
+	<fields name="params">
+		<fieldset name="basic" addfieldpath="/modules/mod_flexicategories/elements">
+			<field
+				name="parent"
+				type="category"
+				extension="com_content"
+				published=""
+				label="MOD_FLEXICATEGORIES_FIELD_PARENT_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_PARENT_DESC"/>
 	
-				<field
-					name="show_description"
-					type="radio"
-					class="btn-group"
-					default="0"
-					label="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_LABEL"
-					description="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_DESC">
-					<option value="1">JYES</option>
-					<option value="0">JNO</option>
-				</field>
+			<field
+				name="show_description"
+				type="radio"
+				class="btn-group"
+				default="0"
+				label="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_DESC">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
 	
-				<field
-					name="numitems"
-					type="radio"
-					class="btn-group"
-					default="0"
-					label="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_LABEL"
-					description="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_DESC">
-					<option value="1">JYES</option>
-					<option value="0">JNO</option>
-				</field>
+			<field
+				name="numitems"
+				type="radio"
+				class="btn-group"
+				default="0"
+				label="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_DESC">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
 	
-				<field
-					name="show_children"
-					type="radio"
-					class="btn-group"
-					default="0"
-					label="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_LABEL"
-					description="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_DESC">
-					<option value="1">JYES</option>
-					<option value="0">JNO</option>
-				</field>
+			<field
+				name="show_children"
+				type="radio"
+				class="btn-group"
+				default="0"
+				label="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_DESC">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
 	
-				<field
-					name="count"
-					type="list"
-					label="MOD_FLEXICATEGORIES_FIELD_COUNT_LABEL"
-					description="MOD_FLEXICATEGORIES_FIELD_COUNT_DESC"
-					default="0"
-				>
-					<option value="0">JALL</option>
-					<option value="1">J1</option>
-					<option value="2">J2</option>
-					<option value="3">J3</option>
-					<option value="4">J4</option>
-					<option value="5">J5</option>
-					<option value="6">J6</option>
-					<option value="7">J7</option>
-					<option value="8">J8</option>
-					<option value="9">J9</option>
-					<option value="10">J10</option>
-				</field>
+			<field
+				name="count"
+				type="list"
+				label="MOD_FLEXICATEGORIES_FIELD_COUNT_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_COUNT_DESC"
+				default="0"
+			>
+				<option value="0">JALL</option>
+				<option value="1">J1</option>
+				<option value="2">J2</option>
+				<option value="3">J3</option>
+				<option value="4">J4</option>
+				<option value="5">J5</option>
+				<option value="6">J6</option>
+				<option value="7">J7</option>
+				<option value="8">J8</option>
+				<option value="9">J9</option>
+				<option value="10">J10</option>
+			</field>
 	
-				<field
-					name="maxlevel"
-					type="list"
-					label="MOD_FLEXICATEGORIES_FIELD_MAXLEVEL_LABEL"
-					description="MOD_FLEXICATEGORIES_FIELD_MAXLEVEL_DESC"
-					default="0"
-				>
-					<option value="0">JALL</option>
-					<option value="1">J1</option>
-					<option value="2">J2</option>
-					<option value="3">J3</option>
-					<option value="4">J4</option>
-					<option value="5">J5</option>
-					<option value="6">J6</option>
-					<option value="7">J7</option>
-					<option value="8">J8</option>
-					<option value="9">J9</option>
-					<option value="10">J10</option>
-				</field>
+			<field
+				name="maxlevel"
+				type="list"
+				label="MOD_FLEXICATEGORIES_FIELD_MAXLEVEL_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_MAXLEVEL_DESC"
+				default="0"
+			>
+				<option value="0">JALL</option>
+				<option value="1">J1</option>
+				<option value="2">J2</option>
+				<option value="3">J3</option>
+				<option value="4">J4</option>
+				<option value="5">J5</option>
+				<option value="6">J6</option>
+				<option value="7">J7</option>
+				<option value="8">J8</option>
+				<option value="9">J9</option>
+				<option value="10">J10</option>
+			</field>
 
-				<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
-				<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group">
-					<option value="0" show_list="" hide_list="disp_cat_img">FLEXI_HIDE</option>
-					<option value="1" show_list="disp_cat_img" hide_list="">FLEXI_SHOW</option>
-				</field>
-				<field name="cat_image_source" type="radio" default="2" label="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE" description="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE_DESC" class="btn-group disp_cat_img">
-					<option value="0">MOD_FLEXICATEGORIES_CAT_IMAGE_EXTRACT</option>
-					<option value="1">MOD_FLEXICATEGORIES_CAT_IMAGE_USEPARAM</option>
-					<option value="2">MOD_FLEXICATEGORIES_CAT_IMAGE_BOTH</option>
-				</field>
-				<field name="cat_link_image" type="radio" default="1" label="MOD_FLEXICATEGORIES_LINK_IMAGE" description="MOD_FLEXICATEGORIES_LINK_IMAGE_DESC" class="btn-group disp_cat_img">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-				<field name="cat_image_method" type="radio" default="1" label="MOD_FLEXICATEGORIES_PROCESSING_METHOD" description="MOD_FLEXICATEGORIES_PROCESSING_METHOD_DESC" class="btn-group disp_cat_img">
-					<option value="0">MOD_FLEXICATEGORIES_SCALE</option>
-					<option value="1">MOD_FLEXICATEGORIES_CROP</option>
-				</field>		
-				<field name="cat_image_width" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_WIDTH" description="MOD_FLEXICATEGORIES_IMAGE_WIDTH" class="disp_cat_img" />
-				<field name="cat_image_height" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" description="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" class="disp_cat_img" />
-				<field name="cat_image_float" type="radio" default="left" label="MOD_FLEXICATEGORIES_IMAGE_POSITION" description="MOD_FLEXICATEGORIES_IMAGE_POSITION_DESC" class="btn-group disp_cat_img">
-					<option value="left">MOD_FLEXICATEGORIES_IMAGE_LEFT</option>
-					<option value="right">MOD_FLEXICATEGORIES_IMAGE_RIGHT</option>
-				</field>
-				<field name="cat_default_image" type="media" default="" label="MOD_FLEXICATEGORIES_DEFAULT_CATIMAGE" description="MOD_FLEXICATEGORIES_DEFAULT_CATIMAGE_DESC" class="disp_cat_img" />
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
+			<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group">
+				<option value="0" show_list="" hide_list="disp_cat_img">FLEXI_HIDE</option>
+				<option value="1" show_list="disp_cat_img" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="cat_image_source" type="radio" default="2" label="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE" description="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE_DESC" class="btn-group disp_cat_img">
+				<option value="0">MOD_FLEXICATEGORIES_CAT_IMAGE_EXTRACT</option>
+				<option value="1">MOD_FLEXICATEGORIES_CAT_IMAGE_USEPARAM</option>
+				<option value="2">MOD_FLEXICATEGORIES_CAT_IMAGE_BOTH</option>
+			</field>
+			<field name="cat_link_image" type="radio" default="1" label="MOD_FLEXICATEGORIES_LINK_IMAGE" description="MOD_FLEXICATEGORIES_LINK_IMAGE_DESC" class="btn-group disp_cat_img">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="cat_image_method" type="radio" default="1" label="MOD_FLEXICATEGORIES_PROCESSING_METHOD" description="MOD_FLEXICATEGORIES_PROCESSING_METHOD_DESC" class="btn-group disp_cat_img">
+				<option value="0">MOD_FLEXICATEGORIES_SCALE</option>
+				<option value="1">MOD_FLEXICATEGORIES_CROP</option>
+			</field>		
+			<field name="cat_image_width" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_WIDTH" description="MOD_FLEXICATEGORIES_IMAGE_WIDTH" class="disp_cat_img" />
+			<field name="cat_image_height" type="text" size="5" default="24" label="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" description="MOD_FLEXICATEGORIES_IMAGE_HEIGHT" class="disp_cat_img" />
+			<field name="cat_image_float" type="radio" default="left" label="MOD_FLEXICATEGORIES_IMAGE_POSITION" description="MOD_FLEXICATEGORIES_IMAGE_POSITION_DESC" class="btn-group disp_cat_img">
+				<option value="left">MOD_FLEXICATEGORIES_IMAGE_LEFT</option>
+				<option value="right">MOD_FLEXICATEGORIES_IMAGE_RIGHT</option>
+			</field>
+			<field name="cat_default_image" type="media" default="" label="MOD_FLEXICATEGORIES_DEFAULT_CATIMAGE" description="MOD_FLEXICATEGORIES_DEFAULT_CATIMAGE_DESC" class="disp_cat_img" />
 
-			</fieldset>
+		</fieldset>
+
+		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
+			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
+				<option value="OR">FLEXI_OR</option>
+				<option value="AND">FLEXI_AND</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
+					checkvals="desktop,tablet,mobile"
+					defaultvals="desktop,tablet,mobile"
+					label="FLEXI_MOD_SHOW_IN_CLIENTS" description="FLEXI_MOD_SHOW_IN_CLIENTS_DESC"
+			/>
+
+			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" />
+			<field name="show_in_views" type="fccheckbox" default=""
+					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_DIRECTORY_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V"
+					checkvals="category,item,favourites,tags,flexicontent,search,others"
+					defaultvals="category,item,favourites,tags,flexicontent,search,others"
+					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
+			/>
+
+			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" />
+			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
+				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
+
+		</fieldset>
+
+		<fieldset name="advanced">
+			<field
+				name="layout"
+				type="modulelayout"
+				label="JFIELD_ALT_LAYOUT_LABEL"
+				description="JFIELD_ALT_MODULE_LAYOUT_DESC" />
 	
-			<fieldset name="advanced">
-				<field
-					name="layout"
-					type="modulelayout"
-					label="JFIELD_ALT_LAYOUT_LABEL"
-					description="JFIELD_ALT_MODULE_LAYOUT_DESC" />
+			<field
+				name="item_heading"
+				type="list"
+				default="4"
+				label="MOD_FLEXICATEGORIES_TITLE_HEADING_LABEL"
+				description="MOD_FLEXICATEGORIES_TITLE_HEADING_DESC"
+			>
+				<option value="1">JH1</option>
+				<option value="2">JH2</option>
+				<option value="3">JH3</option>
+				<option value="4">JH4</option>
+				<option value="5">JH5</option>
+			</field>
 	
-				<field
-					name="item_heading"
-					type="list"
-					default="4"
-					label="MOD_FLEXICATEGORIES_TITLE_HEADING_LABEL"
-					description="MOD_FLEXICATEGORIES_TITLE_HEADING_DESC"
-				>
-					<option value="1">JH1</option>
-					<option value="2">JH2</option>
-					<option value="3">JH3</option>
-					<option value="4">JH4</option>
-					<option value="5">JH5</option>
-				</field>
+			<field
+				name="moduleclass_sfx"
+				type="textarea"
+				rows="3"
+				label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
+				description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC" />
 	
-				<field
-					name="moduleclass_sfx"
-					type="textarea"
-					rows="3"
-					label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
-					description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC" />
+			<field
+				name="owncache"
+				type="list"
+				default="1"
+				label="COM_MODULES_FIELD_CACHING_LABEL"
+				description="COM_MODULES_FIELD_CACHING_DESC"
+			>
+				<option value="1">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+			</field>
 	
-				<field
-					name="owncache"
-					type="list"
-					default="1"
-					label="COM_MODULES_FIELD_CACHING_LABEL"
-					description="COM_MODULES_FIELD_CACHING_DESC"
-				>
-					<option value="1">JGLOBAL_USE_GLOBAL</option>
-					<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
-				</field>
-	
-				<field
-					name="cache_time"
-					type="text"
-					default="900"
-					label="COM_MODULES_FIELD_CACHE_TIME_LABEL"
-					description="COM_MODULES_FIELD_CACHE_TIME_DESC" />
-			</fieldset>
-		</fields>
+			<field
+				name="cache_time"
+				type="text"
+				default="900"
+				label="COM_MODULES_FIELD_CACHE_TIME_LABEL"
+				description="COM_MODULES_FIELD_CACHE_TIME_DESC" />
+		</fieldset>
+		
+	</fields>
 	</config>
 </extension>
