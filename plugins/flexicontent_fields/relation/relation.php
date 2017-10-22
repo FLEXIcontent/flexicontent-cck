@@ -57,6 +57,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+		$elementid_ns = str_replace('-', '_', $elementid);  // Name Safe Element ID
 
 
 		// ***
@@ -223,7 +224,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-item-selector">
 				<label class="' . $add_on_class . ' fc-lbl item-selector-lbl" for="'.$elementid.'_item_selector">'.JText::_( 'FLEXI_RIFLD_ITEMS' ).'</label>
-				<select id="'.$elementid.'_item_selector" name="'.$elementid.'_item_selector" class="use_select2_lib" onchange="return fcrelation_field_'.$elementid.'_add_related(this);">
+				<select id="'.$elementid.'_item_selector" name="'.$elementid.'_item_selector" class="use_select2_lib" onchange="return fcrelation_field_'.$elementid_ns.'_add_related(this);">
 					<option value="">-</option>
 				</select>
 			</div>
@@ -242,7 +243,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		
 		$js = "
 
-function fcrelation_field_".$elementid."_add_related(el)
+function fcrelation_field_".$elementid_ns."_add_related(el)
 {
 	var
 		item_selector = jQuery(el),
@@ -292,7 +293,7 @@ jQuery(document).ready(function()
 	jQuery('#".$elementid."_cat_selector').change(function()
 	{
 		var cat_selector = jQuery(this);
-		var ".$elementid."_cat_selector_val = cat_selector.val();
+		var ".$elementid_ns."_cat_selector_val = cat_selector.val();
 		var catid = parseInt(cat_selector.val());
 		
 		var item_selector = jQuery('#".$elementid."_item_selector');
