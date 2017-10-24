@@ -481,13 +481,20 @@ class plgSystemFlexisystem extends JPlugin
 			$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
 			$catid = $db->loadResult();
 		}
-
+		$cat_lft = 0;
+		$cat_rgt = 0;
+		if($catid) {
+			$db->setQuery('SELECT lft,rgt FROM #__categories WHERE id = ' . $catid);
+			$obj = $db->loadObject();
+			$cat_lft = $obj->lft;
+			$cat_rgt = $obj->rgt;
+		}
 
 		//***
 		//*** First Check if within 'FLEXIcontent' category subtree)
 		//***
 
-		$in_limits = !$catid || ($catid >= FLEXI_LFT_CATEGORY && $catid <= FLEXI_RGT_CATEGORY);
+		$in_limits = !$catid || ($cat_lft >= FLEXI_LFT_CATEGORY && $cat_rgt <= FLEXI_RGT_CATEGORY);
 
 
 		// ***
