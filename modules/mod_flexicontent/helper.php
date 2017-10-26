@@ -818,6 +818,7 @@ class modFlexicontentHelper
 		$method_cat 		= (int)$params->get('method_cat', 1);
 		$catids 				= $params->get('catids', array());
 		$behaviour_cat 	= $params->get('behaviour_cat', 0);
+		$link_via_main  = $params->get('link_via_main', 0);
 		$treeinclude 		= $params->get('treeinclude');
 		$cat_combine    = $params->get('cat_combine', 0);
 
@@ -1968,7 +1969,7 @@ class modFlexicontentHelper
 		// ***
 
 		// if using CATEGORY SCOPE INCLUDE ... then link though them ... otherwise via main category
-		$_cl = (!$behaviour_cat && $method_cat == 3) ? 'c' : 'mc';
+		$_cl = !$behaviour_cat && $method_cat == 3 && !$link_via_main ? 'c' : 'mc';
 		$items_query_data 	= 'SELECT '
 			. ' i.*, ie.*, ty.name AS typename'
 			. $select_comments
