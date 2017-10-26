@@ -251,6 +251,11 @@
 				<option value="3">FLEXI_CHILDREN_ANCESTORS</option>
 				<option value="4">FLEXI_OTHER_CATS_OF_ITEM</option>
 			</field>
+			<field name="link_via_main" type="radio" default="0" label="FLEXI_UMOD_LINK_VIA_MAIN_CAT" description="FLEXI_UMOD_LINK_VIA_MAIN_CAT_DESC" showon="method_cat:3[AND]behaviour_cat:0" class="btn-group group-fcmethod fcoffactive" >
+				<option value="0">FLEXI_UMOD_NO_USE_SELECTED</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 
 
 			<field name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level2" />
