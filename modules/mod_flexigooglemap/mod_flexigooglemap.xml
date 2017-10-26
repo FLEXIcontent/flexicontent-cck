@@ -18,7 +18,6 @@
 	<files>
 		<filename module="mod_flexigooglemap">mod_flexigooglemap.php</filename>
 		<folder>tmpl</folder>
-		<folder>language</folder>
 		<folder>assets</folder>
 		<folder>elements</folder>
 		<filename>helper.php</filename>

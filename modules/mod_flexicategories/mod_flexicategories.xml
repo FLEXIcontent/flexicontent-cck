@@ -12,6 +12,7 @@
 	<files>
 		<filename module="mod_flexicategories">mod_flexicategories.php</filename>
 		<folder>tmpl</folder>
+		<folder>elements</folder>
 		<filename>helper.php</filename>
 		<filename>mod_flexicategories.xml</filename>
 	</files>
