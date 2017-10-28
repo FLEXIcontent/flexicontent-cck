@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="1.6" client="site" method="upgrade">
+<extension type="module" version="3.4" client="site" method="upgrade">
 	<name>mod_flexifilter</name>
-	<author>George Papadakis</author>
+	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page</author>
 	<creationDate>November 2012</creationDate>
-	<copyright>Copyright © 2012 George Papadakis</copyright>
-	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	<authorEmail></authorEmail>
+	<copyright>(C) 2017 flexicontent.org</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+	<authorEmail>info@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>1.0</version>
+	<version>3.2</version>
 	<description>MOD_FLEXIFILTER_XML_DESCRIPTION</description>
 	
 	<files>
@@ -202,6 +202,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
+			<field name="" type="separator" default="FLEXI_EXT_SHOW_HIDE_JCACHE_CONF_NOTE" level="level3" class="alert alert-info fcpadded" />
 			<field name="show_in_clients" type="fccheckbox" default=""
 					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
 					checkvals="desktop,tablet,mobile"

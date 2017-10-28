@@ -1,17 +1,12 @@
 <?php
 /**
- * @version 1.1 $Id: mod_flexitagcloud.php 1767 2013-09-18 17:46:46Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent Tag Cloud Module
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
+ * @package         FLEXIcontent
+ * @subpackage      mod_flexigooglemap
  * 
- * Tags Cloud Module for flexicontent.
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // no direct access
@@ -21,6 +16,7 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 // Decide whether to show module contents
 $app     = JFactory::getApplication();
+$config  = JFactory::getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -35,14 +31,18 @@ $views_show_mod = !count($show_in_views) || in_array($_view,$show_in_views);
 
 
 // Show in client
+$caching = $params->get('cache', '0') ? $config->get('caching', '0') : 0;
+$cache_ppfx = (int) $config->get('cache_platformprefix', '0');
+$client_detectable = !$caching || $cache_ppfx;
 
 $show_in_clients = $params->get('show_in_clients', array());
 $show_in_clients = !is_array($show_in_clients) ? array($show_in_clients) : $show_in_clients;
 
-if (count($show_in_clients) && count($show_in_clients) < 4)  // zero means not saved since we also have 1 extra value '__SAVED__'
+// Try to hide the module only if client is detectable
+if ($client_detectable && count($show_in_clients) && count($show_in_clients) < 4)  // zero means not saved since we also have 1 extra value '__SAVED__'
 {
 	$mobileDetector = flexicontent_html::getMobileDetector();
-	$_client = $mobileDetector->isTablet()
+	$_client = !$caching && $mobileDetector->isTablet()  // Joomla cache does not distiguish tablets !
 		? 'tablet'
 		: ($mobileDetector->isMobile() ? 'mobile' : 'desktop');
 
@@ -92,7 +92,6 @@ if ($mod_initialized === null)
 
 // initialize various variables
 $document = JFactory::getDocument();
-$caching 	= $app->getCfg('caching', 0);
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 // include the helper only once

@@ -1,17 +1,12 @@
 <?php
 /**
- * @version 1.0 $Id: mod_flexicategories.php 1795 2013-10-23 00:08:42Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcategories Module
- * @copyright (C) 2011 flexicontent.org
- * @license GNU/GPL v3
+ * @package         FLEXIcontent
+ * @subpackage      mod_flexicategories
  * 
- * Categories Module for flexicontent.
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 // no direct access
@@ -21,6 +16,7 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 // Decide whether to show module contents
 $app     = JFactory::getApplication();
+$config  = JFactory::getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -35,14 +31,18 @@ $views_show_mod = !count($show_in_views) || in_array($_view,$show_in_views);
 
 
 // Show in client
+$caching = $params->get('cache', '0') ? $config->get('caching', '0') : 0;
+$cache_ppfx = (int) $config->get('cache_platformprefix', '0');
+$client_detectable = !$caching || $cache_ppfx;
 
 $show_in_clients = $params->get('show_in_clients', array());
 $show_in_clients = !is_array($show_in_clients) ? array($show_in_clients) : $show_in_clients;
 
-if (count($show_in_clients) && count($show_in_clients) < 4)  // zero means not saved since we also have 1 extra value '__SAVED__'
+// Try to hide the module only if client is detectable
+if ($client_detectable && count($show_in_clients) && count($show_in_clients) < 4)  // zero means not saved since we also have 1 extra value '__SAVED__'
 {
 	$mobileDetector = flexicontent_html::getMobileDetector();
-	$_client = $mobileDetector->isTablet()
+	$_client = !$caching && $mobileDetector->isTablet()  // Joomla cache does not distiguish tablets !
 		? 'tablet'
 		: ($mobileDetector->isMobile() ? 'mobile' : 'desktop');
 
@@ -79,6 +79,20 @@ jimport('joomla.profiler.profiler');
 $modfc_jprof = new JProfiler();
 $modfc_jprof->mark('START: FLEXIcontent Categories Module');
 
+// Include helpers class file
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+static $mod_initialized = null;
+$modulename = 'mod_flexidownloads';
+if ($mod_initialized === null)
+{
+	flexicontent_html::loadModuleLanguage($modulename);
+	$mod_initialized = true;
+}
+
+// initialize various variables
+$document = JFactory::getDocument();
+$flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 // include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
@@ -100,5 +114,15 @@ if (!empty($list))
 {
 	$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx'));
 	$startLevel      = reset($list)->getParent()->level;
+	// Render Layout
 	require JModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default'));
+}
+
+// append performance stats to global variable
+if ( $flexiparams->get('print_logging_info') )
+{
+	$modfc_jprof->mark('END: FLEXIcontent Categories Module');
+	$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+	global $fc_performance_msg;
+	$fc_performance_msg .= $msg;
 }
