@@ -1934,7 +1934,7 @@ class FlexicontentModelItems extends JModelLegacy
 					$_data['associations'][$row->language]  = $row->id;  // Add new item itself
 					$_data['associations'][$item->language] = $item->id; // unneeded, done by saving ...
 					$context = 'com_content.item';
-					flexicontent_db::saveAssociations($row, $_data, $context);  // Save associations, adding the new item
+					flexicontent_db::saveAssociations($item, $_data, $context);  // Save associations, adding the new item
 					//$app->enqueueMessage( print_r($_data, true), 'message' );
 				}
 			}
