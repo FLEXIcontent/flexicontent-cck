@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<extension type="module" version="1.6" client="site" method="upgrade">
-
+<extension type="module" version="3.4" client="site" method="upgrade">
 	<name>mod_flexigooglemap</name>
 	<author>Berges Yannick</author>
 	<creationDate>Janvier 2016</creationDate>
@@ -40,6 +38,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
+			<field name="" type="separator" default="FLEXI_EXT_SHOW_HIDE_JCACHE_CONF_NOTE" level="level3" class="alert alert-info fcpadded" />
 			<field name="show_in_clients" type="fccheckbox" default=""
 					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
 					checkvals="desktop,tablet,mobile"
@@ -313,12 +312,7 @@
 			</field>
 
 		</fieldset>
-
+		
 	</fields>
 	</config>
-
-	<!--updateservers>
-		<server type="extension" priority="1" name="FLEXI googlemap update">https://update.com3elles.com/mod_flexigooglemap/mod_flexigooglemap_update.xml</server>
-	</updateservers-->
-
 </extension>

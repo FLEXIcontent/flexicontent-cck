@@ -44,6 +44,14 @@ class plgSystemFlexisystem extends JPlugin
 		static $language_loaded = null;
 		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_system_flexisystem', JPATH_ADMINISTRATOR);
 
+		if (!$language_loaded)
+		{
+			JFactory::getApplication()->isAdmin()
+				? JPlugin::loadLanguage('plg_system_flexisystem_common_be', JPATH_ADMINISTRATOR)
+				: JPlugin::loadLanguage('plg_system_flexisystem_common_fe', JPATH_ADMINISTRATOR);
+		}
+		$language_loaded = true;
+
 		$this->extension = 'com_flexicontent';
 		$this->cparams = JComponentHelper::getParams($this->extension);
 
@@ -481,19 +489,19 @@ class plgSystemFlexisystem extends JPlugin
 			$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
 			$catid = $db->loadResult();
 		}
-		$cat_lft = 0;
-		$cat_rgt = 0;
-		if($catid) {
-			$db->setQuery('SELECT lft,rgt FROM #__categories WHERE id = ' . $catid);
-			$obj = $db->loadObject();
-			$cat_lft = $obj->lft;
-			$cat_rgt = $obj->rgt;
-		}
+
 
 		//***
 		//*** First Check if within 'FLEXIcontent' category subtree)
 		//***
 
+		if ($catid)
+		{
+			$db->setQuery('SELECT lft,rgt FROM #__categories WHERE id = ' . $catid);
+			$obj = $db->loadObject();
+			$cat_lft = $obj->lft;
+			$cat_rgt = $obj->rgt;
+		}
 		$in_limits = !$catid || ($cat_lft >= FLEXI_LFT_CATEGORY && $cat_rgt <= FLEXI_RGT_CATEGORY);
 
 

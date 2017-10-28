@@ -16,6 +16,8 @@
 	
 	<languages>
 		<language tag="en-GB">en-GB.plg_system_flexisystem.ini</language>
+		<language tag="en-GB">en-GB.plg_system_flexisystem_common_fe.ini</language>
+		<language tag="en-GB">en-GB.plg_system_flexisystem_common_be.ini</language>
 	</languages>
 	<config>
 	<fields name="params"  addfieldpath="/administrator/components/com_flexicontent/elements">

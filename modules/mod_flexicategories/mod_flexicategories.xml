@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="3.1" client="site" method="upgrade">
+<extension type="module" version="3.4" client="site" method="upgrade">
 	<name>mod_flexicategories</name>
-	<author>Joomla! Project</author>
-	<creationDate>February 2010</creationDate>
-	<copyright>Copyright (C) 2005 - 2015 Open Source Matters. All rights reserved.</copyright>
-	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<authorEmail>admin@joomla.org</authorEmail>
-	<authorUrl>www.joomla.org</authorUrl>
-	<version>3.0.0</version>
+	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page</author>
+	<creationDate>29/06/2016</creationDate>
+	<copyright>(C) 2017 flexicontent.org</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+	<authorEmail>info@flexicontent.org</authorEmail>
+	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<version>3.2</version>
 	<description>MOD_FLEXICATEGORIES_XML_DESCRIPTION</description>
+	
 	<files>
 		<filename module="mod_flexicategories">mod_flexicategories.php</filename>
 		<folder>tmpl</folder>
@@ -16,6 +17,7 @@
 		<filename>helper.php</filename>
 		<filename>mod_flexicategories.xml</filename>
 	</files>
+	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexicategories.ini</language>
 		<language tag="en-GB">languages/en-GB.mod_flexicategories.sys.ini</language>
@@ -140,6 +142,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
+			<field name="" type="separator" default="FLEXI_EXT_SHOW_HIDE_JCACHE_CONF_NOTE" level="level3" class="alert alert-info fcpadded" />
 			<field name="show_in_clients" type="fccheckbox" default=""
 					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
 					checkvals="desktop,tablet,mobile"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="1.6" client="site" method="upgrade">
+<extension type="module" version="3.4" client="site" method="upgrade">
 	<name>mod_flexitagscloud</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>09/11/2009</creationDate>
@@ -267,7 +267,6 @@
 			
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
-				<option value="2">FLEXI_FORCE_CACHE</option>
 				<option value="1">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_CACHING</option>
 			</field>
