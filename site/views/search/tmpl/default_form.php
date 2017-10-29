@@ -149,6 +149,7 @@ $r = 0;
 					<div class="fc_filter_html">
 						<?php echo $append_buttons ? '<span class="btn-wrapper input-append">' : ''; ?>
 							<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
+								data-txt_ac_lang="<?php echo JFactory::getLanguage()->getTag(); ?>"
 								placeholder="<?php echo $text_search_prompt; ?>" name="q" size="30" maxlength="120" 
 								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
 							

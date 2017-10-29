@@ -58,6 +58,8 @@ class FlexicontentTasksCore
 		// Get request variables
 		$type    = $jinput->get('type', '', 'cmd');
 		$text    = $jinput->get('text', '', 'string');
+		$lang    = $jinput->get('lang', '', 'cmd');
+		$lang    = substr($lang, 0,2);
 
 		$pageSize = $jinput->get('pageSize', 20, 'int');
 		$pageNum  = $jinput->get('pageNum', 1, 'int');		
@@ -110,8 +112,6 @@ class FlexicontentTasksCore
 
 		$cid_list = implode(',', $cids);
 
-		$lang = substr(JFactory::getLanguage()->getTag(), 0,2);
-
 		// Nothing to do
 		if ( $type!='basic_index' && $type!='adv_index' ) jexit();
 		if ( !strlen($text) ) jexit();
@@ -123,7 +123,9 @@ class FlexicontentTasksCore
 
 		$_words = array();
 		foreach ($words as & $_w)
+		{
 			$_words[] = !$search_prefix  ?  trim($_w)  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($_w));
+		}
 		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 
 		// Query CLAUSE for match the given text
@@ -137,8 +139,9 @@ class FlexicontentTasksCore
 		$limit      = $pageSize;
 
 		$lang_where = '';
-		if ($filtercat) {
-			$lang_where .= '   AND ( i.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR i.language="*" ' : '') . ' ) ';
+		if ($filtercat)
+		{
+			$lang_where .= '   AND ( i.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR i.language="*" ) ';
 		}
 
 		$access_where = '';
