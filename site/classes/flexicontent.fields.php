@@ -4875,8 +4875,6 @@ class FlexicontentFields
 	static function renderFilters( &$params, &$filters, $form_name )
 	{
 		// Make the filter compatible with Joomla standard cache
-		$cache = JFactory::getCache('com_flexicontent');
-		$cache->clean();
 		$jinput = JFactory::getApplication()->input;
 		
 		$filter_prefix = ($form_name == 'item_form' ? 'iform_' : '') .'filter_';

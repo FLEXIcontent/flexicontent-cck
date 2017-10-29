@@ -129,12 +129,21 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $session->get('clear_cats_cache', 0, 'flexicontent') )
 		{
 			$session->set('clear_cats_cache', 0, 'flexicontent');
+
 			// Clean cache
 			$cache = $this->getCache($group='', 0);
+			$cache->clean('com_flexicontent');
+
+			$cache = $this->getCache($group='', 1);
+			$cache->clean('com_flexicontent');
+
+			$cache = $this->getCache($group='', 0);
 			$cache->clean('com_flexicontent_cats');
+
 			$cache = $this->getCache($group='', 1);
 			$cache->clean('com_flexicontent_cats');
-			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
+
+			//JFactory::getApplication()->enqueueMessage( "Cleaned CACHE groups: <b>com_flexicontent</b>, <b>com_flexicontent_cats</b>", 'message');
 		}
 		
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION)
