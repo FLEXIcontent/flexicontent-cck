@@ -389,6 +389,7 @@ jQuery(document).ready(function() {
 			jQuery.ui.autocomplete( {
 				source: function( request, response ) {
 					var el = jQuery(this.element);
+					var el_lang = el.attr('data-txt_ac_lang') ? el.attr('data-txt_ac_lang') : '';
 					var el_cid  = el.attr('data-txt_ac_cid')  ? el.attr('data-txt_ac_cid')  : (parseInt(_FC_GET['cid']) || 0);
 					var el_cids = el.attr('data-txt_ac_cids') ? el.attr('data-txt_ac_cids') : _FC_GET['cids'];
 					var el_usesubs = parseInt(el.attr('data-txt_ac_usesubs')) || 0;
@@ -400,7 +401,7 @@ jQuery(document).ready(function() {
 							task: "txtautocomplete",
 							pageSize: fc_select_pageSize,
 							text: request.term,
-							lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
+							lang: el_lang,
 							cid: el_cid,
 							cids: el_cids,
 							usesubs: el_usesubs
@@ -472,7 +473,7 @@ jQuery(document).ready(function() {
 						text: term,
 						pageSize: fc_select_pageSize,
 						pageNum: page,
-						lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
+						lang: (jQuery(this).attr('data-txt_ac_lang') ? jQuery(this).attr('data-txt_ac_lang') : ''),
 						cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(_FC_GET['cid']) || 0)),
 						cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : _FC_GET['cids']),
 						usesubs: (parseInt(jQuery(this).attr('data-txt_ac_usesubs')) || 0)
