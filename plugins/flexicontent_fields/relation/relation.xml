@@ -173,6 +173,10 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_FILTER_ITEMS" icon_class="icon-search" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_FILTER_ITEMS_INFO" level="level3" class="alert alert-info fcpadded"/>
 
+			<field name="samelangonly_view" type="radio" default="-1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC" class="btn-group group-fcmethod">
+				<option value="-1">FLEXI_RIFLD_SAME_AS_EDIT</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="use_publish_dates_view" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
 				<option value="-1">FLEXI_RIFLD_SAME_AS_EDIT</option>
 				<option value="1">FLEXI_YES</option>

@@ -4997,31 +4997,45 @@ class FlexicontentFields
 			: array(1,-5,2);
 		$sfx = $isform ? '_form' : '';
 		
-		$publish_where = '';
-		
-		// Get data like aliases and published state
-		$use_publish_dates = $params->get('use_publish_dates_view', 1) != -1  ?  $params->get('use_publish_dates_view', 1)  :  $params->get('use_publish_dates', 1);
+		$scopes_where = array();
+
 		if (!$isform)
 		{
+			$samelangonly = !$reverse_field_id || $params->get('samelangonly_view', 1) != -1
+				? $params->get('samelangonly_view', 1)
+				: $params->get('samelangonly', 1);
+
+			if ($samelangonly)
+			{
+				$scopes_where[] = !$item->language || $item->language=='*' ? " ext.language='*' " : " (ext.language='{$item->language}' OR ext.language='*') ";
+			}
+
+			$use_publish_dates = !$reverse_field_id || $params->get('use_publish_dates_view', 1) != -1
+				? $params->get('use_publish_dates_view', 1)
+				: $params->get('use_publish_dates', 1);
+
 			if ($use_publish_dates)
 			{
 				// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
-				//  thus the items are published globally at the time the author specified in his/her local clock
-				//$app  = JFactory::getApplication();
-				//$now  = $app->requestTime;   // NOT correct behavior it should be UTC (below)
-				//$date = JFactory::getDate();
-				//$now  = $date->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
-				$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
+				// thus the items are published globally at the time the author specified in his/her local clock
+
+				//$now  = JFactory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
+				//$now  = JFactory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
+
+				$nowDate = 'UTC_TIMESTAMP()';  //$db->Quote($now);
 				$nullDate = $db->getNullDate();
 
-				$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
-				$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
+				$scopes_where[] = ' ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$nowDate.' )'; 
+				$scopes_where[] = ' ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$nowDate.' )';
 			}
 
-			$onlypublished = $params->get('onlypublished_view', 1) != -1  ?  $params->get('onlypublished_view', 1)  :  $params->get('onlypublished', 1);
+			$onlypublished = !$reverse_field_id || $params->get('onlypublished_view', 1) != -1
+				? (int) $params->get('onlypublished_view', 1)
+				: (int) $params->get('onlypublished', 1);
+
 			if ($onlypublished && count($states))
 			{
-				$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
+				$scopes_where[] = ' i.state IN ('.implode(',',$states).')';
 			}
 		}
 
@@ -5059,13 +5073,23 @@ class FlexicontentFields
 		}
 
 		// owner scope
-		$ownedbyuser = $params->get('ownedbyuser_view', -1) != -1  ?  $params->get('ownedbyuser_view')  :  $params->get('ownedbyuser', 0);
-		if($ownedbyuser)
+		$ownedbyuser = !$reverse_field_id || $params->get('ownedbyuser_view', -1) != -1
+			? (int) $params->get('ownedbyuser_view')
+			: (int) $params->get('ownedbyuser', 0);
+
+		switch ($ownedbyuser)
 		{
-			//if related item owned by editing user/logged in user currently editing the field
-			if ($ownedbyuser == 1) $itemowned_where = ' AND i.created_by=' . $user->id;
-			//if related item owned by the parent item's owner
-			else if ($ownedbyuser == 2) $itemowned_where = ' AND i.created_by=' . $item->created_by;
+			// Limit the related items list to items created by current user (editor or viewer)
+			case 1:
+				$itemowned_where = ' AND i.created_by=' . $user->id;
+				break;
+
+			// Limit the related items list to items created by the creator of current item
+			case 2:
+				$itemowned_where = ' AND i.created_by=' . $item->created_by;
+				break;
+
+			// case zero, do not apply any limitation to
 		}
 
 
@@ -5179,7 +5203,7 @@ class FlexicontentFields
 				. @ $type_where
 				. @ $cat_where
 				. @ $itemowned_where
-				. $publish_where
+				. ($scopes_where ? ' AND ' . implode(' AND ', $scopes_where) : '')
 				.' GROUP BY i.id '
 				//. $orderby
 				//.@ $limit
@@ -5202,7 +5226,7 @@ class FlexicontentFields
 				. @ $type_where
 				. @ $cat_where
 				. @ $itemowned_where
-				. $publish_where
+				. ($scopes_where ? ' AND ' . implode(' AND ', $scopes_where) : '')
 				.' GROUP BY i.id '
 				. $orderby
 				.@ $limit

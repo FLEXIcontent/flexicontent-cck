@@ -154,6 +154,10 @@
 			<field name="reverse_scope_types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
 
 			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
+			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
 				<option value="1">FLEXI_YES</option>
