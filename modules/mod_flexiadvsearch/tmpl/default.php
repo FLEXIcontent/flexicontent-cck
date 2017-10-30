@@ -153,7 +153,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 <?php
 $js = '
 	jQuery(document).ready(function() {
-		jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
+		jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude):not(.select2-input), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
 			var form=document.getElementById("'.$form_id.'");
 			adminFormPrepare(form, 1);
 		});
