@@ -4499,7 +4499,7 @@ class FlexicontentFields
 			{
 				if ($r->value && $r->value !== $nullDate)
 				{
-					$date = new JDate($is_year_group ? $r->value . '-0' : $r->value);   // JDate can not handle just year (YYYY)
+					$date = new JDate($is_year_group ? $r->value . '-1-1' : $r->value);   // JDate can not handle just year (YYYY) so we use YYYY-1-1
 					$r->text = $date->format($date_txtformat);
 				}
 			}
@@ -4658,7 +4658,7 @@ class FlexicontentFields
 			{
 				if ($r->value && $r->value !== $nullDate)
 				{
-					$date = new JDate($is_year_group ? $r->value . '-0' : $r->value);   // JDate can not handle just year (YYYY)
+					$date = new JDate($is_year_group ? $r->value . '-1-1' : $r->value);   // JDate can not handle just year (YYYY) so we use YYYY-1-1
 					$r->text = $date->format($date_txtformat);
 				}
 			}
