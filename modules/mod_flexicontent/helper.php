@@ -1850,17 +1850,23 @@ class modFlexicontentHelper
 			
 			foreach ($static_filters_data as $filter_id => $filter_values)
 			{
-				// Handle single-valued filter as multi-valued
-				if ( !is_array($filter_values) ) $filter_values = array(0 => $filter_values);
+				$rel_field_id = 0;  // Set if current Field is a relation / relation reverse field
+				$ri_field_id = 0;   // The field of the related items via 'rel_field_id' to apply limitation
 
-				$ri_value = reset($filter_values);
-				$ri_field_id = key($filter_values);
+				// Check if we will apply limitation via relation field
+				if (is_array($filter_values) && count($filter_values) === 1)
+				{
+					$ri_field_id = key($filter_values);
+					$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
+						? - $ri_field_id
+						: 0;
+				}
 
-				$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
-					? - $ri_field_id
-					: 0;
+				// Check existance of the field of the related items that will be used to apply limitations, and set into '$rel_field_id'
 				if ($ri_field_id)
 				{
+					$filter_values = reset($filter_values);
+
 					$_fields = FlexicontentFields::getFieldsByIds(array($filter_id));
 					if (!empty($_fields))
 					{
@@ -1871,37 +1877,48 @@ class modFlexicontentHelper
 					}
 				}
 
-				// Single or Multi valued filter
-				elseif ( isset($filter_values[0]) )
-				{
-					$in_values = array();
-					foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
-					$where_field_filters .= ' AND '.$negate_op.' (rel'.$filter_id.'.value IN ('.implode(',', $in_values).') ) ';
-				}
-				
-				// Range value filter
-				else
-				{
-					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
-					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
-					
-					if ( strlen(@$filter_values[1]) || strlen(@$filter_values[2]) )
-					{
-						$where_field_filters .= ' AND '.$negate_op.' ( 1 ';
-						if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
-						if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';
-						$where_field_filters .= ' )';
-					}
-				}
-				
-				if ($ri_field_id)
+				// Table column alias (field value column used for limitations)
+				$val_alias = $ri_field_id
+					? 'ri_rel'.$filter_id
+					: 'rel'.$filter_id;
+
+				if ($rel_field_id)
 				{
 					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.value_integer=i.id AND rel'.$filter_id.'.field_id = ' . $rel_field_id
-						. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=rel'.$filter_id.'.item_id AND rival.field_id = ' . $ri_field_id . ' AND rival.value = ' . $db->Quote($ri_value);
+						. ' JOIN #__flexicontent_fields_item_relations AS ' . $val_alias . ' ON ' . $val_alias . '.item_id=rel'.$filter_id.'.item_id AND ' . $val_alias . '.field_id = ' . $ri_field_id;
 				}
 				else
 				{
 					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+				}
+
+				// Handle single-valued filter as multi-valued
+				if ( !is_array($filter_values) )
+				{
+					$filter_values = array(0 => $filter_values);
+				}
+
+				// Single or Multi valued filter
+				if ( isset($filter_values[0]) )
+				{
+					$in_values = array();
+					foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
+					$join_field_filters .= ' AND '.$negate_op.' (' . $val_alias . '.value IN ('.implode(',', $in_values).') ) ';
+				}
+
+				// Range value filter
+				else
+				{
+					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
+					$value_empty = !strlen(@ $filter_values[1]) && strlen(@ $filter_values[2]) ? ' OR ' . $val_alias . '.value="" OR ' . $val_alias . '.value IS NULL ' : '';
+					
+					if ( strlen(@ $filter_values[1]) || strlen(@ $filter_values[2]) )
+					{
+						$join_field_filters .= ' AND '.$negate_op.' ( 1 ';
+						if ( strlen(@ $filter_values[1]) ) $join_field_filters .= ' AND (' . $val_alias . '.value >=' . $filter_values[1] . ') ';
+						if ( strlen(@ $filter_values[2]) ) $join_field_filters .= ' AND (' . $val_alias . '.value <=' . $filter_values[2] . $value_empty . ') ';
+						$join_field_filters .= ' )';
+					}
 				}
 			}
 			//echo $join_field_filters;
