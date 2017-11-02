@@ -1852,9 +1852,27 @@ class modFlexicontentHelper
 			{
 				// Handle single-valued filter as multi-valued
 				if ( !is_array($filter_values) ) $filter_values = array(0 => $filter_values);
-				
+
+				$ri_value = reset($filter_values);
+				$ri_field_id = key($filter_values);
+
+				$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
+					? - $ri_field_id
+					: 0;
+				if ($ri_field_id)
+				{
+					$_fields = FlexicontentFields::getFieldsByIds(array($filter_id));
+					if (!empty($_fields))
+					{
+						$ri_field = reset($_fields);
+						$ri_item = null;
+						FlexicontentFields::loadFieldConfig($ri_field, $ri_item);
+						$rel_field_id = (int) $ri_field->parameters->get('reverse_field', 0) ?: $filter_id;
+					}
+				}
+
 				// Single or Multi valued filter
-				if ( isset($filter_values[0]) )
+				elseif ( isset($filter_values[0]) )
 				{
 					$in_values = array();
 					foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
@@ -1862,11 +1880,13 @@ class modFlexicontentHelper
 				}
 				
 				// Range value filter
-				else {
+				else
+				{
 					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
 					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
 					
-					if ( strlen(@$filter_values[1]) || strlen(@$filter_values[2]) ) {
+					if ( strlen(@$filter_values[1]) || strlen(@$filter_values[2]) )
+					{
 						$where_field_filters .= ' AND '.$negate_op.' ( 1 ';
 						if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
 						if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';
@@ -1874,8 +1894,17 @@ class modFlexicontentHelper
 					}
 				}
 				
-				$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+				if ($ri_field_id)
+				{
+					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.value_integer=i.id AND rel'.$filter_id.'.field_id = ' . $rel_field_id
+						. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=rel'.$filter_id.'.item_id AND rival.field_id = ' . $ri_field_id . ' AND rival.value = ' . $db->Quote($ri_value);
+				}
+				else
+				{
+					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+				}
 			}
+			//echo $join_field_filters;
 		}
 		
 		if ($behaviour_filt==1 || $behaviour_filt==2)

@@ -47,10 +47,10 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		// ***
 		// *** Check that relation field to be reversed was configured
 		// ***
-		$reverse_field_id = $field->parameters->get('reverse_field', 0);
+		$reverse_field_id = (int) $field->parameters->get('reverse_field', 0);
 		if ( !$reverse_field_id )
 		{
-			$field->html = '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 			return;
 		}
 
@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		$_fields = FlexicontentFields::getFieldsByIds(array($reverse_field_id));
 		if (empty($_fields))
 		{
-			$field->html = '<div class="alert alert-warning">'.JText::sprintf('FLEXI_RIFLD_FIELD_BEING_REVERSED_NOT_FOUND', $autorelation_itemid).'</div>';
+			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . JText::sprintf('FLEXI_RIFLD_FIELD_BEING_REVERSED_NOT_FOUND', $autorelation_itemid).'</div>';
 			return;
 		}
 
@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 
 				if (!$rel_item)
 				{
-					$field->html = '<div class="alert alert-warning">'.JText::sprintf('FLEXI_RIFLD_CANNOT_AUTORELATE_ITEM', $autorelation_itemid).'</div>';
+					$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . JText::sprintf('FLEXI_RIFLD_CANNOT_AUTORELATE_ITEM', $autorelation_itemid).'</div>';
 					return;
 				}
 
@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
-		$reverse_field_id = $field->parameters->get('reverse_field', 0);
+		$reverse_field_id = (int) $field->parameters->get('reverse_field', 0);
 		
 		if ($reverse_field_id)
 		{
@@ -195,5 +195,46 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
-	
+
+	// Method to display a category filter for the category view
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	{
+	}
+
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value, $return_sql=true)
+	{
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+
+		$reverse_field_id = (int) $filter->parameters->get('reverse_field', 0);
+		if ( !$reverse_field_id )
+		{
+			echo '<div class="alert alert-warning">' . $filter->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+			return null;
+		}
+		$db = JFactory::getDbo();
+
+		$ri_value = reset($value);
+		$ri_field_id = key($value);
+
+		$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
+			? - $ri_field_id
+			: 0;
+
+		if (!$ri_field_id)
+		{
+			return null;
+		}
+
+		$filter->filter_colname     = ' relv.value_integer';
+		$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $reverse_field_id
+			. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id . ' AND rival.value = ' . $db->Quote($ri_value);
+		$filter->filter_valueformat = null;   // use default
+		$filter->filter_valuewhere = ' ';   // skip default
+
+		$sql = FlexicontentFields::getFiltered($filter, $value, $return_sql);
+		return $sql;
+	}
 }

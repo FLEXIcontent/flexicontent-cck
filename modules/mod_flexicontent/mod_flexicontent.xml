@@ -438,8 +438,8 @@
 				<option value="2" show_list="method_filt_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_filt_ops" hide_list="">FLEXI_INCLUDE</option>
 			</field>
-			<field name="static_filters" default="" type="textarea" filter="string" rows="5" cols="32" label="FLEXI_STATIC_FILTERS" description="FLEXI_STATIC_FILTERS_DESC" showon="method_filt:2,3[AND]behaviour_filt:0,2" />
-			
+			<field name="static_filters" default="" type="textarea" filter="string" rows="10" cols="80" label="FLEXI_STATIC_FILTERS" description="FLEXI_STATIC_FILTERS_DESC" showon="method_filt:2,3[AND]behaviour_filt:0,2" />
+
 		</fieldset>
 		
 
