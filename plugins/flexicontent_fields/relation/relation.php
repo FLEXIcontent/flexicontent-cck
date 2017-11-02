@@ -68,7 +68,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		if ( $autorelation_itemid )
 		{
-			$field->html = '<div class="alert alert-warning">You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field</div>';
+			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . 'You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field</div>';
 			return;
 		}
 
@@ -476,7 +476,7 @@ jQuery(document).ready(function()
 			// Check that relation field to be reversed was configured
 			if ( !$reverse_field_id )
 			{
-				$field->{$prop} = '<div class="alert alert-warning">'.JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+				$field->{$prop} = '<div class="alert alert-warning">' . $field->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 				return;
 			}
 

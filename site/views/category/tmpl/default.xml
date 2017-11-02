@@ -533,7 +533,7 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="input-xxlarge" />
+			<field name="initial_filters" default="" type="textarea" rows="10" cols="50" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" />
 			<field name="use_persistent_filters" type="multilist" subtype="radio" inline_tip="FLEXI_FIELDS_MUST_BE_SET_AS_FILTERABLE" tip_class="" tip_img="note.gif" default="" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group">
@@ -541,7 +541,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="input-xxlarge" />
+			<field name="persistent_filters" default="" type="textarea" rows="10" cols="50" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="input-xxlarge" />
 
 		<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" icon_class="icon-link" level="tab_open" box_type="1" />
 

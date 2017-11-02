@@ -2105,7 +2105,7 @@ class FlexicontentFields
 		{
 			$parsed[$field->id][$varname] = true;
 			
-			$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([0-9]+)?(##)?([a-zA-Z_0-9]+)?\}\}/", $variable, $field_matches);
+			$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)(##)?([0-9]+)?(##)?([a-zA-Z_0-9-]+)?\}\}/", $variable, $field_matches);
 			if ($result)
 			{
 				$d[$field->id][$varname]['fulltxt']   = $field_matches[0];
@@ -3114,7 +3114,9 @@ class FlexicontentFields
 		$support = FlexicontentFields::getPropertySupport($filter->field_type, $filter->iscore);
 		if ( ! $support->supportfilter )  return null;
 
-		$valueswhere = FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=0, $is_search=0);
+		$valueswhere = !empty($filter->filter_valuewhere)
+			? $filter->filter_valuewhere
+			: FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=0, $is_search=0);
 		if ( !$valueswhere )  return;
 
 		$colname = !empty($filter->filter_colname)
@@ -4717,7 +4719,7 @@ class FlexicontentFields
 		foreach ($mfilter_arr as $mfilter)
 		{
 			// a. Split elements into their properties: filter_id, filter_value
-			$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);  //print_r($_data);
+			$_data  = preg_split("/[\s]*##[\s]*/", $mfilter, 2);  //print_r($_data);
 			$filter_id = (int) $_data[0];
 			$filter_value = @$_data[1];
 			//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
@@ -4730,7 +4732,21 @@ class FlexicontentFields
 			
 			// d. Skip field filter, if it is not persistent and user user has overriden it
 			if ( !$is_persistent && $jinput->get('filter_'.$filter_id, false, 'raw') !== false ) continue;
-			
+
+			// ***
+			// *** FILTER FOR FIELD OF RELATED ITEM: rel_field_id##rel_item_field_id~~value
+			// ***
+			$relitem_field_id = 0;
+			if (strpos($filter_value, '~~') !== false)
+			{
+				list($relitem_field_id, $rel_field_value) = explode('~~', $filter_value, 2);
+				$relitem_field_id = (int) $relitem_field_id;
+				if ($relitem_field_id)
+				{
+					$filter_value = $rel_field_value;
+				}
+			}
+
 			// CASE: range values:  value01---value02
 			if (strpos($filter_value, '---') !== false)
 			{
@@ -4748,7 +4764,13 @@ class FlexicontentFields
 			
 			// CASE: specific value:  value01
 			else {}
-			
+
+			// *** Add filter for field of related item
+			if ($relitem_field_id)
+			{
+				$filter_value = array(- $relitem_field_id => $filter_value);
+			}
+
 			// INDIRECT method of using field filter (via HTTP request)
 			if ($set_method=='httpReq')
 			{
@@ -5307,7 +5329,7 @@ class FlexicontentFields
 		$addtooltip		= $params->get( $isform ? 'addtooltip_form' : 'addtooltip', 1 ) ;
 
 		// Parse and identify custom fields
-		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $relitem_html, $field_matches);
+		$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)(##)?([a-zA-Z_0-9-]+)?\}\}/", $relitem_html, $field_matches);
 		$custom_field_reps    = $result ? $field_matches[0] : array();
 		$custom_field_names   = $result ? $field_matches[1] : array();
 		$custom_field_methods = $result ? $field_matches[3] : array();

@@ -641,7 +641,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		//return array('"<b>Custom HTML</b>" display for fieldgroup field, is not implemented yet, please use default HTML');
 		
 		if (!$custom_html) return "Empty custom HTML variable for group field: ". $field->label;
-		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $custom_html, $field_matches);
+		$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)(##)?([a-zA-Z_0-9-]+)?\}\}/", $custom_html, $field_matches);
 		$gf_reps    = $result ? $field_matches[0] : array();
 		$gf_names   = $result ? $field_matches[1] : array();
 		$gf_methods = $result ? $field_matches[3] : array();
