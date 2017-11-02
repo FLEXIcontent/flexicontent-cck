@@ -3925,3 +3925,7 @@ img.btn.btn-small.fc-man-icon-s {
 body .j-sidebar-container {
 	padding-bottom: 36px;
 }
+body .popover {
+	max-width: 500px !important;
+	min-width: 400px !important;
+}
