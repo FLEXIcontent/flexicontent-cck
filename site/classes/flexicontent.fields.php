@@ -2969,6 +2969,12 @@ class FlexicontentFields
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
 
+		if (!isset($value[0]) && (isset($value[1]) || isset($value[1])))
+		{
+			$display_filter_as = $isRange ? $display_filter_as : 2;
+			$isRange = true;
+		}
+
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
@@ -3035,11 +3041,16 @@ class FlexicontentFields
 			}
 			$quoted=true;
 		}
-		
+
+
+		// ***
+		// *** Create the VALUEs WHERE clause
+		// ***
+
 		$valueswhere = '';
-		switch ($display_filter_as) {
-		// RANGE cases
-		case 2: case 3: case 8:
+		if ($isRange)
+		{
+			// RANGE cases: 2, 3, 8
 			if ( empty($quoted) )
 			{
 				foreach($value as $i => $v)
@@ -3055,10 +3066,11 @@ class FlexicontentFields
 			$value_empty = !strlen(@$value[1]) && strlen(@$value[2]) ? ' OR _v_="" OR _v_ IS NULL' : '';
 			if ( strlen($value1) ) $valueswhere .= ' AND (_v_ >=' . $value1 . ')';
 			if ( strlen($value2) ) $valueswhere .= ' AND (_v_ <=' . $value2 . $value_empty . ')';
-			//echo $valueswhere . '<br/><br/>';
-			break;
+		}
+		
 		// SINGLE TEXT select value cases
-		case 1:
+		elseif ($display_filter_as === 1)
+		{
 			if (!empty($filter->filter_valueexact))
 			{
 				$valueswhere .= ' AND _v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $value[0]) );
@@ -3075,9 +3087,11 @@ class FlexicontentFields
 					? ' AND  MATCH (_v_) AGAINST ('.$_value_like.' IN BOOLEAN MODE)'
 					: ' AND _v_ LIKE ' . $_value_like;
 			}
-			break;
-		// EXACT value cases
-		case 0: case 4: case 5: case 6: case 7: default:
+		}
+
+		// EXACT value cases: 0, 4, 5, 6, 7, *
+		else
+		{
 			$value_clauses = array();
 			
 			if ( ! $require_all )
@@ -3096,7 +3110,6 @@ class FlexicontentFields
 				}
 				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
 			}
-			break;
 		}
 		
 		//echo $valueswhere . "<br>";
