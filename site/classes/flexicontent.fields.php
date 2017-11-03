@@ -2937,44 +2937,18 @@ class FlexicontentFields
 		static $search_prefix = null;
 		if ($search_prefix === null) $search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$_search_prefix = $colname=='fs.search_index' ? $search_prefix : '';
-		
-		$db = JFactory::getDbo();
-		$display_filter_as = (int) $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
-		$filter_compare_type = (int) $filter->parameters->get( 'filter_compare_type', 0 );
 
-
-		// ***
-		// *** Make sure the current filtering values match the field filter configuration to be single or multi-value
-		// ***
-
-		// Range or Multi-value filter
-		if ( in_array($display_filter_as, array(2,3,5,6,8)) )
-		{
-			if (!is_array($value)) $value = array( $value );
-		}
-
-		// Single value filter
-		else
-		{
-			$value = is_array($value)
-				? array ( @ $value[0] )
-				: array ( $value );
-		}
-
-		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
-		$isRange = in_array( $display_filter_as, array(2,3,8) );
-		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
-
-		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
-			? $require_all_param
-			: 0;
-		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
-		
 
 		// ***
 		// *** Filter out zero-length values
 		// ***
+
+		// *** Force array
+		if (!is_array($value))
+		{
+			$value = array( $value );
+		}
+
 		$_value = array();
 		foreach ($value as $i => $v)
 		{
@@ -2985,9 +2959,28 @@ class FlexicontentFields
 
 		// No values were given
 		if ( !count($value) ) return '';
-		
-		// For text input format the strings, if this was requested by the filter
-		if ($isDate && (isset($value[1]) || isset($value[2])))
+
+
+		$db = JFactory::getDbo();
+		$display_filter_as = (int) $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
+		$filter_compare_type = (int) $filter->parameters->get( 'filter_compare_type', 0 );
+
+		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
+
+		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
+		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+			? $require_all_param
+			: 0;
+		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
+
+
+		// ***
+		// *** Extra preparation date filter range, to support date offsets
+		// ***
+
+		if ($isDate && !isset($value[0]))
 		{
 			if (
 				(isset($value[1]) && strpos(trim($value[1]), 'now') === 0) ||
@@ -3025,6 +3018,12 @@ class FlexicontentFields
 				JFactory::getApplication()->input->set('filter_'.$filter->id, $v);
 			}
 		}
+
+
+		// ***
+		// *** Extra preparation text search inputs with custom value format
+		// ***
+
 		if ($isTextInput && isset($filter->filter_valueformat))
 		{
 			foreach($value as $i => $val)
@@ -3119,10 +3118,17 @@ class FlexicontentFields
 			: FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=0, $is_search=0);
 		if ( !$valueswhere )  return;
 
+		$idname = !empty($filter->filter_valuesjoin)
+			? 'c.id'
+			: 'rel.item_id';
 		$colname = !empty($filter->filter_colname)
 			? $filter->filter_colname
 			: 'value';
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
+
+		$valuesfrom = !empty($filter->filter_valuesfrom)
+			? $filter->filter_valuesfrom
+			: null;
 		$valuesjoin  = !empty($filter->filter_valuesjoin)
 			? $filter->filter_valuesjoin
 			: null;
@@ -3136,41 +3142,37 @@ class FlexicontentFields
 			? $require_all_param
 			: 0;
 
+		$query = 'SELECT '.($require_all ? $idname : 'DISTINCT ' . $idname);
+
+		// We have a special values join, by default, select from the content table
 		if ($valuesjoin)
 		{
-			$query = 'SELECT '.($require_all ? 'c.id' : 'DISTINCT c.id')
-				. ' FROM #__content c'
-				. $filter->filter_valuesjoin
+			$query .= ($valuesfrom ?: ' FROM #__content c')
+				. $valuesjoin
 				. ' WHERE 1'
 				. $valueswhere ;
-			if ($require_all && count($value) > 1)
-			{
-				// Do not use distinct on column, it makes it is very slow, despite column having an index !!
-				// e.g. HAVING COUNT(DISTINCT colname) = ...
-				// Instead the field code should make sure that no duplicate values are saved in the DB !!
-				$query .= ''
-					. ' GROUP BY c.id ' . ' HAVING COUNT(*) >= ' . count($value)
-					. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
-			}
 		}
+
+		// No special values join, by default, select from the values table
 		else
 		{
-			$query = 'SELECT '.($require_all ? 'rel.item_id' : 'DISTINCT rel.item_id')
-				. ' FROM #__flexicontent_fields_item_relations as rel'
+			$query .= ($valuesfrom ?: ' FROM #__flexicontent_fields_item_relations as rel')
 				. ' WHERE rel.field_id=' . $filter->id
 				. $valueswhere ;
-			if ($require_all && count($value) > 1)
-			{
-				// Do not use distinct on column, it makes it is very slow, despite column having an index !!
-				// e.g. HAVING COUNT(DISTINCT colname) = ...
-				// Instead the field code should make sure that no duplicate values are saved in the DB !!
-				$query .= ''
-					. ' GROUP BY rel.item_id ' . ' HAVING COUNT(*) >= ' . count($value)
-					. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
-			}
 		}
+
+		if ($require_all && count($value) > 1)
+		{
+			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+			// e.g. HAVING COUNT(DISTINCT colname) = ...
+			// Instead the field code should make sure that no duplicate values are saved in the DB !!
+			$query .= ''
+				. ' GROUP BY ' . $idname . ' HAVING COUNT(*) >= ' . count($value)
+				. ' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
+		}
+
 		//$query .= ' GROUP BY id';   // BAD PERFORMANCE ?
-		
+
 		if ( !$return_sql )
 		{
 			//echo "<br>GET FILTERED Items (helper func) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";

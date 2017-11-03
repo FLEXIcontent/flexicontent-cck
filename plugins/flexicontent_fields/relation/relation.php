@@ -629,11 +629,32 @@ jQuery(document).ready(function()
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
-		$filter->filter_colname     = ' rel.value_integer';
-		$filter->filter_valuesjoin  = null;   // use default
-		$filter->filter_valueformat = null;   // use default
-		
+
+		$ri_value = reset($value);
+		$ri_field_id = key($value);
+
+		$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
+			? - $ri_field_id
+			: 0;
+
+		if ($ri_field_id)
+		{
+			$filter->filter_colname     = ' rel.value_integer';
+			$filter->filter_valuesjoin  = null;   // use default
+			$filter->filter_valueformat = null;   // use default
+		}
+
+		else
+		{
+			$value = $ri_value;
+
+			$filter->filter_colname     = ' rival.value';
+			$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $reverse_field_id
+				. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id;
+			$filter->filter_valueformat = null;   // use default
+			$filter->filter_valuewhere = null;   // use default
+		}
+
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 	

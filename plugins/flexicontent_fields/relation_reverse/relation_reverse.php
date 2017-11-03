@@ -209,12 +209,12 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
 		$reverse_field_id = (int) $filter->parameters->get('reverse_field', 0);
+
 		if ( !$reverse_field_id )
 		{
 			echo '<div class="alert alert-warning">' . $filter->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 			return null;
 		}
-		$db = JFactory::getDbo();
 
 		$ri_value = reset($value);
 		$ri_field_id = key($value);
@@ -228,13 +228,17 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 			return null;
 		}
 
-		$filter->filter_colname     = ' relv.value_integer';
-		$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $reverse_field_id
-			. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id . ' AND rival.value = ' . $db->Quote($ri_value);
-		$filter->filter_valueformat = null;   // use default
-		$filter->filter_valuewhere = ' ';   // skip default
+		else
+		{
+			$value = $ri_value;
 
-		$sql = FlexicontentFields::getFiltered($filter, $value, $return_sql);
-		return $sql;
+			$filter->filter_colname     = ' rival.value';
+			$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $reverse_field_id
+				. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id;
+			$filter->filter_valueformat = null;   // use default
+			$filter->filter_valuewhere = null;   // use default
+		}
+
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 }
