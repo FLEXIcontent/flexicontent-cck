@@ -42,7 +42,6 @@ class plgSystemFlexisystem extends JPlugin
 		parent::__construct( $subject, $config );
 
 		static $language_loaded = null;
-		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_system_flexisystem', JPATH_ADMINISTRATOR);
 
 		if (!$language_loaded)
 		{
@@ -50,7 +49,11 @@ class plgSystemFlexisystem extends JPlugin
 				? JPlugin::loadLanguage('plg_system_flexisystem_common_be', JPATH_ADMINISTRATOR)
 				: JPlugin::loadLanguage('plg_system_flexisystem_common_fe', JPATH_ADMINISTRATOR);
 		}
-		$language_loaded = true;
+
+		if (!$this->autoloadLanguage && $language_loaded === null)
+		{
+			$language_loaded = JPlugin::loadLanguage('plg_system_flexisystem', JPATH_ADMINISTRATOR);
+		}
 
 		$this->extension = 'com_flexicontent';
 		$this->cparams = JComponentHelper::getParams($this->extension);
