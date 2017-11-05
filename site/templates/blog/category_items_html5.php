@@ -21,10 +21,12 @@ $btn_class = 'btn';
 $tooltip_class = 'hasTooltip';
 
 $lead_use_image        = $this->params->get('lead_use_image', 1);
+$lead_link_image       = $this->params->get('lead_link_image', 1);
 $lead_link_image_to    = $this->params->get('lead_link_image_to', 0);
 $lead_use_description  = $this->params->get('lead_use_description', 1);
 
 $intro_use_image       = $this->params->get('intro_use_image', 1);
+$intro_link_image      = $this->params->get('intro_link_image', 1);
 $intro_link_image_to   = $this->params->get('intro_link_image_to', 0);
 $intro_use_description = $this->params->get('intro_use_description', 1);
 
@@ -397,7 +399,7 @@ if ($leadnum) :
 			<div class="lineinfo image_descr">
 			<?php if ($lead_use_image && $src) : ?>
 			<figure class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
-				<?php if ($this->params->get('lead_link_image', 1)) : ?>
+				<?php if ($lead_link_image) : ?>
 				<a href="<?php echo $link_url; ?>">
 					<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
 				</a>
@@ -769,7 +771,7 @@ if ($count > $leadnum) :
 			<div class="lineinfo image_descr">
 			<?php if ($intro_use_image && $src) : ?>
 			<figure class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
-				<?php if ($this->params->get('intro_link_image', 1)) : ?>
+				<?php if ($intro_link_image) : ?>
 					<a href="<?php echo $link_url; ?>">
 						<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
 					</a>
