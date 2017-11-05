@@ -5,7 +5,7 @@
 // ***
 
 $show_found_items = (int) $params->get('show_found_items', 0);
-$total_info = $show_found_items
+$total_info = $show_found_items && $list_totals
 	? $list_totals[$catdata ? $catdata->id : false]
 	: '';
 $show_total = strlen($total_info);
