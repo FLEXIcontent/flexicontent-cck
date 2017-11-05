@@ -228,13 +228,13 @@ $list_total_cols = 8;
 				<table class="admintable" style="margin: 0 auto !important;">
 					<tr>
 						<td>
-						<?php echo '<span class="btn">'.$copyTmpl_icon.'</span>'; ?>
+						<?php echo '<span style="font-size: 14px;">'.$copyTmpl_icon.'</span>'; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
 						</td>
 						<td>
-						<?php echo '<span class="btn">'.$edit_icon.'</span>'; ?>
+						<?php echo '<span style="font-size: 14px;">'.$edit_icon.'</span>'; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS' ); ?>
@@ -242,13 +242,13 @@ $list_total_cols = 8;
 					</tr>
 					<tr>
 						<td>
-						<?php echo '<span class="btn">'.$delTmpl_icon.'</span>'; ?>
+						<?php echo '<span style="font-size: 14px;">'.$delTmpl_icon.'</span>'; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
 						</td>
 						<td>
-						<?php echo '<span class="btn disabled">'.$noEditLayout_icon.'</span>'; ?>
+						<?php echo '<span  style="font-size: 14px;" class="disabled">'.$noEditLayout_icon.'</span>'; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
