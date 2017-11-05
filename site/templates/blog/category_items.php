@@ -190,17 +190,25 @@ if ($leadnum) :
 			
 			$custom_link = null;
 			if ($lead_use_image) :
+
+				// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+				$img_field = false;
 				if (!empty($img_field_name))
 				{
-					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
-					
-					$img_field = $item->fields[$img_field_name];
+					$img_field = isset($item->fields[$img_field_name]) ? $item->fields[$img_field_name] : false;
+				}
+
+				if ($img_field)
+				{
 					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-					if ( $lead_link_image_to && isset($img_field->value[0]) ) {
+					if ( $lead_link_image_to && isset($img_field->value[0]) )
+					{
 						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
 					}
-				} else {
+				}
+				else
+				{
 					$src = flexicontent_html::extractimagesrc($item);
 				}
 				
@@ -490,7 +498,8 @@ if ($count > $leadnum) :
 
 	<ul class="introblock <?php echo $classnum; ?> group">
 		<?php
-		if ($intro_use_image && $this->params->get('intro_image')) {
+		if ($intro_use_image && $this->params->get('intro_image'))
+		{
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
 			$img_field_name = $this->params->get('intro_image');
@@ -532,17 +541,25 @@ if ($count > $leadnum) :
 			
 			$custom_link = null;
 			if ($intro_use_image) :
+
+				// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+				$img_field = false;
 				if (!empty($img_field_name))
 				{
-					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
-					
-					$img_field = $item->fields[$img_field_name];
+					$img_field = isset($item->fields[$img_field_name]) ? $item->fields[$img_field_name] : false;
+				}
+
+				if ($img_field)
+				{
 					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-					if ( $intro_link_image_to && isset($img_field->value[0]) ) {
+					if ( $intro_link_image_to && isset($img_field->value[0]) )
+					{
 						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
 					}
-				} else {
+				}
+				else
+				{
 					$src = flexicontent_html::extractimagesrc($item);
 				}
 				
