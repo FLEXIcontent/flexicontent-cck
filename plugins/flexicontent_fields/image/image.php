@@ -1135,6 +1135,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		static $initialized = null;
 		static $app, $document, $option;
 		static $isMobile, $isTablet, $useMobile;
+		static $configured_file_path;
 		if ($initialized===null)
 		{
 			$initialized = 1;
