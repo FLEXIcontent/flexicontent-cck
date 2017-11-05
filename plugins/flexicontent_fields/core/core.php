@@ -59,8 +59,37 @@ class plgFlexicontent_fieldsCore extends FCField
 			return;
 		}
 
-		$app = JFactory::getApplication();
-		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
+		static $initialized = null;
+		static $app, $document, $option;
+		static $isMobile, $isTablet, $useMobile;
+		static $cut_options;
+		if ($initialized===null)
+		{
+			$app = JFactory::getApplication();
+			$option = $app->input->get('option', '', 'cmd');
+			$document = JFactory::getDocument();
+			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+
+			// Get isMobile / isTablet Flags
+			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+
+			$cut_options = array(
+				'cut_at_word' => true,
+				'more_toggler' => 2,
+				'more_icon' => 'icon-paragraph-center',
+				'more_txt' => '...',
+				'modal_title'=>'...',
+				'keep_jplugins_code' => false
+			);
+		}
+
+		$realview = $app->input->get('view', 'item', 'cmd');
+		$view = $app->input->get('flexi_callview', $realview, 'cmd');
+		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
 
 		$field = is_object($_field)
 			? $_field
@@ -106,7 +135,20 @@ class plgFlexicontent_fieldsCore extends FCField
 			$separatorf = '&nbsp;';
 			break;
 		}
-		
+
+		// Get date format configuration for date-based fields
+		if ($field->field_type === 'created' || $field->field_type === 'modified')
+		{
+			// Get date format
+			$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
+			$dateformat = $field->parameters->get( 'date_format', '' ) ;
+			$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+		}
+
+		// Get viewing layout
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+
 		foreach($items as $item)
 		{
 			//if (!is_object($_field)) echo $item->id." - ".$_field ."<br/>";
@@ -123,14 +165,18 @@ class plgFlexicontent_fieldsCore extends FCField
 			$field->item = $item;
 			
 			// Replace item properties or values of other fields
-			if (!$pretext_cacheable) {
+			if (!$pretext_cacheable)
+			{
 				$pretext = FlexicontentFields::replaceFieldValue( $field, $item, $_pretext, 'pretext', $pretext_cacheable );
 				if ($pretext && !$remove_space)  $pretext  =  $pretext . ' ';
 			}
-			if (!$posttext_cacheable) {
+
+			if (!$posttext_cacheable)
+			{
 				$posttext = FlexicontentFields::replaceFieldValue( $field, $item, $_posttext, 'posttext', $posttext_cacheable );
 				if ($posttext && !$remove_space) $posttext = ' ' . $posttext;
 			}
+
 			if (!$opentag_cacheable)  $opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $_opentag, 'opentag', $opentag_cacheable );     // used by some fields
 			if (!$closetag_cacheable) $closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $_closetag, 'closetag', $closetag_cacheable );   // used by some fields
 			
@@ -139,14 +185,6 @@ class plgFlexicontent_fieldsCore extends FCField
 			{
 				case 'created': // created
 					$field->value = array($item->created);
-					
-					// Get date format
-					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
-					$dateformat = $field->parameters->get( 'date_format', '' ) ;
-					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
-
-					$viewlayout = $field->parameters->get('viewlayout', '');
-					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
 					// Create field's HTML
 					$field->{$prop} = array();
@@ -166,9 +204,6 @@ class plgFlexicontent_fieldsCore extends FCField
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 
-					$viewlayout = $field->parameters->get('viewlayout', '');
-					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-
 					// Create field's HTML
 					$field->{$prop} = array();
 					include(self::getViewPath('core', $viewlayout, 'modified'));
@@ -181,9 +216,6 @@ class plgFlexicontent_fieldsCore extends FCField
 	
 				case 'title': // title
 					$field->value[] = $item->title;
-
-					$viewlayout = $field->parameters->get('viewlayout', '');
-					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 
 					// Create field's HTML
 					$field->{$prop} = array();
@@ -218,9 +250,6 @@ class plgFlexicontent_fieldsCore extends FCField
 
 					$field->value[] = 'button';  // A dummy value to force display
 
-					$viewlayout = $field->parameters->get('viewlayout', '');
-					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-
 					// Create field's HTML
 					$field->{$prop} = array();
 					include(self::getViewPath('core', $viewlayout, 'voting'));
@@ -235,9 +264,6 @@ class plgFlexicontent_fieldsCore extends FCField
 						? $item->fav
 						: $_favoured;
 
-					$viewlayout = $field->parameters->get('viewlayout', '');
-					$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-					
 					$field->value[] = 'button';  // A dummy value to force display
 
 					// Create field's HTML
@@ -253,7 +279,8 @@ class plgFlexicontent_fieldsCore extends FCField
 					else $categories = & $_categories;
 					
 					
-					if ($categories) :
+					if ($categories)
+					{
 						// Get categories that should be excluded from linking
 						global $globalnoroute;
 						if ( !is_array($globalnoroute) ) $globalnoroute = array();
@@ -267,7 +294,7 @@ class plgFlexicontent_fieldsCore extends FCField
 						include(self::getViewPath('core', $viewlayout, 'categories'));
 						$field->{$prop} = implode($separatorf, $field->{$prop});
 						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-					endif;
+					}
 					break;
 	
 				case 'tags': // assigned tags
@@ -336,24 +363,30 @@ class plgFlexicontent_fieldsCore extends FCField
 							$field->{$prop} = $item->fulltext;
 						}
 					}
+
+					if ($isItemsManager)
+					{
+						$uncut_length = 0;
+						$field->{$prop} = flexicontent_html::striptagsandcut($field->{$prop}, 200, $uncut_length, $cut_options);
+					}
 					
-					// Get ogp configuration
-					$useogp     = $field->parameters->get('useogp', 1);
-					$ogpinview  = $field->parameters->get('ogpinview', array());
-					$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-					$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
-					
-					if ($useogp && $field->{$prop}) {
-						if ( in_array($view, $ogpinview) ) {
-							if ( $item->metadesc ) {
-								JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$item->metadesc.'" />');
-							} else {
-								$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
-								JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
+					// Add ogp description
+					if ($field->parameters->get('useogp', 1) && $field->{$prop})
+					{
+						if ($app->input->get('format', 'html', 'cmd') == 'html' && $app->isSite())
+						{
+							$ogpinview  = $field->parameters->get('ogpinview', array());
+							$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+							$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+
+							if ( in_array($view, $ogpinview) )
+							{
+								$item->metadesc
+									? $document->addCustomTag('<meta property="og:description" content="' . $item->metadesc . '" />')
+									: $document->addCustomTag('<meta property="og:description" content="' . flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) . '" />');
 							}
 						}
 					}
-					
 					break;
 			}
 		}

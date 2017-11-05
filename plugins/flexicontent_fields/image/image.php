@@ -1137,6 +1137,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		static $isMobile, $isTablet, $useMobile;
 		if ($initialized===null)
 		{
+			$initialized = 1;
 			$app       = JFactory::getApplication();
 			$document	 = JFactory::getDocument();
 			$option    = $app->input->get('option', '', 'cmd');
