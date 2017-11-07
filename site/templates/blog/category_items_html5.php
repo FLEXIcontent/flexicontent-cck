@@ -527,7 +527,8 @@ if ($count > $leadnum) :
 
 	<ul class="introblock <?php echo $classnum; ?> group row">	
 		<?php
-		if ($intro_use_image && $this->params->get('intro_image')) {
+		if ($intro_use_image && $this->params->get('intro_image'))
+		{
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
 			$img_field_name = $this->params->get('intro_image');
@@ -582,7 +583,7 @@ if ($count > $leadnum) :
 				if ($img_field)
 				{
 					$src = str_replace(JUri::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-					if ( $lead_link_image_to && isset($img_field->value[0]) )
+					if ( $intro_link_image_to && isset($img_field->value[0]) )
 					{
 						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
 					}
