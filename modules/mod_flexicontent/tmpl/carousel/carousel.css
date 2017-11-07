@@ -472,8 +472,8 @@
 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper .fc_auto_show,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper .fc_auto_show {
-	-webkit-transition: max-height 0.5s ease-out, opacity 0.5s linear, padding 0.3s linear, background-color 0.3s linear;
-	transition: max-height 0.5s ease-out, opacity 0.5s linear, padding 0.3s linear, background-color 0.3s linear;
+	-webkit-transition: max-height 0.3s linear, opacity 0.3s linear, padding 0.3s linear, background-color 0.3s linear;
+	transition: max-height 0.3s linear, opacity 0.3s linear, padding 0.3s linear, background-color 0.3s linear;
 	
 	opacity:0.0;
 	filter:alpha(opacity=0);
@@ -526,7 +526,7 @@
 
 /* image of CURRENTLY ACTIVATED item container */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper .image_standard img {
-	-webkit-transition: all 0.5s ease-out; transition: all 0.5s ease-out;
+	-webkit-transition: all 0.3s ease-out; transition: all 0.3s ease-out;
 	opacity:0.9;
 	filter:alpha(opacity=90);
 }
@@ -679,7 +679,7 @@
 	position:relative;
 }
 .carousel.mod_flexicontent_wrapper .mod_fc_item_handles span.mod_fc_item_handle img {
-	-webkit-transition: all 0.5s ease-out; transition: all 0.5s ease-out;
+	-webkit-transition: all 0.3s ease-out; transition: all 0.3s ease-out;
 	opacity:0.9;
 	filter:alpha(opacity=90);
 }
