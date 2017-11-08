@@ -328,8 +328,8 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 			
 			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC" class="btn-group group-fcinfo">
-				<option value="1">FLEXI_DISPLAY_NAME</option>
-				<option value="2">FLEXI_DISPLAY_USERNAME</option>
+				<option value="1">FLEXI_NAME</option>
+				<option value="2">FLEXI_USER_NAME</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
@@ -642,8 +642,8 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 			
 			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
-				<option value="1">FLEXI_DISPLAY_NAME</option>
-				<option value="2">FLEXI_DISPLAY_USERNAME</option>
+				<option value="1">FLEXI_NAME</option>
+				<option value="2">FLEXI_USER_NAME</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
