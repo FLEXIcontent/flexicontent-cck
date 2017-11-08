@@ -43,6 +43,11 @@ class plgFlexicontent_fieldsText extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
+		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		$auto_value_code = $field->parameters->get('auto_value_code', '');
+		$auto_value = $auto_value === 2 && !strlen($auto_value_code) ? 0 : $auto_value;  
+
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -82,6 +87,7 @@ class plgFlexicontent_fieldsText extends FCField
 		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
+		if ($auto_value) $attribs .= ' readonly="readonly" ';
 		if (!empty($default_values)) $attribs .= ' data-defvals="'.htmlspecialchars( implode('|||', $default_values), ENT_COMPAT, 'UTF-8' ).'" ';
 		$attribs .= ' size="'.$size.'" ';
 		
@@ -293,7 +299,13 @@ class plgFlexicontent_fieldsText extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 		
 		$classes  = 'fcfield_textval' . ($required ? ' required' : '');
-		
+
+		// Set field to 'Automatic' on successful validation'
+		if ($auto_value)
+		{
+			$classes = ' fcfield_auto_value ';
+		}
+
 		// Create attributes for JS inputmask validation
 		$validate_mask = '';
 		switch ($inputmask) {
@@ -343,8 +355,9 @@ class plgFlexicontent_fieldsText extends FCField
 			
 			$field->html[] = '
 				'.$text_field.'
-				'.$select_field.'
-				'.($use_ingroup || !$multiple ? '' : '
+				'.($auto_value ? '' : $select_field).'
+				'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
+				'.($use_ingroup || !$multiple || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -638,6 +651,46 @@ class plgFlexicontent_fieldsText extends FCField
 			$app = JFactory::getApplication();
 			$app->enqueueMessage( print_r($post, true), 'warning');
 		}*/
+	}
+
+
+	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	// $item->fields['fieldname']->postdata contains values of other fields
+	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	function onAllFieldsPostDataValidated( &$field, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		$auto_value_code = $field->parameters->get('auto_value_code', '');
+		$auto_value = $auto_value === 2 && !strlen($auto_value_code) ? 0 : $auto_value;  
+
+		if (!$auto_value)
+		{
+			return;
+		}
+
+		// Check for system plugin
+		$extfolder = 'system';
+		$extname   = 'flexisyspro';
+		$className = 'plg'. ucfirst($extfolder).$extname;
+		$plgPath = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
+		
+		if (!file_exists($plgPath))
+		{
+			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
+			return;
+		}
+		//require_once $plgPath;
+
+		// Create plugin instance
+		$dispatcher   = JEventDispatcher::getInstance();
+		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
+		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
+
+		// Create automatic value
+		$plg->onAllFieldsPostDataValidated($field, $item);
 	}
 	
 	
