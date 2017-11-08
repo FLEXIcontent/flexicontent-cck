@@ -2999,11 +2999,14 @@ fieldset legend .fc_legend_header_text {
 	position: relative;
 	top: 0;
 }
-#flexicontent .form-horizontal .control-label {
-	width: 110px;
+#flexicontent .form-inline.form-inline-header .control-label {
+	text-align: right;
+	width: 120px;
+	display: block;
 }
-#flexicontent .form-horizontal .controls {
-	margin-left: 130px;
+#flexicontent .form-inline.form-inline-header .controls {
+	margin-left: 140px;
+	display: block;
 }
 body .form-horizontal .control-group {
 	margin-bottom: 8px;

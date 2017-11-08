@@ -22,7 +22,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 
-require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'search.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 /**
  * HTML View class for the Search View
@@ -607,15 +608,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$state->set('keyword', $searchword);
 		$filter_word_like_any = $params->get('filter_word_like_any', 0);
 		
-		if ($error) {
+		if ($error)
+		{
 			$results	= array();
 			$total		= 0;
 			$pageNav = '';
 		}
 		else
 		{
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-			
 			$results	= $this->get('data' );
 			$total		= $this->get('total');
 			$pageNav  = $this->get('pagination');

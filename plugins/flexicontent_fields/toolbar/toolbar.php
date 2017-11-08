@@ -255,9 +255,11 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				if ($og_image_field)
 				{
 					$imageurl = FlexicontentFields::getFieldDisplay($item, $og_image_field, null, 'display_'.$og_image_thumbsize.'_src', 'module');
-					if ( $imageurl ) {
+					if ( $imageurl )
+					{
 						$img_field = $item->fields[$og_image_field];
-						if ( (!$imageurl && $og_image_fallback==1) || ($imageurl && $og_image_fallback==2 && $img_field->using_default_value) ) {
+						if ( (!$imageurl && $og_image_fallback==1) || ($imageurl && $og_image_fallback==2 && $img_field->using_default_value) )
+						{
 							$imageurl = $this->_extractimageurl($item);
 						}
 					}
@@ -267,7 +269,8 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					$imageurl = $this->_extractimageurl($item);
 				}
 				// Add image if fould, making sure it is converted to ABSOLUTE URL
-				if ($imageurl) {
+				if ($imageurl)
+				{
 					$is_absolute = (boolean) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
 					$imageurl = $is_absolute ? $imageurl : JUri::root().$imageurl;
 					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
@@ -275,7 +278,8 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			}
 			
 			// Add og-URL explicitely as this is required by facebook ?
-			if ($item_url_abs) {
+			if ($item_url_abs && JFactory::getApplication()->input->get('format', 'html') === 'html')
+			{
 				$document->addCustomTag("<meta property=\"og:url\" content=\"".$item_url_abs."\" />");
 			}
 
@@ -410,7 +414,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			
 			// Add AddThis JS if not already added
 			static $addthis_added = null;
-			if (!$addthis_added)
+			if (!$addthis_added && JFactory::getApplication()->input->get('format', 'html') === 'html')
 			{
 				$document->addCustomTag('	
 					<script type="text/javascript">
