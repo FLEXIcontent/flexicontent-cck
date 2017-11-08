@@ -1669,6 +1669,7 @@ class flexicontent_html
 				JText::script("FLEXI_INDEXED_FIELD_STATE_COL_DISABLED", true);
 				JText::script('FLEXI_REQUIRED',true);
 				JText::script('FLEXI_INVALID',true);
+				JText::script('FLEXI_AUTO',true);
 				JText::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);
 				JText::script('FLEXI_FIELD_SELECT_UP_TO_PROMPT',true);
 				JText::script('FLEXI_FIELD_SELECT_EXACTLY_PROMPT',true);

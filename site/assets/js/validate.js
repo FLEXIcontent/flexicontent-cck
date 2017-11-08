@@ -737,6 +737,10 @@ var JFormValidator = function()
 			}, 20);
 		}
 		
+		if (valid)
+		{
+			jQuery('input.fcfield_auto_value').val(Joomla.JText._('FLEXI_AUTO'));
+		}
 		return valid;
 	},
 
