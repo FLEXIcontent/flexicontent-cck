@@ -45,8 +45,12 @@ class plgFlexicontent_fieldsText extends FCField
 		
 		// Check if using 'auto_value_code', clear 'auto_value', if function not set
 		$auto_value = (int) $field->parameters->get('auto_value', 0);
-		$auto_value_code = $field->parameters->get('auto_value_code', '');
-		$auto_value = $auto_value === 2 && !strlen($auto_value_code) ? 0 : $auto_value;  
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;  
 
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -663,8 +667,12 @@ class plgFlexicontent_fieldsText extends FCField
 
 		// Check if using 'auto_value_code', clear 'auto_value', if function not set
 		$auto_value = (int) $field->parameters->get('auto_value', 0);
-		$auto_value_code = $field->parameters->get('auto_value_code', '');
-		$auto_value = $auto_value === 2 && !strlen($auto_value_code) ? 0 : $auto_value;  
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;  
 
 		if (!$auto_value)
 		{
