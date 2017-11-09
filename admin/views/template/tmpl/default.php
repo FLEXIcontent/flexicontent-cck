@@ -288,7 +288,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 <div id="flexicontent" class="flexicontent">
 
-<form action="index.php" method="post" name="adminForm" id="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-horizontal">
 	
 	<div class="fctabber tabset_layout" id="tabset_layout" style="margin:16px 0 !important;">
 
@@ -623,7 +623,9 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
 				<br/> -	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 			</span>
-			
+
+			<br />
+
 			<span class="fc-mssg-inline fc-info" style="max-width: unset; font-size:100%; margin: 4px 32px 0 0!important; padding-top:4px; padding-bottom:4px;">
 				-	<span class="fc_less_parameter"></span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
 				<br/> - NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%; color:black;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
@@ -645,19 +647,25 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							$cssprep = $field->getAttribute('cssprep');
 							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 							$value = $this->layout->params->getValue($fieldname, $groupname, @$this->conf->attribs[$fieldname]);
-							echo
+							if ($field->getAttribute('type')=='separator' || $field->hidden)
+							{
+								echo $field->input;
+								continue;
+							}
+							echo '<div class="control-group">';
+							echo '<div class="control-label">' .
 								str_replace('class="', 'class="'.$_labelclass.' ',
 									str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_',
 										$this->layout->params->getLabel($fieldname, $groupname)
 									)
-								);
-							echo
+								) . '</div>';
+							echo '<div class="controls">' .
 								str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_', 
 									str_replace('[attribs]', '[layouts]['.$this->layout->name.']',
 										$this->layout->params->getInput($fieldname, $groupname, $value)
 									)
-								);
-							echo '<div class="fcclear"></div>';
+								) . '</div>';
+							echo '</div>';
 						endforeach; ?>
 					</fieldset>
 				<?php endforeach; ?>
