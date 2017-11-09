@@ -2160,9 +2160,9 @@ form div.container_fcfield > select {
 	line-height: unset;
 	height: unset;
 }
-#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
+#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors):not(.input-small):not(.input-xsmall),
 #flexicontent div fieldset.panelform textarea,
-div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors),
+div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors):not(.input-small):not(.input-xsmall),
 div fieldset td textarea {
 	min-width: 80%;
 }

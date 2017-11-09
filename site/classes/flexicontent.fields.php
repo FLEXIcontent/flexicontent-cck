@@ -2968,6 +2968,7 @@ class FlexicontentFields
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
+		$quoted = false;
 
 		if (!isset($value[0]) && (isset($value[1]) || isset($value[1])))
 		{
@@ -3002,8 +3003,7 @@ class FlexicontentFields
 						0 => preg_replace("/[^-+0-9\s]/", "", $value[1]),
 						1 => preg_replace("/[0-9-+\s]/", "", $value[1])
 					);
-					$v[1] = date_time::shift_dates('', $shift[0], $shift[1]);
-					$value[1] = $db->Quote($v[1]);
+					$value[1] = date_time::shift_dates('', $shift[0], $shift[1]);
 				}
 
 				if (!empty($value[2]))
@@ -3013,33 +3013,30 @@ class FlexicontentFields
 						0 => preg_replace("/[^-+0-9\s]/", "", $value[2]),
 						1 => preg_replace("/[0-9-+\s]/", "", $value[2])
 					);
-					$v[2] = date_time::shift_dates('', $shift[0], $shift[1]);
-					$value[2] = $db->Quote($v[2]);
+					$value[2] = date_time::shift_dates('', $shift[0], $shift[1]);
 				}
 
-				$quoted=true;
-				$isTextInput = false;
-
 				// Update filter value to calculated value
-				JFactory::getApplication()->input->set('filter_'.$filter->id, $v);
+				JFactory::getApplication()->input->set('filter_'.$filter->id, $value);
 			}
 		}
 
 
 		// ***
-		// *** Extra preparation text search inputs with custom value format
+		// *** Extra preparation date / text search inputs with custom value formats
 		// ***
 
-		if ($isTextInput && isset($filter->filter_valueformat))
+		if (isset($filter->filter_valueformat))
 		{
 			foreach($value as $i => $val)
 			{
 				$typecasted_val = !$filter_compare_type
 					? $db->Quote($value[$i])
 					: ($filter_compare_type==1 ? intval($value[$i]) : floatval($value[$i]));
+
 				$value[$i] = str_replace('__filtervalue__', $typecasted_val, $filter->filter_valueformat);
 			}
-			$quoted=true;
+			$quoted = true;
 		}
 
 
@@ -3067,9 +3064,36 @@ class FlexicontentFields
 			if ( strlen($value1) ) $valueswhere .= ' AND (_v_ >=' . $value1 . ')';
 			if ( strlen($value2) ) $valueswhere .= ' AND (_v_ <=' . $value2 . $value_empty . ')';
 		}
-		
+
+		// non-text, aka EXACT value cases: 0, 4, 5, 6, 7, * -OR- isDate
+		elseif ($display_filter_as !== 1 || $isDate)
+		{
+			$value_clauses = array();
+
+			if ( ! $require_all )
+			{
+				foreach ($value as $val)
+				{
+					$value_clauses[] = $quoted
+						? '_v_=' . $val
+						: '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+				}
+				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
+			}
+			else
+			{
+				foreach ($value as $val)
+				{
+					$value_clauses[] = $quoted
+						? $val
+						: $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+				}
+				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
+			}
+		}
+
 		// SINGLE TEXT select value cases
-		elseif ($display_filter_as === 1)
+		else
 		{
 			if (!empty($filter->filter_valueexact))
 			{
@@ -3089,29 +3113,6 @@ class FlexicontentFields
 			}
 		}
 
-		// EXACT value cases: 0, 4, 5, 6, 7, *
-		else
-		{
-			$value_clauses = array();
-			
-			if ( ! $require_all )
-			{
-				foreach ($value as $val)
-				{
-					$value_clauses[] = '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
-				}
-				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
-			}
-			else
-			{
-				foreach ($value as $val)
-				{
-					$value_clauses[] = $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
-				}
-				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
-			}
-		}
-		
 		//echo $valueswhere . "<br>";
 		return $valueswhere;
 	}
