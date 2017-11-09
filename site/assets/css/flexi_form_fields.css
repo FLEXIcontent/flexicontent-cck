@@ -1522,6 +1522,9 @@ div.empty_image {
 	clear: both;
 	float: left;
 }
+.fcimg_preview_box .fcimg_preview_msg:empty {
+   display: none;
+}
 div.fcimg_value_props {
 	display: inline-block;
 }
