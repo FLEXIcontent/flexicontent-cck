@@ -165,12 +165,13 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 						success: function( data ) {
 							//window.console.log( '... received tags for \"' + term + '\"');
 							response( jQuery.map( data, function( item ) {
-								if (el.val()==item.name) {
+								if (el.val()==item.name)
+								{
 									//window.console.log( 'Found exact TAG match, (' + item.id + ', \"' + item.name + '\")');
 									el.data('tagid',   item.id);
 									el.data('tagname', item.name);
 								}
-								return { label: item.name, value: item.id };
+								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: item.name, value: item.id };
 							}));
 						}
 					});

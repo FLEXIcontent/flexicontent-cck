@@ -124,12 +124,13 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 						success: function( data ) {
 							//window.console.log( '... received tags for \"' + term + '\"');
 							response( jQuery.map( data, function( item ) {
-								if (el.val()==item.name) {
+								if (el.val()==item.name)
+								{
 									//window.console.log( 'Found exact TAG match, (' + item.id + ', \"' + item.name + '\")');
 									el.data('tagid',   item.id);
 									el.data('tagname', item.name);
 								}
-								return { label: item.name, value: item.id };
+								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: item.name, value: item.id };
 							}));
 						}
 					});
@@ -137,7 +138,7 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 				delay: 200,
 				minLength: 1,
 				focus: function ( event, ui ) {
-					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + 'current Label: ' + ui.item.label :  'Nothing selected') );
+					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + ' , current Label: ' + ui.item.label :  'Nothing selected') );
 					
 					var el = jQuery(event.target);
 					if (ui.item.value!='' && ui.item.value!='0')
