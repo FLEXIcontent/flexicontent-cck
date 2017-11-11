@@ -56,7 +56,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</label>
 			</td>
 			<td>
-				<input type="text" id="filename_original" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge required" maxlength="100" />
+				<input type="text" id="filename_original" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge required" maxlength="4000" />
 			</td>
 		</tr>
 
@@ -67,7 +67,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</label>
 			</td>
 			<td>
-				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100" class="input-xxlarge" />
+				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="4000" class="input-xxlarge" />
 			</td>
 		</tr>
 
