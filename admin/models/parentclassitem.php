@@ -2168,7 +2168,8 @@ class ParentClassItem extends FCModelAdmin
 		{
 			if ( $print_logging_info ) $start_microtime = microtime(true);
 
-			$files = $app->input->files->get('files');
+			// null indicates to retrieve it inside saveFields
+			$files = null;  // $_FILES;  //$app->input->files->get('files');
 			$core_data_via_events = null;
 			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events);
 
@@ -2407,6 +2408,19 @@ class ParentClassItem extends FCModelAdmin
 		$fields = $this->getExtrafields($force=true, $original_content_id, $old_item);
 		$item->fields = & $fields;
 		$item->calculated_fieldvalues = array();
+
+		// Get uploaded files information (name, size, location, etc) and also apply default 'file-is-safe' filtering
+		if ($files === null)
+		{
+			foreach($fields as $field)
+			{
+				$file = $app->input->files->get($field->name, null, 'cmd');
+				if ($file)
+				{
+					$files[$field->name] = $file;
+				}
+			}
+		}
 
 
 		// ***
