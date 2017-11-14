@@ -11,6 +11,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 class plgFlexicontent_fieldsToolbar extends FCField
 {
