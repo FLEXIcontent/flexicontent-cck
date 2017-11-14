@@ -447,8 +447,23 @@ class FlexicontentViewCategory extends JViewLegacy
 		$_v = $params ? $params->get($field->fieldname) : $_v;
 		
 		if ($_v==='' || $_v===null)
+		{
 			return $field->input;
-		else if ($field->getAttribute('type')=='radio' || $field->getAttribute('type')=='fcradio' || ($field->getAttribute('type')=='multilist' && $field->getAttribute('subtype')=='radio'))
+		}
+
+		elseif ($field->getAttribute('type')==='fcordering' || $field->getAttribute('type')==='list' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='list'))
+		{
+			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			if (preg_match('/<option\s*value="' . preg_quote($_v, '/') . '"\s*>(.*?)<\/option>/', $field->input, $matches))
+			{
+				return str_replace(
+					JText::_('FLEXI_USE_GLOBAL'),
+					JText::_('FLEXI_USE_GLOBAL') . ' (' . $matches[1] . ')',
+					$field->input);
+			}
+		}
+
+		elseif ($field->getAttribute('type')==='radio' || $field->getAttribute('type')==='fcradio' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='radio'))
 		{
 			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
 			return str_replace(
@@ -456,7 +471,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				'value="'.$_v.'" class="fc-inherited-value" ',
 				$field->input);
 		}
-		else if ($field->getAttribute('type')=='fccheckbox' && is_array($_v))
+
+		elseif ($field->getAttribute('type')==='fccheckbox' && is_array($_v))
 		{
 			$_input = $field->input;
 			foreach ($_v as $v)
@@ -469,7 +485,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 			return $_input;
 		}
-		else if ($field->getAttribute('type')=='text')
+
+		elseif ($field->getAttribute('type')==='text')
 		{
 			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
 			return str_replace(
@@ -477,18 +494,20 @@ class FlexicontentViewCategory extends JViewLegacy
 				'<input placeholder="'.$_v.'" ',
 				$field->input);
 		}
-		else if ($field->getAttribute('type')=='textarea')
+
+		elseif ($field->getAttribute('type')==='textarea')
 		{
 			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
 			return str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
 		}
-		else if ( method_exists($field, 'setInherited') )
+
+		elseif ( method_exists($field, 'setInherited') )
 		{
 			$field->setInherited($_v);
 			return $field->input;
 		}
-		else
-			return $field->input;
+
+		return $field->input;
 	}
 }
 ?>
