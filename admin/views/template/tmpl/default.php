@@ -539,25 +539,30 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						
 						<?php
 						if (isset($this->layout->positions)) :
-							$count=-1;
+							$count = -1;
+							$posrow = null;
 							foreach ($this->layout->positions as $pos) :
 								$count++;
 								
 								$pos_css = "";
-								$posrow_prev = @$posrow;
+								$posrow_prev = $posrow;
 								$posrow = isset($this->layout->attributes[$count]['posrow'] )  ?  $this->layout->attributes[$count]['posrow'] : '';
-								
+								$postitle = isset($this->layout->attributes[$count]['title'] )  ?  $this->layout->attributes[$count]['title'] : $pos;
+								$title_color = isset($this->layout->attributes[$count]['tcolor'] )  ?  $this->layout->attributes[$count]['tcolor'] : '';
+								$title_color = $title_color ? 'background-color: ' . $title_color . ';'  : '';
+
 								// Detect field group row change and close previous row if open
 								echo ($posrow_prev && $posrow_prev != $posrow)  ?  "</td></tr></table>\n"  :  "";
 								
-								if ($posrow) {
+								if ($posrow)
+								{
 									// we are inside field group row, start it or continue with next field group
 									echo ($posrow_prev != $posrow)  ?  "<table style='width:100%;'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
 								}
 								
 							?>
 							
-							<div class="positions_title label label-success" style="margin:10px 0 2px"><?php echo $pos; ?></div>
+							<div class="positions_title label label-success" style="color: white; margin:10px 0 2px; <?php echo $title_color; ?>"><?php echo $postitle; ?></div>
 							
 							<?php
 							if ( isset($this->layout->attributes[$count]['readonly']) ) {
@@ -595,7 +600,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						<?php 
 							endforeach;
 							// Close any field group line that it is still open
-							echo @$posrow ? "</td></tr></table>\n" : "";
+							echo $posrow ? "</td></tr></table>\n" : "";
 						else :
 							echo JText::_('FLEXI_NO_GROUPS_AVAILABLE');
 						endif;
