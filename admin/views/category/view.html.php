@@ -387,14 +387,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
 
-		// check access level exists
+		// Check access level exists
 		$level_name = flexicontent_html::userlevel(null, $row->access, null, null, null, $_createlist = false);
 		if (empty($level_name))
 		{
 			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
 			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
 		}
-		
+
 
 
 		// ***
@@ -491,13 +491,17 @@ class FlexicontentViewCategory extends JViewLegacy
 			return str_replace(
 				'<input ',
 				'<input placeholder="'.$_v.'" ',
-				$field->input);
+				preg_replace('/^(\s*<input\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
+			);
 		}
-
 		elseif ($field->getAttribute('type')==='textarea')
 		{
 			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
-			return str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
+			return str_replace(
+				'<textarea ',
+				'<textarea placeholder="'.$_v.'" ',
+				preg_replace('/^(\s*<textarea\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
+			);
 		}
 
 		elseif ( method_exists($field, 'setInherited') )
@@ -509,4 +513,3 @@ class FlexicontentViewCategory extends JViewLegacy
 		return $field->input;
 	}
 }
-?>
