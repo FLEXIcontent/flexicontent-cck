@@ -357,24 +357,27 @@ $this->document->addScriptDeclaration($js);
 											$fieldname = $field->fieldname;
 											//$value = $form_layout->getValue($fieldname, $groupname, @ $this->row->params[$fieldname]);
 
-											$input_only = !$field->label || $field->hidden;
-											echo
-												($input_only ? '' :
-												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-													$form_layout->getLabel($fieldname, $groupname)).'
-												<div class="container_fcfield">
-												').
-
-												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-													str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-														$this->getInheritedFieldDisplay($field, $this->iparams)
-														//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
-													)
-												).
-
-												($input_only ? '' : '
+											echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
+											 ? $field->input
+											 : '
+												<div class="control-group" id="'.$field->id.'-container">
+													<div class="control-label">'.
+														str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+															$form_layout->getLabel($fieldname, $groupname)).'
+													</div>
+													<div class="controls">
+														'.
+															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+																str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+																	$this->getInheritedFieldDisplay($field, $this->iparams)
+																	//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+																)
+															).							
+														'
+													</div>
 												</div>
-												');
+											';
+
 										endforeach; ?>
 
 										</fieldset>
