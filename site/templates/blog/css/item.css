@@ -83,11 +83,6 @@ body #flexicontent .desc-title.label {
 .customblock .flexi.value.nolabel {
 	width: 100% !important;
 }
-.group:before,
-.group:after {
-	content: " ";
-	display: table;
-}
-.group:after {
-	clear: both;
+.group {
+	overflow: auto !important;
 }

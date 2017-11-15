@@ -113,11 +113,6 @@ body #flexicontent ul.tabbernav > li:hover a {
 	margin: 2px 4% 6px 0;
 	box-sizing: border-box;
 }
-.group:before,
-.group:after {
-	content: " ";
-	display: table;
-}
-.group:after {
-	clear: both;
+.group {
+	overflow: auto !important;
 }

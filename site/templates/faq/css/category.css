@@ -111,11 +111,6 @@
 	margin-top: 0;
 	margin-bottom: 0;
 }
-.group:before,
-.group:after {
-	content: " ";
-	display: table;
-}
-.group:after {
-	clear: both;
+.group {
+	overflow: auto !important;
 }

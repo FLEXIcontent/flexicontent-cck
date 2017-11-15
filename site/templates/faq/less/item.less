@@ -2,6 +2,7 @@
 
 /* Faq Theme : item template CSS file */
 
+
 /*LESS EXAMPLE variable name: 'FCI_' + parameter name */
 /* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
 body #flexicontent .fc_item_title,
@@ -10,6 +11,7 @@ body #flexicontent .fc_item_title a {
 }
 
 /* Label styling */
+
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: @FCI_label_bg_color;
@@ -18,6 +20,7 @@ body #flexicontent .desc-title.label {
 }
 
 /* TAB styling */
+
 body #flexicontent ul.tabbernav > li a {
 	border: 1px solid @FCI_tab_bg_color_end;
 	background-color: @FCI_tab_bg_color_start;
@@ -44,6 +47,11 @@ body #flexicontent ul.tabbernav > li:hover a {
 	color: @FCI_tab_title_color;
 }
 
+
+// ***
+// *** A row of content
+// ***
+
 .flexi.lineinfo {
 	display: block;
 	padding: 0;
@@ -52,9 +60,10 @@ body #flexicontent ul.tabbernav > li:hover a {
 	clear: both;
 }
 
-.flexi.subtitle1 {}
-.flexi.subtitle2 {}
-.flexi.subtitle3 {}
+
+// ***
+// *** Allow responsive width while floating
+// ***
 
 .tabbertab .flexi.element,
 .subtitle1 .flexi.element,
@@ -69,7 +78,19 @@ body #flexicontent ul.tabbernav > li:hover a {
 }
 
 
-/* topblock: Field block styling */
+// ***
+// *** POSITIONS: SubtitleN
+// ***
+
+.flexi.subtitle1 {}
+.flexi.subtitle2 {}
+.flexi.subtitle3 {}
+
+
+// ***
+// *** POSITION: Top Block
+// ***
+
 .flexi.topblock {
 	overflow: hidden;
 	width: 100%;
@@ -148,27 +169,12 @@ body #flexicontent ul.tabbernav > li:hover a {
 	box-sizing: border-box;
 }
 
-/* ===============================================
-   "micro" clearfix 
-   http://nicolasgallagher.com/micro-clearfix-hack/
-   =============================================== */
 
-/**
- * For modern browsers
- * 1. The space content is one way to avoid an Opera bug when the
- *    contenteditable attribute is included anywhere else in the document.
- *    Otherwise it causes space to appear at the top and bottom of elements
- *    that are clearfixed.
- * 2. The use of `table` rather than `block` is only necessary if using
- *    `:before` to contain the top-margins of child elements.
+/*
+ * clearfix, for clearing a block that contains floated elements
+ * without appending an extra HTML TAG with 'clearfix' class
  */
-.group:before,
-.group:after {
-	content: " "; /* 1 */
-	display: table; /* 2 */
-}
 
-.group:after {
-	clear: both;
+.group {
+	overflow: auto !important;
 }
-
