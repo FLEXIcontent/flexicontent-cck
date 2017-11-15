@@ -301,7 +301,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					$top_cols = $this->params->get('top_cols', 'two');
 					$span_class = ''; //$top_cols == 'one' ? 'span8' : 'span4'; // commented out: bootstrap spanNN is not responsive to width !
 				?>
-				<div class="flexi infoblock <?php echo $top_cols; ?>cols group">
+				<div class="flexi infoblock <?php echo $top_cols; ?>cols">
 					<ul class="flexi">
 						<?php foreach ($item->positions['top'] as $field) : ?>
 						<li class="flexi lvbox <?php echo 'field_' . $field->name; ?>">
