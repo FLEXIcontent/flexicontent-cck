@@ -3020,7 +3020,7 @@ body .form-horizontal .control-group {
 #flexicontent .fc-unset-width {
 	width: unset;
 }
-#flexicontent .nav-tabs > li > a {
+#flexicontent .form-horizontal > .nav-tabs > li > a {
 	text-align: center;
 }
 hr.fcclearline {
