@@ -251,43 +251,49 @@ class FCField extends JPlugin
 	// Calculate and return the layout path for a field
 	// ************************************************
 	
-	public static function getLayoutPath($plg, $layout = 'field', $plg_subtype='')
+	public static function getLayoutPath($plg, $layout = 'field', $plg_subtype='', $default_layout='field')
 	{
 		static $paths = array();
+		static $template = null;
+
 		if ( isset($paths[$plg][$layout][$plg_subtype]) )  // return cached
 		{
 			return $paths[$plg][$layout][$plg_subtype];
 		}
-		
-		$template = JFactory::getApplication('site')->getTemplate();
-		$defaultLayout = $layout;
 
+		if ($template === null)
+		{
+			$template = JFactory::getApplication('site')->getTemplate();
+		}
+
+		// Get the template and layout name from the string if string contains ':' (aka folder seperators)
 		if (strpos($layout, ':') !== false)
 		{
-			// Get the template and file name from the string
 			$temp = explode(':', $layout);
 			$template = ($temp[0] == '_') ? $template : $temp[0];
 			$layout = $temp[1];
-			$defaultLayout = ($temp[1]) ? $temp[1] : 'field';
 		}
 
-		// Build the template and base path for the layout
-		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/flexicontent_fields/' . $plg . '/' . ($plg_subtype ? $plg_subtype.'/' : '') . $layout . '.php';
-		$fPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . $defaultLayout . '.php';
-		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . 'field.php';
+		// ***
+		// *** Build the template and base path for the layout, and check it exists, returing it, in order of priority
+		// ***
 
-		if (file_exists($tPath))
-			// Layout via Joomla template override, in /templates/ folder
+		// Layout via Joomla template override, in /templates/ folder
+		if (file_exists(($tPath = JPATH_ROOT . '/templates/' . $template . '/html/flexicontent_fields/' . $plg . '/' . ($plg_subtype ? $plg_subtype.'/' : '') . $layout . '.php')))
 			$return = $tPath;
-		
-		elseif (file_exists($fPath))
-			// Layout inside field folder
+
+		// Layout inside field folder
+		elseif (file_exists($fPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . $layout . '.php'))
 			$return = $fPath;
-		
-		else
-			// Default fallback
+
+		// Default fallback
+		elseif (file_exists($dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . $default_layout . '.php'))
 			$return = $dPath;
-		
+
+		// Default fallback (strip '_default')
+		else
+			$return = $dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . str_replace('_default', '', $default_layout) . '.php';
+
 		$paths[$plg][$layout][$plg_subtype] = $return;  // Cache result
 		return $return;
 	}
@@ -296,13 +302,13 @@ class FCField extends JPlugin
 	// Get Layout paths for editing, this is a wrapper to getLayoutPath()
 	public function getFormPath($plg, $layout, $plg_subtype='')
 	{
-		return $this->getLayoutPath($plg, $layout, $plg_subtype);
+		return $this->getLayoutPath($plg, $layout ?: 'field', $plg_subtype, $default='field_default');
 	}
 	
 	// Get Layout paths for viewing, this is a wrapper to getLayoutPath()
 	public function getViewPath($plg, $layout, $plg_subtype='')
 	{
-		return $this->getLayoutPath($plg, $layout, $plg_subtype);
+		return $this->getLayoutPath($plg, $layout ?: 'value', $plg_subtype, $default_layout='value_default');
 	}
 	
 	
