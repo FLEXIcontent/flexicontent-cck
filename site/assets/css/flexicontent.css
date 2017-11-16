@@ -3945,7 +3945,7 @@ table.admintable td {
 	max-width: 1200px;
 	padding: 16px 0 0 0;
 }
-#flexicontent .fc-sliders-plain-outer > .pane-sliders .panel h3 {
+#flexicontent .fc-sliders-plain-outer > .pane-sliders > .panel > h3 {
 	margin-bottom: 16px;
 	border: 0 solid !important;
 	background: unset !important;
