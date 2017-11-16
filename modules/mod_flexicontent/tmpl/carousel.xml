@@ -18,7 +18,7 @@
 			
 		<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
 
-			<field name="item_tab_featured" type="separator" default="Featured items (above carousel)" description="Placed before the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
+			<field name="item_tab_featured" type="separator" default="Featured items" description="Placed before the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
 
 			<field name="item_columns_feat" type="list" default="1" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
 				<option value="1">1</option>
@@ -71,7 +71,7 @@
 			<field name="carousel_margin_left_right_feat" type="text" filter="int" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
 			
-			<field name="item_tab_standard" type="separator" default="Standard items (inside carousel)" description="Placed inside the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
+			<field name="item_tab_standard" type="separator" default="Standard items" description="Placed inside the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
 			
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
