@@ -285,29 +285,39 @@ class FlexicontentControllerTemplates extends FlexicontentController
 					if ($field->getAttribute('not_inherited')) continue;
 					if ($field->getAttribute('cssprep')) continue;
 					
-					$_depends = $field->getAttribute('depend_class');
-					
-					//echo $field->label . $field->input;
-					$_label = str_replace('class="', 'class="label-fcinner ', $field->label);
 					if ($ext_type == 'templates')
 					{
-						$_label = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_', $_label);
+						$_label = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_', $field->label);
 						$_input = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_',
 							str_replace('[attribs]', '[layouts]['.$ext_name.']', $field->input)
 						);
 					}
-					else $_input = $field->input;
-					echo '
-					<fieldset class="panelform '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						'.($field->label ? '
-							<span class="label-fcouter">
+					else
+					{
+						$_label = $field->label;
+						$_input = $field->input;
+					}
+
+					if (!$field->label || $field->hidden)
+					{
+						echo $_input;
+						continue;
+					}
+					elseif ($field->input)
+					{
+						$_depends = $field->getAttribute('depend_class');
+						echo '
+						<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+							<div class="control-label">
 								'.$_label.'
-							</span>
-							<div class="container_fcfield">
+							</div>
+							<div class="controls container_fcfield">
 								'.$_input.'
 							</div>
-						' : $field->input).'
-					</fieldset>';
+						</div>
+						';
+					}
+
 				endforeach; ?>
 					
 			</div>

@@ -16,7 +16,10 @@
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" level="level3" default="NOTE: Only standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel" class="alert alert-warning fcpadded" />
 			
-			<field name="" type="separator" default="Featured items (non-carousel items)" description="Placed before the carousel" level="level0" class="fc-nomargin" />
+		<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+
+			<field name="item_tab_featured" type="separator" default="Featured items (above carousel)" description="Placed before the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
+
 			<field name="item_columns_feat" type="list" default="1" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -68,7 +71,7 @@
 			<field name="carousel_margin_left_right_feat" type="text" filter="int" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
 			
-			<field name="" type="separator" default="Standard items (inside carousel)" description="Placed inside the carousel" level="level0" />
+			<field name="item_tab_standard" type="separator" default="Standard items (inside carousel)" description="Placed inside the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
 			
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
@@ -102,7 +105,8 @@
 			<field name="carousel_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="carousel_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
-			<field name="" type="separator" default="Carousel Layout" level="level0" />
+			<field name="item_tab_carousel_ops" type="separator" default="Carousel options" description="..." icon_class="icon-refresh" level="tab_open" box_type="1" />
+
 			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling" class="btn-group group-fcinfo">
 				<option value="vertical">Vertical</option>
 				<option value="horizontal">Horizontal</option>
@@ -298,6 +302,8 @@
 			<field name="" type="separator" default="NOTE: already visible items exist only if displaying more than 1 item and NOT transitioning a FULL page of items" level="level3" class="alert fcpadded"/>
 			<field name="carousel_transition_visible_duration" type="text" default="150" label="Moving Duration (ms)" description="Already visible items will be moved instead of using the chosen effect, select the moving duration in milliseconds. NOTE: this is for all transition effects, except 'Scroll'" />
 			
+		<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
+
 		</fieldset>
 		
 	</fields>
