@@ -164,6 +164,12 @@ class FlexicontentControllerFields extends FlexicontentController
 			$model->setProperty('_id', 0);
 		}
 
+		// The apply_ajax task is treat same as apply (also same redirection in case that AJAX submit is skipped)
+		elseif ($this->task == 'apply_ajax')
+		{
+			$this->task = 'apply';
+		}
+
 		// Calculate access
 		$is_authorised = $model->canEdit($record);
 

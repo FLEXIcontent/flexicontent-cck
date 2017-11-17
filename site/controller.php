@@ -269,6 +269,12 @@ class FlexicontentController extends JControllerLegacy
 			$model->setState('item.id', 0);
 		}
 
+		// The apply_ajax task is treat same as apply (also same redirection in case that AJAX submit is skipped)
+		elseif ($this->task == 'apply_ajax')
+		{
+			$this->task = 'apply';
+		}
+
 		// Get merged parameters: component, type, and (FE only) menu
 		// We will force using new type_id only for the purpose of getting type parameters
 		// Below a check will be made if this type is allowed to the user
