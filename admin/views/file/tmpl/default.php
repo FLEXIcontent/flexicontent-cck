@@ -797,7 +797,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				<span class="label label-info"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
 			</td>
 			<td>
-				<?php echo file_exists($file_path) ? $file_size_str : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
+				<?php echo file_exists($this->rowdata->path) ? $this->rowdata->size_display : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
 			</td>
 		</tr>
 
@@ -806,7 +806,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				<span class="label label-info"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
 			</td>
 			<td>
-				<?php echo $file_path;?>
+				<?php echo $this->rowdata->path;?>
 			</td>
 		</tr>
 
@@ -819,7 +819,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</label>
 			</td>
 			<td>
-				<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->row->size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
+				<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->rowdata->calculated_size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
 				<select id="size_unit" name="size_unit" class="use_select2_lib">
 					<option value="KBs" selected="selected">KBs</option>
 					<option value="MBs">MBs</option>
@@ -827,9 +827,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</select>
 				<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>"><i class="icon-info"></i></span>
 
-				<?php if ($this->row->calculated_size !== $this->row->size) : ?>
-					<span class="fc-mssg fc-mssg-inline fc-nobgimage fc-warning"><?php echo JText::_('FLEXI_REAL_SIZE') . ' : ' . $this->row->calculated_size; ?></span>
-				<?php endif; ?>
+				<?php echo $this->rowdata->size_warning; ?>
 			</td>
 		</tr>
 		

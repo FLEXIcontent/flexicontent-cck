@@ -218,34 +218,43 @@ class FlexicontentViewFile extends JViewLegacy
 		// *** Get real file size (currently)
 		// ***
 
+		$rowdata = new stdclass();
+
 		if (!$row->url)
 		{
-			$path = $this->row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-			$file_path = $path . DS . $this->row->filename;
-			
-			$file_size = file_exists($file_path) ? filesize($file_path) : 0;
-			$file_size_str = $file_size < 1024 * 1024 ?
-				number_format(filesize($file_path) / (1024), 2) .' KBs' :
-				number_format(filesize($file_path) / (1024 * 1024), 2) .' MBs';
+			$path = $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+			$rowdata->path = $path . DS . $row->filename;
+
+			$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
 		}
 
 		else
 		{
 			$url = $row->filename_original ?: $row->filename;
-			$filesize = $model->get_file_size_from_url($url);
+			$rowdata->calculated_size = $model->get_file_size_from_url($url);
 
-			if ($filesize === -999)
+			if ($rowdata->calculated_size === -999)
 			{
 				$app->enqueueMessage($model->getError(), 'warning');
 			}
 
-			if (empty($row->size))
-			{
-				$row->size = $filesize < 0 ? 0 : $filesize;
-			}
-
-			$row->calculated_size = $filesize < 0 ? 0 : $filesize;
+			// Maintain current size if size could not be calulcated
+			$rowdata->calculated_size = $rowdata->calculated_size < 0
+				? $row->size
+				: $rowdata->calculated_size;
 		}
+
+		$rowdata->calculated_size_display = number_format(ceil($rowdata->calculated_size / (1024)), 0) .' KBs';
+		$rowdata->size_display = number_format(ceil($row->size / (1024)), 0) .' KBs';
+
+		// This is typically displayed only if type is URL
+		$rowdata->size_warning = $rowdata->calculated_size_display !== $rowdata->size_display
+			? '<span class="fc-mssg fc-mssg fc-nobgimage fc-warning">'
+				. JText::_('FLEXI_REAL_SIZE') . ': ' . $rowdata->calculated_size_display . ' <br/> '
+				. JText::_('FLEXI_SIZE_IN_DB') . ': ' . $rowdata->size_display . ' <br/> '
+				. JText::_('FLEXI_PLEASE_SAVE_TO_UPDATE')
+				. '</span>'
+			: '';
 
 
 		//***
@@ -295,10 +304,10 @@ class FlexicontentViewFile extends JViewLegacy
 		// Assign data to template
 		$this->row    = $row;
 		$this->form   = $form;
+		$this->rowdata  = $rowdata;
 		$this->lists    = $lists;
 		$this->document = $document;
 
 		parent::display($tpl);
 	}
 }
-?>
