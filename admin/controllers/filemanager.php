@@ -164,6 +164,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$model->setProperty('_id', 0);
 		}
 
+		// The apply_ajax task is treat same as apply (also same redirection in case that AJAX submit is skipped)
+		elseif ($this->task == 'apply_ajax')
+		{
+			$this->task = 'apply';
+		}
+
 		// Calculate access
 		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
 		$canedit = $user->authorise('flexicontent.editfile', 'com_flexicontent');
