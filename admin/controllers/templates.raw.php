@@ -206,9 +206,15 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		if ( $ext_view=='module' && $ext_option!='com_modules' && $ext_option!='com_advancedmodules' )
 		{
-			echo '<div class="alert fcpadded fc-iblock" style="">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
+			echo '
+			<div class="fc_layout_box_outer">
+				<div class="alert fcpadded fc-iblock" style="">
+					You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/>
+					- If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved
+				</div>
+			</div>';
 		}
-		
+
 		if ( !$app->isAdmin() )
 		{
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -229,13 +235,27 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$layoutpath = JPATH::clean($path.DS.$layout_name.'.xml');
 		}
 		
-		if ( !file_exists($layoutpath) ) {
-			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml')) {
+		if ( !file_exists($layoutpath) )
+		{
+			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml'))
+			{
 				$layoutpath = $path.DS.'_fallback'.DS.'_fallback.xml';
-				echo '<div class="alert alert-warning">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults. if this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml</div><div class="fcclear"></div>';
+				echo '
+				<div class="fc_layout_box_outer">
+					<div class="alert alert-warning">
+						Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults.
+						If this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml
+					</div>
+				</div>';
 			}
-			else {
-				echo '<div class="alert alert-info">Currently selected layout: <b>"'.$layout_name.'"</b> does not have layout specific parameters</div>';
+			else
+			{
+				echo '
+				<div class="fc_layout_box_outer">
+					<div class="alert alert-info">
+						Currently selected layout: <b>"'.$layout_name.'"</b> does not have layout specific parameters
+					</div>
+				</div>';
 				exit;
 			}
 		}
@@ -323,8 +343,15 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			</div>
 			
 			<?php endforeach; //fieldSets
-		} else {
-			echo "<br /><div class=\"alert alert-info\" style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</div><br />";
+		}
+		else
+		{
+			echo '
+			<div class="fc_layout_box_outer">
+				<div class="alert alert-info">
+					' . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . '
+				</div>
+			</div>';
 		}
 		//parent::display($tpl);
 	}
