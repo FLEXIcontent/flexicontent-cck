@@ -119,8 +119,8 @@ function tabberObj(argsObj)
   this.tabs = new Array();
 
   /* If the main tabber div was specified, call init() now */
-  if (this.div) {
-
+  if (this.div)
+  {
     this.init(this.div);
 
     /* We don't need the main div anymore, and to prevent a memory leak
@@ -507,25 +507,24 @@ function tabberAutomatic(tabberArgs, container_id)
 
   if (!tabberArgs) { tabberArgs = {}; }
 
-  /* Create a tabber object so we can get the value of classMain */
+  /* Create a tabber object without initializing any tabset,so we can get the value of classMain */
+  tabberArgs.div = null;
   tempObj = new tabberObj(tabberArgs);
 
-  /* Find all DIV elements in the document that have class=tabber */
-
-  /* First get an array of all DIV elements and loop through them */
+  /* Find all DIV elements in the document that have the configured classname */
+  var container_selector = typeof container_id != 'undefined' ? '#' + container_id + ' ' : '';
   var divs = new Array();
-  if (typeof container_id != 'undefined')	{
-	  var i = 0;
-  	jQuery('#'+container_id+' div').each(function() {
-  		divs[i] = jQuery(this).get(0);
-  		i++;
-  	});
-  } else {
- 		divs = document.getElementsByTagName("div");
-	}
+  var i = 0;
+
+	jQuery(container_selector + 'div.' + tempObj.classMain).each(function() {
+		divs[i] = jQuery(this).get(0);
+		i++;
+	});
+
+  /* Loop through all found DIV elements, and initialize TABBER in them */
   for (i=0; i < divs.length; i++)
   {
-    /* Is this DIV the correct class? */
+    /* Recheck if each DIV has the correct classname */
     if (divs[i].className && divs[i].className.match(tempObj.REclassMain))
     {
       /* Now tabify the DIV */
