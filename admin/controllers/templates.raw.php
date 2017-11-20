@@ -129,13 +129,15 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$user = JFactory::getUser();
 		
 		//get vars
-		$ext_option = JRequest::getVar( 'ext_option', '');  // Current component name
-		$ext_view   = JRequest::getVar( 'ext_view', '');    // Current view name
-		$ext_type   = JRequest::getVar( 'ext_type', '');    // Type layouts: 'templates' or empty: ('modules'/'fields')
-		$ext_name   = JRequest::getVar( 'ext_name', '');    // IN item/type/category (templates): template name
-		$ext_id     = JRequest::getInt ( 'ext_id', 0 );     // ID of item / type / category being edited
-		$layout_name = JRequest::getVar( 'layout_name', '' ); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
-		$directory   = JRequest::getVar( 'directory', '' );   // Explicit path of XML file:  $layout_name.xml
+		$ext_option = $app->input->get( 'ext_option', '', 'CMD' );  // Current component name
+		$ext_view   = $app->input->get( 'ext_view', '', 'CMD' );    // Current view name
+		$ext_type   = $app->input->get( 'ext_type', '', 'CMD' );    // Type layouts: 'templates' or empty: ('modules'/'fields')
+		$ext_name   = $app->input->get( 'ext_name', '', 'CMD' );    // IN item/type/category (templates): template name
+		$ext_id     = $app->input->get( 'ext_id', 0, 'INT' );       // ID of item / type / category being edited
+		$layout_pfx = $app->input->get( 'layout_pfx', '', 'CMD' );  // A prefix to distinguish multiple loading of same layout in the same page: (This is typically the name of the layout parameter)
+
+		$layout_name = $app->input->get( 'layout_name', '', 'CMD' ); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
+		$directory   = $app->input->get( 'directory', '', 'STRING' );   // Explicit path of XML file:  $layout_name.xml
 		
 		$db = JFactory::getDbo();
 		if ($ext_view=='item')
@@ -195,7 +197,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 				JFactory::getLanguage()->load('plg_flexicontent_fields_'.$ext_name, JPATH_ADMINISTRATOR, null, true);
 			}
 			$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
-			$groupname = 'params';  // name="..." of <fields> container
+			$groupname = 'attribs';  // name="..." of <fields> container
 		}
 		
 		else
@@ -279,9 +281,15 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		foreach ($form_layout->getGroup($groupname) as $field)
 		{
-			$fieldname = $field->fieldname;
-			$value = $ext_params->get($fieldname);
-			if (strlen($value)) $form_layout->setValue($fieldname, $groupname, $value);
+			// Get prefixed fieldname (that is, if the given layout is using prefix)
+			$prefixed_fieldname = str_replace('PPFX_', $layout_pfx . '_', $field->fieldname);
+
+			// Check if value exists in the extension's parameters and set it into the non-prefixed field name
+			$value = $ext_params->get($prefixed_fieldname);
+			if (strlen($value))
+			{
+				$form_layout->setValue($field->fieldname, $groupname, $value);
+			}
 		}
 		
 		if ($layout_name)
@@ -304,7 +312,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 				
 					if ($field->getAttribute('not_inherited')) continue;
 					if ($field->getAttribute('cssprep')) continue;
-					
+
 					if ($ext_type == 'templates')
 					{
 						$_label = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_', $field->label);
@@ -312,11 +320,23 @@ class FlexicontentControllerTemplates extends FlexicontentController
 							str_replace('[attribs]', '[layouts]['.$ext_name.']', $field->input)
 						);
 					}
+					elseif ($ext_view == 'field')
+					{
+						$_label = str_replace('jform_attribs_', 'jform_layouts_', $field->label);
+						$_input = str_replace('jform_attribs_', 'jform_layouts_',
+							str_replace('[attribs]', '[layouts]', $field->input)
+						);
+					}
 					else
 					{
 						$_label = $field->label;
 						$_input = $field->input;
 					}
+
+					// Replace prefix in the parameter names (that is, if it exists)
+					$_label = str_replace('PPFX_', $layout_pfx . '_', $_label);
+					$_input = str_replace('PPFX_', $layout_pfx . '_', $_input);
+					$_field_id = str_replace('PPFX_', $layout_pfx . '_', $field->id);
 
 					if (!$field->label || $field->hidden)
 					{
@@ -327,7 +347,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 					{
 						$_depends = $field->getAttribute('depend_class');
 						echo '
-						<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$_field_id.'-container">
 							<div class="control-label">
 								'.$_label.'
 							</div>
@@ -388,11 +408,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		);
 		
 		//get vars
-		$load_mode  = JRequest::getVar( 'load_mode', '0' );
-		$layout_name  = JRequest::getVar( 'layout_name', 'default' );
-		$file_subpath = JRequest::getVar( 'file_subpath', '' );
-		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
+		$load_mode   = $app->input->get( 'load_mode', '0', 'INT' );
+		$layout_name = $app->input->get( 'layout_name', 'default', 'CMD' );
+
+		$file_subpath = $app->input->get( 'file_subpath', '', 'STRING' );
 		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
+
 		//$file_subpath = preg_replace("#\\#", DS, $file_subpath);
 		if (!$layout_name) $app->enqueueMessage( 'Layout name is empty / invalid', 'warning');
 		if (!$file_subpath) $app->enqueueMessage( 'File path is empty / invalid', 'warning');
@@ -485,10 +506,11 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		//get vars
 		$file_contents = $_POST['file_contents'];
-		$layout_name  = JRequest::getVar( 'layout_name', 'default' );
-		$file_subpath = JRequest::getVar( 'file_subpath', '' );
-		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
+		$layout_name  = $app->input->get( 'layout_name', 'default', 'CMD' );
+
+		$file_subpath = $app->input->get( 'file_subpath', '', 'STRING' );
 		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
+
 		if (!$layout_name) $app->enqueueMessage( 'Layout name is empty / invalid', 'warning');
 		if (!$file_subpath) $app->enqueueMessage( 'File path is empty / invalid', 'warning');
 		

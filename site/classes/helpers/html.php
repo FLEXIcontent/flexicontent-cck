@@ -1512,7 +1512,9 @@ class flexicontent_html
 				$document->addStyleSheet($framework_path.'/css/elastislide.css');
 
 				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
-				$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
+				//$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
+				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
+				
 				$document->addScript($framework_path.'/js/jquery.elastislide.js');
 				//$document->addScript($framework_path.'/js/gallery.js'); // replace with field specific: gallery_tmpl.js
 				break;
