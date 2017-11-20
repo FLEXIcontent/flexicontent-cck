@@ -94,6 +94,8 @@ class JFormFieldFclayout extends JFormFieldList
 
 		$icon_class = (string) @ $attributes['icon_class'];
 		$icon_class = $icon_class ?: 'icon-palette';
+
+		$icon_class2 = (string) @ $attributes['icon_class2'];
 		
 		$custom_layouts_label  = (string) @ $attributes['custom_layouts_label'];
 		$use_default_label  = (string) @ $attributes['use_default_label'];
@@ -106,6 +108,10 @@ class JFormFieldFclayout extends JFormFieldList
 		$directory = (string) @ $attributes['directory'];
 		$ext_name = (string) @ $attributes['ext_name'];
 		$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
+
+		// The name of parameter selecting the layout, will be the layout prefix (that is prefix 'PPFX_' exists in the layout's parameter names)
+		// This allows loading the layout multiple times inside same form
+		$layout_pfx = (string) @ $attributes['name']; //
 		
 		// For using directory in url
 		$directory = str_replace('\\', '/', $directory);
@@ -425,12 +431,12 @@ function fc_getLayout_".$_name."(el)
 	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
 	bs_tab_handle.length
 		? panel_header.html('<a href=\"javascript:void(0);\"><span> " . $layout_label . ": '+_loading_img+'</span></a>')
-		: panel_header.html('<i class=\"".$icon_class."\"></i> " . $layout_label . ": ' + _loading_img);
+		: panel_header.html('" . '<i class="'.$icon_class.'"></i> ' . $layout_label . ": " . "' + _loading_img);
 	panel.html('');
 
 	jQuery.ajax({
 		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$option."&ext_view=".$view."&ext_name=".$ext_name."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw',
+		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$option."&ext_view=".$view."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw',
 		success: function(str) {
 			if (bs_tab_handle.length)
 			{
@@ -441,7 +447,7 @@ function fc_getLayout_".$_name."(el)
 			{
 				var display_name = layout_name.replace('value_', '').replace('gallery_', '');
 				display_name = display_name.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-				panel_header.html('<i class=\"".$icon_class."\"></i> " . $layout_label . ": ' + display_name);
+				panel_header.html('" . '<i class="'.$icon_class.'"></i> ' . $layout_label . ": " . "' + display_name);
 		 	}
 			panel.html(str);
 			panel.find('.hasTooltip').tooltip({html: true, container: panel});

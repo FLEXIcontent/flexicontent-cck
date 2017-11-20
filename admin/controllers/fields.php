@@ -190,6 +190,13 @@ class FlexicontentControllerFields extends FlexicontentController
 		$form = $model->getForm($data, false);
 		$validated_data = $model->validate($form, $data);
 
+		// Add parameters of layouts, these are unfiltered since field configuration is privileged
+		// and it already allow RAW value parameters like value prefix and value suffix parameters
+		foreach($data['layouts'] as $i => $v )
+		{
+			$validated_data['attribs'][$i] = $v;
+		}
+
 		// Check for validation error
 		if (!$validated_data)
 		{
