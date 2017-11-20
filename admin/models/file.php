@@ -305,8 +305,10 @@ class FlexicontentModelFile extends FCModelAdmin
 	 * or -1 if the size could not be determined
 	 * or -999 if there was an error
 	 */
-	function get_file_size_from_url($url)
+	function get_file_size_from_url($url, $retry = true)
 	{
+		$original_url = $url;
+
 		// clear last error
 		$ignore_last_error = error_get_last();
 
@@ -353,6 +355,12 @@ class FlexicontentModelFile extends FCModelAdmin
 		catch (RuntimeException $e) {
 			$this->setError($e->getMessage());
 			return -999;  // indicate a fatal error
+		}
+
+		// Work-around with content length missing during 1st try, just retry once more
+		if (!isset($headers["Content-Length"]) && $retry)
+		{
+			return $this->get_file_size_from_url($original_url, false);
 		}
 		
 		// Get file size, -1 indicates that the size could not be determined
