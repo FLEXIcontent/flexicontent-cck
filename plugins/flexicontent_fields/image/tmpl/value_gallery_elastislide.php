@@ -47,9 +47,30 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	$uid = 'es_'.$field->name."_fcitem".$item->id;
 	$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'elastislide'.DS.'js'.DS.'gallery_tmpl.js');
 	$js = str_replace('unique_gal_id', $uid, $js);
-	$js = str_replace('__thumb_width__', $field->parameters->get( 'w_s', 120 ), $js);
 
-	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+	$carousel_thumb_size = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
+
+	$carousel_position = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
+	$carousel_thumb_width = $field->parameters->get( 'w_'.$carousel_thumb_size, 120 );
+	$carousel_easing   = $field->parameters->get( $PPFX_ . 'carousel_easing', 'swing');
+	$carousel_easing_inout = $field->parameters->get( $PPFX_ . 'carousel_easing_inout', 'easeOut' );
+	$carousel_speed = $field->parameters->get( $PPFX_ . 'carousel_speed', 600 );
+	$carousel_transition = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
+
+	if ($js)
+	{
+		JFactory::getDocument()->addScriptDeclaration(
+			'var elastislide_options_'.$uid.' = {
+				carousel_position: ' . $carousel_position . ',
+				carousel_thumb_width: ' . $carousel_thumb_width . ',
+				carousel_easing: \'' . $carousel_easing . '\',
+				carousel_easing_inout: \'' . $carousel_easing_inout . '\',
+				carousel_speed: ' . $carousel_speed . ',
+				carousel_transition: \'' . $carousel_transition . '\'
+			};
+			' . $js
+		);
+	}
 
 	JFactory::getDocument()->addCustomTag('
 	<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">	
@@ -95,10 +116,6 @@ if ($result !== _FC_RETURN_)
 		<div class="rg-thumbs">
 			<!-- Elastislide Carousel Thumbnail Viewer -->
 			<div class="es-carousel-wrapper">
-				<div class="es-nav">
-					<span class="es-nav-prev">'.JText::_('FLEXI_PREVIOUS').'</span>
-					<span class="es-nav-next">'.JText::_('FLEXI_NEXT').'</span>
-				</div>
 				<div class="es-carousel">
 					<ul>
 						' . implode('', $field->{$prop}) . '

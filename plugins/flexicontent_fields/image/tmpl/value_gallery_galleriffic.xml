@@ -11,7 +11,7 @@
 	<version>1.0</version>
 	<description>Flexicontent fields - Image field layout - Fancybox parameters</description>
 	
-	<fields name="params">
+	<fields name="attribs">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" level="level3" default="This layout does not have any layout-specific parameters (yet)" class="alert alert-info fcpadded" />

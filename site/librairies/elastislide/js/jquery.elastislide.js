@@ -79,8 +79,10 @@
 	};
 	
 	jQuery.elastislide.defaults 		= {
-		speed		: 450,	// animation speed
-		easing		: '',	// animation easing effect
+		speed			: 450,	// animation speed
+		easing		: 'swing',	// animation transition easing method
+		easing_inout	: 'easeOut',
+		effect		: 'scroll',	// animation transition effect
 		imageW		: 190,	// the images width
 		margin		: 3,	// image margin right
 		border		: 2,	// image border
@@ -374,8 +376,11 @@
 			var sliderCSS	= { marginLeft : val };
 			
 			var instance	= this;
+			var easing_name = this.options.easing != 'linear' && this.options.easing != 'swing'
+				? this.options.easing_inout + this.options.easing.charAt(0).toUpperCase() + this.options.easing.slice(1)
+				: this.options.easing;
 			
-			this.$slider.stop().applyStyle( sliderCSS, jQuery.extend( true, [], { duration : this.options.speed, easing : this.options.easing, complete : function() {
+			this.$slider.stop().applyStyle( sliderCSS, jQuery.extend( true, [], { duration : this.options.speed, easing : easing_name, complete : function() {
 				if( callback ) callback.call();
 			} } ) );
 			

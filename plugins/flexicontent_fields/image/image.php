@@ -1433,6 +1433,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Different for mobile clients
 		$popuptype_mobile = (int)$field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
+		$PPFX_ = $useMobile ? 'popuptype_mobile_' : 'popuptype_';
 		$popuptype = $useMobile
 			? $popuptype_mobile
 			: $popuptype;

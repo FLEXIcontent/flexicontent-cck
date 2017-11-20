@@ -11,10 +11,91 @@
 	<version>1.0</version>
 	<description>Flexicontent fields - Image field layout - Fancybox parameters</description>
 	
-	<fields name="params">
+	<fields name="attribs">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level3" default="This layout does not have any layout-specific parameters (yet)" class="alert alert-info fcpadded" />
+
+			<field name="" type="separator" default="Slideshow options &lt;small&gt;(Main image) &lt;/small&gt;" level="level1" />
+
+			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="Easing method" description="The method for easing the transition between images" class="">
+				<group label="Basic">
+					<option value="linear">Linear</option>
+					<option value="swing">Swing</option>
+				</group>
+				<group label="Advanced (use smoothing function)">
+					<option value="quad">Quadratic</option>
+					<option value="cubic">Cubic</option>
+					<option value="quart">Quartic</option>
+					<option value="quint">Quintic</option>
+					<option value="expo">Exponential</option>
+					<option value="circ">Circular</option>
+					<option value="sine">Sinusoidal</option>
+					<option value="back">Back</option>
+					<option value="bounce">Bounce</option>
+					<option value="elastic">Elastic</option>
+				</group>
+			</field>
+
+			<field name="" type="separator" default="Carousel options &lt;small&gt; (Thumbnail navigation) &lt;/small&gt;" level="level1" />
+
+			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
+				<option value="1" show_list="carousel_ops" hide_list="">Below slideshow</option>
+				<option value="2" show_list="carousel_ops" hide_list="">Above slideshow</option>
+			</field>
+
+			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="Thumbnail size" description="..."  depend_class="carousel_ops" >
+				<option value="s">FLEXI_SMALL</option>
+				<option value="m">FLEXI_MEDIUM</option>
+			</field>
+
+			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="Easing method" description="The method for easing the transition between images" class="" depend_class="carousel_ops">
+				<group label="Basic">
+					<option value="linear">Linear</option>
+					<option value="swing">Swing</option>
+				</group>
+				<group label="Advanced (use smoothing function)">
+					<option value="quad">Quadratic</option>
+					<option value="cubic">Cubic</option>
+					<option value="quart">Quartic</option>
+					<option value="quint">Quintic</option>
+					<option value="expo">Exponential</option>
+					<option value="circ">Circular</option>
+					<option value="sine">Sinusoidal</option>
+					<option value="back">Back</option>
+					<option value="bounce">Bounce</option>
+					<option value="elastic">Elastic</option>
+				</group>
+			</field>
+
+			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="Slow start/ending" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="carousel_ops">
+				<option value="easeIn">easeIn</option>
+				<option value="easeOut">easeOut</option>
+				<option value="easeInOut">easeInOut</option>
+			</field>
+
+			<field name="PPFX_carousel_speed" type="text" default="600" label="Duration" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="carousel_ops"/>
+
+			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="Transition effect" description="The transition effect for moving between images" class="" depend_class="carousel_ops">
+				<option value="scroll">Scroll</option>
+				<!--option value="fade">Fade</option>
+				<option value="slide">Slide</option>
+				<option value="fade-slide">Fade + Slide</option>
+				<option value="clip">Clip</option>	
+				<option value="scale">Scale</option>
+				<option value="drop">Drop</option>
+				<group label="Experimental">
+					<option value="blind">Blind</option>
+					<option value="bounce">Bounce</option>
+					<option value="explode">Explode</option>
+					<option value="fold">Fold</option>
+					<option value="highlight">Highlight</option>
+					<option value="puff">Puff</option>
+					<option value="pulsate">Pulsate</option>
+					<option value="shake">Shake</option>
+				</group-->
+			</field>
+
 		</fieldset>
 
 	</fields>

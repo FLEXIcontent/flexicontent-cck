@@ -1,6 +1,7 @@
 .rg-image-wrapper{
 	position:relative;
-	padding:20px 0px;
+	padding: 0px;
+	margin: 20px 0px;
 	/*background:transparent url(../images/black.png) repeat top left;*/
 	background: white;
 	-moz-border-radius: 10px;
@@ -17,6 +18,7 @@
 	max-height:100%;
 	max-width:100%;
 	width:100%;
+	border-radius: 10px;
 }
 .rg-image-nav a{
 	position:absolute;
@@ -97,4 +99,44 @@
 	-webkit-border-radius: 10px;
 	border-radius: 10px;
 	opacity:0.7;
+}
+
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span {
+	top: 0%;
+	height: 100%;
+	margin-top: 0;
+	padding: 0;
+	width: 28px;
+	background: rgba(155, 155, 155, 0.6)  url(../images/nav.png) no-repeat -15% 50%;
+	-webkit-transition: all 0.4s;transition: all 0.4s;
+	opacity: .6;
+	filter:alpha(opacity=60);
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-prev {
+	border-radius: 10px 0px 0px 10px;
+	background-position: -15% 50%;
+	left: 0;
+}
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-next {
+	border-radius: 0 10px 10px 0;
+	background-position: 115% 50%;
+	right: 0;
+}
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-prev:hover,
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-nav > span.es-nav-next:hover {
+	opacity: 1;
+	filter:alpha(opacity=100);
+}
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper > .es-carousel > ul {
+	margin: 4px;
+	padding: 0px;
+}
+
+.rg-gallery > .rg-thumbs > .es-carousel-wrapper {
+}
+
+.rg-gallery > .rg-view {
 }

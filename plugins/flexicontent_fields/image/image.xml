@@ -444,7 +444,8 @@
 
 				<group label="Inline layouts">
 					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-					<option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
+					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
+					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
 				</group>
 
 				<group label="Enable via parameters">
@@ -472,7 +473,8 @@
 
 				<group label="Inline layouts">
 					<option filename="value_gallery_galleriffic" value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-					<option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
+					<!--option filename="value_gallery_elastislide" value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option-->
+					<option filename="value_gallery_elastislide" value="7">Elastislide (Slideshow + carousel) (Built-in)</option>
 				</group>
 
 				<group label="Enable via parameters">
@@ -516,8 +518,8 @@
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 
 
-			<!--field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-screen" level="tab_open" box_type="1" /-->
-			<!--field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-mobile" level="tab_open" box_type="1" /-->
+			<field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-screen" level="tab_open" box_type="1" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS" icon_class="icon-mobile" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
