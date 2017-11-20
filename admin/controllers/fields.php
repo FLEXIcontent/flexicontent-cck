@@ -192,7 +192,7 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		// Add parameters of layouts, these are unfiltered since field configuration is privileged
 		// and it already allow RAW value parameters like value prefix and value suffix parameters
-		foreach($data['layouts'] as $i => $v )
+		if (isset($data['layouts'])) foreach($data['layouts'] as $i => $v )
 		{
 			$validated_data['attribs'][$i] = $v;
 		}
