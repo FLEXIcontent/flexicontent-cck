@@ -17,28 +17,65 @@
 
 			<field name="" type="separator" default="Slideshow options &lt;small&gt;(Main image) &lt;/small&gt;" level="level1" />
 
-			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="Easing method" description="The method for easing the transition between images" class="">
+			<field name="PPFX_slideshow_thumb_size" type="radio" default="large" label="Thumbnail size" description="This does not effect the width of display but it effects image quality and loading speed"  depend_class="slideshow_ops" >
+				<option value="medium">FLEXI_MEDIUM</option>
+				<option value="large">FLEXI_LARGE</option>
+			</field>
+
+			<field name="" type="separator" default="Transition" level="level3" depend_class="slideshow_ops" />
+
+			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="Effect" description="The transition effect for moving between images" class="" depend_class="slideshow_ops">
+				<option value="cross-fade">Cross Fade</option>
+				<!--option value="scroll">Scroll</option>
+				<option value="fade">Fade</option>
+				<!--option value="slide">Slide</option>
+				<option value="fade-slide">Fade + Slide</option-->
+				<!--option value="clip">Clip</option>	
+				<option value="scale">Scale</option>
+				<option value="drop">Drop</option>
+				<group label="Experimental">
+					<option value="blind">Blind</option>
+					<option value="bounce">Bounce</option>
+					<option value="explode">Explode</option>
+					<option value="fold">Fold</option>
+					<option value="highlight">Highlight</option>
+					<option value="puff">Puff</option>
+					<option value="pulsate">Pulsate</option>
+					<option value="shake">Shake</option>
+				</group-->
+			</field>
+
+			<field name="PPFX_slideshow_easing" type="groupedlist" default="swing" label="Smoothing" description="The method for easing the transition between images" class="slideshow_ops">
 				<group label="Basic">
-					<option value="linear">Linear</option>
-					<option value="swing">Swing</option>
+					<option value="linear" show_list="" hide_list="slideshow_easing_func">Linear</option>
+					<option value="swing" show_list="" hide_list="slideshow_easing_func">Swing</option>
 				</group>
 				<group label="Advanced (use smoothing function)">
-					<option value="quad">Quadratic</option>
-					<option value="cubic">Cubic</option>
-					<option value="quart">Quartic</option>
-					<option value="quint">Quintic</option>
-					<option value="expo">Exponential</option>
-					<option value="circ">Circular</option>
-					<option value="sine">Sinusoidal</option>
-					<option value="back">Back</option>
-					<option value="bounce">Bounce</option>
-					<option value="elastic">Elastic</option>
+					<option value="quad" show_list="slideshow_easing_func" hide_list="">Quadratic</option>
+					<option value="cubic" show_list="slideshow_easing_func" hide_list="">Cubic</option>
+					<option value="quart" show_list="slideshow_easing_func" hide_list="">Quartic</option>
+					<option value="quint" show_list="slideshow_easing_func" hide_list="">Quintic</option>
+					<option value="expo" show_list="slideshow_easing_func" hide_list="">Exponential</option>
+					<option value="circ" show_list="slideshow_easing_func" hide_list="">Circular</option>
+					<option value="sine" show_list="slideshow_easing_func" hide_list="">Sinusoidal</option>
+					<option value="back" show_list="slideshow_easing_func" hide_list="">Back</option>
+					<option value="bounce" show_list="slideshow_easing_func" hide_list="">Bounce</option>
+					<option value="elastic" show_list="slideshow_easing_func" hide_list="">Elastic</option>
 				</group>
 			</field>
 
+			<field name="PPFX_slideshow_easing_inout" type="radio" default="easeOut" label="Smoothing at" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="slideshow_ops slideshow_easing_func" >
+				<option value="easeIn">Start</option>
+				<option value="easeOut">End</option>
+				<option value="easeInOut">Both</option>
+			</field>
+
+			<field name="PPFX_slideshow_speed" type="text" default="600" label="Speed" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="slideshow_ops" />
+
+
 			<field name="" type="separator" default="Carousel options &lt;small&gt; (Thumbnail navigation) &lt;/small&gt;" level="level1" />
 
-			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group group-fcinfo">
+			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group group-fcinfo" labelclass="label label-info" >
 				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
 				<option value="1" show_list="carousel_ops" hide_list="">Below slideshow</option>
 				<option value="2" show_list="carousel_ops" hide_list="">Above slideshow</option>
@@ -49,34 +86,9 @@
 				<option value="m">FLEXI_MEDIUM</option>
 			</field>
 
-			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="Easing method" description="The method for easing the transition between images" class="" depend_class="carousel_ops">
-				<group label="Basic">
-					<option value="linear">Linear</option>
-					<option value="swing">Swing</option>
-				</group>
-				<group label="Advanced (use smoothing function)">
-					<option value="quad">Quadratic</option>
-					<option value="cubic">Cubic</option>
-					<option value="quart">Quartic</option>
-					<option value="quint">Quintic</option>
-					<option value="expo">Exponential</option>
-					<option value="circ">Circular</option>
-					<option value="sine">Sinusoidal</option>
-					<option value="back">Back</option>
-					<option value="bounce">Bounce</option>
-					<option value="elastic">Elastic</option>
-				</group>
-			</field>
+			<field name="" type="separator" default="Transition" level="level3" class="carousel_ops" />
 
-			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="Slow start/ending" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="carousel_ops">
-				<option value="easeIn">easeIn</option>
-				<option value="easeOut">easeOut</option>
-				<option value="easeInOut">easeInOut</option>
-			</field>
-
-			<field name="PPFX_carousel_speed" type="text" default="600" label="Duration" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="carousel_ops"/>
-
-			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="Transition effect" description="The transition effect for moving between images" class="" depend_class="carousel_ops">
+			<field name="PPFX_carousel_transition" type="groupedlist" default="scroll" label="Effect" description="The transition effect for moving between images" class="" depend_class="carousel_ops">
 				<option value="scroll">Scroll</option>
 				<!--option value="fade">Fade</option>
 				<option value="slide">Slide</option>
@@ -95,6 +107,33 @@
 					<option value="shake">Shake</option>
 				</group-->
 			</field>
+
+			<field name="PPFX_carousel_easing" type="groupedlist" default="swing" label="Smoothing" description="The method for easing the transition between images" class="" depend_class="carousel_ops">
+				<group label="Basic">
+					<option value="linear" show_list="" hide_list="carousel_easing_func">Linear</option>
+					<option value="swing" show_list="" hide_list="carousel_easing_func">Swing</option>
+				</group>
+				<group label="Advanced (use smoothing function)">
+					<option value="quad" show_list="carousel_easing_func" hide_list="">Quadratic</option>
+					<option value="cubic" show_list="carousel_easing_func" hide_list="">Cubic</option>
+					<option value="quart" show_list="carousel_easing_func" hide_list="">Quartic</option>
+					<option value="quint" show_list="carousel_easing_func" hide_list="">Quintic</option>
+					<option value="expo" show_list="carousel_easing_func" hide_list="">Exponential</option>
+					<option value="circ" show_list="carousel_easing_func" hide_list="">Circular</option>
+					<option value="sine" show_list="carousel_easing_func" hide_list="">Sinusoidal</option>
+					<option value="back" show_list="carousel_easing_func" hide_list="">Back</option>
+					<option value="bounce" show_list="carousel_easing_func" hide_list="">Bounce</option>
+					<option value="elastic" show_list="carousel_easing_func" hide_list="">Elastic</option>
+				</group>
+			</field>
+
+			<field name="PPFX_carousel_easing_inout" type="radio" default="easeOut" label="Smoothing at" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo" depend_class="carousel_ops carousel_easing_func">
+				<option value="easeIn">Start</option>
+				<option value="easeOut">End</option>
+				<option value="easeInOut">Both</option>
+			</field>
+
+			<field name="PPFX_carousel_speed" type="text" default="600" label="Speed" description="Select the duration of the movement in ms (milli-seconds)" class="" depend_class="carousel_ops"/>
 
 		</fieldset>
 

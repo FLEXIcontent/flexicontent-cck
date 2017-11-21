@@ -24,8 +24,10 @@ foreach ($values as $n => $value)
 
 	$title_attr = $desc ? $desc : $title;
 	$img_legend_custom ='
-		 <img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
-		 	data-large="' . JUri::root(true).'/'.$srcl . '" data-description="'.$title_attr.'" itemprop="image"/>
+		<img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
+			data-medium="' . JUri::root(true).'/'.$srcm . '" 
+			data-large="' . JUri::root(true).'/'.$srcl . '"
+			data-description="'.$title_attr.'" itemprop="image"/>
 	';
 	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 	$field->{$prop}[] = '
@@ -48,25 +50,36 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'elastislide'.DS.'js'.DS.'gallery_tmpl.js');
 	$js = str_replace('unique_gal_id', $uid, $js);
 
-	$carousel_thumb_size = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
+	$slideshow_thumb_size = $field->parameters->get( $PPFX_ . 'slideshow_thumb_size', 'large' );
+	$slideshow_transition = $field->parameters->get( $PPFX_ . 'slideshow_transition', 'cross-fade' );
+	$slideshow_easing   = $field->parameters->get( $PPFX_ . 'slideshow_easing', 'swing');
+	$slideshow_easing_inout = $field->parameters->get( $PPFX_ . 'slideshow_easing_inout', 'easeOut' );
+	$slideshow_speed = $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );
 
 	$carousel_position = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
+	$carousel_thumb_size = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
 	$carousel_thumb_width = $field->parameters->get( 'w_'.$carousel_thumb_size, 120 );
+	$carousel_transition = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
 	$carousel_easing   = $field->parameters->get( $PPFX_ . 'carousel_easing', 'swing');
 	$carousel_easing_inout = $field->parameters->get( $PPFX_ . 'carousel_easing_inout', 'easeOut' );
 	$carousel_speed = $field->parameters->get( $PPFX_ . 'carousel_speed', 600 );
-	$carousel_transition = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
 
 	if ($js)
 	{
 		JFactory::getDocument()->addScriptDeclaration(
 			'var elastislide_options_'.$uid.' = {
+				slideshow_thumb_size: \'' . $slideshow_thumb_size . '\',
+				slideshow_transition: \'' . $slideshow_transition . '\',
+				slideshow_easing: \'' . $slideshow_easing . '\',
+				slideshow_easing_inout: \'' . $slideshow_easing_inout . '\',
+				slideshow_speed: ' . $slideshow_speed . ',
+
 				carousel_position: ' . $carousel_position . ',
 				carousel_thumb_width: ' . $carousel_thumb_width . ',
+				carousel_transition: \'' . $carousel_transition . '\',
 				carousel_easing: \'' . $carousel_easing . '\',
 				carousel_easing_inout: \'' . $carousel_easing_inout . '\',
-				carousel_speed: ' . $carousel_speed . ',
-				carousel_transition: \'' . $carousel_transition . '\'
+				carousel_speed: ' . $carousel_speed . '
 			};
 			' . $js
 		);

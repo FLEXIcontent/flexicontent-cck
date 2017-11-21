@@ -78,20 +78,37 @@ jQuery(function() {
 		// control if one image is being loaded
 		anim			= false,
 
+		// other carousel options
+		slideshow_thumb_size = 'large',
+		slideshow_transition = 'fade',
+		slideshow_easing = 'swing',
+		slideshow_easing_inout = 'easeOut',
+		slideshow_speed = 600,
+
 		// position of carousel (navigation thubmnails), 0: disable, 1: below, 2: above
 		carousel_position = 1,
+		
+		// other carousel options
+		carousel_thumb_width = 120,
+		carousel_transition = 'scroll',
 		carousel_easing = 'swing',
 		carousel_easing_inout = 'easeOut',
 		carousel_speed = 600,
-		carousel_transition = 'fade',
 
 		init = function(ops)
 		{
+			slideshow_thumb_size   = !!ops && typeof ops.slideshow_thumb_size   != 'undefined' ? ops.slideshow_thumb_size   : 'large';
+			slideshow_transition   = !!ops && typeof ops.slideshow_transition   != 'undefined' ? ops.slideshow_transition   : 'cross-fade';
+			slideshow_easing       = !!ops && typeof ops.slideshow_easing       != 'undefined' ? ops.slideshow_easing       : 'swing';
+			slideshow_easing_inout = !!ops && typeof ops.slideshow_easing_inout != 'undefined' ? ops.slideshow_easing_inout : 'easeOut';
+			slideshow_speed        = !!ops && typeof ops.slideshow_speed        != 'undefined' ? ops.slideshow_speed        : 400;
+
 			carousel_position     = !!ops && typeof ops.carousel_position     != 'undefined' ? ops.carousel_position     : 1;
-			carousel_easing       = !!ops && typeof ops.carousel_easing       != 'undefined' ? ops.carousel_easing       : 'linear';
+			carousel_thumb_width  = !!ops && typeof ops.carousel_thumb_width  != 'undefined' ? ops.carousel_thumb_width  : 120;
+			carousel_transition   = !!ops && typeof ops.carousel_transition   != 'undefined' ? ops.carousel_transition   : 'scroll';
+			carousel_easing       = !!ops && typeof ops.carousel_easing       != 'undefined' ? ops.carousel_easing       : 'swing';
 			carousel_easing_inout = !!ops && typeof ops.carousel_easing_inout != 'undefined' ? ops.carousel_easing_inout : 'easeOut';
 			carousel_speed        = !!ops && typeof ops.carousel_speed        != 'undefined' ? ops.carousel_speed        : 600;
-			carousel_transition   = !!ops && typeof ops.carousel_transition   != 'undefined' ? ops.carousel_transition   : 'fade';
 			
 			mode = carousel_position ? 'carousel' : 'fullview';
 
@@ -101,7 +118,7 @@ jQuery(function() {
 				// add options
 				if (carousel_position) _addViewModes();
 				
-				// add large image wrapper
+				// add slideshow image wrapper
 				_addImageWrapper();
 				
 				// show first image
@@ -122,7 +139,7 @@ jQuery(function() {
 			// we are using the elastislide plugin:
 			// http://tympanus.net/codrops/2011/09/12/elastislide-responsive-carousel/
 			$esCarousel.show().elastislide({
-				imageW 	 : __thumb_width__,
+				imageW 	 : carousel_thumb_width,
 				position : carousel_position,
 				easing   : carousel_easing,
 				easing_inout : carousel_easing_inout,
@@ -184,7 +201,7 @@ jQuery(function() {
 
 		_addImageWrapper = function()
 		{
-			// adds the structure for the large image and the navigation buttons (if total items > 1)
+			// adds the structure for the slideshow image and the navigation buttons (if total items > 1)
 			// also initializes the navigation events
 			
 			if (carousel_position == 2)
@@ -211,7 +228,7 @@ jQuery(function() {
 					return false;
 				});
 
-				// Add touchwipe events on the large image wrapper
+				// Add touchwipe events on the slideshow image wrapper
 				$imgWrapper.touchwipe({
 					wipeLeft			: function()
 					{
@@ -237,7 +254,7 @@ jQuery(function() {
 
 		_navigate = function( dir )
 		{
-			// Navigate through the large images
+			// Navigate through the slideshow images
 			if( anim ) return false;
 			anim	= true;
 
@@ -263,33 +280,82 @@ jQuery(function() {
 
 		_showImage = function( $item )
 		{
-			// Shows the large image that is associated to the $item
+			// Shows the slideshow image that is associated to the $item
 
-			//var $loader	= $rgGallery.find('div.rg-loading').show();
+			var $loader	= $rgGallery.find('div.rg-loading').show();
 
 			$items.removeClass('selected');
 			$item.addClass('selected');
 
 			var $thumb = $item.find('img'),
-				largesrc = $thumb.data('large'),
+				imagesrc = $thumb.data(slideshow_thumb_size),
 				title = $thumb.data('description');
 
-			jQuery('<img/>').load( function()
+			var easing_name = slideshow_easing != 'linear' && slideshow_easing != 'swing' ?
+				slideshow_easing_inout + slideshow_easing.charAt(0).toUpperCase() + slideshow_easing.slice(1) :
+				slideshow_easing;
+
+			$rgGallery.find('div.rg-image img').stop(false, true);
+
+			// Get active image
+			var $active = $rgGallery.find('div.rg-image img.active');
+			if (!$active.length)
 			{
-				//$rgGallery.find('div.rg-image').empty().append('<img src="' + largesrc + '"/>');
-				$rgGallery.find('div.rg-image').stop(false, true).animate({ opacity: 0.1 }, 500, function()
+				$active = jQuery('<img src="' + imagesrc + '" class="active" />').hide();
+				$active.ready( function()
 				{
-					var $loader	= $rgGallery.find('div.rg-loading').show();
-					jQuery(this).empty().append('<img src="' + largesrc + '"/>');
+					$rgGallery.find('div.rg-image').append($active);
+					$active.fadeIn(slideshow_speed);
 					$loader.hide();
-					jQuery(this).stop(false, true).animate({ opacity: 1 }, 2000);
 				});
+				// First image shown terminate
+				return;
+			}
+
+			// Add new image if not already added to the container
+			var $image = $rgGallery.find('div.rg-image img[src$=\'' + imagesrc + '\']');
+			if (!$image.length)
+			{
+				$image = jQuery('<img src="' + imagesrc + '" />');
+				$rgGallery.find('div.rg-image').append($image);
+			}
+
+			// Execute after DOM element ready aka image has finished loading (or already loaded)
+			$image.ready( function()
+			{
+				// Force height to fit images
+				var height = 0;
+				jQuery("div.rg-image img").each(function() {
+					height = jQuery(this).height() > height ? jQuery(this).height() : height;
+				});
+				jQuery("div.rg-image").css('height', height);
+
+				//$active.animate({ opacity: 0 }, 500);
+				//$active.animate({ opacity: 1 }, 500);
+
+				$image.css('z-index',2); // Move the newly activated image up the pile
+				$active.animate( {opacity : 0},
+					jQuery.extend( true, [], {
+						duration : slideshow_speed,
+						easing : easing_name,
+						complete : function() {
+							$active.hide().css({opacity : 1});
+							$active.css('z-index', 1).show().removeClass('active'); //reset the z-index and unhide the old active image
+							$image.css('z-index', 3).addClass('active'); // Make the newly activated image the top one
+						}
+					})
+				);
+
+				/*$active.fadeOut(slideshow_speed, function() { // Fade out currently active image
+					$active.css('z-index', 1).show().removeClass('active'); //reset the z-index and unhide the old active image
+					$image.css('z-index', 3).addClass('active'); // Make the newly activated image the top one
+				});*/
 
 				if( title )
 				{
 					$rgGallery.find('div.rg-caption').show().children('p').empty().text( title );
 				}
-				//$loader.hide();
+				$loader.hide();
 
 				if( mode === 'carousel' )
 				{
@@ -299,7 +365,7 @@ jQuery(function() {
 
 				anim	= false;
 
-			}).attr( 'src', largesrc );
+			});
 		},
 
 
@@ -319,7 +385,7 @@ jQuery(function() {
 
 	})();
 
-	Gallery.init(_elastislide_options_);
+	Gallery.init(elastislide_options_unique_gal_id);
 
 	/*
 	Example to add more items to the gallery:
