@@ -53,14 +53,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		parent::__construct();
 
 		// Register task aliases
-		$this->registerTask( 'add',            'edit' );
-		$this->registerTask( 'apply_type',     'save' );
-		$this->registerTask( 'apply',          'save' );
-		$this->registerTask( 'apply_ajax',     'save' );
-		$this->registerTask( 'save2new',       'save' );
-		$this->registerTask( 'save2copy',      'save' );
+		$this->registerTask( 'add',          'edit' );
+		$this->registerTask( 'apply_type',   'save' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'apply_ajax',   'save' );
+		$this->registerTask( 'save2new',     'save' );
+		$this->registerTask( 'save2copy',    'save' );
 
-		$this->registerTask( 'unfeatured',     'featured' );
+		$this->registerTask( 'unfeatured',   'featured' );
 
 		$this->option = $this->input->get('option', '', 'cmd');
 		$this->task   = $this->input->get('task', '', 'cmd');
@@ -101,7 +101,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
+
 		// Initialize variables
 		$app     = JFactory::getApplication();
 		$db      = JFactory::getDbo();
@@ -112,12 +112,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$ctrl_task = 'task=items.';
 		$original_task = $this->task;
-		
-		
-		// ***
-		// *** Get data from request
-		// ***
-		
+
 		// Retrieve form data these are subject to basic filtering
 		$data   = $this->input->post->get('jform', array(), 'array');  // Unfiltered data, (Core Fields) validation will follow via jform
 		$custom = $this->input->post->get('custom', array(), 'array');  // Unfiltered data, (Custom Fields) validation will be done onBeforeSaveField() of every field
@@ -134,7 +129,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 
 		// Get the model
-		$model = $this->getModel('item');
+		$model = $this->getModel($this->record_name);
 		$model->setId($data['id']);  // Make sure id is correct
 		$model->getState();   // Populate state
 		$record = $model->getItem($data['id'], $check_view_access=false, $no_cache=true, $force_version=0);
@@ -169,9 +164,16 @@ class FlexicontentControllerItems extends FlexicontentController
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 				$this->setMessage($this->getError(), 'error');
 
-				// Redirect back to the edit form
-				$this->setRedirect($this->returnURL);
-				return false;
+				// Set the POSTed form data into the session, so that they get reloaded
+				$app->setUserState('com_flexicontent.edit.'.$this->record_name.'.data', $data);      // Save the jform data in the session
+
+				// For errors, we redirect back to refer
+				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+
+				if ($this->input->get('fc_doajax_submit'))
+					jexit(flexicontent_html::get_system_messages_html());
+				else
+					return false;
 			}
 
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
@@ -373,9 +375,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
-		$fc_doajax_submit = $this->input->get('fc_doajax_submit', 0, 'int');
-		
-		// Validate Form data for core fields and for parameters
+
+		// Validate Form data (record properties and parameters specified in XML file)
 		$validated_data = $model->validate($form, $data);
 
 		// Check for validation error
@@ -397,7 +398,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Redirect back to the edit form
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -503,7 +504,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -517,7 +518,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -533,7 +534,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -580,7 +581,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 			catch (Exception $e) {}
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -856,7 +857,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->setRedirect($link, $msg);
 		//return;  // comment above and decomment this one to profile the saving operation
 
-		if ($fc_doajax_submit)
+		if ($this->input->get('fc_doajax_submit'))
 		{
 			JFactory::getApplication()->enqueueMessage($msg, 'message');
 			jexit(flexicontent_html::get_system_messages_html());
@@ -1257,8 +1258,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$redirect_url = $this->returnURL;
 		flexicontent_db::checkin($this->records_jtable, $redirect_url, $this);
 	}
-	
-	
+
+
 	/**
 	 * Import Joomla com_content datas
 	 *
