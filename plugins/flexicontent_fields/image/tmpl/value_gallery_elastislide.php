@@ -51,16 +51,18 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	$js = str_replace('unique_gal_id', $uid, $js);
 
 	$slideshow_thumb_size = $field->parameters->get( $PPFX_ . 'slideshow_thumb_size', 'large' );
+	$slideshow_auto_play = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 1 );
+	$slideshow_auto_delay = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 4000 );
 	$slideshow_transition = $field->parameters->get( $PPFX_ . 'slideshow_transition', 'cross-fade' );
 	$slideshow_easing   = $field->parameters->get( $PPFX_ . 'slideshow_easing', 'swing');
 	$slideshow_easing_inout = $field->parameters->get( $PPFX_ . 'slideshow_easing_inout', 'easeOut' );
-	$slideshow_speed = $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );
+	$slideshow_speed = (int) $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );
 
 	$carousel_position = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
 	$carousel_visible = (int) $field->parameters->get( $PPFX_ . 'carousel_visible', 2 );
 
 	$carousel_thumb_size = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
-	$carousel_thumb_width = $field->parameters->get( 'w_'.$carousel_thumb_size, 120 );
+	$carousel_thumb_width = (int) $field->parameters->get( 'w_'.$carousel_thumb_size, 120 );
 	$carousel_transition = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
 	$carousel_easing   = $field->parameters->get( $PPFX_ . 'carousel_easing', 'swing');
 	$carousel_easing_inout = $field->parameters->get( $PPFX_ . 'carousel_easing_inout', 'easeOut' );
@@ -71,6 +73,8 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 		JFactory::getDocument()->addScriptDeclaration(
 			'var elastislide_options_'.$uid.' = {
 				slideshow_thumb_size: \'' . $slideshow_thumb_size . '\',
+				slideshow_auto_play: ' . $slideshow_auto_play . ',
+				slideshow_auto_delay: ' . $slideshow_auto_delay . ',
 				slideshow_transition: \'' . $slideshow_transition . '\',
 				slideshow_easing: \'' . $slideshow_easing . '\',
 				slideshow_easing_inout: \'' . $slideshow_easing_inout . '\',

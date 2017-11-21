@@ -76,10 +76,12 @@ jQuery(function() {
 		mode 			= 'carousel',
 
 		// control if one image is being loaded
-		anim			= false,
+		doing_animation			= false,
 
-		// other carousel options
+		// slideshow options
 		slideshow_thumb_size = 'large',
+		slideshow_auto_play = 1,
+		slideshow_auto_delay = 4000,
 		slideshow_transition = 'fade',
 		slideshow_easing = 'swing',
 		slideshow_easing_inout = 'easeOut',
@@ -99,10 +101,12 @@ jQuery(function() {
 		init = function(ops)
 		{
 			slideshow_thumb_size   = !!ops && typeof ops.slideshow_thumb_size   != 'undefined' ? ops.slideshow_thumb_size   : 'large';
+			slideshow_auto_play    = !!ops && typeof ops.slideshow_auto_play    != 'undefined' ? ops.slideshow_auto_play    : 1;
+			slideshow_auto_delay   = !!ops && typeof ops.slideshow_auto_delay   != 'undefined' ? ops.slideshow_auto_delay   : 4000;
 			slideshow_transition   = !!ops && typeof ops.slideshow_transition   != 'undefined' ? ops.slideshow_transition   : 'cross-fade';
 			slideshow_easing       = !!ops && typeof ops.slideshow_easing       != 'undefined' ? ops.slideshow_easing       : 'swing';
 			slideshow_easing_inout = !!ops && typeof ops.slideshow_easing_inout != 'undefined' ? ops.slideshow_easing_inout : 'easeOut';
-			slideshow_speed        = !!ops && typeof ops.slideshow_speed        != 'undefined' ? ops.slideshow_speed        : 400;
+			slideshow_speed        = !!ops && typeof ops.slideshow_speed        != 'undefined' ? ops.slideshow_speed        : 600;
 
 			carousel_position     = !!ops && typeof ops.carousel_position     != 'undefined' ? ops.carousel_position     : 1;
 			carousel_visible      = !!ops && typeof ops.carousel_visible      != 'undefined' ? ops.carousel_visible      : 2;
@@ -134,6 +138,22 @@ jQuery(function() {
 			{
 				_initCarousel();
 			}
+
+			// Handle slideshow autoplay 
+			if (slideshow_auto_play)
+			{
+				function triggerAutoPlay()
+				{
+					// Navigate to next image
+					_navigate('right');
+
+					// Register next autoplay step
+					setTimeout(triggerAutoPlay, slideshow_auto_delay);
+				}
+
+				// Register 1st autoplay step
+				setTimeout(triggerAutoPlay, slideshow_auto_delay);
+			}
 		},
 
 
@@ -150,10 +170,12 @@ jQuery(function() {
 				effect   : carousel_transition,
 				onClick	 : function( $item )
 				{
-					if( anim ) return false;
-					anim	= true;
-					// on click show image
+					// on click show image if not already animating towards another image
+					if (doing_animation) return false;
+					doing_animation = true;
+
 					_showImage($item);
+
 					// change current
 					current	= $item.index();
 				}
@@ -255,11 +277,11 @@ jQuery(function() {
 		},
 
 
+		// Navigate to next previous slideshow image
 		_navigate = function( dir )
 		{
-			// Navigate through the slideshow images
-			if( anim ) return false;
-			anim	= true;
+			if (doing_animation) return false;
+			doing_animation = true;
 
 			if( dir === 'right' )
 			{
@@ -374,8 +396,7 @@ jQuery(function() {
 					$esCarousel.elastislide( 'setCurrent', current );
 				}
 
-				anim	= false;
-
+				doing_animation = false;
 			});
 		},
 

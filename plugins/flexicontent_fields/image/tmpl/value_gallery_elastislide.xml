@@ -22,6 +22,13 @@
 				<option value="large">FLEXI_LARGE</option>
 			</field>
 
+			<field name="PPFX_slideshow_auto_play" type="radio" default="1" label="Autoplay" description="Auto start slideshow" depend_class="slideshow_ops" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="PPFX_slideshow_auto_delay" type="text" default="4000" label="Autoplay delay" description="Delay for auto transitioning to next image" depend_class="slideshow_ops" />
+
 			<field name="" type="separator" default="Transition" level="level3" depend_class="slideshow_ops" />
 
 			<field name="PPFX_slideshow_transition" type="groupedlist" default="scroll" label="Effect" description="The transition effect for moving between images" class="" depend_class="slideshow_ops">
