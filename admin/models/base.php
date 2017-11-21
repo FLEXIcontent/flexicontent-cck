@@ -1029,6 +1029,44 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
+	 * Method to get the records having the given name
+	 *
+	 * @since	3.2.1.8
+	 */
+	public function loadRecordsByName($name = null)
+	{
+		// Check 'name' columns and then check 'alias' column exists, if none then clear $name
+		$table = $this->getTable();
+		$name_property = property_exists($table, 'name')
+			? 'name'
+			: (property_exists($table, 'alias')
+				? 'alias'
+				: (property_exists($table, 'title')
+					? 'title'
+					: null
+				)
+			);
+		$name = $name_property ? $name : null;
+
+		$name_quoted = $name ? $this->_db->Quote($name) : null;
+		if (!$name_quoted)
+		{
+			return false;
+		}
+
+		$query = 'SELECT *'
+			. ' FROM #__' . $this->records_dbtbl
+			. ' WHERE '
+			. ( $name_quoted
+				? ' name='.$name_quoted
+				: ' id=' . (int) $pk
+			);
+		$this->_db->setQuery($query);
+		return $this->_db->loadObjectList('id');
+	}
+
+
+	/**
 	 * Method to get the enqueued message array
 	 *
 	 * @since	3.2.0

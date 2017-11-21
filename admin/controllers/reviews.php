@@ -111,8 +111,10 @@ class FlexicontentControllerReviews extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
+		// Initialize variables
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		$original_task = $this->task;
 
 		// Retrieve form data these are subject to basic filtering
 		$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data, validation will follow via jform
@@ -143,7 +145,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 				$this->setMessage($this->getError(), 'error');
 
 				// Set the POSTed form data into the session, so that they get reloaded
-				$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
+				$app->setUserState('com_flexicontent.edit.'.$this->record_name.'.data', $data);      // Save the jform data in the session
 
 				// For errors, we redirect back to refer
 				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
@@ -187,8 +189,17 @@ class FlexicontentControllerReviews extends FlexicontentController
 				return false;
 		}
 
-		// Validate Form data
-		$form = $model->getForm($data, false);
+
+
+		// ***
+		// *** Basic Form data validation
+		// ***
+
+		// Get the JForm object, but do not pass any data we only want the form object,
+		// in order to validate the data and not create a filled-in form
+		$form = $model->getForm();
+
+		// Validate Form data (record properties and parameters specified in XML file)
 		$validated_data = $model->validate($form, $data);
 
 		// Check for validation error
@@ -214,7 +225,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		}
 
 		// Extra custom step before model store
-		if ($this->_beforeModelStore($validated_data, $data) === false)
+		if ($this->_beforeModelStore($validated_data, $data, $model) === false)
 		{
 			$app->enqueueMessage($this->getError(), 'error');
 			$app->setHeader('status', 500, true);
@@ -595,7 +606,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 	 * 
 	 * @since 1.5
 	 */
-	private function _beforeModelStore(& $validated_data, & $data)
+	private function _beforeModelStore(& $validated_data, & $data, $model)
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 	}
