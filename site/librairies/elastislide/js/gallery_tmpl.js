@@ -335,10 +335,15 @@ jQuery(function() {
 				});
 				$rgGallery.find('div.rg-image').css('height', height);
 
-				//$active.animate({ opacity: 0 }, 500);
-				//$active.animate({ opacity: 1 }, 500);
+				$image.css('z-index', 2).show().css({opacity : 0});
+				$image.animate( {opacity : 1},
+					jQuery.extend( true, [], {
+						duration : slideshow_speed,
+						easing : easing_name,
+						complete : function() {}
+					})
+				);
 
-				$image.css('z-index',2); // Move the newly activated image up the pile
 				$active.animate( {opacity : 0},
 					jQuery.extend( true, [], {
 						duration : slideshow_speed,
@@ -350,6 +355,7 @@ jQuery(function() {
 						}
 					})
 				);
+				//$rgGallery.find('div.rg-image').css('height', $image.height());
 
 				/*$active.fadeOut(slideshow_speed, function() { // Fade out currently active image
 					$active.css('z-index', 1).show().removeClass('active'); //reset the z-index and unhide the old active image
