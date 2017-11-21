@@ -28,9 +28,9 @@
 				<option value="cross-fade">Cross Fade</option>
 				<!--option value="scroll">Scroll</option>
 				<option value="fade">Fade</option>
-				<!--option value="slide">Slide</option>
-				<option value="fade-slide">Fade + Slide</option-->
-				<!--option value="clip">Clip</option>	
+				<option value="slide">Slide</option>
+				<option value="fade-slide">Fade + Slide</option>
+				<option value="clip">Clip</option>	
 				<option value="scale">Scale</option>
 				<option value="drop">Drop</option>
 				<group label="Experimental">
