@@ -206,11 +206,11 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
-		// If no given DATA then use posted data to determine new field type
+		// If no given DATA then try to use posted data to determine new field type
 		if (empty($data_obj))
 		{
 			$jform_data = JFactory::getApplication()->input->get('jform', array(), 'array');
-			if ($jform_data)
+			if ($jform_data && isset($jform_data['field_type']))
 			{
 				$data_obj = new stdClass();
 				$data_obj->iscore = isset($jform_data['iscore']) ? (int) $jform_data['iscore'] : 0;
@@ -228,7 +228,6 @@ class FlexicontentModelField extends FCModelAdmin
 		$plugin_name = $data_obj
 			? (!empty($data_obj->iscore) ? 'core' : $data_obj->field_type)
 			: ($this->plugin_name ?: 'text');
-		$plugin_name = JFilterInput::getInstance()->clean($plugin_name, 'CMD');
 
 		// URL variable with name -- 'field_type' overrides current type
 		$plugin_name = JFactory::getApplication()->input->get('field_type', $plugin_name, 'CMD');
