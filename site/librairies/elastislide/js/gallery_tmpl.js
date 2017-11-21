@@ -87,6 +87,7 @@ jQuery(function() {
 
 		// position of carousel (navigation thubmnails), 0: disable, 1: below, 2: above
 		carousel_position = 1,
+		carousel_visible = 2,
 		
 		// other carousel options
 		carousel_thumb_width = 120,
@@ -104,19 +105,21 @@ jQuery(function() {
 			slideshow_speed        = !!ops && typeof ops.slideshow_speed        != 'undefined' ? ops.slideshow_speed        : 400;
 
 			carousel_position     = !!ops && typeof ops.carousel_position     != 'undefined' ? ops.carousel_position     : 1;
+			carousel_visible      = !!ops && typeof ops.carousel_visible      != 'undefined' ? ops.carousel_visible      : 2;
+
 			carousel_thumb_width  = !!ops && typeof ops.carousel_thumb_width  != 'undefined' ? ops.carousel_thumb_width  : 120;
 			carousel_transition   = !!ops && typeof ops.carousel_transition   != 'undefined' ? ops.carousel_transition   : 'scroll';
 			carousel_easing       = !!ops && typeof ops.carousel_easing       != 'undefined' ? ops.carousel_easing       : 'swing';
 			carousel_easing_inout = !!ops && typeof ops.carousel_easing_inout != 'undefined' ? ops.carousel_easing_inout : 'easeOut';
 			carousel_speed        = !!ops && typeof ops.carousel_speed        != 'undefined' ? ops.carousel_speed        : 600;
 			
-			mode = carousel_position ? 'carousel' : 'fullview';
+			mode = carousel_position && carousel_visible ? 'carousel' : 'fullview';
 
 			// (not necessary) preloading the images here...
 			$items.add('<span class="rg-loading"></span>').imagesLoaded( function()
 			{
 				// add options
-				if (carousel_position) _addViewModes();
+				if (carousel_position && carousel_visible != 1) _addViewModes();
 				
 				// add slideshow image wrapper
 				_addImageWrapper();
@@ -302,12 +305,14 @@ jQuery(function() {
 			if (!$active.length)
 			{
 				$active = jQuery('<img src="' + imagesrc + '" class="active" />').hide();
+				$rgGallery.find('div.rg-image').append($active);
 				$active.ready( function()
 				{
-					$rgGallery.find('div.rg-image').append($active);
+					$rgGallery.find('div.rg-image').css('height', $active.height());
 					$active.fadeIn(slideshow_speed);
 					$loader.hide();
 				});
+
 				// First image shown terminate
 				return;
 			}
@@ -325,10 +330,10 @@ jQuery(function() {
 			{
 				// Force height to fit images
 				var height = 0;
-				jQuery("div.rg-image img").each(function() {
+				$rgGallery.find('div.rg-image').each(function() {
 					height = jQuery(this).height() > height ? jQuery(this).height() : height;
 				});
-				jQuery("div.rg-image").css('height', height);
+				$rgGallery.find('div.rg-image').css('height', height);
 
 				//$active.animate({ opacity: 0 }, 500);
 				//$active.animate({ opacity: 1 }, 500);

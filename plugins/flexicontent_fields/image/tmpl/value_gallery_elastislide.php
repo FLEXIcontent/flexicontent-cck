@@ -57,6 +57,8 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	$slideshow_speed = $field->parameters->get( $PPFX_ . 'slideshow_speed', 600 );
 
 	$carousel_position = (int) $field->parameters->get( $PPFX_ . 'carousel_position', 1 );
+	$carousel_visible = (int) $field->parameters->get( $PPFX_ . 'carousel_visible', 2 );
+
 	$carousel_thumb_size = $field->parameters->get( $PPFX_ . 'carousel_thumb_size', 's' );
 	$carousel_thumb_width = $field->parameters->get( 'w_'.$carousel_thumb_size, 120 );
 	$carousel_transition = $field->parameters->get( $PPFX_ . 'carousel_transition', 'scroll' );
@@ -75,6 +77,8 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 				slideshow_speed: ' . $slideshow_speed . ',
 
 				carousel_position: ' . $carousel_position . ',
+				carousel_visible: ' . $carousel_visible . ',
+
 				carousel_thumb_width: ' . $carousel_thumb_width . ',
 				carousel_transition: \'' . $carousel_transition . '\',
 				carousel_easing: \'' . $carousel_easing . '\',

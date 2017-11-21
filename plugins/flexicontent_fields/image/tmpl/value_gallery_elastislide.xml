@@ -75,13 +75,19 @@
 
 			<field name="" type="separator" default="Carousel options &lt;small&gt; (Thumbnail navigation) &lt;/small&gt;" level="level1" />
 
-			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group group-fcinfo" labelclass="label label-info" >
+			<field name="PPFX_carousel_position" type="multilist" subtype="radio" default="1" toggle_related="1" label="Add carousel" description="Enable to show a thumbnail carousel below or above the slideshow" class="btn-group" >
 				<option value="0" show_list="" hide_list="carousel_ops">FLEXI_NO</option>
 				<option value="1" show_list="carousel_ops" hide_list="">Below slideshow</option>
 				<option value="2" show_list="carousel_ops" hide_list="">Above slideshow</option>
 			</field>
 
-			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="Thumbnail size" description="..."  depend_class="carousel_ops" >
+			<field name="PPFX_carousel_visible" type="radio" default="2" label="Carousel state" description="Select what happens on page load, the carousel can start hidden (aka 'closed') with / without its toggler button" class="btn-group group-fcinfo"  depend_class="carousel_ops" >
+				<option value="0">Toggler button only</option>
+				<option value="1">Carousel only</option>
+				<option value="2">FLEXI_BOTH</option>
+			</field>
+
+			<field name="PPFX_carousel_thumb_size" type="radio" default="s" label="Thumbnail size" description="..." class="btn-group group-fcinfo"  depend_class="carousel_ops" >
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 			</field>
