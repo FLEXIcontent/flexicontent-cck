@@ -52,7 +52,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 	$slideshow_thumb_size = $field->parameters->get( $PPFX_ . 'slideshow_thumb_size', 'large' );
 	$slideshow_auto_play = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 1 );
-	$slideshow_auto_delay = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_play', 4000 );
+	$slideshow_auto_delay = (int) $field->parameters->get( $PPFX_ . 'slideshow_auto_delay', 4000 );
 	$slideshow_transition = $field->parameters->get( $PPFX_ . 'slideshow_transition', 'cross-fade' );
 	$slideshow_easing   = $field->parameters->get( $PPFX_ . 'slideshow_easing', 'swing');
 	$slideshow_easing_inout = $field->parameters->get( $PPFX_ . 'slideshow_easing_inout', 'easeOut' );

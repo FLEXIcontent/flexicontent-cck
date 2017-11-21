@@ -145,7 +145,7 @@ jQuery(function() {
 				function triggerAutoPlay()
 				{
 					// Navigate to next image
-					_navigate('right');
+					_navigate( 'right' );
 
 					// Register next autoplay step
 					setTimeout(triggerAutoPlay, slideshow_auto_delay);
