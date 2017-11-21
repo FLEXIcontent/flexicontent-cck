@@ -206,6 +206,18 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
+		// If no given DATA then use posted data to determine new field type
+		if (empty($data_obj))
+		{
+			$jform_data = JFactory::getApplication()->input->get('jform', array(), 'array');
+			if ($jform_data)
+			{
+				$data_obj = new stdClass();
+				$data_obj->iscore = isset($jform_data['iscore']) ? (int) $jform_data['iscore'] : 0;
+				$data_obj->field_type = JFilterInput::getInstance()->clean($jform_data['field_type'], 'CMD');
+			}
+		}
+
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 
@@ -214,12 +226,15 @@ class FlexicontentModelField extends FCModelAdmin
 
 		// Get plugin name from field type
 		$plugin_name = $data_obj
-			? ($data_obj->iscore ? 'core' : $data_obj->field_type)
+			? (!empty($data_obj->iscore) ? 'core' : $data_obj->field_type)
 			: ($this->plugin_name ?: 'text');
-		$plugin_name = JFactory::getApplication()->input->get('field_type', $plugin_name, 'cmd');
+		$plugin_name = JFilterInput::getInstance()->clean($plugin_name, 'CMD');
+
+		// URL variable with name -- 'field_type' overrides current type
+		$plugin_name = JFactory::getApplication()->input->get('field_type', $plugin_name, 'CMD');
 
 		// Try to load plugin file: /plugins/folder/element/element.xml
-		$plugin_path = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml';
+		$plugin_path = JPath::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
 		if (!JFile::exists($plugin_path))
 		{
 			throw new Exception('Error field XML file for field type: - ' . $this->field_type . '- was not found');
