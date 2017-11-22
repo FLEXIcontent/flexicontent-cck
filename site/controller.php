@@ -41,15 +41,16 @@ class FlexicontentController extends JControllerLegacy
 
 		// Register task aliases
 		$this->registerTask( 'save_a_preview', 'save' );
-		$this->registerTask( 'apply_type',     'save' );
-		$this->registerTask( 'apply',          'save' );
-		$this->registerTask( 'apply_ajax',     'save' );
-		$this->registerTask( 'save2new',       'save' );
-		$this->registerTask( 'save2copy',      'save' );
+		$this->registerTask( 'apply_type',   'save' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'apply_ajax',   'save' );
+		$this->registerTask( 'save2new',     'save' );
+		$this->registerTask( 'save2copy',    'save' );
+
 		$this->registerTask( 'download_tree',  'download' );
 
-		$this->input = empty($this->input) ? JFactory::getApplication()->input : $this->input;
-		$this->task  = $this->input->get('task', '', 'cmd');
+		$this->input  = empty($this->input) ? JFactory::getApplication()->input : $this->input;
+		$this->task   = $this->input->get('task', '', 'cmd');
 		$this->returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
 	}
 
@@ -155,11 +156,14 @@ class FlexicontentController extends JControllerLegacy
 			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemmodel->get('id').':'.$itemmodel->get('alias'), $globalcats[$itemmodel->get('catid')]->slug));
 		}
 		
-		else {
+		else
+		{
 			// Item deleted clean item-related caches
 			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
+
 			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
@@ -184,7 +188,7 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
+
 		// Initialize variables
 		$app     = JFactory::getApplication();
 		$db      = JFactory::getDbo();
@@ -195,12 +199,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$ctrl_task = 'task=items.';
 		$original_task = $this->task;
-		
-		
-		// ***
-		// *** Get data from request
-		// ***
-		
+
 		// Retrieve form data these are subject to basic filtering
 		$data   = $this->input->post->get('jform', array(), 'array');  // Unfiltered data, (Core Fields) validation will follow via jform
 		$custom = $this->input->post->get('custom', array(), 'array');  // Unfiltered data, (Custom Fields) validation will be done onBeforeSaveField() of every field
@@ -252,9 +251,16 @@ class FlexicontentController extends JControllerLegacy
 				$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()));
 				$this->setMessage($this->getError(), 'error');
 
-				// Redirect back to the edit form
-				$this->setRedirect($this->returnURL);
-				return false;
+				// Set the POSTed form data into the session, so that they get reloaded
+				$app->setUserState('com_flexicontent.edit.'.'item'.'.data', $data);      // Save the jform data in the session
+
+				// For errors, we redirect back to refer
+				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+
+				if ($this->input->get('fc_doajax_submit'))
+					jexit(flexicontent_html::get_system_messages_html());
+				else
+					return false;
 			}
 
 			// Reset the ID, the multilingual associations and then treat the request as for Apply.
@@ -464,7 +470,6 @@ class FlexicontentController extends JControllerLegacy
 		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
-		$fc_doajax_submit = $this->input->get('fc_doajax_submit', 0, 'int');
 
 		// *** MANUALLY CHECK CAPTCHA ***
 		$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
@@ -499,7 +504,7 @@ class FlexicontentController extends JControllerLegacy
 					// Redirect back to the edit form
 					$this->setRedirect($this->returnURL);
 					
-					if ( $fc_doajax_submit )
+					if ($this->input->get('fc_doajax_submit'))
 						jexit(flexicontent_html::get_system_messages_html());
 					else
 						return false;
@@ -507,7 +512,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 
-		// Validate Form data for core fields and for parameters
+		// Validate Form data (record properties and parameters specified in XML file)
 		$validated_data = $model->validate($form, $data);
 
 		// Check for validation error
@@ -529,7 +534,7 @@ class FlexicontentController extends JControllerLegacy
 			// Redirect back to the edit form
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -635,7 +640,7 @@ class FlexicontentController extends JControllerLegacy
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -649,7 +654,7 @@ class FlexicontentController extends JControllerLegacy
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -665,7 +670,7 @@ class FlexicontentController extends JControllerLegacy
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -712,7 +717,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			catch (Exception $e) {}
 
-			if ( $fc_doajax_submit )
+			if ($this->input->get('fc_doajax_submit'))
 				jexit(flexicontent_html::get_system_messages_html());
 			else
 				return false;
@@ -863,8 +868,10 @@ class FlexicontentController extends JControllerLegacy
 		// *** CLEAN THE CACHE so that our changes appear realtime
 		// ***
 		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
+
 		$cache = FLEXIUtilities::getCache($group='', 1);
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
@@ -1022,7 +1029,7 @@ class FlexicontentController extends JControllerLegacy
 		$this->setRedirect($link, $msg);
 		//return;  // comment above and decomment this one to profile the saving operation
 
-		if ($fc_doajax_submit)
+		if ($this->input->get('fc_doajax_submit'))
 		{
 			JFactory::getApplication()->enqueueMessage($msg, 'message');
 			jexit(flexicontent_html::get_system_messages_html());
