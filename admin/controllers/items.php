@@ -732,8 +732,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		// *** CLEAN THE CACHE so that our changes appear realtime
 		// ***
 		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
+
 		$cache = FLEXIUtilities::getCache($group='', 1);
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
@@ -1232,10 +1234,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		// CLEAN THE CACHE so that our changes appear realtime
-		if ($clean_cache_flag) {
+		if ($clean_cache_flag)
+		{
 			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
+
 			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
@@ -1474,8 +1479,10 @@ class FlexicontentControllerItems extends FlexicontentController
 			if ($newstate=='T') $msg .= '<br/> '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
 
 			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
+
 			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
@@ -1589,8 +1596,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 
 		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
+
 		$cache = FLEXIUtilities::getCache($group='', 1);
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
@@ -1657,8 +1666,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 
 		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
+
 		$cache = FLEXIUtilities::getCache($group='', 1);
 		$cache->clean('com_flexicontent_items');
 		$cache->clean('com_flexicontent_filters');
