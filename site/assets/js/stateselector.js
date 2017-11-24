@@ -37,9 +37,12 @@ jQuery(document).ready(function() {
 
 var fc_statehandler = function(options)
 {
+	var currentURL = window.location;
+	var live_site = currentURL.protocol + '//' + currentURL.host + fc_base_uri;
+
 	this.options = {
 		id: '',
-		script_url: 'index.php?option=com_flexicontent&format=raw',
+		script_url: live_site + '/index.php?option=com_flexicontent&format=raw',
 		task: '',
 		state: '',
 		font_icons: true,

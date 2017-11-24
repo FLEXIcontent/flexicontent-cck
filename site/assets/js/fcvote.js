@@ -1,9 +1,9 @@
 jQuery(document).ready(function(){
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
-	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcvote_rfolder + '/';
+	//var live_site = url.substring(0, url.indexOf('/', 14)) + fc_root_uri + '/';
 	
 	var currentURL = window.location;
-	var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+	var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
 	var under_vote = false;
 	
 	if (jQuery('.fcvote').length)
@@ -131,7 +131,7 @@ jQuery(document).ready(function(){
 		box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
 		
 		var currentURL = window.location;
-		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+		var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
 		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid="+tagid +"&content_id="+content_id +"&review_type="+review_type;
 
 		jQuery.ajax({
@@ -174,7 +174,7 @@ jQuery(document).ready(function(){
 		box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
 
 		var currentURL = window.location;
-		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+		var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
 		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=storereviewform";
 
 		jQuery.ajax({
