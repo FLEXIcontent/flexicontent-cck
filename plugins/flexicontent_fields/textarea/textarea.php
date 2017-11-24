@@ -61,8 +61,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
 		$editor  = JFactory::getEditor($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
-		
-		
+
+
 		// ***
 		// *** Number of values
 		// ***
@@ -71,12 +71,12 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
-		
-		
+
+
 		// ***
 		// *** Value handling
 		// ***
-		
+
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
@@ -88,8 +88,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		// *** Simple Textarea ***
 		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
 		$cols  = $field->parameters->get( 'cols', 80 ) ;
-		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		
+		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, when using HTML editor this will be client size only (and only if editor supports it)
+
+		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
+		$placeholder= $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
+
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '98%') ;
 		if ( is_numeric($width) ) $width .= 'px';
@@ -213,8 +216,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			// Update the new textarea field
 			$js .= "
-				// Update the new textarea
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
 				var container_inner = newField.find('.fcfield_box');
@@ -462,7 +465,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$mce_fieldname_sfx = $mce_fieldname ? '[' . $mce_fieldname . ']' : '';
 			$txtarea = !$use_html ? '
-				<textarea class="fcfield_textval txtarea' .($required ? ' required' : ''). '" id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea class="fcfield_textval txtarea' .($required ? ' required' : ''). '"
+					id="'.$elementid_n.'" name="'.$fieldname_n.'"
+					cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'
+					placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'"
+					>'
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
@@ -516,7 +523,6 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
 		$field->label = JText::_($field->label);
 		
 		// Some variables
@@ -753,17 +759,59 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$new++;
 		}
 		$post = $newpost;
-		
+
 		// Reconstruct value if it has splitted up e.g. to tabs or if given field is the description field,
 		// for textarea MULTI-VALUE and TAB-SPLIT not supported simutaneusly 
 		if ($field->parameters->get('editorarea_per_tab', 0) && count($post)>1)
 		{
 			$post = array(implode(' ', $post)) ;
 		}
-		/*if ($use_ingroup) {
-			$app = JFactory::getApplication();
-			$app->enqueueMessage( print_r($post, true), 'warning');
-		}*/
+
+		//if ($use_ingroup) JFactory::getApplication()->enqueueMessage( print_r($post, true), 'warning');
+	}
+
+
+	// Method to do extra handling of field's values after all fields have validated their posted data, and are ready to be saved
+	// $item->fields['fieldname']->postdata contains values of other fields
+	// $item->fields['fieldname']->filedata contains files of other fields (normally this is empty due to using AJAX for file uploading)
+	function onAllFieldsPostDataValidated( &$field, &$item )
+	{
+		if ( !in_array($field->field_type, static::$field_types) ) return;
+
+		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;  
+
+		if (!$auto_value)
+		{
+			return;
+		}
+
+		// Check for system plugin
+		$extfolder = 'system';
+		$extname   = 'flexisyspro';
+		$className = 'plg'. ucfirst($extfolder).$extname;
+		$plgPath = JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
+		
+		if (!file_exists($plgPath))
+		{
+			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
+			return;
+		}
+		//require_once $plgPath;
+
+		// Create plugin instance
+		$dispatcher   = JEventDispatcher::getInstance();
+		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
+		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
+
+		// Create automatic value
+		$plg->onAllFieldsPostDataValidated($field, $item);
 	}
 	
 	
@@ -789,8 +837,26 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
-		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
+	}
+	
+	
+	// Method to display a category filter for the category view
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		
 		FlexicontentFields::createFilter($filter, $value, $formName);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value, $return_sql=true)
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 	
 	
@@ -800,7 +866,6 @@ class plgFlexicontent_fieldsTextarea extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
-		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
 	

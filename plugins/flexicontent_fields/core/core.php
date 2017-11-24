@@ -529,7 +529,7 @@ class plgFlexicontent_fieldsCore extends FCField
 		{
 			case 'title':
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_TYPE_TO_LIST');
-				$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
+				$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 				$_label_internal = '';
 				$attribs_str = ' class="fc_field_filter '.$_label_internal.'" placeholder="'.$_inner_lb.'"';
 				
@@ -608,7 +608,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				
 				// MULTI-select: special label and prompts
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-				$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
+				$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 				if ($display_filter_as == 6)
 				{
 					if ($label_filter==2)
@@ -782,7 +782,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			// Add the options
 			$options = array();
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-			$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
+			$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 			if ($display_filter_as == 6)
 			{
 				if ($label_filter==2)
