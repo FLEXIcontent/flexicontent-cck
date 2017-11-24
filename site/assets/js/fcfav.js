@@ -41,7 +41,7 @@ function toggleFCFavCookie(id, type)
 function FCFav(id, type, add_counter)
 {
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
-	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcfav_rfolder + '/';
+	//var live_site = url.substring(0, url.indexOf('/', 14)) + fc_root_uri + '/';
 	type = (typeof type === "undefined" || type === null ) ? 'item' : type;
 	add_counter = (typeof add_counter === "undefined" || add_counter === null ) ? false : add_counter;
 
@@ -50,7 +50,7 @@ function FCFav(id, type, add_counter)
 	//toggleFCFavCookie(id, type);
 
 	var currentURL = window.location;
-	var live_site = currentURL.protocol + '//' + currentURL.host + fcfav_rfolder;
+	var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
 	
 	var favurl = live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id+'&type='+type
 

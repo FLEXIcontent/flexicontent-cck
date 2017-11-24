@@ -627,6 +627,7 @@ img.fc_field_image {
 div .fc_image_thumb {
 	display: inline-block;
 	text-decoration: none;
+	float: right;
 }
 div .fc_img_container {
 	display: inline-block;

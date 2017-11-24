@@ -64,9 +64,6 @@ if (!$js_and_css_added)
 	JText::script('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED',true);
 	JText::script('FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true);
 	JText::script('FLEXI_TOTAL',true);
-	$document->addScriptDeclaration('
-		var fcfav_rfolder = "'.JUri::root(true).'";
-	');
 
 	$js_and_css_added = true;
 }

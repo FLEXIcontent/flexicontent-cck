@@ -1629,6 +1629,8 @@ class flexicontent_html
 				if ($fc_uid != $hashedUA)  $jcookie->set( 'fc_uid', $hashedUA, 0);
 
 				$js .= "
+					var fc_root_uri = '" . JUri::root(true) . "';
+					var fc_base_uri = '" . JUri::base(true) . "';
 					var _FC_GET = ".json_encode($_GET).";
 				";
 				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
@@ -2612,6 +2614,9 @@ class flexicontent_html
 			JText::script('FLEXI_UNPUBLISH_THIS_ITEM', true);
 			JText::script('FLEXI_ARCHIVE_THIS_ITEM', true);
 			JText::script('FLEXI_TRASH_THIS_ITEM', true);
+
+			flexicontent_html::loadFramework('flexi_tmpl_common');
+
 			$doc = JFactory::getDocument();
 			$doc->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js = '
@@ -3430,9 +3435,6 @@ class flexicontent_html
 			$document = JFactory::getDocument();
 			$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
 			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
-			$document->addScriptDeclaration('
-				var fcvote_rfolder = "'.JUri::root(true).'";
-			');
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= JUri::root(true).'/'.$image;
