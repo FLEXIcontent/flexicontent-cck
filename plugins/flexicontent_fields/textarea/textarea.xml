@@ -66,13 +66,23 @@
 				</group>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_FIELD_VALUE_AUTO_VALUE_CREATION" level="level2" />
+			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
+			<field name="auto_value" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VALUE_AUTO_VALUE" description="FLEXI_FIELD_VALUE_AUTO_VALUE_DESC" class="btn-group group-fcmethod">
+				<option value="0" hide_list="auto-value-code">FLEXI_NO</option>
+				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+				default="&lt;?php&#13;&#10;$F = &amp; $item->fields;&#13;&#10;$txt = isset( $F['fieldname01'] )&#13;&#10;  ?  $F['fieldname01']->postdata[0]&#13;&#10;  :  'fieldname01 field not found';&#13;&#10;return $txt;"
+				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
 			
-			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_FLOATED_LEFT</option>
-				<option value="2">FLEXI_CLEARED</option>
+			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
+				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
+				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			<field name="use_html" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group group-fcinfo">
@@ -82,6 +92,7 @@
 			
 			
 			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" depend_class="using-plain-area" />
+			<field name="placeholder" type="text" default="" label="FLEXI_FIELD_PLACEHOLDER" description="FLEXI_FIELD_PLACEHOLDER_DESC" depend_class="using-plain-area custom_placeholder" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="using-plain-area" />
 			<field name="rows" type="text" default="3" size="3" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
 			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
@@ -94,7 +105,7 @@
 			</field>
 			<field name="width" type="text" default="98%" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
 			<field name="height" type="text" default="250px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
-			
+
 			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="" level="level3" depend_class="using-html-editor" />
 			<field name="show_buttons" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC" depend_class="using-html-editor" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="using-editor-btns">FLEXI_NO</option>
@@ -228,14 +239,34 @@
 				<option value="2">FLEXI_DESCRIPTION</option>
 			</field>
 			<field name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" depend_class="social-mode" />
-
+			
 		</fieldset>
 		<fieldset name="group-textarea-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
-			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
-				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_start" box_type="1" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" icon_class="icon-list" level="tab_open" box_type="1" />
+
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level2" />
+			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
+			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
+				<option value="1" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" icon_class="icon-list" level="tab_open" box_type="1" />
+			<field name="display_label_filter_s" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_INSIDE_FILTER</option>
+			</field>
+			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
+				<option value="1" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_close" box_type="1" />
 			
 		</fieldset>
 		<fieldset name="group-textarea-tabulate" repeat="1" icon_class="icon-puzzle" label="Tabs (RegEx)" description="Split textarea into TABs via regular expression" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -273,7 +304,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 		</fieldset>
 		
 	</fields>
@@ -282,4 +313,5 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textarea.ini</language>
 	</languages>
+	
 </extension>

@@ -3127,9 +3127,12 @@ class FlexicontentFields
 		$support = FlexicontentFields::getPropertySupport($filter->field_type, $filter->iscore);
 		if ( ! $support->supportfilter )  return null;
 
+		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );
+		$is_full_text = !empty($filter->is_full_text) ? $filter->is_full_text : $display_filter_as == 1;
+
 		$valueswhere = !empty($filter->filter_valuewhere)
 			? $filter->filter_valuewhere
-			: FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=0, $is_search=0);
+			: FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text, $is_search=0);
 		if ( !$valueswhere )  return;
 
 		$idname = !empty($filter->filter_valuesjoin)
@@ -3148,7 +3151,6 @@ class FlexicontentFields
 			: null;
 
 		// Decide to require all values
-		$display_filter_as = $filter->parameters->get('display_filter_as', 0 );
 
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );

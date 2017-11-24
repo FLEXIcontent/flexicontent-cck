@@ -16,7 +16,7 @@ class plgFlexicontent_fieldsText extends FCField
 {
 	static $field_types = array('text', 'textselect');
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
-	
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -25,9 +25,9 @@ class plgFlexicontent_fieldsText extends FCField
 	{
 		parent::__construct( $subject, $params );
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** DISPLAY methods, item form & frontend views
 	// ***
@@ -63,19 +63,20 @@ class plgFlexicontent_fieldsText extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ****************
-		// Number of values
-		// ****************
+		// ***
+		// *** Number of values
+		// ***
+
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
-		
-		
-		// **************
-		// Value handling
-		// **************
-		
+
+
+		// ***
+		// *** Value handling
+		// ***
+
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
@@ -100,21 +101,24 @@ class plgFlexicontent_fieldsText extends FCField
 		$posttext = $field->parameters->get( 'posttext_form', '' ) ;
 		
 		
-		// **********************
-	  // Create validation mask
-		// **********************
+		// ***
+	  // *** Create validation mask
+		// ***
+
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		$custommask = $field->parameters->get( 'custommask', false ) ;
 		$regexmask  = $field->parameters->get( 'regexmask', false ) ;
 		
 		static $inputmask_added = false;
-	  if ($inputmask && !$inputmask_added) {
+	  if ($inputmask && !$inputmask_added)
+		{
 			$inputmask_added = true;
 			flexicontent_html::loadFramework('inputmask');
 		}
 		
 		// Initialise property with default value
-		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
+		{
 			$field->value = $default_values;
 		}
 		
@@ -171,7 +175,7 @@ class plgFlexicontent_fieldsText extends FCField
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update the new text field
+			// Update the new (text) input field
 			$js .= "
 				var theInput = newField.find('input.fcfield_textval').first();
 				var theInput_dv = theInput.attr('data-defvals');
@@ -333,7 +337,7 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 		
 		// Add placeholder tag parameter if not using validation mask, (if using vaildation mask then placeholder should be added a validation mask property)
-		$attribs .= $placeholder ? ' placeholder="'.$placeholder.'" ' : '';
+		$attribs .= $placeholder ? ' placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'" ' : '';
 		
 		
 		// *****************************************
@@ -396,7 +400,6 @@ class plgFlexicontent_fieldsText extends FCField
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
 		$field->label = JText::_($field->label);
 		
 		// Some variables
@@ -426,9 +429,12 @@ class plgFlexicontent_fieldsText extends FCField
 			$output_custom_func = $field->parameters->get('output_custom_func', '');
 			$format_output = !$output_custom_func ? 0 : $format_output;
 		}
-		
-		
-		// Default value
+
+
+		// ***
+		// *** Default value
+		// ***
+
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_value = strlen($default_value) ? JText::_($default_value) : '';
@@ -600,18 +606,22 @@ class plgFlexicontent_fieldsText extends FCField
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
+
 		// Take into consideration client side validation
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 'HTML' ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
-		
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -633,11 +643,11 @@ class plgFlexicontent_fieldsText extends FCField
 				}
 				//JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
 			}
-			
-			// **************************************************************
-			// Validate data, skipping values that are empty after validation
-			// **************************************************************
-			
+
+			// ***
+			// *** Validate data, skipping values that are empty after validation
+			// ***
+
 			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
 			// Skip empty value, but if in group increment the value position
@@ -651,10 +661,8 @@ class plgFlexicontent_fieldsText extends FCField
 			$new++;
 		}
 		$post = $newpost;
-		/*if ($use_ingroup) {
-			$app = JFactory::getApplication();
-			$app->enqueueMessage( print_r($post, true), 'warning');
-		}*/
+
+		//if ($use_ingroup) JFactory::getApplication()->enqueueMessage( print_r($post, true), 'warning');
 	}
 
 

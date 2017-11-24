@@ -56,7 +56,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				.'</div>';
 			return;
 		}
-		
+
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -71,9 +71,10 @@ class plgFlexicontent_fieldsDate extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		// ****************
-		// Number of values
-		// ****************
+		// ***
+		// *** Number of values
+		// ***
+
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
@@ -146,9 +147,10 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 		
 		$field_notes = $field_notes ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$field_notes : '';
-		
+
 		// Initialise property with default value
-		if ( !$field->value ) {
+		if ( !$field->value )
+		{
 			$field->value = array();
 			$field->value[0] = '';
 		}
@@ -199,11 +201,15 @@ class plgFlexicontent_fieldsDate extends FCField
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
-				
-				// Update the new text field
+				";
+			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			// Update the new (date) input field
+			$js .= "
 				var theInput = newField.find('input.fcfield_date').first();
 				theInput.val('');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
@@ -224,7 +230,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			if($disable_keyboardinput)
 				$js .= "
 				theInput.on('keydown keypress keyup', false);
-					";
+				";
 			
 			// Add new field to DOM
 			$js .= "
@@ -603,11 +609,15 @@ class plgFlexicontent_fieldsDate extends FCField
 			// For logged users the date values are in user's time zone, (unlogged users will submit in site default timezone)
 			$timezone = $user->getParam('timezone', $config->get('offset'));  // this is numeric offset in J1.5 and timezone STRING in J2.5
 		}
-		
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
+
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
-		
-		// Reformat the posted data
+
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
@@ -623,8 +633,11 @@ class plgFlexicontent_fieldsDate extends FCField
 				}
 				continue;
 			}
-			
-			// Do server-side validation and skip empty values
+
+			// ***
+			// *** Validate data, skipping values that are empty after validation
+			// ***
+
 			$post[$n] = flexicontent_html::dataFilter($post[$n], 200, 'STRING', 0);
 			
 			// Skip empty value, but if in group increment the value position

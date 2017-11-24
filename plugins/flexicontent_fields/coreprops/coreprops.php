@@ -253,7 +253,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			// Add the options
 			$options = array();
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-			$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
+			$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 			if ($display_filter_as == 6)
 			{
 				if ($label_filter==2)
