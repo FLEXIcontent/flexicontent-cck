@@ -739,7 +739,7 @@ var JFormValidator = function()
 		
 		if (valid)
 		{
-			jQuery('input.fcfield_auto_value').val(Joomla.JText._('FLEXI_AUTO'));
+			jQuery('input.fcfield_auto_value, textarea.fcfield_auto_value').val(Joomla.JText._('FLEXI_AUTO'));
 		}
 		return valid;
 	},

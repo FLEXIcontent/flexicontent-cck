@@ -43,6 +43,15 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
+		// Check if using 'auto_value_code', clear 'auto_value', if function not set
+		$auto_value = (int) $field->parameters->get('auto_value', 0);
+		if ($auto_value === 2)
+		{
+			$auto_value_code = $field->parameters->get('auto_value_code', '');
+			$auto_value_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_value_code);
+		}
+		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;  
+
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -465,9 +474,11 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$mce_fieldname_sfx = $mce_fieldname ? '[' . $mce_fieldname . ']' : '';
 			$txtarea = !$use_html ? '
-				<textarea class="fcfield_textval txtarea' .($required ? ' required' : ''). '"
+				<textarea class="fcfield_textval txtarea' . ($required ? ' required' : '') . ($auto_value ? ' fcfield_auto_value' : '') . '"
 					id="'.$elementid_n.'" name="'.$fieldname_n.'"
-					cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'
+					cols="'.$cols.'" rows="'.$rows.'"
+					' . ($maxlength ? 'maxlength="'.$maxlength.'"' : '') . '
+					' . ($auto_value ? ' readonly="readonly" ' : '') . '
 					placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'"
 					>'
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
@@ -485,7 +496,8 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				</div>';
 			
 			$field->html[] = '
-				'.($use_ingroup || !$multiple ? '' : '
+				'.($auto_value ? '<span class="fc-mssg-inline fc-info fc-nobgimage">' . JText::_('FLEXI_AUTO') . '</span>' : '').'
+				'.($use_ingroup || !$multiple || $auto_value ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
@@ -791,6 +803,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		{
 			return;
 		}
+		echo $field->label . '<br/>';
 
 		// Check for system plugin
 		$extfolder = 'system';

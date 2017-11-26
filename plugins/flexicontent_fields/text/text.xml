@@ -146,7 +146,7 @@
 				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
 			</field>
 			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
-				default="&lt;?php&#13;&#10;$F = &amp; $item->fields;&#13;&#10;$txt = isset( $F['fieldname01'] )&#13;&#10;  ?  $F['fieldname01']->postdata[0]&#13;&#10;  :  'fieldname01 field not found';&#13;&#10;return $txt;"
+				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
 				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
