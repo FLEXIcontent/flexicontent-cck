@@ -33,40 +33,19 @@
 				published=""
 				label="MOD_FLEXICATEGORIES_FIELD_PARENT_LABEL"
 				description="MOD_FLEXICATEGORIES_FIELD_PARENT_DESC"/>
-	
+
 			<field
-				name="show_description"
-				type="radio"
-				class="btn-group"
-				default="0"
-				label="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_LABEL"
-				description="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_DESC">
-				<option value="1">JYES</option>
-				<option value="0">JNO</option>
+				name="show_empty_cats"
+				type="multilist"
+				subtype="radio"
+				class="btn-group group-fcmethod fcoffactive"
+				default="1"
+				label="MOD_FLEXICATEGORIES_EMPTY_CATS"
+				description="MOD_FLEXICATEGORIES_EMPTY_CATS_DESC">
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
 			</field>
-	
-			<field
-				name="numitems"
-				type="radio"
-				class="btn-group"
-				default="0"
-				label="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_LABEL"
-				description="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_DESC">
-				<option value="1">JYES</option>
-				<option value="0">JNO</option>
-			</field>
-	
-			<field
-				name="show_children"
-				type="radio"
-				class="btn-group"
-				default="0"
-				label="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_LABEL"
-				description="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_DESC">
-				<option value="1">JYES</option>
-				<option value="0">JNO</option>
-			</field>
-	
+
 			<field
 				name="count"
 				type="list"
@@ -86,13 +65,50 @@
 				<option value="9">J9</option>
 				<option value="10">J10</option>
 			</field>
+
+			<field name="" type="separator" default="MOD_FLEXICATEGORIES_INFO_SHOWN" description="..." level="level3" />
+
+			<field
+				name="show_description"
+				type="radio"
+				class="btn-group"
+				default="0"
+				label="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_SHOW_DESCRIPTION_DESC">
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
 	
+			<field
+				name="numitems"
+				type="radio"
+				class="btn-group"
+				default="0"
+				label="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_NUMITEMS_DESC">
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+	
+			<field name="" type="separator" default="MOD_FLEXICATEGORIES_SUBCATEGORIES" description="..." level="level3" />
+
+			<field
+				name="show_children"
+				type="radio"
+				class="btn-group"
+				default="0"
+				label="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_LABEL"
+				description="MOD_FLEXICATEGORIES_FIELD_SHOW_CHILDREN_DESC">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
 			<field
 				name="maxlevel"
 				type="list"
 				label="MOD_FLEXICATEGORIES_FIELD_MAXLEVEL_LABEL"
 				description="MOD_FLEXICATEGORIES_FIELD_MAXLEVEL_DESC"
 				default="0"
+				showon="show_children:1"
 			>
 				<option value="0">JALL</option>
 				<option value="1">J1</option>
@@ -109,8 +125,8 @@
 
 			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
 			<field name="show_description_image" type="multilist" subtype="radio" default="0" label="MOD_FLEXICATEGORIES_SHOW_IMAGE" description="MOD_FLEXICATEGORIES_SHOW_IMAGE_DESC" toggle_related="1" class="btn-group">
-				<option value="0" show_list="" hide_list="disp_cat_img">FLEXI_HIDE</option>
-				<option value="1" show_list="disp_cat_img" hide_list="">FLEXI_SHOW</option>
+				<option value="0" show_list="" hide_list="disp_cat_img">JNO</option>
+				<option value="1" show_list="disp_cat_img" hide_list="">JYES</option>
 			</field>
 			<field name="cat_image_source" type="radio" default="2" label="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE" description="MOD_FLEXICATEGORIES_CAT_IMAGE_SOURCE_DESC" class="btn-group disp_cat_img">
 				<option value="0">MOD_FLEXICATEGORIES_CAT_IMAGE_EXTRACT</option>
