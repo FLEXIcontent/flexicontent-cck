@@ -1007,9 +1007,10 @@ class ParentClassItem extends FCModelAdmin
 		
 		// Determine correct permissions to check.
 		$id = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName().'.id');
+		$isNew = !$id;
 
 		// Existing record
-		if ($id)
+		if (!$isNew)
 		{
 			// Can only edit in selected categories.
 			$form->setFieldAttribute('catid', 'action', 'core.edit');
@@ -1024,44 +1025,63 @@ class ParentClassItem extends FCModelAdmin
 			$form->setFieldAttribute('catid', 'action', 'core.create');
 		}
 
+		$canEditState = $this->canEditState( empty($data) ? null : (object)$data );
+		$autoPublished = !empty($this->_record->submit_conf['autopublished']);
+
 		// Modify the form based on Edit State access controls.
-		if ( empty($this->_record->submit_conf['autopublished']) && !$this->canEditState( empty($data) ? null : (object)$data ) )
+		if ( !$autoPublished && !$canEditState )
 		{
-			$frontend_new = !$id && $app->isSite();
-			
-			// *** Disable fields for display.
-			$form->setFieldAttribute('featured', 'disabled', 'true');
-			$form->setFieldAttribute('ordering', 'disabled', 'true');
-			$form->setFieldAttribute('publish_up', 'disabled', 'true');
-			$form->setFieldAttribute('publish_down', 'disabled', 'true');
+			$frontend_new = $isNew && $app->isSite();
 
-			// Skip disabling state for new items in frontend to allow override via menu (auto-publish), menu override must be checked during store
+			/* Allow 'publish_up' & 'publish_down' only for NEW items
+			 * These will either be overriden on item creation (via menu override)
+			 * or they should be checked by the reviewer that will approve / publish the item
+			 */
+			if ($isNew)
+			{
+				$form->setValue('publish_up', null, '');
+				$form->setValue('publish_down', null, '');
+				$form->setFieldAttribute('publish_up', 'hint', JText::_('FLEXI_FIELD_ACCESS_CHECKED_DURING_SAVE'));
+				$form->setFieldAttribute('publish_down', 'hint', JText::_('FLEXI_FIELD_ACCESS_CHECKED_DURING_SAVE'));
+			}
+			else
+			{
+				$form->setFieldAttribute('publish_up', 'disabled', 'true');
+				$form->setFieldAttribute('publish_down', 'disabled', 'true');
+				$form->setFieldAttribute('publish_up', 'filter', 'unset');
+				$form->setFieldAttribute('publish_down', 'filter', 'unset');
+			}
+
+			// Skip disabling & unsetting state for new items in frontend to allow override via menu (auto-publish), menu override must be checked during store
 			if ( !$frontend_new )
 			{
-				$form->setFieldAttribute('state', 'disabled', 'true');   // only for existing items, not for new to allow menu item override
+				$form->setFieldAttribute('state', 'disabled', 'true');
+				$form->setFieldAttribute('state', 'filter', 'unset');
 			}
-			//$form->setFieldAttribute('vstate', 'disabled', 'true');  // DO not -disable- will cause problems
-			
-			// *** Unset posted value for these fields too
-			$form->setFieldAttribute('featured', 'filter', 'unset');
-			$form->setFieldAttribute('ordering', 'filter', 'unset');
-			$form->setFieldAttribute('publish_up', 'filter', 'unset');
-			$form->setFieldAttribute('publish_down', 'filter', 'unset');
 
-			// Skip unsetting state for new items in frontend to allow override via menu (auto-publish), menu override must be check during store
-			if ( !$frontend_new )
-			{
-				$form->setFieldAttribute('state', 'filter', 'unset');   // only for existing items, not for new to allow menu item override
-			}
-			//$form->setFieldAttribute('vstate', 'filter', 'unset');   // DO not -filter- will cause problems
+			// DO not -disable- & -filter- 'vstate' it is needed during model's store and any tampering by user of it has no effect if no publish privilege !
+			//$form->setFieldAttribute('vstate', 'disabled', 'true');
+			//$form->setFieldAttribute('vstate', 'filter', 'unset');
 		}
 
-		// (item edit form) edit creation date
+
+		// (no edit state ACL or is frontend) disable & filter fields 'featured' & 'ordering' fields
+		if (!$app->isAdmin() || !$canEditState)
+		{
+			$form->setFieldAttribute('featured', 'disabled', 'true');
+			$form->setFieldAttribute('ordering', 'disabled', 'true');
+			$form->setFieldAttribute('featured', 'filter', 'unset');
+			$form->setFieldAttribute('ordering', 'filter', 'unset');
+		}
+
+		// (item edit form ACL) edit creation date
 		if (!$perms->EditCreationDate)
 		{
 			$form->setFieldAttribute('created', 'disabled', 'true');
 			$form->setFieldAttribute('created', 'filter', 'unset');
 		}
+
+		// (item edit form ACL) edit creation date
 		if (!$perms->EditCreator)
 		{
 			$form->setFieldAttribute('created_by', 'disabled', 'true');
@@ -1070,7 +1090,7 @@ class ParentClassItem extends FCModelAdmin
 			$form->setFieldAttribute('created_by_alias', 'filter', 'unset');
 		}
 
-		// (item edit form) edit creation date
+		// (item edit form ACL) edit viewing access level
 		if (!$perms->CanAccLvl)
 		{
 			$form->setFieldAttribute('access', 'disabled', 'true');
@@ -1080,7 +1100,7 @@ class ParentClassItem extends FCModelAdmin
 		// Check if item has languages associations, and disable changing category and language in frontend
 		/*$useAssocs = $this->useAssociations();
 		
-		if ($id && $app->isSite() && $useAssocs)
+		if (!$isNew && $app->isSite() && $useAssocs)
 		{
 			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $id);
 			
@@ -1875,17 +1895,28 @@ class ParentClassItem extends FCModelAdmin
 		$item->created_by = $old_created_by;
 		$item->catid      = $old_catid;
 		
-		// If cannot edit state prevent user from changing state related parameters
+		// If cannot edit state or is frontend, then prevent user from changing 'featured' & 'ordering'
+		if ( !$canEditState || $app->isSite() )
+		{
+			unset( $data['featured'] );
+			unset( $data['ordering'] );
+		}
+
+		// If cannot edit state then do extra filtering of fields
+		// Note some fields are not filtered since item will go under approval
 		if ( !$canEditState )
 		{
 			$AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent');
 			$data['vstate'] = $AutoApproveChanges ? 2 : 1;
-			unset( $data['featured'] );
-			unset( $data['publish_up'] );
-			unset( $data['publish_down'] );
-			unset( $data['ordering'] );
-			
-			// Check for publish up/down dates forced during auto-publishing
+
+			// Allow 'publish_up' & 'publish_down' only for NEW items (we may override these with specific value below ...)
+			if (!$isNew)
+			{
+				unset( $data['publish_up'] );
+				unset( $data['publish_down'] );
+			}
+
+			// Override the above values with forced auto-publishing data
 			if ( !empty($publish_up_forced) )   $data['publish_up']   = $publish_up_forced;
 			if ( !empty($publish_down_forced) ) $data['publish_down'] = $publish_down_forced;
 			
@@ -2561,6 +2592,9 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$core_data_via_events[$field->name] = isset($field->postdata[0]) ? $field->postdata[0] : '';
 			}
+
+			// Make sure any modified values are an array
+			$field->postdata = $this->formatToArray( $field->postdata );
 		}
 
 
