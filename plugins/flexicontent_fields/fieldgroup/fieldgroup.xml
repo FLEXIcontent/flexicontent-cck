@@ -14,19 +14,19 @@
 		<filename plugin="fieldgroup">fieldgroup.php</filename>
 		<filename>index.html</filename>
 	</files>
-	
+
 	<config>
 	<fields name="attribs">
-		
+
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
-		
+
 		<fieldset name="group-fieldgroup-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
-			
+
 			<field name="fields" type="fields" multiple="false" groupables="1" issortable="1" default="" label="Fields" description="Select fields that will be show shown as a group" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
 			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" tip_class="multivalue-mode" tip_img="warning.png" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
@@ -38,7 +38,7 @@
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
-			
+
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -51,7 +51,7 @@
 				<option value="1" show_list="form_empty_fields" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="form_empty_fields_text" type="text" default="FLEXI_NA" label="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT" description="FLEXI_FIELD_GROUP_EMPTY_NON_ASSIGNED_FIELDS_CUSTOM_TEXT_DESC" depend_class="form_empty_fields"/>
-		
+
 			<field name="" type="separator" default="Compact editing" description="" depend_class="" level="level2" />
 			<field name="compact_edit_global" type="radio" default="0" label="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -63,13 +63,13 @@
 				<option value="2" show_list="compact_edit" hide_list="">Yes, start expanded</option>
 			</field>
 			<field name="compact_edit_excluded" type="fields" multiple="false" groupables="1" issortable="1" default="" label="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_GROUP_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
-			
+
 		</fieldset>
-		
+
 		<fieldset name="group-fieldgroup-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -83,9 +83,9 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
@@ -96,17 +96,17 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-			
+
 			<field name="" type="separator" default="Display mode" level="level2" />
 			<field name="display_mode" type="multilist" subtype="radio" default="0" label="FLEXI_USE_CUSTOMIZED_HTML" description="FLEXI_USE_CUSTOMIZED_HTML_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="custom-field-disp">Default HTML</option>
 				<option value="1" show_list="custom-field-disp" hide_list="">Custom HTML</option>
 			</field>
-			<field name="custom_html" type="textarea" filter="RAW" cols="38" rows="5" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
-			
+			<field name="custom_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
+
 			<field name="" type="separator" default="Fields WITHOUT value" level="level2" />
 			<field name="hide_lbl_ifnoval" type="filters" multiple="false" groupables="1" isfilter="*" default="" label="Skip field (Label/empty html code)" description="Select fields to hide labels if they have no value. NOTE: if using 'default HTML', then this will also skip fields that produced no HTML code" />
-			
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
@@ -132,19 +132,19 @@
 			</field>
 			<field name="opentag" type="text" default="" filter="raw" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" filter="raw" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
+
 		</fieldset>
-		
+
 		<fieldset name="group-fieldgroup-seo" repeat="1" icon_class="icon-search" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level1" />
 			<field name="fieldgroup_itemtype" type="microdatatype" label="FLEXI_MICRODATA_ITEMTYPE" description="FLEXI_MICRODATA_ITEMTYPE_DESC" />
-			
+
 		</fieldset>
-		
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fieldgroup.ini</language>
 	</languages>

@@ -15,16 +15,16 @@
 		<filename>index.html</filename>
 		<folder>tmpl</folder>
 	</files>
-	
+
 	<config>
-	
+
 	<fields name="attribs">
 
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
-		
+
 		<fieldset name="group-relation-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<!--field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" /-->
 
 
@@ -43,8 +43,8 @@
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
-			
-			
+
+
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" />
 
 			<field name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" class="btn-group btn-group-yesno">
@@ -68,7 +68,7 @@
 				<!--option value="rated">FLEXI_ORDER_BEST_RATED</option-->
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_RIFLD_LIST_OF_SELECTED_ITEMS" level="level2" />
 			<field name="" type="separator" default="FLEXI_RIFLD_ALLOW_SORTING_ITEMS_INFO" level="level3" class="alert alert-info fcpadded" />
 			<field name="selected_items_sortable" type="radio" default="0" label="FLEXI_RIFLD_ALLOW_SORTING_ITEMS" description="FLEXI_RIFLD_ALLOW_SORTING_ITEMS_DESC" class="btn-group btn-group-yesno">
@@ -114,7 +114,7 @@
 				<option value="3">FLEXI_INCLUDE</option>
 			</field>
 			<field name="types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
-			
+
 			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
 			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_RIFLD_NO_LIMIT</option>
@@ -234,8 +234,8 @@
 			<field name="" type="separator" default="FLEXI_FIELD_ITEM_HTML_DESC" level="level3" class="alert alert-info fcpadded" />
 			<field name="" type="separator" default="FLEXI_RIFLD_CONFIG_OVERRIDEN_INSIDE_TOTAL_COUNT_TAB_INFO" level="level4" class="alert alert-info fcpadded" />
 
-			<field name="relitem_html" type="textarea" filter="RAW" cols="38" rows="5" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
-			
+			<field name="relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
+
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" />
 			<field name="displayway" type="list" default="1" label="FLEXI_RELATED_DISPLAY_TEXT" description="FLEXI_RELATED_DISPLAY_TEXT_DESC">
 				<option value="0">FLEXI_RELATED_DISPLAY_ID</option>
@@ -249,7 +249,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
@@ -260,7 +260,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
-			
+
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1">
 				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
@@ -300,7 +300,7 @@
 				<option value="0" show_list="" hide_list="button-relation-mode">FLEXI_NO</option>
 				<option value="1" show_list="button-relation-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" description="" level="level2" depend_class="button-relation-mode" />
 			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC" class="btn-group group-fcinfo" depend_class="button-relation-mode" >
 				<option value="0">FLEXI_BEFORE</option>
@@ -335,7 +335,7 @@
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="viewing-total-mode" />
 			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" depend_class="viewing-total-mode" />
-			
+
 			<field name="" type="separator" default="FLEXI_EXTRA_INFO" level="level2" depend_class="viewing-total-mode" />
 			<field name="total_show_auto_btn" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_SUBMIT_RELATED_BTN" description="FLEXI_RIFLD_TOTAL_SHOW_SUBMIT_RELATED_BTN_DESC" depend_class="viewing-total-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -346,19 +346,19 @@
 				<option value="1" show_list="total_item_list" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FIELD_OVERRIDE_DEFAULT" level="level3" depend_class="viewing-total-mode total_item_list" />
-			<field name="total_relitem_html" type="textarea" filter="RAW" cols="38" rows="5" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
+			<field name="total_relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="38" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
 
 			<field name="" type="separator" default="FLEXI_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 
 		<fieldset name="group-relation-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_start" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" icon_class="icon-database" level="tab_open" box_type="1" />
-			
+
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
-			
+
 			<field name="" type="separator" default="FLEXI_FILTER_VALUES_MATCHING_CONF" level="level3" class="alert alert-info fcpadded" />
 			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
@@ -368,7 +368,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" icon_class="icon-list" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level2" />
@@ -388,13 +388,13 @@
 				<option value="5" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			
+
 			<field name="faceted_filter" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1" class="use_select2_lib fc_skip_highlight">
 				<option value="0" show_list="" hide_list="active-filts-mode">FLEXI_FS_NONE</option>
 				<option value="1" show_list="" hide_list="active-filts-mode">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2" show_list="active-filts-mode" hide_list="">FLEXI_FS_ACTIVE_FILTERS</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" depend_class="active-filts-mode" />
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC" depend_class="active-filts-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
@@ -404,14 +404,14 @@
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_HIDE</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down" />
 			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
 				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down displaydefauttext-mode" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_DISPLAY_AS_SLIDER" level="level3" depend_class="filt-as-slider" />
 			<field name="slider_display_config" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FILTER_SLIDER_DATA" description="FLEXI_FILTER_SLIDER_DATA_DESC" depend_class="filt-as-slider" class="btn-group group-fcmethod">
 				<option value="1" show_list="" hide_list="filt-as-slider-custom">Found values</option>
@@ -431,7 +431,7 @@
 			<field name="closetag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" icon_class="icon-list" level="tab_open" box_type="1" />
-			
+
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level2" />
 			<field name="display_label_filter_s" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -449,13 +449,13 @@
 				<option value="5" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			
+
 			<field name="faceted_filter_s" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1" class="use_select2_lib fc_skip_highlight">
 				<option value="0" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_NONE</option>
 				<option value="1" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2" show_list="active-filts-mode-s" hide_list="">FLEXI_FS_ACTIVE_FILTERS</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" depend_class="active-filts-mode-s" />
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC" depend_class="active-filts-mode-s" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
@@ -465,14 +465,14 @@
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_HIDE</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down-s" />
 			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
 				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="filter_firstoptiontext_s" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down-s displaydefauttext-mode-s" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_DISPLAY_AS_SLIDER" level="level3" depend_class="filt-as-slider-s" />
 			<field name="slider_display_config_s" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FILTER_SLIDER_DATA" description="FLEXI_FILTER_SLIDER_DATA_DESC" depend_class="filt-as-slider-s" class="btn-group group-fcmethod">
 				<option value="1" show_list="" hide_list="filt-as-slider-custom-s">Found values</option>
@@ -493,10 +493,10 @@
 
 			<field name="" type="separator" default="FLEXI_FILTERING" level="tabset_close" box_type="1" />
 		</fieldset>
-		
+
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation.ini</language>
 	</languages>

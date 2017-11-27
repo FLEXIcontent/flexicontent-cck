@@ -14,16 +14,16 @@
 		<filename plugin="groupmarker">groupmarker.php</filename>
 		<filename>index.html</filename>
 	</files>
-	
+
 	<config>
-	
+
 	<fields name="attribs">
-		
+
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
-		
+
 		<fieldset name="group-groupmarker-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="marker_type" type="multilist" default="fieldset_open" label="FLEXI_MARKER" description="FLEXI_MARKER_DESC" toggle_related="1">
 				<group label="FLEXI_TABS">
 					<option value="tabset_start"  show_list="tfclass" hide_list="tfopen,chtml" >FLEXI_TABS_START</option>
@@ -39,21 +39,21 @@
 					<option value="html_separator" show_list="tfclass,chtml" hide_list="tfopen" >FLEXI_HTML</option>
 				</group>
 			</field>
-			
+
 			<field name="cont_cssclass" type="text" size="24" default="" label="FLEXI_CONTAINER_CSS" description="FLEXI_CONTAINER_CSS_DESC" depend_class="tfclass" />
-			
+
 			<field name="tabfset_specific" type="separator" default="FLEXI_TABS_FIELDSET_OPENING" level="level2" depend_class="tfopen" />
 			<field name="cont_label"    type="text" size="24" default="" label="FLEXI_TABS_FIELDSET_LABEL"     description="FLEXI_TABS_FIELDSET_LABEL_DESC" depend_class="tfopen" />
-			
+
 			<field name="chtml_specific" type="separator" default="FLEXI_CUSTOM_HTML_SEP" level="level2" depend_class="chtml" />
-			<field name="custom_html_sep" type="textarea" filter="RAW" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
-			
+			<field name="custom_html_sep" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
+
 		</fieldset>
 	</fields>
 	</config>
-	
+
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_groupmarker.ini</language>
 	</languages>
-	
+
 </extension>

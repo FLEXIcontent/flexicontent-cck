@@ -16,17 +16,17 @@
 		<filename>index.html</filename>
 		<folder>toolbar</folder>
 	</files>
-	
+
 	<config>
 	<fields name="attribs">
-		
+
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
-		
+
 		<fieldset name="group-toolbar-viewing" repeat="1" icon_class="icon-screen" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			
+
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -42,16 +42,16 @@
 			</field>
 			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CONTROLS" level="level1" />
-			
+
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
-			
+
 			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -68,14 +68,14 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field-->
-			
+
 			<field name="" type="separator" default="Voice Controls" level="level2" />
 			<field name="display_voice" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_VOICE" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC" class="btn-group btn-group-yesno">
 				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
 				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
 			</field>
 			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" depend_class="hiddefield-mode" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_REZIZE_CONTROLS" level="level2" />
 			<field name="" type="separator" default="NOTE: These controls will only display in single item view" level="level3" class="alert alert-warning fcpadded" />
 			<field name="display_resizer" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC" class="btn-group btn-group-yesno">
@@ -85,26 +85,26 @@
 			<field name="default_size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
 			<field name="default_line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
-			
+
 		</fieldset>
 		<fieldset name="group-toolbar-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
-			
+
 			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" depend_class="" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
 			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" depend_class="" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
-			
+
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
-			
+
 			<field name="" type="separator" default="FLEXI_TEXT" description="" level="level2" />
-			
+
 			<field name="add_og_site_name" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SITENAME" description="FLEXI_FIELD_TOOLBAR_SITENAME_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FIELD_TOOLBAR_REAL_SITENAME</option>
 				<!--option value="2">Custom Field</option-->
 			</field>
 			<!--field name="og_site_name_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
-			
+
 			<field name="add_og_title" type="radio" default="0" label="FLEXI_TITLE" description="FLEXI_TOOLBAR_ADD_TITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_TOOLBAR_ITEM_TITLE</option>
@@ -112,7 +112,7 @@
 			</field>
 			<!--field name="og_title_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			<!--field name="og_title_maxlen" type="text" default="100" label="Max length" description="Max length of the text" /-->
-			
+
 			<field name="add_og_descr" type="radio" default="0" label="FLEXI_TOOLBAR_DESCRIPTION" description="FLEXI_TOOLBAR_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_TOOLBAR_ITEM_DESCRIPTION</option>
@@ -120,7 +120,7 @@
 			</field>
 			<!--field name="og_descr_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text or textarea field" /-->
 			<!--field name="og_descr_maxlen" type="text" default="300" label="Max length" description="Max length of the text" /-->
-			
+
 			<field name="add_og_type" type="radio" default="article" label="FLEXI_TOOLBAR_CONTENT_TYPE" description="FLEXI_TOOLBAR_CONTENT_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="article">FLEXI_TOOLBAR_CONTENT_TYPE_ARTICLE</option>
@@ -129,9 +129,9 @@
 				<!--option value="2">Custom text Field</option-->
 			</field>
 			<!--field name="og_type_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
-			
+
 			<field name="" type="separator" default="FLEXI_IMAGE" description="" level="level2" />
-			
+
 			<field name="add_og_image" type="multilist" subtype="radio" default="0" label="FLEXI_ADD" toggle_related="1" description="FLEXI_TOOLBAR_CONTENT_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="hiddefield-mode4">FLEXI_NO</option>
 				<option value="1" show_list="hiddefield-mode4" hide_list="">FLEXI_YES</option>
@@ -148,23 +148,23 @@
 				<option value="medium">FLEXI_FIELD_TOOLBAR_MEDIUM_THUMB</option>
 				<option value="large">FLEXI_FIELD_TOOLBAR_LARGE_THUMB</option>
 			</field>
-			
+
 			<!--field name="spacer_size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
 			<field name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" />
 			<field name="required" type="radio" default="0" label="Required" description="Required">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
-			
+
 		</fieldset>
 		<fieldset name="group-toolbar-addthis-item" repeat="1" icon_class="icon-folder-3" label="Social - Item View" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			<field name="display_social" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="enable_addthis">FLEXI_NO</option>
 				<option value="1" show_list="enable_addthis" hide_list="">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="addthis_code_predefined" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS_DESC" labelclass="label label-info" depend_class="enable_addthis">
 				<option value=""   fcreadonly="{'addthis_custom_code':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_counter_facebook\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_google_plusone\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS</option>
@@ -172,8 +172,8 @@
 				<option value="3"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_POPULAR_BUTTONS</option>
 				<option value="4"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_SINGLE_SHARE_BUTTON</option>
 			</field>
-			<field name="addthis_custom_code" type="textarea" filter="RAW" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" rows="13" cols="38" depend_class="enable_addthis" />
-			
+			<field name="addthis_custom_code" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" depend_class="enable_addthis" />
+
 			<field name="" type="separator" default="FLEXI_BUTTONS" description="" level="level2" depend_class="enable_addthis"/>
 			<field name="addthis_size" type="multilist" subtype="radio" default="20" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" inline_tip="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis">
 				<option value="">FLEXI_DEFAULT</option>
@@ -185,7 +185,7 @@
 				<option value="1" show_list="addthis_inline" hide_list="">FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_INLINE_H</option>
 				<option value="2" show_list="" hide_list="addthis_inline">FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_FIXED_V</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_FB_LIKE" description="" level="level3" depend_class="enable_addthis"/>
 			<field name="addthis_fb_like" type="radio" default="1" label="FLEXI_LAYOUT" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis">
 				<option value="0">FLEXI_HIDE</option>
@@ -200,7 +200,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX" description="" level="level2" depend_class="enable_addthis addthis_inline"/>
 			<field name="addthis_box_style" type="radio" default="1" label="FLEXI_FLOAT_CLEAR" description="..." class="btn-group btn-group-yesno" depend_class="enable_addthis addthis_inline">
 				<option value="0">FLEXI_FLOATED</option>
@@ -210,16 +210,16 @@
 				<option value="0">FLEXI_FIELD_TOOLBAR_SOCIAL_INSIDE</option>
 				<option value="1">FLEXI_FIELD_TOOLBAR_SOCIAL_OUTSIDE</option>
 			</field>
-			
+
 		</fieldset>
 		<fieldset name="group-toolbar-addthis-cat" repeat="1" icon_class="icon-stack" label="Social - Category view" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			<field name="display_social_cat" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="enable_addthis_cat">FLEXI_NO</option>
 				<option value="1" show_list="enable_addthis_cat" hide_list="">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="addthis_code_predefined_cat" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS_DESC" class="btn-group group-fcmethod" labelclass="label label-info" depend_class="enable_addthis_cat">
 				<option value=""   fcreadonly="{'addthis_custom_code_cat':0}" >FLEXI_CUSTOMIZE</option>
 				<option value="1"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_counter_facebook\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_google_plusone\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS</option>
@@ -227,8 +227,8 @@
 				<option value="3"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_POPULAR_BUTTONS</option>
 				<option value="4"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_SINGLE_SHARE_BUTTON</option>
 			</field>
-			<field name="addthis_custom_code_cat" type="textarea" filter="RAW" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" rows="13" cols="38" depend_class="enable_addthis_cat" />
-			
+			<field name="addthis_custom_code_cat" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" depend_class="enable_addthis_cat" />
+
 			<field name="" type="separator" default="FLEXI_BUTTONS" description="" level="level2" depend_class="enable_addthis_cat"/>
 			<field name="addthis_size_cat" type="multilist" subtype="radio" default="20" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" inline_tip="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat">
 				<option value="">FLEXI_DEFAULT</option>
@@ -239,7 +239,7 @@
 			<field name="addthis_style_cat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat">
 				<option value="1" show_list="addthis_inline_cat" hide_list="">FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_INLINE_H</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_FB_LIKE" description="" level="level3" depend_class="enable_addthis_cat"/>
 			<field name="addthis_fb_like_cat" type="radio" default="1" label="FLEXI_LAYOUT" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat">
 				<option value="0">FLEXI_HIDE</option>
@@ -253,7 +253,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
+
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX" description="" level="level2" depend_class="enable_addthis_cat addthis_inline_cat"/>
 			<field name="addthis_box_style_cat" type="radio" default="1" label="FLEXI_FLOAT_CLEAR" description="..." class="btn-group btn-group-yesno" depend_class="enable_addthis_cat addthis_inline_cat">
 				<option value="0">FLEXI_FLOATED</option>
@@ -263,7 +263,7 @@
 				<option value="0">FLEXI_FIELD_TOOLBAR_SOCIAL_INSIDE</option>
 				<option value="1">FLEXI_FIELD_TOOLBAR_SOCIAL_OUTSIDE</option>
 			</field>
-			
+
 		</fieldset>
 	</fields>
 	</config>
