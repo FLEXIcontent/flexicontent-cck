@@ -803,7 +803,6 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		{
 			return;
 		}
-		echo $field->label . '<br/>';
 
 		// Check for system plugin
 		$extfolder = 'system';
