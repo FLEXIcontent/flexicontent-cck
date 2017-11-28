@@ -5003,10 +5003,14 @@ class FlexicontentFields
 			$item_list = $db->setQuery($query)->loadObjectList('id');
 		}
 
+		// Check for empty array
 		if ( !$item_list )
 		{
 			return $return_items_array ? array() : '';
 		}
+
+		// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
+		flexicontent_db::getOriginalContentItemids($item_list);
 
 		// Only return the items array without creating their HTML
 		if ( $return_items_array == 2)
