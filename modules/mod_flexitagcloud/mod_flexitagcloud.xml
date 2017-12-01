@@ -47,14 +47,15 @@
 			
 			<field name="" type="separator" default="FLEXI_CATEGORIES" level="level2" />
 			<field name="" type="separator" default="Show tags of items in the following categories. &lt;br/&gt; &lt;b&gt;Current category&lt;/b&gt; is &lt;br/&gt;- either currently viewed category &lt;br/&gt;- or main category of the item currently viewed" level="level3" class="alert alert-info" />
-			<field name="method" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group" >
-				<option value="1" show_list="" hide_list="method_cats_ops">Current category</option>
-				<option value="2" show_list="method_cats_ops" hide_list="">FLEXI_EXCLUDE</option>
-				<option value="3" show_list="method_cats_ops" hide_list="">FLEXI_INCLUDE</option>
+			<field name="method" type="multilist" subtype="radio" default="1" label="FLEXI_CATEGORY" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group" >
+				<option value="0">FLEXI_ANY</option>
+				<option value="1">FLEXI_CURRENT</option>
+				<option value="2">FLEXI_EXCLUDE</option>
+				<option value="3">FLEXI_INCLUDE</option>
 			</field>
-			<field name="categories" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" class="method_cats_ops"/>
+			<field name="categories" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" showon="method:2,3" />
 
-			<field name="treeinclude" type="list" default="0" label="FLEXI_INCLUDE_EXTRACATS" description="...">
+			<field name="treeinclude" type="list" default="0" label="FLEXI_INCLUDE_EXTRACATS" description="..." showon="method:1,2,3">
 				<option value="0">FLEXI_NONE</option>
 				<option value="1">FLEXI_CHILDREN</option>
 				<!--option value="5">FLEXI_CHILDREN_EXCLUDE_SELECTED_CATS</option-->
