@@ -3262,7 +3262,7 @@ class ParentClassItem extends FCModelAdmin
 			
 			$jfdata['title'] = trim($jfdata['title']);
 
-			$jfdata['lang_code'] = $langs->$shortcode->lang_code;
+			$jfdata['lang_code'] = $langs->$shortcode->code;
 			$jfdata['alias'] = $this->getSafeUniqueAlias($item, $jfdata);
 
 			// Search for the {readmore} tag and split the text up accordingly.
@@ -3287,7 +3287,8 @@ class ParentClassItem extends FCModelAdmin
 			);
 			foreach ($translated_fields as $fieldname)
 			{
-				if ( !isset($jfdata[$fieldname]) || !is_string($jfdata[$fieldname]) )
+				// Check that data exist and they are non-zero length -string-
+				if ( !isset($jfdata[$fieldname]) || !is_string($jfdata[$fieldname]) || !strlen($jfdata[$fieldname]) )
 				{
 					continue;
 				}
