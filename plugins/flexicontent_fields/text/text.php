@@ -277,7 +277,8 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 		
 		// Drop-Down select for textselect field type
-		if ($field->field_type=='textselect') {
+		if ($field->field_type === 'textselect')
+		{
 			static $select2_added = false;
 		  if ( !$select2_added )
 		  {
@@ -340,10 +341,10 @@ class plgFlexicontent_fieldsText extends FCField
 		$attribs .= $placeholder ? ' placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'" ' : '';
 		
 		
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
-		
+		// ***
+		// *** Create field's HTML display for item form
+		// ***
+
 		$field->html = array();
 		$n = 0;
 		//if ($use_ingroup) {print_r($field->value);}
@@ -468,7 +469,7 @@ class plgFlexicontent_fieldsText extends FCField
 			foreach ($values as &$value)
 			{
 				if ( !strlen($value) ) continue;  // skip further actions
-				
+
 				if ($format_output > 0)  // 1: decimal, 2: integer
 				{
 					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
@@ -609,7 +610,7 @@ class plgFlexicontent_fieldsText extends FCField
 
 		// Take into consideration client side validation
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
-		
+
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 'HTML' ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;

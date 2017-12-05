@@ -824,7 +824,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
-		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($field->field_type, $viewlayout));
 		
 		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');
 		
