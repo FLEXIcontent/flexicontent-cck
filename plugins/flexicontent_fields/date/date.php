@@ -545,7 +545,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
-		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($field->field_type, $viewlayout));
 		
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)

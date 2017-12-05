@@ -225,7 +225,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update the new textarea field
+			// Update the new textarea
 			$js .= "
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
@@ -436,10 +436,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 		
 		
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
-		
+		// ***
+		// *** Create field's HTML display for item form
+		// ***
+
 		$field->html = array();
 		$n = 0;
 		//if ($use_ingroup) {print_r($field->value);}
@@ -665,7 +665,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
-		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($field->field_type, $viewlayout));
 		
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)

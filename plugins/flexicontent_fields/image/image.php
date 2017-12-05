@@ -1723,7 +1723,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// ***
 
 		$field->{$prop} = array();
-		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($field->field_type, $viewlayout));
 	}
 	
 	
