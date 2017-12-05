@@ -744,7 +744,10 @@ class flexicontent_html
 		$attribs['list.attr']['class'] = $classes;
 		$attribs['list.attr']['form'] = $formname;
 
-		$orderby_options = $params->get('orderby_options'.$sfx, array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
+		$orderby_options = $params->get(
+			'orderby_options'.$sfx,
+			array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order','jorder')
+		);
 		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
 
 		$orderby_names = array(
@@ -765,6 +768,7 @@ class flexicontent_html
 			'commented'=>'FLEXI_ORDER_MOST_COMMENTED',
 			'rated'=>'FLEXI_ORDER_BEST_RATED',
 			'order'=>'FLEXI_ORDER_CONFIGURED_ORDER',
+			'jorder'=>'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA',
 			'random'=>'FLEXI_ORDER_RANDOM',
 			'alias'=>'FLEXI_ORDER_ALIAS',
 			'ralias'=>'FLEXI_ORDER_ALIAS_REVERSE'
