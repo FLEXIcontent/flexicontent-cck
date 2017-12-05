@@ -2383,10 +2383,10 @@ class FlexicontentModelItems extends JModelLegacy
 					foreach ($lang_groups as $lang_group => $ignore)
 					{
 						if ( $lang_group != '_' ) {
-							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_JOOMLA'), $state_group, $lang_group, $altered_catid), "message");
+							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL'), $state_group, $lang_group, $altered_catid), "message");
 							$row->reorder('catid = '.$altered_catid.' AND '.$state_where_arr[$state_group] .' AND language ='. $this->_db->Quote($lang_group));
 						} else {
-							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_JOOMLA'), $state_group, $altered_catid), "message");
+							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_JOOMLA_GLOBAL'), $state_group, $altered_catid), "message");
 							$row->reorder('catid = '.$altered_catid.' AND '.$state_where_arr[$state_group]);
 						}
 					}
@@ -2483,9 +2483,9 @@ class FlexicontentModelItems extends JModelLegacy
 							}
 						}
 						if ( $lang_group != '_' )
-							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_FLEXICONTENT'), $state_group, $lang_group, $altered_catid), "message");
+							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_FC_PER_CATEGORY'), $state_group, $lang_group, $altered_catid), "message");
 						else
-							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_FLEXICONTENT'), $state_group, $altered_catid), "message");
+							$app->enqueueMessage(JText::sprintf('FLEXI_ITEM_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_FC_PER_CATEGORY'), $state_group, $altered_catid), "message");
 					}
 				}
 			}

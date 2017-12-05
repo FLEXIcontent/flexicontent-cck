@@ -130,15 +130,15 @@ $categories_tip  = '<img src="components/com_flexicontent/assets/images/informat
 
 if ( !$this->filter_order_type )
 {
-	$_img_title = JText::_('FLEXI_ORDER_JOOMLA');
-	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
+	$_img_title = JText::_('FLEXI_ORDER_JOOMLA_GLOBAL');
+	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA_GLOBAL')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
 	$ord_catid = 'catid';
 	$ord_col = 'ordering';
 }
 else
 {
-	$_img_title = JText::_('FLEXI_ORDER_FLEXICONTENT', true);
-	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
+	$_img_title = JText::_('FLEXI_ORDER_FC_PER_CATEGORY', true);
+	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FC_PER_CATEGORY')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }

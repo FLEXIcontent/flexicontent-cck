@@ -215,6 +215,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		'rid'=>JText::_( 'FLEXI_UMOD_LOWEST_ITEM_ID'),
 		
 		'catorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER'),  // catorder == order
+		'jorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER_JOOMLA'),
 		'random'=>JText::_( 'FLEXI_UMOD_RANDOM_ITEMS' ),
 		'field'=>JText::sprintf( 'FLEXI_UMOD_CUSTOM_FIELD', $orderby_custom_field->label)
 	);
