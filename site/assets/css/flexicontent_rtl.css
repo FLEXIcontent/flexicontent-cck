@@ -2528,13 +2528,14 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin: 0px;
 	padding: 0px;
 	width: 68%;
-	float: right;
+	float: none;
+	display: inline-block;
 }
 .container_fcfield .container_fcfield-inner {
 	width: 100%;
 }
 .container_fcfield:not(.controls) {
-	float: right !important;
+	float: none !important;
 	padding: 0px !important;
 	margin: 2px 0% 3px 0% !important;
 	width: 82% !important;
@@ -3022,6 +3023,18 @@ body .form-horizontal .control-group {
 }
 #flexicontent .form-horizontal > .nav-tabs > li > a {
 	text-align: center;
+}
+.fc-tabbed-field-box {
+	padding: 0 !important;
+}
+.fc-tabbed-field-box textarea,
+.fc-tabbed-field-box > input {
+	border: 0 !important;
+	border-radius: 4px !important;
+	margin: 0 !important;
+	width: 96% !important;
+	padding-left: 2% !important;
+	padding-right: 2% !important;
 }
 hr.fcclearline {
 	border: 0;
