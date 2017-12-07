@@ -63,7 +63,7 @@ body .tabberlive,
 	margin: 0px 0px 6px 0px;
 	padding: 0px;
 	width: 100%;
-	float: left;
+	float: none;
 	border-width: 0px;
 }
 body .tabbertab,
@@ -72,7 +72,7 @@ body .tabbertab,
 	padding: 5px 1% 3px 1%;
 	width: 100%;
 	box-sizing: border-box;
-	float: left;
+	float: none;
 }
 body .fctabber,
 #flexicontent .fctabber {
@@ -91,7 +91,7 @@ body ul.tabbernav,
 	width: 100%;
 	box-sizing: border-box;
 	display: inline-block;
-	float: left;
+	float: none;
 }
 body ul.tabbernav > li,
 #flexicontent ul.tabbernav > li {
@@ -100,7 +100,7 @@ body ul.tabbernav > li,
 	margin: 4px 0px -1px 8px;
 	overflow: visible;
 	display: inline-block;
-	float: left;
+	float: none;
 }
 body ul.tabbernav > li > a,
 #flexicontent ul.tabbernav > li > a {
