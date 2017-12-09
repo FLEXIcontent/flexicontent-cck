@@ -107,7 +107,7 @@ class JFormFieldFcordering extends JFormFieldList
 		if ( !isset($s['commented']) )  $ordering[] = JHtml::_('select.option',  'commented',  JText::_( 'FLEXI_ORDER_MOST_COMMENTED' ) );
 		if ( !isset($s['rated']) )      $ordering[] = JHtml::_('select.option',  'rated',      JText::_( 'FLEXI_ORDER_BEST_RATED' ) ); 
 		if ( !isset($s['order']) )      $ordering[] = JHtml::_('select.option',  $o['order'],  JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER' ) );    // 'catorder'
-		if ( !isset($s['jorder']) )     $ordering[] = JHtml::_('select.option',  $o['jorder'], JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA' ) );
+		if ( !isset($s['jorder']) )     $ordering[] = JHtml::_('select.option',  'jorder',     JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA' ) );
 		
 		if ( !isset($s['random']) )     $ordering[] = JHtml::_('select.option',  'random',     JText::_( 'FLEXI_ORDER_RANDOM' ) . ' ' . JText::_( 'FLEXI_PER_SESSION_PAGINATION_USABLE' ) );
 		if ( !isset($s['random_ppr']) ) $ordering[] = JHtml::_('select.option',  'random_ppr', JText::_( 'FLEXI_ORDER_RANDOM' ) . ' ' . JText::_( 'FLEXI_PER_VIEW_PAGINATION_NOT_USABLE' ) );

@@ -1,47 +1,15 @@
-<?php 
+<?php
 /**
- * $caching
- * $ordering
- * $count
- * $featured
- *
- * // Display parameters
- * $moduleclass_sfx
- * $layout 
- * $width
- * $height
- * // standard
- * $display_title
- * $link_title
- * $display_date
- * $display_text
- * $mod_readmore
- * $mod_use_image
- * $mod_link_image
- * // featured
- * $display_title_feat 
- * $link_title_feat 
- * $display_date_feat
- * $display_text_feat 
- * $mod_readmore_feat
- * $mod_use_image_feat 
- * $mod_link_image_feat 
- *
- * // Fields parameters
- * $use_fields 
- * $display_label 
- * $fields 
- * // featured
- * $use_fields_feat
- * $display_label_feat 
- * $fields_feat 
- *
- * // Custom parameters
- * $custom1 
- * $custom2 
- * $custom3 
- * $custom4 
- * $custom5 
+ * @version 1.5 stable $Id$
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 // no direct access
@@ -51,6 +19,7 @@ $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 $mod_width_feat 	= (int)$params->get('mod_width_feat', 110);
 $mod_height_feat 	= (int)$params->get('mod_height_feat', 110);
+
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
 
@@ -74,6 +43,7 @@ $padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat',
 $margin_top_bottom_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
 $margin_left_right_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
 $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
+
 
 // Item Dimensions standard
 $inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
@@ -115,9 +85,9 @@ switch ($content_layout_feat) {
 
 
 
-// *****************************************************
-// Content placement and default image of standard items
-// *****************************************************
+// ***
+// *** Content placement and default image of standard items
+// ***
 $content_display = $params->get($layout.'_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
 $content_layout = $params->get($layout.'_content_layout', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
 $item_img_fit = $params->get($layout.'_img_fit', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
@@ -146,9 +116,9 @@ switch ($content_layout) {
 
 
 
-// *******************************
-// Default image and image fitting
-// *******************************
+// ***
+// *** Default image and image fitting
+// ***
 $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
 $img_path = JUri::base(true) .'/'; 
 
@@ -159,9 +129,9 @@ $img_auto_dims_css_feat=" width: 100%; height: auto; display: block !important; 
 $img_auto_dims_css=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 
 
-// *****************************************
-// Parameters for fcxSlider JS configuration
-// *****************************************
+// ***
+// *** Parameters for fcxSlider JS configuration
+// ***
 
 // Carousel direction and Common Dimensions
 $mode = $params->get('carousel_mode', 'horizontal');
@@ -245,7 +215,7 @@ if ($transition=='bounce' || $transition=='shake')
 
 if ($transition=='explode')
 	$_fcx_fxOptions .= ', pieces: "'.(int)$params->get('carousel_jqe_pieces', 4).'"';
-	
+
 if ($transition=='fold')
 	$_fcx_fxOptions .= ', size: "'.(int)$params->get('carousel_jqe_size_folded', 15).'"';
 
@@ -265,7 +235,7 @@ if ($interval < $duration) {
 $item_columns_feat = $params->get('item_columns_feat', 1);
 $item_placement_feat = $params->get($layout.'_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
 $cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
-	
+
 // Standard, these are ignored / unsed since we items are place inside the carousel
 $item_placement_std = -1;  // -1: other, 0: cleared, 1: as masonry tiles
 $item_columns_std = 1;
@@ -296,49 +266,53 @@ if ($transition)
 $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 
+
+<!-- BOF DIV mod_flexicontent_wrapper -->
+
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $container_id; ?>">
-	
+
+
 	<?php
 	// Display FavList Information (if enabled)
 	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/favlist.php');
-	
+
 	// Display Category Information (if enabled)
 	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/category.php');
-	
+
 	$ord_titles = array(
 		'popular'=>JText::_( 'FLEXI_UMOD_MOST_POPULAR'),  // popular == hits
 		'rhits'=>JText::_( 'FLEXI_UMOD_LESS_VIEWED'),
-		
+
 		'author'=>JText::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL'),
 		'rauthor'=>JText::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL_REVERSE'),
-		
+
 		'published'=>JText::_( 'FLEXI_UMOD_RECENTLY_PUBLISHED_SCHEDULED'),
 		'published_oldest'=>JText::_( 'FLEXI_UMOD_OLDEST_PUBLISHED_SCHEDULED'),
 		'expired'=>JText::_( 'FLEXI_UMOD_FLEXI_RECENTLY_EXPIRING_EXPIRED'),
 		'expired_oldest'=>JText::_( 'FLEXI_UMOD_OLDEST_EXPIRING_EXPIRED_FIRST'),
-		
+
 		'commented'=>JText::_( 'FLEXI_UMOD_MOST_COMMENTED'),
 		'rated'=>JText::_( 'FLEXI_UMOD_BEST_RATED' ),
-		
+
 		'added'=>	JText::_( 'FLEXI_UMOD_RECENTLY_ADDED'),  // added == rdate
 		'addedrev'=>JText::_( 'FLEXI_UMOD_RECENTLY_ADDED_REVERSE' ),  // addedrev == date
 		'updated'=>JText::_( 'FLEXI_UMOD_RECENTLY_UPDATED'),  // updated == modified
-		
+
 		'alpha'=>	JText::_( 'FLEXI_UMOD_ALPHABETICAL'),
 		'alpharev'=>JText::_( 'FLEXI_UMOD_ALPHABETICAL_REVERSE'),   // alpharev == ralpha
-		
+
 		'id'=>JText::_( 'FLEXI_UMOD_HIGHEST_ITEM_ID'),
 		'rid'=>JText::_( 'FLEXI_UMOD_LOWEST_ITEM_ID'),
-		
+
 		'catorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER'),  // catorder == order
 		'jorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER_JOOMLA'),
 		'random'=>JText::_( 'FLEXI_UMOD_RANDOM_ITEMS' ),
 		'field'=>JText::sprintf( 'FLEXI_UMOD_CUSTOM_FIELD', $orderby_custom_field->label)
 	);
-	
+
 	$separator = "";
 	$rowtoggler = 0;
-	
+
 	foreach ($ordering as $ord) :
   	echo $separator;
 	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
@@ -351,22 +325,28 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
   	$order_name = $ord ? $ord : 'default';
 		$uniq_ord_id = (count($list)>1 ? $order_name : '').$container_id;
 	?>
+
+
+	<!-- BOF DIV mod_flexicontent -->
+
 	<div id="<?php echo 'order_'.$order_name.$container_id; ?>" class="mod_flexicontent">
-		
+
+
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo isset($ord_titles[$ord]) ? $ord_titles[$ord] : $ord; ?></div>
 		<?php endif; ?>
-	
-		
+
 	<?php if (isset($list[$ord]['featured'])) : ?>
-	
-		<!-- BOF featured items -->
+
 		<?php	$rowcount = 0; ?>
-		
+
+
+		<!-- BOF DIV mod_flexicontent_featured (featured items) -->
+
 		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
-			
+
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
-			
+
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php
 				$img_force_dims_css_feat = $img_auto_dims_css_feat;
@@ -382,63 +362,70 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				}
 				$rowcount++;
 			?>
-			
-			<!-- BOF current item -->	
+
+			<!-- BOF item -->	
 			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
-			
-				<!-- BOF current item's title -->	
-				<?php ob_start(); ?>
-				<?php if ($display_title_feat) : ?>
-				<div class="fc_block" >
-					<div class="fc_inline fcitem_title">
-						<?php if ($link_title_feat) : ?>
-						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-						<?php else : ?>	
-						<?php echo $item->title; ?>
-						<?php endif; ?>
-					</div>
-				</div>
-				<?php endif; ?>
-				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
-				<!-- EOF current item's title -->	
-				
-				<!-- BOF current item's image -->	
-				<?php ob_start(); ?>
-				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
-				<div class="image_featured" <?php echo $img_container_class_feat;?>">
-					<?php if ($mod_link_image_feat) : ?>
-						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
-					<?php else : ?>
-						<?php echo $item->image_rendered; ?>
+				<!-- BOF item title -->
+				<?php ob_start(); ?>
+
+					<?php if ($display_title_feat) : ?>
+						<span class="fcitem_title_box">
+							<span class="fcitem_title">
+							<?php if ($link_title_feat) : ?>
+								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+							<?php else : ?>
+								<?php echo $item->title; ?>
+							<?php endif; ?>
+							</span>
+						</span>
 					<?php endif; ?>
-				</div>
-				
-				<?php elseif ($mod_use_image_feat && $item->image) : ?>
-				
-				<div class="image_featured <?php echo $img_container_class_feat;?>">
-					<?php if ($mod_link_image_feat) : ?>
-						<a href="<?php echo $item->link; ?>">
-							<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-						</a>
-					<?php else : ?>
-						<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+
+				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<!-- EOF item title -->
+
+
+				<!-- BOF item's image -->	
+				<?php ob_start(); ?>
+
+					<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
+
+						<div class="image_featured" <?php echo $img_container_class_feat;?>">
+							<?php if ($mod_link_image_feat) : ?>
+								<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
+							<?php else : ?>
+								<?php echo $item->image_rendered; ?>
+							<?php endif; ?>
+						</div>
+
+					<?php elseif ($mod_use_image_feat && $item->image) : ?>
+
+						<div class="image_featured <?php echo $img_container_class_feat;?>">
+							<?php if ($mod_link_image_feat) : ?>
+								<a href="<?php echo $item->link; ?>">
+									<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+								</a>
+							<?php else : ?>
+								<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+							<?php endif; ?>
+						</div>
+
 					<?php endif; ?>
-				</div>
-				
-				<?php endif; ?>
+
 				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
-				<!-- BOF current item's image -->
-				
+				<!-- EOF item's image -->
+
 				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
-				
-				<!-- BOF current item's content -->
+
+
+				<!-- BOF item's content -->
 				<?php if ($hasTitle || $display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
 				<div class="content_featured <?php echo $content_container_class_feat;?>">
-					
+
 					<?php echo $captured_title; ?>
-					
+
+
 					<?php if ($display_date_feat && $item->date_created) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date created">
@@ -446,7 +433,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_date_feat && $item->date_modified) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date modified">
@@ -454,7 +441,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_hits_feat && @ $item->hits_rendered) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_hits">
@@ -462,7 +449,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_voting_feat && @ $item->voting) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_voting">
@@ -470,7 +457,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_comments_feat) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_comments">
@@ -478,16 +465,16 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_text_feat && $item->text) : ?>
 					<div class="fc_block fcitem_text">
 						<?php echo $item->text; ?>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($use_fields_feat && @$item->fields && $fields_feat) : ?>
 					<div class="fc_block fcitem_fields">
-						
+
 					<?php foreach ($item->fields as $k => $field) : ?>
 						<?php if ( $hide_label_onempty_feat && !strlen($field->display) ) continue; ?>
 						<div class="field_block field_<?php echo $k; ?>">
@@ -497,10 +484,10 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>
 					<?php endforeach; ?>
-						
+
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
@@ -508,52 +495,57 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<div class="clearfix"></div> 
-					
-				</div> <!-- EOF current item's content -->
+
+				</div> <!-- EOF item's content -->
 				<?php endif; ?>
-				
+
 				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
-				
+
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
-			<!-- EOF current item -->
+			<!-- EOF item -->
 
 			<?php if ($item_placement_feat==0) /* 0: clear, 1: as masonry tiles */ echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
 
 			<?php endforeach; ?>
-			
+
 		</div>
-		
-		<!-- EOF featured items -->
-		
+
+		<!-- EOF DIV mod_flexicontent_featured (featured items) -->
+
+
 	<?php endif; ?>
-		
+
 	<div class="modclear"></div>
-	
-		
+
+
 	<?php if (isset($list[$ord]['standard'])) : ?>
-	
-		<!-- BOF standard items -->
+
 		<?php	$rowcount = 0; ?>
-		
+
 		<div id="mod_fc_carousel_mask_<?php echo $uniq_ord_id; ?>_loading" class="mod_fc_carousel_mask_loading">
 			... <?php echo  JText::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo JUri::root(); ?>components/com_flexicontent/assets/images/ajax-loader.gif"/>
 		</div>
-		
+
+
 <div class="mod_fc_carousel" id="mod_fc_carousel_container_<?php echo $uniq_ord_id; ?>" >
-	
+
 	<?php if ($show_controls==1) : ?>
 	<span id="previous<?php echo $_icontrols_method; ?>_fcmod_<?php echo $uniq_ord_id; ?>"  class="mod_fc_nav fc_previous fc_<?php echo $mode; ?>" ></span> 
 	<?php endif; ?>
-	
+
+
 	<div id="mod_fc_carousel_mask_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_mask <?php echo $show_controls==1 ? 'fc_has_nav fc_'.$mode : ''; ?>">
-		
+
+
+		<!-- BOF DIV mod_flexicontent_standard (standard items) -->
+
 		<div class="mod_flexicontent_standard mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>">
-			
+
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; $n=-1; ?>
-			
+
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
 				$img_force_dims_css = $img_auto_dims_css;
@@ -570,65 +562,72 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				$rowcount++;
 				$n++;
 			?>
-			
-			<!-- BOF current item -->	
+
+			<!-- BOF item -->	
 			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
 				onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
 				onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
 			<div class="mod_flexicontent_standard_wrapper_innerbox">
-				
-				<!-- BOF current item's title -->	
+
+				<!-- BOF item title -->
 				<?php ob_start(); ?>
-				<?php if ($display_title || $item_handle_title==2) : ?>
-				<div class="fc_block" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
-					<div class="fc_inline fcitem_title">
-						<?php if ($link_title) : ?>
-							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-						<?php else : ?>	
-							<?php echo $item->title; ?>
-						<?php endif; ?>
-					</div>
-				</div>
-				<?php endif; ?>
+
+					<?php if ($display_title || $item_handle_title==2) : ?>
+						<span class="fcitem_title_box" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
+							<span class="fcitem_title">
+							<?php if ($link_title) : ?>
+								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+							<?php else : ?>
+								<?php echo $item->title; ?>
+							<?php endif; ?>
+							</span>
+						</span>
+					<?php endif; ?>
+
 				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
-				<!-- EOF current item's title -->	
-				
-				<!-- BOF current item's image -->	
+				<!-- EOF item title -->
+
+
+				<!-- BOF item's image -->
 				<?php ob_start(); ?>
-				<?php if ($mod_use_image && $item->image_rendered) : ?>
-				<div class="image_standard" <?php echo $img_container_class;?>">
-					<?php if ($mod_link_image) : ?>
-						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
-					<?php else : ?>
-						<?php echo $item->image_rendered; ?>
+
+					<?php if ($mod_use_image && $item->image_rendered) : ?>
+
+						<div class="image_standard" <?php echo $img_container_class;?>">
+							<?php if ($mod_link_image) : ?>
+								<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
+							<?php else : ?>
+								<?php echo $item->image_rendered; ?>
+							<?php endif; ?>
+						</div>
+
+					<?php elseif ($mod_use_image && $item->image) : ?>
+
+						<div class="image_standard <?php echo $img_container_class;?>">
+							<?php if ($mod_link_image) : ?>
+								<a href="<?php echo $item->link; ?>">
+									<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+								</a>
+							<?php else : ?>
+								<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+							<?php endif; ?>
+						</div>
+
 					<?php endif; ?>
-				</div>
-				
-				<?php elseif ($mod_use_image && $item->image) : ?>
-				
-				<div class="image_standard <?php echo $img_container_class;?>">
-					<?php if ($mod_link_image) : ?>
-						<a href="<?php echo $item->link; ?>">
-							<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-						</a>
-					<?php else : ?>
-						<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-					<?php endif; ?>
-				</div>
-				
-				<?php endif; ?>
+
 				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
-				<!-- BOF current item's image -->	
-				
+				<!-- EOF item's image -->
+
 				<?php echo $content_layout!=2 ? $captured_image : '';?>
-				
-				<!-- BOF current item's content -->
+
+				<!-- BOF item's content -->
 				<?php if ($hasTitle || $display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard <?php echo $content_container_class;?>">
-					
+
 					<?php echo $captured_title; ?>
-					
+
+
 					<?php if ($display_date && $item->date_created) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date created">
@@ -636,7 +635,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_date && $item->date_modified) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date modified">
@@ -644,7 +643,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_hits && @ $item->hits_rendered) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_hits">
@@ -652,7 +651,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_voting && @ $item->voting) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_voting">
@@ -660,7 +659,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($display_comments) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_comments">
@@ -668,16 +667,16 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						</div>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ( ($display_text && $item->text) || $item_handle_text==2 ) : ?>
 					<div class="fc_block fcitem_text" <?php echo !$display_text ? 'style="display:none!important;"' : ''; ?>>
 						<?php echo $item->text; ?>
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($use_fields && @$item->fields && $fields) : ?>
 					<div class="fc_block fcitem_fields">
-						
+
 					<?php foreach ($item->fields as $k => $field) : ?>
 						<?php if ( $hide_label_onempty && !strlen($field->display) ) continue; ?>
 						<div class="field_block field_<?php echo $k; ?>">
@@ -687,10 +686,10 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 							<div class="field_value"><?php echo $field->display; ?></div>
 						</div>
 						<?php endforeach; ?>
-						
+
 					</div>
 					<?php endif; ?>
-					
+
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
@@ -700,23 +699,23 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 					<?php endif; ?>
 
 					<div class="clearfix"></div> 
-					
-				</div> <!-- EOF current item's content -->
+
+				</div> <!-- EOF item's content -->
 				<?php endif; ?>
-				
+
 				<?php echo $content_layout==2 ? $captured_image : '';?>
-				
+
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
-			<!-- EOF current item -->
+			<!-- EOF item -->
 
 			<?php if ($item_placement_std==0) /* 0: clear, 1: as masonry tiles */ echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
 
-			<?php endforeach; ?>
-			
+		<?php endforeach; ?>
 		</div>
-		<!-- EOF standard items -->
-		
+
+		<!-- EOF DIV mod_flexicontent_standard (standard items) -->
+
 	</div> <!-- mod_fc_carousel_mask{module_id} -->
 
 	<?php if ($show_controls==1) : ?>
@@ -724,7 +723,8 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 	<?php endif; ?>
 
 </div> <!-- mod_fc_carousel -->
-		
+
+
 		<?php if ($show_page_handles) : ?>
 			<div class="mod_fc_pages_outer">
 				<div id="mod_fc_page_handles_<?php echo $uniq_ord_id; ?>" class="mod_fc_page_handles"
@@ -737,11 +737,11 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						<div class="mod_fc_page_handle_ico"></div>
 					</span>
 					<?php endforeach; ?>
-				
+
 				</div>
 			</div>
 		<?php endif; ?>
-		
+
 		<?php if (($show_controls==2) && ($dcontrols_auto || $dcontrols_pages || $dcontrols_items)) : ?>
 			<div class="mod_fc_carousel_buttons_outer">
 				<div class="mod_fc_carousel_buttons"
@@ -756,7 +756,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						<span id="backward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=-1;" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_backward<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_BACKWARD'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-backward"></i><?php endif; ?></span>
 						<span id="forward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=1;" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_forward<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_FORWARD'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-forward"></i><?php endif; ?></span>
 					<?php endif; ?>
-					
+
 					<?php if ($dcontrols_pages) : ?>
 						<?php if ($dcontrols_labels) : ?>
 							<span id="pages_controls_label_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_controls_label"><?php echo JText::_('FLEXI_MOD_CAROUSEL_PAGES'); ?></span>
@@ -764,7 +764,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 						<span id="previous_page_fcmod_<?php echo $uniq_ord_id; ?>" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_previous_page<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_PREVIOUS_PAGE'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-first"></i><?php endif; ?></span>
 						<span id="next_page_fcmod_<?php echo $uniq_ord_id; ?>" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_next_page<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_NEXT_PAGE'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-last"></i><?php endif; ?></span>
 					<?php endif; ?>
-					
+
 					<?php if ($dcontrols_items) : ?>
 						<?php if ($dcontrols_labels) : ?>
 							<span id="items_controls_label_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_controls_label"><?php echo JText::_('FLEXI_MOD_CAROUSEL_ITEMS'); ?></span>
@@ -775,16 +775,16 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				</div>
 			</div>
 		<?php endif; ?>
-		
+
 		<?php if ($show_item_handles) : ?>
-		
+
 			<div class="mod_fc_handles_outer">
 				<div id="mod_fc_item_handles_<?php echo $uniq_ord_id; ?>"
 					class="mod_fc_item_handles <?php echo $item_handles_dir=='horizontal' ? 'fc_add_scroller_horizontal fc_scrollbox_h' : 'fc_add_scroller fc_scrollbox_v';?>"
 					onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
 					onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 				>
-				
+
 				<?php $img_path = JUri::base(true) .'/'; ?>
 				<?php $handle_classes = 'mod_fc_item_handle' . ($item_handles_dir=='horizontal' ? ' fc_scrollitem_h' : ' fc_scrollitem_v'); ?>
 				<?php foreach ($list[$ord]['standard'] as $item) : ?>
@@ -799,32 +799,36 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 							<img alt="" src="<?php echo @ $item->image ? $item->image : $img_path.$mod_default_img_path; ?>" style="<?php echo 'width:'.$item_handle_width.'px; height:'.$item_handle_height.'px'; ?>" />
 						</span>
 					<?php endforeach; ?>
-				
+
 				</div>
 			</div>
 		<?php endif; ?>
-	
+
 		<?php if ($show_curritem_info) : ?>
-		
+
 			<div id="mod_fc_activeitem_info_<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info" >
 				<?php /*echo JText::_( 'FLEXI_MOD_CAROUSEL_DISPLAYING').': ';*/ ?>
 				<?php if ($item_handle_title==2) : ?>
 					<span id="mod_fc_info_title_<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info_title"></span>
 				<?php endif; ?>
-				
+
 				<?php if ($item_handle_text==2) : ?>
 					<span id="mod_fc_info_text_<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info_text"></span>
 				<?php endif; ?>
 			</div>
-			
+
 		<?php endif; ?>
-	
+
 	<?php endif; ?>
-		
-	<div class="modclear"></div>
-	
+
 	</div>
-	
+
+	<!-- EOF DIV mod_flexicontent -->
+
+
+	<div class="modclear"></div>
+
+
 	<?php
 	// We need this inside the loop since ... we may have multiple orderings thus we may
 	// have multiple container (1 item list container per order) being effected by JS
@@ -833,36 +837,36 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		var mod_fc_carousel_'.$uniq_ord_id.'_ns_fxOptions='.$_fcx_fxOptions.';
 		var mod_fc_carousel_'.$uniq_ord_id.'_autoPlay='.$autoplay.';
 		var mod_fc_carousel_'.$uniq_ord_id.';
-		
+
 		jQuery(document).ready(function() {
 		 jQuery("#mod_fc_carousel_container_'.$uniq_ord_id.'").imagesLoaded(function(){
-		
+
 			mod_fc_carousel_'.$uniq_ord_id.' = new fcxSlide({
-			
+
 				mode: "'.$mode.'",
 				transition: "'.$transition.'",
 				fxOptions: mod_fc_carousel_'.$uniq_ord_id.'_ns_fxOptions,
 				transition_visible_duration: '.$transition_visible_duration.',
-				
+
 				items: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper"),
 				items_inner: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper_innerbox"),
 				items_box: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'"),
 				items_mask: jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'"),
-				
+
 				touch_walk: '.$_fcx_touch_walk.',
 				mouse_walk: '.$_fcx_mouse_walk.',
 				dragstart_margin: 20,
 				dragwalk_margin: 100,
-				
+
 				responsive: '.$_fcx_responsive.',
 				items_per_page: '.$_fcx_items_per_page.',
 				item_size: '.$_fcx_item_size.',
-				
+
 				'.( !$show_page_handles ? '' : '
 				page_handles: jQuery("#mod_fc_page_handles_'.$uniq_ord_id.'").find("span.mod_fc_page_handle"),
 				page_handle_event: "'.$page_handle_event.'",
 				').'
-				
+
 				'.( !$show_item_handles ? '' : '
 				item_handles_box: jQuery("#mod_fc_item_handles_'.$uniq_ord_id.'"),
 				item_handles: jQuery("#mod_fc_item_handles_'.$uniq_ord_id.'").find("span.mod_fc_item_handle"),
@@ -870,7 +874,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				item_handle_event: "'.$item_handle_event.'",
 				item_handle_duration: '.$item_handle_duration.',
 				').'
-				
+
 				'.( !$show_controls ? '' :
 					'action_handles: {
 						'.( ($show_controls==2 && $dcontrols_auto) ? 'stop: jQuery("#stop_fcmod_'.$uniq_ord_id.'"),' : '').'
@@ -883,47 +887,47 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 					},
 					action_handle_event: "click",
 				').'
-				
+
 				edgeWrap: '.$_fcx_edgeWrap.',
 				autoPlay: '.$_fcx_autoPlay.',
 				playInterval: '.$interval.',
 				playMethod: "'.$method.'",
 				startItem: 0,
-				
+
 				onWalk: function(currentItem, currentPageHandle, currentItemHandle){
 					this.items.removeClass("mod_fc_activeitem");
 					jQuery(currentItem).addClass("mod_fc_activeitem");
-					
+
 					'.( !$show_page_handles ? '' : '
 					this.page_handles.removeClass("active");
 					jQuery(currentPageHandle).addClass("active");
 					').'
-					
+
 					'.( !$show_item_handles ? '' : '
 					this.item_handles.removeClass("active");
 					jQuery(currentItemHandle).addClass("active");
 					').'
-					
+
 					'.( !$show_curritem_info ? '' : '
 						jQuery("#mod_fc_info_title_'.$uniq_ord_id.'").html( jQuery(currentItem).find(".fcitem_title").html() );
 						jQuery("#mod_fc_info_text_'.$uniq_ord_id.'").html( jQuery(currentItem).find(".fcitem_text").html() );
 					').'
 				}
 			});
-			
+
 			jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'_loading").css("display", "none");
 			jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'").css("visibility", "visible");
-			
+
 			jQuery("#next_fcmod_'.$uniq_ord_id.'").css("visibility", "visible");
 			jQuery("#previous_fcmod_'.$uniq_ord_id.'").css("visibility", "visible");
-			
+
 			jQuery("#next_page_fcmod_'.$uniq_ord_id.'").css("visibility", "visible");
 			jQuery("#previous_page_fcmod_'.$uniq_ord_id.'").css("visibility", "visible");
-			
+
 			'.
 			// Alternative but it includes padding
 			// var maxHeight = jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'")[0].clientHeight;
-			
+
 			// Alternative to use computed style, requires ie9+
 			//var maxHeight_withpx = getComputedStyle(jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'")[0], null).getPropertyValue("height")
 			//mod_fc_carousel_'.$uniq_ord_id.'.items.each(function() {
@@ -934,14 +938,13 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		 });
 		});
 		';
-	
+
 	if ($js) $document->addScriptDeclaration($js);
-	
-	
+
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
-	
+
 	$css = ''.
 	/* CONTAINER of featured items */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' {
@@ -957,7 +960,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		margin: '.$margin_top_bottom_feat.'px '.$margin_left_right_feat.'px !important;
 		' : '').'
 	}'.
-	
+
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
 	}'.
@@ -972,18 +975,18 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		margin: '.$margin_top_bottom.'px '.$margin_left_right.'px !important;
 		' : '').'
 	}'.
-	
+
 	/* The MASK that contains the CAROUSEL (mask clips it) */'
 	#mod_fc_carousel_mask_'.$uniq_ord_id.' {
 		z-index: 10
 	}'.
-	
+
 	/* Active item information */'
 	#mod_fc_activeitem_info_'.$uniq_ord_id.' {}'.
-	
+
 	/* Item button handles (instantly display respective item)*/'
 	#mod_fc_item_handles_'.$uniq_ord_id.' {}'.
-	
+
 	/* CAROUSEL item/page handles clickable */'
 	#mod_fc_item_handles_'.$uniq_ord_id.' span.mod_fc_item_handle:hover {
 		'.($item_handle_event=='click' ? 'cursor:pointer;' : 'cursor:default;').'
@@ -992,9 +995,9 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		'.($page_handle_event=='click' ? 'cursor:pointer;' : 'cursor:default;').'
 	}'
 	;
-	
+
 	if ($css) $document->addStyleDeclaration($css);
-	
+
 	if ($item_placement_feat == 1 && $item_columns_feat > 1)
 	{
 		$js = "
@@ -1028,12 +1031,15 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		if ($js) $document->addScriptDeclaration($js);
 	}
 	?>
-	
+
 	<?php endforeach; ?>
-	
+
 	<?php
 	// Display readon of module
 	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/readon.php');
 	?>
-	
+
 </div>
+
+<!-- EOF DIV mod_flexicontent_wrapper -->
+

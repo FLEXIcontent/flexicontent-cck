@@ -3021,6 +3021,7 @@ body .form-horizontal .control-group {
 .fc-tabbed-field-box {
 	padding: 0 !important;
 }
+.fc-tabbed-field-box textarea,
 .fc-tabbed-field-box > input {
 	border: 0 !important;
 	border-radius: 4px !important;
