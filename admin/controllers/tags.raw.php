@@ -62,8 +62,7 @@ class FlexicontentControllerTags extends FlexicontentController
 			return;
 		}
 
-		$jinput = JFactory::getApplication()->input;
-		$list  = $jinput->get('taglist', null, 'string');
+		$list  = $this->input->get('taglist', null, 'string');
 		$list  = preg_replace("/[\"'\\\]/u", "", $list);
 
 		$model = $this->getModel('tags');		
@@ -96,17 +95,17 @@ class FlexicontentControllerTags extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$jinput = JFactory::getApplication()->input;
-		$name  = $jinput->get('name', '', 'string');
-		$array = $jinput->get('cid',  0, 'array');
-		$cid   = (int) $array[0];
+		$name = $this->input->get('name', null, 'string');
+		$cid  = $this->input->get('cid', array(0), 'array');
+		JArrayHelper::toInteger($cid, array(0));
+		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)
 		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
 		$model = new FlexicontentModelTag();
 		$model->setId($cid);
 		$tag = $model->getTag($name);
-		
+
 		if ($tag && $tag->id)
 		{
 			// Since tag was found just output the loaded tag
@@ -115,19 +114,19 @@ class FlexicontentControllerTags extends FlexicontentController
 			echo $id."|".$name;
 			jexit();
 		}
-		
+
 		if ($cid)
 		{
 			echo "0|Tag not found";
 			jexit();
 		}
-		
+
 		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
 		{
 			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
 			jexit();
 		}
-		
+
 		// Add the new tag and output it so that it gets loaded by the form
 		try {
 			$obj = new stdClass();

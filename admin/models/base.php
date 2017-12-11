@@ -283,7 +283,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	protected function _loadRecord($pk = null)
 	{
 		// Maybe we were given a name, try to use it if table has such a property
-		$name = $pk != (int) $pk ? $pk : null;
+		$name = !is_integer($pk) && !empty($pk) ? $pk : null;
 		if ($name)
 		{
 			// Check 'name' columns and then check 'alias' column exists, if none then clear $name
