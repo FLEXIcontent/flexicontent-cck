@@ -66,7 +66,6 @@
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius: 0px;
 	background-color: unset;
-	/*box-shadow: 1px 1px 1px darkgray;*/
 }
 
 
@@ -229,28 +228,18 @@
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.even {
 }
 
-/*.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,*/
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover:hover .mod_flexicontent_standard_wrapper_innerbox {
-	background-color: #D0D0D0;
-	border-color: #888 #555 #555 #888;
-	/*box-shadow: 4px 4px 2px darkgray;*/
-}
-
-
 /* INTERNAL ITEM-LIST CONTAINER (ONE COLUMN MODE) */
 .news.mod_flexicontent_wrapper .mod_flexicontent_featured,
 .news.mod_flexicontent_wrapper .mod_flexicontent_standard {
-	margin-top: 0px !important;
-	margin-bottom: 0px !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 0%;
+	margin-right: 0%;
 	
-	padding-top: 0px !important;
-	padding-bottom: 0px !important;
-	padding-left: 0% !important;
-	padding-right: 0% !important;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 0%;
+	padding-right: 0%;
 	
 	float: left;
 	width: 100%;
@@ -507,7 +496,6 @@
 	margin: 0%;
 	position: absolute;
 	left: 0px;
-	box-shadow: 1px 1px 8px black;
 }
 .news.mod_flexicontent_wrapper .fc_overlayed .fc_block {
 	/*font-family: Raleway;
@@ -567,18 +555,37 @@
 	overflow-y: hidden;
 }
 
-.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
-.news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active { /* force showing content of active item */
-	opacity:1;
-	filter:alpha(opacity=100);
-	max-height: 100%; /* can be approximate, percentage works well if parent height is specific */
-}
-.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .fc_auto_show.fc_show_active,  /* show & highlight content of active item */
-.news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .fc_auto_show.fc_show_active,  /* show & highlight content of active item */
-.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper:hover .fc_auto_show,  /* show content if item under mouse */
-.news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper:hover .fc_auto_show {  /* show content if item under mouse */
-	opacity:1;
-	filter:alpha(opacity=100);
+
+/* AUTO-SHOW CONTENTS of items (having class: .fc_auto_show), when:
+ *
+ * - ACTIVATED (selected)
+ * - HOVERED
+ */
+
+.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,
+.news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,
+.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper:hover .fc_auto_show,
+.news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper:hover .fc_auto_show {
+	opacity: 1;
+	filter: alpha(opacity=100);
 	background-color: rgba(0, 0, 0, 0.75);
 	max-height: 100%; /* can be approximate, percentage works well if parent height is specific */
+}
+
+
+/*
+ * HIGHLIGHT HOVERED item container (if highlight-on-hover enabled in configuration)
+ *
+ * - CLASS .mod_hl_hover => Enables hi-lighting on hovered item (it is added via configuration parameter)
+ * - CLASSES .mod_hl_hover.mod_fc_activeitem => Override CSS for 'active' (selected) when hovered
+ */
+
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_hl_hover.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_hl_hover:hover .mod_flexicontent_featured_wrapper_innerbox,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover:hover .mod_flexicontent_standard_wrapper_innerbox {
+	background-color: #D0D0D0;
+	border-color: #888 #555 #555 #888;
+	box-shadow: -2px 2px 5px -2px black, 2px -2px 5px -2px black;
+	z-index: 12; /* needed in cases the standard-itens outer box has z-index 10 */
 }

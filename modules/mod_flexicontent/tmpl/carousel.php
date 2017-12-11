@@ -232,7 +232,7 @@ if ($interval < $duration) {
 
 
 // Featured
-$item_columns_feat = $params->get('item_columns_feat', 1);
+$item_columns_feat = $params->get('item_columns_feat', 3);
 $item_placement_feat = $params->get($layout.'_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
 $cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
 
