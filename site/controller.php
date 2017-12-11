@@ -2095,25 +2095,11 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
-		
-		$app  = JFactory::getApplication();
 
-		$name = $this->input->get('name', '', 'string');
+		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('id', array(0), 'array');
 		JArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
-
-		if ($cid)
-		{
-			echo "0|Tag not found";
-			jexit();
-		}
-
-		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
-		{
-			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
-			jexit();
-		}
 
 		// Check if tag exists (id exists or name exists)
 		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
@@ -2127,6 +2113,18 @@ class FlexicontentController extends JControllerLegacy
 			$id   = $model->get('id');
 			$name = $model->get('name');
 			echo $id."|".$name;
+			jexit();
+		}
+
+		if ($cid)
+		{
+			echo "0|Tag not found";
+			jexit();
+		}
+
+		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
+		{
+			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
 			jexit();
 		}
 
