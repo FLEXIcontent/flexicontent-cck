@@ -130,13 +130,13 @@ $img_auto_dims_css=" width: 100%; height: auto; display: block !important; borde
 
 
 // Featured
-$item_columns_feat = $params->get('item_columns_feat', 1);
+$item_columns_feat = $params->get('item_columns_feat', 3);
 $item_placement_feat = $params->get($layout.'_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
 $cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
 
 // Standard
 $item_placement_std = $params->get($layout.'_item_placement', 0);  // -1: other, 0: cleared, 1: as masonry tiles
-$item_columns_std = $params->get('item_columns', 2);
+$item_columns_std = $params->get('item_columns', 4);
 $cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 
 $document = JFactory::getDocument();
