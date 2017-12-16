@@ -378,12 +378,12 @@ class JFormFieldFclayout extends JFormFieldList
 		
 		// Add tag attributes
 		$attribs = '';
-		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' )
+		{
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
-		} else {
-			$attribs .= 'class="inputbox"';
 		}
+		$attribs .= ' class="fc-element-auto-init"';
 		$attribs .= ' onchange="fc_getLayout_'.$_name.'(this);"';
 		
 		
@@ -401,7 +401,7 @@ if ( ! @$attributes['skipparams'] ) {
 
 ".($params_source=="file" ? "
 
-function fc_getLayout_".$_name."(el)
+function fc_getLayout_".$_name."(el, initial)
 {
  	var bs_tab_handle = jQuery('a[href=\"#attrib-".$tmpl_container."\"]');
  	var fc_tab_handle = jQuery('#".$tmpl_container."');
@@ -424,6 +424,13 @@ function fc_getLayout_".$_name."(el)
 		//alert('Layout container: ".$tmpl_container." not found');
 		return;
 	}
+
+	// Panel found, abort if this should only run once
+ 	if (initial && jQuery(el).data('fc-layout-first-run'))
+ 	{
+ 		return;
+ 	}
+ 	jQuery(el).data('fc-layout-first-run', 1);
 	
 	var filename = jQuery(el).find(':selected').data('filename');
 	var layout_name = filename ? filename : el.value;
@@ -464,8 +471,14 @@ function fc_getLayout_".$_name."(el)
 
 ":"
 
-function fc_getLayout_".$_name."(el)
+function fc_getLayout_".$_name."(el, initial)
 {
+ 	if (initial && jQuery(el).data('fc-layout-first-run'))
+ 	{
+ 		return;
+ 	}
+ 	jQuery(el).data('fc-layout-first-run', 1);
+
   // *** Hide default container
  	var container = jQuery('a[href=\"#attrib-".$tmpl_container."\"]');
  	if (container) container.parent().css('display', 'none');
@@ -491,7 +504,13 @@ function fc_getLayout_".$_name."(el)
 ")."
 
 window.addEvent('domready', function(){
-	fc_getLayout_".$_name."($('jform_".($view=='field' ? "attribs_" : "params_").$_name."'));
+	var el = jQuery('#jform_".($view=='field' ? "attribs_" : "params_").$_name."');
+	fc_getLayout_".$_name."(el, 1);
+
+	// In case on DOM ready the element is intialized, retry on this custom event
+	el.on('initialize-fc-element', function(){
+		fc_getLayout_".$_name."(el, 1);
+	});
 });
 
 ";

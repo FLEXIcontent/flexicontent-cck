@@ -512,7 +512,7 @@ function tabberAutomatic(tabberArgs, container_id)
   tempObj = new tabberObj(tabberArgs);
 
   /* Find all DIV elements in the document that have the configured classname */
-  var container_selector = typeof container_id != 'undefined' ? '#' + container_id + ' ' : '';
+  var container_selector = typeof container_id != 'undefined' ? '#' + container_id + ' ' : 'body ';
   var divs = new Array();
   var i = 0;
 
@@ -532,7 +532,9 @@ function tabberAutomatic(tabberArgs, container_id)
       divs[i].tabber = new tabberObj(tabberArgs);
     }
   }
-  
+
+ 	jQuery(container_selector).find('.fc-element-auto-init').trigger('initialize-fc-element');
+
   return this;
 }
 
