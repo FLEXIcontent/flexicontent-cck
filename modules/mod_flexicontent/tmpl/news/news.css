@@ -153,7 +153,20 @@
 	border-width: 0px !important;
 }
 
-@media only screen and (min-width: 960px) and (max-width: 1160px) {
+@media only screen and (min-width: 1280px) and (max-width: 1399px) {
+	/* medium-sized desktops */
+	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
+	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
+	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
+	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6,
+	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
+	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
+		width: 20% !important;
+	}
+}
+
+@media only screen and (min-width: 1152px) and (max-width: 1279px) {
+	/* small-sized desktops */
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
@@ -166,8 +179,8 @@
 	}
 }
 
-@media only screen and (min-width: 768px) and (max-width: 960px) {
-	/* start of large tablet styles */
+@media only screen and (min-width: 1024px) and (max-width: 1151px) {
+	/* large-sized tablets, very small-sized desktops */
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
@@ -182,8 +195,8 @@
 	}
 }
 
-@media only screen and (min-width: 480px) and (max-width: 767px) {
-	/* start of medium tablet styles */
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+	/* medium-sized tablets */
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
@@ -200,8 +213,8 @@
 	}
 }
 
-@media only screen and (max-width: 479px) {
-	/* start of phone styles */
+@media only screen and (max-width: 767px) {
+	/* phones and small-sized tablets */
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_2,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
 	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
