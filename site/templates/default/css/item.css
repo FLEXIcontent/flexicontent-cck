@@ -1,12 +1,32 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: inherit;
+	background: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
+}
+.fcitems {
+	background: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	color: inherit;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: #999999;
 	color: #ffffff;
 	border-radius: 3px;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
 }
 body #flexicontent ul.tabbernav > li a {
 	border: 1px solid #1c5a85;
@@ -26,6 +46,25 @@ body #flexicontent ul.tabbernav > li:hover a {
 	background-image: linear-gradient(to bottom,#1c5675,#0a2131);
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#1c5675,endColorstr=#0a2131);
 	color: #ffffff;
+}
+body .tabbertab,
+#flexicontent .tabbertab {
+	background: #ffffff;
+	border-radius: 0pxpx;
+}
+body ul.tabbernav,
+#flexicontent ul.tabbernav {
+	border-bottom: 1pxpx solid inherit !important;
+}
+body .flexi.infoblock {
+	color: inherit;
+	background: inherit;
+	padding-top: 10px;
+	padding-right: 0px;
+	padding-left: 10px;
+	padding-bottom: 10px;
+	border-radius: 0px;
+	border: 1px solid inherit;
 }
 .flexi.lineinfo {
 	display: block;
