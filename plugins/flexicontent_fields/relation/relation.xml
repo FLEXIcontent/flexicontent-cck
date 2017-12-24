@@ -210,7 +210,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 				<option value="jorder">FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA</option>
 				<option value="random">FLEXI_ORDER_RANDOM</option>
-				<!-- manual order meaningless for reverse field ...-->
+				<!-- manual order meaningless for relation reverse field and for autorelationfilters field ...-->
 				<option value="manual" show_list="manual_order" hide_list="manual_order">FLEXI_ORDER_MANUAL_ORDER</option>
 			</field>
 
@@ -349,7 +349,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_OVERRIDE_DEFAULT" level="level3" depend_class="viewing-total-mode total_item_list" />
 			<field name="total_relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="38" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
 
-			<field name="" type="separator" default="FLEXI_VIEWING" level="tabset_close" box_type="1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>
 
 		<fieldset name="group-relation-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">

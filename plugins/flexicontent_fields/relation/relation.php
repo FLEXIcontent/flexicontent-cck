@@ -16,7 +16,7 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 
 class plgFlexicontent_fieldsRelation extends FCField
 {
-	static $field_types = array('relation', 'relation_reverse');
+	static $field_types = array('relation', 'relation_reverse', 'autorelationfilters');
 	var $task_callable = array('getCategoryItems');  // Field's methods allowed to be called via AJAX
 
 	// ***
@@ -483,7 +483,8 @@ jQuery(document).ready(function()
 			// Always ignore passed items, the DB query will determine the items
 			$related_items = null;
 		}
-		else  // $field->field_type == 'relation')
+
+		else  // $field->field_type === 'autorelationfilters' || $field->field_type === 'relation'
 		{
 			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
 			$array = $this->unserialize_array(reset($values), $force_array=false, $force_value=false);
@@ -503,12 +504,12 @@ jQuery(document).ready(function()
 			// Limit list to desired max # items
 			$related_items = array();
 
-			for($i = 0; $i < $itemcount; $i++)
+			for ($i = 0; $i < $itemcount; $i++)
 			{
-				list ($itemid,$catid) = explode(":", $values[$i]);
+				list ($itemid, $catid) = explode(":", $values[$i]);
 				$related_items[$itemid] = new stdClass();
 				$related_items[$itemid]->itemid = $itemid;
-				$related_items[$itemid]->catid = $catid;
+				$related_items[$itemid]->catid  = $catid;
 				$related_items[$itemid]->value  = $values[$i];
 			}
 		}
@@ -523,8 +524,10 @@ jQuery(document).ready(function()
 		$options = new stdClass();
 		if ($disp->item_list || $disp->total_info)
 		{
-			// 0: return string with related items HTML, 1: return related items array,
-			// 2: same as 1 but also means do not create HTML display, 3: same as 2 but also do not get any item data
+			// 0: return string with related items HTML,
+			// 1: return related items array,
+			// 2: same as 1 but also means do not create HTML display,
+			// 3: same as 2 but also do not get any item data
 			$options->return_items_array = $disp->item_list ? 1 : 3;
 
 			// Override the item list HTML parameter ... with the one meant to be used when showing total
