@@ -170,7 +170,7 @@ endif;
 				
 					<?php echo JText::_(
 						$this->params->get('customize_titlecol_header') && $this->params->get('titlecol_header_text') ?
-							$this->params->get('titlecol_header_text') : ($show_title ? 'FLEXI_ITEMS' : '')
+							$this->params->get('titlecol_header_text') : ($show_title ? 'FLEXI_TITLE' : '')
 						); ?>
 					
 				</th>

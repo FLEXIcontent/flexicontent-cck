@@ -155,7 +155,7 @@ $items	= & $this->items;
 			<?php if ($use_image) : ?>
 			<th id="fc_image"><?php echo JText::_( 'FLEXI_IMAGE' ); ?></th>
 			<?php endif; ?>
-			<th id="fc_title"><?php echo JText::_( 'FLEXI_ITEMS' ); ?></th>
+			<th id="fc_title"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
 			<th id="fc_desc"><?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?></th>
 			<?php if ($use_date) : ?>
 			<th id="fc_modified"><?php echo JText::_( 'FLEXI_LAST_UPDATED' ); ?></th>
