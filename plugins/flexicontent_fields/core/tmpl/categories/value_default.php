@@ -1,5 +1,8 @@
 <?php
 
+// Note you can use: -- if ($prop === 'csv_export') { ... } -- to check if executed during CSV export
+$link_to_view = $prop === 'csv_export' ? 0 : $link_to_view;
+
 foreach ($categories as $category)
 {
 	$catid = $category->id;
