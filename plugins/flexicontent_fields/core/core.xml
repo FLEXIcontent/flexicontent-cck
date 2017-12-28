@@ -1236,7 +1236,8 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_FIELD_RAW_VALUES</option>
+				<option value="2">FLEXI_FIELD_RENDERED_VALUES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
@@ -1331,7 +1332,8 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			<field name="include_in_csv_export" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT" description="FLEXI_FIELD_INCLUDE_IN_CSV_EXPORT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_FIELD_RAW_VALUES</option>
+				<option value="2">FLEXI_FIELD_RENDERED_VALUES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />

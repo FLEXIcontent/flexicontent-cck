@@ -104,7 +104,12 @@ class plgFlexicontent_fieldsCore extends FCField
 		$_opentag = $field->parameters->get( 'opentag', '' );
 		$_closetag = $field->parameters->get( 'closetag', '' );
 		$pretext_cacheable = $posttext_cacheable = $opentag_cacheable = $closetag_cacheable = false;
-		
+
+		if ($prop === 'csv_export')
+		{
+			$separatorf = 3;  // comma
+		}
+
 		switch($separatorf)
 		{
 			case 0:
@@ -305,7 +310,8 @@ class plgFlexicontent_fieldsCore extends FCField
 					else */if ($_tags===false) $tags = & $item->tags;
 					else $tags = & $_tags;
 					
-					if ($tags) :
+					if ($tags)
+					{
 						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
 
 						$viewlayout = $field->parameters->get('viewlayout', '');
@@ -316,7 +322,7 @@ class plgFlexicontent_fieldsCore extends FCField
 						include(self::getViewPath('core', $viewlayout, 'tags'));
 						$field->{$prop} = implode($separatorf, $field->{$prop});
 						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-					endif;
+					}
 					break;
 				
 				case 'maintext': // main text
