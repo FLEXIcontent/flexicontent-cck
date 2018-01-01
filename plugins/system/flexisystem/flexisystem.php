@@ -17,7 +17,6 @@
  * GNU General Public License for more details.
  */
 
-// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
@@ -619,6 +618,7 @@ class plgSystemFlexisystem extends JPlugin
 	}
 
 
+
 	/**
 	 * Utility Function:
 	 * Create the globalcats category tree, the result of this function is cached
@@ -633,7 +633,7 @@ class plgSystemFlexisystem extends JPlugin
 		$ROOT_CATEGORY_ID = 1;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
-		
+
 		// Get the category tree
 		$query	= 'SELECT c.id, c.parent_id, c.published, c.access, c.title, c.level, c.lft, c.rgt, c.language,'
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug, 0 AS numitems'
@@ -681,7 +681,8 @@ class plgSystemFlexisystem extends JPlugin
 		//get list of the items
 		$globalcats = plgSystemFlexisystem::_getCatAncestors($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $levellimit-1));
 
-		foreach ($globalcats as $cat) {
+		foreach ($globalcats as $cat)
+		{
 			$cat->ancestorsonlyarray = $cat->ancestors;
 			$cat->ancestorsonly      = implode(',', $cat->ancestors);
 			$cat->ancestors[]        = $cat->id;
@@ -695,71 +696,89 @@ class plgSystemFlexisystem extends JPlugin
 		
 		return $globalcats;
 	}
-	
-	
+
+
+
 	/**
 	 * Utility Function:
-	 * Get the ancestors of each category node
-	 *
-	 * @access private
-	 * @return array
-	 */
-	static private function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
+    * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
+    * The sorting of categories is done by:
+    * a. looping through all categories  v  in given children array padding all of category v with same padding
+    * b. but for every category v that has a children array, it calling itself (recursion) in order to inject the children categories just bellow category v
+    *
+    * This function is based on the joomla 1.0 treerecurse 
+    *
+    * @access private
+    * @return array
+    */
+	static private function _getCatAncestors( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		$ROOT_CATEGORY_ID = 1;
 		if (!$ancestors) $ancestors = array();
 		
-		if (@$children[$id] && $level <= $maxlevel) {
-			foreach ($children[$id] as $v) {
+		if (!empty($children[$parent_id]) && $level <= $maxlevel)
+		{
+			foreach ($children[$parent_id] as $v)
+			{
 				$id = $v->id;
-				
-				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID) {
-					$ancestors[] 	= $v->parent_id;
+
+				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID)
+				{
+					$ancestors[] = $v->parent_id;
 				} 
-				
-				if ($v->parent_id==1) {  // Top level category ( a child of ROOT)
+
+				// Top level category (a child of ROOT)
+				if ($v->parent_id==1)
+				{
 					$pre    = '';
-					$spacer = '&nbsp;.&nbsp;';
-				} else if ( $type ) {
-					$pre    = '<sup>|_</sup>&nbsp;';
-					$spacer = '&nbsp;.&nbsp;';
-				} else {
-					$pre    = '-&nbsp;';
-					$spacer = '&nbsp;.&nbsp;';
+					$spacer = ' . ';
+				}
+				elseif ($type)
+				{
+					$pre    = '<sup>|_</sup> ';
+					$spacer = ' . ';
+				}
+				else
+				{
+					$pre    = '- ';
+					$spacer = ' . ';
 				}
 
-				if ($title) {
-					if ( $v->parent_id == 0 ) {
-						$txt    = ''.$v->title;
-					} else {
-						$txt    = $pre.$v->title;
-					}
-				} else {
-					if ( $v->parent_id == 0 ) {
-						$txt    = '';
-					} else {
-						$txt    = $pre;
-					}
+				if ($title)
+				{
+					$txt = $v->parent_id == $ROOT_CATEGORY_ID
+						? '' . $v->title
+						: $pre . $v->title;
+				}
+				else
+				{
+					$txt = $v->parent_id == $ROOT_CATEGORY_ID
+						? ''
+						: $pre;
 				}
 
 				$pt = $v->parent_id;
 				$list[$id] = $v;
-				$list[$id]->treename 	= "$indent$txt";
-				$list[$id]->title 		= $v->title;
-				$list[$id]->slug 			= $v->slug;
-				$list[$id]->access		= $v->access;
+				$list[$id]->treename  = "$indent$txt";
+				$list[$id]->title     = $v->title;
+				$list[$id]->slug      = $v->slug;
+				$list[$id]->access    = $v->access;
 				$list[$id]->ancestors = $ancestors;
-				$list[$id]->childrenarray = @$children[$id];
-				$list[$id]->children 	= count( @$children[$id] );
-				$list[$id]->level 		= $level+1;
+				$list[$id]->level     = $level + 1;
+				$list[$id]->children  = !empty($children[$id]) ? count($children[$id]) : 0;
+				$list[$id]->childrenarray = !empty($children[$id]) ? $children[$id] : null;
 
-				$list = plgSystemFlexisystem::_getCatAncestors( $id, $indent.$spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors );
+				$parent_id = $id;
+				$list = plgSystemFlexisystem::_getCatAncestors(
+					$parent_id, $indent . $spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors
+				);
 			}
 		}
 		return $list;
 	}
-	
-	
+
+
+
 	/**
 	 * Utility Function:
 	 * Get the descendants of each category node
@@ -772,18 +791,27 @@ class plgSystemFlexisystem extends JPlugin
 		$descendants = array();
 		$stack = array();
 		$stack[] = $cat;
-		
-		while( count($stack) ) {
+
+		while( count($stack) )
+		{
 			$v = array_pop($stack);
 			$descendants[] = $v->id;
-			
-			if ( empty($v->childrenarray) ) continue;
-			foreach( array_reverse($v->childrenarray) as $child ) $stack[] = $child;
+
+			if ( empty($v->childrenarray) )
+			{
+				continue;
+			}
+			foreach( array_reverse($v->childrenarray) as $child )
+			{
+				$stack[] = $child;
+			}
 		}
+
 		return $descendants;
 	}
-	
-	
+
+
+
 	/**
 	 * Utility Function:
 	 * Get the total number of items of each category node
@@ -796,18 +824,27 @@ class plgSystemFlexisystem extends JPlugin
 		$totalItems = 0;
 		$stack = array();
 		$stack[] = $cat;
-		
-		while( count($stack) ) {
+
+		while( count($stack) )
+		{
 			$v = array_pop($stack);
 			$totalItems += $v->numitems;
-			
-			if ( empty($v->childrenarray) ) continue;
-			foreach( $v->childrenarray as $child ) $stack[] = $child;
+
+			if ( empty($v->childrenarray) )
+			{
+				continue;
+			}
+			foreach( $v->childrenarray as $child )
+			{
+				$stack[] = $child;
+			}
 		}
+
 		return $totalItems;
 	}
-	
-	
+
+
+
 	/**
 	 * Utility Function:
 	 * to detect if configuration of flexicontent component was saved

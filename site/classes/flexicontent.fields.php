@@ -3402,12 +3402,12 @@ class FlexicontentFields
 		}
 		else
 		{
-			if (is_array($value)) $value = @ $value[0];
+			if (is_array($value)) $value = isset($value[0]) ? $value[0] : null;
 		}
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+		$require_all = is_array($value) && count($value)>1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 		

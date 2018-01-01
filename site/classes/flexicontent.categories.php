@@ -148,52 +148,59 @@ class flexicontent_cats
 	{
 		global $globalcats;
 		$db = JFactory::getDbo();
-		
-		if ($published_only) {
+
+		if ($published_only)
+		{
 			$where[] = 'published = 1';
 		}
-		
+
+		// Limit category list to those contain in the subtree of the choosen category
 		$parent_id = isset($globalcats[(int)$parent_id]) ? (int)$parent_id : 0;
-		if ( $parent_id ) {
-			// Limit category list to those contain in the subtree of the choosen category
+		if ( $parent_id )
+		{
 			$where[] = 'id IN (' . $globalcats[(int)$parent_id]->descendants . ')';
 		}
-		$where[] = !FLEXI_J16GE ? 'section = '.FLEXI_SECTION : 'extension='.$db->Quote(FLEXI_CAT_EXTENSION);
-		
-		$where = count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '';
-		
-		$query = 'SELECT *, id AS value, title AS text'
-				.' FROM #__categories'
-				.$where
-				.' ORDER BY parent_id '
-				. ( !FLEXI_J16GE ? ', ordering' : ', lft' )
-				;
+
+		$where[] = !FLEXI_J16GE
+			? 'section = ' . FLEXI_SECTION
+			: 'extension = ' . $db->Quote(FLEXI_CAT_EXTENSION);
+
+		$query = 'SELECT *'
+			//. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug'
+			. ', id AS value, title AS text'
+			. ' FROM #__categories AS c'
+			. (count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '')
+			. ' ORDER BY parent_id, lft';
 
 		$db->setQuery($query);
 
 		$rows = $db->loadObjectList();
-		$rows = is_array($rows)?$rows:array();
-		
+		$rows = is_array($rows) ? $rows : array();
+
 		//set depth limit, no detect loop ?
 		$level_limit = $depth_limit ? $depth_limit : 99;
 		
 		//get children
 		$children = array();
-		foreach ($rows as $child) {
+		foreach ($rows as $child)
+		{
 			$parent = $child->parent_id;
-			$list = @$children[$parent] ? $children[$parent] : array();
+			$list = !empty($children[$parent])
+				? $children[$parent]
+				: array();
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
 		
 		//get list of the items
-		$ROOT_CATEGORY_ID = $parent_id ? $globalcats[$parent_id]->parent_id : (!FLEXI_J16GE ? 0 : 1);
-		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $level_limit-1));
+		$root_catid = $parent_id ? $globalcats[$parent_id]->parent_id : 1;
+		$list = flexicontent_cats::treerecurse($root_catid, '', array(), $children, true, max(0, $level_limit-1));
 
 		return $list;
 	}
 	
 	/**
+	 * Utility Function:
     * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
     * The sorting of categories is done by:
     * a. looping through all categories  v  in given children array padding all of category v with same padding
@@ -204,52 +211,73 @@ class flexicontent_cats
     * @access public
     * @return array
     */
-	public static function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
+	static public function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
+		$ROOT_CATEGORY_ID = 1;
 		if (!$ancestors) $ancestors = array();
-		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
 		
-		if (@$children[$parent_id] && $level <= $maxlevel) {
-			foreach ($children[$parent_id] as $v) {
+		if (!empty($children[$parent_id]) && $level <= $maxlevel)
+		{
+			foreach ($children[$parent_id] as $v)
+			{
 				$id = $v->id;
-				
-				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != 0) {
+
+				if ((!in_array($v->parent_id, $ancestors)) && $v->parent_id != $ROOT_CATEGORY_ID)
+				{
 					$ancestors[] = $v->parent_id;
 				} 
-				
-				if ( $type ) {
-					$pre    = '<sup>|_</sup>&nbsp;';
-					$spacer = '.&nbsp;&nbsp;&nbsp;';
-				} else {
+
+				// Top level category (a child of ROOT)
+				if (0)  // NOT needed ?
+				{
+					$pre    = '';
+					$spacer = ' . ';
+				}
+				elseif ($type)
+				{
+					$pre    = '<sup>|_</sup> ';
+					$spacer = ' . ';
+				}
+				else
+				{
 					$pre    = '- ';
-					$spacer = '&nbsp;&nbsp;';
+					$spacer = ' . ';
 				}
 
-				if ($title) {
-					if ( $v->parent_id == $ROOT_CATEGORY_ID ) {
-						$txt    = ''.$v->title;
-					} else {
-						$txt    = $pre.$v->title;
-					}
-				} else {
-					if ( $v->parent_id == $ROOT_CATEGORY_ID ) {
-						$txt    = '';
-					} else {
-						$txt    = $pre;
-					}
+				if ($title)
+				{
+					$txt = $v->parent_id == $ROOT_CATEGORY_ID
+						? '' . $v->title
+						: $pre . $v->title;
 				}
+				else
+				{
+					$txt = $v->parent_id == $ROOT_CATEGORY_ID
+						? ''
+						: $pre;
+				}
+
 				$pt = $v->parent_id;
 				$list[$id] = $v;
-				$list[$id]->treename 		= "$indent$txt";
-				$list[$id]->ancestors 		= $ancestors;
-				$list[$id]->childrenarray 	= @$children[$id];
-				$list[$id]->children 		= count( @$children[$id] );
+				$list[$id]->treename  = "$indent$txt";
+				$list[$id]->title     = $v->title;
+				//$list[$id]->slug      = $v->slug;
+				//$list[$id]->access    = $v->access;
+				$list[$id]->ancestors = $ancestors;
+				//$list[$id]->level     = $level + 1;
+				$list[$id]->children  = !empty($children[$id]) ? count($children[$id]) : 0;
+				$list[$id]->childrenarray = !empty($children[$id]) ? $children[$id] : null;
 
-				$list = flexicontent_cats::treerecurse( $id, $indent . $spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors, $childs );
+				$parent_id = $id;
+				$list = flexicontent_cats::treerecurse(
+					$parent_id, $indent . $spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors
+				);
 			}
 		}
 		return $list;
 	}
+
+
 
 	/**
 	 * Build a html select form field that displays a Category Tree
