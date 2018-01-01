@@ -123,10 +123,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Compatibility text search (LIKE %word%) for language without spaces
 		$filter_word_like_any = $params->get('filter_word_like_any', 0);
-		
-		// ************************************************
-		// some parameter shortcuts common with search view
-		// ************************************************
+
+
+		// ***
+		// *** Some parameter shortcuts common with search view
+		// ***
+
 		$canseltypes  = $params->get('canseltypes', 1);
 		$txtmode      = $params->get('txtmode', 0);  // 0: BASIC Index, 1: ADVANCED Index without search fields user selection, 2: ADVANCED Index with search fields user selection
 		
@@ -140,13 +142,13 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Force single type selection and showing the content type selector
 		$type_based_search = ($show_filters==1 || $show_txtfields==1);
 		$canseltypes = $type_based_search ? 1 : $canseltypes;
-		
-		
-		
-		// ********************************************************************
-		// Get Content Types allowed for user selection in the Search Form
-		// Also retrieve their configuration, plus the currently selected types
-		// ********************************************************************
+
+
+		// ***
+		// *** Get Content Types allowed for user selection in the Search Form
+		// *** Also retrieve their configuration, plus the currently selected types
+		// ***
+
 		// Get them from configuration
 		$contenttypes = $params->get('contenttypes', array());
 		
@@ -164,7 +166,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		foreach($typeData as $tdata) $contenttypes[] = $tdata->id;
 		
 		// Get Content Types to use either those currently selected in the Search Form, or those hard-configured in the search menu item
-		if ( $canseltypes ) {
+		if ( $canseltypes )
+		{
 			$form_contenttypes = JRequest::getVar('contenttypes', array());
 			
 			// Sanitize them
@@ -176,34 +179,44 @@ class plgSearchFlexiadvsearch extends JPlugin
 		}
 		
 		// Check for zero content type (can occur during sanitizing content ids to integers)
-		if ( !empty($contenttypes) ) {
+		if ( !empty($contenttypes) )
+		{
 			foreach($contenttypes as $i => $v) if (!strlen($contenttypes[$i])) unset($contenttypes[$i]);
 		}
 		
 		// Type based seach, get a single content type (first one, if more than 1 were given ...)
-		if ($type_based_search && $canseltypes && !empty($form_contenttypes)) {
+		if ($type_based_search && $canseltypes && !empty($form_contenttypes))
+		{
 			$single_contenttype = reset($form_contenttypes);
 			$contenttypes = array($single_contenttype);
-		} else {
+		}
+		else
+		{
 			$single_contenttype = false;
 		}
-		
-		
-		
-		// *************************************
-		// Text Search Fields of the search form
-		// *************************************
-		if ( !$txtmode ) {
+
+
+		// ***
+		// *** Text Search Fields of the search form
+		// ***
+
+		if ( !$txtmode )
+		{
 			$txtflds = array();
 			$fields_text = array();
 		}
-		
-		else {
+
+		else
+		{
 			$txtflds = '';
-			if ( $show_txtfields ) {
-				if ( $show_txtfields==1 ) {
+			if ( $show_txtfields )
+			{
+				if ( $show_txtfields==1 )
+				{
 					$txtflds = $single_contenttype ? $typeData[$single_contenttype]->params->get('searchable', '') : '';
-				} else {
+				}
+				else
+				{
 					$txtflds = $params->get('txtflds', '');
 				}
 			}
@@ -219,26 +232,36 @@ class plgSearchFlexiadvsearch extends JPlugin
 			// Retrieve field properties/parameters, verifying the support to be used as Text Search Fields
 			// This will return all supported fields if field limiting list is empty
 			$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $txtflds_list, $contenttypes, $load_params=true, 0, 'search');
-			if ( empty($fields_text) ) { // all entries of field limiting list were invalid , get ALL
-				if( !empty($contenttypes) ) {
+
+			// If all entries of field limiting list were invalid, get ALL
+			if ( empty($fields_text) )
+			{
+				if( !empty($contenttypes) )
+				{
 					$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'search');
-				} else {
+				}
+				else
+				{
 					$fields_text = array();
 				}
 			}
 		}
-		
-		
-		
-		// ********************************
-		// Filter Fields of the search form
-		// ********************************
+
+
+		// ***
+		// *** Filter Fields of the search form
+		// ***
+
 		// Get them from type configuration or from search menu item
 		$filtflds = '';
-		if ( $show_filters ) {
-			if ( $show_filters==1 ) {
+		if ( $show_filters )
+		{
+			if ( $show_filters==1 )
+			{
 				$filtflds = $single_contenttype ? $typeData[$single_contenttype]->params->get('filters', '') : '';
-			} else {
+			}
+			else
+			{
 				$filtflds = $params->get('filtflds', '');
 			}
 		}
@@ -253,19 +276,26 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Retrieve field properties/parameters, verifying the support to be used as Filter Fields
 		// This will return all supported fields if field limiting list is empty
-		if ( count($filtflds) ) {
+		if ( count($filtflds) )
+		{
 			$filters_tmp = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $filtflds_list, $contenttypes, $load_params=true, 0, 'filter');
 			
 			// Use custom order
 			$filters = array();
-			if ($canseltypes && $show_filters) {
-				foreach( $filtflds as $field_name) {
+			if ($canseltypes && $show_filters)
+			{
+				foreach( $filtflds as $field_name)
+				{
 					if ( empty($filters_tmp[$field_name]) ) continue;
 					$filter_id = $filters_tmp[$field_name]->id;
 					$filters[$filter_id] = $filters_tmp[$field_name];
 				}
-			} else {
-				foreach( $filters_tmp as $filter) {
+			}
+
+			else
+			{
+				foreach( $filters_tmp as $filter)
+				{
 					$filters[$filter->id] = $filter;  // index by filter_id in this case too (for consistency, although we do not use the array index ?)
 				}
 			}
@@ -274,34 +304,32 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// If configured filters were not found/invalid for the current content type(s)
 		// then retrieve all fields marked as filterable for the give content type(s) this is useful to list per content type filters automatically, even when not set or misconfigured
-		if ( empty($filters) ) {
-			if( !empty($contenttypes) )
-				$filters = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter');
-			else
-				$filters = array();
+		if ( empty($filters) )
+		{
+			$filters = !empty($contenttypes)
+				? FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter')
+				: array();
 		}
-		
-		
-		
-		// **********************
-		// Load Plugin parameters
-		// **********************
-		
+
+
+		// ***
+		// *** Load Plugin parameters
+		// ***
+
 		$plugin = JPluginHelper::getPlugin('search', 'flexiadvsearch');
 		$pluginParams = new JRegistry($plugin->params);
-		
+
 		// Shortcuts for plugin parameters
 		$search_limit    = $params->get( 'search_limit', $pluginParams->get( 'search_limit', 20 ) );      // Limits the returned results of this seach plugin
 		$filter_lang     = $params->get( 'filter_lang', $pluginParams->get( 'filter_lang', 1 ) );         // Language filtering enabled
 		$search_archived = $params->get( 'search_archived', $pluginParams->get( 'search_archived', 1 ) ); // Include archive items into the search
 		$browsernav      = $params->get( 'browsernav', $pluginParams->get( 'browsernav', 2 ) );           // Open search in window (for value 1)
-		
-		
-		
-		// ***************************************************************************************************************
-		// Varous other variable USED in the SQL query like (a) current frontend language and (b) -this- plugin specific ordering, (c) null / now dates, (d) etc 
-		// ***************************************************************************************************************
-		
+
+
+		// ***
+		// *** Various other variable USED in the SQL query like (a) current frontend language and (b) -this- plugin specific ordering, (c) null / now dates, (d) etc 
+		// ***
+
 		// Get current frontend language (fronted user selected)
 		$lang = flexicontent_html::getUserCurrentLang();
 		
@@ -319,29 +347,31 @@ class plgSearchFlexiadvsearch extends JPlugin
 		//$show_filtersop = $params->get('show_filtersop', 1);
 		//$default_filtersop = $params->get('default_filtersop', 'all');
 		//$FILTERSOP = !$show_filtersop ? $default_filtersop : JRequest::getVar('filtersop', $default_filtersop);
-		
-		
-		
-		// ****************************************
-		// Create WHERE clause part for Text Search 
-		// ****************************************
-		
+
+
+		// ***
+		// *** Create WHERE clause part for Text Search 
+		// ***
+
 		$si_tbl = !$txtmode ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
-		
-		if( strlen($text) )
+
+		if ( strlen($text) )
 		{
 			$ts = !$txtmode ? 'ie' : 'ts';
 			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
-			
+
 			switch ($phrase)
 			{
 				case 'natural':
-					if ($filter_word_like_any) {
+					if ($filter_word_like_any)
+					{
 						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-					} else {
+					}
+					else
+					{
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
 					}
 					break;
@@ -355,12 +385,15 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$stopwords = array();
 					$shortwords = array();
 					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
-					if (empty($words)) {
+					if (empty($words))
+					{
 						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						$_text_match = ' 0=1 ';
-					} else {
+					}
+					else
+					{
 						// speed optimization ... 2-level searching: first require ALL words, then require exact text
 						$newtext = '+' . implode( ' +', $words );
 						$quoted_text = $db->escape($newtext, true);
@@ -386,9 +419,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 				
 				case 'any':
 				default:
-					if ($filter_word_like_any) {
+					if ($filter_word_like_any)
+					{
 						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-					} else {
+					}
+					else
+					{
 						$words = preg_split('/\s\s*/u', $text);
 						$stopwords = array();
 						$shortwords = array();
@@ -409,13 +445,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		} else {
 			$text_where = '';
 		}
-		
-		
-		
-		// *******************
-		// Create ORDER clause
-		// *******************
-		
+
+
+		// ***
+		// *** Create ORDER clause
+		// ***
+
 		// FLEXIcontent search view, use FLEXIcontent ordering
 		$orderby_join = '';
 		$orderby_col = '';
@@ -461,7 +496,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 				if ($_field_id && count($order_parts) == 4)
 				{
-					if ($_o_method=='file_hits') {
+					if ($_o_method=='file_hits')
+					{
 						$orderby_join .= '
 							LEFT JOIN (
 								SELECT rf.item_id, SUM(fdat.hits) AS file_hits
@@ -502,7 +538,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 				if ($_field_id && count($order_parts) == 4)
 				{
-					if ($_o_method=='file_hits') {
+					if ($_o_method=='file_hits')
+					{
 						$orderby_join .= '
 							LEFT JOIN (
 								SELECT f2.item_id, SUM(fdat2.hits) AS file_hits2
@@ -517,13 +554,15 @@ class plgSearchFlexiadvsearch extends JPlugin
 			}
 			
 			// Create JOIN for ordering items by author's name
-			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+			if ( in_array('author', $order) || in_array('rauthor', $order) )
+			{
 				$orderby_col = '';
 				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 			}
 			
 			// Create JOIN for ordering items by a most commented
-			if ( in_array('commented', $order) ) {
+			if ( in_array('commented', $order) )
+			{
 				$orderby_col   = ', COUNT(DISTINCT com.id) AS comments_total';
 				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
 			}
@@ -544,7 +583,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 			}
 			
 			// Create JOIN for ordering items by their ordering attribute (in item's main category)
-			if ( in_array('order', $order) ) {
+			if ( in_array('order', $order) )
+			{
 				$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 			}
 		}
@@ -563,12 +603,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 			}
 			$orderby = ' ORDER BY '. $orderby;
 		}
-		
-		
-		
-		// ****************************************************************************************
-		// Create JOIN clause and WHERE clause part for filtering by current (viewing) access level
-		// ****************************************************************************************
+
+
+		// ***
+		// *** Create JOIN clause and WHERE clause part for filtering by current (viewing) access level
+		// ***
+
 		$joinaccess	= '';
 		$andaccess	= '';
 		$select_access = '';
@@ -576,7 +616,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Extra access columns for main category and content type (item access will be added as 'access')
 		$select_access .= ',  c.access as category_access, ty.access as type_access';
 		
-		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
+		if ( !$show_noauth )
+		{
+			// User not allowed to LIST unauthorized items
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
@@ -584,7 +626,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			$select_access .= ', 1 AS has_access';
 		}
-		else {
+
+		else
+		{
 			// Access Flags for: content type, main category, item
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
@@ -595,13 +639,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 				.'   i.access IN ('.$aid_list.') '
 				.' THEN 1 ELSE 0 END AS has_access';
 		}
-		
-		
-		
-		// **********************************************************************************************************************************************************
-		// Create WHERE clause part for filtering by current active language, and current selected contend types ( !! although this is possible via a filter too ...)
-		// **********************************************************************************************************************************************************
-		
+
+
+		// ***
+		// *** Create WHERE clause part for filtering by current active language, and current selected contend types ( !! although this is possible via a filter too ...)
+		// ***
+
 		$andlang = '';
 		if (	$app->isSite() &&
 					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
@@ -612,13 +655,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Filter by currently selected content types
 		$andcontenttypes = count($contenttypes) ? ' AND ie.type_id IN ('. implode(",", $contenttypes) .') ' : '';
-		
-		
-		
-		// ***********************************************************************
-		// Create the AND-WHERE clause parts for the currentl active Field Filters
-		// ***********************************************************************
-		
+
+
+		// ***
+		// *** Create the AND-WHERE clause parts for the currentl active Field Filters
+		// ***
+
 		$return_sql = 2;
 		$filters_where = array();
 		foreach($filters as $field)
@@ -647,20 +689,23 @@ class plgSearchFlexiadvsearch extends JPlugin
 		//echo "\n<br/><br/>Filters Active: ". count($filters_where)."<br/>";
 		//echo "<pre>"; print_r($filters_where);
 		//exit;
-		
-		
-		
-		// ******************************************************
-		// Create Filters JOIN clauses and AND-WHERE clause parts
-		// ******************************************************
-		
+
+
+		// ***
+		// *** Create Filters JOIN clauses and AND-WHERE clause parts
+		// ***
+
 		// JOIN clause - USED - to limit returned 'text' to the text of TEXT-SEARCHABLE only fields ... (NOT shared with filters)
-		if ( !$txtmode ) {
+		if ( !$txtmode )
+		{
 			$onBasic_textsearch    = $text_where;
 			$onAdvanced_textsearch = '';
 			$join_textsearch = '';
 			$join_textfields = '';
-		} else {
+		}
+
+		else
+		{
 			$onBasic_textsearch    = '';
 			$onAdvanced_textsearch = $text_where;
 			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id '.(count($fields_text) ? 'AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')' : '');
@@ -695,12 +740,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// AND-WHERE sub-clauses for text search ... (shared with filters)
 		$and_where_filters = count($filters_where) ? implode( " ", $filters_where) : '';
-		
-		
-		// ************************************************
-		// Set variables used by filters creation mechanism
-		// ************************************************
-		
+
+
+		// ***
+		// *** Set variables used by filters creation mechanism
+		// ***
+
 		global $fc_searchview;
 		$fc_searchview['join_clauses'] = $join_clauses;
 		$fc_searchview['join_clauses_with_text'] = $join_clauses_with_text;
@@ -708,35 +753,33 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$fc_searchview['filters_where'] = $filters_where;  // WHERE of the filters
 		$fc_searchview['search'] = $text_where;  // WHERE for text search
 		$fc_searchview['params'] = $params; // view's parameters
-		
-		
-		
-		// *****************************************************************************************************
-		// Execute search query.  NOTE this is skipped it if (a) no text-search and no (b) no filters are active
-		// *****************************************************************************************************
-		
+
+
+		// ***
+		// *** Execute search query.  NOTE this is skipped it if (a) no text-search and no (b) no filters are active
+		// ***
+
 		// Do not check for 'contentypes' this are based on configuration and not on form submitted data,
 		// considering contenttypes or other configuration based parameters, will return all items on initial search view display !
 		if ( !count($filters_where) && !strlen($text) /*&& !strlen($andcontenttypes)*/ ) return array();
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-		
-		
-		// *****************************************
-		// Overcome possible group concat limitation
-		// *****************************************
-		
+
+
+		// ***
+		// *** Overcome possible group concat limitation
+		// ***
+
 		$query="SET SESSION group_concat_max_len = 9999999";
 		$db->setQuery($query);
 		$db->execute();
-		
-		
-		
-		// *************
-		// Get the items
-		// *************
-		
+
+
+		// ***
+		// *** Get the items
+		// ***
+
 		$query = 'SELECT SQL_CALC_FOUND_ROWS i.id'
 			. $orderby_col
 			. ' FROM #__content AS i'
@@ -749,7 +792,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. $orderby
 		;
 		//echo "Adv search plugin main SQL query: ".nl2br($query)."<br/><br/>";
-		
+
 		// NOTE: The plugin will return a PRECONFIGURED limited number of results, the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins
 		try {
 			// Get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
@@ -765,6 +808,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$fc_searchview['view_total'] = $db->loadResult();
 			$app->setUserState('fc_view_total_'.$view, $fc_searchview['view_total']);
 		}
+
 		catch (Exception $e) {
 			// Get items via normal joomla SQL layer
 			$db->setQuery(str_replace('SQL_CALC_FOUND_ROWS', '', $query), 0, $search_limit);
@@ -772,13 +816,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		}
 		
 		if ( !count($item_ids) ) return array();  // No items found
-		
-		
-		
-		// *****************
-		// Get the item data
-		// *****************
-		
+
+
+		// ***
+		// *** Get the item data
+		// ***
+
 		$query_data = 'SELECT i.id, i.title AS title, i.created, i.id AS fc_item_id, i.access, ie.type_id, i.language'
 			. ', c.title AS maincat_title, c.alias AS maincat_alias'  // Main category data
 			. ( !$txtmode ?
@@ -807,14 +850,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
 		
 		if ( $print_logging_info ) @$fc_run_times['search_query_runtime'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		
-		
-		// *************************************
-		// Create item links and other variables
-		// *************************************
-		
+
+
+		// ***
+		// *** Create item links and other variables
+		// ***
+
 		//echo "<pre>"; print_r($list); echo "</pre>";
 		if( $list )
 		{

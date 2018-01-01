@@ -1200,29 +1200,34 @@ class FCIndexedField extends FCField
 		$field->{$prop} = array();
 		$display_index = array();
 		
+		// Create field's HTML, using layout file
 		include(self::getViewPath($field->field_type, $viewlayout));
 
-
 		// Add microdata to every group of values if field -- is -- in a field group
-		if ($is_ingroup && $itemprop && $prop!='csv_export') {
-			foreach($field->{$prop} as $n => $disp_html) {
+		if ($is_ingroup && $itemprop && $prop!='csv_export')
+		{
+			foreach($field->{$prop} as $n => $disp_html)
+			{
 				$field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 			}
 		}
-		
-		
+
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
-			if ($multiple && static::$valueIsArr) {
-				// Values separator, field 's opening / closing texts, were already applied for every array of values
+			// Values separator, field 's opening / closing texts, were already applied for every array of values
+			if ($multiple && static::$valueIsArr)
+			{
 				$sep = $prop!='csv_export' ? '' : ' -- ';
 				$field->{$prop} = implode($sep, $field->{$prop});
 				$field->display_index = implode($sep, $display_index);
-			} else {
-				// Apply values separator, and field 's opening / closing texts
+			}
+
+			// Apply values separator, and field 's opening / closing texts
+			else
+			{
 				$field->{$prop} = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $field->{$prop}) . $closetag;
-				$field->display_index = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $display_index) . $closetag;
+				$field->display_index = !count($display_index) ? '' : $opentag . implode($separatorf, $display_index) . $closetag;
 			}
 			
 			// Add microdata once for all values, if field -- is NOT -- in a field group

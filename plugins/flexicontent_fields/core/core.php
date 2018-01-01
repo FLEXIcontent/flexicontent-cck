@@ -830,8 +830,14 @@ class plgFlexicontent_fieldsCore extends FCField
 			$filter_ffname = 'filter_'.$filter->id;
 			$filter_ffid   = $formName.'_'.$filter->id.'_val';
 
-			if ( !is_array($value) )  $value = array($value);
-			if ( count($value==1) && !strlen( reset($value) ) )  $value = array();
+			if (!is_array($value))
+			{
+				$value = array($value);
+			}
+			if ( count($value) === 1 && !strlen( reset($value) ) )
+			{
+				$value = array();
+			}
 
 			// Calculate if field has value
 			$has_value = (!is_array($value) && strlen($value)) || (is_array($value) && count($value));
