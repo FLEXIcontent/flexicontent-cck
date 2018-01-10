@@ -480,8 +480,8 @@ class plgFlexicontent_fieldsImage extends FCField
 					}
 				});
 				if ( tipped_elements.length ) {
-					var imgpath_JTooltips = new Tips(jQuery(newField.get(0)).getElements('.hasTipImgpath'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
-					var imgprev_JTooltips = new Tips(jQuery(newField.get(0)).getElements('.hasTipPreview'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
+					var imgpath_JTooltips = new Tips(jQuery(newField).find('.hasTipImgpath').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
+					var imgprev_JTooltips = new Tips(jQuery(newField).find('.hasTipPreview').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
 				}
 
 				// Show uploader, if not 'animating visible' e.g. if not doing multi-add
@@ -837,12 +837,22 @@ class plgFlexicontent_fieldsImage extends FCField
 				$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview', 'style' => ' style="max-width:480px; max-height:360" ');
 				$img = $img_src  ?  JHtml::image($img_src, JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr)  :  '';
 				
-				$previewImg = '<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>' . $img . '</div>';
-				$previewImgEmpty = '<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>'.JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY').'</div>';
+				$previewImg = '
+				<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>
+					' . $img . '
+				</div>';
+				$previewImgEmpty = '
+				<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>
+					' . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
+				</div>';
 				
 				$tooltip = $previewImgEmpty . $previewImg;
-				$tooltip_options = array('title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'), 'text' => '<i class="icon-eye"></i>', 'class' => 'hasTipPreview');
-				
+				$tooltip_options = array(
+					'title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
+					'text' => '<span class="icon-eye" aria-hidden="true"></span>',
+					'class' => 'hasTipPreview'
+				);
+
 				$mm_link = 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
 				$select_existing = '
 				<div class="'.$input_grp_class.'">
