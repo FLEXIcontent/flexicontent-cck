@@ -191,7 +191,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 				<option value="jorder">FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA</option>
 				<option value="random">FLEXI_ORDER_RANDOM</option>
-				<!-- manual order meaningless for reverse field ...-->
+				<!-- manual order meaningless for relation reverse field and for autorelationfilters field ...-->
 				<!--option value="manual" show_list="manual_order" hide_list="manual_order">FLEXI_ORDER_MANUAL_ORDER</option-->
 			</field>
 
@@ -272,39 +272,6 @@
 
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" level="tabset_close" box_type="1" />
 
-
-			<field name="" type="separator" default="FLEXI_RIFLD_SUBMIT_RELATED_BUTTON" icon_class="icon-new" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_SUBMIT_RELATED_BTN" description="FLEXI_RIFLD_DISPLAY_OPS_SUBMIT_RELATED_BTN_DESC" level="level3" class="alert alert-info fcpadded" />
-			<field name="" type="separator" default="FLEXI_RIFLD_CONFIG_OVERRIDEN_INSIDE_TOTAL_COUNT_TAB_INFO" level="level4" class="alert alert-info fcpadded" />
-			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMIT_REVERSE_RELATION_FIELD_NEEDED" description="" level="level3" depend_class="button-relation-mode" class="alert alert-warning fcpadded"/>
-
-			<field name="auto_relate_curritem" type="multilist" subtype="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" toggle_related="1" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="button-relation-mode">FLEXI_NO</option>
-				<option value="1" show_list="button-relation-mode" hide_list="">FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" description="" level="level2" depend_class="button-relation-mode" />
-			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC" class="btn-group group-fcinfo" depend_class="button-relation-mode" >
-				<option value="0">FLEXI_BEFORE</option>
-				<option value="1">FLEXI_AFTER</option>
-				<option value="2">FLEXI_BOTH</option>
-			</field>
-			<field name="auto_relate_acclvl" type="accesslevel" default="1" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_ACCESS" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_ACCESS_DESC" depend_class="button-relation-mode" />
-			<field name="auto_relate_show_to_unauth" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC" depend_class="button-relation-mode" class="btn-group group-fcinfo" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
-				<option value="2">FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_CUSTOMIZE" description="" level="level2" depend_class="button-relation-mode" />
-			<field name="auto_relate_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" disable="separator,test" state="1" published="1" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" depend_class="button-relation-mode">
-				<option value="">FLEXI_SELECT</option>
-			</field>
-
-			<field name="auto_relate_submit_title" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TITLE_DESC" depend_class="button-relation-mode" />
-			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" depend_class="button-relation-mode" />
-			<field name="auto_relate_submit_mssg" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MESSAGE_TEXT_DESC" depend_class="button-relation-mode" />
-
 			<field name="" type="separator" default="FLEXI_RIFLD_TOTAL_COUNT" icon_class="icon-checkmark-circle" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_TOTAL_COUNT" level="level3" class="alert alert-info fcpadded" />
 
@@ -328,7 +295,7 @@
 				<option value="1" show_list="total_item_list" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FIELD_OVERRIDE_DEFAULT" level="level3" depend_class="viewing-total-mode total_item_list" />
-			<field name="total_relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
+			<field name="total_relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="38" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" depend_class="viewing-total-mode total_item_list" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="tabset_close" box_type="1" />
 		</fieldset>

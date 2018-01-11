@@ -454,6 +454,7 @@ jQuery(document).ready(function()
 		}
 
 		// Auto-relate submit button
+		// NOTE: this is not applicable for 'relation_reverse' & 'autorelationfilters' field, and parameter does not exist for this field,
 		$submit_related_curritem    = $field->parameters->get( 'auto_relate_curritem', 0);
 		$submit_related_menu_itemid = $field->parameters->get( 'auto_relate_menu_itemid', 0);
 		$submit_related_position    = $field->parameters->get( 'auto_relate_position', 0);
@@ -624,8 +625,8 @@ jQuery(document).ready(function()
 		
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
-	
-	
+
+
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
@@ -660,8 +661,8 @@ jQuery(document).ready(function()
 
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
-	
-	
+
+
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
