@@ -55,7 +55,6 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		}
 
 
-
 		// ***
 		// *** Check relation field being reversed exists
 		// ***
@@ -196,10 +195,12 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	function onBeforeDeleteField(&$field, &$item) {
 	}
 
+
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 	}
+
 
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
