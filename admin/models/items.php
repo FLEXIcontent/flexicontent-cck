@@ -444,25 +444,26 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
 		$this->_extra_cols = array();
 		
-		// Get the extra fields from COMPONENT OR per type if TYPE FILTER is active
+		// Get the extra fields from COMPONENT then override by type setting if TYPE FILTER is active
+		$im_extra_fields = $this->cparams->get('items_manager_extra_fields');
+		$item_instance = null;
+
 		$types = $this->getTypesFromFilter();
 		if ( count($types)==1 ) 
 		{
 			$type = reset($types);
-			$im_extra_fields = $type->params->get("items_manager_extra_fields");
+			$im_extra_fields = $type->params->get('items_manager_extra_fields', $im_extra_fields);
 			
 			$item_instance = new stdClass();
 			$item_instance->type_id = $type->id;
-		} else {
-			$im_extra_fields = $this->cparams->get("items_manager_extra_fields");
-			$item_instance = null;
 		}
 		
 		$im_extra_fields = trim($im_extra_fields);
 		if (!$im_extra_fields) return array();
 		$im_extra_fields = preg_split("/[\s]*,[\s]*/", $im_extra_fields);
 		
-		foreach($im_extra_fields as $im_extra_field) {
+		foreach($im_extra_fields as $im_extra_field)
+		{
 			@list($fieldname,$methodname) = preg_split("/[\s]*:[\s]*/", $im_extra_field);
 			$methodnames[$fieldname] = empty($methodname) ? 'display' : $methodname;
 		}
@@ -479,8 +480,7 @@ class FlexicontentModelItems extends JModelLegacy
 			.' FROM #__flexicontent_fields AS fi'
 			.' WHERE fi.name IN ("' . implode('","',array_keys($methodnames)) . '")'
 			.' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
-		$this->_db->setQuery($query);
-		$extra_fields = $this->_db->loadObjectList('id');
+		$extra_fields = $this->_db->setQuery($query)->loadObjectList('id');
 		
 		$not_found_fields = $methodnames;
 		foreach($extra_fields as $field)
@@ -489,7 +489,9 @@ class FlexicontentModelItems extends JModelLegacy
 			FlexicontentFields::loadFieldConfig($field, $item_instance);
 			unset($not_found_fields[$field->name]);
 		}
-		if ( count($not_found_fields) ) {
+
+		if ( count($not_found_fields) )
+		{
 			JFactory::getApplication()->enqueueMessage('Extra column fieldnames: '. implode(', ',array_keys($not_found_fields)) .(!empty($filter_type) ? ' for current type ' : ''). ' were not found, please remove from '.(!empty($filter_type) ? ' type ' : ' component ').' configuration', 'warning');
 		}
 		
