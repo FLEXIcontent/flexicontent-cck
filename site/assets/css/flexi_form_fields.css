@@ -1523,7 +1523,7 @@ div.empty_image {
 	float: left;
 }
 .fcimg_preview_box .fcimg_preview_msg:empty {
-   display: none;
+	display: none;
 }
 div.fcimg_value_props {
 	display: inline-block;
