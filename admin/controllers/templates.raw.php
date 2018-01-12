@@ -227,7 +227,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$ext_params_str = $db->loadResult();
 		
 		$layout_names = explode(':', $layout_name);
-		if ( count($layout_names) > 1 ) {
+		if ( count($layout_names) > 1 )
+		{
 			$layout_name = $layout_names[1];
 			$layoutpath = JPATH::clean(JPATH_ROOT.DS.'templates'.DS.$layout_names[0].DS.'html'.DS.$ext_name.DS.$layout_name.'.xml');
 		}
@@ -237,7 +238,18 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$layoutpath = JPATH::clean($path.DS.$layout_name.'.xml');
 		}
 		
-		if ( !file_exists($layoutpath) )
+		if (!$layout_name)
+		{
+			echo '
+			<div class="fc_layout_box_outer">
+				<div class="alert alert-info">
+					Using defaults
+				</div>
+			</div>';
+			exit;
+		}
+
+		elseif ( !file_exists($layoutpath) )
 		{
 			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml'))
 			{

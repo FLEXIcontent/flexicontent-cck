@@ -432,8 +432,9 @@ function fc_getLayout_".$_name."(el, initial)
  	}
  	jQuery(el).data('fc-layout-first-run', 1);
 	
-	var filename = jQuery(el).find(':selected').data('filename');
-	var layout_name = filename ? filename : el.value;
+	var selected_option = jQuery(el).find(':selected');
+	var filename = selected_option.data('filename');
+	var layout_name = filename ? filename : selected_option.val();
 
 	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
 	bs_tab_handle.length
