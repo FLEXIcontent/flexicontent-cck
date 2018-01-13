@@ -90,18 +90,19 @@ if ($mod_initialized === null)
 	$mod_initialized = true;
 }
 
-// initialize various variables
+// Initialize various variables
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 // include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
-// Other parameters
+// Get module's basic display parameters
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $layout 				= $params->get('layout', 'default');
-$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
-$add_tooltips 	= $params->get('add_tooltips', 1);
+
+$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
+$add_tooltips = (int) $params->get('add_tooltips', 1);
 
 $text      = JText::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 $width     = intval($params->get('width', 20));
@@ -131,18 +132,20 @@ $linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_A
 
 
 // Load needed JS libs & CSS styles
-//JHtml::_('behavior.framework', true);
 flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('flexi_tmpl_common');
 
 // Add tooltips
-if ($add_tooltips) JHtml::_('bootstrap.tooltip');
+if ($add_tooltips)
+{
+	JHtml::_('bootstrap.tooltip');
+}
 
 // Add css
 if ($add_ccs && $layout)
 {
 	// Work around for extension that capture module's HTML 
-	if ($add_ccs==2)
+	if ($add_ccs === 2)
 	{
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
@@ -159,6 +162,8 @@ if ($add_ccs && $layout)
 		{
 			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
+
+		// Filter's styles
 		echo '<link rel="stylesheet" href="'.JUri::base(true).'/components/com_flexicontent/assets/css/flexi_filters.css?'.FLEXI_VHASH.'">';
 	}
 	

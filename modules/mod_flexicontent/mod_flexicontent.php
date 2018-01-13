@@ -92,18 +92,18 @@ if ($mod_initialized === null)
 	$mod_initialized = true;
 }
 
-// initialize various variables
+// Initialize various variables
 global $globalcats;
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
-// include the helper only once
+// Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
 // Verify parameters (like forced menu item id and comments showing)
 modFlexicontentHelper::verifyParams( $params );
 
-// get module ordering & count parameters
+// Get module ordering & count parameters
 $ordering					= $params->get('ordering', array());
 $ordering_addtitle= $params->get('ordering_addtitle',1);
 $count 					= (int)$params->get('count', 5);
@@ -126,16 +126,19 @@ if ( empty($orderby_custom_field) ) {
 if ( empty($ordering) )    $ordering = array('added');
 if (!is_array($ordering))  $ordering = explode(',', $ordering);
 
-// get module's basic display parameters
+// Get module's basic display parameters
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $layout 				= $params->get('layout', 'default');
-$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
-$add_tooltips 	= $params->get('add_tooltips', 1);
+
+$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
+$add_tooltips = (int) $params->get('add_tooltips', 1);
+
 $width 					= $params->get('width');
 $height 				= $params->get('height');
 
-// get module basic fields parameters
-// standard
+// Get module basic fields parameters
+
+// Standard
 $display_title 		= $params->get('display_title');
 $link_title 			= $params->get('link_title');
 $display_date 		= $params->get('display_date');
@@ -147,7 +150,7 @@ $mod_readmore	 		= $params->get('mod_readmore');
 $mod_use_image	 	= $params->get('mod_use_image');
 $mod_link_image		= $params->get('mod_link_image');
 
-// featured
+// Featured 
 $display_title_feat 	= $params->get('display_title_feat');
 $link_title_feat 			= $params->get('link_title_feat');
 $display_date_feat		= $params->get('display_date_feat');
@@ -159,14 +162,16 @@ $mod_readmore_feat		= $params->get('mod_readmore_feat');
 $mod_use_image_feat 	= $params->get('mod_use_image_feat');
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
 
-// get module custom fields parameters
-// standard
+// Get module custom fields parameters
+
+// Standard
 $use_fields 				= $params->get('use_fields',1);
 $display_label 			= $params->get('display_label');
 $hide_label_onempty	= $params->get('hide_label_onempty');
 $text_after_label		= $params->get('text_after_label');
 $fields 						= $params->get('fields');
-// featured
+
+// Featured
 $use_fields_feat 				= $params->get('use_fields_feat',1);
 $display_label_feat 		= $params->get('display_label_feat');
 $hide_label_onempty_feat= $params->get('hide_label_onempty_feat');
@@ -209,13 +214,16 @@ flexicontent_html::loadFramework('flexi_tmpl_common');
 flexicontent_html::loadFramework('flexi-lib');
 
 // Add tooltips
-if ($add_tooltips) JHtml::_('bootstrap.tooltip');
+if ($add_tooltips)
+{
+	JHtml::_('bootstrap.tooltip');
+}
 
 // Add css
 if ($add_ccs && $layout)
 {
 	// Work around for extension that capture module's HTML 
-	if ($add_ccs==2)
+	if ($add_ccs === 2)
 	{
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
