@@ -90,21 +90,24 @@ if ($mod_initialized === null)
 	$mod_initialized = true;
 }
 
-// initialize various variables
+// Initialize various variables
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
-// include the helper only once
+// Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
-// get module's basic display parameters
-$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
+// Get module's basic display parameters
+$moduleclass_sfx= $params->get('moduleclass_sfx', '');
+$moduleclass_sfx= htmlspecialchars($moduleclass_sfx);
 $layout 				= $params->get('layout', 'default');
+
+//$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
+//$add_tooltips = (int) $params->get('add_tooltips', 1);
 
 $tMapTips = modFlexigooglemapHelper::renderMapLocations($params);
 $markerdisplay = modFlexigooglemapHelper::getMarkerURL($params);
 
-$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx'));
 
 // Render Layout
 require(JModuleHelper::getLayoutPath('mod_flexigooglemap', $layout));

@@ -90,26 +90,34 @@ if ($mod_initialized === null)
 	$mod_initialized = true;
 }
 
-// initialize various variables
+// Initialize various variables
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 // include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
-// get module's basic display parameters
-$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
+// Get module's basic display parameters
+//$moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $layout 				= $params->get('layout', 'default');
 
+$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
+//$add_tooltips = (int) $params->get('add_tooltips', 1);
+
 // Add css
-if ($add_ccs)
+if ($add_ccs && $layout)
 {
 	// Work around for extension that capture module's HTML 
-	if ($add_ccs==2)
+	if ($add_ccs === 2)
 	{
+		// Active module layout css (optional)
+		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
+		{
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
+		}
 
 		// Module 's core CSS
-		echo '<link rel="stylesheet" href="'.JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VHASH.'">';
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', array('version'=>FLEXI_VHASH));
 
 		// Component CSS with optional override
 		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
@@ -122,6 +130,11 @@ if ($add_ccs)
 	// Standards compliant implementation by placing CSS link into the HTML HEAD
 	else
 	{
+		// Active module layout css (optional)
+		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
+		{
+			$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', FLEXI_VHASH);
+		}
 
 		// Module 's core CSS
 		$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VHASH);
