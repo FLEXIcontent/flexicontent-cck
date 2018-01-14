@@ -4000,7 +4000,6 @@ class ParentClassItem extends FCModelAdmin
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
 
-		$jinput->set('isflexicontent', 'yes');
 		static $event_failed_notice_added = false;
 		
 		if ( $id )
@@ -4036,42 +4035,46 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Trigger Event 'onContentChangeState' of Joomla's Content plugins
 		// ***
-
-		// Make sure we import flexicontent AND content plugins since we will be triggering their events
-		JPluginHelper::importPlugin('content');
-
-		// PREPARE FOR TRIGGERING content events
-		// We need to fake joomla's states ... when triggering events
-		$fc_state = $state;
-		if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
-		else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
-		else $jm_state = $fc_state;                                      // trashed & archive states
-
-		$item = new stdClass();
-
-		// Compatibility steps (including Joomla compatible state),
-		// so that 3rd party plugins using the change state event work properly
-		$jinput->set('view', 'article');
-		$jinput->set('option', 'com_content');
-		$item->state = $jm_state;
-
-		// Workaround for buggy extensions using article model but not setting correct include path
-		JModelLegacy::addIncludePath(JPATH_BASE . '/components/com_content/models');
-
-		//Trigger the event
-		$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
-
-		// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
-		// besides the plugins using the change state event, should have updated DB state value anyway
-		$jinput->set('view', $view);
-		$jinput->set('option', $option);
-		if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
-
-		if (in_array(false, $result, true) && !$event_failed_notice_added)
+		if (empty($this->skipChangeStateEvent))
 		{
-			$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
-			$event_failed_notice_added = true;
-			return false;
+			$jinput->set('isflexicontent', 'yes');
+
+			// Make sure we import flexicontent AND content plugins since we will be triggering their events
+			JPluginHelper::importPlugin('content');
+
+			// PREPARE FOR TRIGGERING content events
+			// We need to fake joomla's states ... when triggering events
+			$fc_state = $state;
+			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
+			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
+			else $jm_state = $fc_state;                                      // trashed & archive states
+
+			$item = new stdClass();
+
+			// Compatibility steps (including Joomla compatible state),
+			// so that 3rd party plugins using the change state event work properly
+			$jinput->set('view', 'article');
+			$jinput->set('option', 'com_content');
+			$item->state = $jm_state;
+
+			// Workaround for buggy extensions using article model but not setting correct include path
+			JModelLegacy::addIncludePath(JPATH_BASE . '/components/com_content/models');
+
+			//Trigger the event
+			$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
+
+			// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
+			// besides the plugins using the change state event, should have updated DB state value anyway
+			$jinput->set('view', $view);
+			$jinput->set('option', $option);
+			if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
+
+			if (in_array(false, $result, true) && !$event_failed_notice_added)
+			{
+				$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
+				$event_failed_notice_added = true;
+				return false;
+			}
 		}
 
 		if ($cleanCache)
@@ -4752,7 +4755,7 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @return	boolean	True on success.
 	 */
-	public function featured($pks, $value = 0)
+	public function featured($pks, $value = 0, $cleanCache = true)
 	{
 		// Sanitize the ids.
 		$pks = (array) $pks;
@@ -4803,8 +4806,12 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		$this->getTable('flexicontent_content_frontpage', '')->reorder();
-		$this->cleanCache(null, 0);
-		$this->cleanCache(null, 1);
+
+		if ($cleanCache)
+		{
+			$this->cleanCache(null, 0);
+			$this->cleanCache(null, 1);
+		}
 		return true;
 	}
 
