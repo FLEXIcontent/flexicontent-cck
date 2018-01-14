@@ -76,7 +76,23 @@ class plgSystemFlexisystem extends JPlugin
 		$app  = JFactory::getApplication();
 		$task = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 
-		if ( $task=='config.store' )
+		if ( $task === 'articles.featured' || $task === 'articles.unfeatured' )
+		{
+			//***
+			//*** Call 'flexicontent' items model to update the featured FLAG
+			//***
+			$this->_loadFcHelpersAndLanguage();
+
+			// Load the FLEXIcontent item
+			$cid = $app->input->get('cid', array(), 'array');
+			$cid = (int) reset($cid);
+
+			// Update featured flag (model will also handle cache cleaning)
+			$itemmodel = new FlexicontentModelItem();
+			$itemmodel->featured($cid, $task === 'articles.featured' ? 1 : 0);
+		}
+
+		elseif ( $task=='config.store' )
 		{
 			$comp = $app->input->get('comp', '', 'cmd');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
@@ -1958,14 +1974,7 @@ class plgSystemFlexisystem extends JPlugin
 			return true;
 		}
 
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		$this->_loadFcHelpersAndLanguage();
 
 
 		// ***
@@ -2419,6 +2428,18 @@ class plgSystemFlexisystem extends JPlugin
 		return time();
 	}
 
+
+	private function _loadFcHelpersAndLanguage()
+	{
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+	}
 
 	private function _addfavs($type, $item_ids, $user_id)
 	{
