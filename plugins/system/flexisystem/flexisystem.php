@@ -79,7 +79,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $task === 'articles.featured' || $task === 'articles.unfeatured' )
 		{
 			//***
-			//*** Call 'flexicontent' items model to update the featured FLAG
+			//*** Call 'flexicontent' items model to update the featured FLAG, thus updating temporary data too
 			//***
 			$this->_loadFcHelpersAndLanguage();
 
@@ -2341,6 +2341,51 @@ class plgSystemFlexisystem extends JPlugin
 		return true;
 	}
 
+	/**
+	 * Change the state in core_content if the state in a table is changed
+	 *
+	 * @param   string   $context  The context for the content passed to the plugin.
+	 * @param   array    $pks      A list of primary key ids of the content that has changed state.
+	 * @param   integer  $value    The value of the state that the content has been changed to.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   3.2.1.9
+	 */
+	public function onContentChangeState($context, $pks, $value)
+	{
+		if ($context != 'com_content.article' || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
+		{
+			return true;
+		}
+
+		$this->_loadFcHelpersAndLanguage();
+
+		//***
+		//*** Call backend 'flexicontent' items model to update flexicontent temporary data
+		//***
+
+		// Load the FLEXIcontent item
+		$app  = JFactory::getApplication();
+		$cid = $app->input->get('cid', array(), 'array');
+		$cid = (int) reset($cid);
+
+		// Update temporary date by calling model's respective method
+		// NOTE 1: since using controller task to trigger temporary data updating will not work because the DB tables have not been updated yet
+		// NOTE 2: we will skip the change state event triggering since com_content 'articles' model will do this
+		$itemmodel = new FlexicontentModelItem();
+
+		// Get item setting it into the model (ITEM DATE: _id, _type_id, _params, etc will be updated)
+		$item = $itemmodel->getItem($cid, $check_view_access=false, $no_cache=true);
+
+		// Load backend 'flexicontent' items model and use it to update flexicontent temporary data
+		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'items.php');
+		$items_model = new FlexicontentModelItems();
+		$items_model->updateItemCountingData(array($item));
+
+		return true;
+	}
+
 
 	/**
 	 * After save event.
@@ -2360,7 +2405,6 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			return true;
 		}
-
 
 		//***
 		//*** Call 'flexicontent' items model to update flexicontent item data: fields, version data, temporary data

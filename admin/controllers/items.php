@@ -1236,14 +1236,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// CLEAN THE CACHE so that our changes appear realtime
 		if ($clean_cache_flag)
 		{
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
+			$this->_cleanRecordsCache($auth_cid);
 		}
 		
 		$this->setRedirect($link, $msg);
@@ -1471,6 +1464,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Set state, (model will also handle cache cleaning)
 		if (count($auth_cid))
 		{
+			// Note we will clean it only once later after the loop
 			foreach ($auth_cid as $item_id)
 			{
 				$itemmodel->setitemstate($item_id, $stateids[$newstate], $_cleanCache = false);
@@ -1478,14 +1472,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg = count($auth_cid) ." ". JText::_('FLEXI_ITEMS') ." : &nbsp; ". JText::_( 'FLEXI_ITEMS_STATE_CHANGED_TO')." -- ".JText::_( $statenames[$newstate] ) ." --";
 			if ($newstate=='T') $msg .= '<br/> '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
 
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
+			// CLEAN THE CACHE so that our changes appear realtime
+			$this->_cleanRecordsCache($auth_cid);
 		}
 
 		$this->setRedirect($this->returnURL, $msg);
@@ -1971,5 +1959,24 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		jexit($hits ?: '0');
 	}
-	
+
+
+	/**
+	 * Method to clean cache of specific records (if implemented by the model)
+	 * 
+	 * @since 3.2.1.9
+	 */
+	private function _cleanRecordsCache($cid)
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
+
+		// Clean this as it contains Joomla frontend view cache)
+		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
+		$cache_site->clean('com_flexicontent');
+
+		// Also pass item IDs array in case of doing special cache cleaning per item
+		$itemmodel = $this->getModel('item');
+		$itemmodel->cleanCache(null, 0, $cid);
+		$itemmodel->cleanCache(null, 1, $cid);
+	}
 }
