@@ -718,7 +718,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				//window.console.log(response.data);
 			 	var file = response.data;
-			 	file.targetid    = jQuery(uploader.settings.container).closest('li').find('.existingname').attr('id');				 	
+			 	file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.existingname').attr('id');				 	
 			 	file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
 			 	fcfield_assignImage".$field->id."(file.targetid, file.filename, file.preview_url, 2, file.filename_original);
 			}
@@ -1102,7 +1102,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$field->html[-1] = $non_value_html;
 			if ($use_inline_uploaders && $uploader_html->thumbResizer)
 			{
-				$field->html[-1] = $uploader_html->thumbResizer . ' ' . $field->html[-1];
+				$field->html[-1] = '<div class="label" style="float: left">' . $field->label . '</div>' . $uploader_html->thumbResizer . ' ' . $field->html[-1] . '<div class="clear"></div>';
 			}
 		}
 		else
