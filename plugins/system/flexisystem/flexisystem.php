@@ -1968,10 +1968,17 @@ class plgSystemFlexisystem extends JPlugin
 		$document   = JFactory::getDocument();
 		$user       = JFactory::getUser();
 
-		// Check we are manipulating the languagecode plugin.
+		// Check we are loading the com_content article form
 		if ($form->getName() !== 'com_content.article' || JFactory::getApplication()->input->get('option', '', 'CMD')==='com_flexicontent')
 		{
 			return true;
+		}
+
+		// Check for empty data (nothing to do ??)
+		if (!$data)
+		{
+			$data = new stdClass();
+			$data->id = 0;
 		}
 
 		$this->_loadFcHelpersAndLanguage();
@@ -1994,7 +2001,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Get model and set default type if type not set already (new item or existing item with no type)
 		$model = new FlexicontentModelItem();
-		if (!$data->type_id)
+		if (empty($data->type_id))
 		{
 			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);		
 			$default_type = isset($types[$default_type_id])
