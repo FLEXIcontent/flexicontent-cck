@@ -937,7 +937,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$dbname   = $app->getCfg('db');
 		
 		$tblname_indexnames = array(
-			'flexicontent_tags'=>array('name'=>0, 'alias'=>0, 'published'=>0),
+			'flexicontent_tags'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'jtag_id'=>0),
 			'flexicontent_types'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'access'=>0),
 			'flexicontent_items_ext'=>array('lang_parent_id'=>0, 'type_id'=>0),
 			'flexicontent_items_tmp'=>array('alias'=>64, 'state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0),

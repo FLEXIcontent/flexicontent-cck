@@ -179,9 +179,11 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags` (
   `published` tinyint(1) NOT NULL,
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `jtag_id` int(10) unsigned NULL,
   KEY `name` (`name`),
   KEY `alias` (`alias`),
   KEY `published` (`published`),
+  KEY `jtag_id` (`jtag_id`),
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 

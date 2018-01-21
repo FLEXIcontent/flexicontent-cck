@@ -151,6 +151,13 @@ class ParentClassItem extends FCModelAdmin
 	var $_translations = null;
 
 	/**
+	 * Model typeAlias string.
+	 *
+	 * @var        string
+	 */
+	public $typeAlias = 'com_content.article';
+
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -1237,7 +1244,7 @@ class ParentClassItem extends FCModelAdmin
 		$iparams_extra = new JRegistry;
 		$user		= JFactory::getUser();
 		$session = JFactory::getSession();
-		$asset	= 'com_content.article.'.$this->_id;
+		$asset	= $this->typeAlias . '.' . $this->_id;
 
 		// Check if item was editable, but was rendered non-editable
 		$hasTmpEdit = false;
@@ -2214,6 +2221,7 @@ class ParentClassItem extends FCModelAdmin
 				return false;
 			}
 		}
+
 		$version_approved = $isNew || $data['vstate']==2;
 		if( $result==='abort' )
 		{
@@ -2274,6 +2282,22 @@ class ParentClassItem extends FCModelAdmin
 			// Reverse compatibility steps
 			$jinput->set('view', $view);
 			$jinput->set('option', $option);
+	
+			// Initialize re-usable member properties, and re-usable local variables
+			$this->initBatch();
+			$asset = $this->typeAlias . '.' . $item->id;
+
+			// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
+			$this->createTagsHelper($this->tagsObserver, $this->type, $item->id, $this->typeAlias, $this->table);
+
+			// Load data of FLEXIcontent tags
+			$fctags = $this->getTagsByIds($data['tags']);
+
+			// Sync the tags assignments
+			$this->syncJTagAssignments($fctags, array($item->id), array($item->id => $asset),  true);
+
+			// Update (if needed) mappings of FLEXIcontent tags to Joomla tags
+			$this->updateJTagMappings($fctags);
 
 			if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
@@ -3062,12 +3086,14 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		
 		// Make sure the data is valid
-		if (!$item->check()) {
+		if (!$item->check())
+		{
 			$this->setError($item->getError());
 			return false;
 		}
 		
-		if (!$item->store()) {
+		if (!$item->store())
+		{
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -3362,11 +3388,9 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		$query 	= 'SELECT *, t.id as tid FROM #__flexicontent_tags as t '
-				. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
-				. ' ORDER BY name ASC'
-				;
-		$this->_db->setQuery($query);
-		$tagsData = $this->_db->loadObjectList('tid');
+			. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
+			. ' ORDER BY name ASC';
+		$tagsData = $this->_db->setQuery($query)->loadObjectList('tid');
 
 		if ($indexed) return $tagsData;
 
@@ -5085,7 +5109,7 @@ class ParentClassItem extends FCModelAdmin
 		if ( !empty($record->id) )
 		{
 			// Existing item, use item specific permissions
-			$asset = 'com_content.article.' . $record->id;
+			$asset = $this->typeAlias . '.' . $record->id;
 			$allowed =
 				($hasTypeEdit && $user->authorise('core.edit', $asset)) ||
 				($hasTypeEditOwn && $user->authorise('core.edit.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -5131,7 +5155,7 @@ class ParentClassItem extends FCModelAdmin
 		// Existing item, use item specific permissions
 		if ( !empty($record->id) )
 		{
-			$asset = 'com_content.article.' . $record->id;
+			$asset = $this->typeAlias . '.' . $record->id;
 			$allowed =
 				($hasTypeEditState && $user->authorise('core.edit.state', $asset)) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -5438,5 +5462,151 @@ class ParentClassItem extends FCModelAdmin
 			$fleximodel->addCurrentVersionData($record->id);
 			$record->last_version = $record->last_version = $record->current_version;
 		}
+	}
+
+
+	/**
+	 * Method to initialize member variables used by batch methods and other methods like saveorder()
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	public function initBatch()
+	{
+		if ($this->batchSet === null)
+		{
+			$this->batchSet = true;
+
+			// Get current user
+			$this->user = \JFactory::getUser();
+
+			// Get table
+			$this->table = $this->getTable('content', 'JTable');
+
+			// Get table class name
+			$tc = explode('\\', get_class($this->table));
+			$this->tableClassName = end($tc);
+
+			// Get UCM Type data
+			$this->contentType = new \JUcmType;
+			$this->type = $this->contentType->getTypeByTable($this->tableClassName)
+				?: $this->contentType->getTypeByAlias($this->typeAlias);
+
+			// Get tabs observer
+			$this->tagsObserver = $this->table->getObserverOfClass('Joomla\CMS\Table\Observer\Tags');
+		}
+	}
+
+
+	/**
+	 * Method to sync FLEXIcontent item's tags with their respective Joomla article tags
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function syncJTagAssignments($fctags, $pks, $contexts, $replaceTags = true)
+	{
+		// Initialize re-usable member properties, and re-usable local variables
+		$this->initBatch();
+
+		$jtag_ids = $this->getJoomlaTagIds($fctags);
+		$jtag_ids = is_array($jtag_ids) ? $jtag_ids : array($jtag_ids);
+
+		foreach ($pks as $pk)
+		{
+			if ($this->user->authorise('core.edit', $contexts[$pk]))
+			{
+				$this->table->reset();
+				$this->table->load($pk);
+
+				// Add new tags, keeping existing ones
+				$result = $this->tagsObserver->setNewTags($jtag_ids, $replaceTags);
+
+				if (!$result)
+				{
+					$this->setError($this->table->getError());
+
+					return false;
+				}
+				//$this->table->store();
+			}
+			else
+			{
+				$this->setError(\JText::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
+
+				return false;
+			}
+		}
+
+		// Clean the cache
+		$this->cleanCache();
+	}
+
+
+	/**
+	 * Method to update mapping of FLEXIcontent tags to their respective Joomla tags
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function updateJTagMappings($fctags)
+	{
+		// Get them again to get ids of newly created tags
+		$jtag_ids = $this->getJoomlaTagIds($fctags);
+		$i = 0;
+		$query_vals = array();
+		foreach($fctags as $fctag)
+		{
+			if (empty($fctag->jtag_id) || $jtag_ids[$i] != $fctag->jtag_id)
+			{
+				$fctag->jtag_id = $jtag_ids[$i];
+				$query_vals[$fctag->id] = ' WHEN ' . $fctag->id . ' THEN ' . $this->_db->Quote((int) $fctag->jtag_id);
+			}
+			$i++;
+		}
+
+		if (count($query_vals))
+		{
+			$query 	= 'UPDATE #__flexicontent_tags SET jtag_id = CASE id '
+				. implode(' ', $query_vals)
+				. ' END '
+				. ' WHERE id IN (' . implode(',', array_keys($query_vals)) . ')';
+			//echo $query . '<br/>';
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to find the ids of the tags by their title
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function getJoomlaTagIds($fctags)
+	{
+		$jtag_ids = array();
+
+		foreach ($fctags as $fctag)
+		{
+			$query = 'SELECT id '
+				. ' FROM #__tags '
+				. ' WHERE title = ' . $this->_db->Quote($fctag->name);
+			$jtag_id = $this->_db->setQuery($query)->loadResult();
+			if ($jtag_id)
+			{
+				$jtag_ids[] = $jtag_id;
+			}
+			else
+			{
+				$jtag_ids[] = '#new#' . $fctag->name;
+			}
+		}
+
+		return $jtag_ids;
 	}
 }
