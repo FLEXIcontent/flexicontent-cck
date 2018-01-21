@@ -5021,10 +5021,13 @@ class flexicontent_html
 	}
 
 
-	static function getCatViewLayoutVars($obj=null, $slug = false)
+	static function getCatViewLayoutVars($obj=null, $use_slug = false)
 	{
-		static $layout_vars;
-		if ($layout_vars) return $layout_vars;
+		static $_layout_vars = array();
+		if (isset($_layout_vars[$use_slug]))
+		{
+			return $_layout_vars[$use_slug];
+		}
 
 		// Get URL variables
 		$app = JFactory::getApplication();
@@ -5033,7 +5036,7 @@ class flexicontent_html
 		$layout_vars['cid']      = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'INT');
 		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : $app->input->get('layout', '', 'CMD');
 
-		if ($slug)
+		if (!$use_slug)
 		{
 			$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : $app->input->get('authorid', 0, 'INT');
 			$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : $app->input->get('tagid', 0, 'INT');
@@ -5062,6 +5065,7 @@ class flexicontent_html
 			$layout_vars['cids'] = implode(',' , $cids);
 		}
 
+		$_layout_vars[$use_slug] = $layout_vars;
 		return $layout_vars;
 	}
 
