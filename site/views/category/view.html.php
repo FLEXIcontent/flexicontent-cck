@@ -115,7 +115,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		
 		// Get URL variables
-		$layout_vars = flexicontent_html::getCatViewLayoutVars($model);
+		$layout_vars = flexicontent_html::getCatViewLayoutVars($model, true);
 		$layout   = $layout_vars['layout'];
 		$authorid = $layout_vars['authorid'];
 		$tagid    = $layout_vars['tagid'];
@@ -223,8 +223,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			// These URL variables must match or be empty:
 			$cid_ok      = $cid       == (int) @$menu->query['cid'];
 			$layout_ok   = $layout    == @ $menu->query['layout'];
-			$authorid_ok = ($layout!='author') || ($authorid  == (int) @ $menu->query['authorid']);
-			$tagid_ok    = ($layout!='tags')   || ($tagid     == (int) @ $menu->query['tagid']);
+			$authorid_ok = ($layout!='author') || ((int) $authorid  == (int) @ $menu->query['authorid']);
+			$tagid_ok    = ($layout!='tags')   || ((int) $tagid     == (int) @ $menu->query['tagid']);
 
 			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
 		}
