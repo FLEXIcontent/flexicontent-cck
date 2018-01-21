@@ -192,10 +192,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			case 'author':
 				$this->_authorid = $jinput->get('authorid', 0, 'int');
+				$this->_authorid_slug = $jinput->get('authorid', 0, 'string');
 				break;
 
 			case 'myitems':
 				$this->_authorid = $user->id;
+				$this->_authorid_slug = $user->id . '-' . $user->username;
 				break;
 
 			case 'favs':
@@ -203,8 +205,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'tags':
-				$_tagid = $jinput->get('tagid', 0, 'int');
-				$this->_tagid = $_tagid;
+				$this->_tagid = $jinput->get('tagid', 0, 'int');
+				$this->_tagid_slug = $jinput->get('tagid', 0, 'string');
 				break;
 
 			case 'mcats':

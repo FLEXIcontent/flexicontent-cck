@@ -5004,7 +5004,7 @@ class flexicontent_html
 		$Itemid = $menu ? $menu->id : 0;
 
 		// Get URL variables
-		$layout_vars = flexicontent_html::getCatViewLayoutVars($catmodel);
+		$layout_vars = flexicontent_html::getCatViewLayoutVars($catmodel, true);
 		$cid  = $layout_vars['cid'];
 
 		$urlvars = array();
@@ -5021,7 +5021,7 @@ class flexicontent_html
 	}
 
 
-	static function getCatViewLayoutVars($obj=null)
+	static function getCatViewLayoutVars($obj=null, $slug = false)
 	{
 		static $layout_vars;
 		if ($layout_vars) return $layout_vars;
@@ -5029,10 +5029,20 @@ class flexicontent_html
 		// Get URL variables
 		$app = JFactory::getApplication();
 		$layout_vars = array();
-		$layout_vars['cid'] = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'INT');
-		$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : $app->input->get('authorid', 0, 'INT');
-		$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : $app->input->get('tagid', 0, 'INT');
+
+		$layout_vars['cid']      = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'INT');
 		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : $app->input->get('layout', '', 'CMD');
+
+		if ($slug)
+		{
+			$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : $app->input->get('authorid', 0, 'INT');
+			$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : $app->input->get('tagid', 0, 'INT');
+		}
+		else
+		{
+			$layout_vars['authorid'] = $obj && isset($obj->_authorid_slug) ? $obj->_authorid_slug : $app->input->get('authorid', 0, 'STRING');
+			$layout_vars['tagid']    = $obj && isset($obj->_tagid_slug) ? $obj->_tagid_slug : $app->input->get('tagid', 0, 'STRING');
+		}
 
 		if ($obj && isset($obj->_ids))
 		{
@@ -5040,7 +5050,7 @@ class flexicontent_html
 		}
 		else
 		{
-			$mcats_list = JRequest::getVar('cids', '');
+			$mcats_list = $app->input->get('cids', '', 'STRING');
 			if ( !is_array($mcats_list) )
 			{
 				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
@@ -5048,7 +5058,7 @@ class flexicontent_html
 			}
 			// make sure given data are integers ... and skipping zero values
 			$cids = array();
-			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int) $_id;
 			$layout_vars['cids'] = implode(',' , $cids);
 		}
 
