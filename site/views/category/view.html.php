@@ -371,15 +371,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Create category link, but also consider current 'layout', and use the 
 		// layout specific variables so that filtering form will work properly
 		// *********************************************************************
-		
+
 		$non_sef_link = null;
 		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
-		
-		
+
+
 		// ***
 		// *** Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
 		// ***
-		
+
 		if ($params->get('add_canonical'))
 		{
 			// Create desired REL canonical URL
@@ -480,41 +480,51 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 			$item->params = clone($type_params[$item->type_id]);
 			$item->params->merge( new JRegistry($item->attribs) );
-			
-			//$item->cats = isset($item->cats) ? $item->cats : array();
-			
-			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins
-			// !!! for description field (maintext) along with all other flexicontent
-			// !!! fields is handled by flexicontent.fields.php
-			// !!! Had serious performance impact
-			// CODE REMOVED
-			
+
 			// We must check if the current category is in the categories of the item ..
 			$item_in_category=false;
-			if ($item->catid == $category->id) {
+			if ($item->catid == $category->id)
+			{
 				$item_in_category=true;
-			} else {
-				foreach ($item->cats as $cat) {
-					if ($cat->id == $category->id) {  $item_in_category=true;  break;  }
+			}
+			else
+			{
+				foreach ($item->cats as $cat)
+				{
+					if ($cat->id == $category->id)
+					{
+						$item_in_category = true;
+						break;
+					}
 				}
 			}
-			
+
 			// ADVANCED CATEGORY ROUTING (=set the most appropriate category for the item ...)
 			// CHOOSE APPROPRIATE category-slug FOR THE ITEM !!! ( )
-			if ( $item_in_category && !isset($noroute_cats[$category->id]) ) {
-				// 1. CATEGORY SLUG: CURRENT category
-				// Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
+
+			// 1. CATEGORY SLUG: CURRENT category
+			// -- Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
+			if ( $item_in_category && !isset($noroute_cats[$category->id]) )
+			{
 				$item->categoryslug = $category->slug;
-			} else if ( !isset($noroute_cats[$item->catid]) ) {
-				// 2. CATEGORY SLUG: ITEM's MAIN category   (already SET, ... no assignment needed)
-				// Since we cannot use current category (above), we will use item's MAIN category 
-				// ALSO routing (creating links) to this category is allowed
-			} else {
-				// 3. CATEGORY SLUG: ANY ITEM's category
-				// We will use the first for which routing (creating links) to the category is allowed
+			}
+
+			// 2. CATEGORY SLUG: ITEM's MAIN category   (already SET, ... no assignment needed)
+			// -- Since we cannot use current category (above), we will use item's MAIN category 
+			// -- ALSO routing (creating links) to this category is allowed
+			elseif ( !isset($noroute_cats[$item->catid]) )
+			{
+			}
+
+			// 3. CATEGORY SLUG: ANY ITEM's category
+			// -- We will use the first for which routing (creating links) to the category is allowed
+			else
+			{
 				$allcats = array();
-				foreach ($item->cats as $cat) {
-					if ( !isset($noroute_cats[$cat->id]) ) {
+				foreach ($item->cats as $cat)
+				{
+					if ( !isset($noroute_cats[$cat->id]) )
+					{
 						$item->categoryslug = $globalcats[$cat->id]->slug;
 						break;
 					}
@@ -548,46 +558,46 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->fields['text']->display = & $item->text;
 			
 		}
-		
-		
-		// *****************************************************
-		// Remove unroutable categories from sub/peer categories
-		// *****************************************************
-		
+
+
+		// ***
+		// *** Remove unroutable categories from sub/peer categories
+		// ***
+
 		// sub-cats
 		$_categories = array();
-		foreach ($categories as $i => $cat) {
+		foreach ($categories as $i => $cat)
+		{
 			if (in_array($cat->id, $globalnoroute)) continue;
 			$_categories[] = $categories[$i];
 		}
 		$categories = $_categories;
-		
+
 		// peer-cats
 		$_categories = array();
-		foreach ($peercats as $i => $cat) {
+		foreach ($peercats as $i => $cat)
+		{
 			if (in_array($cat->id, $globalnoroute)) continue;
 			$_categories[] = $peercats[$i];
 		}
 		$peercats = $_categories;
-		
-		
-		
-		// ************************************
-		// Get some variables needed for images
-		// ************************************
-		
+
+
+		// ***
+		// *** Get some variables needed for images
+		// ***
+
 		$joomla_image_path = $app->getCfg('image_path', '');
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
 		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
-		
-		
-		
-		// **************
-		// CATEGORY IMAGE
-		// **************
-		
+
+
+		// ***
+		// *** CATEGORY IMAGE
+		// ***
+
 		// category image params
 		$show_cat_image = $params->get('show_description_image', 0);  // we use different name for variable
 		$cat_image_source = $params->get('cat_image_source', 2); // 0: extract, 1: use param, 2: use both
@@ -596,8 +606,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$cat_image_width = $params->get('cat_image_width', 80);
 		$cat_image_height = $params->get('cat_image_height', 80);
 		$cat_default_image = $params->get('cat_default_image', '');
-		
-		if ($show_cat_image) {
+
+		if ($show_cat_image)
+		{
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
@@ -605,69 +616,84 @@ class FlexicontentViewCategory extends JViewLegacy
 			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 		}
-		
+
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
-			
+
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-			
+
 			$default_image = $phpThumbURL.$src.$conf;
 			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
-		} else {
+		}
+		else
+		{
 			$default_image = '';
 		}
 		
 		
 		// Create category image/description/etc data 
 		$cat = $category;
-		$image = "";
-		if ($cat) {
-			if ($cat->id && $show_cat_image) {
+		$image = '';
+
+		if ($cat)
+		{
+			if ($cat->id && $show_cat_image)
+			{
 				$cat->image = $params->get('image');
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
-				
-				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+
+				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
-					
+
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-					
+
 					$image = $phpThumbURL.$src.$conf;
-				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
-					
+				}
+
+				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
+				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-					
+
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
-					
+
 					$image = $phpThumbURL.$src.$conf;
 				}
+
 				$cat->image_src = @$src;  // Also add image category URL for developers
 				
-				if ($image) {
+				if ($image)
+				{
 					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
-				} else if ($default_image){
+				}
+				elseif ($default_image)
+				{
 					$image = sprintf($default_image, $cat->title, $cat->title);
 				}
-				if ($cat_link_image && $image) {
+
+				if ($cat_link_image && $image)
+				{
 					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
+
 			$cat->image = $image;
 		}
-		
-		
-		// ******************************
-		// SUBCATEGORIES (some templates)
-		// ******************************
-		
+
+
+		// ***
+		// *** SUBCATEGORIES (some templates)
+		// ***
+
 		// sub-category image params
 		$show_cat_image = $params->get('show_description_image_subcat', 1);  // we use different name for variable
 		$cat_image_source = $params->get('subcat_image_source', 2); // 0: extract, 1: use param, 2: use both
@@ -676,8 +702,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$cat_image_width = $params->get('subcat_image_width', 24);
 		$cat_image_height = $params->get('subcat_image_height', 24);
 		$cat_default_image = $params->get('subcat_default_image', '');
-		
-		if ($show_cat_image) {
+
+		if ($show_cat_image)
+		{
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
@@ -685,44 +712,52 @@ class FlexicontentViewCategory extends JViewLegacy
 			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 		}
-		
+
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
-			
+
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-			
+
 			$default_image = $phpThumbURL.$src.$conf;
 			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
-		} else {
+		}
+		else
+		{
 			$default_image = '';
 		}
 		
 		
 		// Create sub-category image/description/etc data 
-		foreach ($categories as $cat) {
-			$image = "";
-			if ($show_cat_image)  {
-				if (!is_object($cat->params)) {
+		foreach ($categories as $cat)
+		{
+			$image = '';
+			if ($show_cat_image)
+			{
+				if (!is_object($cat->params))
+				{
 					$cat->params = new JRegistry($cat->params);
 				}
-				
+
 				$cat->image = $cat->params->get('image');
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
-				
-				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+
+				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
-					
+
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-					
+
 					$image = $phpThumbURL.$src.$conf;
-				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
-					
+				}
+
+				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
+				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
@@ -732,26 +767,31 @@ class FlexicontentViewCategory extends JViewLegacy
 					
 					$image = $phpThumbURL.$src.$conf;
 				}
+
 				$cat->image_src = @$src;  // Also add image category URL for developers
-				
-				if ($image) {
+
+				if ($image)
+				{
 					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
-				} else if ($default_image){
+				}
+				elseif ($default_image)
+				{
 					$image = sprintf($default_image, $cat->title, $cat->title);
 				}
-				if ($cat_link_image && $image) {
+
+				if ($cat_link_image && $image)
+				{
 					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
 			$cat->image = $image;
 		}
-		
-		
-		
-		// *******************************
-		// PEERCATEGORIES (some templates)
-		// *******************************
-		
+
+
+		// ***
+		// *** PEERCATEGORIES (some templates)
+		// ***
+
 		// peer-category image params
 		$show_cat_image = $params->get('show_description_image_peercat', 1);  // we use different name for variable
 		$cat_image_source = $params->get('peercat_image_source', 2); // 0: extract, 1: use param, 2: use both
@@ -760,8 +800,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$cat_image_width = $params->get('peercat_image_width', 24);
 		$cat_image_height = $params->get('peercat_image_height', 24);
 		$cat_default_image = $params->get('peercat_default_image', '');
-		
-		if ($show_cat_image) {
+
+		if ($show_cat_image)
+		{
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
@@ -773,22 +814,27 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
-			
+
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-			
+
 			$default_image = $phpThumbURL.$src.$conf;
 			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
-		} else {
+		}
+		else
+		{
 			$default_image = '';
 		}
 		
 		// Create peer-category image/description/etc data 
-		foreach ($peercats as $cat) {
-			$image = "";
-			if ($show_cat_image)  {
-				if (!is_object($cat->params)) {
+		foreach ($peercats as $cat)
+		{
+			$image = '';
+			if ($show_cat_image)
+			{
+				if (!is_object($cat->params))
+				{
 					$cat->params = new JRegistry($cat->params);
 				}
 				
@@ -796,7 +842,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				$cat->introtext = & $cat->description;
 				$cat->fulltext = "";
 				
-				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
@@ -804,8 +851,10 @@ class FlexicontentViewCategory extends JViewLegacy
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$image = $phpThumbURL.$src.$conf;
-				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
-					
+				}
+
+				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
+				{
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
@@ -815,22 +864,28 @@ class FlexicontentViewCategory extends JViewLegacy
 					
 					$image = $phpThumbURL.$src.$conf;
 				}
+
 				$cat->image_src = @$src;  // Also add image category URL for developers
 				
-				if ($image) {
+				if ($image)
+				{
 					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
-				} else if ($default_image){
+				}
+				elseif ($default_image)
+				{
 					$image = sprintf($default_image, $cat->title, $cat->title);
 				}
-				if ($cat_link_image && $image) {
+
+				if ($cat_link_image && $image)
+				{
 					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
+
 			$cat->image = $image;
 		}
-		
-		
-		
+
+
 		// remove previous alpha index filter
 		//$uri->delVar('letter');
 		
