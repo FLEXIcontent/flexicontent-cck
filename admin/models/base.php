@@ -602,7 +602,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 *
 	 * @since   3.2.0
 	 */
-	protected function cleanCache($group = NULL, $client_id = -1)
+	public function cleanCache($group = NULL, $client_id = -1)
 	{
 		if ($client_id === -1)
 		{

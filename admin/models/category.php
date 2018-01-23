@@ -167,7 +167,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @since	1.6
 	 */
-	protected function cleanCache($group = NULL, $client_id = -1)
+	public function cleanCache($group = NULL, $client_id = -1)
 	{
 		// -1 means both, but we will do both always
 		parent::cleanCache('com_flexicontent');
