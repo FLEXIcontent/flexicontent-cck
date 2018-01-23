@@ -53,10 +53,10 @@ class FlexicontentControllerCategory extends JControllerForm
 			$this->extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
 
-		$this->registerTask('apply',        'save');
-		$this->registerTask('apply_ajax',   'save');
-		$this->registerTask('save2new',     'save');
-		$this->registerTask('save2copy',    'save');
+		$this->registerTask('apply', 'save');
+		$this->registerTask('apply_ajax', 'save');
+		$this->registerTask('save2new', 'save');
+		$this->registerTask('save2copy', 'save');
 	}
 
 	function add()
@@ -112,8 +112,7 @@ class FlexicontentControllerCategory extends JControllerForm
 			return true;
 		}
 
-		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
-		);
+		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all = true, $check_published = true, $specific_catids = false, $find_first = true);
 
 		return count($usercats) > 0;
 	}
@@ -132,8 +131,8 @@ class FlexicontentControllerCategory extends JControllerForm
 	protected function allowEdit($data = array(), $key = 'parent_id')
 	{
 		// Initialise variables.
-		$recordId	= (int) isset($data[$key]) ? $data[$key] : 0;
-		$user		= JFactory::getUser();
+		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
+		$user = JFactory::getUser();
 		$_extension = 'com_content';
 
 		// Zero record (id:0), return component edit permission by calling parent controller method
@@ -143,7 +142,7 @@ class FlexicontentControllerCategory extends JControllerForm
 		}
 
 		// Check "edit" permission on record asset (explicit or inherited)
-		if ($user->authorise('core.edit',  $_extension . '.category.' . $recordId))
+		if ($user->authorise('core.edit', $_extension . '.category.' . $recordId))
 		{
 			return true;
 		}
