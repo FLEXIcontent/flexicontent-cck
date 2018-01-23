@@ -268,7 +268,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				$app->enqueueMessage('Import task cleared', 'notice');
 				$this->setRedirect($link);
 
-return;
+				return;
 			break;
 
 			// *****************************************************
@@ -425,7 +425,7 @@ return;
 					$app->enqueueMessage('Import task prepared', 'message');
 					$this->setRedirect($link);
 
-return;
+				return;
 
 			break;
 
@@ -439,7 +439,7 @@ return;
 				$app->enqueueMessage('Unknown task: ' . $task, 'error');
 				$this->setRedirect($link);
 
-return;
+				return;
 
 			break;
 		}
