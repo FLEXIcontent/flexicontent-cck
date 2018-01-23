@@ -391,10 +391,14 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF item -->
 
-			<?php if ($item_placement_feat==0) /* 0: clear, 1: as masonry tiles */ echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
+			<?php
+			if ($item_placement_feat == 0)  // 0: clear, 1: as masonry tiles
+			{
+				//echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : '';
+			}
+			?>
 
 			<?php endforeach; ?>
-
 		</div>
 
 		<!-- EOF DIV mod_flexicontent_featured (featured items) -->
@@ -579,9 +583,14 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF item -->
 
-			<?php if ($item_placement_std==0) /* 0: clear, 1: as masonry tiles */ echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
+			<?php
+			if ($item_placement_std == 0)  // 0: clear, 1: as masonry tiles
+			{
+				//echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : '';
+			}
+			?>
 
-		<?php endforeach; ?>
+			<?php endforeach; ?>
 		</div>
 
 		<!-- EOF DIV mod_flexicontent_standard (standard items) -->

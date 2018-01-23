@@ -211,6 +211,10 @@
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
 		width: 50% !important;
 	}
+	.carousel.mod_flexicontent_wrapper .fcitem_title a {
+		color: #08c;
+		font-size: 100%;
+	}
 }
 
 @media only screen and (max-width: 767px) {
@@ -230,6 +234,10 @@
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
 		width: 100% !important;
+	}
+	.carousel.mod_flexicontent_wrapper .fcitem_title a {
+		color: #08c;
+		font-size: 100%;
 	}
 }
 
