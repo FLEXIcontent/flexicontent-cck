@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -16,10 +16,10 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 // Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
+JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
 /**
  * FLEXIcontent Component Import Controller
@@ -41,19 +41,26 @@ class FlexicontentControllerImport extends FlexicontentController
 
 		// Register Extra task
 	}
-	
-	
-	function getlineno() {
+
+
+	function getlineno()
+	{
 		$session = JFactory::getSession();
-		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
-		
+		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
+
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
+		$conf		= unserialize($conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "");
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
-		if ( !empty($conf) )
-			echo 'success|'.count($conf['contents_parsed']).'|'.$lineno.'|'. JSession::getFormToken();
+
+		if (!empty($conf))
+		{
+			echo 'success|' . count($conf['contents_parsed']) . '|' . $lineno . '|' . JSession::getFormToken();
+		}
 		else
+		{
 			echo 'fail|0|0';
+		}
+
 		jexit();
 	}
 }

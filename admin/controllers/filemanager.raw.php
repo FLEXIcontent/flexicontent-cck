@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -16,10 +16,10 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 // Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
+JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
 /**
  * FLEXIcontent Component Files Controller
@@ -62,11 +62,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$uploader_file_data[$file_row_id] = & $props;
 		$session->set('uploader_file_data', $uploader_file_data, 'flexicontent');
 
-		//$app = JFactory::getApplication();
-		//$app->enqueueMessage('<pre>'.print_r($props, true).'</pre>', 'message');
+		// $app = JFactory::getApplication();
+		// $app->enqueueMessage('<pre>'.print_r($props, true).'</pre>', 'message');
 
 		// Return Success JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-success fc-iblock fc-left\">'.JText::_('FLEXI_APPLIED').'</div>", "row_id" : '.json_encode($file_row_id).', "sys_messages" : '.json_encode(flexicontent_html::get_system_messages_html()).'}');
+		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-success fc-iblock fc-left\">' . JText::_('FLEXI_APPLIED') . '</div>", "row_id" : ' . json_encode($file_row_id) . ', "sys_messages" : ' . json_encode(flexicontent_html::get_system_messages_html()) . '}');
 	}
 
 
@@ -93,58 +93,62 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		// Test counting with limited memory
-		//ini_set("memory_limit", "20M");
+		// ini_set("memory_limit", "20M");
 
 		$start_microtime = microtime(true);
 
-		$has_zlib    = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		$has_zlib    = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 		$indexer     = $this->input->getCmd('indexer', 'fileman_default');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
 		$session = JFactory::getSession();
-		$db = JFactory::getDbo();
-		$app = JFactory::getApplication();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		// Actions according to rebuildmode
-		if ($indexer!='fileman_default')
+		if ($indexer != 'fileman_default')
 		{
-			die("'rebuildmode': '".$rebuildmode."'. not supported");
+			die("'rebuildmode': '" . $rebuildmode . "'. not supported");
 		}
-		
+
 		// Clear previous log file
 		$log_filename = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . 'filemanager_index_stats_' . \JFactory::getUser()->id . '.php');
+
 		if (file_exists($log_filename))
 		{
-			@ unlink($log_filename);
+			@unlink($log_filename);
 		}
+
 		$session->set('filemanager.log_filename', $log_filename, 'flexicontent');
 
 		// Get ids of files to index
 		$model = $this->getModel('filemanager');
-		$file_ids = $model->getFileIds($skip_urls=false);  // include URLs to be able to check their usage too
-		
+		$file_ids = $model->getFileIds($skip_urls = false);  // Include URLs to be able to check their usage too
+
 		// Set file ids into session to avoid recalculation ...
-		$session->set($indexer.'_items_to_index', $file_ids, 'flexicontent');
-		
-		echo 'success';  //echo count($fieldids)*count($itemids).'|';
+		$session->set($indexer . '_items_to_index', $file_ids, 'flexicontent');
+
+		echo 'success';
+
+		// Echo count($fieldids)*count($itemids).'|';
 		// WARNING: json_encode will output object if given an array with gaps in the indexing
-		//echo '|'.json_encode($itemids);
-		//echo '|'.json_encode($fieldids);
-		echo '|'.count($file_ids);
-		echo '|'.count(array());
-		
+		// echo '|'.json_encode($itemids);
+		// echo '|'.json_encode($fieldids);
+		echo '|' . count($file_ids);
+		echo '|' . count(array());
+
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		$_total_runtime = $elapsed_microseconds;
 		$_total_queries = 0;
-		echo sprintf( '|0| Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
-		
-		$session->set($indexer.'_total_runtime', $elapsed_microseconds , 'flexicontent');
-		$session->set($indexer.'_total_queries', 0 , 'flexicontent');
+		echo sprintf('|0| Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries;
+
+		$session->set($indexer . '_total_runtime', $elapsed_microseconds, 'flexicontent');
+		$session->set($indexer . '_total_queries', 0, 'flexicontent');
 		jexit();
 	}
-	
-	
+
+
 	function index()
 	{
 		@ob_end_clean();
@@ -153,7 +157,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		//JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		// JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		// Not need because this task need the user session data that are set by countrows that checked for forgeries
 
 		if (!FlexicontentHelperPerm::getPerm()->SuperAdmin)
@@ -162,77 +166,78 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		// Test indexing with limited memory
-		//ini_set("memory_limit", "20M");
+		// ini_set("memory_limit", "20M");
 
 		$start_microtime = microtime(true);
 
 		$session = JFactory::getSession();
-		$db = JFactory::getDbo();
-		$app = JFactory::getApplication();
-		
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
+
 		$indexer     = $this->input->getCmd('indexer', 'fileman_default');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
-		
+
 		$items_per_call = $this->input->getInt('items_per_call', 20);  // Number of item to index per HTTP request
-		$itemcnt = $this->input->getInt('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
-		
+		$itemcnt        = $this->input->getInt('itemcnt', 0);          // Counter of items indexed so far, this is given via HTTP request
+
 		// Actions according to rebuildmode
-		if ($indexer!='fileman_default')
+		if ($indexer != 'fileman_default')
 		{
-			die("'rebuildmode': '".$rebuildmode."'. not supported");
+			die("'rebuildmode': '" . $rebuildmode . "'. not supported");
 		}
-		
+
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
-		$itemids = $session->get($indexer.'_items_to_index', array(), 'flexicontent');
-		
-		
+		$itemids = $session->get($indexer . '_items_to_index', array(), 'flexicontent');
+
 		// Get query size limit
 		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
 		$db->setQuery($query);
 		$_dbvariable = $db->loadObject();
 		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);
-		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256*1024;
-		$query_lim = (int) (3 * $max_allowed_packet / 4);
-		//echo 'fail|'.$query_lim; jexit();
-		
+		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256 * 1024;
+		$query_lim          = (int) (3 * $max_allowed_packet / 4);
+
+		// Echo 'fail|'.$query_lim; jexit();
+
 		// Get script max
 		$max_execution_time = ini_get("max_execution_time");
-		//echo 'fail|'.$max_execution_time; jexit();
-		
+
+		// Echo 'fail|'.$max_execution_time; jexit();
+
 		// Get model
-		$model = $this->getModel('filemanager');
+		$model      = $this->getModel('filemanager');
 		$file_model = $this->getModel('file');
 
 		// Find usage in fields
 		$s_assigned_fields = array('file', 'minigallery');
 		$m_assigned_fields = array('image');
-		$m_assigned_props = array('image'=>'originalname');
-		$m_assigned_vals = array('image'=>'filename');
+		$m_assigned_props  = array('image' => 'originalname');
+		$m_assigned_vals   = array('image' => 'filename');
 
-		$query_count = 0;
+		$query_count         = 0;
 		$max_items_per_query = 100;
 		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
-		$cnt = $itemcnt;
-		while($cnt < count($itemids) && $cnt < $itemcnt+$items_per_call)
+		$cnt                 = $itemcnt;
+
+		while ($cnt < count($itemids) && $cnt < $itemcnt + $items_per_call)
 		{
 			$query_itemids = array_slice($itemids, $cnt, $max_items_per_query);
 			$cnt += $max_items_per_query;
-			
+
 			// Get files
 			$data_query = "SELECT * "
-				." FROM #__flexicontent_files"
-				." WHERE id IN (".implode(', ',$query_itemids).")"
-				;
+				. " FROM #__flexicontent_files"
+				. " WHERE id IN (" . implode(', ', $query_itemids) . ")";
 			$db->setQuery($data_query);
 			$file_data = $db->loadObjectList('id');
-			
-			$size_index = array();
+
+			$size_index  = array();
 			$usage_index = array();
-			$errors = array();
-			
+			$errors      = array();
+
 			// For current item: Loop though all searchable fields according to their type
-			foreach($file_data as $file_id => $file)
+			foreach ($file_data as $file_id => $file)
 			{
 				$file->total_usage = 0;
 				$path = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
@@ -243,9 +248,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					$file->size = file_exists($file_path) ? filesize($file_path) : 0;
 				}
 
-				elseif($index_urls)
+				elseif ($index_urls)
 				{
 					$url = $file->filename_original ?: $file->filename;
+
 					if ($url)
 					{
 						$filesize = $file_model->get_file_size_from_url($url);
@@ -261,6 +267,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 			}
+
 			if (count($errors))
 			{
 				$log_filename = 'filemanager_index_stats_' . \JFactory::getUser()->id . '.php';
@@ -268,7 +275,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				JLog::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file
-            'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+						'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 					),
 					JLog::ALL,  // Sets messages of all log levels to be sent to the file
 					array('com_flexicontent.filemanager.stats_indexer')  // category of logged messages
@@ -276,15 +283,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				$stats_indexer_error_count = $session->get('filemanager.stats_indexer_error_count', 0, 'flexicontent');
 				$session->set('filemanager.stats_indexer_error_count', $stats_indexer_error_count + count($errors), 'flexicontent');
-				//stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', array(), 'flexicontent');
-				foreach($errors as $error_message)
+
+				// Stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', array(), 'flexicontent');
+				foreach ($errors as $error_message)
 				{
-					//$stats_indexer_errors[] = $error_message;
+					// $stats_indexer_errors[] = $error_message;
 					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.filemanager.stats_indexer');
 				}
-				//$session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');
-			}
 
+						// $session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');
+			}
 
 			// Single property fields, get file usage (# assignments)
 			if ($s_assigned_fields)
@@ -306,7 +314,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				}
 			}
 
-			foreach($file_data as $file_id => $file)
+			foreach ($file_data as $file_id => $file)
 			{
 				$usage_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->total_usage;
 			}
@@ -315,45 +323,58 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			unset($query);
 			$query = 'UPDATE #__flexicontent_files '
 				. ' SET '
-				. ' ' . $db->quoteName('size'). ' = CASE id ' . implode('', $size_index) . '  END, '
-				. ' ' . $db->quoteName('assignments'). ' = CASE id ' . implode('', $usage_index) . '  END '
-				. ' WHERE id IN ('.implode(', ',$query_itemids).')';
+				. ' ' . $db->quoteName('size') . ' = CASE id ' . implode('', $size_index) . '  END, '
+				. ' ' . $db->quoteName('assignments') . ' = CASE id ' . implode('', $usage_index) . '  END '
+				. ' WHERE id IN (' . implode(', ', $query_itemids) . ')';
 			$db->setQuery($query);
 			$db->execute();
 			$query_count++;
-			
+
 			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$elapsed_seconds = $elapsed_microseconds / 1000000.0;
-			if ($elapsed_seconds > $max_execution_time/3 || $elapsed_seconds > 5) break;
+
+			if ($elapsed_seconds > $max_execution_time / 3 || $elapsed_seconds > 5)
+			{
+				break;
+			}
 		}
-		
+
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		if ( $session->has($indexer.'_total_runtime', 'flexicontent')) {
-			$_total_runtime = $session->get($indexer.'_total_runtime', 0, 'flexicontent');
-		} else {
+
+		if ($session->has($indexer . '_total_runtime', 'flexicontent'))
+		{
+			$_total_runtime = $session->get($indexer . '_total_runtime', 0, 'flexicontent');
+		}
+		else
+		{
 			$_total_runtime = 0;
 		}
+
 		$_total_runtime += $elapsed_microseconds;
-		$session->set($indexer.'_total_runtime', $_total_runtime, 'flexicontent');
-		
-		if ( $session->has($indexer.'_total_queries', 'flexicontent')) {
-			$_total_queries = $session->get($indexer.'_total_queries', 0, 'flexicontent');
-		} else {
+		$session->set($indexer . '_total_runtime', $_total_runtime, 'flexicontent');
+
+		if ($session->has($indexer . '_total_queries', 'flexicontent'))
+		{
+			$_total_queries = $session->get($indexer . '_total_queries', 0, 'flexicontent');
+		}
+		else
+		{
 			$_total_queries = 0;
 		}
+
 		$_total_queries += $query_count;
-		$session->set($indexer.'_total_queries', $_total_queries , 'flexicontent');
-		
-		jexit(printf( $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries);
+		$session->set($indexer . '_total_queries', $_total_queries, 'flexicontent');
+
+		jexit(printf($cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
 	}
-	
-	
-	/*function purge()
+
+	/*
+	function purge()
 	{
 		$model = $this->getModel('filemanager');
 		$model->purge();
 		$msg = JText::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=filemanager', $msg);
 	}*/
-	
+
 }
