@@ -41,14 +41,14 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask('params', 			'params');
+		$this->registerTask('params',		'params');
 		$this->registerTask('orderdown', 	'orderdown');
 		$this->registerTask('orderup', 		'orderup');
 		$this->registerTask('saveorder', 	'saveorder');
 		$this->registerTask('publish', 		'publish');
 		$this->registerTask('unpublish', 	'unpublish');
 		$this->registerTask('archive', 		'archive');
-		$this->registerTask('trash', 			'trash');
+		$this->registerTask('trash',		'trash');
 
 		// Load Joomla 'com_categories' language files
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
