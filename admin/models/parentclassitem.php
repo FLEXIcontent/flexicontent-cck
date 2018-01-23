@@ -5057,7 +5057,7 @@ class ParentClassItem extends FCModelAdmin
 	}
 	
 	
-	protected function cleanCache($group = null, $client_id = 0)
+	public function cleanCache($group = null, $client_id = 0)
 	{
 		$cache = FLEXIUtilities::getCache($group, $client_id);
 		if ($group)
