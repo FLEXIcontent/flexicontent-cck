@@ -27,6 +27,23 @@ div.fc-inherited-value {
 	right: 30px;
 	overflow: auto;
 }
+
+/* Fixes for pagebuilder CK */
+.ui-dialog.fc-fixed-dialog {
+	z-index: 2050;
+}
+.ui-dialog.fc-fixed-dialog.fc-no-scroll {
+	overflow: hidden;
+}
+.ui-dialog.fc-fixed-dialog.fc-no-scroll .ui-resizable-handle {
+	display: none;
+}
+
+
+/**********************
+ * yet unclassified CSS
+ **********************/
+
 body > #system-message-container {
 	margin: 6px 0 0 0;
 	.alert {
@@ -34,11 +51,6 @@ body > #system-message-container {
 	}
 }
 
-
-/**********************
- * yet unclassified CSS
- **********************/
- 
 .flexicontent .ui-autocomplete-loading {
 	/*background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;*/
 }
