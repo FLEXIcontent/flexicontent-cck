@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -16,10 +16,10 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 // Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
+JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
 /**
  * FLEXIcontent Component Templates Controller
@@ -40,9 +40,9 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,     'edit' );
-		$this->registerTask( 'apply',     'save' );
-		$this->registerTask( 'apply_modal', 'save' );
+		$this->registerTask('add',     'edit');
+		$this->registerTask('apply',     'save');
+		$this->registerTask('apply_modal', 'save');
 	}
 
 
@@ -58,51 +58,53 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
+		// Check access
+		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
 		{
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( 'index.php?option=com_flexicontent', '');
+			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			$this->setRedirect('index.php?option=com_flexicontent', '');
+
 			return;
 		}
 
-		$post   = JRequest::get( 'post' );
+		$post   = JRequest::get('post');
 		$task   = JRequest::getVar('task');
 		$type   = JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
-		$cfgname= JRequest::getVar('cfgname',  '', '', 'cmd');
-		
+		$cfgname = JRequest::getVar('cfgname',  '', '', 'cmd');
+
 		$positions = JRequest::getVar('positions',  '');
 		$positions = explode(',', $positions);
 		$attribs = $post['jform']['layouts'][$folder];
-		
+
 		// Get model
 		$model = $this->getModel('template');
-		
+
 		// Store field positions
 		$model->storeFieldPositions($folder, $cfgname, $type, $positions, $post);
-		
+
 		// Store Layout configurations (template parameters)
 		$model->storeLayoutConf($folder, $cfgname, $type, $attribs);
-		
+
 		// Store LESS configuration (less variables)
 		$model->storeLessConf($folder, $cfgname, $type, $attribs);
-		
+
 		switch ($task)
 		{
 			case 'apply_modal' :
-				$link = 'index.php?option=com_flexicontent&view=template&type='.$type.'&folder='.$folder.'&tmpl=component&ismodal=1';
+				$link = 'index.php?option=com_flexicontent&view=template&type=' . $type . '&folder=' . $folder . '&tmpl=component&ismodal=1';
 				break;
 
 			case 'apply' :
-				$link = 'index.php?option=com_flexicontent&view=template&type='.$type.'&folder='.$folder;
+				$link = 'index.php?option=com_flexicontent&view=template&type=' . $type . '&folder=' . $folder;
 				break;
 
 			default :
 				$link = 'index.php?option=com_flexicontent&view=templates';
 				break;
 		}
-		$msg = JText::_( 'FLEXI_SAVE_FIELD_POSITIONS' );
+
+		$msg = JText::_('FLEXI_SAVE_FIELD_POSITIONS');
 
 		$this->setRedirect($link, $msg);
 	}
@@ -119,15 +121,16 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		// check access
-		if ( !FlexicontentHelperPerm::getPerm()->CanTemplates )
+		// Check access
+		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
 		{
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-			$this->setRedirect( 'index.php?option=com_flexicontent', '');
+			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			$this->setRedirect('index.php?option=com_flexicontent', '');
+
 			return;
 		}
 
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=templates' );
+		$this->setRedirect('index.php?option=com_flexicontent&view=templates');
 	}
 
 }

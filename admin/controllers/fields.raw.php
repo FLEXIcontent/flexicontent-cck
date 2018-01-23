@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -16,10 +16,10 @@
  * GNU General Public License for more details.
  */
 
-defined( '_JEXEC' ) or die( 'Restricted access' );
+defined('_JEXEC') or die('Restricted access');
 
 // Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
+JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
 /**
  * FLEXIcontent Component Fields Controller
@@ -49,7 +49,7 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function getfieldspecificproperties()
 	{
-		$this->input->set('view', 'field');    // set view to be field, if not already done in http request
+		$this->input->set('view', 'field');    // Set view to be field, if not already done in http request
 		$this->input->set('format', 'raw');    // force raw format, if not already done in http request
 
 		// Import field to execute its constructor, e.g. needed for loading language file etc
@@ -77,9 +77,12 @@ class FlexicontentControllerFields extends FlexicontentController
 
 		$is_authorised = !$field_id ?
 			$user->authorise('flexicontent.createfield', 'com_flexicontent') :
-			$user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $field_id) ;
+			$user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $field_id);
 
-		if (!$is_authorised) die(JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ));
+		if (!$is_authorised)
+		{
+			die(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
 
 		// Get field configuration
 		$_fields = FlexicontentFields::getFieldsByIds(array($field_id));
@@ -94,20 +97,27 @@ class FlexicontentControllerFields extends FlexicontentController
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, array(), $item_pros);
 
 		// Check for error during getting indexed field elements
-		if ( !$elements )
+		if (!$elements)
 		{
-			$sql_mode = $field->parameters->get( 'sql_mode', 0 );  // must retrieve variable here, and not before retrieving elements !
+			$sql_mode = $field->parameters->get('sql_mode', 0);  // Must retrieve variable here, and not before retrieving elements !
+
 			if ($sql_mode && $item_pros > 0)
-				$error_mssg = sprintf( JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $field->label );
-			else if ($sql_mode)
+			{
+				$error_mssg = sprintf(JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $field->label);
+			}
+			elseif ($sql_mode)
+			{
 				$error_mssg = JText::_('FLEXI_FIELD_INVALID_QUERY');
+			}
 			else
+			{
 				$error_mssg = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+			}
 
 			echo '';
 			exit;
 		}
-		
+
 		echo json_encode(array_values($elements));
 		exit;
 	}

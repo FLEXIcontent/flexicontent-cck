@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -48,47 +48,51 @@ class FlexicontentControllerCategory extends JControllerForm
 		parent::__construct($config);
 
 		// Guess the JText message prefix. Defaults to the option.
-		if (empty($this->extension)) {
+		if (empty($this->extension))
+		{
 			$this->extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
-		
-		$this->registerTask( 'apply',        'save' );
-		$this->registerTask( 'apply_ajax',   'save' );
-		$this->registerTask( 'save2new',     'save' );
-		$this->registerTask( 'save2copy',    'save' );
+
+		$this->registerTask('apply',        'save');
+		$this->registerTask('apply_ajax',   'save');
+		$this->registerTask('save2new',     'save');
+		$this->registerTask('save2copy',    'save');
 	}
 
 	function add()
 	{
 		parent::add();
 	}
-	
-	function edit($key = NULL, $urlVar = NULL)
+
+	function edit($key = null, $urlVar = null)
 	{
 		$cid = $this->input->get->get('cid', array(), 'array');
+
 		if (count($cid))
 		{
 			$this->input->post->set('cid', $cid);
 		}
+
 		parent::edit();
 	}
 
-	function save($key = NULL, $urlVar = NULL)
+	function save($key = null, $urlVar = null)
 	{
 		parent::save();
-		if ( $this->input->get('fc_doajax_submit') )
+
+		if ($this->input->get('fc_doajax_submit'))
 		{
-			JFactory::getApplication()->enqueueMessage(JText::_( 'FLEXI_ITEM_SAVED' ), 'message');
+			JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_ITEM_SAVED'), 'message');
 			echo flexicontent_html::get_system_messages_html();
 			exit();  // Ajax submit, do not rerender the view
 		}
 	}
-	
-	function cancel($key = NULL)
+
+	function cancel($key = null)
 	{
 		parent::cancel();
 	}
-	
+
 	/**
 	 * Method to check if you can add a new record.
 	 *
@@ -102,13 +106,13 @@ class FlexicontentControllerCategory extends JControllerForm
 	protected function allowAdd($data = array())
 	{
 		$user = JFactory::getUser();
-		if ( $user->authorise('core.create', $this->extension) )
+
+		if ($user->authorise('core.create', $this->extension))
 		{
 			return true;
 		}
 
-		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
-			, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
 		);
 
 		return count($usercats) > 0;
@@ -139,13 +143,13 @@ class FlexicontentControllerCategory extends JControllerForm
 		}
 
 		// Check "edit" permission on record asset (explicit or inherited)
-		if ($user->authorise('core.edit',  $_extension . '.category.'.$recordId))
+		if ($user->authorise('core.edit',  $_extension . '.category.' . $recordId))
 		{
 			return true;
 		}
 
 		// Check "edit own" permission on record asset (explicit or inherited)
-		if ($user->authorise('core.edit.own', $_extension . '.category.'.$recordId))
+		if ($user->authorise('core.edit.own', $_extension . '.category.' . $recordId))
 		{
 			// Load record
 			$record = $this->getModel()->getItem($recordId);
@@ -175,12 +179,14 @@ class FlexicontentControllerCategory extends JControllerForm
 		$model	= $this->getModel('Category');
 
 		$extension = JRequest::getCmd('extension', '');
-		if ($extension) {
-			$extension = '&extension='.$extension;
+
+		if ($extension)
+		{
+			$extension = '&extension=' . $extension;
 		}
 
 		// Preset the redirect
-		$this->setRedirect('index.php?option=com_flexicontent&view=categories'.$extension);
+		$this->setRedirect('index.php?option=com_flexicontent&view=categories' . $extension);
 
 		return parent::batch($model);
 	}
@@ -196,7 +202,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'id')
 	{
 		$append = parent::getRedirectToItemAppend($recordId);
-		$append .= '&extension='.$this->extension;
+		$append .= '&extension=' . $this->extension;
 
 		return $append;
 	}
@@ -210,7 +216,7 @@ class FlexicontentControllerCategory extends JControllerForm
 	protected function getRedirectToListAppend()
 	{
 		$append = parent::getRedirectToListAppend();
-		$append .= '&extension='.$this->extension;
+		$append .= '&extension=' . $this->extension;
 
 		return $append;
 	}
