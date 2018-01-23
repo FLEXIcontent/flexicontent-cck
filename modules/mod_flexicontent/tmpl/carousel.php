@@ -371,7 +371,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				<?php ob_start(); ?>
 
 					<?php if ($display_title_feat) : ?>
-						<span class="fcitem_title_box">
+						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title_feat) : ?>
 								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
@@ -379,7 +379,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 								<?php echo $item->title; ?>
 							<?php endif; ?>
 							</span>
-						</span>
+						</div>
 					<?php endif; ?>
 
 				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
@@ -578,7 +578,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				<?php ob_start(); ?>
 
 					<?php if ($display_title || $item_handle_title==2) : ?>
-						<span class="fcitem_title_box" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
+						<div class="fcitem_title_box" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
 							<span class="fcitem_title">
 							<?php if ($link_title) : ?>
 								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
@@ -586,7 +586,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 								<?php echo $item->title; ?>
 							<?php endif; ?>
 							</span>
-						</span>
+						</div>
 					<?php endif; ?>
 
 				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
