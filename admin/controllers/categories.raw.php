@@ -41,7 +41,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask('params', 			'params');
+		$this->registerTask('params', 'params');
 	}
 
 
@@ -82,12 +82,12 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$copyid		= JRequest::getInt('copycid', '', 'post');
-		$destid		= JRequest::getVar('destcid', null, 'post', 'array');
-		$task		= JRequest::getVar('task');
+		$copyid	= JRequest::getInt('copycid', '', 'post');
+		$destid	= JRequest::getVar('destcid', null, 'post', 'array');
+		$task = JRequest::getVar('task');
 
 		$user = JFactory::getUser();
-		$model 	= $this->getModel('category');
+		$model = $this->getModel('category');
 		$params = $model->getParams($copyid);
 
 		if (!$destid)
