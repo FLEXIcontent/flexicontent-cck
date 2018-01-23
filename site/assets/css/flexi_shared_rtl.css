@@ -15,6 +15,15 @@ div.fc-inherited-value {
 	right: 30px;
 	overflow: auto;
 }
+.ui-dialog.fc-fixed-dialog {
+	z-index: 2050;
+}
+.ui-dialog.fc-fixed-dialog.fc-no-scroll {
+	overflow: hidden;
+}
+.ui-dialog.fc-fixed-dialog.fc-no-scroll .ui-resizable-handle {
+	display: none;
+}
 body > #system-message-container {
 	margin: 6px 0 0 0;
 }

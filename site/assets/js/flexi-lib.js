@@ -107,8 +107,15 @@
 				/*'Close': function() { jQuery(this).dialog('close'); }*/
 			},
 			open: function(ev, ui){
+				// Fix for Pagebuilder CK modifying not-owned modals
+				jQuery('.ui-widgetck .ui-dialog-titlebar-close > .ui-icon').removeClass('ui-widgetck-overlay').css('top', '0').css('left', '0');
+				jQuery('.ui-widgetck').removeClass('ui-widgetck').addClass('ui-widget fc-no-scroll');
+				jQuery('.ui-widgetck-content').removeClass('ui-widgetck-content').addClass('ui-widget-content');
+				jQuery('.ui-widgetck-header').removeClass('ui-widgetck-header').addClass('ui-widget-header');
+				jQuery('.ui-widgetck-overlay').removeClass('ui-widgetck-overlay').addClass('ui-widget-overlay').css('z-index', '2049').css('position', 'fixed');
+
 				// Close on click outside of modal popup
-				jQuery('.ui-widget-overlay').bind('click', function(){
+				jQuery('.ui-widget-overlay, .pac-container').bind('click', function(){
 					obj.dialog('close');
 				});
 			},
@@ -214,9 +221,16 @@
 				no_iframe ?
 					container.load(url) :
 					jQuery('#'+tagid+'_frame').attr('src', url);
-				
+
+				// Fix for Pagebuilder CK modifying not-owned modals
+				jQuery('.ui-widgetck .ui-dialog-titlebar-close > .ui-icon').removeClass('ui-widgetck-overlay').css('top', '0').css('left', '0');
+				jQuery('.ui-widgetck').removeClass('ui-widgetck').addClass('ui-widget fc-no-scroll');
+				jQuery('.ui-widgetck-content').removeClass('ui-widgetck-content').addClass('ui-widget-content');
+				jQuery('.ui-widgetck-header').removeClass('ui-widgetck-header').addClass('ui-widget-header');
+				jQuery('.ui-widgetck-overlay').removeClass('ui-widgetck-overlay').addClass('ui-widget-overlay').css('z-index', '2049').css('position', 'fixed');
+
 				// Close on click outside of modal popup
-				jQuery('.ui-widget-overlay').bind('click', function(){
+				jQuery('.ui-widget-overlay, .pac-container').bind('click', function(){
 					container.dialog('close');
 				});
 			},

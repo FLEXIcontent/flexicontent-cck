@@ -911,16 +911,17 @@ if ($this->item->type_id) {
 				?>
 				
 				<div class="fcclear"></div>
-				<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
+
+				<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
 				<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
 					<?php echo $field->label; ?>
 				</label>
-				</span>
+				</div>
 				<?php if($display_label_form==2):  ?>
 					<div class="fcclear"></div>
 				<?php endif; ?>
 								
-				<div style="<?php echo $container_width; ?>" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
+				<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 					<?php echo ($field->description && $edithelp==3) ? '<div class="alert fc-small fc-iblock">'.$field->description.'</div>' : ''; ?>
 				
 				<?php if ( !isset($field->html) || !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
