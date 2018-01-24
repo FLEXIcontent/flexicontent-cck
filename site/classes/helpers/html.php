@@ -3569,7 +3569,7 @@ class flexicontent_html
 			<div class="fcvote fcvote-box-'.$xid.'">
 				<div class="nowrap_box fcvote-label-outer">
 					'.($label ? '<div class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '').'
-					<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
+					<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcvote-count" '.( !$rating_count || (($counter==-1 || $counter==0) && !$show_percentage) ? 'style="display:none;"' : '' ).'>'.
 						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '').
 						( $counter==-1 || $counter==0 ? '' :
 							($show_percentage && (int)$percent ? ' - ' : '').

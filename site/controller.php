@@ -1431,6 +1431,10 @@ class FlexicontentController extends JControllerLegacy
 				: ($favs && $usercount ? '+'.$favs : 'added');
 		}
 
+		// Item favouring changed clean item-related caches
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
+
 		jexit();
 	}
 	
@@ -1810,10 +1814,13 @@ class FlexicontentController extends JControllerLegacy
 			$error = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTE_OUT_OF_RANGE', $min_rating, $max_rating);
 			
 			// Set responce
-			if ($no_ajax) {
+			if ($no_ajax)
+			{
 				$app->enqueueMessage( $error, 'notice' );
 				return;
-			} else {
+			}
+			else
+			{
 				$result	= new stdClass();
 				$result->percentage = '';
 				$result->htmlrating = '';
@@ -1846,7 +1853,8 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			// Split extra voting ids (xid) and their titles
-			foreach ($extra_votes as $extra_vote) {
+			foreach ($extra_votes as $extra_vote)
+			{
 				@list($extra_id, $extra_title, $extra_desc) = explode("##", $extra_vote);
 				$xids[$extra_id] = 1;
 			}
@@ -1863,12 +1871,16 @@ class FlexicontentController extends JControllerLegacy
 			$error = !$enable_extra_votes ? JText::_('FLEXI_VOTE_COMPOSITE_VOTING_IS_DISABLED') : 'Voting characteristic with id: '.$int_xid .' was not found';
 		}
 		
-		if ( isset($error) ) {
+		if ( isset($error) )
+		{
 			// Set responce
-			if ($no_ajax) {
+			if ($no_ajax)
+			{
 				$app->enqueueMessage( $error, 'notice' );
 				return;
-			} else {
+			}
+			else
+			{
 				$result	= new stdClass();
 				$result->percentage = '';
 				$result->htmlrating = '';
@@ -1920,15 +1932,18 @@ class FlexicontentController extends JControllerLegacy
 			// Add current vote
 			$vote_history[$cid][$int_xid] = $user_rating;
 			
-			foreach($xids as $_xid => $i) {
-				if ( !isset($vote_history[$cid][$_xid]) ) {
+			foreach($xids as $_xid => $i)
+			{
+				if ( !isset($vote_history[$cid][$_xid]) )
+				{
 					$voteIsComplete = false;
 					continue;
 				}
 				$rating_completed++;
 				$main_rating += (int)$vote_history[$cid][$_xid];
 			}
-			if ($voteIsComplete) {
+			if ($voteIsComplete)
+			{
 				$main_rating = (int)($main_rating / count($xids));
 				$vote_history[$cid]['main'] = $main_rating;
 			}
@@ -1936,9 +1951,9 @@ class FlexicontentController extends JControllerLegacy
 		$main_rating_diff = $main_rating - $old_main_rating;
 		
 		
-		// *************************************
-		// Retreive last vote for the given item
-		// *************************************
+		// ***
+		// *** Retreive last vote for the given item
+		// ***
 		
 		$currip = $_SERVER['REMOTE_ADDR'];
 		$currip_quoted = $db->Quote( $currip );
@@ -1959,10 +1974,10 @@ class FlexicontentController extends JControllerLegacy
 			$db_itemratings = $db->loadObject();
 			
 			
-			// ***********************************************************
-			// Voting access allowed and valid, but we will need to make
-			// some more checks (IF voting record exists AND double voting)
-			// ***********************************************************
+			// ***
+			// *** Voting access allowed and valid, but we will need to make
+			// *** some more checks (IF voting record exists AND double voting)
+			// ***
 			
 			// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
 			if ( !$db_itemratings )
@@ -1996,10 +2011,13 @@ class FlexicontentController extends JControllerLegacy
 					$error = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );//.', IP: '.$db_itemratings->lastip;
 					if ($int_xid) $result->message = $error;  else $result->message_main = $error;
 					
-					if ($no_ajax) {
+					if ($no_ajax)
+					{
 						$app->enqueueMessage( $int_xid ? $result->html : $result->html_main, 'notice' );
 						return;
-					} else {
+					}
+					else
+					{
 						$result	= new stdClass();
 						$result->percentage = '';
 						$result->htmlrating = '';
@@ -2068,13 +2086,16 @@ class FlexicontentController extends JControllerLegacy
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
 					'.JText::_('FLEXI_VOTE_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
 				</div>';
-			if ( ! $voteIsComplete ) {
+			if ( ! $voteIsComplete )
+			{
 				$result->message_main = '
 					<div class="fc-mssg fc-warning fc-nobgimage">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
 						'.JText::sprintf('FLEXI_VOTE_PLEASE_COMPLETE_VOTING', $rating_completed, count($xids)).'
 					</div>';
-			} else {
+			}
+			else
+			{
 				$result->html_main = JText::_($old_main_rating ? 'FLEXI_VOTE_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTE_AVERAGE_RATING_SUBMITTED');
 				$result->message_main = '
 				<div class="fc-mssg fc-success fc-nobgimage">
@@ -2097,11 +2118,21 @@ class FlexicontentController extends JControllerLegacy
 		// Set the voting data, into SESSION
 		$session->set('vote_history', $vote_history, 'flexicontent');
 		
+		// Item average vote changed clean item-related caches
+		if ($voteIsComplete)
+		{
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent');  // Also clean this (as it contains Joomla frontend view cache)
+		}
+
 		// Finally set responce
-		if ($no_ajax) {
+		if ($no_ajax)
+		{
 			$app->enqueueMessage( $int_xid ? $result->message_main.'<br/>'.$result->message : $result->message_main, 'notice' );
 			return;
-		} else {
+		}
+		else
+		{
 			echo json_encode($result);
 			jexit();
 		}
