@@ -1146,22 +1146,43 @@ class FlexicontentController extends JControllerLegacy
 		if (!empty($urlparams)) $safeurlparams = & $urlparams;
 		
 		// CASE: urlparams are empty, use the FULL URL request array (_GET)
-		else {
+		else
+		{
 			$safeurlparams = array();
 			
-			// Add menu URL variables
+			// (1) Add menu URL variables
 			$menu = JFactory::getApplication()->getMenu()->getActive();
 			if ($menu)
 			{
 				// Add menu Itemid to make sure that the menu items with --different-- parameter values, will display differently
 				$safeurlparams['Itemid'] = 'STRING';
-				
+
 				// Add menu's HTTP query variables so that we match the non-SEF URL exactly, thus we create the same cache-ID for both SEF / non-SEF urls (purpose: save some cache space)
-				foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+				foreach($menu->query as $_varname => $_ignore)
+				{
+					$safeurlparams[$_varname] = 'STRING';
+				}
 			}
-			
-			// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (values are ignored)
-			foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+
+			// (2) Add real URL variables (GET)
+			foreach($_GET as $_varname => $_ignore)
+			{
+				$safeurlparams[$_varname] = 'STRING';
+			}
+
+			// (3) Add other variables added during Joomla URL routing
+			//  ... ?
+
+			/* (redo 1 and 2 but also implement 3) Add any existing URL variables
+			 * 1) menu URL variables
+			 * 2) real URL variables (GET),
+			 * 3) other variables added during Joomla URL routing
+			 * NOTE: we only need variable names, (values are ignored)
+			 */
+			foreach($this->input->getArray() as $_varname => $_ignore)
+			{
+				$safeurlparams[$_varname] = 'STRING';
+			}
 		}
 		
 		
