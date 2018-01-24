@@ -184,7 +184,12 @@ else
 shRemoveFromGETVarsList('option');
 shRemoveFromGETVarsList('lang');
 if (! empty($Itemid))   shRemoveFromGETVarsList('Itemid');
-if (! empty($limit))    shRemoveFromGETVarsList('limit');
+
+// Warning remove the limit variable from URL, ONLY if the variable is not present in the URL (frontend filtering form allows overriding the value)
+if (empty($_GET['limit']))
+{
+	shRemoveFromGETVarsList('limit');
+}
 
 // Variables 'limitstart', 'start', 'showall' can be zero or empty string, so use isset
 if (isset($limitstart))  shRemoveFromGETVarsList('limitstart');
