@@ -1049,40 +1049,54 @@ if ($this->item->type_id) {
 			<?php if (1) : /* secondary categories always available in backend */ ?>
 				
 				<div class="fcclear"></div>
-				<span class="label-fcouter" id="jform_cid-lbl-outer">
-				<label id="jform_cid-lbl" for="jform_cid" data-for="jform_cid" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
-					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?>
-				</label>
-				</span>
-				<div class="container_fcfield container_fcfield_name_catid">
-					<?php echo $this->lists['cid']; ?>
+				<div class="control-group">
+
+					<div class="control-label" id="jform_cid-lbl-outer">
+						<label id="jform_cid-lbl" for="jform_cid" data-for="jform_cid" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
+							<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?>
+						</label>
+					</div>
+					<div class="controls container_fcfield container_fcfield_name_catid">
+						<?php echo $this->lists['cid']; ?>
+					</div>
+
 				</div>
-				
+
 			<?php endif; ?>
 
 			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
 				<div class="fcclear"></div>
-				<span class="label-fcouter" id="jform_featured_cid-lbl-outer">
-				<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for="jform_featured_cid" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
-					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
-				</label>
-				</span>
-				<div class="container_fcfield container_fcfield_name_featured_cid">
-					<?php echo $this->lists['featured_cid']; ?>
+
+				<div class="control-group">
+
+					<div class="control-label" id="jform_featured_cid-lbl-outer">
+						<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for="jform_featured_cid" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
+							<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
+						</label>
+					</div>
+					<div class="controls container_fcfield container_fcfield_name_featured_cid">
+						<?php echo $this->lists['featured_cid']; ?>
+					</div>
+
 				</div>
+
 			<?php endif; ?>
 
 
 			<div class="fcclear"></div>
-			<span class="label-fcouter" id="jform_featured-lbl-outer">
-			<label id="jform_featured-lbl" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
-				<?php echo JText::_( 'FLEXI_FEATURED' ); ?>
-				<small style="float:right; clear:both;"><?php echo JText::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
-			</label>
-			</span>
-			<div class="container_fcfield container_fcfield_name_featured">
-				<?php echo $this->lists['featured']; ?>
-				<?php //echo $this->form->getInput('featured');?>
+			<div class="control-group">
+
+				<div class="control-label" id="jform_featured-lbl-outer">
+					<label id="jform_featured-lbl" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
+						<?php echo JText::_( 'FLEXI_FEATURED' ); ?>
+						<small style="float:right; clear:both;"><?php echo JText::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
+					</label>
+				</div>
+				<div class="controls container_fcfield container_fcfield_name_featured">
+					<?php echo $this->lists['featured']; ?>
+					<?php //echo $this->form->getInput('featured');?>
+				</div>
+
 			</div>
 
 		</fieldset>
