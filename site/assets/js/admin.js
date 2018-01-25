@@ -208,13 +208,13 @@ function fc_submit_form(form, task, validate)
 			form.doanimated_submit = 0;  // Clear FLAG until next time Joomla.submitform() is called
 
 			jQuery('body').prepend(
-			 	'<span id="fc_filter_form_blocker">' +
-			    '<span class="fc_blocker_opacity"></span>' +
-			    '<span class="fc_blocker_content">' +
-			    	Joomla.JText._('FLEXI_FORM_IS_BEING_SUBMITTED') +
-			    	'<div class="fc_blocker_bar"><div></div></div>' +
-			    '</span>' +
-			  '</span>');
+				'<div id="fc_filter_form_blocker">' +
+					'<div class="fc_blocker_opacity"></div>' +
+					'<div class="fc_blocker_content">' +
+						Joomla.JText._('FLEXI_FORM_IS_BEING_SUBMITTED') +
+						'<div class="fc_blocker_bar"><div></div></div>' +
+					'</div>' +
+				'</div>');
 			var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
 			if (fc_filter_form_blocker) {
 				fc_filter_form_blocker.css("display", "block");
