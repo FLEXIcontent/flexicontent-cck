@@ -247,6 +247,7 @@ $document = JFactory::getDocument();
 flexicontent_html::loadFramework('fcxSlide');
 flexicontent_html::loadFramework('mCSB');
 flexicontent_html::loadFramework('imagesLoaded');
+flexicontent_html::loadFramework('flexi_tmpl_common');
 
 // Add masonry JS
 if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) )
