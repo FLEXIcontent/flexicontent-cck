@@ -209,11 +209,11 @@ class FlexicontentModelTags extends JModelLegacy
 		}
 
 		// Get limitstart, and in case limit has been changed, adjust it accordingly
-		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
+		$limitstart	= $app->input->getInt('limitstart', $app->input->getInt('start', 0));
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		$this->setState('limitstart', $limitstart);
 
-		// Make sure it is limitstart is set
+		// Make sure limitstart is set
 		$app->input->set('limitstart', $limitstart);
 		$app->input->set('start', $limitstart);
 

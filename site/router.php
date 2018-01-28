@@ -26,7 +26,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 function FLEXIcontentBuildRoute(&$query)
 {
 	$segments = array();
-	
+
+	// If both 'start' and 'limitstart' variables are set then prefer 'limitstart' and also remove 'start' variable from URL
+	if (isset($query['start']) && isset($query['limitstart']))
+	{
+		$query['start'] = $query['limitstart'];
+		unset($query['start']);
+	}
+
 	$app = JFactory::getApplication();
 	$params = JComponentHelper::getParams('com_flexicontent');
 	$add_item_sef_segment = $params->get('add_item_sef_segment', 1);

@@ -77,21 +77,29 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Set id and load parameters
 		$id = 0;  // no id used by this view
 		$this->setId((int)$id);
-		$params = & $this->_params;
+		$params = $this->_params;
+		$app    = JFactory::getApplication();
 		
-		//get the root category of the directory
-		$this->_rootcat = (int) JRequest::getInt('rootcat', 0);
+		// Get the root category of the directory
+		$this->_rootcat = (int) $app->input->getInt('rootcat', 0);
+
+		// Compatibility of old saved menu items, the value is inside params instead of being URL query variable
 		if ( !$this->_rootcat)
-			// compatibility of old saved menu items, the value is inside params instead of being URL query variable
-			$this->_rootcat = $params->get('rootcat', FLEXI_J16GE ? 1:0);
+		{
+			$this->_rootcat = $params->get('rootcat', 1);
+		}
 		else
+		{
 			$params->set('rootcat', $this->_rootcat);
-		
-		//set limits
+		}
+
+		// Get limits & set the pagination variables into state (We get them from http request OR use default search view parameters)
 		$limit 			= $params->def('catlimit', 5);
-		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
-		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
-		JFactory::getApplication()->input->set('limitstart', $limitstart);
+		$limitstart	= $app->input->getInt('limitstart', $app->input->getInt('start', 0));
+
+		// Make sure limitstart is set
+		$app->input->set('limitstart', $limitstart);
+		$app->input->set('start', $limitstart);
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);

@@ -51,34 +51,48 @@ class FCPagination extends JPagination
 
 		// Initialize variables
 		$app  = JFactory::getApplication();
-		$view = JRequest::getCMD('view');
+		$view = $app->input->getCmd('view', '');
 		$html = null;
 		$fromResult = $this->limitstart + 1;
 
 		// If the limit is reached before the end of the list
-		if ($this->limitstart + $this->limit < $this->total) {
-			$toResult = $this->limitstart + $this->limit;
-		} else {
-			$toResult = $this->total;
-		}
+		$toResult = $this->limitstart + $this->limit < $this->total
+			? $this->limitstart + $this->limit
+			: $this->total;
 
 		// If there are results found
 		$fc_view_total = 0; //(int) $app->getUserState('fc_view_total_'.$view);
 		if (!$fc_view_total) $fc_view_total = $this->total;
 		
 		$is_featured_only = $app->getUserState('use_limit_before_search_filt') == 2;
+
 		if ($fc_view_total > 0)
 		{
 			// Check for maximum allowed of results
-			$fc_view_limit_max = JRequest::getWord('view')!='search'  ?  0  :  (int) $app->getUserState('fc_view_limit_max_'.$view);
-			$items_total_msg = $fc_view_limit_max && ($this->total >= $fc_view_limit_max) ? 'FLEXI_ITEM_S_OR_MORE' : 'FLEXI_ITEM_S';
-			
-			$html =
-				 '<span class="flexi label item_total_label'.($is_featured_only ? ' label-success' : '').'">'.JText::_( $is_featured_only ? 'FLEXI_FEATURED' : 'FLEXI_TOTAL')."</span> "
-				.'<span class="flexi item_total_value">'.$fc_view_total." " .JText::_( $items_total_msg )."</span>"
-				.'<span class="flexi label item_total_label">'.JText::_( 'FLEXI_DISPLAYING')."</span> "
-				.'<span class="flexi item_total_value">'.$fromResult ." - " .$toResult ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
-				;
+			$fc_view_limit_max = $view !== 'search'
+				? 0
+				: (int) $app->getUserState('fc_view_limit_max_'.$view);
+
+			$items_total_msg = $fc_view_limit_max && ($this->total >= $fc_view_limit_max)
+				? 'FLEXI_ITEM_S_OR_MORE'
+				: 'FLEXI_ITEM_S';
+
+			$html = '
+				<span class="flexi label item_total_label' . ($is_featured_only ? ' label-success' : '') . '">
+					' . JText::_($is_featured_only ? 'FLEXI_FEATURED' : 'FLEXI_TOTAL') . '
+				</span>
+
+				<span class="flexi item_total_value">
+					' . $fc_view_total . ' ' . JText::_( $items_total_msg ) . '
+				</span>
+
+				<span class="flexi label item_total_label">
+					' . JText::_('FLEXI_DISPLAYING') . '
+				</span>
+
+				<span class="flexi item_total_value">
+					' . $fromResult . ' - ' . $toResult . ' ' . JText::_('FLEXI_ITEM_S') . '
+				</span>';
 		}
 		
 		else
@@ -99,7 +113,7 @@ class FCPagination extends JPagination
 	 */
 	protected function _buildDataObject()
 	{
-		if ( JFactory::getApplication()->isAdmin() )
+		if (JFactory::getApplication()->isAdmin())
 		{
 			return parent::_buildDataObject();
 		}
@@ -110,14 +124,34 @@ class FCPagination extends JPagination
 		$data = parent::_buildDataObject();
 
 		// Workaround for JRoute not allowing url-encoded ampersand %26 in values of variables
-		if (!empty($data->pages)) foreach($data->pages as $i => $page)
+		if (!empty($data->pages))
 		{
-			$page->link = str_replace('__amp__', '%26', $page->link);
+			foreach($data->pages as $i => $page)
+			{
+				$page->link = str_replace('__amp__', '%26', $page->link);
+			}
 		}
-		if (!empty($data->start->link)) $data->start->link = str_replace('__amp__', '%26', $data->start->link);
-		if (!empty($data->end->link))   $data->end->link   = str_replace('__amp__', '%26', $data->end->link);
-		if (!empty($data->next->link))     $data->next->link     = str_replace('__amp__', '%26', $data->next->link);
-		if (!empty($data->previous->link)) $data->previous->link = str_replace('__amp__', '%26', $data->previous->link);
+
+		if (!empty($data->start->link))
+		{
+			$data->start->link = str_replace('__amp__', '%26', $data->start->link);
+		}
+
+		if (!empty($data->end->link))
+		{
+			$data->end->link = str_replace('__amp__', '%26', $data->end->link);
+		}
+
+		if (!empty($data->next->link))
+		{
+			$data->next->link = str_replace('__amp__', '%26', $data->next->link);
+		}
+
+		if (!empty($data->previous->link))
+		{
+			$data->previous->link = str_replace('__amp__', '%26', $data->previous->link);
+		}
+
 		return $data;
 	}
 
