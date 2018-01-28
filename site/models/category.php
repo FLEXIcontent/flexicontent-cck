@@ -366,7 +366,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		$this->setState('limitstart', $limitstart);
 
-		// Make sure it is limitstart is set
+		// Make sure limitstart is set
 		$app->input->set('limitstart', $limitstart);
 		$app->input->set('start', $limitstart);
 
