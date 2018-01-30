@@ -891,7 +891,7 @@ class FlexicontentModelItems extends JModelLegacy
 	}
 	
 	
-	function updateItemCountingData($rows = false)
+	function updateItemCountingData($rows = false, $catid = 0)
 	{
 		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
@@ -920,7 +920,7 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		// Copy data into it
-		$query 	= ($row_ids ? 'REPLACE' : 'INSERT') . ' INTO ' . $cache_tbl . ' (';
+		$query 	= ($row_ids || $catid ? 'REPLACE' : 'INSERT') . ' INTO ' . $cache_tbl . ' (';
 		$query .= "`".implode("`, `", $tbl_fields)."`";
 		$query .= ") SELECT ";
 		
@@ -929,6 +929,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$query .= " FROM #__content AS c";
 		$query .= " JOIN #__flexicontent_items_ext AS ie ON c.id=ie.item_id";
 		$query .= $row_ids ? ' WHERE c.id IN (' . implode(',', $row_ids) . ')' : '';
+		$query .= $catid ? ' WHERE c.catid = ' . $catid : '';
 
 		$db->setQuery($query);
 		try { $result = $db->execute(); } catch (Exception $e) { $result = false; echo $e->getMessage(); }

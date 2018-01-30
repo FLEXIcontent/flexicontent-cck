@@ -1692,9 +1692,9 @@ class ParentClassItem extends FCModelAdmin
 			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
 			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
 			else $jm_state = $fc_state;                                      // trashed & archive states
-			
+
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!! ... or for items without type ?!
-			if( !$app->isAdmin() && $item->type_id ) 
+			if (!$app->isAdmin() && $item->type_id)
 			{
 				unset($data['type_id']);
 			}
@@ -1726,6 +1726,11 @@ class ParentClassItem extends FCModelAdmin
 			$this->setDefaults($item);
 		}
 
+		// Make sure type is set e.g. coming from Joomla article form
+		if (!$item->type_id && !empty($data['type_id']))
+		{
+			$item->type_id = (int) $data['type_id'];
+		}
 
 		// ***
 		// *** Create a copy of the old item, to be able to reference previous values
@@ -2141,29 +2146,37 @@ class ParentClassItem extends FCModelAdmin
 		// *** Trigger Event 'OnBeforeContentSave' (J1.5) or 'onContentBeforeSave' (J2.5) of Joomla's Content plugins
 		// ***
 
-		// Some compatibility steps
-		if (!$isNew)
+		if ($option === 'com_flexicontent')
 		{
-			$db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );
-			$db->execute();
+			// Some compatibility steps
+			if (!$isNew)
+			{
+				$db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );
+				$db->execute();
+			}
+			$jinput->set('view', 'article');
+			$jinput->set('option', 'com_content');
+
+			if ( $print_logging_info ) $start_microtime = microtime(true);
+			$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew, $data));
+			if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+			// Reverse compatibility steps
+			if (!$isNew)
+			{
+				$db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );
+				$db->execute();
+			}
+			$jinput->set('view', $view);
+			$jinput->set('option', $option);
+
+			// Cancel item save
+			if (in_array(false, $result, true))
+			{
+				$this->setError($item->getError());
+				return false;
+			}
 		}
-		$jinput->set('view', 'article');
-		$jinput->set('option', 'com_content');
-		
-		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew, $data));
-		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		// Reverse compatibility steps
-		if (!$isNew)
-		{
-			$db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );
-			$db->execute();
-		}
-		$jinput->set('view', $view);
-		$jinput->set('option', $option);
-		
-		if (in_array(false, $result, true))	{ $this->setError($item->getError()); return false; }    // cancel item save
 
 
 		// ***
@@ -2270,36 +2283,38 @@ class ParentClassItem extends FCModelAdmin
 			// ***
 			// *** Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
 			// ***
+			if ($option === 'com_flexicontent')
+			{
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 
-			if ( $print_logging_info ) $start_microtime = microtime(true);
+				// Some compatibility steps
+				$jinput->set('view', 'article');
+				$jinput->set('option', 'com_content');
 
-			// Some compatibility steps
-			$jinput->set('view', 'article');
-			$jinput->set('option', 'com_content');
+				$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isNew, $data));
 
-			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isNew, $data));
+				// Reverse compatibility steps
+				$jinput->set('view', $view);
+				$jinput->set('option', $option);
 
-			// Reverse compatibility steps
-			$jinput->set('view', $view);
-			$jinput->set('option', $option);
-	
-			// Initialize re-usable member properties, and re-usable local variables
-			$this->initBatch();
-			$asset = $this->typeAlias . '.' . $item->id;
+				// Initialize re-usable member properties, and re-usable local variables
+				$this->initBatch();
+				$asset = $this->typeAlias . '.' . $item->id;
 
-			// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
-			$this->createTagsHelper($this->tagsObserver, $this->type, $item->id, $this->typeAlias, $this->table);
+				// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
+				$this->createTagsHelper($this->tagsObserver, $this->type, $item->id, $this->typeAlias, $this->table);
 
-			// Load data of FLEXIcontent tags
-			$fctags = $this->getTagsByIds($data['tags']);
+				// Load data of FLEXIcontent tags
+				$fctags = $this->getTagsByIds($data['tags']);
 
-			// Sync the tags assignments
-			$this->syncJTagAssignments($fctags, array($item->id), array($item->id => $asset),  true);
+				// Sync the tags assignments
+				$this->syncJTagAssignments($fctags, array($item->id), array($item->id => $asset),  true);
 
-			// Update (if needed) mappings of FLEXIcontent tags to Joomla tags
-			$this->updateJTagMappings($fctags);
+				// Update (if needed) mappings of FLEXIcontent tags to Joomla tags
+				$this->updateJTagMappings($fctags);
 
-			if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			}
 		}
 
 

@@ -483,13 +483,15 @@ class plgSystemFlexisystem extends JPlugin
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
+		$task   = $app->input->get('task', '', 'cmd');
+
 
 		//***
 		//*** Let's Redirect/Reroute Joomla's article view & form to FLEXIcontent item view & form respectively !!
 		//*** NOTE: we do not redirect / reroute Joomla's category views (blog, list, featured etc), thus site administrator can still utilize them
 		//***
 
-		$check_redirect = $option === 'com_content' && (
+		$check_redirect = $option === 'com_content' && !$task && (
 			$view === 'article'  ||  // a. CASE :  com_content ARTICLE VIEW
 			$view === 'item'     ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
 			$view === 'form'         // c. CASE :  com_content ARTICLE FORM
@@ -990,8 +992,11 @@ class plgSystemFlexisystem extends JPlugin
 		$session = JFactory::getSession();
 		
 		// Count an item or category hit if appropriate
-		if ( $app->isSite() ) $this->countHit();
-		
+		if ($app->isSite())
+		{
+			$this->countHit();
+		}
+
 		// CSS CLASSES for body TAG
 		if ( $app->isSite() )
 		{
@@ -1045,7 +1050,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Add performance message at document's end
 		global $fc_performance_msg;
-		if ($fc_performance_msg) {
+		if ($fc_performance_msg)
+		{
 			$html = JResponse::getBody();
 			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
 			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
@@ -1979,6 +1985,7 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			$data = new stdClass();
 			$data->id = 0;
+			$data->catid = 0;
 		}
 
 		$this->_loadFcHelpersAndLanguage();
@@ -2348,6 +2355,7 @@ class plgSystemFlexisystem extends JPlugin
 		return true;
 	}
 
+
 	/**
 	 * Change the state in core_content if the state in a table is changed
 	 *
@@ -2425,20 +2433,51 @@ class plgSystemFlexisystem extends JPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
 		JLoader::register('FlexicontentModelItem', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		$app  = JFactory::getApplication();
 
 		// Needed for new items, since now an item has been created
 		$data['id'] = $isNew ? $item->id : $data['id'];
+
 		// Approve new version by default, Note: this is just the default value , ACL will decide real value
 		$data['vstate'] = 2;
-		// RAW (flexicontent) Custom fields data, validation will be done by each field
-		$data['custom'] = isset($_POST['custom']) ? $_POST['custom'] : array();
 
+		// RAW (flexicontent) Custom fields data, validation will be done by each field
+		$data['custom']= $app->input->post->get('custom', array(), 'array');
+
+
+		// ***
+		// *** Load item and its fields and its type parameters
+		// ***
+
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$default_type_id = $cparams->get('jarticle_form_typeid', 1);
+
+		// Get current type_id of the item
+		if (!$isNew)
+		{
+			$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$record->load($data['id']);
+			$data['type_id'] = $record->type_id;
+		}
+
+		// Get model and set default type if type not set already (new item or existing item with no type)
 		$model = new FlexicontentModelItem();
+		if (empty($data['type_id']))
+		{
+			$types = flexicontent_html::getTypesList($type_ids=false, $check_perms = true, $published=true);		
+			$default_type = isset($types[$default_type_id])
+				? $types[$default_type_id]
+				: reset($types);
+			$data['type_id'] = $default_type->id;
+			$model->setId($data['id'], $data['catid'], $data['type_id']);
+		}
+
 		$model->store($data);
 
 		// Revert changes to data
 		unset($data['vstate']);
 		unset($data['custom']);
+		unset($data['type_id']);
 		$data['id'] = $isNew ? 0 : $data['id'];  // restore ID to zero for new items
 
 
@@ -2448,7 +2487,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'items.php');
 		$items_model = new FlexicontentModelItems();
-		$items_model->updateItemCountingData(array($item));
+		$items_model->updateItemCountingData(false, $item->catid);
 
 
 		//***
