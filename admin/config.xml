@@ -1317,6 +1317,15 @@
 		<field name="" type="separator" default="FLEXI_JOOMLA_ARTICLE_FORM" icon_class="icon-joomla" level="tab_open" box_type="1" remove_boxes="2" />
 			<field name="jarticle_form_typeid" type="types" default="" label="FLEXI_JAF_DEFAULT_TYPE" description="FLEXI_JAF_DEFAULT_TYPE_DESC" /> 
 
+			<field name="" type="separator" default="FLEXI_FRONTEND" description="" level="level2" />
+			<field name="jarticle_allow_new_form" type="radio" default="1" label="FLEXI_JAF_NEW_ARTICLE_FORM" description="FLEXI_JAF_NEW_ARTICLE_FORM_DESC" class="btn-group group-fcmethod fcoffactive"> 
+				<option value="1">FLEXI_JAF_OPTION_ALLOW_LOADING</option>
+				<option value="0">FLEXI_JAF_OPTION_NEW_FORM_REDIRECT</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_JAF_ABOUT_EXISTING_ITEMS" label="" level="level3"  class="alert alert-info" />
+
+
 		<field name="" type="separator" default="FLEXI_ITEM_FORM" level="tabset_close" box_type="1" remove_boxes="2" />
 	</fieldset>
 
