@@ -5049,7 +5049,10 @@ class FlexicontentFields
 
 			if ($samelangonly)
 			{
-				$scopes_where[] = !$item->language || $item->language=='*' ? " ext.language='*' " : " (ext.language='{$item->language}' OR ext.language='*') ";
+				$language = !$item->language || $item->language === '*'
+					? JFactory::getLanguage()->getTag()
+					: $item->language;
+				$scopes_where[] = ' (ext.language = ' . $db->Quote($language) . ' OR ext.language = ' . $db->Quote('*') . ') ';
 			}
 
 			$use_publish_dates = !$reverse_field_id || $params->get('use_publish_dates_view', 1) != -1
