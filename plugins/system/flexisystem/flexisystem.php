@@ -511,6 +511,16 @@ class plgSystemFlexisystem extends JPlugin
 		$id = $app->input->get('id', 0, 'int');
 		$id = ($view=='form') ? $app->input->get('a_id', 0, 'int') : $id;
 
+
+		// Allow new article form if so configured
+		if (!$id && $view !== 'item')
+		{
+			if ($this->cparams->get('jarticle_allow_new_form', 1))
+			{
+				return;
+			}
+		}
+
 		// Get article category id, if it is not already in url
 		$catid = $app->input->get('catid', 0, 'int');
 		if (!$catid && $id)
