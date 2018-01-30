@@ -39,17 +39,20 @@ class _flexicontent_items_common extends flexicontent_basetable
 				->where('id = '.(int) $this->catid);
 
 			// Get the asset id from the database.
-			$this->_db->setQuery($query);
-			if ($result = $this->_db->loadResult())
+			$result = $this->_db->setQuery($query)->loadResult();
+			if ($result)
 			{
 				$assetId = (int) $result;
 			}
 		}
 		
 		// Return the asset id.
-		if ($assetId) {
+		if ($assetId)
+		{
 			return $assetId;
-		} else {
+		}
+		else
+		{
 			return parent::_getAssetParentId($table, $id);
 		}
 	}
@@ -59,17 +62,23 @@ class _flexicontent_items_common extends flexicontent_basetable
  *  how to fix STRICT warnings when a newer Joomla version adds TYPE to the parameter of a method
  *  thus makes possible for same code to run on both old and new Joomla version without warnings
  */
-if (FLEXI_J30GE) {
-	class _flexicontent_items extends _flexicontent_items_common {
-		protected function _getAssetParentId(JTable $table = null, $id = null) {
+if (FLEXI_J30GE)
+{
+	class _flexicontent_items extends _flexicontent_items_common
+	{
+		protected function _getAssetParentId(JTable $table = null, $id = null)
+		{
 			return parent::__getAssetParentId($table, $id);
 		}
 	}
 }
 
-else {
-	class _flexicontent_items extends _flexicontent_items_common {
-		protected function _getAssetParentId($table = null, $id = null) {
+else
+{
+	class _flexicontent_items extends _flexicontent_items_common
+	{
+		protected function _getAssetParentId($table = null, $id = null)
+		{
 			return parent::__getAssetParentId($table, $id);
 		}
 	}
@@ -392,9 +401,7 @@ class flexicontent_items extends _flexicontent_items
 			$query->where($this->_db->quoteName($field) . ' = ' . $this->_db->quote($value));
 		}
 
-		$this->_db->setQuery($query);
-
-		$row = $this->_db->loadAssoc();
+		$row = $this->_db->setQuery($query)->loadAssoc();
 
 		// Check that we have a result.
 		if (empty($row))
@@ -479,104 +486,117 @@ class flexicontent_items extends _flexicontent_items
 		$frn_key_ext   = $this->_frn_key_ext;
 		$frn_key_tmp   = $this->_frn_key_tmp;
 
-		// Split the object for the two tables #__content and #__flexicontent_items_ext
-		//$type     = new stdClass();
-		$type = JTable::getInstance('content');
-		$type->_tbl = $this->_tbl;
-		$type->_tbl_key = $this->_tbl_key;
-		//$type_ext = new stdClass();
-		$type_ext = JTable::getInstance('flexicontent_items_ext', '');
-		$type_ext->_tbl = $this->_tbl_join_ext;
-		$type_ext->_tbl_key = $this->_frn_key_ext;
-		//$type_tmp = new stdClass();
-		$type_tmp = JTable::getInstance('flexicontent_items_tmp', '');
-		$type_tmp->_tbl = $this->_tbl_join_tmp;
-		$type_tmp->_tbl_key = $this->_frn_key_tmp;
+		// Split the object for the two tables #__content and #__flexicontent_items_ext, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
+		$record = JTable::getInstance('content');
+		$record->_tbl = $this->_tbl;
+		$record->_tbl_key = $this->_tbl_key;
+
+		$record_ext = JTable::getInstance('flexicontent_items_ext', '');
+		$record_ext->_tbl = $this->_tbl_join_ext;
+		$record_ext->_tbl_key = $this->_frn_key_ext;
+
+		$record_tmp = JTable::getInstance('flexicontent_items_tmp', '');
+		$record_tmp->_tbl = $this->_tbl_join_tmp;
+		$record_tmp->_tbl_key = $this->_frn_key_tmp;
 		
-		foreach ($this->getProperties() as $p => $v) {
-		
+		foreach ($this->getProperties() as $p => $v)
+		{
 			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
 			if (isset($this->tbl_fields[$this->_tbl_join_tmp][$p]))
 			{
-				$type_tmp->$p = $v;
+				$record_tmp->$p = $v;
 			}
 			
 			// If the property is in the join properties array we add it to the items_ext object
 			if (isset($this->tbl_fields[$this->_tbl_join_ext][$p]))
 			{
-				$type_ext->$p = $v;
+				$record_ext->$p = $v;
 				
 				// Catch case of new J1.6+ article language column
 				if ($p == "language")
 				{
 					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('setting content language to' . $v,'message');
-					$type->$p = $v;
+					$record->$p = $v;
 				}
 			
 				// Catch case of master item for (translation groups) not being set
 				if ($p == "lang_parent_id" /*&& $v==0*/)
 				{
 					//$jAp= JFactory::getApplication();
-					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
-					$type_ext->$p = 0;//$type->id;
-					$type_tmp->$p = 0;//$type->id;
+					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $record->id,'message');
+					$record_ext->$p = 0;//$record->id;
+					$record_tmp->$p = 0;//$record->id;
 				}
 			}
 				
 			// Else we add it to the core item properties
 			else
 			{
-				$type->$p = $v;
+				$record->$p = $v;
 			}
 		}
 
 		if( $this->$k )
 		{
-			$ret = $this->_db->updateObject( $this->_tbl, $type, $this->_tbl_key, $updateNulls );
-			$type_ext->$frn_key_ext = $this->$k;
-			$type_tmp->$frn_key_tmp = $this->$k;
+			$ret = $this->_db->updateObject( $this->_tbl, $record, $this->_tbl_key, $updateNulls );
+			$record_ext->$frn_key_ext = $this->$k;
+			$record_tmp->$frn_key_tmp = $this->$k;
 		}
 		else
 		{
-			$ret = $this->_db->insertObject( $this->_tbl, $type, $this->_tbl_key );
-			// set the type_id
-			$this->id = $type->id;
-			$this->id = $this->id ? $this->id : $this->_db->insertid();
+			$ret = $this->_db->insertObject( $this->_tbl, $record, $this->_tbl_key );
+
+			// Get record ID, either this was given or we will get auto-increment ID of last INSERT operation
+			$this->id = $record->id ?: $this->_db->insertid();
 		}
 
-		if( !$ret )
+		if(!$ret)
 		{
 			$this->setError(get_class( $this ).'::store failed - '.$this->_db->getErrorMsg());
 			return false;
 		}
 		else
 		{
-			// check for foreign key
-			if (isset($type_ext->$frn_key_ext) && !empty($type_ext->$frn_key_ext)) {
-				// update #__flexicontent_items_ext table
-				$ret = $this->_db->updateObject( $this->_tbl_join_ext, $type_ext, $this->_frn_key_ext, $updateNulls );
-				
-				// update #__flexicontent_items_tmp table
-				$ret = $this->_db->updateObject( $this->_tbl_join_tmp, $type_tmp, $this->_frn_key_tmp, $updateNulls );
+			// Check for foreign key
+			$ext_exists = false;
+			if (!empty($record_ext->$frn_key_ext))
+			{
+				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_join_ext . ' WHERE ' . $frn_key_ext . '=' . (int) $record_ext->$frn_key_ext)->loadResult();
+			}
+
+			$tmp_exists = false;
+			if (!empty($record_tmp->$frn_key_tmp))
+			{
+				$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_join_tmp . ' WHERE ' . $frn_key_tmp . '=' . (int) $record_tmp->$frn_key_tmp)->loadResult();
 			}
 			
-			else {
-				/*if ($type_ext->lang_parent_id == 0) {
-					// case of new item we need to set lang_parent_id after initial content creation
-					$type_ext->lang_parent_id = $this->id;
-				}*/
-				$type_tmp->lang_parent_id = $type_ext->lang_parent_id;
-				
-				// insert into #__flexicontent_items_ext table
-				$type_ext->$frn_key_ext = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join_ext, $type_ext, $this->_frn_key_ext );
-				
-				// insert into #__flexicontent_items_ext table
-				$type_tmp->$frn_key_tmp = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join_tmp, $type_tmp, $this->_frn_key_tmp );
+			// Update #__flexicontent_items_ext table
+			if ($ext_exists)
+			{
+				$ret = $this->_db->updateObject( $this->_tbl_join_ext, $record_ext, $this->_frn_key_ext, $updateNulls );
 			}
-			
+
+			// Insert into #__flexicontent_items_ext table
+			else
+			{
+				$record_ext->$frn_key_ext = $this->id;
+				$ret = $this->_db->insertObject( $this->_tbl_join_ext, $record_ext, $this->_frn_key_ext );
+			}
+
+			// Update #__flexicontent_items_tmp table
+			if ($tmp_exists)
+			{
+				$ret = $this->_db->updateObject( $this->_tbl_join_tmp, $record_tmp, $this->_frn_key_tmp, $updateNulls );
+			}
+
+			// Insert into #__flexicontent_items_tmp table
+			else
+			{
+				$record_tmp->$frn_key_tmp = $this->id;
+				$ret = $this->_db->insertObject( $this->_tbl_join_tmp, $record_tmp, $this->_frn_key_tmp );
+			}
+
 			// Check for unique Alias
 			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$this->id;
 			$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
@@ -584,24 +604,28 @@ class flexicontent_items extends _flexicontent_items
 				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
 				.' WHERE i.alias='.$this->_db->Quote($this->alias)
 				.'  AND (i.catid='.(int)$this->id.' OR rel.catid IN ('.$sub_q.') )'
-				.'  AND e.language = '.$this->_db->Quote($type_ext->language)
+				.'  AND e.language = '.$this->_db->Quote($record_ext->language)
 				.'  AND i.id <> '.(int)$this->id
-				//.'  AND e.lang_parent_id <> '.(int)$type_ext->lang_parent_id
+				//.'  AND e.lang_parent_id <> '.(int) $record_ext->lang_parent_id
 				;
-			$this->_db->setQuery($query);
-			$duplicate_aliases = (boolean) $this->_db->loadResult();
-			if ($duplicate_aliases) {
-				$query 	= 'UPDATE #__content SET alias='.$this->_db->Quote($this->alias.'_'.$this->id).' WHERE id='.(int)$this->id;
-				$this->_db->setQuery($query);
-				$this->_db->execute();
+
+			$duplicate_aliases = (boolean) $this->_db->setQuery($query)->loadResult();
+
+			if ($duplicate_aliases)
+			{
+				$query 	= 'UPDATE #__content SET alias=' . $this->_db->Quote($this->alias . '_' . $this->id) . ' WHERE id=' . (int) $this->id;
+				$this->_db->setQuery($query)->execute();
 			}
 		}
+
 		// If the table is not set to track assets return true.
-		if (!$this->_trackAssets) {
+		if (!$this->_trackAssets)
+		{
 			return true;
 		}
 
-		if ($this->_locked) {
+		if ($this->_locked)
+		{
 			$this->_unlock();
 		}
 
@@ -617,13 +641,15 @@ class flexicontent_items extends _flexicontent_items
 		$asset->loadByName($name);
 
 		// Check for an error.
-		if ($error = $asset->getError()) {
+		if ($error = $asset->getError())
+		{
 			$this->setError($error);
 			return false;
 		}
 
 		// Specify how a new or moved node asset is inserted into the tree.
-		if (empty($this->asset_id) || $asset->parent_id != $parentId) {
+		if (empty($this->asset_id) || $asset->parent_id != $parentId)
+		{
 			$asset->setLocation($parentId, 'last-child');
 		}
 
@@ -632,29 +658,33 @@ class flexicontent_items extends _flexicontent_items
 		$asset->name		= $name;
 		$asset->title		= $title;
 		
-		//print_r ($this->_rules); exit();
-		if ($this->_rules instanceof JAccessRules) {
+		if ($this->_rules instanceof JAccessRules)
+		{
 			$asset->rules = (string) $this->_rules;
 		}
 
-		if (!$asset->check() || !$asset->store($updateNulls)) {
+		if (!$asset->check() || !$asset->store($updateNulls))
+		{
 			$this->setError($asset->getError());
 			return false;
 		}
 
-		if (empty($this->asset_id)) {
-			// Update the asset_id field in this table.
+		// Update the asset_id field in this table.
+		if (empty($this->asset_id))
+		{
 			$this->asset_id = (int) $asset->id;
 
 			$query = $this->_db->getQuery(true);
 			$query->update( $this->_db->quoteName( $this->_tbl ) );
 			$query->set('asset_id = '.(int) $this->asset_id);
-			$query->where( $this->_db->quoteName( $k ) .' = '.(int) $this->$k);
-			$this->_db->setQuery($query);
-			$this->_db->execute();
+			$query->where($this->_db->quoteName( $k ) .' = '.(int) $this->$k);
+
+			$this->_db->setQuery($query)->execute();
 		}
+
 		return true;
 	}
+
 
 	/**
 	 * Overloaded check function
@@ -667,13 +697,15 @@ class flexicontent_items extends _flexicontent_items
 	function check()
 	{
 		// check for empty title
-		if (trim( $this->title ) == '') {
+		if (trim( $this->title ) == '')
+		{
 			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
 			return false;
 		}
 		
 		// check for empty alias
-		if(empty($this->alias)) {
+		if(empty($this->alias))
+		{
 			$this->alias = $this->title;
 		}
 		
@@ -719,19 +751,22 @@ class flexicontent_items extends _flexicontent_items
 		}
 		
 		// make fulltext empty if it only contains empty spaces
-		if (trim( str_replace( '&nbsp;', '', $this->fulltext ) ) == '') {
+		if (trim( str_replace( '&nbsp;', '', $this->fulltext ) ) == '')
+		{
 			$this->fulltext = '';
 		}
 		
-		// clean up keywords -- eliminate extra spaces between phrases
-		// and cr (\r) and lf (\n) characters from string
-		if(!empty($this->metakey)) { // only process if not empty
+		// clean up keywords -- eliminate extra spaces between phrases and cr (\r) and lf (\n) characters from string
+		if (!empty($this->metakey))
+		{
 			$bad_characters = array("\n", "\r", "\"", "<", ">"); // array of characters to remove
 			$after_clean = StringHelper::str_ireplace($bad_characters, "", $this->metakey); // remove bad characters
 			$keys = explode(',', $after_clean); // create array using commas as delimiter
 			$clean_keys = array(); 
-			foreach($keys as $key) {
-				if(trim($key)) {  // ignore blank keywords
+			foreach($keys as $key)
+			{
+				if (trim($key))
+				{
 					$clean_keys[] = trim($key);
 				}
 			}
@@ -739,7 +774,8 @@ class flexicontent_items extends _flexicontent_items
 		}
 		
 		// clean up description -- eliminate quotes and <> brackets
-		if(!empty($this->metadesc)) { // only process if not empty
+		if (!empty($this->metadesc))
+		{
 			$bad_characters = array("\"", "<", ">");
 			$this->metadesc = StringHelper::str_ireplace($bad_characters, "", $this->metadesc);
 		}
