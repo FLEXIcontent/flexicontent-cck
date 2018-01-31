@@ -777,27 +777,30 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$link = $link && $double_slash_without_proto && strpos($link, '//') !== 0
 				? '//' . $link
 				: $link;
+			
+			// Absolute path without protocol, port, domain (subfolder only) and with them
+			$Abs_Path = JUri::root(true) . '/';
+			$Abs_Path_Full = JUri::root();
 
 			// Remove joomla uri root to make it relative if relative allowed but an absolute URL was given
-			//echo $link . '<br/>';
 			if ( !$force_absolute )
 			{
-				if (strpos($link, JUri::root(true) . '/') === 0)
+				if (strpos($link, $Abs_Path) === 0)
 				{
-					$link = str_replace(JUri::root(true) . '/', '', $link);
+					$link = substr($link, strlen($Abs_Path));
 				}
-				if (strpos($link, JUri::root()) === 0)
+				if (strpos($link, $Abs_Path_Full) === 0)
 				{
-					$link = str_replace(JUri::root(), '', $link);
+					$link = substr($link, strlen($Abs_Path_Full));
 				}
 			}
 
 			// Force full joomla uri root to make it absolute
 			else
 			{
-				if (strpos($link, JUri::root(true) . '/') === 0)
+				if (strpos($link, $Abs_Path) === 0)
 				{
-					$link = str_replace(JUri::root(true) . '/', JUri::root(), $link);
+					$link = $Abs_Path_Full . substr($link, strlen($Abs_Path));
 				}
 			}
 
