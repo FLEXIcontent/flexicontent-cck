@@ -3028,10 +3028,25 @@ class FlexicontentFields
 
 		if (isset($filter->filter_valueformat))
 		{
+			$date_suffix = '';
+
+			if ($isDate)
+			{
+				switch($filter->parameters->get('date_filter_group', 'month'))
+				{
+					case 'year':
+						$date_suffix = '-1-1';
+						break;
+					case 'month':
+						$date_suffix = '-1';
+						break;
+				}
+			}
+
 			foreach($value as $i => $val)
 			{
 				$typecasted_val = !$filter_compare_type
-					? $db->Quote($value[$i])
+					? $db->Quote($value[$i] . $date_suffix)
 					: ($filter_compare_type==1 ? intval($value[$i]) : floatval($value[$i]));
 
 				$value[$i] = str_replace('__filtervalue__', $typecasted_val, $filter->filter_valueformat);
