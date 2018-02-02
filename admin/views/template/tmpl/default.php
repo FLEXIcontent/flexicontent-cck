@@ -160,17 +160,18 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		}
 	}
 	
-	function set_editor_contents(txtarea, theData)
+	function set_editor_contents(txtarea, theData, extension)
 	{
 		var CM = txtarea.next();//.get(0).CodeMirror;
-		if (CM.hasClass('CodeMirror')) {
+		if (CM.hasClass('CodeMirror'))
+		{
 			CM.get(0).CodeMirror.toTextArea();
 			txtarea.val(theData.content);
 			txtarea.attr('form', 'layout_file_editor_form');
 			txtarea.show();
 			CM = CodeMirror.fromTextArea(txtarea.get(0),
 			{
-				mode: "application/x-httpd-php",
+				mode: extension,
 				indentUnit: 2,
 				lineNumbers: true,
 				matchBrackets: true,
@@ -181,10 +182,17 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					hlLine = CM.setLineClass(CM.getCursor().line, "activeline");
 				}	
 			});
-		} else {
+		}
+		else
+		{
 			txtarea.val(theData.content);
 			txtarea.show();
 		}
+
+		CM.getWrapperElement().style['font-size'] = 14 + 'px';
+		CM.getWrapperElement().style['font-weight'] = 'bold';
+		CM.getWrapperElement().style['font-family'] = 'Courier New';
+		CM.refresh();
 	}
 	
 	function save_layout_file(formid)
@@ -222,7 +230,9 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				var theData = jQuery.parseJSON(data);
 				jQuery('#ajax-system-message-container').html(theData.sysmssg);
 				if (!theData.content) return;  // Saving task may return modified data, if so set them into the editor
-				set_editor_contents(txtarea, theData);
+
+				var extension = jQuery('#editor__file_subpath').val().split('.').pop().toLowerCase();
+				set_editor_contents(txtarea, theData, extension);
 			}
 		});
 	}
@@ -270,13 +280,15 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);
 				jQuery('#ajax-system-message-container').html(theData.sysmssg);
-				
-				file_subpath.split('.').pop().toLowerCase() == 'css' ?
+
+				var extension = file_subpath.split('.').pop().toLowerCase();
+				extension == 'css' ?
 					jQuery('#edit-css-files-warning').show() :
 					jQuery('#edit-css-files-warning').hide() ;
-									
+
 				// Loading task always return data, even empty data, set them into the editor
-				set_editor_contents(txtarea, theData);
+				set_editor_contents(txtarea, theData, extension);
+
 				// Display the buttons
 				jQuery('#editor__save_file_btn').css('display', '');
 				jQuery('#editor__download_file_btn').css('display', '');
