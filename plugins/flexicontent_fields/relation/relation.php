@@ -641,7 +641,7 @@ jQuery(document).ready(function()
 			? - $ri_field_id
 			: 0;
 
-		if ($ri_field_id)
+		if (!$ri_field_id)
 		{
 			$filter->filter_colname     = ' rel.value_integer';
 			$filter->filter_valuesjoin  = null;   // use default
@@ -653,7 +653,7 @@ jQuery(document).ready(function()
 			$value = $ri_value;
 
 			$filter->filter_colname     = ' rival.value';
-			$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $reverse_field_id
+			$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $filter->id
 				. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id;
 			$filter->filter_valueformat = null;   // use default
 			$filter->filter_valuewhere = null;   // use default
