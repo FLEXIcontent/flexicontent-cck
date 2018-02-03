@@ -1009,69 +1009,89 @@ class flexicontent_html
 		static $jquery_added = false;
 		static $jquery_ui_added = false;
 		static $jquery_ui_css_added = false;
+
 		$document = JFactory::getDocument();
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		$lib_path = '/components/com_flexicontent/librairies';
+		$add_remote_forced = $add_remote === 2;
+
+		if (!$params)
+		{
+			$params = new JRegistry;
+		}
 
 		// Set jQuery to load in views that use it
-		$JQUERY_VER    = !$params ? '1.8.3' : $params->get('jquery_ver', '1.8.3');
-		$JQUERY_UI_VER = !$params ? '1.9.2' : $params->get('jquery_ui_ver', '1.9.2');
-		$JQUERY_UI_THEME = !$params ? 'ui-lightness' : $params->get('jquery_ui_theme', 'ui-lightness');   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
-		$add_remote = (FLEXI_J30GE && $add_remote==2) || (!FLEXI_J30GE && $add_remote);
+		$JQUERY_VER = $params->get('jquery_ver', $flexiparams->get('jquery_ver', '1.8.3'));
+		$JQUERY_UI_VER = $params->get('jquery_ui_ver', $flexiparams->get('jquery_ui_ver', '1.9.2'));
+		$JQUERY_UI_THEME = $params->get('jquery_ui_theme', $flexiparams->get('jquery_ui_theme', 'ui-lightness'));   // FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
 		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
 
-
-		// **************
-		// jQuery library
-		// **************
+		/*
+		 * jQuery library
+		 */
 
 		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
-			if ( $add_remote ) {
+			if ($add_remote_forced)
+			{
 				JHtml::_('jquery.framework');   // add and "override" it
 				$document->addScript('//ajax.googleapis.com/ajax/libs/jquery/'.$JQUERY_VER.'/jquery.min.js');
-			} else {
-				FLEXI_J30GE ?
-					JHtml::_('jquery.framework') :
-					$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
 			}
+			else
+			{
+				FLEXI_J30GE
+					? JHtml::_('jquery.framework')
+					: $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
+			}
+
 			// The 'noConflict()' statement must be inside a js file, to make sure it executed immediately
-			if (!FLEXI_J30GE) $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-no-conflict.js');
+			if (!FLEXI_J30GE)
+			{
+				$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-no-conflict.js');
+			}
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');  // not placed in proper place
 			$jquery_added = 1;
 		}
 
+		/*
+		 * jQuery-UI library (and its CSS)
+		 */
 
-		// *******************************
-		// jQuery-UI library (and its CSS)
-		// *******************************
-
-		if ( $add_jquery_ui && !$jquery_ui_added ) {
+		if ($add_jquery_ui && !$jquery_ui_added)
+		{
 			// Load all components of jQuery-UI
-			if ($add_remote) {
+			if ($add_remote_forced)
+			{
 				JHtml::_('jquery.ui', array());   // add and "override" it
 				$document->addScript('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
-			} else {
-				if (FLEXI_J30GE) {
+			}
+			else
+			{
+				if (FLEXI_J30GE)
+				{
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
 					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
 					if ( !$params || $params->get('load-ui-menu', 1) )          $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
 					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 					if ( !$params || $params->get('load-ui-progressbar', 1) )   $document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.progressbar.min.js');
-				} else {
+				}
+				else
+				{
 					$document->addScript(JUri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
 				}
 			}
+
 			$jquery_ui_added = 1;
 		}
 
 		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
-		if ( $add_jquery_ui_css && !$jquery_ui_css_added ) {
+		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
+		{
 			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
-			if ($add_remote) {
-				$document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
-			} else {
-				$document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
-			}
+			$add_remote_forced
+				? $document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
+				: $document->addStyleSheet(JUri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+
 			$jquery_ui_css_added = 1;
 		}
 	}

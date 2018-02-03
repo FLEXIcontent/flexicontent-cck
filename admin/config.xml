@@ -1728,6 +1728,12 @@
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
+			<field name="jquery_ui_theme" type="fcradio" default="" label="jQuery UI Theme" description="..." class="btn-group group-fcinfo"> 
+				<option value="">Default</option>
+				<option value="ui-lightness">ui-lightness</option>
+				<option value="smoothness">smoothness</option>
+			</field>
+
 			<field name="loadfw_image_picker" type="fcradio" default="1" label="image-picker" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
