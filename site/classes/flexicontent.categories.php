@@ -305,7 +305,7 @@ class flexicontent_cats
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
 		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
-		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = false
+		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = true
 	) {
 
 		// ***
