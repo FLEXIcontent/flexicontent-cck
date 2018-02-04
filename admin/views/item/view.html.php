@@ -1013,7 +1013,7 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			
 			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, true,	$actions_allowed,
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, ($item->id ? 'edit' : 'create'),	$actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
 		}
@@ -1063,7 +1063,7 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			
 			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs, true, true, $actions_allowed,
+				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $form_cid_nomain, false, $attribs, true, ($item->id ? 'edit' : 'create'), $actions_allowed,
 					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
 		}
@@ -1111,7 +1111,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
 			$attribs .= $disabled;
 			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed,
+				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, ($item->id ? 'edit' : 'create'), $actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
 					$empty_errmsg=JText::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED')
 				);

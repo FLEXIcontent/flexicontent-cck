@@ -305,7 +305,7 @@ class flexicontent_cats
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
 		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
-		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = true
+		$disable_specific_cats = array(), $empty_errmsg = false, $show_viewable = false
 	) {
 
 		// ***
@@ -342,10 +342,20 @@ class flexicontent_cats
 		{
 			// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
 			$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
+
 			// NOTE: already selected categories will be allowed to the user, add them to the category list
 			$selectedcats = !is_array($selected) ? array($selected) : $selected;
 			$usercats_indexed = array_flip($usercats);
-			foreach ($selectedcats as $selectedcat) if ($selectedcat) $usercats_indexed[$selectedcat] = 1;
+			if ($check_perms === 'edit')
+			{
+				foreach ($selectedcats as $selectedcat)
+				{
+					if ($selectedcat)
+					{
+						$usercats_indexed[$selectedcat] = 1;
+					}
+				}
+			}
 		}
 
 
@@ -430,18 +440,17 @@ class flexicontent_cats
 		}
 		
 		
-		// ********************************************************************************************************
-		// Loop through categories to create the select option using user allowed categories (if filtering enabled)
-		// ********************************************************************************************************
+		/*
+		 * Loop through categories to create the select option using user allowed categories (if filtering enabled)
+		 */
+		
+		$cats_allowed = array();
+		$cats_incestors_ancestors = array();
 
 		foreach ($list as $cat)
 		{
-			$cat->treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
-			$cat_title = $cat->treename;
-			if (!$check_published && $cat->published!=1) $cat_title .= ' -U-';
-			
 			if ( !$check_published || $cat->published )
-			{	
+			{
 				// Check for SKIPPED categories e.g. featured categories subtree in item form
 				if ( isset($skip_cats_arr[$cat->id]) )
 				{
@@ -456,12 +465,13 @@ class flexicontent_cats
 					isset( $usercats_indexed[$cat->id] );
 
 				// If not allowed then check to DISABLE OR SKIP if user not having the view access level of the category
+				$skipped = false;
 				if ( !$allowed && !$viewallcats )
 				{
 					// Skip if category not viewable -OR- not showing viewable categories either
 					if ( !isset($user_levels[$cat->access]) || !$show_viewable )
 					{
-						continue;
+						$skipped = true;
 					}
 				}
 
@@ -471,6 +481,34 @@ class flexicontent_cats
 					// NOTE: we did NOT add this CHECK to the ALLOWED check above !! If had added above then VIEW LEVEL checking may have skipped this category !!
 					$allowed = false; 
 				}
+
+				$cats_allowed[$cat->id] = $allowed;
+				if (!$skipped)
+				{
+					$arr = $globalcats[$cat->id]->ancestorsarray;
+
+					if ($arr) foreach($arr as $parent)
+					{
+						$cats_incestors_ancestors[$parent] = 1;
+					}
+					$cats_incestors_ancestors[$cat->id] = 1;
+				}
+			}
+
+			else
+			{
+				$cats_allowed[$cat->id] = false;
+			}
+		}
+
+		foreach ($list as $cat)
+		{
+			if (isset($cats_incestors_ancestors[$cat->id]))
+			{
+				$cat_treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
+				$cat_title = $cat_treename . (!$check_published && $cat->published!=1 ? ' -U-' : '');
+
+				$allowed = $cats_allowed[$cat->id];
 
 				// Finally if category was not skipped ADD it as enabled or as disabled
 				$parent_title = false;
@@ -488,14 +526,15 @@ class flexicontent_cats
 					'attr'  => ($parent_title ? array('data-title' => $parent_title) : null),
 					'disable' => !$allowed
 				);
+
 				$cats_count++;
 			}
 		}
-		
-		
-		// ************************************
-		// Finally create the HTML form element
-		// ************************************
+
+
+		/*
+		 * Finally create the HTML form element
+		 */
 
 		$idtag = preg_replace('/(\]|\[)+/', '_', $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
