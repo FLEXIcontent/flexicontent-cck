@@ -369,12 +369,18 @@ class FlexicontentViewCategory extends JViewLegacy
 		$Lists = array();
 
 		// Build category selectors
-		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
+		$check_published = false;
+		$check_perms = ($row->id ? 'edit' : 'create');
+		$actions_allowed=array('core.create');
+
 		$fieldname = 'jform[parent_id]';
 		$Lists['parent_id'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
 		
-		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
+		$check_published = false;
+		$check_perms = true;
+		$actions_allowed=array('core.edit', 'core.edit.own');
+
 		$fieldname = 'jform[copycid]';
 		$Lists['copycid']    = flexicontent_cats::buildcatselect($globalcats, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false)
 			. '<span class="fc-mssg-inline fc-info fc-small">' . JText::_('FLEXI_PLEASE_USE_SAVE_OR_APPLY_N_RELOAD_BUTTONS') . '</span>';
@@ -383,7 +389,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$custom_options['0'] = 'FLEXI_COMPONENT_ONLY';
 		$custom_options['-1'] = 'FLEXI_PARENT_CAT_MULTI_LEVEL';
 		
-		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
+		$check_published = false;
+		$check_perms = true;
+		$actions_allowed=array('core.edit', 'core.edit.own');
+
 		$fieldname = 'jform[special][inheritcid]';
 		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($globalcats, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
