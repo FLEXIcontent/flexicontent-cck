@@ -214,9 +214,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$maincat  = $categories[$item->catid]->title;
 
 		// Create the non-SEF URL
+		$site_languages = FLEXIUtilities::getLanguages();
+		$sef_lang = $item->language != '*' && isset($site_languages->{$item->language}) ? $site_languages->{$item->language}->sef : '';
 		$item_url =
 			FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)
-			. ($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
+			. ($sef_lang ? '&lang=' . $sef_lang : '');
 
 		// Create the SEF URL
 		$item_url = $app->isAdmin()

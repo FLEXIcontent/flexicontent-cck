@@ -117,7 +117,7 @@ class FLEXIUtilities
 		// Retrieve languages
 		// ******************
 		
-		$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, '
+		$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef, '
 			//. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
 			. ' lc.title as name '
 			.' FROM #__languages as lc '

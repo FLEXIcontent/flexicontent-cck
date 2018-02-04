@@ -374,6 +374,12 @@ class modFlexicontentHelper
 				JHtml::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 		}
 		
+		// Needed if forcing language
+		if ($method_curlang == 1)
+		{
+			$site_languages = FLEXIUtilities::getLanguages();
+		}
+
 		$id = $jinput->get('id', 0, 'int');   // id of current item
 		
 		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
@@ -538,7 +544,13 @@ class modFlexicontentHelper
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
-					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
+
+					$sef_lang = $method_curlang == 1 && $row->language != '*' && isset($site_languages->{$row->language}) ? $site_languages->{$row->language}->sef : '';
+					$non_sef_link =
+						FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row)
+						. ($sef_lang ? '&lang=' . $sef_lang : '');
+
+					$lists[$ord]['featured'][$i]->link	= JRoute::_($non_sef_link);
 					$lists[$ord]['featured'][$i]->title	= StringHelper::strlen($row->title) > $cuttitle_feat  ?  StringHelper::substr($row->title, 0, $cuttitle_feat) . '...'  :  $row->title;
 					$lists[$ord]['featured'][$i]->alias	= $row->alias;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
@@ -694,7 +706,13 @@ class modFlexicontentHelper
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
-					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
+
+					$sef_lang = $method_curlang == 1 && $row->language != '*' && isset($site_languages->{$row->language}) ? $site_languages->{$row->language}->sef : '';
+					$non_sef_link =
+						FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row)
+						. ($sef_lang ? '&lang=' . $sef_lang : '');
+
+					$lists[$ord]['standard'][$i]->link	= JRoute::_($non_sef_link);
 					$lists[$ord]['standard'][$i]->title	= StringHelper::strlen($row->title) > $cuttitle  ?  StringHelper::substr($row->title, 0, $cuttitle) . '...'  :  $row->title;
 					$lists[$ord]['standard'][$i]->alias	= $row->alias;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
@@ -1038,7 +1056,7 @@ class modFlexicontentHelper
 		if ($method_curlang == 1) { // exclude method  ---  exclude items of current language
 			$where .= ' AND ie.language NOT LIKE ' . $db->Quote( $lang .'%' );
 		} else if ($method_curlang == 2) { // include method  ---  include items of current language ONLY
-			$where .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+			$where .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR ie.language="*" ' . ' ) ';
 		} else {
 		  // Items of any language
 		}
