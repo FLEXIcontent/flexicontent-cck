@@ -417,12 +417,14 @@ function delAllFilters() {
 			<td class="col_state" style="padding-right: 8px;">
 				<div class="btn-group fc-group fc-cats">
 					<?php
+					$site_languages = FLEXIUtilities::getLanguages();
+					$sef_lang = $row->language != '*' && isset($site_languages->{$row->language}) ? $site_languages->{$row->language}->sef : '';
 					$record_url =
 						// Route the record URL to an appropriate menu item
 						FlexicontentHelperRoute::getCategoryRoute($globalcats[$row->id]->slug, 0, array(), $row)
 
 						// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
-						. ( $row->language != '*' ? '&lang=' . substr($row->language, 0, 2) : '' );
+						. ($sef_lang ? '&lang=' . $sef_lang : '');
 
 					// Build a frontend SEF url
 					$record_url = flexicontent_html::getSefUrl($record_url);

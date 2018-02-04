@@ -367,12 +367,14 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $cid )
 		{
 			// Create the non-SEF URL
+			$site_languages = FLEXIUtilities::getLanguages();
+			$sef_lang = $item->language != '*' && isset($site_languages->{$item->language}) ? $site_languages->{$item->language}->sef : '';
 			$item_url =
 				// Route the record URL to an appropriate menu item
 				FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug, 0, $item)
 
 				// Force language to be switched to the language of the record, thus showing the record (and not its associated translation of current FE language)
-				. ( $item->language != '*' ? '&lang='.substr($item->language, 0, 2) : '' );
+				. ($sef_lang ? '&lang=' . $sef_lang : '');
 
 			// Build a frontend SEF url
 			$item_url = flexicontent_html::getSefUrl($item_url);

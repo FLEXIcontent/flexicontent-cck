@@ -4485,9 +4485,11 @@ class ParentClassItem extends FCModelAdmin
 		$subject .= ' '. JText::_( $notify_text );
 		
 		// Create the non-SEF URL
+		$site_languages = FLEXIUtilities::getLanguages();
+		$sef_lang = $this->_record->language != '*' && isset($site_languages->{$this->_record->language}) ? $site_languages->{$this->_record->language}->sef : '';
 		$item_url =
 			FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)
-			. ( $this->_record->language != '*' ? '&lang=' . substr($this->_record->language, 0, 2) : '' );
+			. ($sef_lang ? '&lang=' . $sef_lang : '');
 
 		// Create the SEF URL
 		$item_url = $app->isAdmin()
