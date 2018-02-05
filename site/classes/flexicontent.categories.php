@@ -485,11 +485,12 @@ class flexicontent_cats
 				$cats_allowed[$cat->id] = $allowed;
 				if (!$skipped)
 				{
-					$arr = $globalcats[$cat->id]->ancestorsarray;
-
-					if ($arr) foreach($arr as $parent)
+					if (!empty($globalcats[$cat->id]->ancestorsarray))
 					{
-						$cats_incestors_ancestors[$parent] = 1;
+						foreach($globalcats[$cat->id]->ancestorsarray as $parent)
+						{
+							$cats_incestors_ancestors[$parent] = 1;
+						}
 					}
 					$cats_incestors_ancestors[$cat->id] = 1;
 				}
