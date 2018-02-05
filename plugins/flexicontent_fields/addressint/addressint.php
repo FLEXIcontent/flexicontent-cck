@@ -645,8 +645,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			
 			// Skip value if both address and formated address are empty
 			if (
-				empty($v['addr_display']) && empty($v['addr_formatted']) && empty($v['addr1']) &&
-				empty($v['city']) && empty($v['state']) && empty($v['province']) &&
+				empty($v['addr_display']) && empty($v['addr_formatted']) &&
+				empty($v['addr1']) && empty($v['city']) && empty($v['state']) &&
+				empty($v['province']) && empty($v['zip']) &&
 				(empty($v['lat']) || empty($v['lon'])) && empty($v['url'])
 			) continue;
 			

@@ -69,25 +69,17 @@ foreach ($values as $value)
 			<td><textarea class="fcfield_textval addrint_addr_display ' . (in_array('address', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24">'
 			.($value['addr_display'] ? $value['addr_display'] :
 				(
-					($value['name'] ? $value['name']."\n" : '')
-					.(
-					!empty($value['addr1'])    || !empty($value['city']) ||
-					!empty($value['province']) || !empty($value['state']) ||
-					!empty($value['zip'])
+					( // Minimum fields present for creating an address
+					!empty($value['addr1'])    || !empty($value['city']) || !empty($value['state']) ||
+					!empty($value['province']) || !empty($value['zip'])
 					) ?
-					 ($value['addr1'] ? $value['addr1'] . "\n" : '')
+					 ($value['name'] ? $value['name']."\n" : '')
+					.($value['addr1'] ? $value['addr1'] . "\n" : '')
 					.($value['addr2'] ? $value['addr2'] . "\n" : '')
 					.($value['addr3'] ? $value['addr3'] . "\n" : '')
-					.($value['city'] || $value['state'] ? ' '
-						.($value['city']  ? $value['city']  : '')
-						.($value['state'] ? $value['state'] : '')
-					 : ''
-					)
+					.($value['city'] || $value['state'] ? ($value['city']  ? ' ' . $value['city']  : '') . ($value['state'] ? ' ' . $value['state'] : '') : '')
 					.($value['province'] ? ' '  . $value['province'] : '')
-					.($value['zip']      ? ', ' . $value['zip']
-						 .($value['zip_suffix'] ? ' '.$value['zip_suffix'] : '') . "\n"
-					 : ''
-					)
+					.($value['zip']      ? ', ' . $value['zip'] . ($value['zip_suffix'] ? ' '.$value['zip_suffix'] : '') . "\n" : '')
 					.($value['country']  ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) . "\n" : '')
 				: ''
 				)
