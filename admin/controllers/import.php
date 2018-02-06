@@ -47,10 +47,12 @@ class FlexicontentControllerImport extends FlexicontentController
 		$this->registerTask('testcsv',   'importcsv');
 	}
 
+
 	function processcsv()
 	{
 		parent::display();
 	}
+
 
 	/**
 	 * Logic to import csv files with content item data
@@ -125,7 +127,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				$app->enqueueMessage('Import task cleared', 'notice');
 				$this->setRedirect($link);
 
-return;
+				return;
 			break;
 
 			// ***
@@ -274,82 +276,86 @@ return;
 					},
 					$conf['mval_separator']
 				);
-					$conf['mprop_separator']  = preg_replace_callback(
-						$pattern,
-						function ($matches) {
-							$r = $matches[1];
-							eval("\$r = \"$r\";");
 
-							return $r;
-						},
-						$conf['mprop_separator']
-					);
-					$conf['field_separator']  = preg_replace_callback(
-						$pattern,
-						function ($matches) {
-							$r = $matches[1];
-							eval("\$r = \"$r\";");
+				$conf['mprop_separator']  = preg_replace_callback(
+					$pattern,
+					function ($matches) {
+						$r = $matches[1];
+						eval("\$r = \"$r\";");
 
-							return $r;
-						},
-						$conf['field_separator']
-					);
-					$conf['enclosure_char']   = preg_replace_callback(
-						$pattern,
-						function ($matches) {
-							$r = $matches[1];
-							eval("\$r = \"$r\";");
+						return $r;
+					},
+					$conf['mprop_separator']
+				);
 
-							return $r;
-						},
-						$conf['enclosure_char']
-					);
-					$conf['record_separator'] = preg_replace_callback(
-						$pattern,
-						function ($matches) {
-							$r = $matches[1];
-							eval("\$r = \"$r\";");
+				$conf['field_separator']  = preg_replace_callback(
+					$pattern,
+					function ($matches) {
+						$r = $matches[1];
+						eval("\$r = \"$r\";");
 
-							return $r;
-						},
-						$conf['record_separator']
-					);
+						return $r;
+					},
+					$conf['field_separator']
+				);
 
-					// ***
-					// *** Read & Parse the CSV file according the given format
-					// ***
+				$conf['enclosure_char']   = preg_replace_callback(
+					$pattern,
+					function ($matches) {
+						$r = $matches[1];
+						eval("\$r = \"$r\";");
 
-					$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $conf['field_separator'], $conf['enclosure_char'], $conf['record_separator']);
+						return $r;
+					},
+					$conf['enclosure_char']
+				);
 
-					// Basic error checking, for empty data
+				$conf['record_separator'] = preg_replace_callback(
+					$pattern,
+					function ($matches) {
+						$r = $matches[1];
+						eval("\$r = \"$r\";");
+
+						return $r;
+					},
+					$conf['record_separator']
+				);
+
+				// ***
+				// *** Read & Parse the CSV file according the given format
+				// ***
+
+				$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $conf['field_separator'], $conf['enclosure_char'], $conf['record_separator']);
+
+				// Basic error checking, for empty data
 				if (!$contents || count($contents[0]) <= 0)
 				{
 					$app->enqueueMessage('CSV file format is not correct!', 'error');
 					$app->redirect($link);
 				}
 
-					// ***
-					// *** Get field names (from the header line (row 0), and remove it form the data array
-					// ***
+				// ***
+				// *** Get field names (from the header line (row 0), and remove it form the data array
+				// ***
 
-					$conf['columns'] = flexicontent_html::arrayTrim($contents[0]);
-					unset($contents[0]);
-					$q = 'SELECT id, name, field_type, label FROM #__flexicontent_fields AS fi'
+				$conf['columns'] = flexicontent_html::arrayTrim($contents[0]);
+				unset($contents[0]);
+				$q = 'SELECT id, name, field_type, label FROM #__flexicontent_fields AS fi'
 					. ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id=' . $conf['type_id'];
-					$db->setQuery($q);
-					$conf['thefields'] = $db->loadObjectList('name');
-					unset($conf['thefields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
+				$db->setQuery($q);
+				$conf['thefields'] = $db->loadObjectList('name');
+				unset($conf['thefields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
 
-					// ***
-					// *** Check for REQUIRED columns and decide CORE property columns to use
-					// ***
+				// ***
+				// *** Check for REQUIRED columns and decide CORE property columns to use
+				// ***
 
-					$core_props = array();
+				$core_props = array();
 
 				if ($conf['id_col'] && !in_array('id', $conf['columns']))
 				{
-						$app->enqueueMessage('CSV file lacks column <b>\'id\'</b> (Item ID)', 'error');
-						$app->redirect($link);
+					$app->enqueueMessage('CSV file lacks column <b>\'id\'</b> (Item ID)', 'error');
+					$app->redirect($link);
 				}
 				elseif ($conf['id_col'])
 				{
@@ -362,9 +368,9 @@ return;
 					$app->redirect($link);
 				}
 
-					$core_props['title'] = 'Title (core)';
-					$core_props['text']  = 'Description (core)';
-					$core_props['alias'] = 'Alias (core)';
+				$core_props['title'] = 'Title (core)';
+				$core_props['text']  = 'Description (core)';
+				$core_props['alias'] = 'Alias (core)';
 
 				if ($conf['language'] == '-99' && !in_array('language', $conf['columns']))
 				{
@@ -518,18 +524,18 @@ return;
 					$tags_model	= $this->getModel('tags');
 				}
 
-					$conf['core_props'] = & $core_props;
+				$conf['core_props'] = & $core_props;
 
-					// ***
-					// *** Verify that custom specified item ids do not already exist
-					// ***
+				// ***
+				// *** Verify that custom specified item ids do not already exist
+				// ***
 
-					$conf['existing_ids'] = array();
+				$conf['existing_ids'] = array();
 
 				if ($conf['id_col'])
 				{
-						// Get 'id' column no
-						$id_col_no = 0;
+					// Get 'id' column no
+					$id_col_no = 0;
 
 					foreach ($conf['columns'] as $col_no => $column)
 					{
@@ -540,29 +546,29 @@ return;
 						}
 					}
 
-						// Get custom IDs in csv file
-						$custom_id_arr = array();
+					// Get custom IDs in csv file
+					$custom_id_arr = array();
 
 					foreach ($contents as $fields)
 					{
-							$custom_id_arr[] = (int) $fields[$id_col_no];
+						$custom_id_arr[] = (int) $fields[$id_col_no];
 					}
 
-						$custom_id_list = "'" . implode("','", $custom_id_arr) . "'";
+					$custom_id_list = "'" . implode("','", $custom_id_arr) . "'";
 
-						// Cross check them if they already exist in the DB
-						$q = "SELECT id FROM #__content WHERE id IN (" . $custom_id_list . ")";
-						$db->setQuery($q);
-						$conf['existing_ids'] = array_flip($db->loadColumn());
+					// Cross check them if they already exist in the DB
+					$q = "SELECT id FROM #__content WHERE id IN (" . $custom_id_list . ")";
+					$db->setQuery($q);
+					$conf['existing_ids'] = array_flip($db->loadColumn());
 
-						// Throw error if we are only IMPORTING (creating) new items but existing item ids were found
+					// Throw error if we are only IMPORTING (creating) new items but existing item ids were found
 					if ($conf['id_col'] == 1 && $conf['existing_ids'] && count($conf['existing_ids']))
 					{
 						$app->enqueueMessage('File has ' . count($conf['existing_ids']) . ' item IDs that already exist: ' . implode(", ", $conf['existing_ids']) . ', <br/>Please fix or enable -updating- of existing items too', 'error');
 						$app->redirect($link);
 					}
 
-						// Throw error if we are only UPDATING new items but not all item ids were found
+					// Throw error if we are only UPDATING new items but not all item ids were found
 					if ($conf['id_col'] == 3 && count($conf['existing_ids']) < count($custom_id_arr))
 					{
 						$existing_ids = array_keys($conf['existing_ids']);
@@ -573,11 +579,11 @@ return;
 					}
 				}
 
-					// ***
-					// *** Verify that all non core property columns are field names
-					// ***
+				// ***
+				// *** Verify that all non core property columns are field names
+				// ***
 
-					$unused_columns = array();
+				$unused_columns = array();
 
 				foreach ($conf['columns'] as $colname)
 				{
@@ -594,7 +600,7 @@ return;
 					if (!$conf['ignore_unused_cols'])
 					{
 						$app->enqueueMessage('
-						File has unused ' . count($unused_columns) . ' columns : [ ' . implode(' ], [ ', $unused_columns) . ' ]' .
+							File has unused ' . count($unused_columns) . ' columns : [ ' . implode(' ], [ ', $unused_columns) . ' ]' .
 							' <br/><br/>Their fields (fieldnames in column header) are not assigned to chosen content type : <b>' . $types[$conf['type_id']]->name . '</b>' .
 							' <br/><br/>Please enable option: <b>\'Ignore unused columns\'</b>',
 							'warning'
@@ -604,32 +610,32 @@ return;
 					else
 					{
 						$app->enqueueMessage('
-						File has unused ' . count($unused_columns) . ' columns: <b>' . implode(', ', $unused_columns) . '</b>' .
+							File has unused ' . count($unused_columns) . ' columns: <b>' . implode(', ', $unused_columns) . '</b>' .
 							' <br/>These columns will be ignored, because their fields (fieldnames in column header) are not assigned to chosen <b>content type</b> :' . $types[$conf['type_id']]->name,
 							'notice'
 						);
 					}
 				}
 
-					// Trim item's data
+				// Trim item's data
 				foreach ($contents as $fields)
 				{
 					$fields = flexicontent_html::arrayTrim($fields);
 				}
 
-					// Set csvfile contens and columns information
-					$conf['contents']   = & $contents;
+				// Set csvfile contens and columns information
+				$conf['contents']   = & $contents;
 
-					// ***
-					// *** Verify that imported files exist in the media/documents folders
-					// ***
+				// ***
+				// *** Verify that imported files exist in the media/documents folders
+				// ***
 
-					// Get fields that use files
-					$conf['media_folder'] = $jinput->get('media_folder', '', 'string');
-					$conf['docs_folder']  = $jinput->get('docs_folder', '', 'string');
+				// Get fields that use files
+				$conf['media_folder'] = $jinput->get('media_folder', '', 'string');
+				$conf['docs_folder']  = $jinput->get('docs_folder', '', 'string');
 
-					$this->checkfiles($conf, $parse_log, $task);
-					$this->parsevalues($conf, $parse_log, $task);
+				$this->checkfiles($conf, $parse_log, $task);
+				$this->parsevalues($conf, $parse_log, $task);
 
 				if ($task == 'initcsv')
 				{
@@ -639,20 +645,21 @@ return;
 						'flexicontent'
 					);
 
-						$session->set('csvimport_lineno', 0, 'flexicontent');
+					$session->set('csvimport_lineno', 0, 'flexicontent');
 
-						// Set a message that import task was prepared and redirect
-						$app->enqueueMessage(
-							'Import task prepared. <br/>' .
-							'File has ' . count($conf['contents_parsed']) . ' records (content items)' .
-							' and ' . count($conf['columns']) . ' columns (fields)', 'message'
-						);
-						$this->setRedirect($link);
+					// Set a message that import task was prepared and redirect
+					$app->enqueueMessage(
+						'Import task prepared. <br/>' .
+						'File has ' . count($conf['contents_parsed']) . ' records (content items)' .
+						' and ' . count($conf['columns']) . ' columns (fields)',
+						'message'
+					);
+					$this->setRedirect($link);
 
 					return;
 				}
 
-					// ELSE -- task == 'testcsv'
+				// ELSE -- task == 'testcsv'
 				else
 				{
 					$conf['debug_records'] = $conf['debug_records'] ? $conf['debug_records'] : 2;
@@ -670,7 +677,7 @@ return;
 				$app->enqueueMessage('Unknown task: ' . $task, 'error');
 				$this->setRedirect($link);
 
-return;
+				return;
 
 			break;
 		}
@@ -695,7 +702,7 @@ return;
 		$linelim = $items_per_call ? $lineno + $items_per_call - 1 : $itemcount;
 		$linelim = $linelim > $itemcount ? $itemcount : $linelim;
 
-		// Echo "lineno: $lineno -- linelim: $linelim<br/>";
+		// echo "lineno: $lineno -- linelim: $linelim<br/>";
 
 		for (; $lineno <= $linelim; $lineno++)
 		{
@@ -944,7 +951,7 @@ return;
 			}
 		}
 
-		// Fclose($fp);
+		// fclose($fp);
 
 		// Done nothing more to do
 		if ($task == 'testcsv')
@@ -1025,7 +1032,7 @@ return;
 			}
 		}
 
-		// Echo "<pre>"; print_r($filedata_arr); jexit();
+		// echo "<pre>"; print_r($filedata_arr); jexit();
 		if (count($filedata_arr))
 		{
 			$filenames_missing = array();
@@ -1075,8 +1082,8 @@ return;
 
 						if ($filename)
 						{
-							// Echo "<pre>"; print_r(JPath::clean( $srcpath_original  . $filename)); jexit();
-							$srcfilepath  = JPath::clean($srcpath_original . $filename);
+							// echo "<pre>"; print_r(JPath::clean( $srcpath_original  . $filename)); jexit();
+							$srcfilepath = JPath::clean($srcpath_original . $filename);
 
 							if (!JFile::exists($srcfilepath))
 							{

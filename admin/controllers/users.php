@@ -92,8 +92,8 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$FromName	= $config->get('fromname');
 		$SiteName	= $config->get('sitename');
 
-		 // Create a new JUser object for the given user id, and calculate / retrieve some information about the user
-		 $id = JRequest::getVar('id', 0, 'post', 'int');
+		// Create a new JUser object for the given user id, and calculate / retrieve some information about the user
+		$id = JRequest::getVar('id', 0, 'post', 'int');
 		$user = new JUser($id);
 
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
@@ -123,7 +123,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 			JError::raiseWarning(0, JText::_('CANNOT SAVE THE USER INFORMATION'));
 			JError::raiseWarning(0, $user->getError());
 
-			// $app->redirect( 'index.php?option=com_flexicontent&controller=users&view=users', $user->getError() );
+			// $app->redirect('index.php?option=com_flexicontent&controller=users&view=users', $user->getError());
 			// return false;
 			return $this->execute('edit');
 		}
@@ -263,11 +263,6 @@ class FlexicontentControllerUsers extends FlexicontentController
 						. ' WHERE u.block = 0';
 					$db->setQuery($query);
 					$count = $db->loadResult();
-
-					if ($db->getErrorNum())
-					{
-						JFactory::getApplication()->enqueueMessage(__FUNCTION__ . '(): SQL QUERY ERROR:<br/>' . nl2br($db->getErrorMsg()), 'error');
-					}
 				}
 
 				if ($isSuperAdmin && $count <= 1)
@@ -372,11 +367,6 @@ class FlexicontentControllerUsers extends FlexicontentController
 						. ' WHERE u.block = 0';
 					$db->setQuery($query);
 					$count = $db->loadResult();
-
-					if ($db->getErrorNum())
-					{
-						JFactory::getApplication()->enqueueMessage(__FUNCTION__ . '(): SQL QUERY ERROR:<br/>' . nl2br($db->getErrorMsg()), 'error');
-					}
 				}
 
 				if ($block && $isSuperAdmin && $count <= 1)

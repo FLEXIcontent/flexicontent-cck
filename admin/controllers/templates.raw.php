@@ -329,25 +329,23 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		{
 			$fieldSets = $form_layout->getFieldsets($groupname);
 
-			foreach ($fieldSets as $fsname => $fieldSet)
-			:
-	?>
+			foreach ($fieldSets as $fsname => $fieldSet) : ?>
 			
 			<div class="fc_layout_box_outer">
 				
 				<?php
 				if (isset($fieldSet->label) && trim($fieldSet->label))
-				:
+				{
 					echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">' . JText::_($fieldSet->label) . '</div>';
-				endif;
+				}
 
 				if (isset($fieldSet->description) && trim($fieldSet->description))
-				:
+				{
 					echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
-				endif;
+				}
 
 				foreach ($form_layout->getFieldset($fsname) as $field)
-				:
+				{
 					if ($field->getAttribute('not_inherited'))
 					{
 						continue;
@@ -418,7 +416,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			</div>';
 		}
 
-		// Parent::display($tpl);
+		// parent::display($tpl);
 	}
 
 

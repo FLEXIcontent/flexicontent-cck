@@ -160,11 +160,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 		// Get ids of searchable and ids of item having values for these fields
 		$items_total = 0;
-		$itemsmodel = $this->getModel('items');
 
 		// Get items model to call needed methods
-		$itemids    = $itemsmodel->getFieldsItems(// $fieldids
-			null, $items_total, 0, self::$item_limit
+		$itemsmodel = $this->getModel('items');
+
+		$itemids = $itemsmodel->getFieldsItems(
+			/*$fieldids*/ null, $items_total, 0, self::$item_limit
 		);
 
 		// Set item ids into session to avoid recalculation ...
@@ -229,16 +230,17 @@ class FlexicontentControllerSearch extends FlexicontentController
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
 		$fields = $session->get($indexer . '_fields', array(), 'flexicontent');
 
+		// If missing from session then calculate them
 		if (empty($fields))
 		{
-			// If missing from session then calculate them
+			// INDEX: quick advanced index rebuilt
 			if ($rebuildmode == 'quick' && $indexer == 'advanced')
 			{
 				$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'dirty-search');
 			}
 			else
 			{
-				// INDEX: basic or advanced fully rebuilt
+				// INDEX: basic index or fully rebuilt advanced index
 				$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'all-search');
 			}
 		}
@@ -247,7 +249,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$fields = unserialize($has_zlib ? zlib_decode(base64_decode($fields)) : base64_decode($fields));
 		}
 
-		// Echo 'fail|'; print_r(array_keys($fields)); exit;
+		// echo 'fail|'; print_r(array_keys($fields)); exit;
 
 		// Get the field ids of the searchable fields
 		$fieldids = array_keys($fields);
@@ -295,12 +297,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256 * 1024;
 		$query_lim = (int) (3 * $max_allowed_packet / 4);
 
-		// Echo 'fail|'.$query_lim; exit;
+		// echo 'fail|'.$query_lim; exit;
 
 		// Get script max
 		$max_execution_time = ini_get("max_execution_time");
 
-		// Echo 'fail|'.$max_execution_time; exit;
+		// echo 'fail|'.$max_execution_time; exit;
 
 		$query_count = 0;
 		$max_items_per_query = 100;
@@ -373,7 +375,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 				{
 					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexAdvSearch', array( &$field, &$values, &$item ));
 
-					// Print_r($field->ai_query_vals);
+					// print_r($field->ai_query_vals);
 					if (isset($field->ai_query_vals))
 					{
 						foreach ($field->ai_query_vals as $query_val)
@@ -381,15 +383,16 @@ class FlexicontentControllerSearch extends FlexicontentController
 							$ai_query_vals[] = $query_val;
 						}
 
+						// Currently for advanced index only
 						if (isset($filterable_ids[$field->id]))
 						{
-							// Current for advanced index only
 							foreach ($field->ai_query_vals as $query_val)
 							{
 								$ai_query_vals_f[$field->id][] = $query_val;
 							}
 						}
-					} // Else echo "Not set for : ". $field->name;
+					}
+					// else echo "Not set for : ". $field->name;
 				}
 				elseif ($indexer == 'basic')
 				{
@@ -397,10 +400,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 					foreach ($query_itemids as $query_itemid)
 					{
-						if (@$field->search[$query_itemid])
+						if (!empty($field->search[$query_itemid]))
 						{
-							$searchindex[$query_itemid][] = // $field->name.': '.
-							$field->search[$query_itemid];
+							$searchindex[$query_itemid][] = $field->search[$query_itemid];
 						}
 					}
 				}
@@ -412,11 +414,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 			if ($indexer == 'basic')
 			{
+				// Check for zero search index records
 				if (count($searchindex))
 				{
-					// Check for zero search index records
+					// Start new query
 					$query_vals = '';
-					$query_ids = array();  // Start new query
+					$query_ids = array();
 
 					foreach ($searchindex as $query_itemid => $search_text)
 					{
@@ -427,8 +430,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 								. " END "
 								. " WHERE item_id IN (" . implode(',', $query_ids) . ")";
 							$queries[] = $query;
+
+							// Start new query
 							$query_vals = '';
-							$query_ids = array();  // Start new query
+							$query_ids = array();
 						}
 
 						$query_ids[] = $query_itemid;
@@ -454,9 +459,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 			}
 			else
 			{
+				// Check for zero search index records
 				if (count($ai_query_vals))
 				{
-					// Check for zero search index records
 					$query_vals = '';  // Start new query
 
 					foreach ($ai_query_vals as &$query_value)
@@ -482,7 +487,8 @@ class FlexicontentControllerSearch extends FlexicontentController
 					}
 				}
 
-				foreach ($ai_query_vals_f as $_field_id => $_query_vals)  // Per field Table
+				// Per field Table
+				foreach ($ai_query_vals_f as $_field_id => $_query_vals)
 				{
 					$query_vals = '';  // Start new query
 
@@ -567,11 +573,11 @@ class FlexicontentControllerSearch extends FlexicontentController
 		{
 			$items_start = $items_start + self::$item_limit;
 
+			// Get items model to call needed methods
 			$itemsmodel = $this->getModel('items');
 
-			// Get items model to call needed methods
-			$itemids = $itemsmodel->getFieldsItems(// $fieldids
-				null, $total, $items_start, self::$item_limit
+			$itemids = $itemsmodel->getFieldsItems(
+				/*$fieldids*/ null, $total, $items_start, self::$item_limit
 			);
 
 			// Set item ids into session to avoid recalculation ...

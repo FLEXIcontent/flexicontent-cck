@@ -483,9 +483,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$default_dir = 0;  // 'media' folder
 			}
 
-					$target_dir = $field->parameters->get('target_dir', $default_dir);
+			$target_dir = $field->parameters->get('target_dir', $default_dir);
 
-					// Force secure / media DB folder according to field configuration
+			// Force secure / media DB folder according to field configuration
 			if (strlen($target_dir) && $target_dir != 2)
 			{
 				$secure = $target_dir ? 1 : 0;
@@ -524,7 +524,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			if (!file_exists($targetDir))
 			{
-				@mkdir($targetDir);
+				@ mkdir($targetDir);
 			}
 
 			// Create name of the unique temporary filename to use for concatenation of the chunks, or get the filename from session
@@ -541,7 +541,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				if (!file_exists($targetDir))
 				{
-					@mkdir($targetDir);
+					@ mkdir($targetDir);
 				}
 
 				$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
@@ -579,8 +579,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				fwrite($out, $buff);
 			}
 
-			@fclose($out);
-			@fclose($in);
+			@ fclose($out);
+			@ fclose($in);
 
 			// If not last chunk terminate further execution
 			if ($chunk < $chunks - 1)
@@ -616,14 +616,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				}
 			}
 
-			// Echo "-- chunk: $chunk \n-- chunks: $chunks \n-- targetDir: $targetDir \n--filePath_tmp: $filePath_tmp \n--fileName: $fileName";
+			// echo "-- chunk: $chunk \n-- chunks: $chunks \n-- targetDir: $targetDir \n--filePath_tmp: $filePath_tmp \n--fileName: $fileName";
 			// echo "\n"; print_r($_REQUEST);
 			$file['name'] = $fileName;
 			$file['tmp_name'] = $filePath_tmp;
 			$file['size'] = filesize($filePath_tmp);
 			$file['error'] = 0;
 
-			// Echo "\n"; print_r($file);
+			// echo "\n"; print_r($file);
 		}
 
 		if ($fieldid)
@@ -674,7 +674,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Get the extension to record it in the DB
 		$ext = strtolower(flexicontent_upload::getExt($filename));
 
-		// Echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
+		// echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
 		$move_success = $chunks ?
 			rename($file['tmp_name'], $filepath) :
 			JFile::upload($file['tmp_name'], $filepath, false, false,

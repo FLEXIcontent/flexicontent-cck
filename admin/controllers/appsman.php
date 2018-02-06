@@ -347,9 +347,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 							}
 						}
 
-						echo $table_name . " <br/><pre>";
-						print_r($obj);
-						echo "</pre>";
+						echo $table_name . '<br/>';
+						echo '<pre>' . print_r($obj, true) . '</pre>';
 
 						// Insert record in DB
 						// $db->insertObject('#__'.$table_name, $obj);
@@ -381,7 +380,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 					}
 				}
 
-				// Echo "<pre>"; print_r($xml); echo "</pre>";
+				// echo "<pre>"; print_r($xml); echo "</pre>";
 			exit;
 
 			// CONTINUE to do the import task

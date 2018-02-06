@@ -336,9 +336,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$data['featured_cid'] = $featured_cid;
 		}
 
-		// Enforce maintaining secondary categories if user is not allowed to changed
-		if (!$enable_cid_selector   // User can not change / set secondary cats
-		)
+		// Enforce maintaining secondary categories if user is not allowed to change / set secondary cats
+		if (!$enable_cid_selector)
 		{
 			// For new item use default secondary categories from type configuration
 			if ($isnew)
@@ -370,18 +369,18 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 		}
 
-		// Enforce maintaining main category if user is not allowed to change
-		if (!$enable_catid_selector   // User can not change / set main category
-		)
+		// Enforce maintaining main category if user is not allowed to change / set main category
+		if (!$enable_catid_selector)
 		{
+			// For new item use default main category from type configuration
 			if ($isnew && $params->get('catid_default'))
 			{
-				// For new item use default main category from type configuration
 				$data['catid'] = $params->get('catid_default');
 			}
+
+			// Use already assigned main category (existing item)
 			elseif ($model->get('catid'))
 			{
-				// Use already assigned main category (existing item)
 				$data['catid'] = $model->get('catid');
 			}
 		}
@@ -743,8 +742,9 @@ class FlexicontentControllerItems extends FlexicontentController
 
 				if (empty($states_notify_new))
 				{
-						$states_notify_new = array();
+					$states_notify_new = array();
 				}
+
 				elseif (! is_array($states_notify_new))
 				{
 					$states_notify_new = !FLEXI_J16GE ? array($states_notify_new) : explode("|", $states_notify_new);
@@ -754,8 +754,9 @@ class FlexicontentControllerItems extends FlexicontentController
 
 				if (empty($states_notify_existing))
 				{
-						$states_notify_existing = array();
+					$states_notify_existing = array();
 				}
+
 				elseif (! is_array($states_notify_existing))
 				{
 					$states_notify_existing = !FLEXI_J16GE ? array($states_notify_existing) : explode("|", $states_notify_existing);
@@ -806,7 +807,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					$notify_text = $params->get('text_notify_existing');
 				}
 
-				// Print_r($notify_emails); jexit();
+				// print_r($notify_emails); jexit();
 			}
 		}
 
@@ -1009,8 +1010,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->redirect($this->returnURL);
 		}
 
-		$this->setRedirect($this->returnURL// , JText::_( 'FLEXI_NEW_ORDERING_SAVED' )
-		);
+		$this->setRedirect($this->returnURL);  // , JText::_('FLEXI_NEW_ORDERING_SAVED')
 	}
 
 
@@ -1081,8 +1081,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$app->redirect($this->returnURL);
 		}
 
-		$this->setRedirect($this->returnURL// , JText::_( 'FLEXI_NEW_ORDERING_SAVED' )
-		);
+		$this->setRedirect($this->returnURL);  // , JText::_('FLEXI_NEW_ORDERING_SAVED')
 	}
 
 
@@ -1153,7 +1152,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 
-			// Echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
+			// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 		}
 		else
 		{
@@ -1273,7 +1272,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 
-			// Echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
+			// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 		}
 		else
 		{
@@ -1303,7 +1302,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Try to copy/move items
 		if ($this->task == 'copymove')
 		{
-			if ($method == 1) // Copy
+			// Copy CASE
+			if ($method == 1)
 			{
 				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state))
 				{
@@ -1317,7 +1317,9 @@ class FlexicontentControllerItems extends FlexicontentController
 					$msg = '';
 				}
 			}
-			elseif ($method == 2) // Update (optionally moving)
+
+			// Update CASE (optionally moving)
+			elseif ($method == 2)
 			{
 				$msg = JText::sprintf('FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid));
 
@@ -1333,7 +1335,9 @@ class FlexicontentControllerItems extends FlexicontentController
 
 				$clean_cache_flag = true;
 			}
-			else // Copy and update (optionally moving)
+
+			// Copy and update CASE (optionally moving)
+			else
 			{
 				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats, $type_id, $access))
 				{
@@ -1587,7 +1591,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 		}
 
-		// Echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
+		// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 
 		// Set warning for undeletable items
 		if (count($non_auth_cid))
@@ -1707,7 +1711,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 		}
 
-		// Echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
+		// echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 
 		// Set warning for undeletable items
 		if (count($non_auth_cid))

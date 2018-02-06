@@ -117,7 +117,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (file_exists($log_filename))
 		{
-			@unlink($log_filename);
+			@ unlink($log_filename);
 		}
 
 		$session->set('filemanager.log_filename', $log_filename, 'flexicontent');
@@ -130,11 +130,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$session->set($indexer . '_items_to_index', $file_ids, 'flexicontent');
 
 		echo 'success';
+		// echo count($fieldids)*count($itemids).'|';
 
-		// Echo count($fieldids)*count($itemids).'|';
 		// WARNING: json_encode will output object if given an array with gaps in the indexing
-		// echo '|'.json_encode($itemids);
-		// echo '|'.json_encode($fieldids);
+		// echo '|' . json_encode($itemids);
+		// echo '|' . json_encode($fieldids);
 		echo '|' . count($file_ids);
 		echo '|' . count(array());
 
@@ -198,12 +198,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256 * 1024;
 		$query_lim          = (int) (3 * $max_allowed_packet / 4);
 
-		// Echo 'fail|'.$query_lim; jexit();
+		// echo 'fail|' . $query_lim; jexit();
 
 		// Get script max
 		$max_execution_time = ini_get("max_execution_time");
 
-		// Echo 'fail|'.$max_execution_time; jexit();
+		// echo 'fail|' . $max_execution_time; jexit();
 
 		// Get model
 		$model      = $this->getModel('filemanager');
@@ -291,7 +291,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.filemanager.stats_indexer');
 				}
 
-						// $session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');
+				// $session->set('filemanager.stats_indexer_errors', $stats_indexer_errors, 'flexicontent');
 			}
 
 			// Single property fields, get file usage (# assignments)
@@ -368,6 +368,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		jexit(printf($cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
 	}
 
+
 	/*
 	function purge()
 	{
@@ -375,6 +376,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$model->purge();
 		$msg = JText::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=filemanager', $msg);
-	}*/
-
+	}
+	*/
 }

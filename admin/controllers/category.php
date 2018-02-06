@@ -53,16 +53,18 @@ class FlexicontentControllerCategory extends JControllerForm
 			$this->extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
 
-		$this->registerTask('apply', 'save');
-		$this->registerTask('apply_ajax', 'save');
-		$this->registerTask('save2new', 'save');
-		$this->registerTask('save2copy', 'save');
+		$this->registerTask('apply',			'save');
+		$this->registerTask('apply_ajax',	'save');
+		$this->registerTask('save2new',		'save');
+		$this->registerTask('save2copy',	'save');
 	}
+
 
 	function add()
 	{
 		parent::add();
 	}
+
 
 	function edit($key = null, $urlVar = null)
 	{
@@ -76,6 +78,7 @@ class FlexicontentControllerCategory extends JControllerForm
 		parent::edit();
 	}
 
+
 	function save($key = null, $urlVar = null)
 	{
 		parent::save();
@@ -88,10 +91,12 @@ class FlexicontentControllerCategory extends JControllerForm
 		}
 	}
 
+
 	function cancel($key = null)
 	{
 		parent::cancel();
 	}
+
 
 	/**
 	 * Method to check if you can add a new record.
@@ -112,7 +117,10 @@ class FlexicontentControllerCategory extends JControllerForm
 			return true;
 		}
 
-		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all = true, $check_published = true, $specific_catids = false, $find_first = true);
+		$usercats = FlexicontentHelperPerm::getAllowedCats(
+			$user, $actions_allowed = array('core.create'),
+			$require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+		);
 
 		return count($usercats) > 0;
 	}

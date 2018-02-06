@@ -36,25 +36,25 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 	{
 		parent::__construct();
 
-		$this->registerTask('createdefaultfields', 'createDefaultFields');
-		$this->registerTask('createmenuitems', 'createMenuItems');
-		$this->registerTask('createdefaultype', 'createDefaultType');
-		$this->registerTask('publishplugins', 'publishPlugins');
-		$this->registerTask('addmcatitemrelations', 'addMcatItemRelations');
-		$this->registerTask('updatelanguageData', 'updateLanguageData');
-		$this->registerTask('createdbindexes', 'createDBindexes');
-		$this->registerTask('createversionstable', 'createVersionsTable');
-		$this->registerTask('populateversionstable', 'populateVersionsTable');
-		$this->registerTask('createauthorstable', 'createauthorstable');
-		$this->registerTask('setcachethumbperms', 'setCacheThumbPerms');
-		$this->registerTask('updateitemcountingdata', 'updateItemCountingData');
-		$this->registerTask('deletedeprecatedfiles', 'deleteDeprecatedFiles');
-		$this->registerTask('cleanupoldtables', 'cleanupOldTables');
-		$this->registerTask('addcurrentversiondata', 'addCurrentVersionData');
+		$this->registerTask('createdefaultfields',		'createDefaultFields');
+		$this->registerTask('createmenuitems',				'createMenuItems');
+		$this->registerTask('createdefaultype', 			'createDefaultType');
+		$this->registerTask('publishplugins', 				'publishPlugins');
+		$this->registerTask('addmcatitemrelations',		'addMcatItemRelations');
+		$this->registerTask('updatelanguageData',			'updateLanguageData');
+		$this->registerTask('createdbindexes',				'createDBindexes');
+		$this->registerTask('createversionstable',		'createVersionsTable');
+		$this->registerTask('populateversionstable',	'populateVersionsTable');
+		$this->registerTask('createauthorstable',			'createauthorstable');
+		$this->registerTask('setcachethumbperms',			'setCacheThumbPerms');
+		$this->registerTask('updateitemcountingdata',	'updateItemCountingData');
+		$this->registerTask('deletedeprecatedfiles',	'deleteDeprecatedFiles');
+		$this->registerTask('cleanupoldtables',				'cleanupOldTables');
+		$this->registerTask('addcurrentversiondata',	'addCurrentVersionData');
 		$this->registerTask('updateinitialpermission', 'updateInitialPermission');
 
-		$this->registerTask('createlanguagepack', 'createLanguagePack');
-		$this->registerTask('fcversioncompare', 'FCVersionCompare');
+		$this->registerTask('createlanguagepack',			'createLanguagePack');
+		$this->registerTask('fcversioncompare',				'FCVersionCompare');
 	}
 
 
@@ -635,6 +635,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 		$db->setQuery($query);
 
+		// Suppress exception in case of SQL error, we will print it below
 		try
 		{
 			$db->execute();
@@ -646,7 +647,6 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 			jexit();
 		}
 
-		// Suppress exception in case of SQL error, we will print it below
 		echo '<span class="install-ok"></span>';
 	}
 
@@ -1038,7 +1038,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 					$obj->version    = (int) $row->version;
 					$obj->value      = $field->value;
 
-					// Echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder.",suborder : ".$obj->suborder."<br />";
+					// echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder.",suborder : ".$obj->suborder."<br />";
 					// echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
 
@@ -1046,7 +1046,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 					{
 						unset($obj->version);
 
-						// Echo "inserting into __flexicontent_fields_item_relations<br />";
+						// echo "inserting into __flexicontent_fields_item_relations<br />";
 						$db->insertObject('#__flexicontent_fields_item_relations', $obj);
 						flexicontent_db::setValues_commonDataTypes($obj);
 					}
@@ -1064,7 +1064,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 				$v->created_by = $row->created_by;
 				$v->comment    = '';
 
-				// Echo "inserting into __flexicontent_versions<br />";
+				// echo "inserting into __flexicontent_versions<br />";
 				$db->insertObject('#__flexicontent_versions', $v);
 			}
 		}

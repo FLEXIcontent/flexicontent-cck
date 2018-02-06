@@ -99,7 +99,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				<td class="versions" align="center">
 					<a href="javascript:;" class="hasTooltip" title="' . JHtml::tooltipText(JText::_('FLEXI_COMMENT'), ($v->comment ? $v->comment : 'No comment written'), 0, 1) . '">' . $comment . '</a>
 				' . (
-				((int) $v->nr == (int) $currentversion) ? // Is current version ?
+				((int) $v->nr === (int) $currentversion) ? // Is current version ?
 					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&cid=' . $item->id . '&version=' . $v->nr . '\');" href="javascript:;">' . JText::_('FLEXI_CURRENT') . '</a>' :
 					'<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $item->id . '&version=' . $v->nr . '&tmpl=component" title="' . JText::_('FLEXI_COMPARE_WITH_CURRENT_VERSION') . '" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">' . $view . '</a>
 					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&cid=' . $item->id . '&version=' . $v->nr . '&' . JSession::getFormToken() . '=1\');" href="javascript:;" title="' . JText::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $v->nr) . '">' . $revert . '</a>
@@ -124,18 +124,10 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$model->resetHits($id);
 
-		if (FLEXI_J16GE)
-		{
-			$cache = FLEXIUtilities::getCache($group = '', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache = FLEXIUtilities::getCache($group = '', 1);
-			$cache->clean('com_flexicontent_items');
-		}
-		else
-		{
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group = '', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache = FLEXIUtilities::getCache($group = '', 1);
+		$cache->clean('com_flexicontent_items');
 
 		echo 0;
 	}
@@ -148,21 +140,15 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function resetvotes()
 	{
-		$id		= JRequest::getInt('id', 0);
+		$id = JRequest::getInt('id', 0);
 		$model = $this->getModel('item');
 
 		$model->resetVotes($id);
 
-		if (FLEXI_J16GE)
-		{
-			$cache = FLEXIUtilities::getCache();
-			$cache->clean('com_flexicontent_items');
-		}
-		else
-		{
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group = '', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache = FLEXIUtilities::getCache($group = '', 1);
+		$cache->clean('com_flexicontent_items');
 
 		echo JText::_('FLEXI_NOT_RATED_YET');
 	}
@@ -184,7 +170,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		@ob_end_clean();
 
-		// Header("Content-type:text/json");
+		// header("Content-type:text/json");
 		// header('Content-type: application/json');
 		// header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -206,7 +192,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			{
 				foreach ($tagobjs as $tag)
 				{
-								$array[] = "{\"id\":\"" . $tag->id . "\",\"name\":\"" . $tag->name . "\"}";
+					$array[] = "{\"id\":\"" . $tag->id . "\",\"name\":\"" . $tag->name . "\"}";
 				}
 			}
 
@@ -257,9 +243,9 @@ class FlexicontentControllerItems extends FlexicontentController
 
 			if ($auth_publish)
 			{
-				$state['P'] = array( 'name' => 'FLEXI_PUBLISHED', 'desc' => 'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'btn_class' => 'btn-success' );
+				$state['P']  = array( 'name' => 'FLEXI_PUBLISHED', 'desc' => 'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'btn_class' => 'btn-success' );
 				$state['IP'] = array( 'name' => 'FLEXI_IN_PROGRESS', 'desc' => 'FLEXI_NOT_FINISHED_YET', 'icon' => 'publish_g.png', 'btn_class' => 'btn-success', 'clear' => true );
-				$state['U'] = array( 'name' => 'FLEXI_UNPUBLISHED', 'desc' => 'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'btn_class' => 'btn-warning' );
+				$state['U']  = array( 'name' => 'FLEXI_UNPUBLISHED', 'desc' => 'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'btn_class' => 'btn-warning' );
 				$state['PE'] = array( 'name' => 'FLEXI_PENDING', 'desc' => 'FLEXI_NEED_TO_BE_APPROVED', 'icon' => 'publish_r.png', 'btn_class' => 'btn-warning' );
 				$state['OQ'] = array( 'name' => 'FLEXI_TO_WRITE', 'desc' => 'FLEXI_TO_WRITE_DESC', 'icon' => 'publish_y.png', 'btn_class' => 'btn-warning', 'clear' => true );
 			}
@@ -274,31 +260,34 @@ class FlexicontentControllerItems extends FlexicontentController
 				$state['T'] = array( 'name' => 'FLEXI_TRASHED', 'desc' => 'FLEXI_TRASHED_TO_BE_DELETED', 'icon' => 'trash.png', 'btn_class' => 'btn-danger' );
 			}
 
-			// Echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b>";
+			// echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b>";
 			echo "<br /><br />";
 		?>
 			
 		<?php
 		foreach ($state as $shortname => $statedata)
-			{
+		{
 			$css = "width:216px; margin:0px 12px 12px 0px;";
 			$link = JUri::base(true) . "/index.php?option=com_flexicontent&task=items.changestate&newstate=" . $shortname . "&" . JSession::getFormToken() . "=1";
 			$icon = "../components/com_flexicontent/assets/images/" . $statedata['icon'];
 		?>
-		<span class="fc-filter nowrap_box">
-		<?php // <img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo JText::_($statedata['desc']); ?>" /> &nbsp;
- ?>
-		<span style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
-			onclick="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'<?php echo $shortname; ?>', 'task':'items.changestate'}, {'task':'items.changestate', 'is_list':true});"
-		>
-			<?php echo JText::_($statedata['name']); ?>
-		</span>
-		</span>
+			<span class="fc-filter nowrap_box">
+			<?php
+				/*
+				<!-- <img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo JText::_($statedata['desc']); ?>" /> &nbsp; -->
+				*/
+				?>
+				<span style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
+					onclick="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'<?php echo $shortname; ?>', 'task':'items.changestate'}, {'task':'items.changestate', 'is_list':true});"
+				>
+					<?php echo JText::_($statedata['name']); ?>
+				</span>
+			</span>
 		<?php
-		if (isset($statedata['clear']))
-				{
-			echo '<div class="fcclear"></div>';
-		}
+			if (isset($statedata['clear']))
+			{
+				echo '<div class="fcclear"></div>';
+			}
 		}
 		?>
 	</div>
@@ -351,9 +340,10 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$bind_limit = JRequest::getInt('bind_limit', 25000);
 
+		// Make sure bind limit is sane
 		if ($bind_limit < 1 || $bind_limit > 25000)
 		{
-			$bind_limit = 25000;  // Make sure this is valid
+			$bind_limit = 25000;
 		}
 
 		$model = $this->getModel('items');
