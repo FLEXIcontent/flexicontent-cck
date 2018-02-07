@@ -2322,51 +2322,6 @@ class plgSystemFlexisystem extends JPlugin
 
 
 	/**
-	 * Before save event.
-	 *
-	 * @param   string   $context  The context
-	 * @param   JTable   $item     The table
-	 * @param   boolean  $isNew    Is new item
-	 * @param   array    $data     The validated data
-	 *
-	 * @return  boolean
-	 *
-	 * @since   3.2.0
-	 */
-	public function onContentBeforeSave($context, $item, $isNew, $data = array())
-	{
-		if ($context != 'com_content.article' || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
-		{
-			return true;
-		}
-
-		//*** 
-		//*** Maintain flexicontent-specific article parameters
-		//*** 
-
-		JLoader::register('FlexicontentModelItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
-		$model = new FlexicontentModelItem();
-
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-		$record->load($item->id);
-
-		$mergeProperties = array('attribs', 'metadata');
-		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array('com_flexicontent' => 'item', 'com_content' => 'article'));
-		$model->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
-
-		$item_data = array();
-		foreach($mergeProperties as $prop)
-		{
-			$item_data[$prop] = isset($record->$prop) ? $record->$prop : null;
-		}
-		JFactory::getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
-
-		return true;
-	}
-
-
-	/**
 	 * Change the state in core_content if the state in a table is changed
 	 *
 	 * @param   string   $context  The context for the content passed to the plugin.
@@ -2413,6 +2368,51 @@ class plgSystemFlexisystem extends JPlugin
 
 
 	/**
+	 * Before save event.
+	 *
+	 * @param   string   $context  The context
+	 * @param   JTable   $item     The table
+	 * @param   boolean  $isNew    Is new item
+	 * @param   array    $data     The validated data
+	 *
+	 * @return  boolean
+	 *
+	 * @since   3.2.0
+	 */
+	public function onContentBeforeSave($context, $item, $isNew, $data = array())
+	{
+		if (($context !== 'com_content.article' && $context !== 'com_content.form') || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
+		{
+			return true;
+		}
+
+		//*** 
+		//*** Maintain flexicontent-specific article parameters
+		//*** 
+
+		JLoader::register('FlexicontentModelItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
+		$model = new FlexicontentModelItem();
+
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$record->load($item->id);
+
+		$mergeProperties = array('attribs', 'metadata');
+		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array('com_flexicontent' => 'item', 'com_content' => 'article'));
+		$model->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
+
+		$item_data = array();
+		foreach($mergeProperties as $prop)
+		{
+			$item_data[$prop] = isset($record->$prop) ? $record->$prop : null;
+		}
+		JFactory::getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
+
+		return true;
+	}
+
+
+	/**
 	 * After save event.
 	 *
 	 * @param   string   $context  The context
@@ -2426,7 +2426,7 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onContentAfterSave($context, $item, $isNew, $data = array())
 	{
-		if ($context != 'com_content.article' || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
+		if (($context !== 'com_content.article' && $context !== 'com_content.form') || JFactory::getApplication()->input->get('isflexicontent', false, 'CMD'))
 		{
 			return true;
 		}
