@@ -1687,7 +1687,7 @@ class ParentClassItem extends FCModelAdmin
 			else $jm_state = $fc_state;                                      // trashed & archive states
 
 			// Frontend SECURITY concern: ONLY allow to set item type for new items !!! ... or for items without type ?!
-			if (!$app->isAdmin() && $item->type_id)
+			if (!$app->isAdmin() && $item->type_id && ($option === 'com_flexicontent' || $item->version > 1))
 			{
 				unset($data['type_id']);
 			}
