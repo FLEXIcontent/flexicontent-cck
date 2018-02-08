@@ -480,24 +480,26 @@ class plgFlexicontent_fieldsCore extends FCField
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->iscore != 1) return;
-		
-		if ($filter->field_type == 'maintext' || $filter->field_type == 'title') {
-			$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		if ($filter->iscore != 1)
+		{
+			return;
+		}
+
+		// For fields: title, description, only supports a basic filter of single text search input 
+		if ($filter->field_type === 'title' || $filter->field_type === 'maintext')
+		{
+			$filter->parameters->set( 'display_filter_as_s', 1 );
 		}
 		
 		// This will make filter values to be retrieved from the value_id DB column
 		$indexed_elements = in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
 		
-		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
+		if ($filter->field_type == 'title' || $filter->field_type == 'created' || $filter->field_type == 'modified')
+		{
 			$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		}
-		
-		else if ($filter->field_type == 'created' || $filter->field_type == 'modified') {
-			$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
-		}
-		
-		else {
+		else
+		{
 			$filter->filter_orderby_adv = null;   // default will order by value and not by label
 			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		}
@@ -507,7 +509,10 @@ class plgFlexicontent_fieldsCore extends FCField
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
-		if($filter->iscore != 1) return; // performance check
+		if ($filter->iscore != 1)
+		{
+			return;
+		}
 
 		// This will make filter values to be retrieved from the value_id DB column
 		$indexed_elements = $isSearchView
@@ -594,14 +599,14 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			case 'state':
 				$options = array(); 
-				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
-				$options[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-				$options[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-				$options[] = JHtml::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-				$options[] = JHtml::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-				$options[] = JHtml::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-				$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
-				//$options[] = JHtml::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+				//$options[] = (object) array('value' => '', '- '.$first_option_txt.' -');
+				$options[] = (object) array('value' => 'P', 'text' => JText::_('FLEXI_PUBLISHED'));
+				$options[] = (object) array('value' => 'U', 'text' => JText::_('FLEXI_UNPUBLISHED'));
+				$options[] = (object) array('value' => 'PE', 'text' => JText::_('FLEXI_PENDING'));
+				$options[] = (object) array('value' => 'OQ', 'text' => JText::_('FLEXI_TO_WRITE'));
+				$options[] = (object) array('value' => 'IP', 'text' => JText::_('FLEXI_IN_PROGRESS'));
+				$options[] = (object) array('value' => 'A', 'text' => JText::_('FLEXI_ARCHIVED'));
+				//$options[] = (object) array('value' => 'T', 'text' => JText::_('FLEXI_TRASHED'));
 				$filter->filter_options = $options;
 				unset($options);
 
@@ -609,23 +614,6 @@ class plgFlexicontent_fieldsCore extends FCField
 			break;
 			
 			case 'categories':
-				// Initialize options
-				$options = array();
-				
-				// MULTI-select: special label and prompts
-				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-				$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
-				if ($display_filter_as == 6)
-				{
-					if ($label_filter==2)
-					{
-						$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
-					}
-				}
-				// SINGLE-select does not has an internal label a drop-down list option
-				else
-					$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
-				
 				// Get categories
 				global $globalcats;
 				$rootcatid = $filter->parameters->get( 'rootcatid'.$_s, '' ) ;
@@ -646,49 +634,83 @@ class plgFlexicontent_fieldsCore extends FCField
 					$cids = count($cids)
 						? $cids
 						: array($cid);
-					//$options[] = JHtml::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
 					//$cats = $globalcats[$cid]->childrenarray;
 				}
 				else if ( $rootcatid )
 				{
 					// If configured ... limit to subcategory tree of a specified category
 					$cids = array($rootcatid);
-					//$options[] = JHtml::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
 					//$cats = $globalcats[$rootcatid]->childrenarray;
 				}
 				
+				// Specific categories were given, e.g. category of current category view
 				if ( count($cids) )
 				{
+					// If having more than one root then force displaying as drop-down select
+					if (count($cids) > 1)
+					{
+						$filter->parameters->set('display_filter_as' . $_s, 0);
+						$display_filter_as = 0;
+					}
+
+					// Loop through given categories, adding them and their immediate sub-categories
 					foreach($cids as $_cid)
 					{
-						if ( !isset($globalcats[$_cid]) ) continue;
+						if (!isset($globalcats[$_cid]))
+						{
+							continue;
+						}
+
 						// Do not add root category of single category sub-tree to the filter
 						if ( count($cids) > 1 )
 						{
 							$cat_obj = new stdClass();
 							$cat_obj->id = $globalcats[$_cid]->id;
-							$cat_obj->treename = $globalcats[$_cid]->title;  // $globalcats[$_cid]->treename;
+							$cat_obj->treename = $globalcats[$_cid]->title;  // Make first-level categories look as if at first level, thus do not use: $globalcats[$_cid]->treename;
 							$cat_obj->totalitems = $globalcats[$_cid]->totalitems;
 							$cats[] = $cat_obj;
 						}
-						if ( empty($globalcats[$_cid]->childrenarray)) continue;
-						foreach($globalcats[$_cid]->childrenarray as $child) {
+
+						if ( empty($globalcats[$_cid]->childrenarray))
+						{
+							continue;
+						}
+
+						foreach($globalcats[$_cid]->childrenarray as $child)
+						{
 							$_child = clone($child);
-							$_child->treename = '&nbsp; '.str_replace('<sup>|_</sup>&nbsp;', '', str_replace('&nbsp;.&nbsp;', '', $_child->treename));
+							$_child->treename = ($display_filter_as === 0 ? ' . ' : '') . $_child->title;
 							$cats[] = $_child;
 						}
 					}
 				}
-				else {
-					$cats = $globalcats;  // All categories by default
-				}
-				
-				if (!empty($cats) ) foreach ($cats as $k => $list)
+
+				// Not display specific categories add all categories, forcing filter display as a drop-down select
+				else
 				{
-					$options[] = JHtml::_('select.option', $list->id, $list->treename . ($faceted_filter ? '&nbsp; (<'. $list->totalitems.')' : ''));
+					$filter->parameters->set('display_filter_as'.$_s, 0);
+					$display_filter_as = 0;
+
+					// All categories by default
+					foreach($globalcats as $child)
+					{
+						$_child = clone($child);
+						$_child->treename = str_replace('<sup>|_</sup> ', '', str_replace('&nbsp;.&nbsp;', '', $_child->treename));
+						$cats[] = $_child;
+					}
 				}
-				
-				$extra_classes = '';
+
+				$filter->filter_options = array();
+
+				if (!empty($cats))
+				{
+					foreach ($cats as $k => $list)
+					{
+						$filter->filter_options[] = (object) array('value' => $list->id, 'text' => $list->treename, 'found' => $list->totalitems);
+					}
+				}
+
+				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
 			
 			case 'tags':
@@ -806,7 +828,7 @@ class plgFlexicontent_fieldsCore extends FCField
 		{
 			// Make use of select2 lib
 			flexicontent_html::loadFramework('select2');
-			$classes  = " use_select2_lib". @ $extra_classes;
+			$classes  = " use_select2_lib";
 			$extra_param = '';
 			
 			// MULTI-select: special label and prompts
@@ -891,8 +913,11 @@ class plgFlexicontent_fieldsCore extends FCField
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if($filter->iscore != 1) return;
-		
+		if ($filter->iscore != 1)
+		{
+			return;
+		}
+
 		if ($filter->field_type == 'maintext' || $filter->field_type == 'title') {
 			$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		}
@@ -950,8 +975,20 @@ class plgFlexicontent_fieldsCore extends FCField
 	{
 		static $nullDate = null;
 		static $state_names = null;
-		if (!$state_names) $state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'));
-		
+
+		if (!$state_names)
+		{
+			$state_names = array(
+				1 => JText::_('FLEXI_PUBLISHED'),
+				-5 => JText::_('FLEXI_IN_PROGRESS'),
+				0 => JText::_('FLEXI_UNPUBLISHED'),
+				-3 => JText::_('FLEXI_PENDING'),
+				-4 => JText::_('FLEXI_TO_WRITE'),
+				2 => JText::_('FLEXI_ARCHIVED'),
+				-2 => JText::_('FLEXI_TRASHED')
+			);
+		}
+
 		// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 		// for CORE fields, we do not set the query clauses, these are inside the fields helper file
 		if ($post===null)

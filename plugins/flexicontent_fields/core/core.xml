@@ -1292,6 +1292,8 @@
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib" >
 				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="faceted_filter" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1" class="use_select2_lib fc_skip_highlight">
@@ -1308,6 +1310,8 @@
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
 				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="faceted_filter_s" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1" class="use_select2_lib fc_skip_highlight">
