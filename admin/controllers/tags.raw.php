@@ -64,7 +64,6 @@ class FlexicontentControllerTags extends FlexicontentController
 		}
 
 		$list  = $this->input->get('taglist', null, 'string');
-		$list  = preg_replace("/[\"'\\\]/u", "", $list);
 
 		$model = $this->getModel('tags');
 		$logs  = $model->importList($list);

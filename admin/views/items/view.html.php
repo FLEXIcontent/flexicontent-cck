@@ -141,9 +141,9 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($filter_id) $count_filters++;
 		
 		// Text search
-		$scope  = $model->getState( 'scope' );
-		$search = $model->getState( 'search' );
-		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
+		$scope  = $model->getState('scope');
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
 		
 		
 		

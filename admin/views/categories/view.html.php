@@ -81,8 +81,8 @@ class FlexicontentViewCategories extends JViewLegacy
 
 
 		// Text search
-		$search = $model->getState( 'search' );
-		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
 
 		// Order and order direction
 		$filter_order     = $model->getState('filter_order');
