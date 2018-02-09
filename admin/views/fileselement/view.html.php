@@ -202,9 +202,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// *** EOF FILESELEMENT view specific ***
 
 		// Text search
-		$scope  = $model->getState( 'scope' );
-		$search = $model->getState( 'search' );
-		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
+		$scope  = $model->getState('scope');
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
 		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';

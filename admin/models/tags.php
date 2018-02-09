@@ -445,30 +445,19 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		$result = false;
 
-		if (count( $cid ))
+		if (count($cid))
 		{
-			$cids = implode( ',', $cid );
+			$cids = implode(',', $cid);
+
 			$query = 'DELETE FROM #__flexicontent_tags'
-					. ' WHERE id IN ('. $cids .')'
-					;
+				. ' WHERE id IN (' . $cids . ')';
 
-			$this->_db->setQuery( $query );
+			$this->_db->setQuery($query)->_db->execute();
 
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			
 			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
-					. ' WHERE tid IN ('. $cids .')'
-					;
+				. ' WHERE tid IN (' . $cids . ')';
 
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			$this->_db->setQuery($query)->_db->execute();
 		}
 
 		return true;
@@ -485,23 +474,29 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function importList($tags)
 	{
-		if (!$tags) return;
-		
-		// initialize the logs counters
+		if (!$tags)
+		{
+			return;
+		}
+
+		// Initialize the logs counters
 		$logs = array();
 		$logs['error'] 		= 0;
 		$logs['success'] 	= 0;
 		
 		$tags = explode("\n", $tags);
 		
-		foreach ($tags as $tag) {
-			$row  = $this->getTable('flexicontent_tags', '');
+		foreach ($tags as $tag)
+		{
+			$row = $this->getTable('flexicontent_tags', '');
 			$row->name 		= $tag;
-			$row->alias 	= JFilterOutput::stringURLSafe($tag);
 			$row->published = 1;
-			if (!$row->check()) {
+			if (!$row->check())
+			{
 				$logs['error']++;			
-			} else {
+			}
+			else
+			{
 				$row->store();
 				$logs['success']++;
 			}
@@ -511,4 +506,3 @@ class FlexicontentModelTags extends JModelLegacy
 	}
 
 }
-?>

@@ -66,8 +66,8 @@ class FlexicontentViewTypes extends JViewLegacy
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
 		
 		// Text search
-		$search = $model->getState( 'search' );
-		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
+		$search = $model->getState('search');
+		$search = StringHelper::trim(StringHelper::strtolower($search));
 
 		// Order and order direction
 		$filter_order     = $model->getState('filter_order');
