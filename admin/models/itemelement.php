@@ -64,6 +64,9 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
 
+		// Parameters of the view, in our case it is only the component parameters
+		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
+
 		$limit      = $app->getUserStateFromRequest( $option.'.'.$view.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
 		$limitstart = $app->getUserStateFromRequest( $option.'.'.$view.'.limitstart', 'limitstart', 0, 'int' );
 
@@ -80,23 +83,68 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 * @access public
 	 * @return array
 	 */
+
+
+	/**
+	 * Method to get item data
+	 *
+	 * @access public
+	 * @return object
+	 */
 	function getData()
 	{
-		$user = JFactory::getUser();
-		if ( !$user->id ) return array();  // catch case of guest user submitting in frontend
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$cid     = $jinput->get('cid', array(), 'array');
 		
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_data))
+		$print_logging_info = $this->cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
+		// Lets load the Items if it doesn't already exist
+		if ( $this->_data === null )
 		{
+			// 1, get filtered, limited, ordered items
 			$query = $this->_buildQuery();
-			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
+			if ( $print_logging_info )  $start_microtime = microtime(true);
+			$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
+			$rows = $this->_db->loadObjectList();
+			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			
+			// 2, get current items total for pagination
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $this->_db->loadResult();
+			
+			// 3, get item ids
+			$query_ids = array();
+			foreach ($rows as $row)
+			{
+				$query_ids[] = $row->id;
+			}
+			
+			// 4, get item data
+			if (count($query_ids)) $query = $this->_buildQuery($query_ids);
+			if ( $print_logging_info )  $start_microtime = microtime(true);
+			$_data = array();
+			if (count($query_ids))
+			{
+				$_data = $this->_db->setQuery($query)->loadObjectList('id');
+			}
+			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			
+			// 5, reorder items and get cat ids
+			$this->_data = array();
+			foreach($query_ids as $item_id)
+			{
+				$item = $_data[$item_id];
+
+				$this->_data[] = $item;
+			}
 		}
+
 		return $this->_data;
 	}
+
 
 	/**
 	 * Total nr
@@ -145,20 +193,36 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 * @access private
 	 * @return string
 	 */
-	function _buildQuery()
+	function _buildQuery($query_ids = false)
 	{
-		$query = 'SELECT DISTINCT SQL_CALC_FOUND_ROWS rel.itemid, i.*, i.language AS lang'
-			. ', u.name AS author, t.name AS type_name, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
-			. ' FROM #__content AS i'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-			. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
-			. $this->_buildContentWhere()
-			. $this->_buildContentOrderBy()
-			;
+		if (!$query_ids)
+		{
+			$query = 'SELECT DISTINCT i.id'
+				. ' FROM #__flexicontent_items_tmp AS i'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
+				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+				. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
+				. $this->_buildContentWhere()
+				. $this->_buildContentOrderBy();
+		}
+		else
+		{
+			$query = 'SELECT i.*, i.language AS lang'
+				. ', u.name AS author, t.name AS type_name, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
+				. ' FROM #__flexicontent_items_tmp AS i'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__viewlevels as level ON level.id=i.access'
+				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+				. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
+				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
+				. ' GROUP BY i.id';
+		}
+
 		return $query;
 	}
 	
