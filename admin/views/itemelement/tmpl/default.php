@@ -229,7 +229,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="6">
+			<td colspan="9">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
