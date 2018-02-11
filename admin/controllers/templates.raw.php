@@ -344,8 +344,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 					echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
 				}
 
-				foreach ($form_layout->getFieldset($fsname) as $field)
-				{
+				foreach ($form_layout->getFieldset($fsname) as $field) :
+
 					if ($field->getAttribute('not_inherited'))
 					{
 						continue;
@@ -400,6 +400,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 						</div>
 						';
 					}
+
 				endforeach; ?>
 					
 			</div>
