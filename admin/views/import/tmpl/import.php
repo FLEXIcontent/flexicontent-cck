@@ -193,6 +193,18 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 			<tr>
+				<td class="key"><label class="label"><?php echo JText::_("FLEXI_CUSTOM_TITLE");?></label></td>
+				<td class="data">
+					<?php
+						$_desc_checked = $this->model->getState('custom_ititle_col') == 1 ? 'checked="checked"' : '';
+					?>
+					<input type="checkbox" id="custom_ititle_col" name="custom_ititle_col" value="1" <?php echo $_desc_checked; ?> />
+					<label for="custom_ititle_col"><?php echo JText::_("FLEXI_IMPORT_USE_CUSTOM_TITLE_COL");?></label>
+					<span class="icon-info hasTooltip" style="font-size: 18px;" title="<?php echo htmlspecialchars(JText::_('FLEXI_CUSTOM_TITLE_DESC'), ENT_COMPAT, 'UTF-8'); ?>"</span>
+				</td>
+			</tr>
+			
+			<tr>
 				<td colspan="2">
 					<br/>
 					<div class="fc-mssg fc-info"><?php echo JText::_("FLEXI_IMPORT_ENTER_VALID_DATES");?></div>

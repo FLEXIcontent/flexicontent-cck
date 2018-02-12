@@ -227,6 +227,7 @@ class FlexicontentViewImport extends JViewLegacy
 		// Publication: META data
 		$formvals['metadesc_col'] = $model->getState('metadesc_col');
 		$formvals['metakey_col']  = $model->getState('metakey_col');
+		$formvals['custom_ititle_col'] = $model->getState('custom_ititle_col');
 		
 		
 		// Publication: dates

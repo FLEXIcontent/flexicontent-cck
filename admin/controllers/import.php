@@ -187,6 +187,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				// Publication: META data
 				$conf['metadesc_col'] = $jinput->get('metadesc_col', 0, 'int');
 				$conf['metakey_col'] = $jinput->get('metakey_col', 0, 'int');
+				$conf['custom_ititle_col'] = $jinput->get('custom_ititle_col', 0, 'int');
 
 				// Publication: dates
 				$conf['modified_col'] = $jinput->get('modified_col', 0, 'int');
@@ -343,14 +344,16 @@ class FlexicontentControllerImport extends FlexicontentController
 				$q = 'SELECT id, name, field_type, label FROM #__flexicontent_fields AS fi'
 					. ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id=' . $conf['type_id'];
 				$db->setQuery($q);
-				$conf['thefields'] = $db->loadObjectList('name');
-				unset($conf['thefields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
+				$conf['theFields'] = $db->loadObjectList('name');
+				unset($conf['theFields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
 
 				// ***
 				// *** Check for REQUIRED columns and decide CORE property columns to use
 				// ***
 
-				$core_props = array();
+				$conf['core_props'] = array();
+				$conf['attribs'] = array();
+				$conf['metadata'] = array();
 
 				if ($conf['id_col'] && !in_array('id', $conf['columns']))
 				{
@@ -359,7 +362,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['id_col'])
 				{
-					$core_props['id'] = 'Item ID';
+					$conf['core_props']['id'] = 'Item ID';
 				}
 
 				if (!in_array('title', $conf['columns']))
@@ -368,9 +371,9 @@ class FlexicontentControllerImport extends FlexicontentController
 					$app->redirect($link);
 				}
 
-				$core_props['title'] = 'Title (core)';
-				$core_props['text']  = 'Description (core)';
-				$core_props['alias'] = 'Alias (core)';
+				$conf['core_props']['title'] = 'Title (core)';
+				$conf['core_props']['text']  = 'Description (core)';
+				$conf['core_props']['alias'] = 'Alias (core)';
 
 				if ($conf['language'] == '-99' && !in_array('language', $conf['columns']))
 				{
@@ -379,7 +382,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['language'] == '-99')
 				{
-					$core_props['language'] = 'Language';
+					$conf['core_props']['language'] = 'Language';
 				}
 
 				if ($conf['state'] == '-99' && !in_array('state', $conf['columns']))
@@ -389,7 +392,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['state'] == '-99')
 				{
-					$core_props['state'] = 'State';
+					$conf['core_props']['state'] = 'State';
 				}
 
 				if ($conf['access'] === 0 && !in_array('access', $conf['columns']))
@@ -399,7 +402,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['access'] === 0)
 				{
-					$core_props['access'] = 'Access';
+					$conf['core_props']['access'] = 'Access';
 				}
 
 				if ($conf['maincat_col'] && !in_array('catid', $conf['columns']))
@@ -409,7 +412,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['maincat_col'])
 				{
-					$core_props['catid'] = 'Primary category';
+					$conf['core_props']['catid'] = 'Primary category';
 				}
 
 				if ($conf['seccats_col'] && !in_array('cid', $conf['columns']))
@@ -419,7 +422,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['seccats_col'])
 				{
-					$core_props['cid'] = 'Secondary categories';
+					$conf['core_props']['cid'] = 'Secondary categories';
 				}
 
 				if ($conf['created_col'] && !in_array('created', $conf['columns']))
@@ -429,7 +432,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['created_col'])
 				{
-					$core_props['created'] = 'Creation Date';
+					$conf['core_props']['created'] = 'Creation Date';
 				}
 
 				if ($conf['created_by_col'] && !in_array('created_by', $conf['columns']))
@@ -439,7 +442,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['created_by_col'])
 				{
-					$core_props['created_by'] = 'Creator (Author)';
+					$conf['core_props']['created_by'] = 'Creator (Author)';
 				}
 
 				if ($conf['modified_col'] && !in_array('modified', $conf['columns']))
@@ -449,7 +452,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['modified_col'])
 				{
-					$core_props['modified'] = 'Modification Date';
+					$conf['core_props']['modified'] = 'Modification Date';
 				}
 
 				if ($conf['modified_by_col'] && !in_array('modified_by', $conf['columns']))
@@ -459,7 +462,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['modified_by_col'])
 				{
-					$core_props['modified_by'] = 'Last modifier';
+					$conf['core_props']['modified_by'] = 'Last modifier';
 				}
 
 				if ($conf['metadesc_col'] && !in_array('metadesc', $conf['columns']))
@@ -469,7 +472,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['metadesc_col'])
 				{
-					$core_props['metadesc'] = 'META Description';
+					$conf['core_props']['metadesc'] = 'META Description';
 				}
 
 				if ($conf['metakey_col'] && !in_array('metakey', $conf['columns']))
@@ -479,7 +482,17 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['metakey_col'])
 				{
-					$core_props['metakey'] = 'META Keywords';
+					$conf['core_props']['metakey'] = 'META Keywords';
+				}
+
+				if ($conf['custom_ititle_col'] && !in_array('custom_ititle', $conf['columns']))
+				{
+					$app->enqueueMessage('CSV file lacks column <b>\'custom_ititle\'</b> (Custom &lt;title&gt;)', 'error');
+					$app->redirect($link);
+				}
+				elseif ($conf['custom_ititle_col'])
+				{
+					$conf['attribs']['custom_ititle'] = 'Custom &lt;title&gt;';
 				}
 
 				if ($conf['publish_up_col'] && !in_array('publish_up', $conf['columns']))
@@ -489,7 +502,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['publish_up_col'])
 				{
-					$core_props['publish_up'] = 'Start publication date';
+					$conf['core_props']['publish_up'] = 'Start publication date';
 				}
 
 				if ($conf['publish_down_col'] && !in_array('publish_down', $conf['columns']))
@@ -499,7 +512,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['publish_down_col'])
 				{
-					$core_props['publish_down'] = 'End publication Date';
+					$conf['core_props']['publish_down'] = 'End publication Date';
 				}
 
 				if ($conf['tags_col'] == 1 && !in_array('tags_names', $conf['columns']))
@@ -509,7 +522,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['tags_col'] == 1)
 				{
-					$core_props['tags_names'] = 'Tag names';
+					$conf['core_props']['tags_names'] = 'Tag names';
 					$tags_model	= $this->getModel('tags');
 				}
 
@@ -520,11 +533,9 @@ class FlexicontentControllerImport extends FlexicontentController
 				}
 				elseif ($conf['tags_col'] == 2)
 				{
-					$core_props['tags_raw'] = 'Tags';
+					$conf['core_props']['tags_raw'] = 'Tags';
 					$tags_model	= $this->getModel('tags');
 				}
-
-				$conf['core_props'] = & $core_props;
 
 				// ***
 				// *** Verify that custom specified item ids do not already exist
@@ -587,7 +598,7 @@ class FlexicontentControllerImport extends FlexicontentController
 
 				foreach ($conf['columns'] as $colname)
 				{
-					if (!isset($conf['core_props'][$colname]) && !isset($conf['thefields'][$colname]))
+					if (!isset($conf['core_props'][$colname]) && !isset($conf['theFields'][$colname]) && !isset($conf['attribs'][$colname]) && !isset($conf['metadata'][$colname]))
 					{
 						$unused_columns[] = $colname;
 					}
@@ -709,6 +720,8 @@ class FlexicontentControllerImport extends FlexicontentController
 			$_d = & $conf['contents_parsed'][$lineno];
 			$data = array();
 			$data['custom'] = array();
+			$data['attribs']  = array();
+			$data['metadata'] = array();
 
 			$data['type_id'] = $conf['type_id'];
 			$data['language'] = $conf['language'];
@@ -789,6 +802,16 @@ class FlexicontentControllerImport extends FlexicontentController
 						$data[$fieldname] = $field_values;
 					}
 
+					elseif ($fieldname == 'attribs')
+					{
+						$data['attribs'] = $field_values;
+					}
+
+					elseif ($fieldname == 'metadata')
+					{
+						$data['metadata'] = $field_values;
+					}
+
 					else
 					{
 						$data['custom'][$fieldname] = $field_values;
@@ -838,6 +861,24 @@ class FlexicontentControllerImport extends FlexicontentController
 					{
 						$data['custom'][$i] = $v;
 					}
+
+					$data_attribs = $data['attribs'];  // Backup attribs from file
+					$data['attribs'] = $item->attribs ?: array();  // Get existing item's attribs
+
+					// Override existing item attribs with those from file
+					foreach ($data_attribs as $i => $v)
+					{
+						$data['attribs'][$i] = $v;
+					}
+
+					$data_metadata = $data['metadata'];  // Backup metadata from file
+					$data['metadata'] = $item->metadata ?: array();  // Get existing item's metadata
+
+					// Override existing item metadata with those from file
+					foreach ($data_metadata as $i => $v)
+					{
+						$data['metadata'][$i] = $v;
+					}
 				}
 
 				// INTERNAL ERROR, item could not be loaded, but we have checked above that it does exist, so this indicates a bug in our code
@@ -846,6 +887,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					$data['id'] = -1;
 				}
 			}
+			//echo '<pre>'; print_r($data); echo '</pre>'; exit;
 
 			$isNew = $data['id'] == 0;
 
@@ -997,7 +1039,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder);
 		$ff_names_to_types = array();
 
-		foreach ($conf['thefields'] as $_fld)
+		foreach ($conf['theFields'] as $_fld)
 		{
 			if (isset($ff_types_to_props[$_fld->field_type]))
 			{
@@ -1168,6 +1210,8 @@ class FlexicontentControllerImport extends FlexicontentController
 
 			// Prepare request variable used by the item's Model
 			$data = array();
+			$data['attribs'] = array();
+			$data['metadata'] = array();
 
 			foreach ($fields as $col_no => $field_data)
 			{
@@ -1304,6 +1348,13 @@ class FlexicontentControllerImport extends FlexicontentController
 					if ($conf['metakey_col'])
 					{
 						$data[$fieldname] = $field_values;
+					}
+				}
+				elseif ($fieldname == 'custom_ititle')
+				{
+					if ($conf['custom_ititle_col'])
+					{
+						$data['attribs'][$fieldname] = reset($field_values);  // non-array
 					}
 				}
 				elseif ($fieldname == 'publish_up')
