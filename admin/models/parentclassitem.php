@@ -2305,7 +2305,7 @@ class ParentClassItem extends FCModelAdmin
 				$this->createTagsHelper($this->tagsObserver, $this->type, $item->id, $this->typeAlias, $this->table);
 
 				// Load data of FLEXIcontent tags
-				$fctags = $this->getTagsByIds($data['tags']);
+				$fctags = isset($data['tags']) ? $this->getTagsByIds($data['tags']) : array();
 
 				// Sync the tags assignments
 				$this->syncJTagAssignments($fctags, array($item->id), array($item->id => $asset),  true);

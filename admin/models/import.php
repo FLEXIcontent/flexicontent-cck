@@ -110,12 +110,15 @@ class FlexicontentModelImport extends JModelList
 		// Publication: META data
 		$metadesc_col = $fcform ? $jinput->get('metadesc_col', 0, 'int')  :  $app->getUserStateFromRequest( $p.'metadesc_col', 'metadesc_col', $this->cparams->get('import_metadesc_col', 0), 'int');
 		$metakey_col  = $fcform ? $jinput->get('metakey_col', 0, 'int')   :  $app->getUserStateFromRequest( $p.'metakey_col', 'metakey_col', $this->cparams->get('import_metakey_col', 0), 'int');
+		$custom_ititle_col = $fcform ? $jinput->get('custom_ititle_col', 0, 'int')   :  $app->getUserStateFromRequest( $p.'custom_ititle_col', 'custom_ititle_col', $this->cparams->get('import_custom_ititle_col', 0), 'int');
 		
 		$this->setState('metadesc_col', $metadesc_col);
 		$this->setState('metakey_col', $metakey_col);
+		$this->setState('custom_ititle_col', $custom_ititle_col);
 		
 		$app->setUserState($p.'metadesc_col', $metadesc_col);
 		$app->setUserState($p.'metakey_col', $metakey_col);
+		$app->setUserState($p.'custom_ititle_col', $custom_ititle_col);
 		
 		
 		// Publication: dates

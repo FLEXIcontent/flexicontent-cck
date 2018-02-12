@@ -1591,6 +1591,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="import_custom_ititle_col" type="fcradio" default="0" label="FLEXI_IMPORT_USE_CUSTOM_TITLE_COL" description="FLEXI_CUSTOM_TITLE_DESC" class="btn-group">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_DATES" label="" level="level2" />
 			<field name="import_created_col" type="fcradio" default="0" label="FLEXI_CREATION_DATE" description="..." class="btn-group group-fcinfo">
