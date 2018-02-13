@@ -91,6 +91,24 @@ class FlexicontentHelperRoute
 	}
 
 
+	/**
+	 * function to discover if a active menu item id is of flexicontent component
+	 */
+	static function _getActiveFlexiMenuitem()
+	{
+		static $active = null;
+
+		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+		$active = $menus->getActive();
+
+		if (!$active || !isset($active->query['option']) || $active->query['option'] !== 'com_flexicontent')
+		{
+			$active = false;
+		}
+
+		return $active;
+	}
+
 
 	/**
 	 * function to discover a default item id only once
@@ -119,7 +137,7 @@ class FlexicontentHelperRoute
 			$menu = $menus->getActive();
 			
 			// Check that (a) it exists and is active (b) points to com_flexicontent
-			if ($menu && @ $menu->query['option']=='com_flexicontent' )
+			if ($menu && isset($menu->query['option']) && $menu->query['option'] === 'com_flexicontent' )
 			{
 				// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
 				$item_matches = $current_language == '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
@@ -867,11 +885,10 @@ class FlexicontentHelperRoute
 		// Get current menu item, we will prefer current menu if it points to given category,
 		// thus maintaining current menu item if multiple menu items to same category exist !!
 		static $active = null;
-		if ($active == null)
+
+		if ($active === null)
 		{
-			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-			$active = $menus->getActive();
-			if ($active && @ $active->query['option']!='com_flexicontent') $active=false;
+			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 		}
 		
 		
@@ -954,11 +971,10 @@ class FlexicontentHelperRoute
 		// Get current menu item, we will prefer current menu if it points to given category,
 		// thus maintaining current menu item if multiple menu items to same category exist !!
 		static $active = null;
-		if ($active == null)
+
+		if ($active === null)
 		{
-			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-			$active = $menus->getActive();
-			if ($active && @ $active->query['option']!='com_flexicontent') $active=false;
+			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 		}
 		
 		
@@ -1038,10 +1054,10 @@ class FlexicontentHelperRoute
 		// Get current menu item, we will prefer current menu if it points to given category,
 		// thus maintaining current menu item if multiple menu items to same category exist !!
 		static $active = null;
-		if ($active == null) {
-			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-			$active = $menus->getActive();
-			if ($active && @ $active->query['option']!='com_flexicontent') $active=false;
+
+		if ($active === null)
+		{
+			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 		}
 		
 		
@@ -1143,7 +1159,7 @@ class FlexicontentHelperRoute
 		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item		
 
 		// Check that (a) it exists and is active (b) points to com_flexicontent
-		if ($menu && @ $menu->query['option']=='com_flexicontent')
+		if ($menu && isset($menu->query['option']) && $menu->query['option'] === 'com_flexicontent')
 		{
 			// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
 			$item_matches = $current_language == '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
@@ -1168,7 +1184,7 @@ class FlexicontentHelperRoute
 					// Check the associated menu item too
 					$menuitem_id = $associated[$current_language];
 					$menu = $menus->getItem($menuitem_id);
-					if (!$menu || @ $menu->query['option']!='com_flexicontent')
+					if (!$menu || !isset($menu->query['option']) || $menu->query['option'] !== 'com_flexicontent')
 					{
 						// Clear menu item and and menu item id
 						$menuitem_id = 0;
