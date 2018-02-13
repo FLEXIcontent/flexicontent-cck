@@ -452,12 +452,12 @@ class FlexicontentModelTags extends JModelLegacy
 			$query = 'DELETE FROM #__flexicontent_tags'
 				. ' WHERE id IN (' . $cids . ')';
 
-			$this->_db->setQuery($query)->_db->execute();
+			$this->_db->setQuery($query)->execute();
 
 			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
 				. ' WHERE tid IN (' . $cids . ')';
 
-			$this->_db->setQuery($query)->_db->execute();
+			$this->_db->setQuery($query)->execute();
 		}
 
 		return true;
