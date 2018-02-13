@@ -2,6 +2,15 @@
 
 extract($displayData);
 
+$cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
+$use_font_icons = $cparams->get('use_font_icons', 1);
+
+// Some parameter shortcuts
+$_s = $isSearchView ? '_s' : '';
+$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
+$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
+$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+
 // Make use of select2 lib
 flexicontent_html::loadFramework('select2');
 $classes  = " use_select2_lib";
@@ -56,7 +65,7 @@ if ( $extra_attribs = $filter->parameters->get( 'filter_extra_attribs'.$_s, '' )
 }
 //$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 
-if ($display_filter_as==6 && $combine_tip)
+if ($display_filter_as==6 && $filter->parameters->get('filter_values_require_all_tip', 0))
 {
 	$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 }

@@ -3357,29 +3357,28 @@ class FlexicontentFields
 	// Method to create a category (content list) or search filter
 	static function createFilter(&$filter, $value='', $formName='adminForm', $indexed_elements=false, $search_prop='')
 	{
-		static $apply_cache = null;
 		static $faceted_overlimit_msg = null;
 
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$cparams   = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
+		$cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
-		$use_font_icons = $cparams->get('use_font_icons', 1);
 		
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
-		$is_fc_component = $option=='com_flexicontent';
-		$isCategoryView = $is_fc_component && $view=='category';
-		$isSearchView   = $is_fc_component && $view=='search';
-		
-		if ( $print_logging_info ) {
+
+		$isFC = $option === 'com_flexicontent';
+		$isCategoryView = $isFC && $view === 'category';
+		$isSearchView   = $isFC && $view === 'search';
+
+		if ( $print_logging_info )
+		{
 			global $fc_run_times;
 			$start_microtime = microtime(true);
 		}
 		
 		// Apply caching to filters regardless of cache setting ...
-		$apply_cache = FLEXI_CACHE;
-		if ($apply_cache)
+		if (FLEXI_CACHE)
 		{
 			$itemcache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
@@ -3387,13 +3386,10 @@ class FlexicontentFields
 		}
 		
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
-		$default_size = $isDate ? 15 : 30;
 		$_s = $isSearchView ? '_s' : '';
 		
 		// Some parameter shortcuts
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
-		$size         = $filter->parameters->get( 'text_filter_size', $default_size );        // Size of filter
-		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		
@@ -3411,7 +3407,7 @@ class FlexicontentFields
 		}
 		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6,8)) )
+		if (in_array($display_filter_as, array(2,3,5,6,8)))
 		{
 			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
 		}
@@ -3425,8 +3421,6 @@ class FlexicontentFields
 		$require_all = is_array($value) && count($value)>1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
-		
-		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
@@ -3453,14 +3447,14 @@ class FlexicontentFields
 		}
 		
 		// Get filtering values, this can be cached if not filtering according to current category filters
-		if ( $get_filter_vals )
+		if ($get_filter_vals)
 		{
 			$view_join = '';
 			$view_join_n_text = '';
 			$view_where = '';
 			$filters_where = array();
 			$text_search = '';
-			$view_total=0;
+			$view_total = 0;
 			
 			// ***
 			// *** Limiting of displayed filter values according to current category filtering, but show all field values if filter is active
@@ -3470,7 +3464,9 @@ class FlexicontentFields
 			if ( $isCategoryView )
 			{
 				global $fc_catview;
-				if ( $faceted_filter ) {
+
+				if ($faceted_filter)
+				{
 					$view_join = @ $fc_catview['join_clauses'];
 					$view_join_n_text = @ $fc_catview['join_clauses_with_text'];
 					$view_where = @ $fc_catview['where_conf_only'];
@@ -3484,8 +3480,14 @@ class FlexicontentFields
 			else if ( $isSearchView )
 			{
 				global $fc_searchview;
-				if ( empty($fc_searchview) ) return array();  // search view plugin disabled ?
-				if ( $faceted_filter ) {
+
+				if (empty($fc_searchview))
+				{
+					return array();  // search view plugin disabled ?
+				}
+
+				if ($faceted_filter)
+				{
 					$view_join = $fc_searchview['join_clauses'];
 					$view_join_n_text = $fc_searchview['join_clauses_with_text'];
 					$view_where = $fc_searchview['where_conf_only'];
@@ -3501,7 +3503,7 @@ class FlexicontentFields
 			$lang_code = $isDate && !empty($filter->date_txtformat)? JFactory::getLanguage()->getTag() : null;
 
 			// This is hack for filter core properties to be filterable in search view without being added to the adv search index
-			if( $filter->field_type == 'coreprops' &&  $view=='search' )
+			if ($filter->field_type == 'coreprops' &&  $view=='search')
 			{ 
 				$createFilterValues = 'createFilterValues';
 			}
@@ -3511,16 +3513,22 @@ class FlexicontentFields
 			{
 				$results_page = $filter->filter_options;
 			}
-			elseif ( $apply_cache )
+			elseif (FLEXI_CACHE)
+			{
 				$results_page = $itemcache->get(
 					array('FlexicontentFields', $createFilterValues),
 					array($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code)
 				);
+			}
 			elseif (!$isSearchView)
+			{
 				$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
+			}
 			else
+			{
 				$results_page = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
-			
+			}
+
 			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
 			$faceted_max_item_limit = 10000;
 			if ( $faceted_filter==2 )
@@ -3608,13 +3616,10 @@ class FlexicontentFields
 		}
 
 		$displayData = array(
-			'display_filter_as' => $display_filter_as,
-			'label_filter' => $label_filter,
+			'filter' => & $filter,
 			'results' => & $results,
-			'isSlider' => $isSlider,
-			'isDate' => $isDate,
 			'value' => $value,
-			'filter' => & $filter
+			'isSearchView' => $isSearchView
 		);
 
 		$layouts_path = null;
@@ -3634,21 +3639,22 @@ class FlexicontentFields
 			{
 				case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
 
-					JLayoutHelper::render('items_list_filters.select', $displayData, $layouts_path);
+					JLayoutHelper::render('items_list_filters.select_selectmul', $displayData, $layouts_path);
 					break;
 
 				case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
 
-					JLayoutHelper::render('items_list_filters.slider', $displayData, $layouts_path);
+					JLayoutHelper::render('items_list_filters.txtsearch_date_slider', $displayData, $layouts_path);
 					break;
 
 				case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
 
-					JLayoutHelper::render('items_list_filters.radiocheck', $displayData, $layouts_path);
+					JLayoutHelper::render('items_list_filters.radio_checkbox', $displayData, $layouts_path);
 					break;
 
 				default:
-					JLayoutHelper::render('items_list_filters.radiocheck', $displayData, $layouts_path);
+					//JLayoutHelper::render('items_list_filters.radiocheck', $displayData, $layouts_path);
+					$filter->html = 'Case ' . $display_filter_as . ' not implemented';
 					break;
 			}
 		}

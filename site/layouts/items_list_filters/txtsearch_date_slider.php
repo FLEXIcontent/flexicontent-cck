@@ -2,6 +2,21 @@
 
 extract($displayData);
 
+$cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
+$use_font_icons = $cparams->get('use_font_icons', 1);
+
+// Some parameter shortcuts
+$_s = $isSearchView ? '_s' : '';
+$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
+$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
+$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+
+$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
+$isSlider = $display_filter_as == 7 || $display_filter_as == 8;
+$slider_display_config = $filter->parameters->get( 'slider_display_config'.$_s, 1 );  // Slider found values: 1 or custom values/labels: 2
+
+$size = $filter->parameters->get( 'text_filter_size', $isDate ? 15 : 30);        // Size of filter
+
 if (!$isSlider)
 {
 	$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
@@ -282,7 +297,7 @@ else
 	}
 	else
 	{
-		$size = (int)($size / 2);
+		$size = (int) ($size / 2);
 		$filter->html	.=
 		($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
 			<div class="fc_filter_element">
