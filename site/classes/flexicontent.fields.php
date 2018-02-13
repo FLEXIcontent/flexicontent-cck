@@ -3396,16 +3396,6 @@ class FlexicontentFields
 		$isSlider = $display_filter_as == 7 || $display_filter_as == 8;
 		$slider_display_config = $filter->parameters->get( 'slider_display_config'.$_s, 1 );  // Slider found values: 1 or custom values/labels: 2
 		
-		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
-		if ($filter_vals_display)
-		{
-			$icon_size  = $filter->parameters->get( 'icon_size_filter'.$_s );
-			$icon_color = $filter->parameters->get( 'icon_color_filter'.$_s );
-			
-			$icon_class = ($icon_size ? ' fc-icon-'.$icon_size : '');
-			$icon_style = ($icon_color ? ' color: '.$icon_color.';' : '');
-		}
-		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
 		if (in_array($display_filter_as, array(2,3,5,6,8)))
 		{
@@ -3617,6 +3607,8 @@ class FlexicontentFields
 
 		$displayData = array(
 			'filter' => & $filter,
+			'filter_ffid' => $filter_ffid,
+			'filter_ffname' => $filter_ffname,
 			'results' => & $results,
 			'value' => $value,
 			'isSearchView' => $isSearchView
