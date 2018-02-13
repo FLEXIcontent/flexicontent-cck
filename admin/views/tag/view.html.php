@@ -217,6 +217,37 @@ class FlexicontentViewTag extends JViewLegacy
 			);
 		}
 
+		$jtag_id = $row->jtag_id;
+
+		if ($jtag_id)
+		{
+			JText::script("FLEXI_UPDATING_CONTENTS", true);
+			$document->addScriptDeclaration('
+				function fc_edit_jtag_modal_load( container )
+				{
+					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+					{
+						container.dialog("close");
+					}
+				}
+				function fc_edit_jtag_modal_close()
+				{
+					window.location.reload(false);
+					document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				}
+			');
+			
+			$modal_title = JText::_('FLEXI_EDIT_JTAG', true);
+			$tip_class = ' hasTooltip';
+			JToolbarHelper::divider();
+			flexicontent_html::addToolBarButton(
+				'FLEXI_EDIT_JTAG', $btn_name='edit_jtag',
+				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jtag_modal_load}); return false;",
+				$msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
+				'data-placement="bottom" data-href="index.php?option=com_tags&task=tag.edit&id='.$jtag_id.'" title="Edit all details of joomla tag"'
+			);
+		}
 
 
 		// ***
