@@ -3650,6 +3650,8 @@ class FlexicontentFields
 					break;
 			}
 		}
+		//$last_error = error_get_last();
+		//echo '<pre>'; print_r($last_error); exit;
 
 		// Prepend opening Text to filter's HTML
 		if ($opentag_filter)
