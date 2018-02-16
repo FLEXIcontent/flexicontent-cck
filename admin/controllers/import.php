@@ -344,8 +344,8 @@ class FlexicontentControllerImport extends FlexicontentController
 				$q = 'SELECT id, name, field_type, label FROM #__flexicontent_fields AS fi'
 					. ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id=' . $conf['type_id'];
 				$db->setQuery($q);
-				$conf['theFields'] = $db->loadObjectList('name');
-				unset($conf['theFields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
+				$conf['custom_fields'] = $db->loadObjectList('name');
+				unset($conf['custom_fields']['tags']); // Prevent Automated Raw insertion of tags, we will use special code
 
 				// ***
 				// *** Check for REQUIRED columns and decide CORE property columns to use
@@ -598,7 +598,7 @@ class FlexicontentControllerImport extends FlexicontentController
 
 				foreach ($conf['columns'] as $colname)
 				{
-					if (!isset($conf['core_props'][$colname]) && !isset($conf['theFields'][$colname]) && !isset($conf['attribs'][$colname]) && !isset($conf['metadata'][$colname]))
+					if (!isset($conf['core_props'][$colname]) && !isset($conf['custom_fields'][$colname]) && !isset($conf['attribs'][$colname]) && !isset($conf['metadata'][$colname]))
 					{
 						$unused_columns[] = $colname;
 					}
@@ -862,8 +862,15 @@ class FlexicontentControllerImport extends FlexicontentController
 						$data['custom'][$i] = $v;
 					}
 
-					$data_attribs = $data['attribs'];  // Backup attribs from file
-					$data['attribs'] = $item->attribs ?: array();  // Get existing item's attribs
+					// Backup attribs from file
+					$data_attribs = $data['attribs'];
+
+					if (!is_array($item->attribs) && !is_object($item->attribs))
+					{
+						$item->attribs = new JRegistry($item->attribs);
+					}
+
+					$data['attribs'] = is_object($item->attribs) ? $item->attribs->toArray() : $item->attribs;
 
 					// Override existing item attribs with those from file
 					foreach ($data_attribs as $i => $v)
@@ -872,7 +879,13 @@ class FlexicontentControllerImport extends FlexicontentController
 					}
 
 					$data_metadata = $data['metadata'];  // Backup metadata from file
-					$data['metadata'] = $item->metadata ?: array();  // Get existing item's metadata
+
+					if (!is_array($item->metadata) && !is_object($item->metadata))
+					{
+						$item->metadata = new JRegistry($item->metadata);
+					}
+
+					$data['metadata'] = is_object($item->metadata) ? $item->metadata->toArray() : $item->metadata;
 
 					// Override existing item metadata with those from file
 					foreach ($data_metadata as $i => $v)
@@ -1039,7 +1052,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder);
 		$ff_names_to_types = array();
 
-		foreach ($conf['theFields'] as $_fld)
+		foreach ($conf['custom_fields'] as $_fld)
 		{
 			if (isset($ff_types_to_props[$_fld->field_type]))
 			{
@@ -1210,8 +1223,6 @@ class FlexicontentControllerImport extends FlexicontentController
 
 			// Prepare request variable used by the item's Model
 			$data = array();
-			$data['attribs'] = array();
-			$data['metadata'] = array();
 
 			foreach ($fields as $col_no => $field_data)
 			{

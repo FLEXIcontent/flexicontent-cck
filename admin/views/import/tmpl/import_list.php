@@ -189,25 +189,57 @@ foreach($_levels as $_level) {
 	</div>
 </div>
 
+<?php
+//echo '<pre>'; print_r($this->conf); exit;
+?>
+
+
 <table class="adminlist">
 	<thead>
 	<tr>
 		<th>#</th>
-		<?php foreach($this->conf['contents_parsed'][1] as $fieldname => $contents_parsed) :?>
-			<?php	if ( !isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['thefields'][$fieldname]) )  continue; ?>
+		<?php foreach($this->conf['contents_parsed'][1] as $index => $contents_parsed) :?>
+			<?php
+			if ($index === 'attribs' || $index === 'metadata')
+			{
+				$_keys = array_keys($contents_parsed);
+				$fieldname = reset($_keys);
+			}
+			else
+			{
+				$fieldname = $index;
+			}
+			if (!isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['custom_fields'][$fieldname]) && !isset($this->conf['attribs'][$fieldname]) && !isset($this->conf['metadata'][$fieldname]) )
+			{
+				continue;
+			}
+			?>
 			<th style="text-align: left;">
 			<?php
-			if ( isset($this->conf['thefields'][$fieldname]) ) {
-				echo $this->conf['thefields'][$fieldname]->label."<br/>";
-			} else if ( isset($this->conf['core_props'][$fieldname]) ) {
-				echo $this->conf['core_props'][$fieldname]."<br/>";
+			if (isset($this->conf['custom_fields'][$fieldname]))
+			{
+				echo $this->conf['custom_fields'][$fieldname]->label . '<br>';
 			}
-			echo '<small>-- '.$fieldname.' --</small>';
+			elseif (isset($this->conf['core_props'][$fieldname]))
+			{
+				echo $this->conf['core_props'][$fieldname] . '<br>';
+			}
+			elseif (isset($this->conf['attribs'][$fieldname]))
+			{
+				echo $this->conf['attribs'][$fieldname] . '<br>';
+			}
+			elseif (isset($this->conf['metadata'][$fieldname]))
+			{
+				echo $this->conf['metadata'][$fieldname] . '<br>';
+			}
+
+			echo '<span class="badge" style="border-radius: 3px; font-size: 90%;">' . $fieldname . '</span>';
 			
-			$folderpath = '';
-			if ( isset($this->conf['thefields'][$fieldname]) && isset($this->conf['ff_types_to_paths'][ $this->conf['thefields'][$fieldname]->field_type]) ) {
-				$this->conf['thefields'][$fieldname]->folderpath = $this->conf['ff_types_to_paths'][ $this->conf['thefields'][$fieldname]->field_type];
+			if (isset($this->conf['custom_fields'][$fieldname]) && isset($this->conf['ff_types_to_paths'][ $this->conf['custom_fields'][$fieldname]->field_type]))
+			{
+				$this->conf['custom_fields'][$fieldname]->folderpath = $this->conf['ff_types_to_paths'][ $this->conf['custom_fields'][$fieldname]->field_type];
 			}
+
 			?>
 			</th>
 		<?php endforeach; ?>
@@ -218,9 +250,23 @@ foreach($_levels as $_level) {
 	<?php foreach($this->conf['contents_parsed'] as $row_no => $contents_parsed) :?>
 	<tr>
 		<td class="center"><?php echo $row_no; ?></td>
-		<?php foreach($contents_parsed as $fieldname => $field_values) :?>
+		<?php foreach($contents_parsed as $index => $data) :?>
 			<?php
-			if ( !isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['thefields'][$fieldname]) )  continue;
+			if ($index === 'attribs' || $index === 'metadata')
+			{
+				$_keys = array_keys($data);
+				$fieldname = reset($_keys);
+				$field_values = reset($data);
+			}
+			else
+			{
+				$fieldname = $index;
+				$field_values = $data;
+			}
+			if (!isset($this->conf['core_props'][$fieldname]) && !isset($this->conf['custom_fields'][$fieldname]) && !isset($this->conf['attribs'][$fieldname]) && !isset($this->conf['metadata'][$fieldname]) )
+			{
+				continue;
+			}
 			?>
 			<td style="text-align: left;">
 				<?php
@@ -263,7 +309,7 @@ foreach($_levels as $_level) {
 						if (!is_array($field_values))
 						{
 							$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_values) && isset($this->conf['filenames_missing'][$fieldname][$field_values]);
-							echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
+							echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['custom_fields'][$fieldname]->folderpath).'">' : '';
 							echo StringHelper::strlen($field_values) > 40  ?  StringHelper::substr(strip_tags($field_values), 0, 40) . ' ... '  :  $field_values;
 							echo $is_missing ? '</span>' : '';
 						}
@@ -278,7 +324,7 @@ foreach($_levels as $_level) {
 								if (!is_array($field_value))
 								{
 									$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_value) && isset($this->conf['filenames_missing'][$fieldname][$field_value]);
-									echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
+									echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['custom_fields'][$fieldname]->folderpath).'">' : '';
 									echo StringHelper::strlen($field_value) > 40  ?  StringHelper::substr(strip_tags($field_value), 0, 40) . ' ... '  :  $field_value;
 									echo $is_missing ? '</span>' : '';
 								}
