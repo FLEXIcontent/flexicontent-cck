@@ -950,7 +950,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					case 'youtube':
 						$embed_url = '//www.youtube.com/embed/' . $content_id;
 						$_show_related = '&rel=0';
-						$_show_srvlogo = '&modestbranding=1&maxwidth=0&modestbranding=1';
+						$_show_srvlogo = '&modestbranding=1&maxwidth=0';
 						break;
 					case 'vimeo':
 						$embed_url = '//player.vimeo.com/video/' . $content_id;
@@ -969,7 +969,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 						break;
 				}
 			}
-			$player_url = ($embed_url ? $embed_url : 'about:blank').'?autoplay='.$autostart.$_show_related.$_show_srvlogo;
+			$player_url = $embed_url ? $embed_url : 'about:blank';
+			$player_url = (strstr($player_url, '?') ? '&'  : '?') . 'autoplay=' . $autostart . $_show_related . $_show_srvlogo;
 
 			$_width  = ($display_edit_size_form && (int) @ $value['width'])  ? (int)$value['width']  : $width;
 			$_height = ($display_edit_size_form && (int) @ $value['height']) ? (int)$value['height'] : $height;
