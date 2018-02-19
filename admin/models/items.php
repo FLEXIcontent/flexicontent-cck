@@ -2165,7 +2165,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$lang->load('com_messages');
 		
 		$ctrl_task = FLEXI_J16GE ? '&task=items.edit' : '&controller=items&task=edit';
-		$item->url = JUri::base() . 'index.php?option=com_flexicontent'.$ctrl_task .'&cid[]=' . $item->id;
+		$item->url = JUri::base(true) . 'index.php?option=com_flexicontent'.$ctrl_task .'&cid[]=' . $item->id;
 
 		foreach ($users as $user)
 		{
