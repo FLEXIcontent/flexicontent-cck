@@ -246,7 +246,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ( $hasPublish )
 		{
 			$add_divider = true;
-			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+			$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&task=items.selectstate&format=raw';
 
 			/*$btn_task = '';
 			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
@@ -337,7 +337,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($CanAddAny)
 		{
 			$btn_task = '';
-			$popup_load_url = JUri::base().'index.php?option=com_flexicontent&view=types&format=raw';
+			$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=types&format=raw';
 			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
 			$js .= "
 				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
@@ -369,7 +369,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		if ( $cparams->get('show_csvbutton_be', 0) )
 		{
-			$full_js     = "window.location.replace('" .JUri::base().'index.php?option=com_flexicontent&view=items&format=csv'. "')";
+			$full_js     = "window.location.replace('" .JUri::base(true).'index.php?option=com_flexicontent&view=items&format=csv'. "')";
 			flexicontent_html::addToolBarButton(
 				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
