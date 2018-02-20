@@ -268,6 +268,13 @@
 	<field name="" type="separator" default="" level="level_br" />
 	<field name="" type="separator" default="" level="level_br"/>
 	<field name="" type="separator" default="FLEXI_LISTS" level="tabset_start" box_type="1" remove_boxes="2" class="fcparams_tabset" tab_class="s-fake" />
+
+	<field name="" type="separator" default="FLEXI_CAT_IMAGE" icon_class="icon-image" level="tab_open" box_type="1" remove_boxes="2" />
+
+		<field name="" type="separator" default="FLEXI_CATEGORY_VIEWS_DEFAULT_VALUES" level="level3"  class="alert alert-info fcpadded" />
+		<field name="image" type="fcmedia" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_CATEGORY" />
+		<field name="image_alt" type="text" label="FLEXI_ALTERNATIVE_TEXT" description="" size="20" />
+
 	<field name="" type="separator" default="FLEXI_LISTS_HEADER_CONF" icon_class="icon-info-circle" level="tab_open" box_type="1" remove_boxes="2" />
 
 		<field name="" type="separator" default="FLEXI_LISTS_HEADER_CONF" level="tabset_start" box_type="1" remove_boxes="2" class="fcparams_tabset" />

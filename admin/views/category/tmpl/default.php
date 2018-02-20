@@ -127,21 +127,31 @@ $this->document->addScriptDeclaration($js);
 
 						<div class="control-group">
 							<div class="control-label">
-								<?php echo $this->form->getLabel('image'); ?>
-							</div>
-							<div class="controls">
-									<?php echo $this->form->getInput('image'); ?>
-							</div>
-						</div>
-
-						<div class="control-group">
-							<div class="control-label">
 								<?php echo $this->form->getLabel('note'); ?>
 							</div>
 							<div class="controls">
 									<?php echo $this->form->getInput('note'); ?>
 							</div>
 						</div>
+
+						<?php
+						$fieldSet = $this->form->getFieldset('basic');
+
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
+						endif;
+						?>
+
+						<?php foreach ($fieldSet as $field) :
+							echo ($field->getAttribute('type') == 'separator' || $field->hidden) ? $field->input : '
+							<div class="control-group">
+								<div class="control-label">' . $field->label . '</div>
+								<div class="controls">
+									' . $this->getInheritedFieldDisplay($field, $this->iparams) . '
+								</div>
+							</div>
+							';
+						endforeach; ?>
 
 					</div>
 
