@@ -494,7 +494,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			return $_input;
 		}
 
-		elseif ($field->getAttribute('type')==='text')
+		elseif ($field->getAttribute('type')==='text' || $field->getAttribute('type')==='fcmedia' || $field->getAttribute('type')==='media')
 		{
 			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
 			return str_replace(

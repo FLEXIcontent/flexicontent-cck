@@ -42,6 +42,12 @@
 		<fieldset name="cats_params_set" label="FLEXI_CAT_PARAMETERS_MENU_ITEM" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 		<field name="" type="separator" default="FLEXI_CATS_PARAMS_SET" level="tabset_start" tab_class="s-fake" box_type="1" />
+
+		<field name="" type="separator" default="FLEXI_CAT_IMAGE" icon_class="icon-image" level="tab_open" box_type="1" />
+
+			<field name="image" type="fcmedia" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_CATEGORY" />
+			<field name="image_alt" type="text" label="FLEXI_ALTERNATIVE_TEXT" description="" size="20" />
+
 		<field name="cats_display" type="separator" default="FLEXI_LISTS_HEADER_CONF" icon_class="icon-info-circle fc-display-params-icon" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_CAT_DISPLAY_HEADER" level="tabset_start" box_type="1" />

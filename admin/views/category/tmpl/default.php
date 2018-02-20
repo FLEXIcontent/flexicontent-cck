@@ -60,10 +60,10 @@ $this->document->addScriptDeclaration($js);
 
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('language')); ?>
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('note')); ?>
 			</span>
 			<div class="container_fcfield">
-				<?php echo $this->form->getInput('language'); ?>
+				<?php echo $this->form->getInput('note'); ?>
 			</div>
 
 		</div><!-- span6 EOF -->
@@ -91,6 +91,14 @@ $this->document->addScriptDeclaration($js);
 			</span>
 			<div class="container_fcfield">
 				<?php echo $this->form->getInput('access'); ?>
+			</div>
+
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label-fcinner ', $this->form->getLabel('language')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->form->getInput('language'); ?>
 			</div>
 
 		</div><!-- span6 EOF -->
@@ -121,7 +129,7 @@ $this->document->addScriptDeclaration($js);
 					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_IMAGE'); ?> </h3>
 
 					<?php
-					$fieldSet = $this->form->getFieldset('cat_basic');
+					$fieldSet = $this->form->getFieldset('basic');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';

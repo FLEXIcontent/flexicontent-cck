@@ -18,6 +18,9 @@
 		<option value="2">JARCHIVED</option>
 		<option value="-2">JTRASHED</option>
 	</field>
+
+	<field name="note" type="textarea" rows="2" label="FLEXI_CAT_NOTES" description="FLEXI_CAT_NOTES_DESC" class="input-xxlarge inputbox" size="40"/>
+
 	<field name="checked_out" type="hidden" filter="unset"/>
 	<field name="checked_out_time" type="hidden" filter="unset"/>
 	<field name="access" type="accesslevel" label="FLEXI_ACCESS" description="JFIELD_ACCESS_DESC" class="use_select2_lib" />
@@ -34,15 +37,19 @@
 		<option value="*">JALL</option>
 	</field>
 	<field id="rules" name="rules" type="rules" label="JFIELD_RULES_LABEL" description="JFIELD_RULES_DESC" filter="rules" class="inputbox" component="com_flexicontent" section="category" />
+
 	<fields name="params">
-		<fieldset name="cat_basic">
-			<!--field name="target" type="componentlayout" label="FLEXI_OVERRIDE_TMPL_LAYOUT" description="FLEXI_OVERRIDE_TMPL_LAYOUT_DESC" view="categories" /-->
+
+		<fieldset name="basic">
+			<!--field name="category_layout" type="componentlayout" label="JFIELD_ALT_LAYOUT_LABEL" description="JFIELD_ALT_COMPONENT_LAYOUT_DESC" view="category" useglobal="true" /-->
+
+			<field name="" type="separator" default="FLEXI_CAT_IMAGE" level="level2" />
 			<field name="image" type="fcmedia" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_CATEGORY" />
-			<field name="note" type="text" label="FLEXI_CAT_NOTES" description="FLEXI_CAT_NOTES_DESC" class="input-xxlarge inputbox" size="40"/>
+			<field name="image_alt" type="text" label="COM_CATEGORIES_FIELD_IMAGE_ALT_LABEL" description="COM_CATEGORIES_FIELD_IMAGE_ALT_DESC" size="20" />
 		</fieldset>
 
-		<fieldset name="cats_display" addfieldpath="/administrator/components/com_flexicontent/elements" icon_class="icon-info-circle">
 
+		<fieldset name="cats_display" addfieldpath="/administrator/components/com_flexicontent/elements" icon_class="icon-info-circle">
 
 			<field name="" type="separator" default="FLEXI_CAT_DISPLAY_HEADER" level="tabset_start" box_type="1" />
 			<field name="" type="separator" default="FLEXI_PARAMS_CAT_BUTTONS" icon_class="icon-menu-3" level="tab_open" box_type="1" />
@@ -1055,7 +1062,9 @@
 		</fieldset>
 	
 	</fields>
+
 	<fields name="metadata">
+
 		<fieldset name="jmetadata" label="JGLOBAL_FIELDSET_METADATA_OPTIONS">
 			<field name="page_title" type="text" class="input-xxlarge" label="JFIELD_ALT_PAGE_TITLE_LABEL" description="JFIELD_ALT_PAGE_TITLE_DESC" size="30"/>
 			<field name="author" type="text" class="input-xxlarge" label="JAUTHOR" description="JFIELD_METADATA_AUTHOR_DESC" size="30"/>
@@ -1067,8 +1076,9 @@
 				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
 			</field>
 		</fieldset>
+
 	</fields>
-	
+
 	<fields name="templates">
 			
 			<!-- Do not modify default value (XML file) ... default category layout 'blog', as currently, it is hard coded in (a) the frontend category's view.html.php and (b) in the backend category manager listing -->
