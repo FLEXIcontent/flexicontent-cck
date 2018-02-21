@@ -219,6 +219,21 @@ class FlexicontentViewTag extends JViewLegacy
 
 		$jtag_id = $row->jtag_id;
 
+		// Find the respective Joomla Tag Id by using its title, creating a new Joomla tag if it does not exist already, and then mapping it to current FLEXIcontent tag
+		if (!$isnew && !$jtag_id)
+		{
+			$tagsHelper = new \JHelperTags;
+			$jtag_id_arr = $tagsHelper->createTagsFromField(array('#new#' . $row->name));
+			if (!empty($jtag_id_arr))
+			{
+				$jtag_id = reset($jtag_id_arr);
+				$tagTable = JTable::getInstance($_type = 'flexicontent_tags', $_prefix = '', $_config = array());
+				$tagTable->load($row->id);
+				$tagTable->jtag_id = $jtag_id;
+				$tagTable->store();
+			}
+		}
+
 		if ($jtag_id)
 		{
 			JText::script("FLEXI_UPDATING_CONTENTS", true);
