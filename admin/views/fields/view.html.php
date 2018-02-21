@@ -154,7 +154,7 @@ class FlexicontentViewFields extends JViewLegacy
 		if ($perms->CanEditField)
 		{
 			$ctrl_task = '&task=fields.selectsearchflag';
-			$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
 			
 			$btn_name = 'basicindex';
 			$btn_task = '';

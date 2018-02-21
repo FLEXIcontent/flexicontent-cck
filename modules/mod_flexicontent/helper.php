@@ -126,7 +126,7 @@ class modFlexicontentHelper
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
-			$thumb_default = JUri::root(true).'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$thumb_default = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			
 			// Default image standard
 			$h		= '&amp;h=' . $mod_height_feat;
@@ -140,7 +140,7 @@ class modFlexicontentHelper
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
-			$thumb_default_feat = JUri::root(true).'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$thumb_default_feat = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		
 		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
@@ -487,7 +487,7 @@ class modFlexicontentHelper
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 							
     					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
-    					$thumb = JUri::root(true).'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+    					$thumb = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		    		}
 					}
 					$lists[$ord]['featured'][$i] = new stdClass();
@@ -646,7 +646,7 @@ class modFlexicontentHelper
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 							
     					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
-    					$thumb = JUri::root(true).'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+    					$thumb = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		    		}
 					}
 					
@@ -2268,7 +2268,7 @@ class modFlexicontentHelper
 					$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-					$catimage = JUri::root(true).'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$catimage = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				}
 				else if ( $catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata) )
 				{
@@ -2282,7 +2282,7 @@ class modFlexicontentHelper
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
-					$catimage = JUri::root(true).'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$catimage = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				}
 
 				$catdata->image = $catimage;

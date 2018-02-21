@@ -175,7 +175,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			if (0) // FLEXI_J37GE
 			{
 				$btn_task = '';
-				$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&layout=import&format=raw';
+				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&layout=import&format=raw';
 				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
 				$js .= "
 					jQuery('#toolbar-download a.toolbar, #toolbar-download button').attr('href', '".$popup_load_url."')
@@ -188,7 +188,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			if (0) // TODO evaluate for e.g. submiting a template
 			{
 				$btn_task = '';
-				$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&layout=language&tmpl=component';
+				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&layout=language&tmpl=component';
 				//$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
 				$js .= "
 					jQuery('#toolbar-language a.toolbar, #toolbar-language button').attr('href', '".$popup_load_url."')

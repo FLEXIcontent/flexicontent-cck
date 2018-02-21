@@ -87,7 +87,7 @@ abstract class JHtmlFcuploader
 		$initialized[$up_tag_id] = true;
 
 		$defaults = array(
-			'action' => JUri::base(true) . 'index.php?option=com_flexicontent&task=filemanager.uploads'
+			'action' => JUri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
 				. '&'.JSession::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id,
 			'upload_maxcount' => 0,
 			'autostart_on_select' => false,

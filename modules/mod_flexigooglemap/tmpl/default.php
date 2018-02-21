@@ -69,7 +69,7 @@ if ($clustermode)
 	{
 		$imgcluster_w = $img_info[0];
 		$imgcluster_h = $img_info[1];
-		$imgcluster_url  = JUri::root(true) . $imgcluster;
+		$imgcluster_url  = JUri::root(true) . '/' . $imgcluster;
 	}
 	else
 	{

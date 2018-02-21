@@ -279,7 +279,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		$btn_task = '';
-		$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
+		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
 		//$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 350);
 		$js .= "
 			jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
@@ -291,7 +291,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		JToolbarHelper::divider();  JToolbarHelper::spacer();
 
 		$btn_task = '';
-		$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
+		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
 		//$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 350);
 		$js .= "
 			jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
@@ -301,7 +301,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		JToolbarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
 
 		$btn_task = '';
-		$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
+		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
 		//$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 350);
 		$js .= "
 			jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button').attr('href', '".$popup_load_url."')
