@@ -31,7 +31,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $ctrl_task  = 'task=filemanager.';
 $ctrl_task_authors = 'task=users.';
-$action_url = JUri::base(true) . 'index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
+$action_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
 
 $app  = JFactory::getApplication();
 $jinput = $app->input;
@@ -375,7 +375,7 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => JUri::base(true) . 'index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
+		'action' => JUri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
 			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,

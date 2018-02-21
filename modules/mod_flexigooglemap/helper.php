@@ -270,7 +270,7 @@ class modFlexigooglemapHelper
 
 			default:  // 'Local image file' mode
 				$markerimage = $params->get('markerimage');
-				return $markerimage ? ("'" . JUri::root(true) . $markerimage . "'") : 'null';
+				return $markerimage ? ("'" . JUri::root(true) . '/' . $markerimage . "'") : 'null';
 		}
 	}
 

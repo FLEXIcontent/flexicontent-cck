@@ -147,7 +147,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// Copy Parameters
 		$btn_task = '';
-		$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
+		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
 		//$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		$js .= "
 			jQuery('#toolbar-params a.toolbar, #toolbar-params button').attr('href', '".$popup_load_url."')
@@ -156,7 +156,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		";
 		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 
-		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JUri::base(true).'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
+		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 		JToolbarHelper::divider();
 		
 		$add_divider = false;

@@ -134,7 +134,7 @@ class FlexicontentViewTags extends JViewLegacy
 		if ($perms->CanConfig)
 		{
 			$btn_task = '';
-			$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
 			//$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
 			$js .= "
 				jQuery('#toolbar-import a.toolbar, #toolbar-import button')

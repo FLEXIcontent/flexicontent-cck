@@ -503,7 +503,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($perms->CanConfig)
 		{
 			$btn_task = '';
-			$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
 			//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 			$js .= "
 				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
@@ -513,7 +513,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ' )', false );
 
 			$btn_task = '';
-			$popup_load_url = JUri::base(true).'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default&index_urls=1';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default&index_urls=1';
 			//$toolbar->appendButton('Popup', 'advindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 			$js .= "
 				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
