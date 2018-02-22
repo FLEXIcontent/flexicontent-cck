@@ -3129,11 +3129,19 @@ class flexicontent_html
 		}
 
 		// Check for invalid state
-		if ( !isset($state_names[$state]) ) $state = 'u';
+		if ( !isset($state_names[$state]) )
+		{
+			$state = 'u';
+		}
+
+		$show_icons = (int) $params->get('show_icons', 1);
 		$state_text = $state_names[$state];
 
 		// Return state name if not showing icons
-		if (!$params->get('show_icons', 1)) return $state_names[$state];
+		if (!$show_icons)
+		{
+			return $state_names[$state];
+		}
 
 		// Return cached icon if already calculated
 		$popup_type = $type == 'json' ? 'basic' : $params->get('stateicon_popup', 'full');
@@ -3160,19 +3168,30 @@ class flexicontent_html
 		// Special case return uncached JSON encoded data
 		if ($type == 'json')
 		{
-			$data['html'] = $use_font
+			$data['html'] = ($use_font
 				? '<span class="'.$data['class'].'"></span>'
-				: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '');
+				: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], '')
+			) . ($show_icons === 2
+				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_names[$state] . '</span>'
+				: ''
+			);
 			unset($data['class']);
 			return json_encode($data);
 		}
 
 		// Create state icon image, cache it and return it
 		$tag_attribs = '';
-		foreach($data as $key => $val) $tag_attribs .= ' ' . $key . '="' . $val . '" ';
-		$state_icons[$state][$popup_type] = $use_font
+		foreach($data as $key => $val)
+		{
+			$tag_attribs .= ' ' . $key . '="' . $val . '" ';
+		}
+		$state_icons[$state][$popup_type] = ($use_font
 			? '<span '.$tag_attribs.'></span>'
-			: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs);
+			: JHtml::image('components/com_flexicontent/assets/images/'.$state_imgs[$state], $state_names[$state], $tag_attribs)
+		) . ($show_icons === 2
+				? '<span class="fc-mssg-inline fc-info fc-iblock fc-nobgimage">' . $state_names[$state] . '</span>'
+				: ''
+		);
 
 		return $state_icons[$state][$popup_type];
 	}
