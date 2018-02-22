@@ -750,11 +750,16 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 			
-			<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="show_icons" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use-font-icons-ops">FLEXI_TEXT</option>
+				<option value="1" show_list="use-font-icons-ops" hide_list="">FLEXI_ICON</option>
+				<option value="2" show_list="use-font-icons-ops" hide_list="">FLEXI_BOTH</option>
 			</field>
-			
+			<field name="use_font_icons" type="radio" default="1" label="FLEXI_ICON_TYPE" description="FLEXI_ICON_TYPE_DESC" class="btn-group group-fcinfo" depend_class="use-font-icons-ops">
+				<option value="0">FLEXI_IMAGE</option>
+				<option value="1">FLEXI_FONT_ICONS</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" level="level3"/>
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
