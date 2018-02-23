@@ -82,10 +82,10 @@
 			<field name="item_text_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
 
 			<field name="item_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="item_pad_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
-			<field name="item_pad_left" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="item_pad_right" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
-			<field name="item_pad_bottom" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_top" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_left" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_right" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_bottom" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
 
 			<field name="item_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
 			<field name="item_border_radius" type="number" cssprep="less" default="0" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
@@ -112,10 +112,10 @@
 			<field name="title_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" />
 
 			<field name="item_title_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="title_pad_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
-			<field name="title_pad_left" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="title_pad_right" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
-			<field name="title_pad_bottom" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
+			<field name="title_pad_top" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
+			<field name="title_pad_left" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="title_pad_right" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
+			<field name="title_pad_bottom" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
 
 			<field name="item_title_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
 			<field name="title_border_radius" type="number" cssprep="less" default="0" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
@@ -144,10 +144,10 @@
 			<field name="beforedesc_txt_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
 
 			<field name="beforedesc_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="beforedesc_pad_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
-			<field name="beforedesc_pad_left" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="beforedesc_pad_right" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
-			<field name="beforedesc_pad_bottom" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
+			<field name="beforedesc_pad_top" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
+			<field name="beforedesc_pad_left" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="beforedesc_pad_right" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
+			<field name="beforedesc_pad_bottom" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
 
 			<field name="beforedesc_margin_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_MARGIN" description="" level="level3" />
 			<field name="beforedesc_mar_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_MARGIN_TOP" description="FLEXI_TMPL_MARGIN_TOP_DESC" min="0" max="80" step="1" />
@@ -178,10 +178,10 @@
 			<field name="desc_txt_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
 
 			<field name="desc_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="desc_pad_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
-			<field name="desc_pad_left" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="desc_pad_right" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
-			<field name="desc_pad_bottom" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
+			<field name="desc_pad_top" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
+			<field name="desc_pad_left" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="desc_pad_right" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
+			<field name="desc_pad_bottom" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
 
 			<field name="desc_margin_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_MARGIN" description="" level="level3" />
 			<field name="desc_mar_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_MARGIN_TOP" description="FLEXI_TMPL_MARGIN_TOP_DESC" min="0" max="80" step="1" />
@@ -211,10 +211,10 @@
 			<field name="afterdesc_txt_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
 
 			<field name="afterdesc_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="afterdesc_pad_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
-			<field name="afterdesc_pad_left" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="afterdesc_pad_right" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
-			<field name="afterdesc_pad_bottom" type="number" cssprep="less" default="0" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
+			<field name="afterdesc_pad_top" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
+			<field name="afterdesc_pad_left" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="afterdesc_pad_right" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
+			<field name="afterdesc_pad_bottom" type="number" cssprep="less" default="inherit" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
 
 			<field name="afterdesc_margin_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_MARGIN" description="" level="level3" />
 			<field name="afterdesc_mar_top" type="number" cssprep="less" default="0" label="FLEXI_TMPL_MARGIN_TOP" description="FLEXI_TMPL_MARGIN_TOP_DESC" min="0" max="80" step="1" />

@@ -1,74 +1,74 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
-	color: #d62b2b;
-	background-color: #170808;
-	padding-top: 20px;
-	padding-right: 5px;
-	padding-left: 5px;
-	padding-bottom: 20px;
-	border-radius: 7px;
+	color: inherit;
+	background-color: inherit;
+	padding-top: inheritpx;
+	padding-right: inheritpx;
+	padding-left: inheritpx;
+	padding-bottom: inheritpx;
+	border-radius: 0px;
 }
 .fcitems {
-	background-color: #942121;
-	padding-top: 20px;
-	padding-right: 5px;
-	padding-left: 5px;
-	padding-bottom: 0px;
-	border-radius: 5px;
-	border: 7px ridge #b34141;
-	color: #1bd4c8;
+	background-color: inherit;
+	padding-top: inheritpx;
+	padding-right: inheritpx;
+	padding-left: inheritpx;
+	padding-bottom: inheritpx;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	color: inherit;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #4a1616;
+	background-color: #999999;
 	color: #ffffff;
-	border-radius: 7px;
+	border-radius: 3px;
 	padding-top: 2px;
 	padding-right: 4px;
 	padding-left: 4px;
 	padding-bottom: 2px;
 }
 body #flexicontent .customblock.beforedescription.group {
-	background-color: #3acf14;
-	padding-top: 50px !important;
-	padding-right: 7px !important;
-	padding-left: 5px !important;
-	padding-bottom: 4px !important;
-	color: #522828;
-	border-radius: 7px;
-	border: 8px groove #bf8b8b;
+	background-color: inherit;
+	padding-top: inheritpx !important;
+	padding-right: inheritpx !important;
+	padding-left: inheritpx !important;
+	padding-bottom: inheritpx !important;
+	color: inherit;
+	border-radius: 0px;
+	border: 0px solid inherit;
 	margin-top: 0px !important;
-	margin-right: 20px !important;
-	margin-left: 20px !important;
+	margin-right: 8px !important;
+	margin-left: 8px !important;
 	margin-bottom: 0px !important;
 }
 body #flexicontent .description.group {
-	background-color: #f7f4f4;
-	padding-top: 20px !important;
-	padding-right: 20px !important;
-	padding-left: 20px !important;
-	padding-bottom: 20px !important;
-	color: #1041ad;
-	border-radius: 7px;
-	border: 10px dotted #613b3b;
-	margin-top: 20px !important;
+	background-color: inherit;
+	padding-top: inheritpx !important;
+	padding-right: inheritpx !important;
+	padding-left: inheritpx !important;
+	padding-bottom: inheritpx !important;
+	color: inherit;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	margin-top: 0px !important;
 	margin-right: 8px !important;
 	margin-left: 8px !important;
-	margin-bottom: 20px !important;
+	margin-bottom: 0px !important;
 }
 body #flexicontent .customblock.afterdescription.group {
-	background-color: #693b3b;
-	padding-top: 20px !important;
-	padding-right: 3px !important;
-	padding-left: 4px !important;
-	padding-bottom: 10px !important;
-	color: #f0f0f0;
-	border-radius: 7px;
-	border: 3px dashed #b35959;
-	margin-top: 5px !important;
+	background-color: inherit;
+	padding-top: inheritpx !important;
+	padding-right: inheritpx !important;
+	padding-left: inheritpx !important;
+	padding-bottom: inheritpx !important;
+	color: inherit;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	margin-top: 0px !important;
 	margin-right: 8px !important;
-	margin-left: 7px !important;
-	margin-bottom: 6px !important;
+	margin-left: 8px !important;
+	margin-bottom: 0px !important;
 }
 .iteminfo .createdline,
 .iteminfo .modifiedline {
