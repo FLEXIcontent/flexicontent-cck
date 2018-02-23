@@ -33,7 +33,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-$list_total_cols = 7;
+$list_total_cols = 8;
 
 
 // *********************
@@ -175,6 +175,7 @@ function delAllFilters() {
 			<th class="hideOnDemandClass alias hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_JTAG_ID', 't.jtag_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -292,6 +293,13 @@ function delAllFilters() {
 				</a>
 			</td>
 			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
+			<td class="center hidden-tablet hidden-phone">
+				<?php if ($row->jtag_id) : ?>
+				<a href="javascript:;" onclick="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'<?php echo JText::_('FLEXI_EDIT_JTAG'); ?>', loadFunc: fc_edit_jtag_modal_load}); return false;" data-href="index.php?option=com_tags&task=tag.edit&id=<?php echo $row->jtag_id; ?>">
+					<?php echo $image_editlayout; ?>
+				</a>
+				<?php endif; ?>
+			</td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>
@@ -322,3 +330,20 @@ function delAllFilters() {
 </div>  <!-- row -->
 </form>
 </div><!-- #flexicontent end -->
+
+<?php
+JFactory::getDocument()->addScriptDeclaration('
+	function fc_edit_jtag_modal_load( container )
+	{
+		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+		{
+			container.dialog("close");
+		}
+	}
+	function fc_edit_jtag_modal_close()
+	{
+		window.location.reload(false);
+		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+	}
+');
+?>
