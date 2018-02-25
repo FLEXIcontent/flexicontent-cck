@@ -73,12 +73,13 @@
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_CATID_FIXED_CATS</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_CATID_CURRENT</option>
+				<option value="2">MOD_FLEXIGOOGLEMAP_CURRENT_ITEM</option>
 			</field>
 
 			<field
 				name="method_category" type="radio" default="0"
 				label="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_LABEL" description="MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_DESC" showon="catidmode:0"
-				class="btn-group"
+				class="btn-group group-fcmethod"
 				>
 				<option value="0">MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_INCLUDE</option>
 				<option value="1">MOD_FLEXIGOOGLEMAP_CATEGORYMETHODE_EXCLUDE</option>
@@ -94,7 +95,7 @@
 				<!--option value="4">FLEXI_OTHER_CATS_OF_ITEM</option-->
 			</field>
 
-			<field name="fieldaddressid" type="sql" default="10" label="MOD_FLEXIGOOGLEMAP_ADDRESSFIELD" query="SELECT id AS value, concat( name, ' (', id, ')') AS title FROM #__flexicontent_fields WHERE field_type='addressint'" description="MOD_FLEXIGOOGLEMAP_ADDRESSFIELD_DESC" value_field="title"/>
+			<field name="fieldaddressid" type="fields" field_type="addressint" label="MOD_FLEXIGOOGLEMAP_ADDRESSFIELD" description="MOD_FLEXIGOOGLEMAP_ADDRESSFIELD_DESC" />
 			<field
 				name="apikey" type="text" default=""
 				label="MOD_FLEXIGOOGLEMAP_APIKEY" description="MOD_FLEXIGOOGLEMAP_APIKEY_DESC"
