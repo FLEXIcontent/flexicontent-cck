@@ -1642,7 +1642,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return array
 	 */
-	function getCategory($pk=null, $raiseErrors=true, $checkAccess=true)
+	function getCategory($pk = null, $raiseErrors = true, $checkAccess = true, $checkPublished = true)
 	{
 		//initialize some vars
 		$app  = JFactory::getApplication();
@@ -1661,34 +1661,47 @@ class FlexicontentModelCategory extends JModelLegacy {
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');  // If category model is loaded from 3rd party code
 			$catshelper = new flexicontent_cats($this->_id);
 			$parents    = $catshelper->getParentlist($all_cols=false);
-			
 			$parents_published = true;
-			foreach($parents as $parent) if ( !$parent->published )
-				{ $parents_published = false; break; }
-			
+
+			// Check if category's parents are published
+			if ($checkPublished)
+			{
+				foreach($parents as $parent)
+				{
+					if ( !$parent->published )
+					{
+						$parents_published = false;
+						break;
+					}
+				}
+			}
+
+			/**
+			 * Retrieve category data, but ONLY if current layout can use it, ('mcats' does not since it uses multiple ids)
+			 */
 			if ($parents_published)
 			{
-				// ************************************************************************************************************
-				// Retrieve category data, but ONLY if current layout can use it, ('mcats' does not since it uses multiple ids)
-				// ************************************************************************************************************
-				
 				$query 	= 'SELECT c.*,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 					. ' FROM #__categories AS c'
 					. ' WHERE c.id = '.$this->_id
-					. ' AND c.published = 1 AND c.extension=' . $this->_db->Quote(FLEXI_CAT_EXTENSION)
+					. ($checkPublished ? ' AND c.published = 1' : '') . ' AND c.extension=' . $this->_db->Quote(FLEXI_CAT_EXTENSION)
 					;
 				$this->_db->setQuery($query);
 				$_category = $this->_db->loadObject();   // False if not found or unpublished
 			}
-			
-			else {
-				$_category = false;  // A parent category is unpublished
+
+			// A parent category is unpublished
+			else
+			{
+				$_category = false;
 			}
 		}
-		
-		else {
-			$_category = false;   // No category id given, or category id is not applicable for current layout
+
+		// No category id given, or category id is not applicable for current layout
+		else
+		{
+			$_category = false;
 		}
 		
 		
@@ -1719,10 +1732,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// create an empty category data object (if one was not created already)
 		// *********************************************************************
 		
-		if ($this->_layout) {
-			if ( $this->_layout!='mcats' && !empty($_category) ) {
+		if ($this->_layout)
+		{
+			if ($this->_layout!='mcats' && !empty($_category))
+			{
 				$this->_category = $_category;
-			} else {
+			}
+			else
+			{
 				$this->_category = new stdClass;
 				$this->_category->published = 1;
 				$this->_category->id = $this->_id;   // can be zero for layouts: author/myitems/favs/tags, etc 
@@ -1732,7 +1749,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$this->_category->ids = $this->_ids; // mcats layout but it can be empty, to allow all categories
 			}
 		}
-		else {
+
+		else
+		{
 			$this->_category = $_category;
 		}
 		
@@ -1805,25 +1824,29 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 			}
 		}
-		
-		
-		// ************************************
-		// Force loading of category parameters
-		// ************************************
-		
+
+
+		/**
+		 * Force loading of category parameters
+		 */
+
 		$this->_loadCategoryParams($force=true);
 		$this->_category->parameters = $this->_params;
-		
-		
-		// ******************************************************************
-		// Check whether category access level allows access and throw errors
-		// but skip checking Access if so requested via function parameter
-		// ******************************************************************
-		
-		if (!$checkAccess) return $this->_category;
-		
-		// Check access level of category and of its parents
+
+
+		/**
+		 * Check whether category access level allows access and throw errors
+		 * but skip checking Access if so requested via function parameter
+		 */
+
+		if (!$checkAccess)
+		{
+			return $this->_category;
+		}
+
 		$canread = true;
+
+		// Check access level of category and of its parents
 		if ( $this->_id )
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);

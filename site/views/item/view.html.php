@@ -184,6 +184,9 @@ class FlexicontentViewItem extends JViewLegacy
 		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
 		$themes = flexicontent_tmpl::getTemplates( array($ilayout) );
 		
+		// Compatibility for content plugins that use this
+		$item->readmore_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+
 		
 		// ***
 		// *** Get Item's Fields

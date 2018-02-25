@@ -993,7 +993,16 @@ class FlexicontentFields
 		$method_text = isset($field->{$method}) ? $field->{$method} : '';
 		
 		$field->text = $method_text;
-		$field->introtext = $method_text;  // needed by some plugins that do not use or clear ->text property
+
+		// Needed by some plugins that do not use or clear ->text property
+		$field->introtext = $method_text;
+
+		if (isset($item->readmore_link))
+		{
+			// Some plugins expect this
+			$field->readmore_link = $item->readmore_link;
+		}
+
 		$field->created_by = $item->created_by;
 		$field->language = $item->language;
 		$field->title = $item->title;

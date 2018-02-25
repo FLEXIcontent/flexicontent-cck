@@ -396,7 +396,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 			// Get/Create current category model ... according to configuration set above into the HTTP Request variables
 			$catmodel = new FlexicontentModelCategory();
-			$category = $catmodel->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
+			$category = $catmodel->getCategory($pk=null, $raiseErrors=false, $checkAccess=false, $checkPublished=false);
 
 			$query = $catmodel->_buildQuery(false, $count_total=false);
 			$db->setQuery($query, 0, 50000);
