@@ -404,6 +404,10 @@ class ParentClassItem extends FCModelAdmin
 		// Recalculate if needed, component + type parameters
 		$this->getComponentTypeParams();
 
+		// This is used in places that item data need to be retrieved again because item object was not given
+		global $fc_view_item;
+		$fc_view_item = $this->_record;
+
 		return $this->_record;
 	}
 
