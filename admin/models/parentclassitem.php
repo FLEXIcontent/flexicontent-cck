@@ -4772,6 +4772,8 @@ class ParentClassItem extends FCModelAdmin
 		// No cached data, get associated translations
 		if ($id && !isset($translations[$id]))
 		{
+			$translations[$id] = array();
+
 			foreach(flexicontent_db::getLangAssocs(array($id)) as $item_id => $assocs)
 			{
 				$translations[$item_id] = $assocs;
