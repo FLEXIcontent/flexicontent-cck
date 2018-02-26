@@ -4756,38 +4756,28 @@ class ParentClassItem extends FCModelAdmin
 	}
 	
 	
+	/**
+	 * Method to get item (language) associations
+	 *
+	 * @param		int			The id of the item
+	 *
+	 * @return	array		The array of associations
+	 */
 	function getLangAssocs($id=0)
 	{
-		static $translations = array();
-		
-		$id = !$id ? $this->_id : $id;
-		if (!$id) return array();
-		
-		// Return cached
-		if (isset($translations[$id])) return $translations[$id];
-		
-		// Start with empty array
-		$translations[$id] = array();
-		if ($id = $this->_id) $this->_translations = array();
-		
-		// Get associated translations
-		$query = 'SELECT `key`'
-			. ' FROM #__associations'
-			. ' WHERE id = '. $this->_id .' AND context = "com_content.item"';
-		$this->_db->setQuery($query);
-		$assoc_key = $this->_db->loadResult();
-		if (!$assoc_key) return $translations[$id];
-		
-		$query = 'SELECT i.id as id, i.title, i.created, i.modified, i.language as language, i.language as lang '
-			. ' FROM #__content AS i '
-			. ' JOIN #__associations AS a ON i.id=a.id '
-			. ' WHERE a.context = "com_content.item" AND a.`key`= '.$this->_db->Quote($assoc_key);
-		$this->_db->setQuery($query);
-		$translations[$id] = $this->_db->loadObjectList('id');
-		
-		// Set this object translations if id is same
-		if ($id = $this->_id) $this->_translations = $translations[$id];
-		
+		static $translations = array(0 => array());
+
+		$id = $id ?: $this->_id;
+
+		// No cached data, get associated translations
+		if ($id && !isset($translations[$id]))
+		{
+			foreach(flexicontent_db::getLangAssocs(array($id)) as $item_id => $assocs)
+			{
+				$translations[$item_id] = $assocs;
+			}
+		}
+
 		return $translations[$id];
 	}
 

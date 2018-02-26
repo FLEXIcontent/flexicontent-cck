@@ -32,18 +32,25 @@ use Joomla\String\StringHelper;
 class FlexicontentModelItemelement extends JModelLegacy
 {
 	/**
-	 * rows array
+	 * view's rows
 	 *
 	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Category total
+	 * rows total
 	 *
 	 * @var integer
 	 */
 	var $_total = null;
+
+	/**
+	 * Associated item translations
+	 *
+	 * @var array
+	 */
+	var $_translations = null;
 
 	/**
 	 * Pagination object
@@ -61,8 +68,10 @@ class FlexicontentModelItemelement extends JModelLegacy
 	{
 		parent::__construct();
 		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -94,9 +103,18 @@ class FlexicontentModelItemelement extends JModelLegacy
 	function getData()
 	{
 		$app     = JFactory::getApplication();
+
 		$jinput  = $app->input;
 		$cid     = $jinput->get('cid', array(), 'array');
-		
+
+		$assocs_id = $jinput->get('assocs_id', 0, 'int');
+		$lang_assocs = array();
+
+		if ($assocs_id)
+		{
+			$lang_assocs = flexicontent_db::getLangAssocs(array($assocs_id));
+		}
+
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
@@ -137,8 +155,12 @@ class FlexicontentModelItemelement extends JModelLegacy
 			foreach($query_ids as $item_id)
 			{
 				$item = $_data[$item_id];
-
 				$this->_data[] = $item;
+
+				if (isset($lang_assocs[$assocs_id][$item_id]))
+				{
+					$item->is_current_association = 1;
+				}
 			}
 		}
 
@@ -236,8 +258,9 @@ class FlexicontentModelItemelement extends JModelLegacy
 	function _buildContentOrderBy($query = null)
 	{
 		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 		
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     'i.ordering', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '',           'cmd' );
@@ -260,21 +283,24 @@ class FlexicontentModelItemelement extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		
-		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
-		
+
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+
+		$assocs_id = $jinput->get('assocs_id', 0, 'int');
+
 		if ($assocs_id)
 		{
 			$type_id     = $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
-			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
+			$item_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.item_lang', 'item_lang', '', 'string' );
 			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
 			
 			//$type_data = $this->getTypeData( $assocs_id, $type_id );
 			
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
-			if (!$assocanytrans && !$created_by) {
+			if (!$assocanytrans && !$created_by)
+			{
 				$created_by = $user->id;
 				$app->setUserState( $option.'.'.$view.'.created_by', $created_by );
 			}
@@ -289,7 +315,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'int' );
 		
 		$filter_type   = $assocs_id && $type_id    ? $type_id    : $filter_type;
-		$filter_lang   = $assocs_id && $language   ? $language   : $filter_lang;
+		$filter_lang   = $assocs_id && $item_lang  ? $item_lang  : $filter_lang;
 		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
@@ -375,11 +401,10 @@ class FlexicontentModelItemelement extends JModelLegacy
 	}
 	
 	
-	// ***********************************
-	// *** MODEL SPECIFIC HELPER FUNCTIONS
-	// ***********************************
-	
-	
+	/**
+	 * MODEL SPECIFIC HELPER FUNCTIONS
+	 */
+
 	/**
 	 * Method to get types list
 	 * 
@@ -436,5 +461,36 @@ class FlexicontentModelItemelement extends JModelLegacy
 		
 		$type_data = $this->getTypeslist();
 		return isset($type_data[$type_id])  ?  $type_data[$type_id]  :  false;
+	}
+
+
+	/**
+	 * Method to get item (language) associations
+	 *
+	 * @param		int			The id of the item
+	 *
+	 * @return	array		The array of associations
+	 */
+	function getLangAssocs()
+	{
+		// If items array is empty, just return empty array
+		if (empty($this->_data))
+		{
+			return array();
+		}
+		
+		// Get associated translations
+		elseif ($this->_translations === null)
+		{
+			$ids = array();
+			foreach ($this->_data as $item)
+			{
+				$ids[] = $item->id;
+			}
+
+			$this->_translations = flexicontent_db::getLangAssocs($ids);
+		}
+
+		return $this->_translations;
 	}
 }

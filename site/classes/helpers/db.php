@@ -906,7 +906,7 @@ class flexicontent_db
 		foreach ($associations as $assoc)
 		{
 			$assoc->shortcode = strpos($assoc->language,'-')  ?  substr($assoc->language, 0, strpos($assoc->language,'-'))  :  $assoc->language;
-			$translations[$assoc->item_id][] = $assoc;
+			$translations[$assoc->item_id][$assoc->id] = $assoc;
 		}
 		
 		return $translations;
