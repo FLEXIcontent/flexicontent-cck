@@ -98,7 +98,9 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$authors  = $this->get( 'Authorslist' );
 		$langs    = FLEXIUtilities::getLanguages('code');
 		$pagination = $this->get( 'Pagination' );
-		
+		$lang_assocs = $assocs_id ? $this->get( 'LangAssocs' ) : array();
+
+
 		// Ordering active FLAG
 		$ordering = ($filter_order == 'i.ordering');
 		
@@ -173,6 +175,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$this->rows = $rows;
 		$this->ordering = $ordering;
 		$this->pagination = $pagination;
+		$this->lang_assocs = $lang_assocs;
 
 		parent::display($tpl);
 	}

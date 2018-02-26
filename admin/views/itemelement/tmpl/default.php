@@ -21,6 +21,11 @@ $app = JFactory::getApplication();
 $option = $app->input->get('option');
 global $globalcats;
 
+$useAssocs = flexicontent_db::useAssociations();
+
+$list_total_cols = 9;
+if ( $useAssocs ) $list_total_cols++;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 ?>
@@ -119,6 +124,13 @@ function delAllFilters() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHtml::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+
+		<?php if ( $useAssocs ) : ?>
+			<th class="left hideOnDemandClass">
+				<?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?>
+			</th>
+		<?php endif; ?>
+
 			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_MAIN_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="" nowrap="nowrap"><?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -172,24 +184,73 @@ function delAllFilters() {
 			
 			<td align="left">
 				<?php
+					$activate_row = !empty($row->is_current_association) || empty($this->lang_assocs[$row->id]);
+
 					$parentcats_ids = isset($globalcats[$row->catid]) ? $globalcats[$row->catid]->ancestorsarray : array();
 					$pcpath = array();
+
 					foreach($parentcats_ids as $pcid)
 					{
 						$pcpath[] = $globalcats[$pcid]->title;
 					}
+
 					$pcpath = implode($pcpath, ' / ');
 				?>
 				<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_SELECT' ), $row->title . '<br/><br/>' .JText::_('FLEXI_MAIN_CATEGORY'). '<br/>' . $pcpath, 0, 1); ?>">
-				<?php if(JRequest::getVar('object','')==''): ?>
-					<a style="cursor:pointer" onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ? $this->filter_cats : $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+				<?php if (JRequest::getVar('object','')=='' && $activate_row): ?>
+					<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.fcSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ? $this->filter_cats : $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
+				<?php elseif ($activate_row): ?>
+					<a style="cursor: pointer;" href="javascript:;" onclick="window.parent.jSelectArticle('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>', '<?php echo JRequest::getVar('object',''); ?>');">
 				<?php else: ?>
-					<a style="cursor:pointer" onclick="window.parent.jSelectArticle('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>', '<?php echo JRequest::getVar('object',''); ?>');">
+					<a style="cursor: default;" href="javascript:;" onclick="var box = jQuery('#assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo JText::_('FLEXI_ABOUT', true); ?>'}); return false;">
 				<?php endif; ?>
 						<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a>
 				</span>
+
+				<?php
+					echo !empty($row->is_current_association) ? ' <span class="label label-association label-warning">' . JText::_('FLEXI_CURRENT') . '</span> ' : '';
+				?>
 			</td>
+
+			<?php if ( $useAssocs ) : ?>
+			<td>
+				<?php
+				if ( !empty($this->lang_assocs[$row->id]) )
+				{
+					$row_modified = strtotime($row->modified);
+					if (!$row_modified)
+					{
+						$row_modified = strtotime($row->created);
+					}
+
+					foreach($this->lang_assocs[$row->id] as $assoc_item)
+					{
+						// Joomla article manager show also current item, so we will not skip it
+						$is_current = $assoc_item->id == $row->id;
+
+						$assoc_modified = strtotime($assoc_item->modified);
+						if (!$assoc_modified)
+						{
+							$assoc_modified = strtotime($assoc_item->created);
+						}
+
+						$_title = flexicontent_html::getToolTip(
+							($is_current ? '' : JText::_( $assoc_modified < $row_modified ? 'FLEXI_EARLIER_THAN_THIS' : 'FLEXI_LATER_THAN_THIS')),
+							( !empty($this->langs->{$assoc_item->lang}->imgsrc) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
+							($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$assoc_item->lang}->name).' <br/> '.
+							$assoc_item->title, 0, 1
+						);
+
+						echo '
+						<span class="fc_assoc_translation label label-association ' . $tip_class . ($assoc_modified < $row_modified ? ' fc_assoc_later_mod' : '').'" title="'.$_title.'" >
+							'.($assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : strtoupper($assoc_item->shortcode)).'
+						</span>';
+					}
+				}
+				?>
+			</td>
+			<?php endif ; ?>
 
 			<td align="center" class="col_type"><?php echo $row->type_name; ?></td>
 			
@@ -229,7 +290,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="9">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
@@ -243,4 +304,7 @@ function delAllFilters() {
 		<input type="hidden" name="assocs_id" value="'.$this->assocs_id.'" />'
 		: ''; ?>
 </form>
+</div>
+<div id="assoc_not_allowed_msg" style="display: none;">
+	<?php echo JText::_('FLEXI_ITEM_TRANSLATION_IN_USE'); ?>
 </div>

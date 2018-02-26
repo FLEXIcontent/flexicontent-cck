@@ -408,28 +408,39 @@ class FlexicontentModelItems extends JModelLegacy
 
 		return $this->_data;
 	}
-	
-	
+
+
+	/**
+	 * Method to get item (language) associations
+	 *
+	 * @param		int			The id of the item
+	 *
+	 * @return	array		The array of associations
+	 */
 	function getLangAssocs()
 	{
-		if ($this->_translations!==null) return $this->_translations;
-		$this->_translations = array();
-		
-		// Make sure we item list is populased and non-empty
-		if ( empty($this->_data) )  return $this->_translations;
-		
-		// Get associated translations
-		$ids = array();
-		foreach ($this->_data as $_item_data) {
-			$ids[] = $_item_data->id;
+		// If items array is empty, just return empty array
+		if (empty($this->_data))
+		{
+			return array();
 		}
 		
-		$this->_translations = flexicontent_db::getLangAssocs($ids);
-		
+		// Get associated translations
+		elseif ($this->_translations === null)
+		{
+			$ids = array();
+			foreach ($this->_data as $item)
+			{
+				$ids[] = $item->id;
+			}
+
+			$this->_translations = flexicontent_db::getLangAssocs($ids);
+		}
+
 		return $this->_translations;
 	}
-	
-	
+
+
 	/**
 	 * Method to get fields used as extra columns of the item list
 	 *

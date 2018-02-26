@@ -141,7 +141,7 @@ class JFormFieldItem extends JFormField
 		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component';
 		$link .= $this->element['type_id'] ? '&amp;type_id=' . $this->element['type_id'] : '';
 		$link .= $this->element['created_by'] ? '&amp;created_by=' . $this->element['created_by'] : '';
-		$link .= $language ? '&amp;language=' . $language : '';
+		$link .= $language ? '&amp;item_lang=' . $language : '';
 		$link .= ($language && $assocs_id) ? '&amp;assocs_id=' . $assocs_id : '';
 		
 		//$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
@@ -167,4 +167,3 @@ class JFormFieldItem extends JFormField
 		';
 	}
 }
-?>
