@@ -1091,13 +1091,21 @@ class FCIndexedField extends FCField
 		
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) && !$is_ingroup;  // NOT supported inside fielgroup yet
-    $display_all = $prop=='csv_export' ? 0 : $display_all;
-		if ( empty($values) && !$display_all ) {
-			if (!$is_ingroup) {
-				$field->{$prop} = ''; $field->display_index = '';
-			} else {
-				$field->{$prop} = array(); $field->display_index = array();
+    $display_all = $prop === 'csv_export' ? 0 : $display_all;
+
+		if (empty($values) && !$display_all)
+		{
+			if (!$is_ingroup)
+			{
+				$field->{$prop} = '';
+				$field->display_index = '';
 			}
+			else
+			{
+				$field->{$prop} = array();
+				$field->display_index = array();
+			}
+
 			return;
 		}
 		
@@ -1163,7 +1171,11 @@ class FCIndexedField extends FCField
 			$separatorf = '&nbsp;';
 			break;
 		}
-		if ($prop == 'csv_export') $separatorf = ', ';
+
+		if ($prop === 'csv_export')
+		{
+			$separatorf = ', ';
+		}
 		
 		
 		// Get indexed element values
@@ -1204,7 +1216,7 @@ class FCIndexedField extends FCField
 		include(self::getViewPath($field->field_type, $viewlayout));
 
 		// Add microdata to every group of values if field -- is -- in a field group
-		if ($is_ingroup && $itemprop && $prop!='csv_export')
+		if ($is_ingroup && $itemprop && $prop !== 'csv_export')
 		{
 			foreach($field->{$prop} as $n => $disp_html)
 			{
@@ -1218,7 +1230,8 @@ class FCIndexedField extends FCField
 			// Values separator, field 's opening / closing texts, were already applied for every array of values
 			if ($multiple && static::$valueIsArr)
 			{
-				$sep = $prop!='csv_export' ? '' : ' -- ';
+				$sep = $prop !== 'csv_export' ? '' : ' -- ';
+
 				$field->{$prop} = implode($sep, $field->{$prop});
 				$field->display_index = implode($sep, $display_index);
 			}
