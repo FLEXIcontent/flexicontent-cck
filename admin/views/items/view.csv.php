@@ -33,7 +33,7 @@ class FlexicontentViewItems extends JViewLegacy
 {
 	function encodeCSVField($string)
 	{
-		if(strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
+		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
 		{
 			$string = '"' . str_replace('"', '""', $string) . '"';
 		}
@@ -58,18 +58,37 @@ class FlexicontentViewItems extends JViewLegacy
 		// Get model
 		$model  = $this->getModel();
 
-		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
-		$params = JComponentHelper::getParams( 'com_flexicontent' );
+		/**
+		 * Get configuration parameters
+		 * For backend this is component parameters only
+		 * For frontend this category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
+		 */
+		if ($app->isAdmin())
+		{
+			$params = JComponentHelper::getParams('com_flexicontent');
+		}
+
+		else
+		{
+			// Get the category, loading category data and doing parameters merging
+			$category = $this->get('Category');
+			$params = $category->parameters;
+		}
 
 		// Check if CSV export button is enabled for current view
-		$show_csvbutton = $app->isAdmin() ? $params->get('show_csvbutton_be', 0) : $params->get('show_csvbutton', 0) ;
-		if ( ! $show_csvbutton ) die('CSV export not enabled for this view');
+		$show_csvbutton = $app->isAdmin()
+			? $params->get('show_csvbutton_be', 0)
+			: $params->get('show_csvbutton', 0) ;
+
+		if (!$show_csvbutton)
+		{
+			die('CSV export not enabled for this view');
+		}
 
 
-
-		// ***********************
-		// Get data from the model
-		// ***********************
+		/**
+		 * Get data from the model
+		 */
 
 		$items   = $this->get('Data');
 
@@ -87,31 +106,37 @@ class FlexicontentViewItems extends JViewLegacy
 		}*/
 
 
-
-		// ********************************************
-		// Find fields that will be added to CSV export
-		// ********************************************
+		/**
+		 * Find fields that will be added to CSV export
+		 */
 
 		// Map of CORE to item properties
-		$props = array('title'=>'title', 'created_by'=>'author', 'modified_by'=>'modifier', 'created'=>'created', 'modified'=>'modified');
+		$core_props = array(
+			'title'=>'title',
+			'created_by'=>'author',
+			'modified_by'=>'modifier',
+			'created'=>'created',
+			'modified'=>'modified'
+		);
 
 		$total_fields = 0;
-		$delim = "";
+		$delim = '';
 		$item0 = reset($items);
 		
 		foreach( $item0->fields as $field )
 		{
 			FlexicontentFields::loadFieldConfig($field, $item0);
 
-			$include_in_csv_export = $field->parameters->get('include_in_csv_export', 0);
-			if ( !$include_in_csv_export )
+			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+
+			if (!$include_in_csv_export)
 			{
 				continue;
 			}
 			$total_fields++;
 
 			// Render field's CSV display
-			if ( $include_in_csv_export == 2 )
+			if ( $include_in_csv_export === 2 )
 			{
 				FlexicontentFields::getFieldDisplay($items, $field->name, $values=null, $method='csv_export');
 			}
@@ -122,15 +147,17 @@ class FlexicontentViewItems extends JViewLegacy
 			$app->enqueueMessage("Fist record in list does not have any fields that supports CSV export and that are also marked as CSV exportable in their configuration", "notice");
 
 			$referer = @$_SERVER['HTTP_REFERER'];
-			$referer = flexicontent_html::is_safe_url($referer) ? $referer : JUri::base();
+			$referer = flexicontent_html::is_safe_url($referer)
+				? $referer
+				: JUri::base();
+
 			$app->redirect($referer);
 		}
 
 
-
-		// **********************
-		// 1. Output HTTP HEADERS
-		// **********************
+		/**
+		 * 1. Output HTTP HEADERS
+		 */
 
 		@ob_end_clean();
 		header("Pragma: no-cache");
@@ -143,14 +170,13 @@ class FlexicontentViewItems extends JViewLegacy
 		echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
 
-
-		// *********************
-		// 2. Output HEADERS row
-		// *********************
+		/**
+		 * 2. Output HEADERS row
+		 */
 
 		foreach( $item0->fields as $field )
 		{
-			$include_in_csv_export = $field->parameters->get('include_in_csv_export', 0);
+			$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
 			if ( !$include_in_csv_export )
 			{
 				continue;
@@ -163,44 +189,62 @@ class FlexicontentViewItems extends JViewLegacy
 		echo "\n";
 
 
+		/**
+		 * 3. Output data rows
+		 */
 
-		// *******************
-		// 3. Output data rows
-		// *******************
-		
 		foreach($items as $item)
 		{
-			$delim = "";
+			$delim = '';
 			foreach($item0->fields as $field_name => $field)
 			{
-				$include_in_csv_export = $field->parameters->get('include_in_csv_export', 0);
+				$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+
 				if ( !$include_in_csv_export )
 				{
 					continue;
 				}
 
 				echo $delim;
-				$delim = ",";
+				$delim = ',';
+				$vals = '';
 
-				if ($field->iscore)
+				// CASE 1: RENDERED value display !
+				if ($include_in_csv_export === 2)
 				{
-					$prop = isset($props[$field_name]) ? $props[$field_name] : $field_name;
-					echo $this->encodeCSVField( $item->$prop );
+					// Check that field created a non-empty 'display' property named: "csv_export"
+					$vals = isset($item->onDemandFields[$field->name]->csv_export)
+						? $item->onDemandFields[$field->name]->csv_export
+						: '';
 				}
 
-				else if (isset($item->fieldvalues[$field->id]))
+				// CASE 2: CORE properties (special case), TODO: Implement this as "RENDERED value display" (and make it default output for them ?)
+				elseif ($field->iscore && isset($core_props[$field_name]))
 				{
-					if ($include_in_csv_export==1)
+					$prop = $core_props[$field_name];
+					$vals = $item->$prop;
+				}
+
+				// CASE 3: RAW value display !
+				elseif (isset($item->fieldvalues[$field->id]))
+				{
+					if (is_array(reset($item->fieldvalues[$field->id])))
 					{
-						$vals = reset( $item->fieldvalues[$field->id] );
-						$vals = is_array($vals) ? $vals : $item->fieldvalues[$field->id];
-						echo $this->encodeCSVField( implode(",", $vals ) );
+						$vals = array();
+
+						foreach ($item->fieldvalues[$field->id] as $v)
+						{
+							$vals = implode(' | ', $v);
+						}
 					}
+
 					else
 					{
-						echo $this->encodeCSVField( isset($item->onDemandFields[$field->name]->csv_export) ? $item->onDemandFields[$field->name]->csv_export : '' );
+						$vals = $item->fieldvalues[$field->id];
 					}
 				}
+
+				echo $this->encodeCSVField( is_array($vals) ? implode(', ', $vals ) : $vals );
 			}
 
 			echo "\n";
