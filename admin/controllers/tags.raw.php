@@ -208,10 +208,10 @@ class FlexicontentControllerTags extends FlexicontentController
 		$session->set($indexer . '_items_to_index', $tags_ids, 'flexicontent');
 
 		echo 'success';
-		// echo count($fieldids)*count($itemids).'|';
+		// echo count($fieldids)*count($tagids).'|';
 
 		// WARNING: json_encode will output object if given an array with gaps in the indexing
-		// echo '|' . json_encode($itemids);
+		// echo '|' . json_encode($tagids);
 		// echo '|' . json_encode($fieldids);
 		echo '|' . count($tags_ids);
 		echo '|' . count(array());
@@ -265,8 +265,19 @@ class FlexicontentControllerTags extends FlexicontentController
 			die("'rebuildmode': '" . $rebuildmode . "'. not supported");
 		}
 
-		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
-		$itemids = $session->get($indexer . '_items_to_index', array(), 'flexicontent');
+		$log_filename = 'tags_index_mappings_' . \JFactory::getUser()->id . '.php';
+		jimport('joomla.log.log');
+		JLog::addLogger(
+			array(
+				'text_file' => $log_filename,  // Sets the target log file
+				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+			),
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			array('com_flexicontent.tags.mappings_indexer')  // category of logged messages
+		);
+
+		// Get tag ids that have value for any of the searchable fields, but use session to avoid recalculation
+		$tagids = $session->get($indexer . '_items_to_index', array(), 'flexicontent');
 
 		// Get query size limit
 		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
@@ -292,9 +303,9 @@ class FlexicontentControllerTags extends FlexicontentController
 		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
 		$cnt                 = $itemcnt;
 
-		while ($cnt < count($itemids) && $cnt < $itemcnt + $items_per_call)
+		while ($cnt < count($tagids) && $cnt < $itemcnt + $items_per_call)
 		{
-			$query_itemids = array_slice($itemids, $cnt, $max_items_per_query);
+			$query_itemids = array_slice($tagids, $cnt, $max_items_per_query);
 			$cnt += $max_items_per_query;
 
 			// Get files
@@ -311,57 +322,31 @@ class FlexicontentControllerTags extends FlexicontentController
 			// Find / Create Joomla tags
 			foreach ($tag_data as $tag_id => $tag)
 			{
-				$jtag_id_arr = $model->createTagsFromField(array($tag->alias => '#new#' . $tag->name));
-				$jtag_id = $jtag_id_arr ? reset($jtag_id_arr) : 0;
-				$tag->jtag_id = $jtag_id_arr ? reset($jtag_id_arr) : 0;
+				$jtag_data_arr = $model->createTagsFromText(array($tag->alias => '#new#' . $tag->name));
+				$jtag_data = $jtag_data_arr ? reset($jtag_data_arr) : false;
+				$tag->jtag_id = $jtag_data ? $jtag_data->id : 0;
 				$map_index[] = ' WHEN ' . $tag->id . ' THEN ' . $tag->jtag_id;
 			}
 
+			// Increment error count in session, and log errors into the log file
 			if (count($errors))
 			{
-				$log_filename = 'tags_index_mappings_' . \JFactory::getUser()->id . '.php';
-				jimport('joomla.log.log');
-				JLog::addLogger(
-					array(
-						'text_file' => $log_filename,  // Sets the target log file
-						'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
-					),
-					JLog::ALL,  // Sets messages of all log levels to be sent to the file
-					array('com_flexicontent.tags.mappings_indexer')  // category of logged messages
-				);
-
 				$mappings_indexer_error_count = $session->get('tags.mappings_indexer_error_count', 0, 'flexicontent');
 				$session->set('tags.mappings_indexer_error_count', $mappings_indexer_error_count + count($errors), 'flexicontent');
 
-				// mappings_indexer_errors = $session->get('tags.mappings_indexer_errors', array(), 'flexicontent');
 				foreach ($errors as $error_message)
 				{
-					// $mappings_indexer_errors[] = $error_message;
 					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.tags.mappings_indexer');
 				}
-
-				// $session->set('tags.mappings_indexer_errors', $mappings_indexer_errors, 'flexicontent');
 			}
-			else
-			{
-				/*$log_filename = 'tags_index_mappings_' . \JFactory::getUser()->id . '.php';
-				jimport('joomla.log.log');
-				JLog::addLogger(
-					array(
-						'text_file' => $log_filename,  // Sets the target log file
-						'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
-					),
-					JLog::ALL,  // Sets messages of all log levels to be sent to the file
-					array('com_flexicontent.tags.mappings_indexer')  // category of logged messages
-				);
 
-				// mappings_indexer_errors = $session->get('tags.mappings_indexer_errors', array(), 'flexicontent');
+			/*else
+			{
 				foreach ($map_index as $map_index_clause)
 				{
-					// $mappings_indexer_errors[] = $error_message;
 					JLog::add($map_index_clause, JLog::INFO, 'com_flexicontent.tags.mappings_indexer');
-				}*/
-			}
+				}
+			}*/
 
 			// Create query that will update/insert data into the DB
 			unset($query);
@@ -380,6 +365,13 @@ class FlexicontentControllerTags extends FlexicontentController
 			{
 				break;
 			}
+		}
+
+		// Terminate if not indexing any items
+		if (!$tagids)
+		{
+			echo 'fail|No tags need to be synced';
+			exit;
 		}
 
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
