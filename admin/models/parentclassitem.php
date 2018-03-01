@@ -2280,7 +2280,7 @@ class ParentClassItem extends FCModelAdmin
 				if ( $print_logging_info ) $start_microtime = microtime(true);
 
 				// Some compatibility steps
-				$jinput->set('view', 'article');
+				$jinput->set('view', null);
 				$jinput->set('option', 'com_content');
 
 				$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isNew, $data));
