@@ -441,20 +441,18 @@ class FlexicontentViewCategory extends JViewLegacy
 			$tmpl = '.category.default';
 		}
 
-		// @TODO trigger the plugin selectively
-		// and delete the plugins tags if not active
+		// @TODO (possible improvement) trigger the plugin selectively, and delete the plugins tags if not active
 		if ($category->id && $params->get('trigger_onprepare_content_cat')) // just check if the parameter is active
 		{
 			JPluginHelper::importPlugin('content');
 
 			// Allow to trigger content plugins on category description
-			// NOTE: for J2.5, we will trigger the plugins as if description text was an article text, using ... 'com_content.article'
 			$category->text = $category->description;
 
 			$_id = $jinput->get('id');
 			$jinput->set('id', $category->id);   // compatibility for plugin that will try to use this variable
 
-			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$category, &$params, 0));
+			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.category', &$category, &$params, 0));
 
 			$jinput->set('layout', $layout);  // Restore LAYOUT variable should some plugin have modified it
 			$jinput->set('id', $_id);   // Restore previous value of this variable 
