@@ -33,46 +33,68 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'c
 class modFlexifilterHelper
 {
 
-	public static function decideCats( &$params )
+	public static function decideCats(& $params)
 	{
 		global $globalcats;
 		
-		$display_cat_list = $params->get('display_cat_list', 0);
+		$display_cat_list = (int) $params->get('display_cat_list', 0);
 		$catids = $params->get('catids', array());
-		$usesubcats = $params->get('usesubcats', 0 );
-		
+		$usesubcats = (int) $params->get('usesubcats', 0);
+
+		// Get user's allowed categories
+		if ($display_cat_list)
+		{
+			$tree = flexicontent_cats::getCategoriesTree();
+
+			// (only) For include mode, use all categories if no cats were selected via configuration
+			if ($display_cat_list === 1 && empty($catids))
+			{
+				global $globalcats;
+				$catids = array_keys($globalcats);
+			}
+		}
+
 		// Find descendants of the categories
 		if ($usesubcats)
 		{
 			$subcats = array();
-			foreach ($catids as $catid) {
-				$subcats = array_merge($subcats, array_map('trim',explode(",",$globalcats[$catid]->descendants)) );
+
+			foreach ($catids as $catid)
+			{
+				$subcats = array_merge($subcats, array_map('trim', explode(',', $globalcats[$catid]->descendants)) );
 			}
+
 			$catids = array_unique($subcats);
 		}
-    
-    
-		// Find categories to display
-		$tree = flexicontent_cats::getCategoriesTree();
 		
-		if ( $display_cat_list == 1 )  // include method
+		switch ($display_cat_list)
 		{
-			foreach ($catids as $catid)  $allowedtree[$catid] = $tree[$catid];
+			// Include method
+			case 1:
+				$allowedtree = array();
+
+				foreach ($catids as $catid)
+				{
+					$allowedtree[$catid] = $tree[$catid];
+				}
+				break;
+
+			// Exclude method
+			case 2:
+				foreach ($catids as $catid)
+				{
+					unset($tree[$catid]);
+				}
+				$allowedtree = & $tree;
+				break;
+
+			// Not using category selector
+			case 0:
+			default:
+				$allowedtree = array();
+				break;
 		}
-		
-		else if ( $display_cat_list == 2 )  // exclude method
-		{
-			foreach ($catids as $catid)  unset($tree[$catid]);
-			$allowedtree = & $tree;
-		}
-		
-		else
-		{
-			$allowedtree = & $tree;
-		}
-		
+
 		return $allowedtree;
 	}
-	
 }
-?>

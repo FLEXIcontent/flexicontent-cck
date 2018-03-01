@@ -170,9 +170,9 @@ else
 
 
 // FIELD FILTERS
-$display_filter_list  = $params->get('display_filter_list', 0);
+$display_filter_list  = (int) $params->get('display_filter_list', 0);
 $filter_ids           = $params->get('filters', array());
-$limit_filters_to_cat = $display_filter_list==1 || $display_filter_list==3;
+$limit_filters_to_cat = $display_filter_list === 1 || $display_filter_list === 3;
 
 // Check if array or comma separated list
 if ( !is_array($filter_ids) ) {
@@ -214,14 +214,23 @@ if ($display_cat_list)
 		$_fld_name = 'cids[]';
 		
 		$mcats_list = $jinput->get('cids', '', 'string');
+
 		if ( !is_array($mcats_list) )
 		{
 			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
 			$mcats_list = explode(',', $mcats_list);
 		}
+
 		// Make sure given data are integers ... !!
 		$cids = array();
-		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+
+		foreach ($mcats_list as $i => $_id)
+		{
+			if ((int)$_id)
+			{
+				$cids[] = (int) $_id;
+			}
+		}
 	}
 	
 	// CASE 2: Single category selector, targeting single category view
@@ -232,12 +241,15 @@ if ($display_cat_list)
 		$_fld_onchange = ' onchange="update_'.$form_name.'();" ';
 		$_fld_name = $catid_fieldname;
 	}
+
 	$_fld_attributes = ' class="'.$_fld_classes.'" '.$_fld_size.$_fld_onchange.$_fld_multiple;
 	
 	$allowedtree = modFlexifilterHelper::decideCats($params);
-	$selected_cats = $mcats_selection ? $cids : ($catid ? $catid : '');
-	$top = false;
-	$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, $top, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
+	$selected_cats = $mcats_selection
+		? $cids
+		: ($catid ? $catid : '');
+
+	$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, $top = false, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
 }
 
 
@@ -275,47 +287,58 @@ $cat_model->_buildItemFromJoin($counting=true);
 // Category parameters from category or from multi-category menu item
 $view_params = !empty($mcats_menu) ? $menu_params : $cat_params;
 
-// ALL filters
-if ($display_filter_list==0)
-{
-	// WARNING: this CASE is supposed to get ALL filters regardless category,
-	// but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
-	// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
-	$filters = ! $params->get('use_filters', 0) ? array() : FlexicontentFields::getFilters('filters', '__ALL_FILTERS__', $view_params);
-}
 
-// Filter selected in category configuration
-else if ($display_filter_list==1)
+/**
+ * Decide which filters to display
+ */
+switch ($display_filter_list)
 {
-	// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
-	$filters = FlexicontentFields::getFilters('filters', 'use_filters', $view_params);
-}
+	// ALL filters
+	case 0:
+		/**
+		 * WARNING: this CASE is supposed to get ALL filters regardless category,
+		 * but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
+		 * ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
+		 */
+		$filters = ! $params->get('use_filters', 0) ? array() : FlexicontentFields::getFilters('filters', '__ALL_FILTERS__', $view_params);
+		break;
 
-// Filters selected in module
-else if ($display_filter_list==2)
-{
-	$params->set('filters_order', 1); // respect filters ordering
-	$filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
-}
+	// Filter selected in category configuration
+	case 1:
+		// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
+		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $view_params);
+		break;
 
-// Filters selected in module and intersect with current category
-else if ($display_filter_list)  // ==3
-{
-	$params->set('filters_order', 1); // respect filters ordering
-	$cat_filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
-	
-	// Intersection of selected filters and of category assigned filters
-	$filters = array();
-	$filter_ids_indexed = array_flip($filter_ids);
-	foreach ($cat_filters as $filter_name => $filter) {
-		if ( isset($filter_ids_indexed[$filter->id]) ) {
-			$filters[] = $filter;
+	// Filters selected in module
+	case 2:
+		$params->set('filters_order', 1); // respect filters ordering
+		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
+		break;
+
+	// Filters selected in module and intersect with current category
+	case 3:
+		$params->set('filters_order', 1); // respect filters ordering
+		$cat_filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
+
+		// Intersection of selected filters and of category assigned filters
+		$filters = array();
+		$filter_ids_indexed = array_flip($filter_ids);
+
+		foreach ($cat_filters as $filter_name => $filter)
+		{
+			if (isset($filter_ids_indexed[$filter->id]))
+			{
+				$filters[] = $filter;
+			}
 		}
-	}
+		break;
 }
 
-// Remove categories filter
-if ($display_cat_list)  unset($filters[13]);
+// Remove categories filter, if using module's custom category selector
+if ($display_cat_list)
+{
+	unset($filters[13]);
+}
 
 // Set filter values (initial or locked) via configuration parameters
 FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
@@ -327,14 +350,16 @@ $params->set('txt_ac_usesubs', $display_subcats );
 
 // Override text search auto-complete category ids with those of filter 13
 $f13_val = $jinput->get('filter_13', '', 'string');
-if ( isset($filters['categories']) && !empty($f13_val) )
+
+if (isset($filters['categories']) && !empty($f13_val))
 {
 	$params->set('txt_ac_cid', 'NA');
 	$params->set('txt_ac_cids', is_array($f13_val) ? $f13_val : array((string) $f13_val) );
 }
 
 // 4. Add html to filter objects
-if ( !empty($filters) ) {
+if (!empty($filters))
+{
 	FlexicontentFields::renderFilters( $params, $filters, $form_name );
 }
 
@@ -424,39 +449,49 @@ else if ($catid)
 require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
 
 // Add needed js
-$js = "";
-/*if (!$display_cat_list || !empty($selected_cats)) {
+$js = '';
+
+/*
+if (!$display_cat_list || !empty($selected_cats))
+{
 	$js .= '
 		jQuery(document).ready(function() {
 			jQuery("#'.$form_name.'_filter_box").css("display", "block");
 		});
 	';
 }
-$document = JFactory::getDocument();
-$document->addScriptDeclaration($js);*/
+*/
 
 if ($display_cat_list && !$mcats_selection)
 {
 	$js .= '
-		function update_'.$form_name.'()
+		function update_' . $form_name . '()
 		{
-			form=document.getElementById("'.$form_name.'");
-			cid_val=form.'.$catid_fieldname.'.value;
-			if ( cid_val.length == 0 )
+			var form = document.getElementById("' . $form_name . '");
+			var cid_val = form.' . $catid_fieldname . '.value;
+
+			if (cid_val.length == 0)
 			{
 				var fcform = jQuery(form);
-				var _action = fcform.attr("data-fcform_default_action"); 
-				fcform.attr("action", _action);
-				fcform.attr("data-fcform_action", _action ); 
+				var default_action = fcform.attr("data-fcform_default_action"); 
+
+				fcform.attr("action", default_action);
+				fcform.attr("data-fcform_action", default_action); 
+
 				adminFormPrepare(form, 1);
 				return;
 			}
+
 			getSEFurl("cid_loading_'.$module->id.'",	"'.$loader_html.'", form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.', "'.$default_mcats_target.'");
 			/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
 		}
 	';
 }
-if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+
+if ($js)
+{
+	JFactory::getDocument()->addScriptDeclaration($js);
+}
 
 // append performance stats to global variable
 if ( $flexiparams->get('print_logging_info') )
