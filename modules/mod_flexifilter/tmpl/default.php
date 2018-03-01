@@ -36,7 +36,7 @@ if ($ff_placement){
 }
 ?>
 
-<form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $default_target; ?>' method='<?php echo $form_method; ?>' >
+<form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' >
 
 <?php if ( !empty($cats_select_field) ) : ?>
 <fieldset class="fc_filter_set" style="padding-bottom:0px;">
