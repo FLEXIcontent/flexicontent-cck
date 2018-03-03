@@ -6,7 +6,8 @@ var itemscreen = function(name, options)
 		this.name = name;
 		this.options = {};
 		this.options.id = options.id || '';
-		this.options.script_url = options.script_url || 'index.php?option=com_flexicontent&controller=items&tmpl=component';
+		this.options.sess_token = options.sess_token || '';
+		this.options.script_url = options.script_url || 'index.php?option=com_flexicontent&controller=items&tmpl=component' + (this.options.sess_token ? '&' + this.options.sess_token + '=1' : '');
 		this.options.task = options.task || '';
 	};
 
@@ -22,7 +23,7 @@ var itemscreen = function(name, options)
 
 		jQuery('#'+doname).html('<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		jQuery.ajax({
-			url: this.options.script_url + "&task=" + this.options.task + "&id=" + this.options.id,
+			url: this.options.script_url + "&format=raw&task=" + this.options.task + "&id=" + this.options.id,
 			type: 'get',
 			data: {},
 			success: function (data)
