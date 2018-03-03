@@ -45,6 +45,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
 		@ob_end_clean();
 		$id 		= JRequest::getInt('id', 0);
 		$active 	= JRequest::getInt('active', 0);
@@ -119,17 +120,19 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function resethits()
 	{
-		$id		= JRequest::getInt('id', 0);
-		$model = $this->getModel('item');
+		// Check session token, item exists, is editable
+		$itemmodel = $this->_getEditorModel();
 
-		$model->resetHits($id);
+		if (!is_object($itemmodel))
+		{
+			jexit($itemmodel);
+		}
 
-		$cache = FLEXIUtilities::getCache($group = '', 0);
-		$cache->clean('com_flexicontent_items');
-		$cache = FLEXIUtilities::getCache($group = '', 1);
-		$cache->clean('com_flexicontent_items');
+		$itemmodel->resetHits();
 
-		echo 0;
+		$this->_cleanRecordsCache(0, $itemmodel);
+
+		jexit('0');
 	}
 
 
@@ -140,17 +143,61 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function resetvotes()
 	{
-		$id = JRequest::getInt('id', 0);
-		$model = $this->getModel('item');
+		// Check session token, item exists, is editable
+		$itemmodel = $this->_getEditorModel();
 
-		$model->resetVotes($id);
+		if (!is_object($itemmodel))
+		{
+			jexit($itemmodel);
+		}
 
-		$cache = FLEXIUtilities::getCache($group = '', 0);
-		$cache->clean('com_flexicontent_items');
-		$cache = FLEXIUtilities::getCache($group = '', 1);
-		$cache->clean('com_flexicontent_items');
+		$itemmodel->resetVotes();
 
-		echo JText::_('FLEXI_NOT_RATED_YET');
+		$this->_cleanRecordsCache(0, $itemmodel);
+
+		jexit(JText::_('FLEXI_NOT_RATED_YET'));
+	}
+
+
+	/**
+	 * Method to fetch the votes
+	 *
+	 * @since 1.5
+	 */
+	function getvotes()
+	{
+		// Check session token, item exists, is editable
+		$itemmodel = $this->_getEditorModel();
+
+		if (!is_object($itemmodel))
+		{
+			jexit($itemmodel);
+		}
+
+		$votes = $itemmodel->getRatingDisplay();
+
+		jexit($votes ?: '0');
+	}
+
+
+	/**
+	 * Method to get hits
+	 *
+	 * @since 1.5
+	 */
+	function gethits()
+	{
+		// Check session token, item exists, is editable
+		$itemmodel = $this->_getEditorModel();
+
+		if (!is_object($itemmodel))
+		{
+			jexit($itemmodel);
+		}
+
+		$hits = $itemmodel->gethits();
+
+		jexit($hits ?: '0');
 	}
 
 
@@ -381,4 +428,67 @@ class FlexicontentControllerItems extends FlexicontentController
 		flexicontent_html::setitemstate($this, 'json');
 	}
 
+
+	/**
+	 * Method to check session token, item exists, is editable
+	 *
+	 * return string | object   return error string or item model of editable item
+	 *
+	 * @since 3.2.1.13
+	 */
+	private function _getEditorModel()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$id = $jinput->getInt('id', 0);
+
+		if (!$id)
+		{
+			return JText::_('Item not found');
+		}
+
+		$model = $this->getModel('item');
+		$model->setId($id);
+		$item = $model->getItem();
+
+		if (!$item)
+		{
+			return JText::_('Item not found');
+		}
+
+		// Task usage reversed for editors only
+		if (!$model->canEdit())
+		{
+			return JText::_('FLEXI_NO_ACCESS_EDIT');
+		}
+
+		return $model;
+	}
+
+
+	/**
+	 * Method to clean cache of specific records (if implemented by the model)
+	 *
+	 * @since 3.2.1.13
+	 */
+	private function _cleanRecordsCache($cid = 0, $itemmodel = null)
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__)
+		{
+			die(__FUNCTION__ . ' : direct call not allowed');
+		}
+
+		// Clean this as it contains Joomla frontend view cache)
+		$cache_site = FLEXIUtilities::getCache($group = '', $client = 0);
+		$cache_site->clean('com_flexicontent');
+
+		// Also pass item IDs array in case of doing special cache cleaning per item
+		$itemmodel = $itemmodel ?: $this->getModel('item');
+		$cid = $cid ?: $itemmodel->get('id');
+		$itemmodel->cleanCache(null, 0, $cid);
+		$itemmodel->cleanCache(null, 1, $cid);
+	}
 }

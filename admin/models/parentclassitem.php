@@ -3530,12 +3530,20 @@ class ParentClassItem extends FCModelAdmin
 	 * @return int
 	 * @since 1.0
 	 */
-	function resetHits($id)
+	function resetHits($id = 0)
 	{
+		$id = (int) ($id ?: $this->_id);
+
+		if (!$id)
+		{
+			return;
+		}
+
 		$row = $this->getTable();
 		$row->load($id);
 		$row->hits = 0;
 		$row->store();
+
 		return $row->id;
 	}
 	
@@ -3547,17 +3555,22 @@ class ParentClassItem extends FCModelAdmin
 	 * @return int
 	 * @since 1.0
 	 */
-	function resetVotes($id)
+	function resetVotes($id = 0)
 	{
+		$id = (int) ($id ?: $this->_id);
+
+		if (!$id)
+		{
+			return;
+		}
+
 		// Delete main vote type
-		$query = 'DELETE FROM #__content_rating WHERE content_id = '.$id;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
-		
+		$query = 'DELETE FROM #__content_rating WHERE content_id = ' . (int) $id;
+		$this->_db->setQuery($query)->execute();
+
 		// Delete extra vote types
-		$query = 'DELETE FROM #__flexicontent_items_extravote WHERE content_id = '.$id;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
+		$query = 'DELETE FROM #__flexicontent_items_extravote WHERE content_id = ' . (int) $id;
+		$this->_db->setQuery($query)->execute();
 	}
 
 
@@ -5101,7 +5114,9 @@ class ParentClassItem extends FCModelAdmin
 
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
-		$hasCoupon = false;
+		// Check if item was editable, but was rendered non-editable
+		$hasTmpEdit = false;
+		$hasCoupon  = false;
 		if ($session->has('rendered_uneditable', 'flexicontent'))
 		{
 			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
@@ -5384,13 +5399,13 @@ class ParentClassItem extends FCModelAdmin
 		// *** Get rating data
 		// ***
 
-		if ( $record->id )
+		if (!$record->id)
 		{
 			$record->rating_count = 0;
 			$record->rating       = 0;
 			$record->score        = 0;
 		}
-		else if ( !isset($record->rating_count) || !isset($record->rating) || !isset($record->score) )
+		elseif (!isset($record->rating_count) || !isset($record->rating) || !isset($record->score))
 		{
 			$rating_resolution = (int)$this->getVotingResolution();
 

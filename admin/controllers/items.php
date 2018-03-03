@@ -2104,38 +2104,6 @@ class FlexicontentControllerItems extends FlexicontentController
 
 
 	/**
-	 * Method to fetch the votes
-	 *
-	 * @since 1.5
-	 */
-	function getvotes()
-	{
-		$id = JFactory::getApplication()->input->get('id', 0, 'int');
-
-		@ob_end_clean();
-		$votes = $this->getModel('item')->getRatingDisplay($id);
-
-		jexit($votes ?: '0');
-	}
-
-
-	/**
-	 * Method to get hits
-	 *
-	 * @since 1.5
-	 */
-	function gethits()
-	{
-		$id = JFactory::getApplication()->input->get('id', 0, 'int');
-
-		@ob_end_clean();
-		$hits = $this->getModel('item')->gethits($id);
-
-		jexit($hits ?: '0');
-	}
-
-
-	/**
 	 * Method to clean cache of specific records (if implemented by the model)
 	 *
 	 * @since 3.2.1.9

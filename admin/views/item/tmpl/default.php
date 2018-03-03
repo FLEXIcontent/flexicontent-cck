@@ -260,28 +260,32 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 }
 
 // version variables
-$this->document->addScriptDeclaration("
+$this->document->addScriptDeclaration
+("
 	jQuery(document).ready(function(){
-		var hits = new itemscreen('hits', {id:".($this->item->id ? $this->item->id : 0).", task:'".$ctrl_items."gethits'});
+		var hits = new itemscreen('hits', {id:".($this->item->id ? $this->item->id : 0).", task:'".$ctrl_items."gethits', sess_token:'" . JSession::getFormToken() . "'});
 		//hits.fetchscreen();
 	
-		var votes = new itemscreen('votes', {id:".($this->item->id ? $this->item->id : 0).", task:'".$ctrl_items."getvotes'});
+		var votes = new itemscreen('votes', {id:".($this->item->id ? $this->item->id : 0).", task:'".$ctrl_items."getvotes', sess_token:'" . JSession::getFormToken() . "'});
 		//votes.fetchscreen();
 	});
 	
-	function reseter(task, id, div){
+	function reseter(task, id, div)
+	{
 		var res = new itemscreen();
 		task = '".$ctrl_items."' + task;
-		res.reseter( task, id, div, '".JUri::base(true)."/index.php?option=com_flexicontent&controller=items' );
+		res.reseter(task, id, div, '" . JUri::base(true) . "/index.php?option=com_flexicontent&controller=items&" . JSession::getFormToken() . "=1');
 	}
 	
-	function clickRestore(link) {
-		if(confirm('".JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."')) {
+	function clickRestore(link)
+	{
+		if (confirm('".JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."'))
+		{
 			location.href=link;
 		}
+
 		return false;
 	}
-	
 ");
 
 
