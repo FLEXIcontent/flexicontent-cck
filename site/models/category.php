@@ -114,7 +114,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_uid = 0;
 	
 	/**
-	 * Tag id (used by TAGS layout)
+	 * Tag id for tagged items (used by TAGS layout)
 	 *
 	 * @var integer
 	 */
@@ -133,6 +133,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @var string
 	 */
 	var $_comments = null;
+	
+	/**
+	 * Tag data for tagged items (used by TAGS layout)
+	 *
+	 * @var object
+	 */
+	var $_tag = null;
 	
 	
 	/**
@@ -153,7 +160,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		// Set category id and call constrcuctor
 		$cid = JFactory::getApplication()->input->get('cid', 0, 'int');
-		$this->setId((int)$cid);  // This will set the category id and clear all member variables
+
+		// This will set the category id and clear all member variables
+		$this->setId($cid);
+
 		parent::__construct();
 
 		// Populate state data, if record id is changed this function must be called again
@@ -316,8 +326,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getData()
 	{
-		// Make sure category has been loaded (false means category view without current category)
-		if ( $this->_category === null) $this->getCategory();
+		// Make sure category has been loaded
+		$this->getCategory();
 
 		$app = JFactory::getApplication();
 
@@ -1552,38 +1562,41 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 	function getChilds()
 	{
-		if ( !$this->_id && !count($this->_ids)) return array();
-		
-		// Make sure category has been loaded (false means category view without current category)
-		if ( $this->_category === null) $this->getCategory();
+		// Make sure category has been loaded
+		$this->getCategory();
+
+		if (!$this->_id && !count($this->_ids))
+		{
+			return array();
+		}
 		
 		$show_itemcount   = $this->_params->get('show_itemcount', 1);
-		//$show_subcatcount = $this->_params->get('show_subcatcount', 0);
 		
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
-		$id = $this->_id;  // save id in case we need to change it
+
 		$k = 0;
 		$count = count($this->_childs);
-		for($i = 0; $i < $count; $i++)
+
+		for ($i = 0; $i < $count; $i++)
 		{
-			$category =& $this->_childs[$i];
+			$category = & $this->_childs[$i];
 			$category->assigneditems = null;
-			if ($show_itemcount) {
+
+			if ($show_itemcount)
+			{
 				if ( $print_logging_info )  $start_microtime = microtime(true);
 				$category->assigneditems = $this->_getassigned( $category->id );
 				if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
-			$category->subcats       = $this->_getsubs( $category->id );
-			//$this->_id        = $category->id;
-			//$category->items  = $this->getData();
-			//$this->_data      = null;
+
+			$category->subcats = $this->_getsubs($category->id);
+
 			$k = 1 - $k;
 		}
-		$this->_id = $id;  // restore id in case it has been changed
 		
 		return $this->_childs;
 	}
@@ -1599,38 +1612,40 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 	function getPeers()
 	{
-		if ( !$this->_id || !$this->_category ) return array();
-		
-		// Make sure category has been loaded (false means category view without current category)
-		if ( $this->_category === null) $this->getCategory();
+		// Make sure category has been loaded
+		$this->getCategory();
+
+		if (!$this->_id || !$this->_category)
+		{
+			return array();
+		}
 		
 		$show_itemcount   = $this->_params->get('show_itemcount_peercat', 1);
-		//$show_subcatcount = $this->_params->get('show_subcatcount_peercat', 0);
 		
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		$query = $this->_buildChildsQuery($this->_category->parent_id);
 		$this->_peers = $this->_getList($query);
-		$id = $this->_id;  // save id in case we need to change it
+
 		$k = 0;
 		$count = count($this->_peers);
-		for($i = 0; $i < $count; $i++)
+
+		for ($i = 0; $i < $count; $i++)
 		{
 			$category =& $this->_peers[$i];
 			$category->assigneditems = null;
-			if ($show_itemcount) {
+			if ($show_itemcount)
+			{
 				if ( $print_logging_info )  $start_microtime = microtime(true);
 				$category->assigneditems = $this->_getassigned( $category->id );
 				if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
-			$category->subcats       = $this->_getsubs( $category->id );
-			//$this->_id        = $category->id;
-			//$category->items  = $this->getData();
-			//$this->_data      = null;
+
+			$category->subcats = $this->_getsubs($category->id);
+
 			$k = 1 - $k;
 		}
-		$this->_id = $id;  // restore id in case it has been changed
 		
 		return $this->_peers;
 	}
@@ -1644,19 +1659,29 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getCategory($pk = null, $raiseErrors = true, $checkAccess = true, $checkPublished = true)
 	{
-		//initialize some vars
+		// Return cached result if category has been loaded already (false means category view without current category)
+		if ($this->_category !== null)
+		{
+			return $this->_category;
+		}
+
+		// Initialize some vars
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		
-		if ($pk) $this->_id = $pk;  // Set a specific id
-		
+
+		// Set a specific id
+		if ($pk)
+		{
+			$this->_id = $pk;
+		}
+
 		$cat_required = $this->_layout == '';
 		$cat_usable   = !$this->_layout || $this->_layout!='mcats';
-		
+
 		// Clear category id, if current layout cannot be limited to a specific category
 		$this->_id = $cat_usable ? $this->_id : 0;
-		
-		if ( $this->_id )
+
+		if ($this->_id)
 		{
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');  // If category model is loaded from 3rd party code
 			$catshelper = new flexicontent_cats($this->_id);
@@ -1668,7 +1693,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				foreach($parents as $parent)
 				{
-					if ( !$parent->published )
+					if (!$parent->published)
 					{
 						$parents_published = false;
 						break;
@@ -1703,12 +1728,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$_category = false;
 		}
-		
-		
-		// *******************************************************************************
-		// Check category was found / is published, and throw an error. Note that an empty
-		// layout means single category view, so raise an error if category id is missing
-		// *******************************************************************************
+
+
+		/**
+		 * Check category was found / is published, and throw an error. Note that an empty
+		 * layout means single category view, so raise an error if category id is missing
+		 */
 		
 		if (($this->_id || $cat_required) && !$_category)
 		{
@@ -1725,13 +1750,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 				throw new Exception($err_mssg, $err_type);
 			}
 		}
-		
-		
-		// *********************************************************************
-		// Some layouts optionally limit to a specific category, for these
-		// create an empty category data object (if one was not created already)
-		// *********************************************************************
-		
+
+
+		/**
+		 * Some layouts optionally limit to a specific category, for these
+		 * create an empty category data object (if one was not created already)
+		 */
+
 		if ($this->_layout)
 		{
 			if ($this->_layout!='mcats' && !empty($_category))
@@ -1754,38 +1779,38 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$this->_category = $_category;
 		}
-		
-		
-		// *****************************************************
-		// Check for proper layout configuration and throw error
-		// *****************************************************
-		
+
+
+		/**
+		 * Check for proper layout configuration and throw error
+		 */
+
 		if ($this->_layout)
 		{
 			$err_mssg = $err_type = false;
 			
-			if ( !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
+			if (!in_array($this->_layout, array('favs','tags','mcats','myitems','author')))
 			{
 				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
 				$err_type = 404;
 			}
-			else if ( $this->_layout=='author' && !$this->_authorid )
+			elseif ($this->_layout=='author' && !$this->_authorid)
 			{
 				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
 				$err_type = 404;
 			}
-			else if ( $this->_layout=='tags' && !$this->_tagid )
+			elseif ($this->_layout=='tags' && !$this->_tagid)
 			{
 				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
 				$err_type = 404;
 			}
-			else if ( $this->_layout=='myitems' && !$this->_authorid )
+			elseif ($this->_layout=='myitems' && !$this->_authorid)
 			{
 				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
 				$err_type = 403;
 				$login_redirect = true;
 			}
-			else if ( $this->_layout=='favs' && !$this->_uid )
+			elseif ($this->_layout=='favs' && !$this->_uid)
 			{
 				// Get Favourites field configuration
 				$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
@@ -1802,8 +1827,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Raise a notice and redirect
 			if ($err_mssg)
 			{
-				if (!$raiseErrors) return false;
-				
+				if (!$raiseErrors)
+				{
+					return false;
+				}
+
 				if (!empty($login_redirect))
 				{
 					// redirect unlogged user to login
@@ -1847,7 +1875,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$canread = true;
 
 		// Check access level of category and of its parents
-		if ( $this->_id )
+		if ($this->_id)
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$allowed_levels = array_flip($aid_arr);
@@ -1857,7 +1885,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				foreach($parents as $parent)
 				{
-					if ( !isset($allowed_levels[$parent->access]) )
+					if (!isset($allowed_levels[$parent->access]))
 					{
 						$canread = false;
 						break;
@@ -1867,7 +1895,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		// Handle unreadable category (issue 403 unauthorized error, redirecting unlogged users to login)
-		if ( $this->_id && !$canread )
+		if ($this->_id && !$canread)
 		{
 			if ($user->guest)
 			{
@@ -1884,7 +1912,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$app->redirect($url);
 			}
 
-			else if ($this->_params->get('unauthorized_page', ''))
+			elseif ($this->_params->get('unauthorized_page', ''))
 			{
 				$app->redirect($this->_params->get('unauthorized_page'));				
 			}
@@ -1909,17 +1937,48 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getTag()
 	{
-		$query = 'SELECT t.name, t.id,'
+		if (!$this->_tagid)
+		{
+			$this->_tag = false;
+		}
+
+		// Return cached result if tag has been already loaded (false means category view without tag)
+		if ($this->_tag !== null)
+		{
+			return $this->_tag;
+		}
+
+		// Load tag data
+		$query = 'SELECT *,'
 			. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 			. ' FROM #__flexicontent_tags AS t'
 			. ' WHERE t.id = ' . (int) $this->_tagid;
-		$this->_db->setQuery($query);
-		$this->_tag = $this->_db->loadObject();       // Execute query to load tag properties
-		if ($this->_tag)
+		$this->_tag = $this->_db->setQuery($query)->loadObject();
+
+		// Abort further execution if tag not found
+		if (!$this->_tag)
 		{
-			$this->_tag->parameters = $this->_params;   // Assign tag parameters ( already load by setId() )
-    }
-    
+			return $this->_tag;
+		}
+
+		// Get the linked joomla tag
+		if ($this->_tag->jtag_id)
+		{
+			$query = 'SELECT *'
+				. ' FROM #__tags AS t'
+				. ' WHERE t.id = ' . (int) $this->_tag->jtag_id;
+			$this->_tag->jtag = $this->_db->setQuery($query)->loadObject();
+		}
+		else
+		{
+			$this->_tag->jtag = false;
+		}
+
+		// Assign tag parameters from Joomla tag params
+		$this->_tag->parameters = $this->_tag->jtag
+			? new JRegistry($this->_tag->jtag->params)
+			: null;
+
 		return $this->_tag;
 	}
 	
@@ -2155,15 +2214,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
 		
 		// Bugs of v2.0 RC2
-		if (FLEXI_J16GE) {
-			if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
-				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories");
-				$params->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
-			}
-			if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
-				JError::raiseNotice(0, "The login url seems to be wrongly set in the FLEXIcontent component configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
-				$params->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
-			}
+		if (is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)))
+		{
+			$app->enqueueMessage("FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories", 'notice');
+			$params->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+		}
+
+		if (preg_match("/option=com_user&/", $params->get('login_page', '')))
+		{
+			$app->enqueueMessage("The login url seems to be wrongly set in the FLEXIcontent component configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>", 'notice');
+			$params->set('login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')));
 		}
 		
 		
@@ -2176,10 +2236,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_params = clone($layoutParams);
 		$this->_params->merge($params);
 		$merge_stack[1] = "MERGED LAYOUT PARAMETERS of '".$this->_clayout ."'";
-		
-		if ($debug_inheritcid) $app->enqueueMessage(implode("<br/>\n", $merge_stack));
-		
-		
+
+		if ($debug_inheritcid)
+		{
+			$app->enqueueMessage(implode("<br/>\n", $merge_stack));
+		}
+
 		// Set category id for TEXT autocomplete (maybe overriden by category filter 13 in getFilters)
 		$this->_params->set('txt_ac_cid',  (!empty($this->_id) ? $this->_id : 'NA') );
 		// Set category ids for TEXT autocomplete (maybe overriden by category filter 13 in getFilters)
@@ -2394,8 +2456,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
  	function getAlphaindex()
 	{
-		// Make sure category has been loaded (false means category view without current category)
-		if ( $this->_category === null) $this->getCategory();
+		// Make sure category has been loaded
+		$this->getCategory();
 		
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
