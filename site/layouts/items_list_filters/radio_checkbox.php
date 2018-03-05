@@ -59,7 +59,7 @@ else
 {
 	$filter->html .= '
 				<input onchange="fc_toggleClass(this, \'fc_highlight\', 1);"
-					id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']"
+					id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'[]"
 					value="" '.$checked_attr.' class="fc_checkradio" />';
 }
 
@@ -117,7 +117,7 @@ foreach ($results as $result)
 	else
 	{
 		$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\');" ';
-		$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
+		$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'[]" ';
 		$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 	}
 	
