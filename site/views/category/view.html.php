@@ -76,14 +76,50 @@ class FlexicontentViewCategory extends JViewLegacy
 		$model->mergeMenuParams = true;
 		
 		// Get the category, loading category data and doing parameters merging
-		$category = $this->get('Category');
+		$category = $model->getCategory();
 		
-		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
-		$params   = $category->parameters;
-		
-		if ($category->id)
+		// Get Tag data if current layout is 'tags'
+		$tag = $model->getTag();
+
+
+		/**
+		 * Get category parameters as VIEW's parameters
+		 * Category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu
+		 */
+
+		// View's parameters (OVERRIDE)
+		$params = $category->parameters;
+
+		// View's metadata parameters
+		$meta_params = $category->id
+			? new JRegistry($category->metadata)
+			: null;
+
+		// View's meta description and keywords
+		$metadesc = $category->id && $category->metadesc
+			? $category->metadesc
+			: '';
+		$metakey = $category->id && $category->metakey
+			? $category->metakey
+			: '';
+
+		/**
+		 * Get tag metadata, metadesc, metakey
+		 */
+		$meta_params_tag = $tag && $tag->jtag
+			? new JRegistry($tag->jtag->metadata)
+			: null;
+
+		if ($tag && $tag->jtag)
 		{
-			$meta_params = new JRegistry($category->metadata);
+			// Override view's metadata with tag's metadata
+			$meta_params
+				? $meta_params->merge($meta_params_tag)
+				: $meta_params = $meta_params_tag;
+
+			// Prepend tag metadata to view's meta description and keywords
+			$metadesc = $tag->jtag->metadesc . ($metadesc ? "\n" . $metadesc : '');
+			$metakey = $tag->jtag->metakey . ($metakey ? "\n" . $metakey : '');
 		}
 
 
@@ -121,9 +157,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$tagid    = $layout_vars['tagid'];
 		$cids = $layout_vars['cids'];
 		$cid  = $layout_vars['cid'];
-		
-		// Get Tag data if current layout is 'tags'
-		if ($tagid) $tag = $this->get('Tag');
 		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed')
@@ -296,23 +329,27 @@ class FlexicontentViewCategory extends JViewLegacy
 				break;
 			default        : ;
 		}
-		
-		
-		
-		// ************************************************************
-		// Create the document title, by from page title and other data
-		// ************************************************************
+
+
+		/**
+		 * Create the document title, by from page title and other data
+		 */
 		
 		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
 		// or the overriden custom <title> ... set via parameter
-		$doc_title  =  empty($meta_params)  ?  $params->get( 'page_title' )  :  $meta_params->get('page_title', $params->get( 'page_title' ));
-		
+		$doc_title = empty($meta_params)
+			? $params->get('page_title')
+			: $meta_params->get('page_title', $params->get('page_title'));
+
 		// Check and prepend or append site name to page title
-		if ( $doc_title != $app->getCfg('sitename') ) {
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+		if ($doc_title != $app->getCfg('sitename'))
+		{
+			if ($app->getCfg('sitename_pagetitles', 0) == 1)
+			{
 				$doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
 			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2)
+			{
 				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
 			}
 		}
@@ -321,45 +358,57 @@ class FlexicontentViewCategory extends JViewLegacy
 		$document->setTitle($doc_title);
 		
 		
-		// ************************
-		// Set document's META tags
-		// ************************
+		/**
+		 * Set document's META tags
+		 */
 		
 		// Workaround for Joomla not setting the default value for 'robots', so component must do it
 		$app_params = $app->getParams();
 		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
-		
-		if ($category->id) {   // possibly not set for author items OR my items
-			if ($category->metadesc) $document->setDescription( $category->metadesc );
-			if ($category->metakey)  $document->setMetadata('keywords', $category->metakey);
-			
-			// meta_params are always set if J1.6+ and category id is set
-			if ( $meta_params->get('robots') )  $document->setMetadata('robots', $meta_params->get('robots'));
-			
-			// This has been deprecated, the <title> tag is used instead by search engines
-			if (0 && $app->getCfg('MetaTitle') == '1')
+
+
+		/**
+		 * TAG + CATEGORY meta-description and meta-keywords
+		 * Possibly not set metadesc, metakey for authored items OR my items
+		 */
+		if ($metadesc)
+		{
+			$document->setDescription($metadesc);
+		}
+		if ($metakey)
+		{
+			$document->setMetadata('keywords', $metakey);
+		}
+
+
+		/**
+		 * Set metadata according to metadata parameters
+		 */
+		if ($meta_params && $meta_params->get('robots'))
+		{
+			$document->setMetadata('robots', $meta_params->get('robots'));
+		}
+
+		// This has been deprecated, the <title> tag is used instead by search engines
+		/*if ($app->getCfg('MetaTitle') == '1')
+		{
+			if ($meta_params && $meta_params->get('page_title'))
 			{
-				$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
-				$document->setMetaData('title', $meta_title);
+				$document->setMetaData('title', $meta_params->get('page_title'));
 			}
-			
-			if ($app->getCfg('MetaAuthor') == '1')
+		}*/
+
+		if ($app->getCfg('MetaAuthor') == '1')
+		{
+			if ($meta_params && $meta_params->get('author'))
 			{
-				if ( $meta_params->get('author') )
-				{
-					$meta_author = $meta_params->get('author');
-				}
-				else
-				{
-					$table = JUser::getTable();
-					$meta_author = $table->load( $category->created_user_id ) ? $table->name : '';
-				}
-				$document->setMetaData('author', $meta_author);
+				$document->setMetaData('author', $meta_params->get('author'));
 			}
 		}
 		
 		// Overwrite with menu META data if menu matched
-		if ($menu_matches) {
+		if ($menu_matches)
+		{
 			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
 			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
 			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
@@ -367,10 +416,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		
-		// *********************************************************************
-		// Create category link, but also consider current 'layout', and use the 
-		// layout specific variables so that filtering form will work properly
-		// *********************************************************************
+		/**
+		 * Create category link, but also consider current 'layout', and use the 
+		 * layout specific variables so that filtering form will work properly
+		 */
 
 		$non_sef_link = null;
 		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
@@ -967,6 +1016,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->categories = $categories;
 		$this->peercats = $peercats;
 		$this->items = $items;
+		$this->tag = $tag;
 		$this->authordescr_item_html = $authordescr_item_html;
 		$this->lists = $lists;
 		$this->params = $params;
