@@ -78,9 +78,14 @@ class plgFlexicontent_fieldsDate extends FCField
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
+		$minyear = $field->parameters->get('minyear', '');
+		$maxyear = $field->parameters->get('maxyear', '');
+
+		$minyear = strlen($minyear) ? (int) $minyear : '';
+		$maxyear = strlen($maxyear) ? (int) $maxyear : '';
 		
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
@@ -339,14 +344,14 @@ class plgFlexicontent_fieldsDate extends FCField
 		if ($css) $document->addStyleDeclaration($css);
 		
 		
-		// *****************************************
-		// Create field's HTML display for item form
-		// *****************************************
-		
+		/**
+		 * Create field's HTML display for item form
+		 */
+
 		$field->html = array();
 		$n = 0;
 		$skipped_vals = array();
-		//if ($use_ingroup) {print_r($field->value);}
+
 		foreach ($field->value as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
@@ -354,16 +359,21 @@ class plgFlexicontent_fieldsDate extends FCField
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			if ( $date_source==3 ) {
+			if ($date_source==3)
+			{
 				// Use indexes of existing values to keep track of field values being re-ordered, this (partly) avoids form tampering
-				if ($value) {
+				if ($value)
+				{
 					try {
 						$timestamp = '<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_existing">'. JHtml::_('date', $value, $dateformat, $timezone ).$tz_info.'</span> ';
 					} catch ( Exception $e ) {
 						$timestamp = '';
 					}
 				}
-				else $timestamp = '';
+				else
+				{
+					$timestamp = '';
+				}
 				
 				$timestamp .= 
 						'<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_new" style="'.($timestamp ? 'display:none;' : '').'">'.JText::_('FLEXI_FIELD_DATE_NOW').', '. // ' - '$date_now_str.' - '
@@ -373,13 +383,30 @@ class plgFlexicontent_fieldsDate extends FCField
 					<input type="hidden" class="fcfield_date" value="'.($value ? $n : '').'" id="'.$elementid_n.'" name="'.$fieldname_n.'" />
 				';
 			}
-			else {
-				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date input-medium'.$required), $skip_on_invalid=true, $timezone);
+			else
+			{
+				$attribs_arr = array('class'=>'fcfield_date input-medium' . $required_class);
+
+				if (strlen($minyear))
+				{
+					$attribs_arr['minYear'] = $minyear;
+				}
+
+				if (strlen($maxyear))
+				{
+					$attribs_arr['maxYear'] = $maxyear;
+				}
+				
+				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone);
+
 				if (!$html)
 				{
 					$skipped_vals[] = $value;
-					if (!$use_ingroup) continue;
-					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date input-medium'.$required), $skip_on_invalid=true, $timezone);
+					if (!$use_ingroup)
+					{
+						continue;
+					}
+					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone);
 				}
 			}
 			
