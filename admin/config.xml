@@ -70,6 +70,7 @@
 
 		<field name="" type="separator" default="FLEXI_SEO_SEF_URLS" label="" level="level0" />
 			
+			<field name="" type="separator" default="FLEXI_URL_SEGMENTS_CREATION" label="" level="level3" />
 			<field name="add_item_sef_segment" type="fcradio" default="1" label="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS" description="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS_DESC" class="group-fcset fc-cleared">
 				<option value="0">FLEXI_SKIP_ITEM_SEGMENT_IN_ITEM_URLS</option>
 				<option value="1">FLEXI_SKIP_CAT_SEGMENT_IN_CAT_URLS</option>
@@ -80,6 +81,8 @@
 				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
 				<option value="2">FLEXI_DMI_ID_YES</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_PATHWAY_BREADCRUMBS_MODULE" label="" level="level3" />
 			<field name="default_menuitem_nopathway" type="fcradio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -88,12 +91,14 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_SEARCH_ENGINE_INDEXING" label="" level="level3" />
 			<field name="add_canonical" type="fcradio" default="1" label="FLEXI_ADD_REL_CANONICAL" description="FLEXI_ADD_REL_CANONICAL_DESC" class="btn-group">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="max_filt_to_index" type="integer" default="4" first="0" last="10" step="1" label="FLEXI_MAX_FILTERS_TO_ALLOW_INDEXING" description="FLEXI_MAX_FILTERS_TO_ALLOW_INDEXING_DESC" />
 
-						
 	</fieldset>
 	<fieldset name="buttons_fset" label="FLEXI_BUTTONS" description="" >
 		
