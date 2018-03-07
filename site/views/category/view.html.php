@@ -90,12 +90,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		// View's parameters (OVERRIDE)
 		$params = $category->parameters;
 
-		// View's metadata parameters
-		$meta_params = $category->id
-			? new JRegistry($category->metadata)
-			: null;
 
-		// View's meta description and keywords
+		// View's metadata parameters (clone category meta parameters)
+		$meta_params = clone($category->metadata);
+
+		// Category's meta description and keywords
 		$metadesc = $category->id && $category->metadesc
 			? $category->metadesc
 			: '';
@@ -103,19 +102,18 @@ class FlexicontentViewCategory extends JViewLegacy
 			? $category->metakey
 			: '';
 
-		/**
-		 * Get tag metadata, metadesc, metakey
-		 */
-		$meta_params_tag = $tag && $tag->jtag
-			? new JRegistry($tag->jtag->metadata)
-			: null;
 
+		/**
+		 * Override with tag's metadata and prepend with tag's metadesc, metakey
+		 */
 		if ($tag && $tag->jtag)
 		{
-			// Override view's metadata with tag's metadata
+			$meta_params_tags = $tag->metadata;
+
+			// Override category's metadata with tag's metadata
 			$meta_params
-				? $meta_params->merge($meta_params_tag)
-				: $meta_params = $meta_params_tag;
+				? $meta_params->merge($tag->metadata)
+				: $meta_params = $tag->metadata;
 
 			// Prepend tag metadata to view's meta description and keywords
 			$metadesc = $tag->jtag->metadesc . ($metadesc ? "\n" . $metadesc : '');

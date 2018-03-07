@@ -1860,6 +1860,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		$this->_loadCategoryParams($force=true);
 		$this->_category->parameters = $this->_params;
+		$this->_category->metadata = $this->_category->id
+			? new JRegistry($this->_category->metadata)
+			: null;
 
 
 		/**
@@ -1975,8 +1978,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Assign tag parameters from Joomla tag params
-		$this->_tag->parameters = $this->_tag->jtag
+		$this->_tag->params = $this->_tag->jtag
 			? new JRegistry($this->_tag->jtag->params)
+			: null;
+
+		// Assign tag metadata parameters from Joomla tag metadata params
+		$this->_tag->metadata = $this->_tag->jtag
+			? new JRegistry($this->_tag->jtag->metadata)
 			: null;
 
 		return $this->_tag;
