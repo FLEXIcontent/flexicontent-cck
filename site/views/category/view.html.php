@@ -362,7 +362,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Workaround for Joomla not setting the default value for 'robots', so component must do it
 		$app_params = $app->getParams();
-		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
+		if (($_mp=$app_params->get('robots')))
+		{
+			$document->setMetadata('robots', $_mp);
+		}
 
 
 		/**
@@ -426,14 +429,51 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***
 		// *** Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
 		// ***
-
-		if ($params->get('add_canonical'))
+		
+		$add_canonical = (int) $params->get('add_canonical', 0);
+		if ($add_canonical)
 		{
+			$max_filt_in_canonical = (int) $params->get('max_filt_in_canonical', 1);
+			$max_filt_to_index = (int) $params->get('max_filt_to_index', 4);
+
 			// Create desired REL canonical URL
 			$start = $jinput->get('start', '', 'int');
-			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars).($start ? "&start=".$start : ''));
+
+			$filters_count = 0;
+			$canonical_filters = '';
+
+			foreach($_GET as $i => $v)
+			{
+				if (substr($i, 0, 6) !== "filter")
+				{
+					continue;
+				}
+
+				if (is_array($v))
+				{
+					foreach($v as $ii => &$vv)
+					{
+						$canonical_filters .= '&' . $i . '[' . $ii . ']=' . $vv;
+					}
+				}
+				else
+				{
+					$canonical_filters .= '&' . $i . '=' . $v;
+				}
+
+				$filters_count++;
+			}
+
+			if ($filters_count > $max_filt_in_canonical)
+			{
+				$canonical_filters = '';
+				$document->setMetadata('robots', 'noindex, follow');
+			}
+
+			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars) . $canonical_filters . ($start ? "&start=".$start : ''));
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
+
 
 		// ***
 		// *** Add feed link
