@@ -2191,20 +2191,23 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		// This is meant for Joomla article view
 		if ( $context!='com_content.article' ) return;
-		
+
 		$app = JFactory::getApplication();
 		if (
 			$app->input->get('option', '', 'CMD')!='com_content' ||
 			$app->input->get('view', '', 'CMD')!='article' ||
 			$app->input->get('isflexicontent', false, 'CMD')
 		) return;
-		
-		
+
+
 		static $fields_added = array();
 		static $items = array();
-		if ( !empty($fields_added[$row->id]) ) return;
-		
-		
+		if (!empty($fields_added[$row->id]))
+		{
+			return;
+		}
+
+
 		static $init = null;
 		if (!$init)
 		{
@@ -2217,18 +2220,24 @@ class plgSystemFlexisystem extends JPlugin
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item'.'.php');
 		}
 		
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$aid = JAccess::getAuthorisedViewLevels($user->id);
-		
-		$model = new FlexicontentModelItem();
-		if ( !isset($items[$row->id]) )
+		if (!isset($items[$row->id]))
 		{
+			$model = new FlexicontentModelItem();
 			$items[$row->id] = $model->getItem($row->id, $check_view_access=false);
 		}
-		$item = $items[$row->id];
-		if (!$item) return;  // Item retrieval failed avoid fatal error
-		
+
+		// Get a copy of the item
+		$item = $items[$row->id]
+			? clone($items[$row->id])
+			: false;
+
+		// Item retrieval failed avoid fatal error
+		if (!$item)
+		{
+			return;
+		}
+
+
 		// Check placement and abort adding the fields
 		$placements_arr = array(
 			1=>'beforeContent',
@@ -2242,7 +2251,7 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$fields_added[$row->id] = true; // Only add once
 		$view = 'com_content.article' ? 'item' : 'category';
-		$items = FlexicontentFields::getFields($item, $view, $_item_params = null, $aid = null, $use_tmpl = false);  // $_item_params == null means only retrieve fields
+		FlexicontentFields::getFields($item, $view, $_item_params = null, $aid = null, $use_tmpl = false);  // $_item_params == null means only retrieve fields
 		
 		// Only Render custom fields
 		$displayed_fields = array();
@@ -2252,7 +2261,7 @@ class plgSystemFlexisystem extends JPlugin
 			
 			$displayed_fields[$field->name] = $field;
 			$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
-			FlexicontentFields::renderField($item, $field, $values, $method='display', $view);
+			FlexicontentFields::renderField($item, $field, $values, $method='display', $view, false, $row);
 		}
 		
 		if (!count($displayed_fields)) return null;

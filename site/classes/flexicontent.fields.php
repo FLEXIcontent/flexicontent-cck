@@ -657,7 +657,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function renderField(&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW, $skip_trigger_plgs = false)
+	static function renderField(&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW, $skip_trigger_plgs = false, $event_row = false)
 	{
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
@@ -882,7 +882,7 @@ class FlexicontentFields
 					continue;
 
 				if ($print_logging_info)  $start_microtime = microtime(true);	
-				FlexicontentFields::triggerContentPlugins($field, $item, $method, $view);
+				FlexicontentFields::triggerContentPlugins($field, $item, $method, $view, $event_row);
 				if ( $print_logging_info ) @$fc_run_times['content_plg'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 		}
@@ -899,7 +899,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function triggerContentPlugins(&$field, &$item, $method, $view=FLEXI_ITEMVIEW) 
+	static function triggerContentPlugins(&$field, &$item, $method, $view=FLEXI_ITEMVIEW, $event_row = false) 
 	{
 		$debug = false;
 		static $_plgs_loaded = array();
@@ -983,51 +983,87 @@ class FlexicontentFields
 		}
 		
 		$plg_arr = $_fields_plgs[$field->name];
-		
-		// Suppress some plugins from triggering for compatibility reasons, e.g.
-		// (a) jcomments, jom_comment_bot plugins, because we will get comments HTML manually inside the template files
+
+
+		/**
+		 * Suppress some plugins from triggering for compatibility reasons, e.g. plugins: jcomments, jom_comment_bot
+		 * because we will get comments HTML manually inside the template files
+		 */
 		$suppress_arr = array('jcomments', 'jom_comment_bot');
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
-		
-		// Initialize field for plugin triggering
-		$method_text = isset($field->{$method}) ? $field->{$method} : '';
-		
-		$field->text = $method_text;
 
-		// Needed by some plugins that do not use or clear ->text property
-		$field->introtext = $method_text;
 
-		if (isset($item->readmore_link))
+		/**
+		 * Create record object to be used for plugin triggering
+		 */
+
+		// A row was given by 3rd party extension, use its data !
+		if ($event_row)
 		{
-			// Some plugins expect this
-			$field->readmore_link = $item->readmore_link;
+			$record = clone($event_row);
 		}
 
-		$field->created_by = $item->created_by;
-		$field->language = $item->language;
-		$field->title = $item->title;
-		$field->slug = isset($item->slug) ? $item->slug : $item->id;
-		$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;
-		$field->catid = $item->catid;
-		$field->catslug = @$item->categoryslug;
-		$field->fieldid = $field->id;
-		$field->id = $item->id;
-		$field->state = $item->state;
-		$field->type_id = $item->type_id;
-		
+		// Create a new record object
+		else
+		{
+			$record = new stdClass;
+		}
+
+
+		/**
+		 * Initialize Record object  to be used for plugin triggering
+		 */
+
+		// Field's display HTML will be used as text of plugin triggering
+		$record->text = isset($field->{$method}) ? $field->{$method} : '';
+
+		// Needed by some plugins that do not use or clear ->text property
+		$record->introtext = $record->text;
+
+		// Some plugins expect this
+		if (isset($item->readmore_link))
+		{
+			$record->readmore_link = $item->readmore_link;
+		}
+
+		/**
+		 * Set needed record properties, expected by plugins
+		 */
+		$record->created_by = $item->created_by;
+		$record->language = $item->language;
+		$record->title = $item->title;
+		$record->slug = isset($item->slug)
+			? $item->slug
+			: (isset($record->slug) ? $record->slug : $item->id);
+		$record->catid = $item->catid;
+		$record->catslug = isset($item->categoryslug)
+			? $item->categoryslug
+			: (isset($record->catslug) ? $record->catslug : $item->catid);
+		$record->fieldid = $field->id;
+		$record->id = $item->id;
+		$record->state = $item->state;
+		$record->type_id = $item->type_id;
+
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');
 
-		// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-		$results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$field, &$item->parameters, $limitstart), $plg_arr);
+		/**
+		 * Trigger content plugins on field's HTML display, as if they were a "joomla article"
+		 */
+		$results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$record, &$item->parameters, $limitstart), $plg_arr);
+
+		// Get pluing triggering result
+		$field->{$method} = $record->text;
+
+
+		/**
+		 * Restore state
+		 */
 
 		// Restore 'view' and 'option' request variables
 		$jinput->set('view', $_view);
 		$jinput->set('option', $_option);
-
-		$field->id = $field->fieldid;
-		$field->{$method} = $field->text;
 
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins( $suppress_arr,'restore' );
