@@ -1983,7 +1983,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			: null;
 
 		// Assign tag metadata parameters from Joomla tag metadata params
-		$this->_tag->metadata = $this->_tag->jtag
+		$this->_tag->jtag->metadata = $this->_tag->jtag
 			? new JRegistry($this->_tag->jtag->metadata)
 			: null;
 
