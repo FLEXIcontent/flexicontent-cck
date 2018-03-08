@@ -19,7 +19,8 @@ if ( empty($filter_form_body) ) return;
 // FORM in slider
 $ff_placement = $this->params->get('ff_placement', 0);
 
-if ($ff_placement){
+if ($ff_placement)
+{
 	$model = $this->getModel();
 	$ff_slider_id = 
 		($model->_id     ? '_'.$model->_id : '').
@@ -45,18 +46,24 @@ if ($ff_placement){
 	<input type="hidden" name="layout" value="<?php echo $this->layout_vars['layout']; ?>" />
 
 	<input type="hidden" name="letter" value="<?php echo JFactory::getApplication()->input->get('letter', '', 'string'); ?>" id="alpha_index" />
+
+	<?php if (flexicontent_html::initial_list_limited($this->params)) : ?>
 	<input type="hidden" name="listall" value="<?php echo JFactory::getApplication()->input->get('listall', 0, 'int'); ?>" />
+	<?php endif; ?>
+
 </form>
 
 <?php
 // FORM in slider
 if ($ff_placement) echo JHtml::_('sliders.end');
 
-$listall_selector = flexicontent_html::listall_selector( $this->params, $formname='adminForm', $autosubmit=1 );
+$listall_selector = flexicontent_html::listall_selector($this->params, $formname='adminForm', $autosubmit=1);
 
 if ($listall_selector) : ?>
 	<div class="fc_listall_box">
-		<div class="fc_listall_selector"><?php echo $listall_selector;?></div>
+		<div class="fc_listall_selector">
+			<?php echo $listall_selector;?>
+		</div>
 	</div>
 <?php endif; ?>
 

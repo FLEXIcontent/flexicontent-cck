@@ -1029,19 +1029,25 @@ class FlexicontentFields
 		/**
 		 * Set needed record properties, expected by plugins
 		 */
-		$record->created_by = $item->created_by;
-		$record->language = $item->language;
 		$record->title = $item->title;
+		$record->language = $item->language;
+		$record->created_by = $item->created_by;
+
+		$record->id = $item->id;
 		$record->slug = isset($item->slug)
 			? $item->slug
 			: (isset($record->slug) ? $record->slug : $item->id);
+
 		$record->catid = $item->catid;
 		$record->catslug = isset($item->categoryslug)
 			? $item->categoryslug
 			: (isset($record->catslug) ? $record->catslug : $item->catid);
-		$record->fieldid = $field->id;
-		$record->id = $item->id;
+
 		$record->state = $item->state;
+		$record->access = $item->access;
+		$record->sectionid = 0;
+
+		$record->fieldid = $field->id;
 		$record->type_id = $item->type_id;
 
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
