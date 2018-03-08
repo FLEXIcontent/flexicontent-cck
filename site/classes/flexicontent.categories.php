@@ -53,7 +53,7 @@ class flexicontent_cats
 	 */
 	public function __construct($cid)
 	{
-		$this->id = $cid;
+		$this->id = (int) $cid;
 	}
     
 	/**

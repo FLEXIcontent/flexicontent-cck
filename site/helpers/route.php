@@ -434,8 +434,13 @@ class FlexicontentHelperRoute
 
 		// view
 		$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW;
+
 		// category id
-		if ($_catid) $link .= '&cid='.$catid;
+		if ($_catid)
+		{
+			$link .= '&cid='.$catid;
+		}
+
 		// item id
 		$link .= '&id='. $id;
 
@@ -555,24 +560,37 @@ class FlexicontentHelperRoute
 			$needles['category'][] = 0;
 			$needles['category'][] = -1;
 		}
-		
-		
-		// ***************
-		// Create the link
-		// ***************
-		
+
+
+		// ***
+		// *** Create the link
+		// ***
+
+		// view
 		$link = 'index.php?option=com_flexicontent&view=category';
-		if ($_catid) $link .= '&cid='.$catid;
+
+		// category id
+		if ($_catid)
+		{
+			$link .= '&cid='.$catid;
+		}
 		
 		// Other data to pass to _findCategory()
 		$data = array();
 		
-		// Append given variables
-		foreach ($urlvars as $varname => $varval) 
-			if ($varval)
-				$link .= '&'.$varname.'='.$varval;
+		// Append given variables, but exclude 'cid' if already added ('catslug')
+		foreach ($urlvars as $varname => $varval)
+		{
+			if ($varval && ($varname !== 'cid' || !$_catid))
+			{
+				$link .= '&' . $varname . '=' . $varval;
+			}
 			else
+			{
 				unset($urlvars[$varname]);
+			}
+		}
+
 		$data['urlvars'] = $urlvars;
 		
 		

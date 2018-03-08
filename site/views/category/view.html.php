@@ -148,16 +148,21 @@ class FlexicontentViewCategory extends JViewLegacy
 		$themes = flexicontent_tmpl::getTemplates(  array($clayout) );
 		
 		
-		// Get URL variables
-		$layout_vars = flexicontent_html::getCatViewLayoutVars($model, true);
+		/**
+		 * Get URL variables
+		 */
+
+		// Return slug for authorid, tagid variables
+		$layout_vars = flexicontent_html::getCatViewLayoutVars($model, $use_slug = true);
+
 		$layout   = $layout_vars['layout'];
-		$authorid = $layout_vars['authorid'];
-		$tagid    = $layout_vars['tagid'];
+		$authorid = $layout_vars['authorid'];  // SLUG
+		$tagid    = $layout_vars['tagid'];     // SLUG
 		$cids = $layout_vars['cids'];
-		$cid  = $layout_vars['cid'];
-		
+		$cid  = $layout_vars['cid'];   // SLUG
+
 		$authordescr_item = false;
-		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed')
+		if ((int) $authorid && $params->get('authordescr_itemid') && $format != 'feed')
 		{
 			$authordescr_itemid = $params->get('authordescr_itemid');
 		}
@@ -187,7 +192,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ********************************************************************************************
 		
 		// Get category titles needed by pathway, this will allow Falang to translate them
-		$catshelper = new flexicontent_cats($cid);
+		$catshelper = new flexicontent_cats($category->id);
 		$parents    = $catshelper->getParentlist($all_cols=false);
 		$rootcat = (int) $params->get('rootcat');
 		if ($rootcat) $root_parents = $globalcats[$rootcat]->ancestorsarray;
@@ -252,7 +257,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$view_ok     = 'category' == @$menu->query['view'];
 
 			// These URL variables must match or be empty:
-			$cid_ok      = $cid       == (int) @$menu->query['cid'];
+			$cid_ok      = (int) $cid == (int) @ $menu->query['cid'];
 			$layout_ok   = $layout    == @ $menu->query['layout'];
 			$authorid_ok = ($layout!='author') || ((int) $authorid  == (int) @ $menu->query['authorid']);
 			$tagid_ok    = ($layout!='tags')   || ((int) $tagid     == (int) @ $menu->query['tagid']);
@@ -287,12 +292,12 @@ class FlexicontentViewCategory extends JViewLegacy
 			{
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading = JText::_('FLEXI_MY_CONTENT');  break;
-				case 'author'  :  $default_heading = JText::_('FLEXI_CONTENT_BY_AUTHOR')  .': '. JFactory::getUser($authorid)->get('name');  break;
+				case 'author'  :  $default_heading = JText::_('FLEXI_CONTENT_BY_AUTHOR')  .': '. JFactory::getUser((int) $authorid)->get('name');  break;
 				case 'tags'    :  $default_heading = JText::_('FLEXI_TAG' /*'FLEXI_ITEMS_WITH_TAG'*/) .': '. $tag->name;  break;
 				case 'favs'    :  $default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');  break;
 				default        :  $default_heading = JText::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
-			if ($layout && $cid)  // Non-single category listings, limited to a specific category
+			if ($layout && $category->id)  // Category-based view that is limited to a specific category
 			{
 				$default_heading .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;
 			}
@@ -442,7 +447,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$filters_count = 0;
 			$canonical_filters = '';
 
-			foreach($_GET as $i => $v)
+			foreach($jinput->get->get->getArray() as $i => $v)
 			{
 				if (substr($i, 0, 6) !== "filter")
 				{
@@ -464,13 +469,20 @@ class FlexicontentViewCategory extends JViewLegacy
 				$filters_count++;
 			}
 
+			// Check if max number of filters limit for search-engine indexing has been reached
 			if ($filters_count > $max_filt_in_canonical)
 			{
-				$canonical_filters = '';
 				$document->setMetadata('robots', 'noindex, follow');
 			}
 
-			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars) . $canonical_filters . ($start ? "&start=".$start : ''));
+			// After filtering form submit may have different display
+			$canonical_filters .= !empty($jinput->get('listall', null, 'INT')) ? '&listall=1' : '';
+
+			$ucanonical = JRoute::_(
+				FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars)
+				. $canonical_filters . ($start ? "&start=".$start : '')
+			);
+
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
 
@@ -1004,7 +1016,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$pageNav = $this->get('pagination');
 		
 		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-		foreach($_GET as $i => $v)
+		foreach($jinput->get->get->getArray() as $i => $v)
 		{
 			// URL-encode filter values
 			if (substr($i, 0, 6) === "filter")

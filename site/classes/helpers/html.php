@@ -391,8 +391,9 @@ class flexicontent_html
 
 		// Add REL canonical only if different than current URL
 		// * J3.5.1+ * Always add canonical, otherwise Joomla SEF plugin will add the default
-		if ($addRel /*&& rawurldecode($uri->toString()) != $ucanonical*/) {
-			$doc->addHeadLink( $ucanonical_encoded, 'canonical', 'rel' );
+		if ($addRel /*&& rawurldecode($uri->toString()) != $ucanonical*/)
+		{
+			$doc->addHeadLink( $ucanonical, 'canonical', 'rel' );
 		}
 	}
 
@@ -633,23 +634,39 @@ class flexicontent_html
 		return $item_html;
 	}
 
+
 	static function listall_selector(&$params, $formname='adminForm', $autosubmit=1)
 	{
+		if (flexicontent_html::initial_list_limited($params))
+		{
+			$tooltip_class = 'hasTooltip';
+			return '
+				<input type="checkbox" id="listall" name="listall" value="1" form="'.$formname.'"/>
+				<label id="listall-lbl" for="listall" class="btn '.$tooltip_class.'" style="width:100%; margin:8px 0; box-sizing:border-box;" title="'.JText::_('FLEXI_LISTING_ONLY_FEATURED_CLICK_TO_LIST_ALL_DESC', true).'">
+					'.JText::_('FLEXI_LIST_ALL_ITEMS').'
+				</label>
+			';
+		}
+	}
 
+
+	static function initial_list_limited(&$params)
+	{
 		$use_limit_before = (int) $params->get('use_limit_before_search_filt', 0);
-		if ($use_limit_before < 2) return '';
 
-		$app = JFactory::getApplication();
-		$use_limit_before_search_filt = $app->getUserState('use_limit_before_search_filt');
-		if ($use_limit_before_search_filt < 2) return '';
+		if ($use_limit_before < 2)
+		{
+			return false;
+		}
 
-		$tooltip_class = 'hasTooltip';
-		return '
-			<input type="checkbox" id="listall" name="listall" value="1" form="'.$formname.'"/>
-			<label id="listall-lbl" for="listall" class="btn '.$tooltip_class.'" style="width:100%; margin:8px 0; box-sizing:border-box;" title="'.JText::_('FLEXI_LISTING_ONLY_FEATURED_CLICK_TO_LIST_ALL_DESC', true).'">
-				'.JText::_('FLEXI_LIST_ALL_ITEMS').'
-			</label>
-		';
+		$use_limit_before_search_filt = JFactory::getApplication()->getUserState('use_limit_before_search_filt');
+
+		if ($use_limit_before_search_filt < 2)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -982,24 +999,33 @@ class flexicontent_html
 			);
 
 			$searchphrases = array();
+
 			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name)
 			{
-				$_obj = new stdClass();
-				$_obj->value = $searchphrase_value;
-				$_obj->text  = $searchphrase_name;
-				$searchphrases[] = $_obj;
+				$searchphrases[] = array(
+					'value' => $searchphrase_value,
+					'text'  => $searchphrase_name,
+					'attr'  => $default_searchphrase === $searchphrase_value ? array('data-is-default-value' => '1') : array()
+				);
 			}
-			$html = JHtml::_('select.genericlist', $searchphrases, 'p',
-				'class="fc_field_filter use_select2_lib"', 'value', 'text',
-				$p, 'searchphrase', $_translate=true
+
+			$attribs = array(
+				'id' => 'searchphrase', // HTML id for select field
+				'group.id' => 'id',
+				'list.attr' => array('class' => 'fc_field_filter use_select2_lib'),
+				'list.translate' => true, // true to translate
+				'option.key'  => 'value', // key name for value in data array
+				'option.text' => 'text',  // key name for text in data array
+				'option.attr' => 'attr',  // key name for attr in data array
+				'list.select' => $p, // value of the SELECTED field
 			);
+
+			return JHtml::_('select.genericlist', $searchphrases, 'limit', $attribs);
 		}
 		else
 		{
-			$html = '<input type="hidden" name="p" value="' . $p . '" />';
+			return '<input type="hidden" name="p" value="' . $p . '" />';
 		}
-
-		return $html;
 	}
 
 
@@ -5050,14 +5076,7 @@ class flexicontent_html
 		$Itemid = $menu ? $menu->id : 0;
 
 		// Get URL variables
-		$layout_vars = flexicontent_html::getCatViewLayoutVars($catmodel, true);
-		$cid  = $layout_vars['cid'];
-
-		$urlvars = array();
-		if ($layout_vars['layout'])   $urlvars['layout']   = $layout_vars['layout'];
-		if ($layout_vars['authorid']) $urlvars['authorid'] = $layout_vars['authorid'];
-		if ($layout_vars['tagid'])    $urlvars['tagid']    = $layout_vars['tagid'];
-		if ($layout_vars['cids'])     $urlvars['cids']     = $layout_vars['cids'];
+		$urlvars = flexicontent_html::getCatViewLayoutVars($catmodel, $use_slug = true);
 
 		// Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author/favs/tags layouts
 		$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($slug, $Itemid, $urlvars);
@@ -5079,16 +5098,17 @@ class flexicontent_html
 		$app = JFactory::getApplication();
 		$layout_vars = array();
 
-		$layout_vars['cid']      = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'INT');
 		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : $app->input->get('layout', '', 'CMD');
 
 		if (!$use_slug)
 		{
+			$layout_vars['cid']      = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'INT');
 			$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : $app->input->get('authorid', 0, 'INT');
 			$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : $app->input->get('tagid', 0, 'INT');
 		}
 		else
 		{
+			$layout_vars['cid']      = $obj && isset($obj->_id) ? $obj->_id : $app->input->get('cid', 0, 'STRING');
 			$layout_vars['authorid'] = $obj && isset($obj->_authorid_slug) ? $obj->_authorid_slug : $app->input->get('authorid', 0, 'STRING');
 			$layout_vars['tagid']    = $obj && isset($obj->_tagid_slug) ? $obj->_tagid_slug : $app->input->get('tagid', 0, 'STRING');
 		}
