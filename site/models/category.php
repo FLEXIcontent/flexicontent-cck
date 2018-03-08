@@ -1965,7 +1965,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Get the linked joomla tag
-		if ($this->_tag->jtag_id)
+		
+		if (!empty($this->_tag->jtag_id))
 		{
 			$query = 'SELECT *'
 				. ' FROM #__tags AS t'
@@ -1983,9 +1984,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			: null;
 
 		// Assign tag metadata parameters from Joomla tag metadata params
-		$this->_tag->jtag->metadata = $this->_tag->jtag
-			? new JRegistry($this->_tag->jtag->metadata)
+		if ($this->_tag->jtag)
+		{
+			$this->_tag->jtag->metadata = $this->_tag->jtag
+				? new JRegistry($this->_tag->jtag->metadata)
 			: null;
+		}
 
 		return $this->_tag;
 	}
