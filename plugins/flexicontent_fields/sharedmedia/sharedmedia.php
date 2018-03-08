@@ -970,7 +970,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				}
 			}
 			$player_url = $embed_url ? $embed_url : 'about:blank';
-			$player_url = (strstr($player_url, '?') ? '&'  : '?') . 'autoplay=' . $autostart . $_show_related . $_show_srvlogo;
+			$player_url .= (strstr($player_url, '?') ? '&'  : '?') . 'autoplay=' . $autostart . $_show_related . $_show_srvlogo;
 
 			$_width  = ($display_edit_size_form && (int) @ $value['width'])  ? (int)$value['width']  : $width;
 			$_height = ($display_edit_size_form && (int) @ $value['height']) ? (int)$value['height'] : $height;
