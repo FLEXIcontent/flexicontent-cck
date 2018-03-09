@@ -368,9 +368,17 @@ class flexicontent_html
 		$domain = null;
 		$defaultCanonical = flexicontent_html::getDefaultCanonical($domain);
 		$domain = $domain ? $domain : $uri->toString(array('scheme', 'host', 'port'));
+		
+		// Remove trailing slash for home page without subfolder'
+		if ($ucanonical === '/')
+		{
+			$ucanonical = '';
+		}
+
+		// Add scheme, domain, port
+		$ucanonical = $domain . $ucanonical;
 
 		// Encode the canonical URL
-		$ucanonical = $domain . $ucanonical;
 		$ucanonical_encoded = htmlspecialchars($ucanonical);
 
 		// Get head object
