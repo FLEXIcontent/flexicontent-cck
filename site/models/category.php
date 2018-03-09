@@ -1988,7 +1988,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$this->_tag->jtag->metadata = $this->_tag->jtag
 				? new JRegistry($this->_tag->jtag->metadata)
-			: null;
+				: null;
 		}
 
 		return $this->_tag;
