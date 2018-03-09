@@ -672,7 +672,10 @@ class flexicontent_html
 
 	static function limit_selector(&$params, $formname='adminForm', $autosubmit=1)
 	{
-		if ( !$params->get('limit_override') ) return '';
+		if (!$params->get('limit_override'))
+		{
+			return '';
+		}
 
 		$app = JFactory::getApplication();
 
@@ -987,45 +990,49 @@ class flexicontent_html
 
 	static function searchphrase_selector(&$params, $formname='adminForm')
 	{
-		$default_searchphrase = $params->get('default_searchphrase', 'all');
+		$show_searchphrase = $params->get('show_searchphrase', 1);
+
+		if (!$show_searchphrase)
+		{
+			return '';
+		}
+
 		$app = JFactory::getApplication();
+
+		$default_searchphrase = $params->get('default_searchphrase', 'all');
 		$p = $app->input->getWord('searchphrase', $app->input->getWord('p', $default_searchphrase));
 
-		if ($show_searchphrase = $params->get('show_searchphrase', 1))
+		$searchphrase_names = array(
+			'all'=>'FLEXI_ALL_WORDS',
+			'any'=>'FLEXI_ANY_WORDS',
+			'natural'=>'FLEXI_NATURAL_PHRASE',
+			'exact'=>'FLEXI_EXACT_PHRASE',
+			'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT'
+		);
+
+		$searchphrases = array();
+
+		foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name)
 		{
-			$searchphrase_names = array(
-				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'natural'=>'FLEXI_NATURAL_PHRASE',
-				'exact'=>'FLEXI_EXACT_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT'
+			$searchphrases[] = array(
+				'value' => $searchphrase_value,
+				'text'  => $searchphrase_name,
+				'attr'  => $default_searchphrase === $searchphrase_value ? array('data-is-default-value' => '1') : array()
 			);
-
-			$searchphrases = array();
-
-			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name)
-			{
-				$searchphrases[] = array(
-					'value' => $searchphrase_value,
-					'text'  => $searchphrase_name,
-					'attr'  => $default_searchphrase === $searchphrase_value ? array('data-is-default-value' => '1') : array()
-				);
-			}
-
-			$attribs = array(
-				'id' => 'searchphrase', // HTML id for select field
-				'group.id' => 'id',
-				'list.attr' => array('class' => 'fc_field_filter use_select2_lib'),
-				'list.translate' => true, // true to translate
-				'option.key'  => 'value', // key name for value in data array
-				'option.text' => 'text',  // key name for text in data array
-				'option.attr' => 'attr',  // key name for attr in data array
-				'list.select' => $p, // value of the SELECTED field
-			);
-
-			return JHtml::_('select.genericlist', $searchphrases, 'limit', $attribs);
 		}
-		else
-		{
-			return '<input type="hidden" name="p" value="' . $p . '" />';
-		}
+
+		$attribs = array(
+			'id' => 'searchphrase', // HTML id for select field
+			'group.id' => 'id',
+			'list.attr' => array('class' => 'fc_field_filter use_select2_lib'),
+			'list.translate' => true, // true to translate
+			'option.key'  => 'value', // key name for value in data array
+			'option.text' => 'text',  // key name for text in data array
+			'option.attr' => 'attr',  // key name for attr in data array
+			'list.select' => $p, // value of the SELECTED field
+		);
+
+		return JHtml::_('select.genericlist', $searchphrases, 'p', $attribs);
 	}
 
 
