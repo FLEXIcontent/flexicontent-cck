@@ -682,7 +682,17 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			foreach($gf_names as $pos => $grp_field_name)
 			{
 				// Check that field exists and is assigned the fieldgroup field (needed only when using custom fieldgroup display HTML)
-				if ( !isset($_name_to_field[$grp_field_name]) ) continue;
+				if (!isset($_name_to_field[$grp_field_name]))
+				{
+					continue;
+				}
+
+				// Check that field is assigned to the content type
+				if (!isset($item->fields[$grp_field_name]))
+				{
+					continue;
+				}
+
 				$_grouped_field = $_name_to_field[$grp_field_name];
 
 				// Get item's field object, set 'value' and 'ingroup' properties
