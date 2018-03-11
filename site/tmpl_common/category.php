@@ -124,8 +124,15 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF pagination -->
 <?php
-	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include('pagination.php');
+/**
+ * Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+ * If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+ *
+ * First try current folder, otherwise load from common folder
+ */
+	file_exists('pagination.php')
+		? include('pagination.php')
+		: include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'pagination.php');
 ?>
 <!-- EOF pagination -->
 

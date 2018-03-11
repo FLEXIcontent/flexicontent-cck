@@ -4,9 +4,16 @@ if ( JFactory::getApplication()->input->get('print', 0, 'int') ) return;
 
 ob_start();
 
-// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
-// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-include('listings_filter_form_body.php');
+/**
+ * Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+ * If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+ *
+ * First try current folder, otherwise load from common folder
+ */
+
+file_exists('listings_filter_form_body.php')
+	? include('listings_filter_form_body.php')
+	: include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
 
 $filter_form_body = trim(ob_get_contents());
 ob_end_clean();
