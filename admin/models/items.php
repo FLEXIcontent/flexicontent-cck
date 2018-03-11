@@ -995,14 +995,6 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function _buildQuery( $query_ids=false )
 	{
-		// Get the WHERE and ORDER BY clauses for the query
-		$extra_joins = "";
-		if ( !$query_ids )
-		{
-			$where		= $this->_buildContentWhere($extra_joins);
-			$orderby	= $this->_buildContentOrderBy();
-		}
-
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
 		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
@@ -1023,8 +1015,7 @@ class FlexicontentModelItems extends JModelLegacy
 			(!is_array($filter_state) ? array($filter_state) : $filter_state);
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
-		
-		
+
 		if (!$query_ids)
 		{
 			$customFilts = $this->getCustomFilts();
@@ -1098,9 +1089,18 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
-		
+
 		$use_tmp = !$query_ids && (!$search || $scope!=2);
 		$tmp_only = $use_tmp && (!$search || $scope!=4);
+
+		// Get the WHERE and ORDER BY clauses for the query
+		$extra_joins = '';
+		if (!$query_ids)
+		{
+			$where		= $this->_buildContentWhere($extra_joins, $tmp_only);
+			$orderby	= $this->_buildContentOrderBy();
+		}
+
 		$query .= ''
 				. ($use_tmp
 					? ' FROM #__flexicontent_items_tmp AS i'
@@ -1140,7 +1140,7 @@ class FlexicontentModelItems extends JModelLegacy
 					. ($filter_cats && !$filter_subcats ? ' AND rel.catid=' . $filter_cats : '') // Force rel.catid to be of the specific filtered category (rel.catid is used by ordering code)
 
 				// Get type info, (left join and not inner join, needed to INCLUDE items without type !!)
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ' . ($tmp_only ? 'i.' : 'ie.') . 'type_id'
 
 				// Get user info of that checkout the item, left join and not inner join, needed to INCLUDE items checkedout by a deleted user
 				. ($query_ids
@@ -1223,7 +1223,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere(& $extra_joins = '')
+	function _buildContentWhere(& $extra_joins = '', $tmp_only = false)
 	{
 		$session = JFactory::getSession();
 		$user    = JFactory::getUser();
@@ -1477,7 +1477,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( !empty($filter_type) )
 		{
 			JArrayHelper::toInteger($filter_type, null);
-			$where[] = 'i.type_id IN (' . implode( ',', $filter_type) .')';
+			$where[] = ($tmp_only ? 'i.' : 'ie.') . 'type_id IN (' . implode( ',', $filter_type) .')';
 		}
 
 		if ( !empty($filter_author) )
