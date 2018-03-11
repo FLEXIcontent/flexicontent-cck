@@ -68,7 +68,7 @@ function delFilter(name)
 }
 
 function delAllFilters() {
-	delFilter('filter_fieldtype'); delFilter('filter_itemtype'); delFilter('filter_itemstate');
+	delFilter('filter_fieldtype'); delFilter('filter_type'); delFilter('filter_state');
 	delFilter('search'); delFilter('search_itemtitle'); delFilter('search_itemid');
 	delFilter('filter_order'); delFilter('filter_order_Dir');
 }
@@ -146,13 +146,13 @@ function delAllFilters() {
 
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_itemtype']; ?>
+				<?php echo $this->lists['filter_type']; ?>
 			</div>
 		</div>
 
 		<div class="fc-filter nowrap_box">
 			<div <?php echo $fcfilter_attrs_row; ?> >
-				<?php echo $this->lists['filter_itemstate']; ?>
+				<?php echo $this->lists['filter_state']; ?>
 			</div>
 		</div>
 

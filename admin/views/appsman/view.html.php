@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -18,11 +18,11 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
-jimport('joomla.application.component.helper' );
+jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
- * View class for the FLEXIcontent categories screen
+ * View class for the FLEXIcontent appsman screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -50,15 +50,16 @@ class FlexicontentViewAppsman extends JViewLegacy
 		
 		// Get model
 		$model = $this->getModel();
-		
+
 		// Some flags
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		// Get session information
 		$conf  = $session->get('appsman_config', "", 'flexicontent');
 		$conf  = unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
-		
-		$session->set('appsman_parse_log', null, 'flexicontent');  // This is the flag if XML file has been parsed (import form already submitted), thus to display the imported data
+
+		// This is the flag if XML file has been parsed (import form already submitted), thus to display the imported data
+		$session->set('appsman_parse_log', null, 'flexicontent');
 		
 		
 		// ***
@@ -88,9 +89,6 @@ class FlexicontentViewAppsman extends JViewLegacy
 		// *** Create Submenu & Toolbar
 		// ***
 
-		// Get user's global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
-
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanAppsman');
 		
@@ -101,72 +99,8 @@ class FlexicontentViewAppsman extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		$toolbar = JToolbar::getInstance('toolbar');
-		
-		
-		/*$btn_icon = 'icon-import';
-		$btn_name = 'import';
-		$btn_task    = 'appsman.initxml';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Import', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn", $btn_icon);
-		*/
-		
-		if ( !empty($conf) ) {
-			if ($task!='processxml') {
-				$ctrl_task = 'appsman.processxml';
-				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
-				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
-			}
-			$ctrl_task = 'appsman.clearxml';
-			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
-		} else {
-			//$ctrl_task = 'appsman.initxml';
-			//JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
-		}
+		$this->setToolbar();
 
-
-		
-		/*
-		$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = 'appsman.exportxml';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export XML', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
-		
-		
-		$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = 'appsman.exportsql';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
-		
-		
-		$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = 'appsman.exportcsv';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
-		*/
-		
-		
-		if ($perms->CanConfig) {
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
-		}
-		
 
 		// Get types
 		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
@@ -331,4 +265,107 @@ class FlexicontentViewAppsman extends JViewLegacy
 
 		parent::display($tpl);
 	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		$js = '';
+
+		$contrl = "appsman.";
+		$contrl_singular = null;
+
+		$document = JFactory::getDocument();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		/*$btn_icon = 'icon-import';
+		$btn_name = 'import';
+		$btn_task    = 'appsman.initxml';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Import', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn", $btn_icon);
+		*/
+		
+		if (!empty($conf))
+		{
+			if ($task !== 'processxml')
+			{
+				$ctrl_task = 'appsman.processxml';
+				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
+				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
+			}
+
+			$ctrl_task = 'appsman.clearxml';
+			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
+		}
+
+		else
+		{
+			//$ctrl_task = 'appsman.initxml';
+			//JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
+		}
+
+
+		/*
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'appsman.exportxml';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export XML', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		
+		
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'appsman.exportsql';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		
+		
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'appsman.exportcsv';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		*/
+
+		
+		if ($perms->CanConfig)
+		{
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
+		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+	}
+
 }

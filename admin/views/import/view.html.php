@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -19,9 +19,10 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
- * View class for the FLEXIcontent categories screen
+ * View class for the FLEXIcontent import screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -29,19 +30,18 @@ jimport('legacy.view.legacy');
  */
 class FlexicontentViewImport extends JViewLegacy
 {
-
 	function display( $tpl = null )
 	{
-		// ********************
-		// Initialise variables
-		// ********************
-		
+		// ***
+		// *** Initialise variables
+		// ***
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		$task    = $jinput->get('task', '', 'cmd');
-		
+
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
@@ -50,7 +50,7 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		// Get model
 		$model = $this->getModel();
-		
+
 		// Some flags
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
@@ -62,9 +62,9 @@ class FlexicontentViewImport extends JViewLegacy
 		$session->set('csvimport_parse_log', null, 'flexicontent');  // This is the flag if CSV file has been parsed (import form already submitted), thus to display the imported data
 		
 		
-		// **************************
-		// Add css and js to document
-		// **************************
+		// ***
+		// *** Add css and js to document
+		// ***
 		
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
@@ -72,7 +72,7 @@ class FlexicontentViewImport extends JViewLegacy
 		!JFactory::getLanguage()->isRtl()
 			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
@@ -83,21 +83,13 @@ class FlexicontentViewImport extends JViewLegacy
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		
-		
-		// *****************************
-		// Get user's global permissions
-		// *****************************
-		
-		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
-		
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+
+
+
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanImport');
 		
@@ -106,37 +98,11 @@ class FlexicontentViewImport extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'import' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
+
 		// Create the toolbar
-		$toolbar = JToolbar::getInstance('toolbar');
-		
-		if ( !empty($conf) ) {
-			if ($task!='processcsv') {
-				$ctrl_task = 'import.processcsv';
-				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
-				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
-			}
-			$ctrl_task = 'import.clearcsv';
-			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
-		} else {
-			$ctrl_task = 'import.initcsv';
-			JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
-			$ctrl_task = 'import.testcsv';
-			JToolbarHelper::custom( $ctrl_task, 'test.png', 'test.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
-		}
-		//JToolbarHelper::Back();
-		if ($perms->CanConfig) {
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
-		}
-		
-		
-			
+		$this->setToolbar();
+
+
 		// Get types
 		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		
@@ -333,5 +299,72 @@ class FlexicontentViewImport extends JViewLegacy
 
 		parent::display($tpl);
 	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		$js = '';
+
+		$contrl = "import.";
+		$contrl_singular = null;
+
+		$document = JFactory::getDocument();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		if (!empty($conf))
+		{
+			if ($task !== 'processcsv')
+			{
+				$ctrl_task = 'import.processcsv';
+				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
+				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
+			}
+
+			$ctrl_task = 'import.clearcsv';
+			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
+		}
+
+		else
+		{
+			$ctrl_task = 'import.initcsv';
+			JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
+			$ctrl_task = 'import.testcsv';
+			JToolbarHelper::custom( $ctrl_task, 'test.png', 'test.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
+		}
+
+		//JToolbarHelper::Back();
+
+		if ($perms->CanConfig)
+		{
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
+		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+	}
+
 }
-?>

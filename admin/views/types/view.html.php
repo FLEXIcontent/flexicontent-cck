@@ -110,9 +110,6 @@ class FlexicontentViewTypes extends JViewLegacy
 		// *** Create Submenu & Toolbar
 		// ***
 
-		// Get user's global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
-
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanTypes');
 		
@@ -123,6 +120,91 @@ class FlexicontentViewTypes extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
+		$this->setToolbar();
+
+
+		// Get data from the model
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$rows = $this->get( 'Items' );
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+		// Create pagination object
+		$pagination = $this->get( 'Pagination' );
+		
+		// Create type's parameters
+		foreach($rows as $type)
+		{
+			$type->config = new JRegistry($type->config);
+		}
+
+
+
+		// ***
+		// *** Create List Filters
+		// ***
+
+		$lists = array();
+		
+		// build publication state filter
+		$states 	= array();
+		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$states[] = JHtml::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
+		
+		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
+			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+			//JHtml::_('grid.state', $filter_state );
+		
+		
+		// build access level filter
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+		$fieldname =  $elementid = 'filter_access';
+		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
+		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
+			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+		
+		
+		// text search filter
+		$lists['search']= $search;
+
+
+		// table ordering
+		$lists['order_Dir'] = $filter_order_Dir;
+		$lists['order'] = $filter_order;
+
+
+		//assign data to template
+		$this->permissions = FlexicontentHelperPerm::getPerm();
+		$this->count_filters = $count_filters;
+
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pagination = $pagination;
+
+		$this->option = $option;
+		$this->view = $view;
+
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		parent::display($tpl);
+	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
 		$js = '';
 
 		$contrl = "types.";
@@ -195,73 +277,6 @@ class FlexicontentViewTypes extends JViewLegacy
 				});
 			');
 		}
-
-
-		// Get data from the model
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rows = $this->get( 'Items' );
-		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-
-		// Create pagination object
-		$pagination = $this->get( 'Pagination' );
-		
-		// Create type's parameters
-		foreach($rows as $type)
-		{
-			$type->config = new JRegistry($type->config);
-		}
-
-
-
-		// ***
-		// *** Create List Filters
-		// ***
-
-		$lists = array();
-		
-		// build publication state filter
-		$states 	= array();
-		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$states[] = JHtml::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
-		
-		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
-			//JHtml::_('grid.state', $filter_state );
-		
-		
-		// build access level filter
-		$options = JHtml::_('access.assetgroups');
-		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
-		$fieldname =  $elementid = 'filter_access';
-		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
-		$lists['access'] = ($filter_access || 1 ? '<div class="add-on">'.JText::_('FLEXI_ACCESS').'</div>' : '').
-			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-		
-		
-		// text search filter
-		$lists['search']= $search;
-
-
-		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
-
-
-		//assign data to template
-		$this->CanTemplates = $perms->CanTemplates;
-		$this->count_filters = $count_filters;
-
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->pagination = $pagination;
-
-		$this->option = $option;
-		$this->view = $view;
-
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-		parent::display($tpl);
 	}
+
 }

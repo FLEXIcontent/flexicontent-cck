@@ -40,11 +40,13 @@ class FlexicontentViewTags extends JViewLegacy
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
+		$task    = $jinput->get('task', '', 'cmd');
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDbo();
 		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
 		
 		// Get model
 		$model = $this->getModel();
@@ -73,7 +75,6 @@ class FlexicontentViewTags extends JViewLegacy
 		// Order and order direction
 		$filter_order     = $model->getState('filter_order');
 		$filter_order_Dir = $model->getState('filter_order_Dir');
-
 
 
 		// ***
@@ -111,9 +112,6 @@ class FlexicontentViewTags extends JViewLegacy
 		// *** Create Submenu & Toolbar
 		// ***
 
-		// Get user's global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
-
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanTags');
 		
@@ -124,87 +122,7 @@ class FlexicontentViewTags extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		$js = '';
-
-		$contrl = "tags.";
-		$contrl_singular = "tag.";
-		$toolbar = JToolbar::getInstance('toolbar');
-		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
-
-		if ($perms->CanConfig)
-		{
-			$btn_task = '';
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
-			//$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
-			$js .= "
-				jQuery('#toolbar-import a.toolbar, #toolbar-import button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
-			";
-			JToolbarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
-			JHtml::_('behavior.modal', '#toolbar-import a.toolbar, #toolbar-import button');
-			JToolbarHelper::divider();
-		}
-
-		JToolbarHelper::publishList($contrl.'publish');
-		JToolbarHelper::unpublishList($contrl.'unpublish');
-		if ($perms->CanCreateTags)
-		{
-			JToolbarHelper::addNew($contrl.'add');
-
-			if ($perms->CanConfig)
-			{
-				$btn_task = '';
-				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=indexer&tmpl=component&indexer=tags_default';
-				//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-				$js .= "
-					jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
-				";
-				JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('Update Joomla tags mappings'), false );
-			}
-		}
-
-		if (1)
-		{
-			JToolbarHelper::editList($contrl.'edit');
-		}
-
-		if (1)
-		{
-			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
-			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
-			$btn_task    = $contrl.'remove';
-			$extra_js    = "";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-		}
-
-		JToolbarHelper::checkin($contrl.'checkin');
-		
-		if ($perms->CanConfig)
-		{
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
-		}
-		
-		if ($js)
-		{
-			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
-					' . $js . '
-				});
-			');
-		}
+		$this->setToolbar();
 
 
 		// Get data from the model
@@ -285,4 +203,104 @@ class FlexicontentViewTags extends JViewLegacy
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		$js = '';
+
+		$contrl = "tags.";
+		$contrl_singular = "tag.";
+
+		$document = JFactory::getDocument();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		if ($perms->CanConfig)
+		{
+			$btn_task = '';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
+			//$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
+			$js .= "
+				jQuery('#toolbar-import a.toolbar, #toolbar-import button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
+			";
+			JToolbarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
+			JHtml::_('behavior.modal', '#toolbar-import a.toolbar, #toolbar-import button');
+			JToolbarHelper::divider();
+		}
+
+		JToolbarHelper::publishList($contrl.'publish');
+		JToolbarHelper::unpublishList($contrl.'unpublish');
+		if ($perms->CanCreateTags)
+		{
+			JToolbarHelper::addNew($contrl.'add');
+
+			if ($perms->CanConfig)
+			{
+				$btn_task = '';
+				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=indexer&tmpl=component&indexer=tags_default';
+				//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
+				$js .= "
+					jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
+						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
+							.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
+				";
+				JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('Update Joomla tags mappings'), false );
+			}
+		}
+
+		if (1)
+		{
+			JToolbarHelper::editList($contrl.'edit');
+		}
+
+		if (1)
+		{
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+
+		JToolbarHelper::checkin($contrl.'checkin');
+
+		if ($perms->CanConfig)
+		{
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
+		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+	}
+
 }

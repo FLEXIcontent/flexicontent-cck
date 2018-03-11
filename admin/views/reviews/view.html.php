@@ -70,7 +70,7 @@ class FlexicontentViewReviews extends JViewLegacy
 		// Text search
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
-		
+
 		// Order and order direction
 		$filter_order     = $model->getState('filter_order');
 		$filter_order_Dir = $model->getState('filter_order_Dir');
@@ -110,9 +110,6 @@ class FlexicontentViewReviews extends JViewLegacy
 		// ***
 		// *** Create Submenu & Toolbar
 		// ***
-		
-		// Get user's global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
 
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanReviews');
@@ -124,10 +121,80 @@ class FlexicontentViewReviews extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		$js = "jQuery(document).ready(function(){";
+		$this->setToolbar();
+
+
+		// Get data from the model
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$rows = $this->get( 'Data' );
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+		// Create pagination object
+		$pagination = $this->get( 'Pagination' );
+
+
+		// ***
+		// *** Create List Filters
+		// ***
+
+		$lists = array();
+		
+		// build publication state filter
+		$states 	= array();
+		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$states[] = JHtml::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
+		
+		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
+			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
+			//JHtml::_('grid.state', $filter_state );
+		
+		
+		// text search filter
+		$lists['search']= $search;
+
+
+		// table ordering
+		$lists['order_Dir'] = $filter_order_Dir;
+		$lists['order'] = $filter_order;
+
+
+		//assign data to template
+		$this->count_filters = $count_filters;
+
+		$this->lists = $lists;
+		$this->rows = $rows;
+		$this->pagination = $pagination;
+
+		$this->option = $option;
+		$this->view = $view;
+
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		parent::display($tpl);
+	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		$js = '';
 
 		$contrl = "reviews.";
 		$contrl_singular = "review.";
+
+		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
@@ -173,7 +240,8 @@ class FlexicontentViewReviews extends JViewLegacy
 
 		JToolbarHelper::checkin($contrl.'checkin');
 		
-		if ($perms->CanConfig) {
+		if ($perms->CanConfig)
+		{
 			JToolbarHelper::divider(); JToolbarHelper::spacer();
 			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -183,52 +251,14 @@ class FlexicontentViewReviews extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
-		
-		// Get data from the model
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rows = $this->get( 'Data');
-		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-
-		// Create pagination object
-		$pagination = $this->get( 'Pagination' );
-
-		$lists = array();
-		
-		// build publication state filter
-		$states 	= array();
-		$states[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
-		$states[] = JHtml::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$states[] = JHtml::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		//$states[] = JHtml::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
-		
-		$lists['state'] = ($filter_state || 1 ? '<div class="add-on">'.JText::_('FLEXI_STATE').'</div>' : '').
-			JHtml::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
-			//JHtml::_('grid.state', $filter_state );
-		
-		
-		// text search filter
-		$lists['search']= $search;
-		
-		
-		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
-		
-		
-		//assign data to template
-		$this->count_filters = $count_filters;
-		$this->lists = $lists;
-		$this->rows = $rows;
-		$this->pagination = $pagination;
-
-		$this->option = $option;
-		$this->view = $view;
-
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
-		parent::display($tpl);
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 	}
+
 }

@@ -16,7 +16,6 @@
  * GNU General Public License for more details.
  */
 
-// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
@@ -33,33 +32,30 @@ class FlexicontentViewItems extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		// ***********
-		// Batch tasks
-		// ***********
-		
+		// ***
+		// *** Initialise variables
+		// ***
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
-		
+
+		// Batch task variable
 		$task    = $jinput->get('task', '', 'cmd');
 		$cid     = $jinput->get('cid', array(), 'array');
 		
-		if($task == 'copy')
+		if ($task == 'copy')
 		{
 			$behaviour = $jinput->get('copy_behaviour', 'copy/move', 'string');
 			$this->setLayout('copy');
 			$this->_displayCopyMove($tpl, $cid, $behaviour);
 			return;
 		}
-		
-		
-		// ********************
-		// Initialise variables
-		// ********************
-		
-		global $globalcats;
-		
+
+
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
+
+		global $globalcats;
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
@@ -74,12 +70,12 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// Get model
 		$model = $this->getModel();
-		
-		
-		// ***********
-		// Get filters
-		// ***********
-		
+
+
+		// ***
+		// *** Get filters
+		// ***
+
 		$count_filters = 0;
 		
 		// File id filtering
@@ -87,17 +83,17 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_fileid     = $model->getState('filter_fileid');
 		if ($filter_fileid) $count_filters++;
 		
-		// Order type, order, order direction
-		$filter_order_type = $model->getState('filter_order_type');
-		$filter_order      = $model->getState('filter_order');
-		$filter_order_Dir  = $model->getState('filter_order_Dir');
-		
 		// Category filtering
 		$filter_cats        = $model->getState('filter_cats');
 		$filter_subcats     = $model->getState('filter_subcats');
 		$filter_catsinstate = $model->getState('filter_catsinstate');
 		$filter_featured    = $model->getState('filter_featured');
-
+		
+		// Order type, order, order direction
+		$filter_order_type = $model->getState('filter_order_type');
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+		
 		// filter ordering
 		$reOrderingActive = !$filter_order_type
 			? $filter_order == 'i.ordering'
@@ -144,9 +140,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
-		
-		
-		
+
+
 		// ***
 		// *** Add css and js to document
 		// ***
@@ -186,49 +181,12 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 		}
 		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
-		
-		
-		// *****************************
-		// Get user's global permissions
-		// *****************************
-		
-		$perms = FlexicontentHelperPerm::getPerm();
-		
-		$CanEdit			= $perms->CanEdit;
-		$CanPublish		= $perms->CanPublish;
-		$CanDelete		= $perms->CanDelete;
-		
-		$CanEditOwn			= $perms->CanEditOwn;
-		$CanPublishOwn	= $perms->CanPublishOwn;
-		$CanDeleteOwn		= $perms->CanDeleteOwn;
-		
-		$hasEdit    = $CanEdit    || $CanEditOwn     || $CanEdit==null    || $CanEditOwn==null;
-		$hasPublish = $CanPublish || $CanPublishOwn  || $CanPublish==null || $CanPublishOwn==null;
-		$hasDelete  = $CanDelete  || $CanDeleteOwn   || $CanDelete==null  || $CanDeleteOwn==null;
-		
-		$CanCats		= $perms->CanCats;
-		$CanAccLvl	= $perms->CanAccLvl;
-		$CanOrder		= $perms->CanOrder;
-		$CanCopy		= $perms->CanCopy;
-		$CanArchives= $perms->CanArchives;
-		
-		// Check if user can create in at least one published category
-		require_once("components/com_flexicontent/models/item.php");
-		$itemmodel = new FlexicontentModelItem();
-		$CanAddAny = $itemmodel->getItemAccess()->get('access-create');
-		
-		
-		// *****************************
-		// Get user's global permissions
-		// *****************************
-		
-		$perms = FlexicontentHelperPerm::getPerm();
 
 
-		// ************************
-		// Create Submenu & Toolbar
-		// ************************
-		
+		// ***
+		// *** Create Submenu & Toolbar
+		// ***
+
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu(null);
 		
@@ -237,162 +195,10 @@ class FlexicontentViewItems extends JViewLegacy
 		$site_title = $document->getTitle();
 		JToolbarHelper::title( $doc_title, 'items' );
 		$document->setTitle($doc_title .' - '. $site_title);
-		
-		$toolbar = JToolbar::getInstance('toolbar');
-		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
-		
-		// Implementation of multiple-item state selector
-		$add_divider = false;
-		if ( $hasPublish )
-		{
-			$add_divider = true;
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&task=items.selectstate&format=raw';
 
-			/*$btn_task = '';
-			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
-			$js .= "
-				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
-			";
-			JToolbarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
+		// Create the toolbar
+		$this->setToolbar();
 
-			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
-			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
-			$btn_task    = '';
-			$extra_js    = "";
-			$full_js     = "
-				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
-			";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_CHANGE_STATE', 'publish', $full_js, $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="",
-				$btn_icon="icon-publish", $attrs='', $auto_add = true, $tag_type='button');*/
-
-			$btn_arr = $this->getStateButtons();
-			$drop_btn = '
-				<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
-					'.JText::_('FLEXI_CHANGE_STATE').'
-					<span class="caret"></span>
-				</button>';
-			array_unshift($btn_arr, $drop_btn);
-			flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
-		}
-
-		if ($hasDelete)
-		{
-			if ( $filter_state && in_array('T',$filter_state) ) {
-				//$btn_msg = JText::_('FLEXI_ARE_YOU_SURE');
-				//$btn_task = 'items.remove';
-				//JToolbarHelper::deleteList($btn_msg, $btn_task);
-				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
-				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
-				$btn_task    = 'items.remove';
-				$extra_js    = "";
-				flexicontent_html::addToolBarButton(
-					'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
-					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning");
-			}
-			/*else
-			{
-				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH'));
-				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM').' '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
-				$btn_task    = 'items.changestate';
-				$extra_js    = "document.adminForm.newstate.value='T';";
-				flexicontent_html::addToolBarButton(
-					'FLEXI_TRASH', 'trash', '', $msg_alert, $msg_confirm,
-					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="");
-			}*/
-			$add_divider = true;
-		}
-		
-		/*if ($CanArchives && (!$filter_state || !in_array('A',$filter_state)))
-		{
-			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE'));
-			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
-			$btn_task    = 'items.changestate';
-			$extra_js    = "document.adminForm.newstate.value='A';";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_ARCHIVE', 'archive', $full_js='', $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-			$add_divider = true;
-		}*/
-		
-		if (
-			($CanArchives && $filter_state && in_array('A',$filter_state)) ||
-			($hasDelete   && $filter_state && in_array('T',$filter_state))
-		) {
-			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE'));
-			$msg_confirm = JText::_('FLEXI_RESTORE_CONFIRM');
-			$btn_task    = 'items.changestate';
-			$extra_js    = "document.adminForm.newstate.value='P';";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_RESTORE', 'restore', $full_js='', $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-		}
-		if ($add_divider) { JToolbarHelper::divider(); }
-		
-		$add_divider = false;
-		if ($CanAddAny)
-		{
-			$btn_task = '';
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&format=raw';
-			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
-			$js .= "
-				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 240, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
-			";
-			JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
-			$add_divider = true;
-		}
-		if ($hasEdit)
-		{
-			$btn_task = 'items.edit';
-			JToolbarHelper::editList($btn_task);
-			$add_divider = true;
-		}
-		if ($add_divider) { JToolbarHelper::divider(); }
-		
-		$add_divider = false;
-		if ($CanAddAny && $CanCopy)
-		{
-			$btn_task = 'items.copy';
-			JToolbarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
-			if ($useAssocs) {
-				JToolbarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
-			}
-			$add_divider = true;
-		}
-		$btn_task = 'items.checkin';
-		JToolbarHelper::checkin($btn_task);
-		
-		if ( $cparams->get('show_csvbutton_be', 0) )
-		{
-			$full_js     = "window.location.replace('" . JUri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv'. "')";
-			flexicontent_html::addToolBarButton(
-				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
-				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
-		}
-
-		if ($add_divider) { JToolbarHelper::divider(); JToolbarHelper::spacer(); }
-		if ($perms->CanConfig) {
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
-		}
-		
-		if ($js)
-		{
-			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
-					' . $js . '
-				});
-			');
-		}
 
 		// ***
 		// *** Get data from the model
@@ -420,9 +226,12 @@ class FlexicontentViewItems extends JViewLegacy
 			FlexicontentFields::getFields($rows, 'category');
 		}
 
-		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
+		if ($useAssocs)
+		{
+			$langAssocs = $this->get('LangAssocs');
+		}
 		$langs = FLEXIUtilities::getLanguages('code');
-		$categories = $globalcats ? $globalcats : array();
+		$categories = $globalcats ?: array();
 		
 		
 		$inline_ss_max = 50000;
@@ -469,11 +278,11 @@ class FlexicontentViewItems extends JViewLegacy
 				<sup>[4]</sup> ' . JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS') . '<br />
 			</div>
 		';
-		
-		
-		// *******************
-		// Create Filters HTML
-		// *******************
+
+
+		// ***
+		// *** Create List Filters
+		// ***
 		
 		// filter publication state
 		$states 	= array();
@@ -685,7 +494,6 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		
 		//assign data to template
-		$this->CanTemplates = $perms->CanTemplates;
 		$this->count_filters = $count_filters;
 		//$this->filter_stategrp = $filter_stategrp;
 		$this->filter_catsinstate = $filter_catsinstate;
@@ -696,14 +504,12 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->itemTags = $itemTags;
 		$this->extra_fields = $extraCols;
 		$this->custom_filts = $customFilts;
-		if ($useAssocs)  $this->lang_assocs = $langAssocs;
+		$this->lang_assocs = $useAssocs ? $langAssocs : null;
 		$this->langs = $langs;
 		$this->cid = $cid;
 		$this->pagination = $pagination;
 		$this->reOrderingActive = $reOrderingActive;
-		$this->CanOrder = $CanOrder;
-		$this->CanCats = $CanCats;
-		$this->CanAccLvl = $CanAccLvl;
+		$this->permissions = FlexicontentHelperPerm::getPerm();
 		$this->unassociated = $unassociated;
 		$this->badcatitems = $badcatitems;
 		
@@ -841,8 +647,9 @@ class FlexicontentViewItems extends JViewLegacy
 	{
 		// Use general permissions since we do not have examine any specific item
 		$perms = FlexicontentHelperPerm::getPerm();
-		$auth_publish = $perms->CanPublish || $perms->CanPublishOwn || $perms->CanPublish==null || $perms->CanPublishOwn==null;
-		$auth_delete  = $perms->CanDelete  || $perms->CanDeleteOwn  || $perms->CanDelete==null  || $perms->CanDeleteOwn==null;
+
+		$auth_publish = $perms->CanPublish || $perms->CanPublishOwn;
+		$auth_delete  = $perms->CanDelete  || $perms->CanDeleteOwn;
 		$auth_archive = $perms->CanArchives;
 		
 		if ($auth_publish)
@@ -877,4 +684,194 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		return $btn_arr;
 	}
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		$js = '';
+
+		$document = JFactory::getDocument();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+		$model = $this->getModel();
+
+		$hasEdit    = $perms->CanEdit    || $perms->CanEditOwn;
+		$hasPublish = $perms->CanPublish || $perms->CanPublishOwn;
+		$hasDelete  = $perms->CanDelete  || $perms->CanDeleteOwn;
+
+		// Check if user can create in at least one published category
+		require_once("components/com_flexicontent/models/item.php");
+		$itemmodel = new FlexicontentModelItem();
+		$CanAddAny = $itemmodel->getItemAccess()->get('access-create');
+
+		$filter_state  = $model->getState('filter_state');
+
+		// Implementation of multiple-item state selector
+		$add_divider = false;
+		if ($hasPublish)
+		{
+			$add_divider = true;
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+
+			/*$btn_task = '';
+			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
+			$js .= "
+				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
+			";
+			JToolbarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
+
+			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
+			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
+			$btn_task    = '';
+			$extra_js    = "";
+			$full_js     = "
+				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
+			";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_CHANGE_STATE', 'publish', $full_js, $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="",
+				$btn_icon="icon-publish", $attrs='', $auto_add = true, $tag_type='button');*/
+
+			$btn_arr = $this->getStateButtons();
+			$drop_btn = '
+				<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_CHANGE_STATE').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
+		}
+
+		if ($hasDelete)
+		{
+			if ($filter_state && in_array('T', $filter_state))
+			{
+				//$btn_msg = JText::_('FLEXI_ARE_YOU_SURE');
+				//$btn_task = 'items.remove';
+				//JToolbarHelper::deleteList($btn_msg, $btn_task);
+				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
+				$btn_task    = 'items.remove';
+				$extra_js    = "";
+				flexicontent_html::addToolBarButton(
+					'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning");
+			}
+			/*else
+			{
+				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH'));
+				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM').' '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
+				$btn_task    = 'items.changestate';
+				$extra_js    = "document.adminForm.newstate.value='T';";
+				flexicontent_html::addToolBarButton(
+					'FLEXI_TRASH', 'trash', '', $msg_alert, $msg_confirm,
+					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="");
+			}*/
+			$add_divider = true;
+		}
+		
+		/*if ($perms->CanArchives && (!$filter_state || !in_array('A',$filter_state)))
+		{
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE'));
+			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
+			$btn_task    = 'items.changestate';
+			$extra_js    = "document.adminForm.newstate.value='A';";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_ARCHIVE', 'archive', $full_js='', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+			$add_divider = true;
+		}*/
+		
+		if (
+			($perms->CanArchives && $filter_state && in_array('A', $filter_state)) ||
+			($hasDelete   && $filter_state && in_array('T', $filter_state))
+		) {
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE'));
+			$msg_confirm = JText::_('FLEXI_RESTORE_CONFIRM');
+			$btn_task    = 'items.changestate';
+			$extra_js    = "document.adminForm.newstate.value='P';";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_RESTORE', 'restore', $full_js='', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+		if ($add_divider) { JToolbarHelper::divider(); }
+		
+		$add_divider = false;
+		if ($CanAddAny)
+		{
+			$btn_task = '';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&format=raw';
+			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
+			$js .= "
+				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 240, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
+			";
+			JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
+			$add_divider = true;
+		}
+		if ($hasEdit)
+		{
+			$btn_task = 'items.edit';
+			JToolbarHelper::editList($btn_task);
+			$add_divider = true;
+		}
+		if ($add_divider) { JToolbarHelper::divider(); }
+		
+		$add_divider = false;
+		if ($CanAddAny && $perms->CanCopy)
+		{
+			$btn_task = 'items.copy';
+			JToolbarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
+			$useAssocs = flexicontent_db::useAssociations();
+			if ($useAssocs)
+			{
+				JToolbarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
+			}
+			$add_divider = true;
+		}
+		$btn_task = 'items.checkin';
+		JToolbarHelper::checkin($btn_task);
+		
+		if (JComponentHelper::getParams('com_flexicontent')->get('show_csvbutton_be', 0))
+		{
+			$full_js     = "window.location.replace('" . JUri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv'. "')";
+			flexicontent_html::addToolBarButton(
+				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
+		}
+
+		if ($add_divider) { JToolbarHelper::divider(); JToolbarHelper::spacer(); }
+		if ($perms->CanConfig)
+		{
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
+		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+	}
+
 }

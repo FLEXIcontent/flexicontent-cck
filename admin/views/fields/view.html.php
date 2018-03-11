@@ -134,9 +134,6 @@ class FlexicontentViewFields extends JViewLegacy
 		// *** Create Submenu & Toolbar
 		// ***
 
-		// Get user's global permissions
-		$perms = FlexicontentHelperPerm::getPerm();
-
 		// Create Submenu (and also check access to current view)
 		FLEXIUtilities::ManagerSideMenu('CanFields');
 		
@@ -147,117 +144,9 @@ class FlexicontentViewFields extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
-		$js = "jQuery(document).ready(function(){";
+		$this->setToolbar();
 
-		$contrl = "fields.";
 
-		if ($perms->CanEditField)
-		{
-			$ctrl_task = '&task=fields.selectsearchflag';
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
-			
-			$btn_name = 'basicindex';
-			$btn_task = '';
-			$full_js  = ';';
-			$extra_js = '';
-			flexicontent_html::addToolBarButton(
-				JText::_('FLEXI_TOGGLE_SEARCH_FLAG'), $btn_name, $full_js, $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="");
-			
-			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
-			";
-			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
-		}
-		
-		if ($perms->CanCopyFields)
-		{
-			JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
-			JToolbarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
-			JToolbarHelper::divider();
-		}
-
-		JToolbarHelper::publishList($contrl.'publish');
-		JToolbarHelper::unpublishList($contrl.'unpublish');
-		if ($perms->CanAddField)
-		{
-			JToolbarHelper::addNew($contrl.'add');
-		}
-		if ($perms->CanEditField)
-		{
-			JToolbarHelper::editList($contrl.'edit');
-		}
-		if ($perms->CanDeleteField)
-		{
-			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
-			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
-			$btn_task    = $contrl.'remove';
-			$extra_js    = "";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-		}
-
-		JToolbarHelper::checkin($contrl.'checkin');
-
-		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
-		if (file_exists($appsman_path))
-		{
-			$btn_icon = 'icon-download';
-			$btn_name = 'download';
-			$btn_task    = 'appsman.exportxml';
-			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
-			flexicontent_html::addToolBarButton(
-				'Export now',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
-				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
-			
-			$btn_icon = 'icon-box-add';
-			$btn_name = 'box-add';
-			$btn_task    = 'appsman.addtoexport';
-			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
-			flexicontent_html::addToolBarButton(
-				'Add to export',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
-				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
-		}
-		
-		/*$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = 'fields.exportsql';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as SQL',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
-		
-		
-		$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = 'fields.exportcsv';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);*/
-		
-		
-		if ($perms->CanConfig) {
-			JToolbarHelper::divider(); JToolbarHelper::spacer();
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
-		}
-		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
-		
 		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$rows       = $this->get( 'Items' );
@@ -355,7 +244,7 @@ class FlexicontentViewFields extends JViewLegacy
 
 		//assign data to template
 		$this->count_filters = $count_filters;
-		$this->permission = $perms;
+		$this->permission = FlexicontentHelperPerm::getPerm();
 		$this->filter_type = $filter_type;
 
 		$this->lists = $lists;
@@ -373,4 +262,142 @@ class FlexicontentViewFields extends JViewLegacy
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
+
+
+
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		$js = '';
+
+		$contrl = "fields.";
+		$contrl_singular = "field.";
+
+		$document = JFactory::getDocument();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+
+		if ($perms->CanEditField)
+		{
+			$ctrl_task = '&task=fields.selectsearchflag';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
+			
+			$btn_name = 'basicindex';
+			$btn_task = '';
+			$full_js  = ';';
+			$extra_js = '';
+			flexicontent_html::addToolBarButton(
+				JText::_('FLEXI_TOGGLE_SEARCH_FLAG'), $btn_name, $full_js, $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="");
+			
+			$js .= "
+				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
+			";
+			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
+		}
+		
+		if ($perms->CanCopyFields)
+		{
+			JToolbarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+			JToolbarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
+			JToolbarHelper::divider();
+		}
+
+		JToolbarHelper::publishList($contrl.'publish');
+		JToolbarHelper::unpublishList($contrl.'unpublish');
+		if ($perms->CanAddField)
+		{
+			JToolbarHelper::addNew($contrl.'add');
+		}
+		if ($perms->CanEditField)
+		{
+			JToolbarHelper::editList($contrl.'edit');
+		}
+		if ($perms->CanDeleteField)
+		{
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+
+		JToolbarHelper::checkin($contrl.'checkin');
+
+		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path))
+		{
+			$btn_icon = 'icon-download';
+			$btn_name = 'download';
+			$btn_task    = 'appsman.exportxml';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Export now',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+			
+			$btn_icon = 'icon-box-add';
+			$btn_name = 'box-add';
+			$btn_task    = 'appsman.addtoexport';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Add to export',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+		}
+		
+		/*$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'fields.exportsql';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as SQL',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		
+		
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'fields.exportcsv';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);*/
+		
+		
+		if ($perms->CanConfig)
+		{
+			JToolbarHelper::divider(); JToolbarHelper::spacer();
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
+		
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
+	}
+
 }

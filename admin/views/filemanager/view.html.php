@@ -561,9 +561,4 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$document->addScriptDeclaration($js);
 	}
 
-
-	function indexer($tpl)
-	{		
-		parent::display($tpl);
-	}
 }

@@ -592,7 +592,7 @@ jQuery(document).ready(function(){
 
 	<?php if ($this->reOrderingActive): ?>
 
-		<?php if ($this->CanOrder): ?>
+		<?php if ($this->permissions->CanOrder): ?>
 		<div id="fcorder_save_warn_box" class="fc-mssg-inline fc-nobgimage fc-info" style="padding: 4px 8px 4px 8px; margin: 4px 0 0 0; line-height: 28px; max-width: unset;">
 			<span class="icon-pin"></span> <?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') . flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder'); ?>
 		</div>
@@ -667,10 +667,10 @@ jQuery(document).ready(function(){
 
 			<th class="hideOnDemandClass left nowrap">
 				<?php
-				echo $this->CanOrder ? $image_ordering_tip : '';
+				echo $this->permissions->CanOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_', JText::_('FLEXI_ORDER', true), str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2"></span></a>', JHtml::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'i.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order'] )));
 
-				/*if ($this->CanOrder && $this->reOrderingActive) :
+				/*if ($this->permissions->CanOrder && $this->reOrderingActive) :
 					echo flexicontent_html::gridOrderBtn($this->rows, 'filesave.png', $ctrl.'saveorder');
 				endif;*/
 				?>
@@ -825,7 +825,7 @@ jQuery(document).ready(function(){
 		</tr>
 	</thead>
 
-	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->reOrderingActive ? 'id="sortable_fcitems"' : ''; ?> >
+	<tbody <?php echo $ordering_draggable && $this->permissions->CanOrder && $this->reOrderingActive ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
 		$unpublishableFound = false;
 		$canCheckinRecords = $user->authorise('core.admin', 'com_checkin');
@@ -864,7 +864,7 @@ jQuery(document).ready(function(){
 				<?php /*echo $this->pagination->getRowOffset( $i );*/ ?>
 			</td-->
 
-		<?php if ($this->CanOrder) : ?>
+		<?php if ($this->permissions->CanOrder) : ?>
 
 			<td class="order center">
 				<?php
@@ -1034,7 +1034,7 @@ jQuery(document).ready(function(){
 			</td>
 
 			<td class="col_edit_layout">
-				<?php if ($this->CanTemplates && $row_ilayout) : ?>
+				<?php if ($this->permissions->CanTemplates && $row_ilayout) : ?>
 				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
 					<?php echo $image_editlayout;?>
 				</a>
@@ -1055,7 +1055,7 @@ jQuery(document).ready(function(){
 		<?php endforeach; ?>
 
 			<td class="col_access">
-				<?php echo $row->canEdit && $this->CanAccLvl
+				<?php echo $row->canEdit && $this->permissions->CanAccLvl
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"')
 					: $row->access_level; ?>
 			</td>
@@ -1114,7 +1114,7 @@ jQuery(document).ready(function(){
 					$short_name = StringHelper::strlen($title) > 40  ? StringHelper::substr( $title , 0 , 40) . '...' : $title;
 					if (!$isMainCat)
 					{
-						$row_cats[] = !$this->CanCats ? $short_name : '
+						$row_cats[] = !$this->permissions->CanCats ? $short_name : '
 							<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 								<a href="'.$catLink.'">'.$short_name.'</a>
 							</span>';
@@ -1122,7 +1122,7 @@ jQuery(document).ready(function(){
 					}
 					else
 					{
-						$_maincat = !$this->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
+						$_maincat = !$this->permissions->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
 						<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 							<a href="'.$catLink.'">'.$short_name.'</a>
 						</span>';
