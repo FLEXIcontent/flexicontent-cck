@@ -271,7 +271,7 @@ function delAllFilters() {
 			</td>
 
 			<td class="hidden-phone col_edit_layout">
-				<?php if ($this->CanTemplates) : ?>
+				<?php if ($this->permissions->CanTemplates) : ?>
 				<a <?php echo $attribs_editlayout; ?> href="<?php echo $layout_url; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
 					<?php echo $image_editlayout;?>
 				</a>

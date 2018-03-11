@@ -22,13 +22,13 @@ jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 
 /**
- * View class for the FLEXIcontent import screen
+ * View class for the FLEXIcontent appsman screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewImport extends JViewLegacy
+class FlexicontentViewAppsman extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
@@ -52,14 +52,14 @@ class FlexicontentViewImport extends JViewLegacy
 		$model = $this->getModel();
 
 		// Some flags
-		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		// Get session information
-		$conf  = $session->get('csvimport_config', "", 'flexicontent');
+		$conf  = $session->get('appsman_config', "", 'flexicontent');
 		$conf  = unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
-		
-		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
-		$session->set('csvimport_parse_log', null, 'flexicontent');  // This is the flag if CSV file has been parsed (import form already submitted), thus to display the imported data
+
+		// This is the flag if XML file has been parsed (import form already submitted), thus to display the imported data
+		$session->set('appsman_parse_log', null, 'flexicontent');
 		
 		
 		// ***
@@ -77,7 +77,6 @@ class FlexicontentViewImport extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
-		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Add js function to overload the joomla submitform validation
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
@@ -91,12 +90,12 @@ class FlexicontentViewImport extends JViewLegacy
 		// ***
 
 		// Create Submenu (and also check access to current view)
-		FLEXIUtilities::ManagerSideMenu('CanImport');
+		FLEXIUtilities::ManagerSideMenu('CanAppsman');
 		
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_IMPORT' );
+		$doc_title = JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'import' );
+		JToolbarHelper::title( $doc_title, 'appsman' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -114,30 +113,30 @@ class FlexicontentViewImport extends JViewLegacy
 		$categories = $globalcats;
 		
 		
-		// ************************************
-		// Decide layout to load: 'import*.php'
-		// ************************************
-		
+		// ***
+		// *** Decide layout to load: 'import*.php'
+		// ***
+
 		$this->setLayout('import');
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		
 		
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
-		if ( !empty($conf) && $task=='processcsv' )
+		if ( !empty($conf) && $task=='processxml' )
 		{
-			$this->conf = $conf;
+			$this->assignRef('conf', $conf);
 			parent::display('process');
 			return;
 		}
 		
 		// Configuration has been parsed, display a 'preview' layout:  (import_list.php)
-		else if ( !empty($conf) )
+		else if ( $task=='importxml' || !empty($conf) )
 		{
-			$this->conf = $conf;
-			$this->cparams = $cparams;
-			$this->types = $types;
-			$this->languages = $languages;
-			$this->categories = $globalcats;
+			$this->assignRef('conf', $conf);
+			$this->assignRef('cparams', $cparams);
+			$this->assignRef('types', $types);
+			$this->assignRef('languages', $languages);
+			$this->assignRef('categories', $globalcats);
 			parent::display('list');
 			return;
 		}
@@ -147,37 +146,12 @@ class FlexicontentViewImport extends JViewLegacy
 		// else ...
 		
 		
-		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
-		$tblname  = 'session';
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
-		$db->setQuery("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."'");
-		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
-		$_dataColType = strtolower($jession_coltypes['data']['DATA_TYPE']);
-		$_dataCol_wrongSize = ($_dataColType != 'mediumtext') && ($_dataColType != 'longtext');
-		
-		// If data type is "text" it is safe to assume that it can be converted to "mediumtext",
-		// since "text" means that session table is not memory storage,
-		// plus it is already stored externally aka operation will be quick ?
-		/*if ($_dataCol_wrongSize && $_dataColType == 'text')
-		{
-			$db->setQuery("ALTER TABLE `#__session` MODIFY `data` MEDIUMTEXT");
-			$db->execute();
-			$_dataCol_wrongSize = false;
-		}*/
-		if ($_dataCol_wrongSize) {
-			$app->enqueueMessage("Joomla DB table: <b>'session'</b> has a <b>'data'</b> column with type: <b>'".$_dataColType."'</b>, instead of expected type <b>'mediumtext'</b>. Trying to import large data files may fail", "notice");
-		}
-		
-		
 		$formvals = array();
 		
 		// Retrieve Basic configuration
-		$formvals['id_col']             = $model->getState('id_col');
 		$formvals['type_id']  = $model->getState('type_id');
 		$formvals['language'] = $model->getState('language');
 		$formvals['state']    = $model->getState('state');
-		$formvals['access']   = $model->getState('access');
 		
 		// Main and secondary categories, tags
 		$formvals['maincat']     = $model->getState('maincat');
@@ -193,7 +167,6 @@ class FlexicontentViewImport extends JViewLegacy
 		// Publication: META data
 		$formvals['metadesc_col'] = $model->getState('metadesc_col');
 		$formvals['metakey_col']  = $model->getState('metakey_col');
-		$formvals['custom_ititle_col'] = $model->getState('custom_ititle_col');
 		
 		
 		// Publication: dates
@@ -205,6 +178,7 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		// Advanced configuration
 		$formvals['ignore_unused_cols'] = $model->getState('ignore_unused_cols');
+		$formvals['id_col']             = $model->getState('id_col');
 		$formvals['items_per_step']     = $model->getState('items_per_step');
 		
 		
@@ -262,15 +236,6 @@ class FlexicontentViewImport extends JViewLegacy
 				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
 			</span>';
 		
-		// build access level filter
-		$access_levels = JHtml::_('access.assetgroups');
-		array_unshift($access_levels, JHtml::_('select.option', '0', "Use 'access' column") );
-		array_unshift($access_levels, JHtml::_('select.option', '', 'FLEXI_SELECT_ACCESS_LEVEL') );
-		$fieldname = 'access';  // make multivalue
-		$elementid = 'access';
-		$attribs = 'class="required use_select2_lib"';
-		$lists['access'] = JHtml::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $formvals['access'], $elementid, $translate=true );
-		
 		// Ignore warnings because component may not be installed
 		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
 		JERROR::setErrorHandling( E_WARNING, 'ignore' );
@@ -290,12 +255,13 @@ class FlexicontentViewImport extends JViewLegacy
 		$file_fields = $db->loadObjectList('name');
 		
 		//assign data to template
-		$this->model = $model;
-		$this->lists = $lists;
-		$this->user = $user;
-		$this->cparams = $cparams;
-		$this->file_fields = $file_fields;
-		$this->formvals = $formvals;
+		$this->assignRef('model'   	, $model);
+		$this->assignRef('lists'   	, $lists);
+		$this->assignRef('user'			, $user);
+		$this->assignRef('cparams', $cparams);
+		$this->assignRef('file_fields', $file_fields);
+		
+		$this->assignRef('formvals', $formvals);
 
 		parent::display($tpl);
 	}
@@ -316,36 +282,71 @@ class FlexicontentViewImport extends JViewLegacy
 
 		$js = '';
 
-		$contrl = "import.";
+		$contrl = "appsman.";
 		$contrl_singular = null;
 
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
+		/*$btn_icon = 'icon-import';
+		$btn_name = 'import';
+		$btn_task    = 'appsman.initxml';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Import', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn", $btn_icon);
+		*/
+		
 		if (!empty($conf))
 		{
-			if ($task !== 'processcsv')
+			if ($task !== 'processxml')
 			{
-				$ctrl_task = 'import.processcsv';
+				$ctrl_task = 'appsman.processxml';
 				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
 				JToolbarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
 			}
 
-			$ctrl_task = 'import.clearcsv';
+			$ctrl_task = 'appsman.clearxml';
 			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
 		}
 
 		else
 		{
-			$ctrl_task = 'import.initcsv';
-			JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
-			$ctrl_task = 'import.testcsv';
-			JToolbarHelper::custom( $ctrl_task, 'test.png', 'test.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
+			//$ctrl_task = 'appsman.initxml';
+			//JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
 		}
 
-		//JToolbarHelper::Back();
 
+		/*
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'appsman.exportxml';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export XML', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		
+		
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'appsman.exportsql';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		
+		
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = 'appsman.exportcsv';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		*/
+
+		
 		if ($perms->CanConfig)
 		{
 			JToolbarHelper::divider(); JToolbarHelper::spacer();

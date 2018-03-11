@@ -84,20 +84,20 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// **************
 		
 		// Various filters
-		$filter_itemstate = $fcform ? $jinput->get('filter_itemstate', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_itemstate', 'filter_itemstate', '', 'cmd' );
-		$filter_itemtype  = $fcform ? $jinput->get('filter_itemtype',  0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_itemtype',  'filter_itemtype',   0, 'int' );
+		$filter_state     = $fcform ? $jinput->get('filter_state', '', 'cmd')         :  $app->getUserStateFromRequest( $p.'filter_state', 'filter_state', '', 'cmd' );
+		$filter_type      = $fcform ? $jinput->get('filter_type',  0,  'int')         :  $app->getUserStateFromRequest( $p.'filter_type',  'filter_type',   0, 'int' );
 		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'cmd' );
 		$search_itemtitle = $fcform ? $jinput->get('search_itemtitle', '', 'string')  :  $app->getUserStateFromRequest( $p.'search_itemtitle', 'search_itemtitle', '', 'string' );
 		$search_itemid    = $fcform ? $jinput->get('search_itemid',     0, 'int')     :  $app->getUserStateFromRequest( $p.'search_itemid',    'search_itemid',     0, 'int' );
 		
-		$this->setState('filter_itemstate', $filter_itemstate);
-		$this->setState('filter_itemtype', $filter_itemtype);
+		$this->setState('filter_state', $filter_state);
+		$this->setState('filter_type', $filter_type);
 		$this->setState('filter_fieldtype', $filter_fieldtype);
 		$this->setState('search_itemtitle', $search_itemtitle);
 		$this->setState('search_itemid', $search_itemid);
 		
-		$app->setUserState($p.'filter_itemstate', $filter_itemstate);
-		$app->setUserState($p.'filter_itemtype', $filter_itemtype);
+		$app->setUserState($p.'filter_state', $filter_state);
+		$app->setUserState($p.'filter_type', $filter_type);
 		$app->setUserState($p.'filter_fieldtype', $filter_fieldtype);
 		$app->setUserState($p.'search_itemtitle', $search_itemtitle);
 		$app->setUserState($p.'search_itemid', $search_itemid);
@@ -252,8 +252,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$filter_order     = $this->getState( 'filter_order' );
 			
 			$filter_fieldtype = $this->getState( 'filter_fieldtype' );
-			$filter_itemstate = $this->getState( 'filter_itemstate' );
-			$filter_itemtype  = $this->getState( 'filter_itemtype' );
+			$filter_state = $this->getState( 'filter_state' );
+			$filter_type  = $this->getState( 'filter_type' );
 			
 			$search_itemtitle = $this->getState( 'search_itemtitle' );
 			$search_itemid    = $this->getState( 'search_itemid' );
@@ -286,9 +286,9 @@ class FLEXIcontentModelSearch extends JModelLegacy
 					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
 					;
 			else {
-				if ($filter_order == 'a.id' || $filter_order == 'a.title' || $filter_itemstate || $filter_itemtype || $search_itemtitle || $search_itemid)
+				if ($filter_order == 'a.id' || $filter_order == 'a.title' || $filter_state || $filter_type || $search_itemtitle || $search_itemid)
 					$query .= ' JOIN #__flexicontent_items_tmp as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id';
-				if ($isADV && $filter_itemtype)
+				if ($isADV && $filter_type)
 					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id';
 			}
 		}
@@ -333,8 +333,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		static $where;
 		if ( isset($where) ) return $where;
 		
-		$filter_itemstate	= $this->getState( 'filter_itemstate' );
-		$filter_itemtype	= $this->getState( 'filter_itemtype' );
+		$filter_state	= $this->getState( 'filter_state' );
+		$filter_type	= $this->getState( 'filter_type' );
 		$filter_fieldtype = $this->getState( 'filter_fieldtype' );
 		$search_itemtitle	= $this->getState( 'search_itemtitle' );
 		$search_itemid		= $this->getState( 'search_itemid' );
@@ -357,16 +357,16 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			}
 		}
 
-		if ( $filter_itemstate ) {
-			if ( $filter_itemstate == 'P' ) {
+		if ( $filter_state ) {
+			if ( $filter_state == 'P' ) {
 				$where[] = 'a.state IN (1, -5)';
-			} else if ($filter_itemstate == 'U' ) {
+			} else if ($filter_state == 'U' ) {
 				$where[] = 'a.state NOT IN (1, -5)';
 			}
 		}
 
-		if ( $filter_itemtype ) {
-			$where[] = 'ext.type_id = ' . (int)$filter_itemtype;
+		if ( $filter_type ) {
+			$where[] = 'ext.type_id = ' . (int)$filter_type;
 		}
 
 		if ($search) {
