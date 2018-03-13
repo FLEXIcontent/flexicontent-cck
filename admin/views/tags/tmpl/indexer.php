@@ -18,13 +18,14 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$ctrl_task = 'controller=tags&task=';
+$records_name = 'tags';
+$ctrl_task = 'task=tags.';
 
 $app = JFactory::getApplication();
-$indexer_name = $app->input->get('indexer', 'tags_default', 'cmd');
+$indexer_name = $app->input->get('indexer', 'tag_mappings', 'cmd');
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
-$index_urls   = $app->input->get('index_urls', 0, 'int');
 ?>
+
 <div>&nbsp;</div>
 <div style="heading">
 	Indexer Running ... <br/>
@@ -32,7 +33,7 @@ $index_urls   = $app->input->get('index_urls', 0, 'int');
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	var total_time = 0;
-	var items_per_call = 1000;
+	var records_per_call = 1000;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;
@@ -47,24 +48,26 @@ jQuery(document).ready(function() {
 			//jQuery('img#page_loading_img').hide();
 			return;
 		}
-		
+
 		var start_time = new Date().getTime();
-		
+
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>"+"&index_urls=<?php echo $index_urls; ?>",
+			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&records_per_call="+records_per_call+"&records_cnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>",
 			success: function(response, status2, xhr2) {
 				var request_time = new Date().getTime() - start_time;
 				total_time += request_time;
 				
 				var arr = response.split('|');
-				if(arr[0]=='fail') {
-					jQuery('div#statuscomment').html(arr[1]);
+				var result = arr[0].trim();
+				if ( result=='fail' || result!='success' )
+				{
+					jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
 					//jQuery('img#page_loading_img').hide();
 					looper = number;
 					return;
 				}
-				//looper=looper+items_per_call;
-				looper=parseInt(arr[0]);
+				//looper=looper+records_per_call;
+				looper=parseInt(arr[1]);
 				
 				width = onesector*looper;
 				if (width>300) width = 300;
@@ -72,26 +75,33 @@ jQuery(document).ready(function() {
 				jQuery('div#insideprogress').css('width', width+'px');
 				jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
 				jQuery('div#statuscomment').html(
-					(looper<number?looper:number)+' / '+number+' tags  <br/>'
-					+ '<br/>' + arr[1]
-					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
+					(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
 					+ '<br/>' + arr[2]
+					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
+					+ '<br/>' + arr[3]
 				);
 				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status);
+				alert(thrownError);
 			}
 		});
 	}
-	
+
 	var start_time = new Date().getTime();
+
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
 		success: function(response, status, xhr) {
 			var request_time = new Date().getTime() - start_time;
 			total_time += request_time;
 			
 			var arr = response.split('|');
-			if(arr[0]=='fail') {
-				jQuery('div#statuscomment').html(arr[1]);
+			var result = arr[0].trim();
+			if( result=='fail' || result!='success' )
+			{
+				jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
 				return;
 			}
 			//items = jQuery.parseJSON(arr[1]);
@@ -109,12 +119,16 @@ jQuery(document).ready(function() {
 			jQuery('div#insideprogress').css('width', width+'px');
 			jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
 			jQuery('div#statuscomment').html(
-				(looper<number?looper:number)+' / '+number+' tags  <br/>'
+				(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
 					+ '<br/>' + arr[4]
 					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
 					+ '<br/>' + arr[5]
 			);
 			updateprogress();
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
 		}
 	});
 });

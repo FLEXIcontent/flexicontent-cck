@@ -30,7 +30,7 @@ JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'componen
  */
 class FlexicontentControllerSearch extends FlexicontentController
 {
-	static $item_limit = 5000;
+	static $record_limit = 5000;
 
 	/**
 	 * Constructor
@@ -58,11 +58,11 @@ class FlexicontentControllerSearch extends FlexicontentController
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit('fail | ' . JText::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test counting with limited memory
@@ -71,29 +71,48 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$start_microtime = microtime(true);
 
 		$has_zlib    = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
-		$indexer     = JRequest::getVar('indexer', 'advanced');
-		$rebuildmode = JRequest::getVar('rebuildmode', '');
+		$indexer     = $this->input->getCmd('indexer', 'advanced');
+		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
 		$session = JFactory::getSession();
 		$db      = JFactory::getDbo();
 		$app     = JFactory::getApplication();
 		$model = $this->getModel('search');
 
+		// Check indexer type
+		if ($indexer !== 'advanced' && $indexer !== 'basic')
+		{
+			jexit('fail | indexer: ' . $indexer . ' not supported');
+		}
+
+		// Clear previous log file
+		$log_filename = 'items_search_indexer_' . \JFactory::getUser()->id . '.php';
+		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
+
+		if (file_exists($log_filename_full))
+		{
+			@ unlink($log_filename_full);
+		}
+		
+		/**
+		 * Get ids of searchable fields and ids of items having values for these fields
+		 */
+
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
-		if ($rebuildmode == 'quick' && $indexer == 'advanced')
+		if ($rebuildmode === 'quick' && $indexer === 'advanced')
 		{
 			$nse_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'non-search');
 			$nsp_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'dirty-nosupport');
 			$fields     = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'dirty-search');
 
 			// Get the field ids of the fields removed from searching
-			$del_fieldids = array_unique(array_merge(array_keys($nse_fields), array_keys($nsp_fields), array_keys($fields)));
+			$del_field_ids = array_unique(array_merge(array_keys($nse_fields), array_keys($nsp_fields), array_keys($fields)));
 		}
 		else
 		{
 			// INDEX: basic or advanced fully rebuilt
 			$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'all-search');
-			$del_fieldids = null;
+			$del_field_ids = null;
 		}
 
 		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
@@ -129,7 +148,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		}
 
 		// Set field IDs of fields that are advanced-index "filters"
-		if ($indexer == 'advanced')
+		if ($indexer === 'advanced')
 		{
 			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params = false, 0, $search_type = 'filter');
 			$filterable_ids = array_flip(array_keys($filterables));
@@ -143,12 +162,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$session->set($indexer . '_filterable_ids',  $_sz_encoded,  'flexicontent');  // This is both <3.4.7 session safe and also small, so do not compress
 
 		// Get the field ids of the searchable fields that will be re-indexed, These are all ones ('all-search') or just the new ones ('dirty-search')
-		$fieldids = array_keys($fields);
+		$field_ids = array_keys($fields);
 
 		// For advanced search index remove old search values from the DB, also creating missing per field tables
-		if ($indexer == 'advanced')
+		if ($indexer === 'advanced')
 		{
-			$model->purge($del_fieldids);
+			$model->purge($del_field_ids);
 		}
 
 		// For basic index, clear records if no fields marked as text searchable
@@ -158,27 +177,23 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$db->execute();
 		}
 
-		// Get ids of searchable and ids of item having values for these fields
-		$items_total = 0;
 
-		// Get items model to call needed methods
-		$itemsmodel = $this->getModel('items');
+		// Get records model to call needed methods
+		$records_model = $this->getModel('items');
 
-		$itemids = $itemsmodel->getFieldsItems(
-			/*$fieldids*/ null, $items_total, 0, self::$item_limit
+		// Get ids of records to process
+		$records_total = 0;
+		$record_ids = $records_model->getFieldsItems(/*$field_ids*/ null,
+			$records_total, 0, self::$record_limit
 		);
 
-		// Set item ids into session to avoid recalculation ...
-		$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($itemids), -15) : serialize($itemids));
-		$session->set($indexer . '_items_to_index', $_sz_encoded, 'flexicontent');
+		// Set record ids into session to avoid recalculation ...
+		$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
+		$session->set($indexer . '_records_to_index', $_sz_encoded, 'flexicontent');
 
 		echo 'success';
-
-		// WARNING: json_encode will output object if given an array with gaps in the indexing
-		// echo '|'.json_encode($itemids);
-		// echo '|'.json_encode($fieldids);
-		echo '|' . $items_total;
-		echo '|' . count($fieldids);
+		echo '|' . $records_total;
+		echo '|' . count($field_ids);
 
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		$_total_runtime = $elapsed_microseconds;
@@ -187,9 +202,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 		$session->set($indexer . '_total_runtime', $elapsed_microseconds, 'flexicontent');
 		$session->set($indexer . '_total_queries', 0, 'flexicontent');
-		$session->set($indexer . '_items_total', $items_total, 'flexicontent');
-		$session->set($indexer . '_items_start', 0, 'flexicontent');
-		exit;
+		$session->set($indexer . '_records_total', $records_total, 'flexicontent');
+		$session->set($indexer . '_records_start', 0, 'flexicontent');
+		$session->set($indexer . '_log_filename', $log_filename, 'flexicontent');
+		jexit();
 	}
 
 
@@ -206,7 +222,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test indexing with limited memory
@@ -216,15 +232,27 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 		$session = JFactory::getSession();
 		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 		$search_prefix = JComponentHelper::getParams('com_flexicontent')->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
-		$indexer     = JRequest::getVar('indexer', 'advanced');
-		$rebuildmode = JRequest::getVar('rebuildmode', '');
+		$indexer     = $this->input->getCmd('indexer', 'advanced');
+		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$items_per_call = JRequest::getVar('items_per_call', 20);  // Number of item to index per HTTP request
-		$itemcnt        = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
+		$records_per_call = $this->input->getInt('records_per_call', 20);  // Number of item to index per HTTP request
+		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
+
+		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
+		jimport('joomla.log.log');
+		JLog::addLogger(
+			array(
+				'text_file' => $log_filename,  // Sets the target log file
+				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
+			),
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			array('com_flexicontent.search.items_indexer')  // category of logged messages
+		);
 
 		// TAKE CARE: this code depends on countrows() to set session variables
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
@@ -252,10 +280,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 		// echo 'fail|'; print_r(array_keys($fields)); exit;
 
 		// Get the field ids of the searchable fields
-		$fieldids = array_keys($fields);
+		$field_ids = array_keys($fields);
 
 		// Get fields that will have atomic search tables, (current for advanced index only)
-		if ($indexer == 'advanced')
+		if ($indexer === 'advanced')
 		{
 			$filterable_ids = $session->get($indexer . '_filterable_ids', array(), 'flexicontent');
 			$filterable_ids = unserialize($has_zlib ? zlib_decode(base64_decode($filterable_ids)) : base64_decode($filterable_ids));
@@ -265,13 +293,18 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$filterable_ids = array();
 		}
 
-		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
-		$itemids = $session->get($indexer . '_items_to_index', array(), 'flexicontent');
-		$itemids = unserialize($has_zlib ? zlib_decode(base64_decode($itemids)) : base64_decode($itemids));
+
+		/**
+		 * We will process items that have value for any of the searchable fields
+		 */
+
+		// Get record ids to process, but use session to avoid recalculation
+		$record_ids = $session->get($indexer . '_records_to_index', array(), 'flexicontent');
+		$record_ids = unserialize($has_zlib ? zlib_decode(base64_decode($record_ids)) : base64_decode($record_ids));
 
 		// Get total and current limit-start
-		$items_total = $session->get($indexer . '_items_total', 0, 'flexicontent');
-		$items_start = $session->get($indexer . '_items_start', 0, 'flexicontent');
+		$records_total = $session->get($indexer . '_records_total', 0, 'flexicontent');
+		$records_start = $session->get($indexer . '_records_start', 0, 'flexicontent');
 
 		$_fields = array();
 
@@ -295,36 +328,43 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$_dbvariable = $db->loadObject();
 		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);
 		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256 * 1024;
-		$query_lim = (int) (3 * $max_allowed_packet / 4);
+		$query_lim          = (int) (3 * $max_allowed_packet / 4);
 
-		// echo 'fail|'.$query_lim; exit;
+		// jexit('fail | ' . $query_lim);
 
 		// Get script max
 		$max_execution_time = ini_get("max_execution_time");
 
-		// echo 'fail|'.$max_execution_time; exit;
+		// jexit('fail | ' . $max_execution_time);
 
-		$query_count = 0;
+		// Get records models
+		$records_model = $this->getModel('items');
+		$record_model  = null;
+
+		$query_count         = 0;
 		$max_items_per_query = 100;
-		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
-		$cnt = $itemcnt;  // Start item counter at given index position
+		$max_items_per_query = $max_items_per_query > $records_per_call ? $records_per_call : $max_items_per_query;
 
-		while ($cnt < $items_start + count($itemids)  &&  $cnt < $itemcnt + $items_per_call)   // Until all items of current sub-set finish or until maximum items per AJAX call are reached
+		// Start item counter at given index position
+		$cnt = $records_cnt;
+
+		// Until all records of current sub-set finish or until maximum records per AJAX call are reached
+		while ($cnt < $records_start + count($record_ids)  &&  $cnt < $records_cnt + $records_per_call)
 		{
 			// Get maximum items per SQL query
-			$query_itemids = array_slice($itemids, ($cnt - $items_start), $max_items_per_query);
+			$query_itemids = array_slice($record_ids, ($cnt - $records_start), $max_items_per_query);
 
 			if (empty($query_itemids))
 			{
-				die("fail|current step has no items");
+				jexit('fail | current step has no items');
 			}
 
 			// Increment item counter, but detect passing past current sub-set limit
 			$cnt += $max_items_per_query;
 
-			if ($cnt > $items_start + self::$item_limit)
+			if ($cnt > $records_start + self::$record_limit)
 			{
-				$cnt = $items_start + self::$item_limit;
+				$cnt = $records_start + self::$record_limit;
 			}
 
 			// Item is not needed, later and only if field uses item replacements then it will be loaded
@@ -337,7 +377,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$db->setQuery($lang_query);
 			$items_data = $db->loadObjectList('id');
 
-			if ($indexer == 'basic')
+			if ($indexer === 'basic')
 			{
 				$searchindex = array();
 
@@ -355,10 +395,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 			}
 
 			// For current item: Loop though all searchable fields according to their type
-			foreach ($fieldids as $fieldid)
+			foreach ($field_ids as $field_id)
 			{
 				// Must SHALLOW clone because we will be setting some properties , e.g. 'ai_query_vals', that we do not
-				$field = clone $fields[$fieldid];
+				$field = clone $fields[$field_id];
 
 				// Indicate multiple items per query
 				$field->item_id = 0;
@@ -371,7 +411,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 				// Add values to advanced search index
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 
-				if ($indexer == 'advanced')
+				if ($indexer === 'advanced')
 				{
 					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexAdvSearch', array( &$field, &$values, &$item ));
 
@@ -394,7 +434,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 					}
 					// else echo "Not set for : ". $field->name;
 				}
-				elseif ($indexer == 'basic')
+				elseif ($indexer === 'basic')
 				{
 					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$values, &$item ));
 
@@ -409,10 +449,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 			}
 
 			// Create query that will update/insert data into the DB
-			unset($queries);  // make sure it is not set above
 			$queries = array();
 
-			if ($indexer == 'basic')
+			if ($indexer === 'basic')
 			{
 				// Check for zero search index records
 				if (count($searchindex))
@@ -425,11 +464,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 					{
 						if (strlen($query_vals) > $query_lim)
 						{
-							$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id "
+							$queries[] = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id "
 								. $query_vals
 								. " END "
 								. " WHERE item_id IN (" . implode(',', $query_ids) . ")";
-							$queries[] = $query;
 
 							// Start new query
 							$query_vals = '';
@@ -449,11 +487,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 					if (count($query_ids))
 					{
-						$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id "
+						$queries[] = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id "
 							. $query_vals
 							. " END "
 							. " WHERE item_id IN (" . implode(',', $query_ids) . ")";
-						$queries[] = $query;
 					}
 				}
 			}
@@ -517,16 +554,13 @@ class FlexicontentControllerSearch extends FlexicontentController
 
 			foreach ($queries as $query)
 			{
-				$db->setQuery($query);
-
 				try
 				{
-					$db->execute();
+					$db->setQuery($query)->execute();
 				}
 				catch (RuntimeException $e)
 				{
-					echo "fail|" . $e->getMessage();
-					exit;
+					jexit('fail | ' . $e->getMessage());
 				}
 			}
 
@@ -542,7 +576,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		}
 
 		// Check if items have finished, otherwise continue with -next- group of item ids
-		if ($cnt >= $items_total)
+		if ($cnt >= $records_total)
 		{
 			// Reset dirty SEARCH properties of published fields to be: normal ON/OFF
 			$set_clause = ' SET' . ($indexer == 'basic' ?
@@ -554,7 +588,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$db->execute();
 
 			// Force SEARCH properties of unpublished fields to be: normal OFF
-			if ($indexer == 'basic')
+			if ($indexer === 'basic')
 			{
 				$query = 'UPDATE #__flexicontent_fields SET issearch = 0 WHERE published=0';
 				$db->setQuery($query);
@@ -569,38 +603,44 @@ class FlexicontentControllerSearch extends FlexicontentController
 		}
 
 		// Get next sub-set of items
-		elseif ($cnt >= $items_start + self::$item_limit)
+		elseif ($cnt >= $records_start + self::$record_limit)
 		{
-			$items_start = $items_start + self::$item_limit;
+			$records_start = $records_start + self::$record_limit;
 
-			// Get items model to call needed methods
-			$itemsmodel = $this->getModel('items');
-
-			$itemids = $itemsmodel->getFieldsItems(
-				/*$fieldids*/ null, $total, $items_start, self::$item_limit
+			// Get next set of records
+			$record_ids = $records_model->getFieldsItems(/*$field_ids*/ null,
+				$total, $records_start, self::$record_limit
 			);
 
 			// Set item ids into session to avoid recalculation ...
-			$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($itemids), -15) : serialize($itemids));
-			$session->set($indexer . '_items_to_index', $_sz_encoded, 'flexicontent');
+			$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
+			$session->set($indexer . '_records_to_index', $_sz_encoded, 'flexicontent');
 
-			$session->set($indexer . '_items_start', $items_start, 'flexicontent');
+			$session->set($indexer . '_records_start', $records_start, 'flexicontent');
 		}
 
 		// Terminate if no fields found to be indexable
-		if (!count($fieldids))
+		if (!count($field_ids))
 		{
-			echo 'fail|Index was only cleaned-up, <br/>since no <b>fields</b> were marked as: ' . '<br> -- ' .
-				($indexer == 'basic' ? 'Text Searchable (CONTENT LISTS)' : 'Text Searchable OR filterable (SEARCH VIEW)');
-			exit;
+			jexit(
+				'fail | Index was only cleaned-up, <br/>since no <b>fields</b> were marked as: ' . '<br> -- ' .
+				($indexer == 'basic'
+					? 'Text Searchable (CONTENT LISTS)'
+					: 'Text Searchable OR filterable (SEARCH VIEW)'
+				)
+			);
 		}
 
-		// Terminate if not indexing any items
-		if (!$items_total)
+		// Terminate if not processing any records
+		if (!$records_total)
 		{
-			echo 'fail|Index was only cleaned-up, <br/>since no <b>items</b> were found to have value for fields marked as: ' . '<br> -- ' .
-				($indexer == 'basic' ? 'Text Searchable (CONTENT LISTS)' : 'Text Searchable OR filterable (SEARCH VIEW)');
-			exit;
+			jexit(
+				'fail | Index was only cleaned-up, <br/>since no <b>items</b> were found to have value for fields marked as: ' . '<br> -- ' .
+				($indexer == 'basic'
+					? 'Text Searchable (CONTENT LISTS)'
+					: 'Text Searchable OR filterable (SEARCH VIEW)'
+				)
+			);
 		}
 
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -629,8 +669,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$_total_queries += $query_count;
 		$session->set($indexer . '_total_queries', $_total_queries, 'flexicontent');
 
-		echo sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries;
-		exit;
+		jexit(sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
 	}
 
 

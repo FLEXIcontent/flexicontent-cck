@@ -2842,8 +2842,31 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		return $this->_tags;
 	}
-	
-	
+
+
+	/**
+	 * Method to get ids of all files
+	 *
+	 * @access	public
+	 * @return	boolean	integer array on success
+	 * @since	1.0
+	 */
+	function getItemsWithTags(&$total=null, $start=0, $limit=5000)
+	{
+		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id '
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_tags_item_relations AS tg ON i.id = tg.itemid'
+			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
+			;
+		$item_ids = $this->_db->setQuery($query)->loadColumn();
+
+		// Get items total
+		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
+		return $item_ids;
+	}
+
+
 	/**
 	 * Method to get the name of the author of an item
 	 *
@@ -3088,34 +3111,47 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function getFieldsItems($fields=null, &$total=null, $start=0, $limit=5000)
 	{
-		if ( $fields===null )
+		if ($fields === null)
+		{
 			$use_all_items = true;
-		
-		else if ( !count($fields) )
+		}
+
+		elseif (!count($fields))
+		{
 			return array();
-		
-		else {
-			// Get field data, so that we can identify the fields and take special action for each of them
-			$field_list = "'".implode("','", $fields)."'";
-			$query = "SELECT * FROM #__flexicontent_fields WHERE id IN ({$field_list})";
-			$this->_db->setQuery($query);
-			$field_data = $this->_db->loadObjectList();
-			
+		}
+
+		// Get field data, so that we can identify the fields and take special action for each of them
+		else
+		{
+			JArrayHelper::toInteger($fields, null);
+
+			$query = 'SELECT *'
+				. ' FROM #__flexicontent_fields'
+				. ' WHERE id IN (' . implode(',', $fields) . ')';
+			$field_data = $this->_db->setQuery($query)->loadObjectList();
+
 			// Check the type of fields
 			$use_all_items = false;
 			$check_items_for_tags = false;
 			$non_core_fields = array();
-			foreach ($field_data as $field) {
+
+			foreach ($field_data as $field)
+			{
 				// tags
-				if ($field->field_type == 'tags') {
+				if ($field->field_type === 'tags')
+				{
 					$get_items_with_tags = true;
 					continue;
 				}
+
 				// other core fields
-				if ($field->iscore) {
+				if ($field->iscore)
+				{
 					$use_all_items = true;
 					break;
 				}
+
 				// non core fields
 				$non_core_fields[] = $field->id;
 			}
@@ -3129,14 +3165,14 @@ class FlexicontentModelItems extends JModelLegacy
 		// Return all items, since we included a core field other than tag
 		if ($use_all_items == true)
 		{
-			$query = "SELECT SQL_CALC_FOUND_ROWS id FROM #__content";
-			if ($limit) $query .= " LIMIT ". (int)$start . ", ". (int)$limit;
-			$this->_db->setQuery($query);
-			$item_list = $this->_db->loadColumn();
+			$query = 'SELECT SQL_CALC_FOUND_ROWS id'
+				. ' FROM #__content'
+				. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
+				;
+			$item_list = $this->_db->setQuery($query)->loadColumn();
 			
 			// Get items total
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$total = $this->_db->loadResult();
+			$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
 			
 			return $item_list;
 		}
@@ -3164,18 +3200,19 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		}
 		
-		$query = "SELECT SQL_CALC_FOUND_ROWS i.* FROM ((". implode(") UNION ( ", $queries) .")) AS i";
-		if ($limit) $query .= " LIMIT ". (int)$start . ", ". (int)$limit;
-		$this->_db->setQuery($query);
-		$item_list = $this->_db->loadColumn();
-		
+		$query = 'SELECT SQL_CALC_FOUND_ROWS i.*'
+			. ' FROM (('. implode(') UNION ( ', $queries) . ')) AS i'
+			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
+			;
+		$item_list = $this->_db->setQuery($query)->loadColumn();
+
 		// Get items total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
-		//echo $total;
-		
-		// NOTE: array_unique() creates gaps in the index of the array,
-		// and if passed to json_encode it will output object !!! so we use array_values()
+		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
+		/**
+		 * NOTE: array_unique() creates gaps in the index of the array,
+		 * and if passed to json_encode it will output object !!! so we use array_values()
+		 */
 		return array_values(array_unique($item_list));
 	}
 	

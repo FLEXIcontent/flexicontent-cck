@@ -30,6 +30,8 @@ JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'componen
  */
 class FlexicontentControllerTags extends FlexicontentController
 {
+	static $record_limit = 5000;
+
 	/**
 	 * Constructor
 	 *
@@ -163,11 +165,11 @@ class FlexicontentControllerTags extends FlexicontentController
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit('fail | ' . JText::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test counting with limited memory
@@ -176,44 +178,44 @@ class FlexicontentControllerTags extends FlexicontentController
 		$start_microtime = microtime(true);
 
 		$has_zlib    = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
-		$indexer     = $this->input->getCmd('indexer', 'tags_default');
+		$indexer     = $this->input->getCmd('indexer', 'tag_mappings');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
-		$index_urls  = $this->input->getInt('index_urls', 0);
 
 		$session = JFactory::getSession();
 		$db      = JFactory::getDbo();
 		$app     = JFactory::getApplication();
 
-		// Actions according to rebuildmode
-		if ($indexer != 'tags_default')
+		// Check indexer type
+		if ($indexer !== 'tag_mappings')
 		{
-			die("'rebuildmode': '" . $rebuildmode . "'. not supported");
+			jexit('fail | indexer: ' . $indexer . ' not supported');
 		}
 
 		// Clear previous log file
-		$log_filename = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . 'tags_index_mappings_' . \JFactory::getUser()->id . '.php');
+		$log_filename = 'tag_mappings_checker_' . \JFactory::getUser()->id . '.php';
+		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
 
-		if (file_exists($log_filename))
+		if (file_exists($log_filename_full))
 		{
-			@ unlink($log_filename);
+			@ unlink($log_filename_full);
 		}
 
-		$session->set('tags.log_filename', $log_filename, 'flexicontent');
 
-		// Get ids of files to index
-		$model = $this->getModel('tags');
-		$tags_ids = $model->getNotMappedTagIds();
+		// Get records model to call needed methods
+		$records_model = $this->getModel('tags');
 
-		// Set tag ids into session to avoid recalculation ...
-		$session->set($indexer . '_items_to_index', $tags_ids, 'flexicontent');
+		// Get ids of records to process
+		$records_total = 0;
+		$record_ids = $records_model->getNotMappedTagIds(
+			$records_total, 0, self::$record_limit
+		);
+
+		// Set record ids into session to avoid recalculation ...
+		$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
+		$session->set($indexer . '_records_to_index', $_sz_encoded, 'flexicontent');
 
 		echo 'success';
-		// echo count($fieldids)*count($tagids).'|';
-
-		// WARNING: json_encode will output object if given an array with gaps in the indexing
-		// echo '|' . json_encode($tagids);
-		// echo '|' . json_encode($fieldids);
-		echo '|' . count($tags_ids);
+		echo '|' . $records_total;
 		echo '|' . count(array());
 
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -223,6 +225,9 @@ class FlexicontentControllerTags extends FlexicontentController
 
 		$session->set($indexer . '_total_runtime', $elapsed_microseconds, 'flexicontent');
 		$session->set($indexer . '_total_queries', 0, 'flexicontent');
+		$session->set($indexer . '_records_total', $records_total, 'flexicontent');
+		$session->set($indexer . '_records_start', 0, 'flexicontent');
+		$session->set($indexer . '_log_filename', $log_filename, 'flexicontent');
 		jexit();
 	}
 
@@ -238,9 +243,9 @@ class FlexicontentControllerTags extends FlexicontentController
 		// JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		// Not need because this task need the user session data that are set by countrows that checked for forgeries
 
-		if (!FlexicontentHelperPerm::getPerm()->SuperAdmin)
+		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test indexing with limited memory
@@ -252,20 +257,15 @@ class FlexicontentControllerTags extends FlexicontentController
 		$db      = JFactory::getDbo();
 		$app     = JFactory::getApplication();
 
-		$indexer     = $this->input->getCmd('indexer', 'tags_default');
+		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
+
+		$indexer     = $this->input->getCmd('indexer', 'tag_mappings');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
-		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$items_per_call = $this->input->getInt('items_per_call', 20);  // Number of item to index per HTTP request
-		$itemcnt        = $this->input->getInt('itemcnt', 0);          // Counter of items indexed so far, this is given via HTTP request
+		$records_per_call = $this->input->getInt('records_per_call', 20);  // Number of item to index per HTTP request
+		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
-		// Actions according to rebuildmode
-		if ($indexer != 'tags_default')
-		{
-			die("'rebuildmode': '" . $rebuildmode . "'. not supported");
-		}
-
-		$log_filename = 'tags_index_mappings_' . \JFactory::getUser()->id . '.php';
+		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		jimport('joomla.log.log');
 		JLog::addLogger(
 			array(
@@ -276,8 +276,14 @@ class FlexicontentControllerTags extends FlexicontentController
 			array('com_flexicontent.tags.mappings_indexer')  // category of logged messages
 		);
 
-		// Get tag ids that have value for any of the searchable fields, but use session to avoid recalculation
-		$tagids = $session->get($indexer . '_items_to_index', array(), 'flexicontent');
+		// Get record ids to process, but use session to avoid recalculation
+		$record_ids = $session->get($indexer . '_records_to_index', array(), 'flexicontent');
+		$record_ids = unserialize($has_zlib ? zlib_decode(base64_decode($record_ids)) : base64_decode($record_ids));
+
+		// Get total and current limit-start
+		$records_total = $session->get($indexer . '_records_total', 0, 'flexicontent');
+		$records_start = $session->get($indexer . '_records_start', 0, 'flexicontent');
+
 
 		// Get query size limit
 		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
@@ -287,42 +293,60 @@ class FlexicontentControllerTags extends FlexicontentController
 		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256 * 1024;
 		$query_lim          = (int) (3 * $max_allowed_packet / 4);
 
-		// echo 'fail|' . $query_lim; jexit();
+		// jexit('fail | ' . $query_lim);
 
 		// Get script max
 		$max_execution_time = ini_get("max_execution_time");
 
-		// echo 'fail|' . $max_execution_time; jexit();
+		// jexit('fail | ' . $max_execution_time);
 
-		// Get model
-		$model      = $this->getModel('tags');
-		$file_model = $this->getModel('tag');
+		// Get records models
+		$records_model = $this->getModel('tags');
+		$record_model  = null;
 
 		$query_count         = 0;
 		$max_items_per_query = 100;
-		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
-		$cnt                 = $itemcnt;
+		$max_items_per_query = $max_items_per_query > $records_per_call ? $records_per_call : $max_items_per_query;
 
-		while ($cnt < count($tagids) && $cnt < $itemcnt + $items_per_call)
+		// Start item counter at given index position
+		$cnt = $records_cnt;
+
+		// Until all records of current sub-set finish or until maximum records per AJAX call are reached
+		while ($cnt < $records_start + count($record_ids)  &&  $cnt < $records_cnt + $records_per_call)
 		{
-			$query_itemids = array_slice($tagids, $cnt, $max_items_per_query);
+			// Get maximum items per SQL query
+			$query_itemids = array_slice($record_ids, ($cnt - $records_start), $max_items_per_query);
+
+			if (empty($query_itemids))
+			{
+				jexit('fail | current step has no items');
+			}
+
+			// Increment item counter, but detect passing past current sub-set limit
 			$cnt += $max_items_per_query;
 
-			// Get files
+			if ($cnt > $records_start + self::$record_limit)
+			{
+				$cnt = $records_start + self::$record_limit;
+			}
+
+			// Get record data
 			$data_query = "SELECT id, name, alias"
 				. " FROM #__flexicontent_tags"
 				. " WHERE id IN (" . implode(', ', $query_itemids) . ")";
 			$db->setQuery($data_query);
-			$tag_data = $db->loadObjectList('id');
+			$record_data = $db->loadObjectList('id');
 
 			$map_index = array();
 			$errors = array();
-			$tag_titles = array();
 
-			// Find / Create Joomla tags
-			foreach ($tag_data as $tag_id => $tag)
+			/**
+			 * Loop through records
+			 * Find / Create Joomla tags
+			 */
+			foreach ($record_data as $tag_id => $tag)
 			{
-				$jtag_data_arr = $model->createTagsFromText(array($tag->alias => '#new#' . $tag->name));
+				$jtag_data_arr = $records_model->createTagsFromText(array($tag->alias => '#new#' . $tag->name));
 				$jtag_data = $jtag_data_arr ? reset($jtag_data_arr) : false;
 				$tag->jtag_id = $jtag_data ? $jtag_data->id : 0;
 				$map_index[] = ' WHEN ' . $tag->id . ' THEN ' . $tag->jtag_id;
@@ -331,8 +355,8 @@ class FlexicontentControllerTags extends FlexicontentController
 			// Increment error count in session, and log errors into the log file
 			if (count($errors))
 			{
-				$mappings_indexer_error_count = $session->get('tags.mappings_indexer_error_count', 0, 'flexicontent');
-				$session->set('tags.mappings_indexer_error_count', $mappings_indexer_error_count + count($errors), 'flexicontent');
+				$error_count = $session->get('tags.mappings_indexer.error_count', 0, 'flexicontent');
+				$session->set('tags.mappings_indexer.error_count', $error_count + count($errors), 'flexicontent');
 
 				foreach ($errors as $error_message)
 				{
@@ -340,38 +364,70 @@ class FlexicontentControllerTags extends FlexicontentController
 				}
 			}
 
-			/*else
-			{
-				foreach ($map_index as $map_index_clause)
-				{
-					JLog::add($map_index_clause, JLog::INFO, 'com_flexicontent.tags.mappings_indexer');
-				}
-			}*/
 
 			// Create query that will update/insert data into the DB
-			unset($query);
-			$query = 'UPDATE #__flexicontent_tags '
-				. ' SET '
-				. ' ' . $db->quoteName('jtag_id') . ' = CASE id ' . implode('', $map_index) . '  END '
-				. ' WHERE id IN (' . implode(', ', $query_itemids) . ')';
-			$db->setQuery($query);
-			$db->execute();
-			$query_count++;
+			$queries = array();
+
+			if ($indexer === 'tag_mappings')
+			{
+				$queries[] = 'UPDATE #__flexicontent_tags '
+					. ' SET '
+					. ' ' . $db->quoteName('jtag_id') . ' = CASE id ' . implode('', $map_index) . '  END '
+					. ' WHERE id IN (' . implode(', ', $query_itemids) . ')';
+			}
+
+			foreach ($queries as $query)
+			{
+				try
+				{
+					$db->setQuery($query)->execute();
+				}
+				catch (RuntimeException $e)
+				{
+					jexit('fail | ' . $e->getMessage());
+				}
+			}
+
+			$query_count += count($queries);
 
 			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$elapsed_seconds = $elapsed_microseconds / 1000000.0;
 
-			if ($elapsed_seconds > $max_execution_time / 3 || $elapsed_seconds > 5)
+			if ($elapsed_seconds > $max_execution_time / 3 || $elapsed_seconds > 6)
 			{
 				break;
 			}
 		}
 
-		// Terminate if not indexing any items
-		if (!$tagids)
+		// Check if items have finished, otherwise continue with -next- group of item ids
+		if ($cnt >= $records_total)
 		{
-			echo 'fail|No tags need to be synced';
-			exit;
+			// Nothing to do in here
+		}
+
+		// Get next sub-set of items
+		elseif ($cnt >= $records_start + self::$record_limit)
+		{
+			$records_start = $records_start + self::$record_limit;
+
+			// Get next set of records
+			$record_ids = $records_model->getNotMappedTagIds(
+				$total, $records_start, self::$record_limit
+			);
+
+			// Set item ids into session to avoid recalculation ...
+			$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
+			$session->set($indexer . '_records_to_index', $_sz_encoded, 'flexicontent');
+
+			$session->set($indexer . '_records_start', $records_start, 'flexicontent');
+		}
+
+		// Terminate if not processing any records
+		if (!$records_total)
+		{
+			jexit(
+				'fail | No tag mappings need to be synced'
+			);
 		}
 
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -400,7 +456,7 @@ class FlexicontentControllerTags extends FlexicontentController
 		$_total_queries += $query_count;
 		$session->set($indexer . '_total_queries', $_total_queries, 'flexicontent');
 
-		jexit(printf($cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
+		jexit(sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
 	}
 
 

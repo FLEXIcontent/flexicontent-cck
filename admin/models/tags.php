@@ -526,15 +526,19 @@ class FlexicontentModelTags extends JModelLegacy
 	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function getNotMappedTagIds()
+	function getNotMappedTagIds(&$total=null, $start=0, $limit=5000)
 	{
-		$query = 'SELECT ft.id '
+		$query = 'SELECT SQL_CALC_FOUND_ROWS ft.id '
 			. ' FROM #__flexicontent_tags AS ft'
 			. ' LEFT JOIN #__tags AS jt ON ft.jtag_id = jt.id'
 			. ' WHERE ft.jtag_id = 0 OR jt.id IS NULL'
+			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
-		$this->_db->setQuery($query);
-		$tag_ids = $this->_db->loadColumn();
+		$tag_ids = $this->_db->setQuery($query)->loadColumn();
+
+		// Get items total
+		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
 		return $tag_ids;
 	}
 
