@@ -523,24 +523,44 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Get article category id, if it is not already in url
 		$catid = $app->input->get('catid', 0, 'int');
-		if (!$catid && $id)
-		{
-			$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
-			$catid = $db->loadResult();
-		}
 
 
 		//***
-		//*** First Check if within 'FLEXIcontent' category subtree)
+		//*** First Check if within 'FLEXIcontent' category subtree
 		//***
 
 		if ($catid)
 		{
-			$db->setQuery('SELECT lft,rgt FROM #__categories WHERE id = ' . $catid);
-			$obj = $db->loadObject();
-			$cat_lft = $obj->lft;
-			$cat_rgt = $obj->rgt;
+			$db->setQuery('SELECT lft, rgt FROM #__categories WHERE id = ' . $catid);
+			$cat_info = $db->loadObject();
+
+			if ($cat_info)
+			{
+				$cat_lft = $cat_info->lft;
+				$cat_rgt = $cat_info->rgt;
+			}
+
+			elseif ($id)
+			{
+				$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
+				$main_catid = $db->loadResult();
+
+				$db->setQuery('SELECT lft, rgt FROM #__categories WHERE id = ' . $main_catid);
+				$cat_info = $db->loadObject();
+
+				if ($cat_info)
+				{
+					$cat_lft = $cat_info->lft;
+					$cat_rgt = $cat_info->rgt;
+					$catid = $main_catid;
+				}
+				else
+				{
+					$catid = 0;
+				}
+			}
 		}
+
 		$in_limits = !$catid || ($cat_lft >= FLEXI_LFT_CATEGORY && $cat_rgt <= FLEXI_RGT_CATEGORY);
 
 
@@ -1990,12 +2010,18 @@ class plgSystemFlexisystem extends JPlugin
 			return true;
 		}
 
-		// Check for empty data (nothing to do ??)
+		// Check for empty data, create empty object
 		if (!$data)
 		{
 			$data = new stdClass();
 			$data->id = 0;
 			$data->catid = 0;
+		}
+
+		// Check for array data, convert to object
+		if (is_array($data))
+		{
+			$data = (object) $data;
 		}
 
 		$this->_loadFcHelpersAndLanguage();
