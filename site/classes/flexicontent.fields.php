@@ -4146,17 +4146,18 @@ class FlexicontentFields
 			$current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
 			$faceted_str = array(0=>'non-FACETED ', 1=>'FACETED: current view &nbsp; (cacheable) ', 2=>'FACETED: current filters:'." (".$flt_active_count.' active) ');
-			
+
 			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation + (!empty($fc_run_times['create_filter'][$filter->name]) ? $fc_run_times['create_filter'][$filter->name] : 0);
-			if ( isset($fc_run_times['_create_filter_init']) ) {
+			if (isset($fc_run_times['_create_filter_init']))
+			{
 				$fc_run_times['create_filter'][$filter->name] -= $fc_run_times['_create_filter_init'];
 				$fc_run_times['create_filter_init'] = $fc_run_times['_create_filter_init'] + (!empty($fc_run_times['create_filter_init']) ? $fc_run_times['create_filter_init'] : 0);
 				unset($fc_run_times['_create_filter_init']);
 			}
-			
+
 			$fc_run_times['create_filter_type'][$filter->name] = $faceted_str[$faceted_filter];
 		}
-		
+
 		//$filter_display_typestr = array(0=>'Single Select', 1=>'Single Text', 2=>'Range Dual Select', 3=>'Range Dual Text', 4=>'Radio Buttons', 5=>'Checkbox Buttons');
 		//echo "FIELD name: <b>". $filter->name ."</b> Field Type: <b>". $filter->field_type."</b> Filter Type: <b>". $filter_display_typestr[$display_filter_as] ."</b> (".$display_filter_as.") ".sprintf(" %.2f s",$current_filter_creation/1000000)." <br/>";
 	}

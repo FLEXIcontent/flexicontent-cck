@@ -1628,14 +1628,18 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function getFileIds($skip_urls=true)
+	function getFileIds($skip_urls=true, &$total=null, $start=0, $limit=5000)
 	{
-		$query = 'SELECT id '
-			.' FROM #__flexicontent_files'
-			.($skip_urls ? ' WHERE url=0 ' : '')
+		$query = 'SELECT SQL_CALC_FOUND_ROWS id '
+			. ' FROM #__flexicontent_files'
+			. ($skip_urls ? ' WHERE url = 0 ' : '')
+			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
-		$this->_db->setQuery($query);
-		$file_ids = $this->_db->loadColumn();
+		$file_ids = $this->_db->setQuery($query)->loadColumn();
+
+		// Get items total
+		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
 		return $file_ids;
 	}
 }

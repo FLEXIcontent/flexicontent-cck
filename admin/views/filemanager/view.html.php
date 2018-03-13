@@ -565,18 +565,18 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			$session->set('filemanager.stats_indexer_errors', null, 'flexicontent');
 		}*/
 
-		$stats_indexer_error_count = $session->get('filemanager.stats_indexer_error_count', 0, 'flexicontent');
-		if ($stats_indexer_error_count)
+		$error_count = $session->get('filemanager.stats_indexer.error_count', 0, 'flexicontent');
+		if ($error_count)
 		{
-			JFactory::getApplication()->enqueueMessage('Could not calculate file stats for: ' . $stats_indexer_error_count . ' cases (e.g. bad URLs)', 'warning');
-			$session->set('filemanager.stats_indexer_error_count', null, 'flexicontent');
+			JFactory::getApplication()->enqueueMessage('Could not calculate file stats for: ' . $error_count . ' cases (e.g. bad URLs)', 'warning');
+			$session->set('filemanager.stats_indexer.error_count', null, 'flexicontent');
 
-			if ($log_filename = $session->get('filemanager.log_filename', null, 'flexicontent'))
+			if ($log_filename = $session->get('filemanager_stats_log_filename', null, 'flexicontent'))
 			{
-				JFactory::getApplication()->enqueueMessage('You may see log file : <b>' . JPATH::clean($log_filename) . '</b> for messages and errors', 'warning');
+				JFactory::getApplication()->enqueueMessage('You may see log file : <b>' . JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
 			}
 		}
-		$session->set('filemanager.log_filename', null, 'flexicontent');
+		$session->set('filemanager_stats_log_filename', null, 'flexicontent');
 
 		if ($perms->CanConfig)
 		{

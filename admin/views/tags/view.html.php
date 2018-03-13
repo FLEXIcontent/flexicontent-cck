@@ -219,7 +219,6 @@ class FlexicontentViewTags extends JViewLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		$js = '';
-
 		$contrl = "tags.";
 		$contrl_singular = "tag.";
 
@@ -245,10 +244,6 @@ class FlexicontentViewTags extends JViewLegacy
 
 		JToolbarHelper::publishList($contrl.'publish');
 		JToolbarHelper::unpublishList($contrl.'unpublish');
-		if ($perms->CanCreateTags)
-		{
-			JToolbarHelper::addNew($contrl.'add');
-		}
 
 		if (1)
 		{
@@ -268,6 +263,7 @@ class FlexicontentViewTags extends JViewLegacy
 		}
 
 		JToolbarHelper::checkin($contrl.'checkin');
+
 
 		if ($perms->CanConfig)
 		{
