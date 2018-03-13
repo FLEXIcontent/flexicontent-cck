@@ -21,6 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.model.admin');
 use Joomla\String\StringHelper;
+use Joomla\CMS\Table\Table;
 require_once('base.php');
 
 /**
@@ -866,15 +867,16 @@ class ParentClassItem extends FCModelAdmin
 			if ( $use_versioning && $version )
 			{
 				// Check version value was found
-				if ( !isset($item->tags) || !is_array($item->tags) )
+				if (!isset($item->tags) || !is_array($item->tags))
+				{
 					$item->tags = array();
+				}
 			}
 			else
 			{
 				// Retrieve unversioned value
 				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$pk;
-				$db->setQuery($query);
-				$item->tags = $db->loadColumn();
+				$item->tags = $db->setQuery($query)->loadColumn();
 				$item->tags = array_reverse($item->tags);
 			}
 			
@@ -2301,21 +2303,8 @@ class ParentClassItem extends FCModelAdmin
 				$jinput->set('view', $view);
 				$jinput->set('option', $option);
 
-				// Initialize re-usable member properties, and re-usable local variables
-				$this->initBatch();
-				$asset = $this->typeAlias . '.' . $item->id;
-
-				// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
-				$this->createTagsHelper($this->tagsObserver, $this->type, $item->id, $this->typeAlias, $this->table);
-
-				// Load data of FLEXIcontent tags
-				$fctags = isset($data['tags']) ? $this->getTagsByIds($data['tags']) : array();
-
-				// Sync the tags assignments
-				$this->syncJTagAssignments($fctags, array($item->id), array($item->id => $asset),  true);
-
-				// Update (if needed) mappings of FLEXIcontent tags to Joomla tags
-				$this->updateJTagMappings($fctags);
+				$fc_tag_ids = isset($data['tags']) ? $data['tags'] : array();
+				$this->saveTagsAssignments($fc_tag_ids, $item->id);
 
 				if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
@@ -5536,11 +5525,30 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	protected function syncJTagAssignments($fctags, $pks, $contexts, $replaceTags = true)
 	{
-		// Initialize re-usable member properties, and re-usable local variables
+		// Make sure re-usable member properties have been initialized
 		$this->initBatch();
 
-		$jtag_ids = $this->getJoomlaTagIds($fctags);
-		$jtag_ids = is_array($jtag_ids) ? $jtag_ids : array($jtag_ids);
+		$jtag_ids = array();
+		$jtags = $this->createFindJoomlaTags($fctags, true, $index_col = 'id');
+		//echo '<pre>'; print_r($jtags); echo '</pre>';
+
+		foreach($jtags as $fc_tag_id => $jtag)
+		{
+			if ($jtag)
+			{
+				/**
+				 * Warning ... the TagsHelper method expects that Tag Ids are 'STRING' type ! or if we want to pass tag
+				 * titles of existing tags, ... we need to prefix them with '#new#' to avoid being interpreted as Tag Ids
+				 */
+				$jtag_ids[] = (string) $jtag->id;
+				$fctags[$fc_tag_id]->jtag_id_new = $jtag->id;
+			}
+			else
+			{
+				$fctags[$fc_tag_id]->jtag_id_new = 0;
+			}
+		}
+		//echo '<pre>syncJTagAssignments(): createFindJoomlaTags(): \\n ' . print_r($jtag_ids, true) . '</pre>';
 
 		foreach ($pks as $pk)
 		{
@@ -5582,17 +5590,17 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	protected function updateJTagMappings($fctags)
 	{
-		// Get them again to get ids of newly created tags
-		$jtag_ids = $this->getJoomlaTagIds($fctags);
 		$i = 0;
 		$query_vals = array();
+
 		foreach($fctags as $fctag)
 		{
-			if (empty($fctag->jtag_id) || $jtag_ids[$i] != $fctag->jtag_id)
+			if ($fctag->jtag_id_new != $fctag->jtag_id)
 			{
-				$fctag->jtag_id = $jtag_ids[$i];
+				$fctag->jtag_id = $fctag->jtag_id_new;
 				$query_vals[$fctag->id] = ' WHEN ' . $fctag->id . ' THEN ' . $this->_db->Quote((int) $fctag->jtag_id);
 			}
+			unset($fctag->jtag_id_new);
 			$i++;
 		}
 
@@ -5608,33 +5616,138 @@ class ParentClassItem extends FCModelAdmin
 	}
 
 
+	public function saveTagsAssignments($fc_tags_ids, $pk = null)
+	{
+		$pk = $pk ?: $this->_id;
+		//echo '<pre>saveTagsAssignments(): fc_tags_ids = ' . print_r($fc_tags_ids, true) . '</pre>';
+
+		// Make sure re-usable member properties have been initialized
+		$this->initBatch();
+		$asset = $this->typeAlias . '.' . $pk;
+
+		// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
+		$this->createTagsHelper($this->tagsObserver, $this->type, $pk, $this->typeAlias, $this->table);
+
+		// Load data of FLEXIcontent tags
+		$fctags = $this->getTagsByIds($fc_tags_ids);
+		//echo '<pre>saveTagsAssignments(): getTagsByIds(): ' . print_r($fctags, true) . '</pre>';
+
+		// Sync the tags assignments
+		$this->syncJTagAssignments($fctags, array($pk), array($pk => $asset),  true);
+
+		// Update (if needed) mappings of FLEXIcontent tags to Joomla tags
+		$this->updateJTagMappings($fctags);
+	}
+
+
 	/**
-	 * Method to find the ids of the tags by their title
+	 * Find respective Joomla tags, creating them if they do not exist
 	 *
-	 * @return  void
+	 * @param   array  $tags      Tags text array from the field
+	 * @param   array  $checkACL  Flag to indicate if tag creation ACL should be used
+	 *
+	 * @return  mixed   If successful, an array of tag data, indexed via the given tag titles
 	 *
 	 * @since   3.3.0
 	 */
-	protected function getJoomlaTagIds($fctags)
+	public function createFindJoomlaTags($tags, $checkACL = true, $index_col = 'id')
 	{
-		$jtag_ids = array();
+		$newTags = array();
 
-		foreach ($fctags as $fctag)
+		if (empty($tags))
 		{
-			$query = 'SELECT id '
-				. ' FROM #__tags '
-				. ' WHERE title = ' . $this->_db->Quote($fctag->name);
-			$jtag_id = $this->_db->setQuery($query)->loadResult();
-			if ($jtag_id)
+			return $newTags;
+		}
+
+		// We will use the tags table to store them
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		$tagTable  = Table::getInstance('Tag', 'TagsTable');
+		$canCreate = \JFactory::getUser()->authorise('core.create', 'com_tags');
+
+		foreach ($tags as $key => $tag)
+		{
+			$tagText = $tag->name;
+
+			$loaded = false;
+
+			// Clear old data if exist
+			$tagTable->reset();
+
+			// (A) Try to load the selected tag via id
+			if ((int) $tag->jtag_id && $tagTable->load((int) $tag->jtag_id))
 			{
-				$jtag_ids[] = $jtag_id;
+				$loaded = true;
+			}
+
+			// (B) Try to load the selected tag via title
+			elseif ($tagTable->load(array('title' => $tagText)))
+			{
+				$loaded = true;
+			}
+
+			// (C) Create the tag if we are allowed to do it
+			else
+			{
+				if ($checkACL && !$canCreate)
+				{
+					$newTags[$tag->{$index_col}] = null;
+					continue;
+				}
+
+				// Set title then call check() method to auto-create an alias
+				$tagTable->title = $tagText;
+				$tagTable->check();
+
+				// (C) Try to load the selected tag, via auto-created alias
+				if ($tagTable->alias && $tagTable->load(array('alias' => $tagTable->alias)))
+				{
+					$loaded = true;
+				}
+
+				// (D) Tag not found. Create a new tag at top-level with language 'ALL', with public access
+				else
+				{
+					// Prepare tag data
+					$tagTable->id = 0;
+					$tagTable->title = $tagText;
+					$tagTable->published = 1;
+
+					// Language ALL, Public access (assumed ... 1)
+					$tagTable->language = '*';
+					$tagTable->access = 1;
+
+					// Make this item a child of the root tag
+					$tagTable->setLocation($tagTable->getRootId(), 'last-child');
+
+					// Try to store tag
+					if ($tagTable->check())
+					{
+						// Assign the alias as path (autogenerated tags have always level 1)
+						$tagTable->path = $tagTable->alias;
+
+						if ($tagTable->store())
+						{
+							$loaded = true;
+						}
+					}
+				}
+			}
+
+			if ($loaded)
+			{
+				$newTags[$tag->{$index_col}] = (object) array(
+					'id' => (int) $tagTable->id,
+					'title' => $tagTable->title,
+					'alias' => $tagTable->alias
+				);
 			}
 			else
 			{
-				$jtag_ids[] = '#new#' . $fctag->name;
+				$newTags[$tag->{$index_col}] = null;
 			}
 		}
 
-		return $jtag_ids;
+		return $newTags;
 	}
+
 }
