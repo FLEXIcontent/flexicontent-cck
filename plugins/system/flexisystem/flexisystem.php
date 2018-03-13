@@ -2010,18 +2010,18 @@ class plgSystemFlexisystem extends JPlugin
 			return true;
 		}
 
-		// Check for array data, convert to object
-		if (is_array($data))
-		{
-			$data = (object) $data;
-		}
-
 		// Check for empty data, create empty object
 		if (!$data)
 		{
 			$data = new stdClass();
 			$data->id = 0;
 			$data->catid = 0;
+		}
+
+		// Check for array data, convert to object
+		if (is_array($data))
+		{
+			$data = (object) $data;
 		}
 
 		$this->_loadFcHelpersAndLanguage();
