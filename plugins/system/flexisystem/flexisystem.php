@@ -2517,6 +2517,10 @@ class plgSystemFlexisystem extends JPlugin
 			$model->setId($data['id'], $data['catid'], $data['type_id']);
 		}
 
+		// These are joomla tag ids, and not fc tag ids, so unset them, until we get a more complete solution
+		$tags_tmp = isset($data['tags']) ? $data['tags'] : null;
+		unset($data['tags']);
+
 		$model->store($data);
 
 		// Revert changes to data
@@ -2524,7 +2528,7 @@ class plgSystemFlexisystem extends JPlugin
 		unset($data['custom']);
 		unset($data['type_id']);
 		$data['id'] = $isNew ? 0 : $data['id'];  // restore ID to zero for new items
-
+		$data['tags'] = $tags_tmp;   // restore joomla tag ids
 
 		//***
 		//*** Call backend 'flexicontent' items model to update flexicontent temporary data
