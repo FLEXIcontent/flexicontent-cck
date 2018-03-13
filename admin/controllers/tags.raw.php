@@ -344,12 +344,15 @@ class FlexicontentControllerTags extends FlexicontentController
 			 * Loop through records
 			 * Find / Create Joomla tags
 			 */
-			foreach ($record_data as $tag_id => $tag)
+			if ($indexer === 'tag_mappings')
 			{
-				$jtag_data_arr = $records_model->createTagsFromText(array($tag->alias => '#new#' . $tag->name));
-				$jtag_data = $jtag_data_arr ? reset($jtag_data_arr) : false;
-				$tag->jtag_id = $jtag_data ? $jtag_data->id : 0;
-				$map_index[] = ' WHEN ' . $tag->id . ' THEN ' . $tag->jtag_id;
+				foreach ($record_data as $tag_id => $tag)
+				{
+					$jtag_data_arr = $records_model->createTagsFromText(array($tag->alias => '#new#' . $tag->name));
+					$jtag_data = $jtag_data_arr ? reset($jtag_data_arr) : false;
+					$tag->jtag_id = $jtag_data ? $jtag_data->id : 0;
+					$map_index[] = ' WHEN ' . $tag->id . ' THEN ' . $tag->jtag_id;
+				}
 			}
 
 			// Increment error count in session, and log errors into the log file

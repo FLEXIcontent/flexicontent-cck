@@ -2521,7 +2521,11 @@ class plgSystemFlexisystem extends JPlugin
 		$tags_tmp = isset($data['tags']) ? $data['tags'] : null;
 		unset($data['tags']);
 
+		// Save FLEXIcontent item, using the provided data
 		$model->store($data);
+
+		// Replace FC tag assignments with Joomla tag assignments
+		$model->mergeJTagsAssignments($_item = null, $_jtags = null, $_replaceTags = true);
 
 		// Revert changes to data
 		unset($data['vstate']);

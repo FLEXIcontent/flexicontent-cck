@@ -1067,6 +1067,40 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
+	 * Method to initialize member variables used by batch methods and other methods like saveorder()
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	public function initBatch()
+	{
+		if ($this->batchSet === null)
+		{
+			$this->batchSet = true;
+
+			// Get current user
+			$this->user = \JFactory::getUser();
+
+			// Get table
+			$this->table = $this->getTable($this->records_dbtbl, 'JTable');
+
+			// Get table class name
+			$tc = explode('\\', get_class($this->table));
+			$this->tableClassName = end($tc);
+
+			// Get UCM Type data
+			$this->contentType = new \JUcmType;
+			$this->type = $this->contentType->getTypeByTable($this->tableClassName)
+				?: $this->contentType->getTypeByAlias($this->typeAlias);
+
+			// Get tabs observer
+			$this->tagsObserver = $this->table->getObserverOfClass('Joomla\CMS\Table\Observer\Tags');
+		}
+	}
+
+
+	/**
 	 * Method to get the enqueued message array
 	 *
 	 * @since	3.2.0
