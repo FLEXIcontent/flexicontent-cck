@@ -709,6 +709,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+		$tip_class = ' hasTooltip';
 
 		$hasEdit    = $perms->CanEdit    || $perms->CanEditOwn;
 		$hasPublish = $perms->CanPublish || $perms->CanPublishOwn;
@@ -724,43 +725,25 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_state = $model->getState('filter_state');
 
 		// Implementation of multiple-item state selector
+
 		$add_divider = false;
-		if ($hasPublish)
+
+		if ($CanAddAny)
 		{
-			$add_divider = true;
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&task=items.selectstate&format=raw';
-
-			/*$btn_task = '';
-			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
+			$btn_task = '';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&format=raw';
+			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
 			$js .= "
-				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
+				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 240, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
 			";
-			JToolbarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
-
-			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
-			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
-			$btn_task    = '';
-			$extra_js    = "";
-			$full_js     = "
-				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
-			";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_CHANGE_STATE', 'publish', $full_js, $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="",
-				$btn_icon="icon-publish", $attrs='', $auto_add = true, $tag_type='button');*/
-
-			$btn_arr = $this->getStateButtons();
-			$drop_btn = '
-				<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
-					'.JText::_('FLEXI_CHANGE_STATE').'
-					<span class="caret"></span>
-				</button>';
-			array_unshift($btn_arr, $drop_btn);
-			flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
+			JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
+			$add_divider = true;
 		}
+
+		if ($add_divider) { JToolbarHelper::divider(); }
+
+		$add_divider = false;
 
 		if ($hasDelete)
 		{
@@ -817,18 +800,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($add_divider) { JToolbarHelper::divider(); }
 		
 		$add_divider = false;
-		if ($CanAddAny)
-		{
-			$btn_task = '';
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&format=raw';
-			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
-			$js .= "
-				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 240, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_TYPE'), 2)."\'}); return false;');
-			";
-			JToolbarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
-			$add_divider = true;
-		}
+
 		if ($hasEdit)
 		{
 			$btn_task = $contrl . 'edit';
@@ -836,7 +808,48 @@ class FlexicontentViewItems extends JViewLegacy
 			$add_divider = true;
 		}
 		if ($add_divider) { JToolbarHelper::divider(); }
-		
+
+		if ($hasPublish)
+		{
+			$add_divider = true;
+			/*$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&task=items.selectstate&format=raw';
+
+			$btn_task = '';
+			//$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 300);  //JToolbarHelper::publishList( $btn_task );
+			$js .= "
+				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
+			";
+			JToolbarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', true );*/
+
+			/*$msg_alert   = JText::_('FLEXI_NO_ITEMS_SELECTED');
+			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
+			$btn_task    = '';
+			$extra_js    = "";
+			$full_js     = "
+				jQuery('#toolbar-publish a.toolbar, #toolbar-publish button').attr('href', '".$popup_load_url."')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 300, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_CHANGE_STATE'), 2)."\', \'modal\': true}); return false;');
+			";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_CHANGE_STATE', 'publish', $full_js, $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="",
+				$btn_icon="icon-publish", $attrs='', $auto_add = true, $tag_type='button');*/
+
+			$btn_arr = $this->getStateButtons();
+
+			if (count($btn_arr))
+			{
+				$drop_btn = '
+					<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+						<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
+						'.JText::_('FLEXI_CHANGE_STATE').'
+						<span class="caret"></span>
+					</button>';
+				array_unshift($btn_arr, $drop_btn);
+				flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
+			}
+		}
+
 		$add_divider = false;
 		if ($CanAddAny && $perms->CanCopy)
 		{
@@ -857,27 +870,38 @@ class FlexicontentViewItems extends JViewLegacy
 			$full_js     = "window.location.replace('" . JUri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv'. "')";
 			flexicontent_html::addToolBarButton(
 				'CSV', 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
-				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-download");
+				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-download");
 		}
 
 		if ($add_divider) { JToolbarHelper::divider(); JToolbarHelper::spacer(); }
 
+		$btn_arr = array();
+
 		if ($perms->CanCreateTags)
 		{
-			JToolbarHelper::addNew($contrl.'add');
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=items&layout=indexer&tmpl=component&indexer=tag_assignments';
+			$btn_name = 'sync_tags';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC'), 2)."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				'FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC', $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2) . '"', $auto_add = 0, $tag_type='button')
+				;
+		}
 
-			if ($perms->CanConfig)
-			{
-				$btn_task = '';
-				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=items&layout=indexer&tmpl=component&indexer=tag_assignments';
-				//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-				$js .= "
-					jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Verify assignments to Joomla Tags'), 2)."\'}); return false;');
-				";
-				JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('Verify assignments to Joomla Tags'), false );
-			}
+		if (count($btn_arr))
+		{
+			$drop_btn = '
+				<button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_MAINTENANCE').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'maintenance-btns-group', ' ');
 		}
 
 		if ($perms->CanConfig)
@@ -889,7 +913,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
-		
+
 		if ($js)
 		{
 			$document->addScriptDeclaration('

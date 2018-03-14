@@ -28,7 +28,7 @@ $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 
 <div>&nbsp;</div>
 <div style="heading">
-	Indexer Running ... <?php echo FlexicontentFields::getPDFParser() ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
+	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <?php echo FlexicontentFields::getPDFParser() ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
 	
 <script type="text/javascript">
 jQuery(document).ready(function() {

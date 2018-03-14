@@ -28,7 +28,7 @@ $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 
 <div>&nbsp;</div>
 <div style="heading">
-	Indexer Running ... <br/>
+	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <br/>
 	
 <script type="text/javascript">
 jQuery(document).ready(function() {

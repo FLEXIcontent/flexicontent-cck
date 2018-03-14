@@ -486,41 +486,68 @@ class FlexicontentViewFilemanager extends JViewLegacy
 	 */
 	function setToolbar()
 	{
+		// Get user's global permissions
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		$js = '';
+		$contrl = "filemanager.";
+		$contrl_singular = "file.";
+
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+		$tip_class = ' hasTooltip';
 
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 		$session = JFactory::getSession();
 
-		$contrl = "filemanager.";
 		JToolbarHelper::editList($contrl.'edit');
 		JToolbarHelper::checkin($contrl.'checkin');
 		JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
-		$js = "jQuery(document).ready(function(){";
+		$btn_arr = array();
+
 		if ($perms->CanConfig)
 		{
-			$btn_task = '';
 			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=filemanager_stats';
-			//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-						.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
-			";
-			JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ' )', false );
+			$btn_text = JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ' )';
+			$btn_name = 'index_files_stats';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
+				;
 
-			$btn_task = '';
 			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=filemanager_stats&index_urls=1';
-			//$toolbar->appendButton('Popup', 'advindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-			$js .= "
-				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
-					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-						.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Index file statistics'), 2)."\'}); return false;');
-			";
-			JToolbarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ', ' . JText::_('FLEXI_URL') . ' )', false );
+			$btn_text = JText::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . JText::_('FLEXI_SIZE') . ', ' . JText::_('FLEXI_USAGE') . ', ' . JText::_('FLEXI_URL') . ' )';
+			$btn_name = 'index_files_urls_stats';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
+				;
+		}
+
+		if (count($btn_arr))
+		{
+			$drop_btn = '
+				<button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_MAINTENANCE').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'maintenance-btns-group', ' ');
 		}
 
 		/*$stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', null, 'flexicontent');
@@ -557,8 +584,14 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		$js .= "});";
-		$document->addScriptDeclaration($js);
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 	}
 
 }

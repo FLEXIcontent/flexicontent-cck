@@ -145,6 +145,115 @@ class FlexicontentViewCategories extends JViewLegacy
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 		
+		$add_divider = false;
+
+		if ($user->authorise('core.create', 'com_flexicontent'))
+		{
+			$cancreate_cat = true;
+		}
+		else
+		{
+			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
+				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+			);
+			$cancreate_cat  = count($usercats) > 0;
+		}
+		
+		if ($cancreate_cat)
+		{
+			JToolbarHelper::addNew($contrl_singular.'add');
+			$add_divider = true;
+		}
+
+		if ($user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent'))
+		{
+			JToolbarHelper::editList($contrl_singular.'edit');
+			$add_divider = true;
+		}
+		
+		$add_divider = false;
+
+		$btn_arr = array();
+
+		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') )
+		{
+			$btn_text = 'JTOOLBAR_PUBLISH';
+			$btn_name = 'publish';
+			$btn_task = $contrl . 'publish';
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction', 'icon-checkbox',
+				'', $auto_add = 0, $tag_type='button'
+			);
+
+			$btn_text = 'JTOOLBAR_UNPUBLISH';
+			$btn_name = 'unpublish';
+			$btn_task = $contrl . 'unpublish';
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction', 'icon-cancel',
+				'', $auto_add = 0, $tag_type='button'
+			);
+
+			$btn_text = 'JTOOLBAR_ARCHIVE';
+			$btn_name = 'archive';
+			$btn_task = $contrl . 'archive';
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction', 'icon-archive',
+				'', $auto_add = 0, $tag_type='button'
+			);
+
+			//JToolbarHelper::publishList($contrl.'publish');
+			//JToolbarHelper::unpublishList($contrl.'unpublish');
+			//JToolbarHelper::archiveList($contrl.'archive');
+		}
+
+		if ($filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent'))
+		{
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+		elseif ($user->authorise('core.edit.state', 'com_flexicontent'))
+		{
+			$btn_text = 'JTOOLBAR_TRASH';
+			$btn_name = 'trash';
+			$btn_task = $contrl . 'trash';
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task, $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction', 'icon-trash',
+				'', $auto_add = 0, $tag_type='button'
+			);
+			//JToolbarHelper::trash($contrl.'trash');
+		}
+
+		if (count($btn_arr))
+		{
+			$drop_btn = '
+				<button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_CHANGE_STATE').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'change-state-btns-group', ' ');
+		}
+
 		// Copy Parameters
 		$btn_task = '';
 		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
@@ -157,55 +266,6 @@ class FlexicontentViewCategories extends JViewLegacy
 		JToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 
 		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
-		JToolbarHelper::divider();
-		
-		$add_divider = false;
-		if ( $user->authorise('core.create', 'com_flexicontent') ) {
-			$cancreate_cat = true;
-		} else {
-			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
-				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
-			);
-			$cancreate_cat  = count($usercats) > 0;
-		}
-		
-		if ( $cancreate_cat ) {
-			JToolbarHelper::addNew($contrl_singular.'add');
-			$add_divider = true;
-		}
-		if ( $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent') ) {
-			JToolbarHelper::editList($contrl_singular.'edit');
-			$add_divider = true;
-		}
-		
-		$add_divider = false;
-		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') )
-		{
-			JToolbarHelper::publishList($contrl.'publish');
-			JToolbarHelper::unpublishList($contrl.'unpublish');
-			JToolbarHelper::divider();
-			JToolbarHelper::archiveList($contrl.'archive');
-		}
-		
-		$add_divider = false;
-		if ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) {
-			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
-			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
-			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
-			$btn_task    = $contrl.'remove';
-			$extra_js    = "";
-			flexicontent_html::addToolBarButton(
-				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
-				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
-			
-			$add_divider = true;
-		}
-		elseif ( $user->authorise('core.edit.state', 'com_flexicontent') )
-		{
-			JToolbarHelper::trash($contrl.'trash');
-			$add_divider = true;
-		}
 		if ($add_divider) JToolbarHelper::divider();
 
 		JToolbarHelper::checkin($contrl.'checkin');

@@ -139,8 +139,8 @@ icon-typeadd:before,
 	content: "\35";
 }
 @media (min-width: 1020px) {
-	#toolbar-purge,
-	#toolbar-custom_order,
+	#toolbar-copy,
+	#toolbar-maintenance-btns-group,
 	#toolbar-download {
 		margin-left: 32px;
 	}
