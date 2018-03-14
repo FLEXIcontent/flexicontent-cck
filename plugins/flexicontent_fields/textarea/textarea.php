@@ -485,8 +485,9 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				'</textarea>
 				' : $editor->display(
 					$fieldname_n . $mce_fieldname_sfx, htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
-					$skip_buttons_arr, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params
+					$skip_buttons_arr, $elementid_n, $_asset_ = '', $_author_ = null, $editor_plg_params
 				);
+				// NOTE asset = ''; above is to workaround an issue in image XTD button that makes strict check $asset = $asset !== '' ? $asset : $extension;
 
 			$txtarea = '
 				<div class="fc_txtarea">
