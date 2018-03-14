@@ -145,7 +145,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Build select lists
 		$lists = array();
 
-		$js = "jQuery(document).ready(function(){";
+		$js = '';
 		
 		//build backend visible filter
 		if ($isADV)
@@ -214,9 +214,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$js .= "jQuery('.col_search').addClass('filtered_column');";
 		}		
 
-		$js .= "});";
-
-		$document->addScriptDeclaration($js);
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 
 		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
 		$db->setQuery($query);
@@ -280,63 +285,90 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 
-		$js = "jQuery(document).ready(function(){";
+		$js = '';
+		$contrl = "search.";
+		$contrl_singular = null;
 
 		$document = JFactory::getDocument();
 		$toolbar = JToolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+		$tip_class = ' hasTooltip';
 
-		$btn_task = '';
-		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
-		//$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 350);
-		$js .= "
-			jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
-				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-					.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'), 2)."\'}); return false;');
-		";
-		JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_REINDEX_BASIC_CONTENT_LISTS', false );
+		$btn_arr = array();
 
-		JToolbarHelper::divider();  JToolbarHelper::spacer();
+		if ($perms->CanIndex)
+		{
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
+			$btn_text = JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS');
+			$btn_name = 'search_adv_index_dirty_only';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
+				;
 
-		$btn_task = '';
-		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
-		//$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 350);
-		$js .= "
-			jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button').attr('href', '".$popup_load_url."')
-				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-					.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'), 2)."\'}); return false;');
-		";
-		JToolbarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
+			$btn_text = JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW');
+			$btn_name = 'search_adv_index_dirty_only';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
+				;
 
-		$btn_task = '';
-		$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
-		//$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 350);
-		$js .= "
-			jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button').attr('href', '".$popup_load_url."')
-				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-					.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'), 2)."\'}); return false;');
-		";
-		JToolbarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
+			$btn_text = JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY');
+			$btn_name = 'search_adv_index_dirty_only';
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."</span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'), 'd')."'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . $tip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
+				;
+		}
 
-		//$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', 'search.purge', false);
+		if (count($btn_arr))
+		{
+			$drop_btn = '
+				<button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">
+					<span title="'.JText::_('FLEXI_SEARCH_INDEXES').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_SEARCH_INDEXES').'
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, 'search-index-btns-group', ' ');
+		}
+
+		//$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', $contrl . 'purge', false);
 		$btn_icon = 'icon-trash';
 		$btn_name = 'purge';
-		$btn_task = 'search.purge';
+		$btn_task = $contrl . 'purge';
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_INDEX_ADVANCED_PURGE',
 			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_PURGE_INDEX_CONFIRM'),
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
 
-		//$toolbar->appendButton('Confirm', 'Update ?', 'shuffle', 'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES', 'search.custom_order', false);
+		//$toolbar->appendButton('Confirm', 'Update ?', 'shuffle', 'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES', $contrl . 'custom_order', false);
 		$btn_icon = 'icon-shuffle';
 		$btn_name = 'custom_order';
-		$btn_task = 'search.custom_order';
+		$btn_task = $contrl . 'custom_order';
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES',
 			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_UPDATE_CUSTOM_ORDER_INDEXES'),
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
 
 		// Configuration button
 		if ($perms->CanConfig)
@@ -350,9 +382,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		$js .= "});";
-
-		$document->addScriptDeclaration($js);
+		if ($js)
+		{
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					' . $js . '
+				});
+			');
+		}
 	}
 
 }
