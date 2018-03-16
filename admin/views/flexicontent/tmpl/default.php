@@ -51,6 +51,7 @@ $skip_expert_fieldset  = $skip_users_fieldset   || !$sectionExpert;
 if (isset($sbtns['comments'])) $commentsShown = false;
 else if (
 	($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
+	($this->params->get('comments')==3 && $user->authorise('core.manage', 'com_komento')) ||  // Can administer Komento
 	(!$this->params->get('comments') && $this->params->get('comments_admin_link'))  // Custom comments extension
 ) $commentsShown = true;
 else $commentsShown = false;
@@ -211,18 +212,34 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 				}
 			}
-			if (isset($sbtns['comments'])) {} // skip
-			else if (
+			if (isset($sbtns['comments']))
+			{
+				// skip
+			}
+			elseif (
 				($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
+				($this->params->get('comments')==3 && $user->authorise('core.manage', 'com_komento')) ||  // Can administer Komento
 				(!$this->params->get('comments') && $this->params->get('comments_admin_link'))  // Custom comments extension
 			) {
 				echo '<span class="fc-board-button_sep"></span>';
-				$link = ($this->params->get('comments')==1 && $this->perms->CanComments) ?
-					'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent' :
-					$this->params->get('comments_admin_link');
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_COMMENTS' ), 1 );
+				switch((int) $this->params->get('comments'))
+				{
+					case 1:
+						$link = 'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent';
+						$link_title = JText::_('JComments');
+						break;
+					case 3:
+						$link = 'index.php?option=com_komento';
+						$link_title = JText::_('Komento');
+						break;
+					default:
+						$link = $this->params->get('comments_admin_link');
+						$link_title = JText::_('FLEXI_COMMENTS');
+						break;
+				}
+				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', $link_title, 1 );
 			}
-			else if ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
+			elseif ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
 			{
 				echo '<span class="fc-board-button_sep"></span>';
 				$link = '';

@@ -195,9 +195,10 @@
 			</field>
 
 		<field name="" type="separator" default="FLEXI_COMMENTS" label="" level="level2" />
-			<field name="comments" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" toggle_related="0" class="btn-group group-fcmethod fcoffactive">
+			<field name="comments" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" class="btn-group group-fcmethod fcoffactive">
 				<option value="0" show_list="comments_manual" hide_list="">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
 				<option value="1" show_list="" hide_list="comments_manual">FLEXI_JCOMMENTS_INTEGRATION</option>
+				<option value="3" show_list="" hide_list="comments_manual">Komento</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_MANUAL_COMMENTS_INTEGRATION" label="" level="level3" class="comments_manual alert alert-info fcpadded" />
 			<field name="comments_admin_link" type="text" default="" label="FLEXI_COMMENTS_BACKEND_ADMIN_LINK" description="FLEXI_COMMENTS_BACKEND_ADMIN_LINK_DESC" class="comments_manual input-xxlarge" />
