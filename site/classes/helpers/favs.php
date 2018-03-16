@@ -1,138 +1,74 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+require_once('state.php');
 
-class flexicontent_favs
+class flexicontent_favs extends flexicontent_state
 {
-	static $fcfavs = null;
-	static $types = array('item' => 0, 'category' => 1);
+	static $instance = null;   // Needed to for late static binding, definition in parent is not enough, do not remove
+	var $records = null;
+	var $types = array('item' => 0, 'category' => 1);
+	var $ckname = 'fcfavs';
+
 
 	/**
-	 * Method to load Favourites from cookie
+	 * Gets class's singleton object
 	 *
-	 * @access public
+	 * @return  object
 	 *
-	 * @return void
-	 *
-	 * @since 3.2.0
+	 * @since 3.3.0
 	 */
-	static function loadCookieFavs()
+	public static function getInstance()
 	{
-		// If not already loaded
-		if (self::$fcfavs)
+		if (static::$instance === null)
 		{
-			return;
-		}
-		self::$fcfavs = JFactory::getApplication()->input->cookie->get('fcfavs', '{}', 'string');
-
-		// Parse the favourites
-		try
-		{
-			self::$fcfavs = json_decode(self::$fcfavs);
-		}
-		catch (Exception $e)
-		{
-			$jcookie->set('fcfavs', '{}', time()+60*60*24*(365*5), JUri::base(true), '');
+			static::$instance = new flexicontent_favs();
 		}
 
-		// Make sure it is a class
-		if (!self::$fcfavs)
-		{
-			self::$fcfavs = new stdClass();
-		}
-
-		// Convert data to array and disgard not known types
-		foreach(self::$fcfavs as $type => $id_arr)
-		{
-			if (isset(self::$types[$type]))
-			{
-				self::$fcfavs->$type = (array)$id_arr;
-				continue;
-			}
-
-			unset (self::$fcfavs->$type);
-		}
-
-		// Validate data of each type as integers
-		foreach(self::$types as $type => $i)
-		{
-			$arr = array();
-			if (!isset(self::$fcfavs->$type))
-			{
-				self::$fcfavs->$type = array();
-			}
-
-			foreach(self::$fcfavs->$type as $id => $i)
-			{
-				$id = (int) $id;
-				$arr[$id] = 1;
-			}
-			self::$fcfavs->$type = $arr;
-		}
+		return static::$instance;
 	}
 
 
 	/**
-	 * Method to get Favourites from cookie all or of specific type
-	 *
-	 * @access public
-	 * @param  $type    The type of favourites
-	 * @return void
-	 *
-	 * @since 3.2.0
-	 */
-	static function getCookieFavs($type=null)
-	{
-		flexicontent_favs::loadCookieFavs();
-
-		return $type ? self::$fcfavs->$type : self::$fcfavs;
-	}
-
-
-	/**
-	 * Method to save Favourites into cookie
-	 *
-	 * @access public
-	 * @return void
-	 *
-	 * @since 3.2.0
-	 */
-	static function saveCookieFavs()
-	{
-		flexicontent_favs::loadCookieFavs();
-
-		$app = JFactory::getApplication();
-		$jcookie = $app->input->cookie;
-
-		// Clear any cookie set to current path, and set cookie at top-level folder of current joomla installation
-		$jcookie->set('fcfavs', null, 1, '', '');
-		$jcookie->set('fcfavs', json_encode(self::$fcfavs), time()+60*60*24*(365*5), JUri::base(true), '');
-	}
-
-
-	/**
-	 * Method to toggle Favourites FLAG form a given $type / $id pair
+	 * Method to toggle Favoured FLAG form a given $type / (record) $id pair
 	 *
 	 * @access public
 	 * @param  $type    The type of favourites
 	 * @param  $id      The ID of a record
 	 * @return void
 	 *
-	 * @since 3.2.0
+	 * @since 3.3.0
 	 */
-	static function toggleCookieFav($type, $id)
+	public function toggleIsFavoured($type, $id)
 	{
-		flexicontent_favs::loadCookieFavs();
+		$this->loadState();
 
-		if (isset(self::$fcfavs->$type[$id]))
+		if (isset($this->records->$type[$id]))
 		{
-			unset(self::$fcfavs->$type[$id]);
+			unset($this->records->$type[$id]);
 			return -1;
 		}
 		else
 		{
-			self::$fcfavs->$type[$id] = 1;
+			$this->records->$type[$id] = 1;
 			return 1;
 		}
 	}
-}
 
+
+	/**
+	 * Method to validate the record data
+	 *
+	 * @access public
+	 * @param  mixed    $record_data   The data of the record inside the cookie
+	 *
+	 * @return mixed    The validated data
+	 *
+	 * @since 3.3.0
+	 */
+
+	protected function validateRecordData($record_data)
+	{
+		// If cookie data of a record is set we assumed record is favoured
+		return 1;
+	}
+}
