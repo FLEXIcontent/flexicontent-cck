@@ -753,21 +753,28 @@ class FLEXIUtilities
 			{
 				call_user_func($addEntry,
 					'<a href="index.php?option=com_jcomments&task=view&fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_( 'FLEXI_COMMENTS' ).
+						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('JComments').
 					'</a>', '', false);
 			}
-			else if ($cparams->get('comments')==1 && !$perms->JComments_Installed)
+			elseif ($cparams->get('comments')==1 && !$perms->JComments_Installed)
 			{
 				call_user_func($addEntry,
 					'<span class="fcsb-icon-comments icon-comments disabled"></span>'.
-						'<span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).
+						'<span class="fc_sidebar_entry disabled">'.JText::_('FLEXI_JCOMMENTS_MISSING').
 					'</span>', '', false);
 			}
-			else if (!$cparams->get('comments') && $cparams->get('comments_admin_link'))
+			elseif ($cparams->get('comments')==3 && JFactory::getUser()->authorise('core.manage', 'com_komento'))
+			{
+				call_user_func($addEntry,
+					'<a href="index.php?option=com_komento" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('Komento').
+					'</a>', '', false);
+			}
+			elseif (!$cparams->get('comments') && $cparams->get('comments_admin_link'))
 			{
 				call_user_func($addEntry,
 					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_( 'FLEXI_COMMENTS' ).
+						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('FLEXI_COMMENTS').
 					'</a>', '', false);
 			}
 			
