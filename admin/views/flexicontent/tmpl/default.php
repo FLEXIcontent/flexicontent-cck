@@ -51,7 +51,7 @@ $skip_expert_fieldset  = $skip_users_fieldset   || !$sectionExpert;
 if (isset($sbtns['comments'])) $commentsShown = false;
 else if (
 	($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
-	(!$this->params->get('comments') && $this->params->get('comments', 'comments_admin_link'))  // Custom comments extension
+	(!$this->params->get('comments') && $this->params->get('comments_admin_link'))  // Custom comments extension
 ) $commentsShown = true;
 else $commentsShown = false;
 
@@ -214,12 +214,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			if (isset($sbtns['comments'])) {} // skip
 			else if (
 				($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
-				(!$this->params->get('comments') && $this->params->get('comments', 'comments_admin_link'))  // Custom comments extension
+				(!$this->params->get('comments') && $this->params->get('comments_admin_link'))  // Custom comments extension
 			) {
 				echo '<span class="fc-board-button_sep"></span>';
 				$link = ($this->params->get('comments')==1 && $this->perms->CanComments) ?
 					'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent' :
-					$this->params->get('comments', 'comments_admin_link');
+					$this->params->get('comments_admin_link');
 				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_COMMENTS' ), 1 );
 			}
 			else if ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
