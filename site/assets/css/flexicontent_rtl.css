@@ -714,7 +714,6 @@ body .fc-mssg-inline {
 body .fc-mssg-inline {
 	display: inline-block;
 	margin: 1px 0 2px 12px;
-	max-width: 62%;
 }
 body .fc-field-invalid {
 	padding: 4px 8px;
