@@ -34,7 +34,7 @@ $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$list_total_cols = 7;
+$list_total_cols = 11;
 
 
 
@@ -166,6 +166,10 @@ function delAllFilters() {
 			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_STATE', 'r.state', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'r.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'r.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_AUTHOR', 'r.user_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_EMAIL', 'r.email', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_CREATED', 'r.submit_date', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHtml::_('grid.sort', 'FLEXI_MODIFIED', 'r.update_date', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -253,7 +257,12 @@ function delAllFilters() {
 			<td class="center">
 				<?php echo $row->approved ? 'Not approved' : 'Approved'; ?>
 			</td>
+
 			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
+			<td class="center hidden-tablet hidden-phone"><?php echo $row->user_id; ?></td>
+			<td class="center hidden-tablet hidden-phone"><?php echo $row->email; ?></td>
+			<td class="center hidden-phone"><?php echo $row->submit_date; ?></td>
+			<td class="center hidden-tablet hidden-phone"><?php echo $row->update_date; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>

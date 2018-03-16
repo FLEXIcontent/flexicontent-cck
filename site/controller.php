@@ -1455,65 +1455,69 @@ class FlexicontentController extends JControllerLegacy
 		$content_id  = $this->input->get('content_id', 0, 'int');
 		$review_type = $this->input->get('review_type', 'item', 'cmd');
 		
-		
-		// ******************************
-		// Get voting field configuration
-		// ******************************
-		
-		if (!$content_id)  $error = "Content_id is zero";
-		else if ($review_type!='item')  $error = "review_type <> item is not yet supported";
-		else
+		$errors = array();
+
+
+		/**
+		 * Check for validation failures on posted data
+		 */
+
+		if (!$content_id)
 		{
-			// Check content item exists
-			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			if ( !$item->load( $content_id ) )
-			{
-				$error = 'ID: '.$pk. ': '.$item->getError();
-			}
-			
-			// Check voting is enabled
-			else
-			{
-				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-				$field = $db->loadObject();
-				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
-				$allow_reviews = (int)$field->parameters->get('allow_reviews', 0);
-				if (!$allow_reviews)  $error = "Reviews are disabled";
-			}
+			$errors[] = 'content_id is zero';
 		}
-		
-		if (!empty($error))
+
+		if ($review_type !== 'item')
 		{
-			$result	= new stdClass();
-			$error = '
-			<div class="fc-mssg fc-warning fc-nobgimage">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				'.$error.'
-			</div>';
-			$result->html = $error;
-			echo json_encode($result);
-			jexit();
+			$errors[] = 'review_type <> "item" is not yet supported';
 		}
-		
+
+
+		/**
+		 * Do voting / reviewing permissions check
+		 */
+
+		if (!count($errors))
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = true);
+		}
+
+		// Check if an error has been encountered
+		if (count($errors))
+		{
+			$result = (object) array(
+				'error' => 0,
+				'html' => '
+					<div class="fc-mssg fc-warning fc-nobgimage">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						' . implode('<br>', $errors) . '
+					</div>'
+			);
+
+			jexit(json_encode($result));
+		}
+
 		// Load review of a logged user
 		$review = false;
+
 		if ($user->id)
 		{
-			$query = "SELECT * "
-				." FROM #__flexicontent_reviews_dev AS r"
-				." WHERE r.content_id=" . $content_id
-				."  AND r.type=". $db->Quote($review_type)
-				."  AND r.user_id=". $user->id;				
-			$db->setQuery($query);
-			$review = $db->loadObject();
+			$query = 'SELECT * '
+				. ' FROM #__flexicontent_reviews_dev AS r'
+				. ' WHERE r.content_id = ' . (int) $content_id
+				. '  AND r.type = ' . $db->Quote($review_type)
+				. '  AND r.user_id = ' . (int) $user->id
+				;
+			$review = $db->setQuery($query)->loadObject();
 		}
-		
-		$result	= new stdClass();
-		$result->html = '
+
+		$result = (object) array('html' => '
 		<form id="fcvote_review_form_'.$content_id.'" name="fcvote_form_'.$content_id.'">
 			<input type="hidden" name="review_id"  value="'. ($review ? $review->id : '').'"/>
-			<input type="hidden" name="content_id"  value="'.$content_id.'"/>
-			<input type="hidden" name="review_type" value="'.$review_type.'"/>
+			<input type="hidden" name="content_id"  value="' . $content_id . '"/>
+			<input type="hidden" name="review_type" value="' . $review_type . '"/>
 			<table class="fc-form-tbl fcinner">
 				<tr class="fcvote_review_form_title_row">
 					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_title">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
@@ -1542,13 +1546,12 @@ class FlexicontentController extends JControllerLegacy
 				</tr>
 			</table>
 		</form>
-		';
-		
-		echo json_encode($result);
-		jexit();
+		');
+
+		jexit(json_encode($result));
 	}
-	
-	
+
+
 	function storereviewform()
 	{
 		$app  = JFactory::getApplication();
@@ -1559,127 +1562,220 @@ class FlexicontentController extends JControllerLegacy
 		$content_id  = $this->input->get('content_id', 0, 'int');
 		$review_type = $this->input->get('review_type', 'item', 'cmd');
 
-		$error = false;
+		$errors = array();
 
 		// Validate title
 		$title = flexicontent_html::dataFilter($this->input->get('title', '', 'string'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
-		
+
 		// Validate email
 		$email = $user->id ? $user->email : flexicontent_html::dataFilter($this->input->get('email', '', 'string'), $maxlength=255, 'EMAIL', 0);  // Validate email
-		
+
 		// Validate text
 		$text = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
-		
-		
-		// ******************************
-		// Get voting field configuration
-		// ******************************
-		
-		if (!$content_id)  $error = "Content_id is zero";
-		else if (!$email)  $error = "Email is invalid or empty";
-		else if (!$text)   $error = "Text is invalid or empty";
-		else if ($review_type!='item')  $error = "review_type <> item is not yet supported";
-		else {
-			// Check content item exists
-			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$item->getError();
-			
-			// Check voting is enabled
-			else {
-				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-				$field = $db->loadObject();
-				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
-				$allow_reviews = (int)$field->parameters->get('allow_reviews', 0);
-				if (!$allow_reviews)  $error = "Reviews are disabled";
-			}
-		}
-		
-		if (!empty($error))
-		{
-			$result	= new stdClass();
-			$error = '
-			<div class="fc-mssg fc-error fc-nobgimage">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				'.$error.'
-			</div>';
-			$result->html = $error;
-			$result->error = 1;
-			echo json_encode($result);
-			jexit();
-		}
-		
-		// Check if review exists
-		$review = JTable::getInstance( $type = 'flexicontent_reviews', $prefix = '', $config = array() );
-		
-		if ($user->id && $review_id)
-		{
-			if ( !$review->load( $review_id ) )  
-			{
-				$result	= new stdClass();
-				$error = 'ID: '.$review_id. ': '.$review->getError();
-				$error = '
-				<div class="fc-mssg fc-error fc-nobgimage">
-					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.$error.'
-				</div>';
-				$result->html = $error;
-				$result->error = 1;
-				echo json_encode($result);
-				jexit();
-			}
-			
-			if ( $review.content_id == $content_id )  $error = "Found content_id <> given content_id: "  .$content_id;
-			if ( !$review.type == $review_type )      $error = "Found review_type: " .$review.type.       " <> given review_type: " .$review_type;
-			if ( $review.user_id == $user->id )       $error = "Found user_id <> given user_id: "     .$user->id;
-			if ( ! empty($error) )
-			{
-				$result	= new stdClass();
-				$error = '
-				<div class="fc-mssg fc-error fc-nobgimage">
-					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.$error.'
-				</div>';
-				$result->html = $error;
-				$result->error = 1;
-				echo json_encode($result);
-				jexit();
-			}
-		}
-		
-		$review->id = $review_id;
-		$review->content_id = $content_id;
-		$review->type  = $review_type;
-		$review->title = $title;
-		$review->email = $user->id ? '' : $email;
-		$review->text  = $text;
-		
-		if ( !$review->store() )
-		{
-			$result	= new stdClass();
-			$error = 'ID: '.$review_id. ': '.$review->getError();
-			$error = '
-			<div class="fc-mssg fc-error fc-nobgimage">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				'.$error.'
-			</div>';
-			$result->html = $error;
-			$result->error = 1;
-			echo json_encode($result);
-			jexit();
-		}
-		
-		$result	= new stdClass();
-		$mssg = $review_id ? 'Existing review updated' : 'New review saved';
-		$mssg = '
-		<div class="fc-mssg fc-success fc-nobgimage">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			'.$mssg.'
-		</div>';
-		$result->html = $mssg;
-		//$result->html .= '<pre>'.print_r($_REQUEST, true).'</pre>';
 
-		echo json_encode($result);
-		jexit();
+
+		/**
+		 * Check for validation failures on posted data
+		 */
+
+		if (!$content_id)
+		{
+			$errors[] = 'content_id is zero';
+		}
+
+		if (!$email)
+		{
+			$errors[] = 'Email is invalid or empty';
+		}
+		elseif (!$user->id)
+		{
+			$query = 'SELECT id FROM #__users WHERE email = ' . $db->Quote($email);
+			$reviewer = $db->setQuery($query)->loadObject();
+
+			if ($reviewer)
+			{
+				$errors[] = 'Please login';
+			}
+		}
+
+		if (!$text)
+		{
+			$errors[] = 'Text is invalid or empty';
+		}
+
+		if ($review_type !== 'item')
+		{
+			$errors[] = 'review_type <> item is not yet supported';
+		}
+
+
+		/**
+		 * Do voting / reviewing permissions check
+		 */
+
+		if (!count($errors))
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = true);
+		}
+
+		if (!count($errors))
+		{
+			// Get a 'flexicontent_reviews' JTable instance
+			$review = JTable::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
+
+			$review_props = array('content_id' => $content_id, 'user_id' => $user->id, 'type' => $review_type);
+
+			if ($review_id)
+			{
+				$review_props['id'] = $review_id;
+			}
+
+			// Try to find existing review and delete
+			if ($review->load($review_props))
+			{
+				$query = 'DELETE FROM #__flexicontent_reviews WHERE id = ' . $review->id;
+				$field = $db->setQuery($query)->execute();
+			}
+
+			$review->id = $review_id;
+			$review->content_id = $content_id;
+			$review->type  = $review_type;
+			$review->title = $title;
+			$review->email = $user->id ? '' : $email;
+			$review->user_id = $user->id;
+			$review->text  = $text;
+
+			// Save review into DB
+			if (!$review->store())
+			{
+				$errors[] = 'Error storing review : ' . $review->getError();
+			}
+		}
+
+		// Create success response
+		if (!count($errors))
+		{
+			$mssg = $review_id
+				? 'Existing review updated'
+				: 'New review saved';
+
+			$result = (object) array(
+				'error' => 0,
+				'html' => '
+					<div class="fc-mssg fc-success fc-nobgimage">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						' . $mssg . '
+					</div>'
+			);
+		}
+
+		// Create error response
+		else
+		{
+			$result = (object) array(
+				'error' => 1,
+				'html' => '
+					<div class="fc-mssg fc-warning fc-nobgimage">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						' . implode('<br>', $errors) . '
+					</div>'
+			);
+		}
+
+		// Send response to client
+		jexit(json_encode($result));
+	}
+
+
+
+	/**
+	 * Method to do prechecks for loading / saving review forms
+	 *
+	 * @param   object    $item       by reference variable to return the reviewed item
+	 * @param   object    $field      by reference variable to return the voting (reviews) field
+	 * @param   array     $errors     The array of error messages that have occured
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	private function reviewPrepare($content_id, & $item = null, & $field = null, $errors = null, $checkSubmit = true)
+	{
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
+
+
+		/**
+		 * Load content item related to the review
+		 */
+
+		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+
+		if (!$item->load($content_id))
+		{
+			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
+			return;
+		}
+
+
+		/**
+		 * Do voting / reviewing permissions check
+		 */
+
+		// Get voting field
+		$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
+		$field = $db->setQuery($query)->loadObject();
+
+		// Load field's configuration together with type-specific field customization
+		FlexicontentFields::loadFieldConfig($field, $item);
+
+		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
+
+		// Check reviews are allowed
+		if (!$allow_reviews)
+		{
+			$errors[] = 'Reviews are disabled';
+		}
+
+		// Check if user has the ACCESS level required for voting
+		elseif ($checkSubmit)
+		{
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
+			$has_acclvl = in_array($acclvl, $aid_arr);
+
+			// Create no access Redirect Message
+			if (!$has_acclvl)
+			{
+				$logged_no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
+				$guest_no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
+				$no_acc_msg = $user->id ? $logged_no_acc_msg : $guest_no_acc_msg;
+				$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
+
+				// Message not set create a Default Message
+				if (!$no_acc_msg)
+				{
+					// Find name of required Access Level
+					$acclvl_name = '';
+					if ($acclvl)
+					{
+						$query = 'SELECT title FROM #__viewlevels as level WHERE level.id = ' . (int) $acclvl;
+						$acclvl_name = $db->setQuery($query)->loadResult();
+						if (!$acclvl_name)
+						{
+							$acclvl_name = 'Access Level: ' . $acclvl . ' not found / was deleted';
+						}
+					}
+
+					$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
+				}
+
+				$errors[] = 'You are not authorized to submit reviews';
+			}
+		}
 	}
 
 
@@ -1710,9 +1806,9 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 
-		// *******************************************************************
-		// Check for invalid xid (according to voting field/type configuration
-		// *******************************************************************
+		/**
+		 * Check for invalid xid (according to voting field/type configuration
+		 */
 
 		$xid = empty($xid) ? 'main' : $xid;
 		$int_xid  = (int)$xid;
@@ -1742,18 +1838,27 @@ class FlexicontentController extends JControllerLegacy
 				jexit();
 			}
 		}
+
 		
-		
-		// ******************************
-		// Get voting field configuration
-		// ******************************
-		
-		$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-		$field = $db->loadObject();
+		/**
+		 * Load item
+		 */
+
 		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-		$item->load( $cid );
+		$item->load($cid);
+
+
+		/**
+		 * Get voting field configuration
+		 */
+
+		// Get voting field
+		$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
+		$field = $db->setQuery($query)->loadObject();
+
+		// Load field's configuration together with type-specific field customization
 		FlexicontentFields::loadFieldConfig($field, $item);
-		
+
 		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
 		$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
 		$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
@@ -1767,22 +1872,22 @@ class FlexicontentController extends JControllerLegacy
 		$extra_counter_show_label = (int)$field->parameters->get('extra_counter_show_label', 1);
 		$main_counter_show_percentage  = (int)$field->parameters->get('main_counter_show_percentage', 0);
 		$extra_counter_show_percentage = (int)$field->parameters->get('extra_counter_show_percentage', 0);
-		
-		
-		// *****************************************************
-		// Find if user has the ACCESS level required for voting
-		// *****************************************************
-		
+
+
+		/**
+		 * Find if user has the ACCESS level required for voting
+		 */
+
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
 		$has_acclvl = in_array($acclvl, $aid_arr);
-		
-		
-		// *********************************
-		// Create no access Redirect Message
-		// *********************************
-		
-		if ( !$has_acclvl )
+
+
+		/**
+		 * Create no access Redirect Message
+		 */
+
+		if (!$has_acclvl)
 		{
 			$logged_no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
 			$guest_no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
@@ -1790,25 +1895,30 @@ class FlexicontentController extends JControllerLegacy
 			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
 			
 			// Message not set create a Default Message
-			if ( !$no_acc_msg )
+			if (!$no_acc_msg)
 			{
 				// Find name of required Access Level
 				$acclvl_name = '';
-				if ($acclvl) {
-					$db->setQuery('SELECT title FROM #__viewlevels as level WHERE level.id='.$acclvl);
-					$acclvl_name = $db->loadResult();
-					if ( !$acclvl_name ) $acclvl_name = "Access Level: ".$acclvl." not found/was deleted";
+				if ($acclvl)
+				{
+					$query = 'SELECT title FROM #__viewlevels as level WHERE level.id = ' . (int) $acclvl;
+					$acclvl_name = $db->setQuery($query)->loadResult();
+					if (!$acclvl_name)
+					{
+						$acclvl_name = 'Access Level: ' . $acclvl . ' not found / was deleted';
+					}
 				}
+
 				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
 			}
 		}
-		
-		
-		// ****************************************************
-		// NO voting Access OR rating is NOT within valid range
-		// ****************************************************
-		
-		if ( !$has_acclvl  ||  ($user_rating < $min_rating && $user_rating > $max_rating) )
+
+
+		/**
+		 * NO voting Access OR rating is NOT within valid range
+		 */
+
+		if (!$has_acclvl  ||  ($user_rating < $min_rating && $user_rating > $max_rating))
 		{
 			// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
 			$error = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTE_OUT_OF_RANGE', $min_rating, $max_rating);
@@ -1834,12 +1944,12 @@ class FlexicontentController extends JControllerLegacy
 				jexit();
 			}
 		}
-		
-		
-		// *************************************************
-		// Check extra vote exists and get extra votes types
-		// *************************************************
-		
+
+
+		/**
+		 * Check extra vote exists and get extra votes types
+		 */
+
 		$xids = array();
 		$enable_extra_votes = $field->parameters->get('enable_extra_votes', '');
 		if ($enable_extra_votes)
@@ -1859,19 +1969,19 @@ class FlexicontentController extends JControllerLegacy
 				$xids[$extra_id] = 1;
 			}
 		}
-		
-		if ( !$int_xid && count($xids) )
+
+		if (!$int_xid && count($xids))
 		{
 			$error = JText::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
 		}
-		
-		if ( $int_xid && !isset($xids[$int_xid]) )
+
+		if ($int_xid && !isset($xids[$int_xid]))
 		{
 			// Rare/unreachable voting ERROR
 			$error = !$enable_extra_votes ? JText::_('FLEXI_VOTE_COMPOSITE_VOTING_IS_DISABLED') : 'Voting characteristic with id: '.$int_xid .' was not found';
 		}
-		
-		if ( isset($error) )
+
+		if (isset($error))
 		{
 			// Set responce
 			if ($no_ajax)
@@ -1894,25 +2004,25 @@ class FlexicontentController extends JControllerLegacy
 				jexit();
 			}
 		}
-		
-		
-		// ********************************************************************************************
-		// Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
-		// ********************************************************************************************
-		
+
+
+		/**
+		 * Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
+		 */
+
 		$vote_history = $session->get('vote_history', array(),'flexicontent');
 		if ( !isset($vote_history[$cid]) || !is_array($vote_history[$cid]) )
 		{
 			$vote_history[$cid] = array();
 		}
-		
+
 		// Allow user to change his vote
 		$old_rating = isset($vote_history[$cid][$xid]) ? (int) $vote_history[$cid][$xid] : 0;
 		$old_main_rating = isset($vote_history[$cid]['main']) ? (int) $vote_history[$cid]['main'] : 0;
-		
+
 		// For the case that the browser was not close we can get rating from user's session and allow to change the vote
 		$rating_diff = $user_rating - $old_rating;
-		
+
 		// Accept votes only if user has voted for all cases, but do not store session yet
 		$main_rating = 0;
 		if (!count($xids))
@@ -1924,14 +2034,14 @@ class FlexicontentController extends JControllerLegacy
 		else
 		{
 			if (!$int_xid) die('unreachable int_xid is zero');
-			
+
 			$voteIsComplete = true;
 			$main_rating = 0;
 			$rating_completed = 0;
-			
+
 			// Add current vote
 			$vote_history[$cid][$int_xid] = $user_rating;
-			
+
 			foreach($xids as $_xid => $i)
 			{
 				if ( !isset($vote_history[$cid][$_xid]) )
@@ -1949,12 +2059,12 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		$main_rating_diff = $main_rating - $old_main_rating;
-		
-		
-		// ***
-		// *** Retreive last vote for the given item
-		// ***
-		
+
+
+		/**
+		 * Retreive last vote for the given item
+		 */
+
 		$currip = $_SERVER['REMOTE_ADDR'];
 		$currip_quoted = $db->Quote( $currip );
 		$result	= new stdClass();
@@ -1962,25 +2072,25 @@ class FlexicontentController extends JControllerLegacy
 		{
 			if (!$voteIsComplete && $_xid!=$xid) continue; // nothing todo
 			//echo $_xid."\n";
-			
+
 			$dbtbl = !(int)$_xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
 			$and_extra_id = (int)$_xid ? ' AND field_id = '.(int)$_xid : '';     // second part is for defining the vote type in case of extra vote
-			
+
 			$query = ' SELECT *'
 				. ' FROM '.$dbtbl.' AS a '
 				. ' WHERE content_id = '.(int)$cid
 				. ' '.$and_extra_id;
 			$db->setQuery( $query );
 			$db_itemratings = $db->loadObject();
-			
-			
-			// ***
-			// *** Voting access allowed and valid, but we will need to make
-			// *** some more checks (IF voting record exists AND double voting)
-			// ***
-			
+
+
+			/**
+			 * Voting access allowed and valid, but we will need to make
+			 * some more checks (IF voting record exists AND double voting)
+			 */
+
 			// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
-			if ( !$db_itemratings )
+			if (!$db_itemratings)
 			{
 				if ($voteIsComplete)
 				{
@@ -1990,20 +2100,23 @@ class FlexicontentController extends JControllerLegacy
 						. '  rating_sum = '.(int)$user_rating.', '
 						. '  rating_count = 1 '
 						. ( (int)$_xid ? ', field_id = '.(int)$_xid : '' );
-						
-					$db->setQuery( $query );
-					$db->execute() or die( $db->stderr() );
+
+					$db->setQuery($query)->execute();
 				}
 			}
-			
+
 			// Voting record exists for this item, check if user has already voted
 			else
 			{
-				if ( (int)$_xid && !isset($xids[$_xid]) && $_xid!='main' ) continue;  // just in case there are some old records in session table 'vote_history'
+				// Just in case there are some old records in session table 'vote_history'
+				if ((int)$_xid && !isset($xids[$_xid]) && $_xid!='main')
+				{
+					continue;
+				}
 				//echo $db_itemratings->rating_sum. " - ".$rating_diff. "\n";
-				
+
 				// If item is not in the user's voting history (session), then we check if this IP has voted for this item recently and refuse to accept vote
-				if ( $_xid==$xid && !$old_rating && $currip==$db_itemratings->lastip ) 
+				if ($_xid==$xid && !$old_rating && $currip==$db_itemratings->lastip)
 				{
 					// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
 					//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
