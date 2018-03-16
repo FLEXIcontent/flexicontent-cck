@@ -1406,10 +1406,10 @@ class FlexicontentController extends JControllerLegacy
 		else if (!$user->id)
 		{
 			// Output simple response without counter
-			echo flexicontent_favs::toggleCookieFav($type, $id) < 1
+			echo flexicontent_favs::getInstance()->toggleIsFavoured($type, $id, true) < 1
 				? 'removed'
 				: 'added';
-			flexicontent_favs::saveCookieFavs();
+			flexicontent_favs::getInstance()->saveState();
 		}
 
 		// Logged user, update DB, adding / removing given id as favoured
@@ -1427,8 +1427,8 @@ class FlexicontentController extends JControllerLegacy
 			// Output response for counter (if this has been enabled)
 			$favs = $model->getFavourites();
 			echo $isfav
-				? ($favs && $usercount ? '-'.$favs : 'removed')
-				: ($favs && $usercount ? '+'.$favs : 'added');
+				? ($favs && $usercount ? '-' . $favs : 'removed')
+				: ($favs && $usercount ? '+' . $favs : 'added');
 		}
 
 		// Item favouring changed clean item-related caches

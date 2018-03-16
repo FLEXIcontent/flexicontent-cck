@@ -1067,7 +1067,7 @@ class modFlexicontentHelper
 		// *** 
 
 		// Favourites via cookie
-		$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
+		$favs = array_keys(flexicontent_favs::getInstance()->getRecords('item'));
 
 		// Exclude method
   	if ($method_curuserfavs == 1)
