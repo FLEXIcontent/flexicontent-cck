@@ -294,8 +294,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	{
 		//initialise variables
 		$lang = JFactory::getLanguage();
-		$link_attribs = empty($_SERVER['HTTPS']) && $modal
-			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($text), 2).'\'}); return false;"' : '';
+		$link_attribs = $modal
+			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', false, {\'title\': \''.flexicontent_html::encodeHTML(JText::_($text), 2).'\'}); return false;"'
+			: '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>
 		<span class="fc-board-button">

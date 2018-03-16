@@ -763,6 +763,13 @@ class FLEXIUtilities
 						'<span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).
 					'</span>', '', false);
 			}
+			else if (!$cparams->get('comments') && $cparams->get('comments_admin_link'))
+			{
+				call_user_func($addEntry,
+					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_( 'FLEXI_COMMENTS' ).
+					'</a>', '', false);
+			}
 			
 			$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
 			if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.1.99', '>'))
