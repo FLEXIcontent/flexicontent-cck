@@ -390,7 +390,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$where = ' WHERE  1 ';
 
 		// Favourites via cookie
-		$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
+		$favs = array_keys(flexicontent_favs::getInstance()->getRecords('item'));
 
 		// Select only current user's favoured items
 		$where_favs = array();

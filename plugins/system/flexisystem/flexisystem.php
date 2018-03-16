@@ -2313,7 +2313,7 @@ class plgSystemFlexisystem extends JPlugin
 		$jcookie->set( 'fc_uid', JUserHelper::getShortHashedUserAgent(), 0);
 
 		// Add favourites via cookie to the DB
-		$fcfavs = flexicontent_favs::getCookieFavs();
+		$fcfavs = flexicontent_favs::getInstance()->getRecords();
 
 		$types = array('item' => 0, 'category' => 1);
 		foreach($types as $type => $type_id)

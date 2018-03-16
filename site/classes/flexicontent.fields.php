@@ -1500,7 +1500,7 @@ class FlexicontentFields
 		$favourites = $db->loadObjectList('itemid');
 
 		// Also add favourites via cookie (Only current user is considered)
-		$favs = flexicontent_favs::getCookieFavs($_favs_type = 'item');
+		$favs = flexicontent_favs::getInstance()->getRecords($_favs_type = 'item');
 
 		foreach($favs as $itemid => $f)
 		{
@@ -1534,7 +1534,7 @@ class FlexicontentFields
 		$favoured = $db->loadObjectList('itemid');
 
 		// Also add favourites via cookie
-		$favs = flexicontent_favs::getCookieFavs($_favs_type = 'item');
+		$favs = flexicontent_favs::getInstance()->getRecords($_favs_type = 'item');
 
 		foreach($favs as $itemid => $f)
 		{

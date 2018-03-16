@@ -1019,7 +1019,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_layout=='favs')
 		{
 			// Favourites via cookie
-			$favs = array_keys(flexicontent_favs::getCookieFavs('item'));
+			$favs = array_keys(flexicontent_favs::getInstance()->getRecords('item'));
 
 			// First thing we need to do is to select only the requested FAVOURED items
 			$where_favs = array();
