@@ -3576,7 +3576,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getvotes($id = 0)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		$this->_db->setQuery('SELECT rating_sum, rating_count FROM #__content_rating WHERE content_id = ' . (int) $id);
 		return $this->_db->loadObjectlist();
@@ -3585,7 +3585,7 @@ class ParentClassItem extends FCModelAdmin
 	
 	function getRatingDisplay($id = 0)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		$votes = $this->getvotes($id);
 		if ($votes)
@@ -3603,7 +3603,7 @@ class ParentClassItem extends FCModelAdmin
 	function getVotingResolution($id = 0)
 	{
 		static $rating_resolution = array();
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 		if (isset($rating_resolution[$id])) return $rating_resolution[$id];
 
 		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
@@ -3630,7 +3630,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function gethits($id = 0)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		$this->_db->setQuery('SELECT hits FROM #__content WHERE id = ' . (int) $id);
 		return $this->_db->loadResult();
@@ -3648,7 +3648,7 @@ class ParentClassItem extends FCModelAdmin
 	function getSubscribersCount($id = 0)
 	{
 		static $subscribers = array();
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 		if ( isset($subscribers[$id]) ) return $subscribers[$id];
 		
 		$query	= 'SELECT COUNT(*)'
@@ -4773,7 +4773,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		static $translations = array(0 => array());
 
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		// No cached data, get associated translations
 		if ($id && !isset($translations[$id]))
@@ -5869,7 +5869,7 @@ class ParentClassItem extends FCModelAdmin
 		$db = $this->_db;
 
 		$contentType = $contentType ?: $this->typeAlias;
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		// Create the query
 		$query = $db->getQuery(true)
@@ -5955,7 +5955,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	public function saveJTagsAssignments($fctag_ids, $id = null)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): fctag_ids = ' . print_r($fctag_ids, true) . '</pre>';
 
 		// Make sure re-usable member properties have been initialized
@@ -5991,7 +5991,7 @@ class ParentClassItem extends FCModelAdmin
 	public function saveFcTagsAssignments($tags, $id = null, $replaceTags = true)
 	{
 		$db = $this->_db;
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		// Delete old tag relations
 		if ($replaceTags)
