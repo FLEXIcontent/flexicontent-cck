@@ -20,8 +20,10 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.model.admin');
-use Joomla\String\StringHelper;
 require_once('base.php');
+
+use Joomla\String\StringHelper;
+use Joomla\CMS\Table\Table;
 
 /**
  * FLEXIcontent Component Item Model
@@ -151,6 +153,13 @@ class ParentClassItem extends FCModelAdmin
 	var $_translations = null;
 
 	/**
+	 * Model typeAlias string.
+	 *
+	 * @var        string
+	 */
+	public $typeAlias = 'com_content.article';
+
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -161,6 +170,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$this->record_keys = array('id');
 		}
+		$this->debug_tags = false;
 
 		parent::__construct();
 
@@ -316,13 +326,16 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to get a record.
 	 *
-	 * @param	integer  $pk An optional id of the object to get, otherwise the id from the model state is used.
+	 * @param	  integer   $pk                 An optional id of the object to get, otherwise the id from the model state is used.
+	 * @param	  boolean   $check_view_access  Whether to check current user access of the item ... this includes CATEGORY ACCESS + TYPE ACCESS of the item
+	 * @param	  boolean   $no_cache           Force reloading the item, e.g. useful if item may have changed in the DB, or if current object may have been modified
+	 * @param	  boolean   $force_version      Force loading data of specific item version
 	 *
 	 * @return	mixed 	Record data object on success, false on failure.
 	 *
 	 * @since	1.6
 	 */
-	public function getItem($pk=null, $check_view_access=true, $no_cache=false, $force_version=0)
+	public function getItem($pk = null, $check_view_access = true, $no_cache = false, $force_version = 0)
 	{
 		$app     = JFactory::getApplication();
 		$cparams = $this->_cparams;
@@ -396,6 +409,10 @@ class ParentClassItem extends FCModelAdmin
 
 		// Recalculate if needed, component + type parameters
 		$this->getComponentTypeParams();
+
+		// This is used in places that item data need to be retrieved again because item object was not given
+		global $fc_view_item;
+		$fc_view_item = $this->_record;
 
 		return $this->_record;
 	}
@@ -710,7 +727,7 @@ class ParentClassItem extends FCModelAdmin
 				// -- Try to retrieve all Falang data for the current item
 				$query = 'SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published'
 					. ' FROM #__' . $nn_content_tbl . ' AS jfc '
-					. ' WHERE jfc.reference_table = ' . $db->Quote('content') . ' AND jfc.reference_id = ' . (int) $pk
+					. ' WHERE jfc.reference_table = ' . $db->Quote($this->records_dbtbl) . ' AND jfc.reference_id = ' . (int) $pk
 					;
 				$translated_fields = $db->setQuery($query)->loadObjectList();
 
@@ -855,18 +872,19 @@ class ParentClassItem extends FCModelAdmin
 			if ( $use_versioning && $version )
 			{
 				// Check version value was found
-				if ( !isset($item->tags) || !is_array($item->tags) )
+				if (!isset($item->tags) || !is_array($item->tags))
+				{
 					$item->tags = array();
+				}
 			}
 			else
 			{
 				// Retrieve unversioned value
-				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$pk;
-				$db->setQuery($query);
-				$item->tags = $db->loadColumn();
+				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int) $pk;
+				$item->tags = $db->setQuery($query)->loadColumn();
 				$item->tags = array_reverse($item->tags);
 			}
-			
+
 			// -- Retrieve categories field value (if not using versioning)
 			if ( $use_versioning && $version )
 			{
@@ -880,8 +898,7 @@ class ParentClassItem extends FCModelAdmin
 			{
 				// Retrieve unversioned value
 				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$pk;
-				$db->setQuery($query);
-				$item->categories = $db->loadColumn();
+				$item->categories = $db->setQuery($query)->loadColumn();
 			}
 			
 			// Make sure catid is in categories array
@@ -1125,13 +1142,13 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @param   JForm   $form   The form object
 	 * @param   array   $data   The data to be merged into the form object
-	 * @param   string  $group  The plugin group to be executed
+	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
 	 * @since    3.0
 	 */
-	protected function preprocessForm(JForm $form, $data, $group = 'content')
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		// Association content items
 		$app = JFactory::getApplication();
@@ -1170,7 +1187,9 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 
-		parent::preprocessForm($form, $data, $group);
+		// Trigger the default form events.
+		$plugins_group = $plugins_group ?: $this->plugins_group;
+		parent::preprocessForm($form, $data, $plugins_group);
 	}
 
 
@@ -1237,7 +1256,7 @@ class ParentClassItem extends FCModelAdmin
 		$iparams_extra = new JRegistry;
 		$user		= JFactory::getUser();
 		$session = JFactory::getSession();
-		$asset	= 'com_content.article.'.$this->_id;
+		$asset	= $this->typeAlias . '.' . $this->_id;
 
 		// Check if item was editable, but was rendered non-editable
 		$hasTmpEdit = false;
@@ -2122,7 +2141,11 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		JPluginHelper::importPlugin('flexicontent');
-		JPluginHelper::importPlugin('content');
+
+		if ($this->plugins_group)
+		{
+			JPluginHelper::importPlugin($this->plugins_group);
+		}
 
 
 		// ***
@@ -2227,6 +2250,7 @@ class ParentClassItem extends FCModelAdmin
 				return false;
 			}
 		}
+
 		$version_approved = $isNew || $data['vstate']==2;
 		if( $result==='abort' )
 		{
@@ -3077,12 +3101,14 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		
 		// Make sure the data is valid
-		if (!$item->check()) {
+		if (!$item->check())
+		{
 			$this->setError($item->getError());
 			return false;
 		}
 		
-		if (!$item->store()) {
+		if (!$item->store())
+		{
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -3126,29 +3152,12 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// ***
-		// *** Delete old tag relations and Store the new ones
+		// *** Delete old tag relations and store the new ones
 		// ***
 		
 		if (isset($data['tags']))
 		{
-			$tags = & $data['tags'];
-			$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int) $item->id;
-			$this->_db->setQuery($query)->execute();
-
-			$tag_vals = array();
-			foreach($tags as $tagid)
-			{
-				$tag_vals[] = '(' . (int) $tagid . ',' . (int) $item->id . ')';
-			}
-
-			if (count($tag_vals))
-			{
-				$query = 'INSERT INTO #__flexicontent_tags_item_relations'
-					. ' (tid, itemid)'
-					. ' VALUES ' . implode(',', $tag_vals)
-					;
-				$this->_db->setQuery($query)->execute();
-			}
+			$this->saveFcTagsAssignments($data['tags'], $item->id, $_replace = true);
 		}
 
 
@@ -3286,7 +3295,7 @@ class ParentClassItem extends FCModelAdmin
 			// Delete existing Falang translation data for the current item
 			$query = 'DELETE FROM  #__' . $nn_content_tbl
 				. ' WHERE language_id = ' . (int) $langs->$shortcode->id
-				. '  AND reference_table = ' . $db->Quote('content')
+				. '  AND reference_table = ' . $db->Quote($this->records_dbtbl)
 				. '  AND reference_id = ' . (int) $item->id
 				;
 			$db->setQuery($query)->execute();
@@ -3312,7 +3321,7 @@ class ParentClassItem extends FCModelAdmin
 					. ' VALUES ( '
 						. (int) $langs->$shortcode->id . ', '
 						. (int) $item->id . ', '
-						. $db->Quote('content') . ', '
+						. $db->Quote($this->records_dbtbl) . ', '
 						. $db->Quote($fieldname) . ', '
 						. $db->Quote($jfdata[$fieldname]) . ', '
 						. $db->Quote(md5($item->$fieldname)) . ', '
@@ -3377,11 +3386,9 @@ class ParentClassItem extends FCModelAdmin
 		}
 		
 		$query 	= 'SELECT *, t.id as tid FROM #__flexicontent_tags as t '
-				. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
-				. ' ORDER BY name ASC'
-				;
-		$this->_db->setQuery($query);
-		$tagsData = $this->_db->loadObjectList('tid');
+			. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
+			. ' ORDER BY name ASC';
+		$tagsData = $this->_db->setQuery($query)->loadObjectList('tid');
 
 		if ($indexed) return $tagsData;
 
@@ -3555,7 +3562,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getvotes($id = 0)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		$this->_db->setQuery('SELECT rating_sum, rating_count FROM #__content_rating WHERE content_id = ' . (int) $id);
 		return $this->_db->loadObjectlist();
@@ -3564,7 +3571,7 @@ class ParentClassItem extends FCModelAdmin
 	
 	function getRatingDisplay($id = 0)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		$votes = $this->getvotes($id);
 		if ($votes)
@@ -3582,7 +3589,7 @@ class ParentClassItem extends FCModelAdmin
 	function getVotingResolution($id = 0)
 	{
 		static $rating_resolution = array();
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 		if (isset($rating_resolution[$id])) return $rating_resolution[$id];
 
 		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
@@ -3609,7 +3616,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function gethits($id = 0)
 	{
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		$this->_db->setQuery('SELECT hits FROM #__content WHERE id = ' . (int) $id);
 		return $this->_db->loadResult();
@@ -3627,7 +3634,7 @@ class ParentClassItem extends FCModelAdmin
 	function getSubscribersCount($id = 0)
 	{
 		static $subscribers = array();
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 		if ( isset($subscribers[$id]) ) return $subscribers[$id];
 		
 		$query	= 'SELECT COUNT(*)'
@@ -4752,7 +4759,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		static $translations = array(0 => array());
 
-		$id = $id ?: $this->_id;
+		$id = (int) ($id ?: $this->_id);
 
 		// No cached data, get associated translations
 		if ($id && !isset($translations[$id]))
@@ -4789,10 +4796,10 @@ class ParentClassItem extends FCModelAdmin
 			return false;
 		}
 
-		$db = $this->getDbo();
+		$db = $this->_db;
 		try {
 			$query = 'UPDATE #__%s SET featured = ' . (int)$value . ' WHERE id IN ('.implode(',', $pks).')';
-			$db->setQuery(sprintf($query, 'content'))->execute();
+			$db->setQuery(sprintf($query, $this->records_dbtbl))->execute();
 			$db->setQuery(sprintf($query, 'flexicontent_items_tmp'))->execute();
 
 			// Adjust the mapping table, clear the existing features settings
@@ -5048,7 +5055,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 		catch (Exception $e)
 		{
-			$registry = flexicontent_db::check_fix_JSON_column($colname, 'content', 'id', $this->_record->id, $this->_record->$colname);
+			$registry = flexicontent_db::check_fix_JSON_column($colname, $this->records_dbtbl, 'id', $this->_record->id, $this->_record->$colname);
 		}
 		$this->_record->$colname = $registry->toArray();
 		$this->_record->itemparams->merge($registry);
@@ -5109,7 +5116,7 @@ class ParentClassItem extends FCModelAdmin
 		if ( !empty($record->id) )
 		{
 			// Existing item, use item specific permissions
-			$asset = 'com_content.article.' . $record->id;
+			$asset = $this->typeAlias . '.' . $record->id;
 			$allowed =
 				($hasTypeEdit && $user->authorise('core.edit', $asset)) ||
 				($hasTypeEditOwn && $user->authorise('core.edit.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -5155,7 +5162,7 @@ class ParentClassItem extends FCModelAdmin
 		// Existing item, use item specific permissions
 		if ( !empty($record->id) )
 		{
-			$asset = 'com_content.article.' . $record->id;
+			$asset = $this->typeAlias . '.' . $record->id;
 			$allowed =
 				($hasTypeEditState && $user->authorise('core.edit.state', $asset)) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // hasCoupon acts as item owner
@@ -5463,4 +5470,541 @@ class ParentClassItem extends FCModelAdmin
 			$record->last_version = $record->last_version = $record->current_version;
 		}
 	}
+
+
+	/**
+	 * Method to sync FLEXIcontent item's tags with their respective Joomla article tags
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function syncJTagAssignments($fctags, $pks, $contexts, $replaceTags = true)
+	{
+		// Make sure re-usable member properties have been initialized
+		$this->initBatch();
+
+		$jtag_ids = array();
+		$jtags = $this->createFindJoomlaTags($fctags, true, $indexCol = 'id');
+		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): createFindJoomlaTags(): (objs) ' . print_r($jtags, true) . '</pre>';
+
+		foreach($jtags as $fctag_id => $jtag)
+		{
+			if ($jtag)
+			{
+				/**
+				 * Warning ... the TagsHelper method expects that Tag Ids are 'STRING' type ! or if we want to pass tag
+				 * titles of existing tags, ... we need to prefix them with '#new#' to avoid being interpreted as Tag Ids
+				 */
+				$jtag_ids[] = (string) $jtag->id;
+				$fctags[$fctag_id]->jtag_id_new = $jtag->id;
+			}
+			else
+			{
+				$fctags[$fctag_id]->jtag_id_new = 0;
+			}
+		}
+		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): createFindJoomlaTags(): (ids) ' . print_r($jtag_ids, true) . '</pre>';
+
+		foreach ($pks as $pk)
+		{
+			if ($this->user->authorise('core.edit', $contexts[$pk]))
+			{
+				$this->table->reset();
+				$this->table->load($pk);
+
+				// Add new tags, keeping existing ones
+				$result = $this->tagsObserver->setNewTags($jtag_ids, $replaceTags);
+
+				if (!$result)
+				{
+					$this->setError($this->table->getError());
+
+					return false;
+				}
+				//$this->table->store();
+			}
+			else
+			{
+				$this->setError(\JText::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
+
+				return false;
+			}
+		}
+
+		// Clean the cache
+		$this->cleanCache();
+	}
+
+
+	/**
+	 * Method to update mapping of FLEXIcontent tags to their respective Joomla tags
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function updateJTagMappings($fctags)
+	{
+		$i = 0;
+		$query_vals = array();
+
+		foreach($fctags as $fctag)
+		{
+			if ($fctag->jtag_id_new != $fctag->jtag_id)
+			{
+				$fctag->jtag_id = $fctag->jtag_id_new;
+				$query_vals[$fctag->id] = ' WHEN ' . $fctag->id . ' THEN ' . $this->_db->Quote((int) $fctag->jtag_id);
+			}
+			unset($fctag->jtag_id_new);
+			$i++;
+		}
+
+		if (count($query_vals))
+		{
+			$query 	= 'UPDATE #__flexicontent_tags SET jtag_id = CASE id '
+				. implode(' ', $query_vals)
+				. ' END '
+				. ' WHERE id IN (' . implode(',', array_keys($query_vals)) . ')';
+			//echo $query . '<br/>';
+			$this->_db->setQuery($query)->execute();
+		}
+	}
+
+
+	/**
+	 * Method to populate respective Joomla Tag data for a given array of FC tags
+	 *
+	 * @param   array   $fctags      The array of FC Tags
+	 *
+	 * @return  array   The array of FC Tags that was provided
+	 *
+	 * @since   3.3.0
+	 */
+	protected function loadJoomlaTagsData(& $fctags)
+	{
+		if (empty($fctags))
+		{
+			return $fctags;
+		}
+
+		$jtag_ids = array();
+
+		foreach ($fctags as $fctag)
+		{
+			if ((int) $fctag->jtag_id)
+			{
+				$jtag_ids[] = (int) $fctag->jtag_id;
+			}
+		}
+
+		if ($jtag_ids)
+		{
+			$query = 'SELECT *'
+				. ' FROM #__tags '
+				. ' WHERE id IN (' . implode(', ', $jtag_ids) . ')';
+			$jtags = $this->_db->setQuery($query)->loadObject('id');
+
+			foreach ($fctags as $fctag)
+			{
+				$fctag->jtag = isset($jtags[$fctag->jtag_id])
+					? $jtags[$fctag->jtag_id]
+					: null;
+			}
+		}
+
+		return $fctags;
+	}
+
+
+	/**
+	 * Find Joomla tags when given respective FC tags, creating them if they do not exist
+	 *
+	 * @param   array   $tags       Tags text array from the field
+	 * @param   array   $checkACL   Flag to indicate if tag creation ACL should be used
+	 * @param   string  $indexCol   Tag table column (name) whose value to use for indexing the return array
+	 *
+	 * @return  array   An array of tag data (or null tag data), indexed by the value of the given tag column
+	 *
+	 * @since   3.3.0
+	 */
+	public function createFindJoomlaTags($tags, $checkACL = true, $indexCol = 'id')
+	{
+		$newTags = array();
+
+		if (empty($tags))
+		{
+			return $newTags;
+		}
+
+		// We will use the tags table to store them
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		$tagTable  = Table::getInstance('Tag', 'TagsTable');
+		$canCreate = \JFactory::getUser()->authorise('core.create', 'com_tags');
+
+		foreach ($tags as $key => $tag)
+		{
+			$tagText = $tag->name;
+
+			$loaded = false;
+
+			// Clear old data if exist
+			$tagTable->reset();
+
+			// (A) Try to load the selected tag via id
+			if ((int) $tag->jtag_id && $tagTable->load((int) $tag->jtag_id))
+			{
+				$loaded = true;
+			}
+
+			// (B) Try to load the selected tag via title
+			elseif ($tagTable->load(array('title' => $tagText)))
+			{
+				$loaded = true;
+			}
+
+			// (C) Create the tag if we are allowed to do it
+			else
+			{
+				if ($checkACL && !$canCreate)
+				{
+					$newTags[$tag->{$indexCol}] = null;
+					continue;
+				}
+
+				// Set title then call check() method to auto-create an alias
+				$tagTable->title = $tagText;
+				$tagTable->check();
+
+				// (C) Try to load the selected tag, via auto-created alias
+				if ($tagTable->alias && $tagTable->load(array('alias' => $tagTable->alias)))
+				{
+					$loaded = true;
+				}
+
+				// (D) Tag not found. Create a new tag at top-level with language 'ALL', with public access
+				else
+				{
+					// Prepare tag data
+					$tagTable->id = 0;
+					$tagTable->title = $tagText;
+					$tagTable->published = 1;
+
+					// Language ALL, Public access (assumed ... 1)
+					$tagTable->language = '*';
+					$tagTable->access = 1;
+
+					// Make this item a child of the root tag
+					$tagTable->setLocation($tagTable->getRootId(), 'last-child');
+
+					// Try to store tag
+					if ($tagTable->check())
+					{
+						// Assign the alias as path (autogenerated tags have always level 1)
+						$tagTable->path = $tagTable->alias;
+
+						if ($tagTable->store())
+						{
+							$loaded = true;
+						}
+					}
+				}
+			}
+
+			if ($loaded)
+			{
+				$newTags[$tag->{$indexCol}] = (object) array(
+					'id' => (int) $tagTable->id,
+					'title' => $tagTable->title,
+					'alias' => $tagTable->alias
+				);
+			}
+			else
+			{
+				$newTags[$tag->{$indexCol}] = null;
+			}
+		}
+
+		return $newTags;
+	}
+
+
+	/**
+	 * Find FC tags when given respective Joomla tags, creating them if they do not exist
+	 *
+	 * @param   array   $tags       Tags text array from the field
+	 * @param   array   $checkACL   Flag to indicate if tag creation ACL should be used
+	 * @param   string  $indexCol   Tag table column (name) whose value to use for indexing the return array
+	 *
+	 * @return  array   An array of tag data (or null tag data), indexed by the value of the given tag column
+	 *
+	 * @since   3.3.0
+	 */
+	public function createFindFcTags($tags, $checkACL = true, $indexCol = 'id')
+	{
+		$newTags = array();
+
+		if (empty($tags))
+		{
+			return $newTags;
+		}
+
+		// We will use the tags table to store them
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables');
+		$tagTable  = Table::getInstance('flexicontent_tags', '');
+		$canCreate = FlexicontentHelperPerm::getPerm()->CanTags;
+
+		foreach ($tags as $key => $tag)
+		{
+			$tagText = $tag->title;
+
+			$loaded = false;
+
+			// Clear old data if exist
+			$tagTable->reset();
+
+			// (A) Try to load the selected tag via id
+			if ($tag->fctag_id && $tagTable->load((int) $tag->fctag_id))
+			{
+				$loaded = true;
+			}
+
+			// (B) Try to load the selected tag via title
+			elseif ($tagTable->load(array('name' => $tagText)))
+			{
+				$loaded = true;
+			}
+
+			// (C) Create the tag if we are allowed to do it
+			else
+			{
+				if ($checkACL && !$canCreate)
+				{
+					$newTags[$tag->{$indexCol}] = null;
+					continue;
+				}
+
+				// Set title then call check() method to auto-create an alias
+				$tagTable->name = $tagText;
+				$tagTable->check();
+
+				// (C) Try to load the selected tag, via auto-created alias
+				if ($tagTable->alias && $tagTable->load(array('alias' => $tagTable->alias)))
+				{
+					$loaded = true;
+				}
+
+				// (D) Tag not found. Create a new tag at top-level with language 'ALL', with public access
+				else
+				{
+					// Prepare tag data
+					$tagTable->id = 0;
+					$tagTable->name = $tagText;
+					$tagTable->jtag_id = $tag->id;
+					$tagTable->published = 1;
+
+					// Try to store tag
+					if ($tagTable->check())
+					{
+						if ($tagTable->store())
+						{
+							$loaded = true;
+						}
+					}
+				}
+			}
+
+			if ($loaded)
+			{
+				if (!$tagTable->jtag_id)
+				{
+					$tagTable->jtag_id = $tag->id;
+					$tagTable->store();
+				}
+
+				$newTags[$tag->{$indexCol}] = (object) array(
+					'id' => (int) $tagTable->id,
+					'title' => $tagTable->name,
+					'alias' => $tagTable->alias
+				);
+			}
+			else
+			{
+				$newTags[$tag->{$indexCol}] = null;
+			}
+		}
+
+		return $newTags;
+	}
+
+
+	/**
+	 * Method to get an array of the Joomla tags assigned to an item, optionally retrieving the tag data.
+	 *
+	 * @param   string   $contentType  Content type alias. Dot separated.
+	 * @param   integer  $id           Id of the item to retrieve tags for.
+	 * @param   boolean  $getTagData   If true, data from the tags table will be included, defaults to true.
+	 *
+	 * @return  array    Array of of tag objects
+	 *
+	 * @since   3.3.0
+	 */
+	public function getJTagsAssignments($contentType = null, $id = 0, $getTagData = true)
+	{
+		$this->initBatch();
+		$db = $this->_db;
+
+		$contentType = $contentType ?: $this->typeAlias;
+		$id = (int) ($id ?: $this->_id);
+
+		// Create the query
+		$query = $db->getQuery(true)
+			->select('m.tag_id, ft.id AS fctag_id')
+			->from('#__contentitem_tag_map AS m ')
+			->join('INNER', '#__tags AS t ON m.tag_id = t.id')
+			->join('LEFT', '#__flexicontent_tags AS ft ON ft.jtag_id = t.id')
+			->where(array(
+				'm.type_alias = ' . $db->quote($contentType),
+				'm.content_item_id = ' . (int) $id,
+			));
+
+		if ($getTagData)
+		{
+			$query->select('t.*');
+		}
+
+		return $db->setQuery($query)->loadObjectList();
+	}
+
+
+	/**
+	 * Method to merge Joomla tags assignments of an item, to existing FC tag assignments of the item, finding / creating / mapping respective FC tags as needed
+	 *
+	 * @param   array    $item       The FC item object
+	 * @param   array    $jtags      The Joomla tags assigned to the item
+	 *
+	 * @return  array    Array all FC tags assigned to the item after merging Joomla tag assignments
+	 *
+	 * @since   3.3.0
+	 */
+	public function mergeJTagsAssignments($item = null, $jtags = null, $replaceTags = false)
+	{
+		$db = $this->_db;
+
+		$item = $item ?: $this->_record;
+		$jtags = $jtags !== null
+			? $jtags
+			: $this->getJTagsAssignments();
+
+		// Find / Create respective fc tags
+		$fctags = $this->createFindFcTags($jtags, $_checkACL = false, $_indexCol = 'id');
+		
+		$old_tags = array_flip($item->tags);
+		$new_tags = array();
+
+		// Find which tags are not already assigned to given FC item, or add them all if replacing existing ones
+		foreach ($fctags as $fctag)
+		{
+			if ($replaceTags || !isset($old_tags[$fctag->id]))
+			{
+				$new_tags[] = $fctag->id;
+			}
+		}
+		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): new_tags = ' . print_r($new_tags, true) . '</pre>';
+
+		// Only update FC tag relations in DB if we have new tags
+		if (count($new_tags) || $replaceTags)
+		{
+			$tags = array_flip($new_tags);
+			$this->saveFcTagsAssignments($new_tags, $item->id, $replaceTags);
+
+			// Add the new assignment to the already loaded FC item
+			foreach($new_tags as $fctag_id)
+			{
+				$item->tags[] = $fctag_id;
+			}
+		}
+	}
+
+
+
+	/**
+	 * Method to save Joomla tags when given existing Joomla tags assigned to an item
+	 *
+	 * @param   array     $tags       The FC tag ids to be assigned to the item
+	 * @param   integer   $id         The FC item id
+	 * @param   boolean   $replace    Indicates that old tags needed to be deleted (being replaced)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	public function saveJTagsAssignments($fctag_ids, $id = null)
+	{
+		$id = (int) ($id ?: $this->_id);
+		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): fctag_ids = ' . print_r($fctag_ids, true) . '</pre>';
+
+		// Make sure re-usable member properties have been initialized
+		$this->initBatch();
+		$asset = $this->typeAlias . '.' . $id;
+
+		// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
+		$this->createTagsHelper($this->tagsObserver, $this->type, $id, $this->typeAlias, $this->table);
+
+		// Load data of FLEXIcontent tags
+		$fctags = $this->getTagsByIds($fctag_ids);
+		echo empty($this->debug_tags) ? null : '<pre>' . __FUNCTION__ . '(): getTagsByIds(): ' . print_r($fctags, true) . '</pre>';
+
+		// Sync the tags assignments
+		$this->syncJTagAssignments($fctags, array($id), array($id => $asset),  true);
+
+		// Update (if needed) mappings of FLEXIcontent tags to Joomla tags
+		$this->updateJTagMappings($fctags);
+	}
+
+
+	/**
+	 * Method to save FC tags assigned to an item when given an array of FC tags Ids
+	 *
+	 * @param   array     $tags       The FC tag ids to be assigned to the item
+	 * @param   integer   $id         The FC item id
+	 * @param   boolean   $replace    Indicates that old tags needed to be deleted (being replaced)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	public function saveFcTagsAssignments($tags, $id = null, $replaceTags = true)
+	{
+		$db = $this->_db;
+		$id = (int) ($id ?: $this->_id);
+
+		// Delete old tag relations
+		if ($replaceTags)
+		{
+			$query = 'DELETE FROM #__flexicontent_tags_item_relations'
+				. ' WHERE itemid = ' . (int) $id
+				;
+			$db->setQuery($query)->execute();
+		}
+
+		$tag_vals = array();
+		foreach($tags as $tagid)
+		{
+			$tag_vals[] = '(' . (int) $tagid . ',' . (int) $id . ')';
+		}
+
+		// Store the new tag relations
+		if (count($tag_vals))
+		{
+			// If replacing Tags then it is safe to use 'INSERT' otherwise avoid duplicate errors using the slower 'REPLACE'
+			$query = ($replaceTags ? 'INSERT' : 'REPLACE')
+				. ' INTO #__flexicontent_tags_item_relations'
+				. ' (tid, itemid)'
+				. ' VALUES ' . implode(',', $tag_vals)
+				;
+			$db->setQuery($query)->execute();
+		}
+	}
+
 }
