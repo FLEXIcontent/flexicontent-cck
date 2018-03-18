@@ -231,7 +231,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-selected-items">
 				<label class="' . $add_on_class . ' fc-lbl selected-items-lbl" for="'.$elementid.'">'.JText::_($selected_items_label).'</label>
-				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' >
+				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' onchange="return fcrelation_field_'.$elementid_ns.'_mark_selected();" >
 					'.$items_options_select.'
 				</select>
 				'.($selected_items_sortable ? '
@@ -245,34 +245,69 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 function fcrelation_field_".$elementid_ns."_add_related(el)
 {
+	if (!parseInt(jQuery(el).val())) return false;
+
 	var
 		item_selector = jQuery(el),
-		item_id = parseInt( item_selector.val() ),
-		item_title = item_selector.find('option:selected').text();
-	
-	if ( !item_id ) return false;
-	
-	var
+		item_id = parseInt(item_selector.val()),
 		cat_selector = jQuery('#".$elementid."_cat_selector'),
-		cat_id = cat_selector.val();
-	
-	var itemid_catid = item_id+':'+cat_id;
+		cat_id = cat_selector.val(),
+		selected_item = item_selector.find('option:selected'),
+		item_title = selected_item.text(),
+		itemid_catid = item_id + ':' + cat_id;
+
 	window.console.log(itemid_catid);
-	
+
 	var selitems_selector = jQuery('#".$elementid."');
 	selitems_selector.append(jQuery('<option>', {
 		value: itemid_catid,
 		text: item_title,
 		selected: 'selected'
-	}));
-	
-	setTimeout(function() {
-		item_selector.val('').trigger('change');   // Clear item selection
-		jQuery('#".$elementid."').trigger('change');
-	}, 50);
-	
+	})).trigger('change');
+
 	return true;
 }
+
+
+function fcrelation_field_".$elementid_ns."_mark_selected()
+{
+	var item_selector = jQuery('#".$elementid."_item_selector');
+	var selitems_selector = jQuery('#".$elementid."');
+
+	var selitems_arr = selitems_selector.val();
+	selitems_arr = !!selitems_arr ? selitems_arr : [];
+
+	for (var i = 0; i < selitems_arr.length; i++)
+	{
+		selitems_arr[i] = parseInt(selitems_arr[i]).toString();
+	}
+	window.console.log(selitems_arr);
+
+	[].forEach.call(
+		document.querySelectorAll('#' + item_selector.attr('id') + ' option'),
+		function(el)
+		{
+			if (selitems_arr.indexOf(el.value) >= 0)
+			{
+				el.disabled = true;
+				el.setAttribute('disabled', 'disabled');
+			}
+			else
+			{
+				el.disabled = false;
+				el.removeAttribute('disabled');
+			}
+		}
+	);
+
+	// Clear item selection
+	setTimeout(function() {
+		item_selector.val('').trigger('change');
+	}, 50);
+
+	return true;
+}
+
 
 jQuery(document).ready(function()
 {
@@ -281,15 +316,16 @@ jQuery(document).ready(function()
 		var selitems_selector = jQuery('#".$elementid."');
 		setTimeout(function() {
 			var non_selected = selitems_selector.find('option:not(:selected)');
-			if (non_selected.length) {
+			if (non_selected.length)
+			{
 				non_selected.remove();
 				selitems_selector.trigger('change');
 			}
 		}, 50);
 		return true;
 	});
-	
-	
+
+
 	jQuery('#".$elementid."_cat_selector').change(function()
 	{
 		var cat_selector = jQuery(this);
@@ -350,16 +386,18 @@ jQuery(document).ready(function()
 				for(var i=0; i<data.options.length; i++)
 				{
 					item = data.options[i];
-					item_selector.append(jQuery('<option>', {
-						value: (item.item_id+':'+catid),
-						text: item.item_title
-					}));
+					item_selector.append(
+						jQuery('<option>', {
+							value: item.item_id,
+							text: item.item_title
+						})
+					);
 				}
 			}
 			
-			// Trigger change event to update select2 display
-			item_selector.val('').trigger('change');
-			
+			// Disable selected values (this will also trigger change event to update select2 display)
+			fcrelation_field_".$elementid_ns."_mark_selected();
+
 			// Remove loading animation
 			sel2_item_selector.next().remove();
 
@@ -855,13 +893,17 @@ jQuery(document).ready(function()
 	}
 
 
-	// Method called via AJAX to get dependent values
+	/**
+	 * Method called via AJAX to get dependent values
+	 */
+
 	function getCategoryItems()
 	{
 		// Get API objects / data
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
-		
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDbo();
+
 		// Get Access Levels of user
 		$uacc = array_flip(JAccess::getAuthorisedViewLevels($user->id));
 		
@@ -878,69 +920,90 @@ jQuery(document).ready(function()
 		$response = array();
 		$response['error'] = '';
 		$response['options'] = array();
-		
-		if (!$field_id)    $response['error'] = 'Invalid field_id';
-		else if (!$catid)  $response['error'] = 'Invalid catid';
-		
-		if ( $response['error'] )
-		{
-			exit( json_encode($response) );
-		}
-		$request_catids = array($catid);
-		
-		
-		
-		// ***
-		// *** Load and check field
-		// ***
-		
-		$field = JTable::getInstance( $_type = 'flexicontent_fields', $_prefix = '', $_config = array() );
-		
 
-		if ( !$field->load( $field_id ) )           $response['error'] = 'field not found';
-		else if ( $field->field_type!='relation' )  $response['error'] = 'field id is not a relation field';
+
+		if (!$field_id)
+		{
+			$response['error'] = 'Invalid field_id';
+		}
+
+		elseif (!$catid)
+		{
+			$response['error'] = 'Invalid catid';
+		}
+
+		if ($response['error'])
+		{
+			jexit(json_encode($response));
+		}
+		
+		
+		
+		/**
+		 * Load and check field
+		 */
+
+		$field = JTable::getInstance( $_type = 'flexicontent_fields', $_prefix = '', $_config = array() );
+
+		if (!$field->load($field_id))
+		{
+			$response['error'] = 'field not found';
+		}
+
+		elseif ($field->field_type !== 'relation')
+		{
+			$response['error'] = 'field id is not a relation field';
+		}
+
 		else
 		{
 			$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+
 			if ( !$is_editable )
 			{
 				$response['error'] = 'you do not have permission to edit lthis field';
 			}
 		}
 		
-		if ( $response['error'] )
+		if ($response['error'])
 		{
-			exit( json_encode($response) );
+			jexit(json_encode($response));
 		}
 		
 		
-		// ***
-		// *** Load and check item
-		// ***
-		
+		/**
+		 * Load and check item
+		 */
+
 		$item = JTable::getInstance( $_type = 'flexicontent_items', $_prefix = '', $_config = array() );
-		if ( !$item_id )
+
+		if (!$item_id)
 		{
 			$item->type_id = $type_id;
 			$item->language = $lang_code;
 			$item->created_by = $user->id;
 		}
-		else if ( !$item->load( $item_id ) )       $response['error'] = 'content item not found';
+
+		elseif (!$item->load($item_id))
+		{
+			$response['error'] = 'content item not found';
+		}
+
 		else
 		{
 			$asset = 'com_content.article.' . $item->id;
 			$isOwner = $item->created_by == $user->get('id');
 			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-			if ( !$canEdit )
+
+			if (!$canEdit)
 			{
 				$response['error'] = 'content item has non-allowed access level';
 			}
 		}
 
-		if ( $response['error'] )
+		if ($response['error'])
 		{
-			exit( json_encode($response) );
-			exit;
+			jexit(json_encode($response));
 		}
 		
 		
@@ -962,78 +1025,143 @@ jQuery(document).ready(function()
 		// NOTE: categories scope parameters ... not used here, since category scope is checked by calling getAllowedCategories()
 
 		// types scope parameters
-		$method_types = $field->parameters->get('method_types', 1);
-
+		$method_types = (int) $field->parameters->get('method_types', 1);
 		$types = $field->parameters->get('types');
-		if ( empty($types) )							$types = array();
-		else if ( ! is_array($types) )		$types = !FLEXI_J16GE ? array($types) : explode("|", $types);
+
+		if (empty($types))
+		{
+			$types = array();
+		}
+
+		elseif (!is_array($types))
+		{
+			$types = explode('|', $types);
+		}
 
 		// other limits of scope parameters
-		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
-		$onlypublished = $field->parameters->get( 'onlypublished', 1 );
-		$ownedbyuser   = $field->parameters->get( 'ownedbyuser', 0 );
+		$samelangonly  = (int) $field->parameters->get('samelangonly', 1);
+		$onlypublished = (int) $field->parameters->get('onlypublished', 1);
+		$ownedbyuser   = (int) $field->parameters->get('ownedbyuser', 0);
 		
 		
-		// ***
-		// *** Item retrieving query ... CREATE WHERE CLAUSE
-		// ***
+		/**
+		 * Item retrieving query ... CREATE WHERE CLAUSE according to configured limitations SCOPEs
+		 */
 		$where = array();
 
+		// Exclude currently edited item
+		if ($item_id)
+		{
+			$where[] = ' i.id <> ' . (int) $item_id;
+		}
 
-		// CATEGORY SCOPE
+
+		/**
+		 * CATEGORY SCOPE
+		 */
+
 		$allowed_cats = self::getAllowedCategories($field);
+
 		if (empty($allowed_cats))
 		{
-			echo json_encode( array('error' => JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')) );
-			exit;
+			jexit(json_encode(array(
+				'error' => JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')
+			)));
 		}
 
 		// Check given category (-ies) is in the allowed categories
+		$request_catids = array($catid);
 		$catids = array_intersect($allowed_cats, $request_catids);
-		if ( empty($catids) )
+
+		if (empty($catids))
 		{
-			echo json_encode( array('error' => JText::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')) );
-			exit;
+			jexit(json_encode(array(
+				'error' => JText::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')
+			)));
 		}
 
 		// Also include subcategory items
-		$subcat_items = $field->parameters->get('subcat_items', 1 );
+		$subcat_items = (int) $field->parameters->get('subcat_items', 1 );
+
 		if ($subcat_items)
 		{
 			global $globalcats;
 			$_catids = array();
+
 			foreach ($catids as $catid)
 			{
 				$subcats = $globalcats[$catid]->descendantsarray;
-				foreach ($subcats as $subcat)  $_catids[(int)$subcat] = 1;
+
+				foreach ($subcats as $subcat)
+				{
+					$_catids[(int)$subcat] = 1;
+				}
 			}
 			$catids = array_keys($_catids);
 		}
+
 		$where[] = ' rel.catid IN (' . implode(',', $catids ) . ') ';
 
 
-		// TYPE SCOPE
-		if ( ($method_types == 2 || $method_types == 3) && ( !count($types) || empty($types[0]) ) )
+		/**
+		 * TYPE SCOPE
+		 */
+
+		if (($method_types === 2 || $method_types === 3) && (!count($types) || empty($types[0])))
 		{
-			echo json_encode( array('error' => 'Content Type scope is set to include/exclude but no Types are selected in field configuration, please set to "ALL" or select types to include/exclude') );
-			exit;
+			jexit(json_encode(array(
+				'error' => 'Content Type scope is set to include/exclude but no Types are selected in field configuration, please set to "ALL" or select types to include/exclude'
+			)));
 		}
 
-		if ($method_types == 2)       $where[] = ' ie.type_id NOT IN (' . implode(',', $types) . ')';   // exclude method
-		else if ($method_types == 3)  $where[] = ' ie.type_id IN (' . implode(',', $types) . ')';       // include method
-		
-		// OTHER SCOPE LIMITS
-		if ($samelangonly)  $where[] = !$item->language || $item->language=='*' ? " ie.language='*' " : " (ie.language='{$item->language}' OR ie.language='*') ";
-		if ($onlypublished) $where[] = " i.state IN (1, -5) ";
-		if ($ownedbyuser==1) $where[] = " i.created_by = ". $user->id;
-		else if ($ownedbyuser==2) $where[] = " i.created_by = ". $item->created_by;
-		
-		$where = !count($where) ? "" : " WHERE " . implode(" AND ", $where);
-		
-		
-		// ***
-		// *** Item retrieving query ... CREATE ORDERBY CLAUSE
-		// ***
+		// exclude method
+		if ($method_types === 2)
+		{
+			$where[] = ' ie.type_id NOT IN (' . implode(',', $types) . ')';
+		}
+
+		// include method
+		elseif ($method_types === 3)
+		{
+			$where[] = ' ie.type_id IN (' . implode(',', $types) . ')';
+		}
+
+
+		/**
+		 * OTHER SCOPE LIMITATIONS
+		 */
+
+		if ($samelangonly)
+		{
+			$where[] = !$item->language || $item->language === '*'
+				? ' i.language = ' . $db->Quote('*')
+				: ' (i.language = ' . $db->Quote($item->language) . ' OR i.language = ' . $db->Quote('*') . ') ';
+		}
+
+		if ($onlypublished)
+		{
+			$where[] = ' i.state IN (1, -5) ';
+		}
+
+		if ($ownedbyuser === 1)
+		{
+			$where[] = ' i.created_by = ' . (int) $user->id;
+		}
+		elseif ($ownedbyuser === 2)
+		{
+			$where[] = ' i.created_by = ' . (int) $item->created_by;
+		}
+
+
+		// Create the WHERE clause
+		$where = !count($where)
+			? ''
+			: ' WHERE ' . implode(' AND ', $where);
+
+
+		/**
+		 * Item retrieving query ... CREATE ORDERBY CLAUSE
+		 */
 
 		$order = $field->parameters->get( 'orderby_form', 'alpha' );;   // TODO: add more orderings: commented, rated
 		$orderby = flexicontent_db::buildItemOrderBy(
@@ -1042,53 +1170,56 @@ jQuery(document).ready(function()
 			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
 			$default_order='', $default_order_dir='', $sfx='_form', $support_2nd_lvl=false
 		);
-		
-		// Create JOIN for ordering items by a most rated
-		if ( in_array('author', $order) || in_array('rauthor', $order) )
-		{
-			$orderby_join = ' LEFT JOIN #__users AS u ON u.id = i.created_by';
-		}
-		
-		
-		// ***
-		// *** Item retrieving query ... put together and execute it
-		// ***
 
-		$db = JFactory::getDbo();
-		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
-			.", GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist"
-			.' FROM #__content AS i '
-			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on i.id=ie.item_id " : "")
+		// Create JOIN for ordering items by a most rated
+		$orderby_join = in_array('author', $order) || in_array('rauthor', $order)
+			? ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			: '';
+
+		// Create JOIN for getting item types
+		$types_join = $method_types > 1
+			? ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id '
+			: '';
+
+		/**
+		 * Item retrieving query ... put together and execute it
+		 */
+
+		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias, GROUP_CONCAT(rel.catid SEPARATOR \',\') as catlist'
+			. ' FROM #__content AS i '
+			. $types_join
 			. ' JOIN #__flexicontent_cats_item_relations AS rel on i.id=rel.itemid '
-			. @ $orderby_join
+			. $orderby_join
 			. $where
-			. " GROUP BY rel.itemid "
+			. ' GROUP BY rel.itemid '
 			. $orderby
 			;
-		$db->setQuery($query);
-		$items_arr = $db->loadObjectList();
+		$items_arr = $db->setQuery($query)->loadObjectList();
 		
 		// Some configuration
-		$prepend_item_state = $field->parameters->get( 'prepend_item_state', 1 ) ;
+		$prepend_item_state = (int) $field->parameters->get('prepend_item_state', 1);
 		
 		foreach($items_arr as $itemdata)
 		{
-			$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
-			if (0 && $prepend_item_state)
+			$itemtitle = StringHelper::strlen($itemdata->title) > $maxtitlechars
+				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '...'
+				: $itemdata->title;
+
+			/*if ($prepend_item_state)
 			{
-				$statestr = "[". @$state_shortname[$itemdata->state]."] ";
+				$statestr = '[' . (isset($state_shortname[$itemdata->state]) ? $state_shortname[$itemdata->state] : 'U') . '] ';
 				$itemtitle = $statestr.$itemtitle." ";
-			}
-			$itemcat_arr = explode(",", $itemdata->catlist);
+			}*/
+
+			$itemcat_arr = explode(',', $itemdata->catlist);
 			$itemid = $itemdata->id;
 			
-			$response['options'][] = array('item_id'=>$itemid, 'item_title'=>$itemtitle);
+			$response['options'][] = array('item_id' => $itemid, 'item_title' => $itemtitle);
 		}
 
-		// echo "<pre>"; print_r($response); echo "</pre>"; exit;
+		//jexit(print_r($response, true));
 
 		// Output the field
-		echo json_encode($response);
-		exit;
+		jexit(json_encode($response));
 	}
 }
