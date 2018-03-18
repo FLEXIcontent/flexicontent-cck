@@ -262,7 +262,7 @@ jQuery(document).ready(function() {
 	};
 	
 	// Add instant text type filter to lists
-	jQuery('span.fc_list_filter_wrapper').each(function() {
+	jQuery('div.fc_list_filter_wrapper').each(function() {
 		var list = jQuery(this).find('ul:first');
 		// prepend text filter input to the list
 		var form = jQuery("<form>").attr({"class":"fc_instant_filter", "action":"#"}),
