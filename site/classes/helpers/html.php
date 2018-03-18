@@ -1247,12 +1247,27 @@ class flexicontent_html
 				}
 				break;
 
+			case 'mousewheel':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+
+				$framework_path = JUri::root(true).$lib_path.'/mousewheel';
+				$document->addScript($framework_path.'/jquery.mousewheel.min.js');
+				break;
+
 			case 'mCSB':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$framework_path = JUri::root(true).$lib_path.'/mCSB';
+
+				// Load jQuery mouse wheel as this JS can make use of it
+				flexicontent_html::loadFramework('mousewheel');
+
+				// Add mousewheel plugin (this is optional)
+				//$document->addScript($framework_path.'/jquery.mousewheel.min.js');
+
 				$document->addScript($framework_path.'/jquery.mCustomScrollbar.min.js');
-				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.css');
+				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.min.css');
+
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('.fc_add_scroller').mCustomScrollbar({
@@ -1290,8 +1305,12 @@ class flexicontent_html
 
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
+
 				// Load flexi-lib, as it contains the select2 attach function: fc_attachSelect2()
 				flexicontent_html::loadFramework('flexi-lib');
+
+				// Load jQuery mouse wheel as this JS can make use of it
+				flexicontent_html::loadFramework('mousewheel');
 
 				// Disable select2 JS in mobile devices and instead use chosen JS ...
 				$mobileDetector = flexicontent_html::getMobileDetector();
@@ -1537,8 +1556,11 @@ class flexicontent_html
 
 				$framework_path = JUri::root(true).$lib_path.'/fancybox';
 
+				// Load jQuery mouse wheel as this JS can make use of it
+				flexicontent_html::loadFramework('mousewheel');
+
 				// Add mousewheel plugin (this is optional)
-				$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js');
+				//$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js');
 
 				// Add fancyBox CSS / JS
 				$document->addStyleSheet($framework_path.'/source/jquery.fancybox.css');
