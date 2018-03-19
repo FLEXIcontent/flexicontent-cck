@@ -27,43 +27,19 @@
 		<language tag="en-GB">en-GB/en-GB.mod_flexigooglemap.ini</language>
 		<language tag="fr-FR">fr-FR/fr-FR.mod_flexigooglemap.ini</language>
 	</languages>
-
+	
 	<config>
 	<fields name="params" addfieldpath="modules/mod_flexigooglemap/elements/">
-
-		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
-			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
-				<option value="OR">FLEXI_OR</option>
-				<option value="AND">FLEXI_AND</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
-			<field name="" type="separator" default="FLEXI_EXT_SHOW_HIDE_JCACHE_CONF_NOTE" level="level3" class="alert alert-info fcpadded" />
-			<field name="show_in_clients" type="fccheckbox" default=""
-					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
-					checkvals="desktop,tablet,mobile"
-					defaultvals="desktop,tablet,mobile"
-					label="FLEXI_MOD_SHOW_IN_CLIENTS" description="FLEXI_MOD_SHOW_IN_CLIENTS_DESC"
-			/>
-
-			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" />
-			<field name="show_in_views" type="fccheckbox" default=""
-					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_DIRECTORY_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V"
-					checkvals="category,item,favourites,tags,flexicontent,search,others"
-					defaultvals="category,item,favourites,tags,flexicontent,search,others"
-					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
-			/>
-
-			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" />
-			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group group-fcmethod">
-				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
-				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
-
-		</fieldset>
-
+		
 		<fieldset name="basic">
+
+			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" class="fc-ngmargin" />
+			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
+			<field name="layout" type="fclayout" default="news" label="FLEXI_CHOOSE_TMPL"
+				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexiadvsearch/tmpl" ext_name="mod_flexiadvsearch"
+				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
+				tmpl_container="mod_tmpl_layout" params_source="file"
+				/> <!-- params_source="file" -->
 
 			<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_CONFIG" level="level1" />
 			<field
@@ -297,19 +273,46 @@
 
 		</fieldset>
 
+		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
+			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
+				<option value="OR">FLEXI_OR</option>
+				<option value="AND">FLEXI_AND</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_MOD_CLIENTS" level="level2" />
+			<field name="" type="separator" default="FLEXI_EXT_SHOW_HIDE_JCACHE_CONF_NOTE" level="level3" class="alert alert-info fcpadded" />
+			<field name="show_in_clients" type="fccheckbox" default=""
+					checkoptions="FLEXI_MOD_DESKTOP,FLEXI_MOD_TABLET,FLEXI_MOD_MOBILE"
+					checkvals="desktop,tablet,mobile"
+					defaultvals="desktop,tablet,mobile"
+					label="FLEXI_MOD_SHOW_IN_CLIENTS" description="FLEXI_MOD_SHOW_IN_CLIENTS_DESC"
+			/>
+
+			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" />
+			<field name="show_in_views" type="fccheckbox" default=""
+					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_DIRECTORY_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V"
+					checkvals="category,item,favourites,tags,flexicontent,search,others"
+					defaultvals="category,item,favourites,tags,flexicontent,search,others"
+					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
+			/>
+
+			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" />
+			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
+				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
+
+		</fieldset>
+		
+		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
+		</fieldset>
 
 		<fieldset name="advanced">
 
-			<field
-				name="cache"
-				type="list"
-				default="1"
-				label="COM_MODULES_FIELD_CACHING_LABEL"
-				description="COM_MODULES_FIELD_CACHING_DESC">
-				<option
-				value="1">JGLOBAL_USE_GLOBAL</option>
-				<option
-				value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+			<field name="cache" type="list" default="1" label="COM_MODULES_FIELD_CACHING_LABEL" description="COM_MODULES_FIELD_CACHING_DESC">
+				<option value="1">JGLOBAL_USE_GLOBAL</option>
+				<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
 			</field>
 
 		</fieldset>

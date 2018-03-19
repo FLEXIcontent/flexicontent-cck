@@ -28,11 +28,14 @@
 	<fields name="params" addfieldpath="/modules/mod_flexifilter/elements">
 		<fieldset name="basic">
 		
-			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level0" class="fc-ngmargin" />
+			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" level="level1" class="fc-ngmargin" />
 			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
-			<field name="layout" type="fclayout" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl" ext_name="mod_flexifilter"
-					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
-			
+			<field name="layout" type="fclayout" default="default" label="FLEXI_CHOOSE_TMPL"
+				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl" ext_name="mod_flexifilter"
+				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
+				tmpl_container="mod_tmpl_layout" params_source="file"
+				/> <!-- params_source="inline" -->
+
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" />
 
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" class="alert alert-info fcpadded" />
@@ -226,8 +229,11 @@
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
+		
+		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
+		</fieldset>
 
-		<fieldset name="FLEXI_MOD_ADVANCED" label="FLEXI_MOD_ADVANCED">
+		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
 			
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="0" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">

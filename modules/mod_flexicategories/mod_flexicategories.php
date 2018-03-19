@@ -79,6 +79,7 @@ jimport('joomla.profiler.profiler');
 $modfc_jprof = new JProfiler();
 $modfc_jprof->mark('START: FLEXIcontent Categories Module');
 
+
 // Include helpers class file
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
@@ -90,15 +91,17 @@ if ($mod_initialized === null)
 	$mod_initialized = true;
 }
 
-// initialize various variables
+// Initialize various variables
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
-// include the helper only once
+// Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
+// Include JCategoryNode class file
 JLoader::register('JCategoryNode', JPATH_BASE . '/libraries/legacy/categories/categories.php');
 
+// Get module's basic display parameters
 $cacheid = md5($module->id);
 
 $cacheparams               = new stdClass;
