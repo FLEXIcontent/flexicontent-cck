@@ -44,6 +44,16 @@
 			<field name="item_border_radius" type="number" cssprep="less" default="0" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
 			<field name="item_border_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" />
 			<field name="item_border_size" type="number" cssprep="less" default="0" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" min="0" max="80" step="1" />
+			<field name="item_border_type" type="list" cssprep="less" default="solid" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+			<option value="solid">FLEXI_SOLID</option>
+			<option value="dotted">FLEXI_DOTTED</option>
+			<option value="dashed">FLEXI_DASHED</option>
+			<option value="double">FLEXI_DOUBLE</option>
+			<option value="groove">FLEXI_GROOVE</option>
+			<option value="ridge">FLEXI_RIDGE</option>
+			<option value="inset">FLEXI_INSET</option>
+			<option value="outset">FLEXI_OUTSET</option>
+			</field>
 
 			<field name="item_tab_title" type="separator" default="FLEXI_TMPL_ITEM_TITLE_TAB" description="" icon_class="icon-brush" level="tab_open" box_type="1" />
 
@@ -108,7 +118,7 @@
 			<field name="subtitle_tab10_label" type="text" default="" label="Label for Tab 10" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="subtitle_tab11_label" type="text" default="" label="Label for Tab 11" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="subtitle_tab12_label" type="text" default="" label="Label for Tab 12" description="The text for this label is filter via JText (you can add to your ini language files)" />
-			
+
 			<field name="bottom_tabs_grp" type="separator" default="Bottom Tabs" description="" level="level2" />
 			<field name="bottom_tab1_label" type="text" default="" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="bottom_tab2_label" type="text" default="" label="Label for Tab 2" description="The text for this label is filter via JText (you can add to your ini language files)" />
@@ -140,7 +150,7 @@
 			<field name="column_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
 			<field name="column_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" />
 			<field name="column_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" />
-			
+
 			<field name="column_padding_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
 			<field name="column_pad_top" type="number" cssprep="less" default="10" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
 			<field name="column_pad_left" type="number" cssprep="less" default="10" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="10" max="80" step="1" />
@@ -151,12 +161,22 @@
 			<field name="column_border_radius" type="number" cssprep="less" default="0" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
 			<field name="column_border_size" type="number" cssprep="less" default="1" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
 			<field name="column_border_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" />
+			<field name="column_border_type" type="list" cssprep="less" default="solid" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+			<option value="solid">FLEXI_SOLID</option>
+			<option value="dotted">FLEXI_DOTTED</option>
+			<option value="dashed">FLEXI_DASHED</option>
+			<option value="double">FLEXI_DOUBLE</option>
+			<option value="groove">FLEXI_GROOVE</option>
+			<option value="ridge">FLEXI_RIDGE</option>
+			<option value="inset">FLEXI_INSET</option>
+			<option value="outset">FLEXI_OUTSET</option>
+			</field>
 
 			<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 
 		</fieldset>
 	</fields>
-	
+
 	<fieldgroups>
 		<group>subtitle1</group>
 		<group>subtitle2</group>
@@ -195,5 +215,5 @@
 		<file>css/item.css</file>
 	</cssitem>
 	<jsitem>
-	</jsitem>	
+	</jsitem>
 </form>

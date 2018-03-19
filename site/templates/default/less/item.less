@@ -24,7 +24,7 @@ body #flexicontent .fc_item_title a {
 	padding-left: @FCI_item_pad_left + px;
 	padding-bottom: @FCI_item_pad_bottom + px;
 	border-radius: @FCI_item_border_radius + px;
-	border: @FCI_item_border_size + px solid @FCI_item_border_color;
+	border: @FCI_item_border_size + px @FCI_item_border_type @FCI_item_border_color ;
 	color:@FCI_item_text_color;
 }
 
@@ -87,7 +87,7 @@ body .flexi.infoblock{
 	padding-left: @FCI_column_pad_left + px;
 	padding-bottom: @FCI_column_pad_bottom + px;
 	border-radius: @FCI_column_border_radius + px;
-	border : @FCI_column_border_size + px solid @FCI_column_border_color;
+	border : @FCI_column_border_size + px @FCI_column_border_type @FCI_column_border_color ;
 }
 
 // ***
