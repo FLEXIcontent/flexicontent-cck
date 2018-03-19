@@ -94,7 +94,7 @@ if ($mod_initialized === null)
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
 
-// include the helper only once
+// Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
 // Get module's basic display parameters

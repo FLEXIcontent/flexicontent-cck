@@ -245,7 +245,7 @@ class JFormFieldFclayout extends JFormFieldList
 				continue;
 			}
 
-			$text = $stripPrefix ? str_replace($stripPrefix, '', $value) : $file;
+			$text = $stripPrefix ? str_replace($stripPrefix, '', $file) : $file;
 
 			$groups['custom']['items'][] = (object) array('text' => $text, 'value' => $file);
 			$layout_files[] = $file;
@@ -390,8 +390,12 @@ class JFormFieldFclayout extends JFormFieldList
 		// Container of parameters
 		$tmpl_container = (string) @ $attributes['tmpl_container'];
 
-		// Add JS code to display parameters, either via 'file' or 'inline'
-		// For modules we can not use method 'file' (external xml file), because J2.5+ does form validation on the XML file ...
+		/**
+		 * Add JS code to display parameters, either via 'file' or 'inline'
+		 * 'file' means make an AJAX call to read the respective XML file, then set the the target in the same container (TAB)
+		 * 'inline' means parameters of all layout were specified inside the main XML, thus just hide all containers (TABs) and display only the appropriate one
+		 */
+
 		$params_source = (string) @ $attributes['params_source'];
 
 flexicontent_html::loadJQuery();

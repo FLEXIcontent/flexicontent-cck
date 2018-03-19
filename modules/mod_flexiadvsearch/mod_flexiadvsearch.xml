@@ -28,14 +28,15 @@
 	<fields name="params" addfieldpath="/modules/mod_flexiadvsearch/elements">
 		
 		<fieldset name="basic">
-			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" class="fc-ngmargin" />
 			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank'&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
-			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
-						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexiadvsearch/tmpl"  ext_name="mod_flexiadvsearch"
-						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
-						tmpl_container="mod_tmpl_layout" params_source="inline"
-						/> <!-- params_source="file" -->
-			
+			<field name="layout" type="fclayout" default="news" label="FLEXI_CHOOSE_TMPL"
+				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexiadvsearch/tmpl" ext_name="mod_flexiadvsearch"
+				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
+				tmpl_container="mod_tmpl_layout" params_source="file"
+				/> <!-- params_source="file" -->
+
 			<field name="" type="separator" default="FLEXI_MOD_MENU_ITEM" level="level1" />
 			<field name="itemid_force" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
 				<option value="0" show_list="" hide_list="force_menuitem">FLEXI_MOD_MENU_ITEMID_DEFAULT</option>
@@ -163,8 +164,11 @@
 			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
+		
+		<fieldset name="mod_tmpl_layout" label="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
+		</fieldset>
 
-		<fieldset name="FLEXI_MOD_ADVANCED" label="FLEXI_MOD_ADVANCED">
+		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
 			
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">

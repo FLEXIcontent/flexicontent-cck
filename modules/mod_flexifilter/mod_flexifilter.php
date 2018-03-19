@@ -79,10 +79,6 @@ jimport('joomla.profiler.profiler');
 $modfc_jprof = new JProfiler();
 $modfc_jprof->mark('START: FLEXIcontent Filter-Search Module');
 
-// include the helper only once
-require_once (dirname(__FILE__).DS.'helper.php');
-// include flexicontent route helper file
-require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 // Include helpers class file
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
@@ -97,6 +93,9 @@ if ($mod_initialized === null)
 // Initialize various variables
 $document = JFactory::getDocument();
 $flexiparams = JComponentHelper::getParams('com_flexicontent');
+
+// Include the helper only once
+require_once (dirname(__FILE__).DS.'helper.php');
 
 // Get module's basic display parameters
 $moduleclass_sfx= $params->get('moduleclass_sfx', '');

@@ -77,13 +77,13 @@ if ( !$show_mod )  return;
 global $modfc_jprof;
 jimport('joomla.profiler.profiler');
 $modfc_jprof = new JProfiler();
-$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
+$modfc_jprof->mark('START: FLEXIcontent Google Maps Module');
 
 // Include helpers class file
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 static $mod_initialized = null;
-$modulename = 'mod_flexitagcloud';
+$modulename = 'mod_flexigooglemap';
 if ($mod_initialized === null)
 {
 	flexicontent_html::loadModuleLanguage($modulename);
@@ -102,12 +102,62 @@ $moduleclass_sfx= $params->get('moduleclass_sfx', '');
 $moduleclass_sfx= htmlspecialchars($moduleclass_sfx);
 $layout 				= $params->get('layout', 'default');
 
-//$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
-//$add_tooltips = (int) $params->get('add_tooltips', 1);
+$add_ccs      = (int) $params->get('add_ccs', $flexiparams->get('disablecss', 0) ? 0 : 1);
+$add_tooltips = 0; //(int) $params->get('add_tooltips', 1);
 
 $tMapTips = modFlexigooglemapHelper::renderMapLocations($params);
 $markerdisplay = modFlexigooglemapHelper::getMarkerURL($params);
 
+
+// Add tooltips
+if ($add_tooltips)
+{
+	JHtml::_('bootstrap.tooltip');
+}
+
+// Add css
+if ($add_ccs && $layout)
+{
+	// Work around for extension that capture module's HTML 
+	if ($add_ccs === 2)
+	{
+		// Active module layout css (optional)
+		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
+		{
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
+		}
+
+		// Module 's core CSS
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
+
+		// Component CSS with optional override
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
+		{
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		}
+	}
+	
+	// Standards compliant implementation by placing CSS link into the HTML HEAD
+	else
+	{
+		// Active module layout css (optional)
+		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
+		{
+			$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', FLEXI_VHASH);
+		}
+
+		// Module 's core CSS
+		$document->addStyleSheetVersion(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VHASH);
+
+		// Component CSS with optional override
+		$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
+		{
+			$document->addStyleSheet(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+		}
+	}
+}
 
 // Render Layout
 require(JModuleHelper::getLayoutPath('mod_flexigooglemap', $layout));
@@ -115,7 +165,7 @@ require(JModuleHelper::getLayoutPath('mod_flexigooglemap', $layout));
 // append performance stats to global variable
 if ( $flexiparams->get('print_logging_info') )
 {
-	$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
+	$modfc_jprof->mark('END: FLEXIcontent Google Maps Module');
 	$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
 	global $fc_performance_msg;
 	$fc_performance_msg .= $msg;
