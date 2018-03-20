@@ -9,6 +9,13 @@
  * Note: This is an inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
  */
 
+if ($is_ingroup)
+{
+	$field->{$prop}[] = 'Usage of this gallery inside field-group not possible, outer container can not be added';
+
+	return;
+}
+
 
 // ***
 // *** Values loop

@@ -867,7 +867,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); currElement'.$field->id.'=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((screen.width-120) > 1360 ? 1360 : (screen.width-120)), y: ((screen.height-220) > 800 ? 800 : (screen.height-220))}, handler: \'iframe\', onClose: function() { incrementValCnt'.$field->id.'(); } });  return false;">
 						'.JText::_('FLEXI_SELECT').'
 					</a>
-					<a class="btn btn-small '.$tooltip_class.'" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\');  clearField'.$field->id.'(this); jInsertFieldValue(\'\', mm_id); return false;" >
+					<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\');  clearField'.$field->id.'(this); jInsertFieldValue(\'\', mm_id); return false;" >
 						<i class="icon-remove"></i>
 					</a>
 				</div>
@@ -1438,11 +1438,22 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** JS gallery configuration
 		// ***
 
-		$usepopup   = (int)$field->parameters->get( 'usepopup',  1 ) ; // use JS gallery
-		$popuptype  = (int)$field->parameters->get( 'popuptype', 1 ) ; // JS gallery type
+		$usepopup   = (int) $field->parameters->get( 'usepopup',  1 ) ; // use JS gallery
+		$popuptype  = $field->parameters->get( 'popuptype', 1 ) ; // JS gallery type
+
+		if (is_numeric($popuptype))
+		{
+			$popuptype = (int) $popuptype;
+		}
 
 		// Different for mobile clients
-		$popuptype_mobile = (int)$field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
+		$popuptype_mobile = $field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
+
+		if (is_numeric($popuptype_mobile))
+		{
+			$popuptype_mobile = (int) $popuptype_mobile;
+		}
+
 		$PPFX_ = $useMobile ? 'popuptype_mobile_' : 'popuptype_';
 		$popuptype = $useMobile
 			? $popuptype_mobile
@@ -1470,7 +1481,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$no_container_needed = array(1,2,3,4,6);  // Display types that need special container are not allowed when field in a group
 		if (
 			($isItemsManager && !in_array($popuptype, $iManager_containers)) ||
-			($is_ingroup && !in_array($popuptype, $no_container_needed))
+			($is_ingroup && is_numeric($popuptype) && !in_array($popuptype, $no_container_needed))
 		)
 		{
 			$popuptype = 4;
@@ -1699,7 +1710,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// CASE 3: // Built-in JS gallery
-		elseif ( $usepopup != -1 )
+		elseif ( is_numeric($popuptype) )
 		{
 			$built_in_gallery_names = array(
 				// Inline slideshow galleries
@@ -1723,8 +1734,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// CASE 4: // Custom layout
 		else
 		{
-			$viewlayout = $field->parameters->get('viewlayout', '');
-			$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+			$viewlayout = 'value_' . $popuptype;
 		}
 
 
@@ -2849,13 +2859,13 @@ class plgFlexicontent_fieldsImage extends FCField
 	 * Get DB data for the given file IDs
 	 */
 
-	function getFileData( $fid, $published=1, $extra_select='' )
+	function getFileData($fid, $published = 1, $extra_select = '')
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
 		$return_data = array();
 		$new_ids = array();
-		$file_ids = is_array($fid) ? $fid : array($fid);
+		$file_ids = (array) $fid;
 		foreach ($file_ids as $file_id)
 		{
 			$f = (int)$file_id;

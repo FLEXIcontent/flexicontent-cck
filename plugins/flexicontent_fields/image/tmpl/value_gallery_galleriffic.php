@@ -6,6 +6,13 @@
  * This layout does not support inline_info, pretext, posttext
  */
 
+if ($is_ingroup)
+{
+	$field->{$prop}[] = 'Usage of this gallery inside field-group not possible, outer container can not be added';
+
+	return;
+}
+
 
 // ***
 // *** Values loop
