@@ -218,6 +218,9 @@
 		<!-- Plugins: system -->
 		<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core tasks</plugin>
 		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, routing tasks</plugin>
+
+		<!-- Plugins: osmap -->
+		<plugin name="com_flexicontent"   folder="plugins/osmap/com_flexicontent"   instfolder="osmap">OSMap - FLEXIcontent Plugin</plugin>
 		
 		<!-- Modules -->
 		<module name="mod_flexicategories" folder="modules/mod_flexicategories">FLEXIcontent - Categories</module>
