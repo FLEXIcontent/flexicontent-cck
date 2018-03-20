@@ -421,22 +421,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		// Make sure basic CORE fields are published
 		$q = 'UPDATE #__flexicontent_fields SET published=1 WHERE id > 0 AND id < 7';
-		$this->_db->setQuery( $q );
-		$this->_db->execute();
+		$this->_db->setQuery($q)->execute();
 		
-		$tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
-		$idcol = FLEXI_J16GE ? 'extension_id' : 'id';
-		$stcol = FLEXI_J16GE ? 'enabled' : 'published';
-		$query 	= 'SELECT COUNT( '.$idcol.' )'
-			. ' FROM '.$tbl
-			. ' WHERE 1 '. (FLEXI_J16GE ? ' AND `type`=' . $this->_db->Quote('plugin') : '')
-			. ' AND ( folder = ' . $this->_db->Quote('flexicontent_fields')
+		$query 	= 'SELECT COUNT( extension_id )'
+			. ' FROM #__extensions'
+			. ' WHERE `type`=' . $this->_db->Quote('plugin')
+			. ' AND (folder = ' . $this->_db->Quote('flexicontent_fields')
 			. ' OR element = ' . $this->_db->Quote('flexisystem')
 			. ' OR element = ' . $this->_db->Quote('flexiadvroute')
+			. ' OR (folder = ' . $this->_db->Quote('osmap') . ' AND element = ' . $this->_db->Quote('com_flexicontent') . ')'
 			//. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
 			//. ' OR element = ' . $this->_db->Quote('flexisearch')
 			. ')'
-			. ' AND '.$stcol.' <> 1'
+			. ' AND enabled <> 1'
 			;
 		$this->_db->setQuery( $query );
 		$return = $this->_db->loadResult() ? false : true;

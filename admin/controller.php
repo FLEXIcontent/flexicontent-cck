@@ -109,7 +109,7 @@ class FlexicontentController extends JControllerLegacy
 				$session->set('flexicontent.allplgpublish', $allplgpublish);
 			}
 			
-			if ($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok)
+			if ($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'reviews', 'review', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok)
 			{
 				$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 				$link 	= 'index.php?option=com_flexicontent';

@@ -270,6 +270,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 				. ' OR `element` = ' . $db->Quote('flexisystem')
 				. ' OR `element` = ' . $db->Quote('flexiadvsearch')
 				. ' OR `element` = ' . $db->Quote('flexiadvroute')
+				. ' OR (`folder` = ' . $db->Quote('osmap') . ' AND `element` = ' . $db->Quote('com_flexicontent') . ')'
 				. ')';
 		$db->setQuery($query);
 
