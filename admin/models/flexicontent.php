@@ -571,6 +571,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	}
 
 
+	// Check and if needed install Joomla template overrides into current Joomla template
+	function install_template_overrides()
+	{
+		flexicontent_html::install_template_overrides(true);
+	}
+
+
+	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
 	{
 		jimport('joomla.filesystem.path' );

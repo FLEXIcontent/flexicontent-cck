@@ -5543,4 +5543,65 @@ class flexicontent_html
 
 		return $url;
 	}
+
+
+	// Check and if needed install Joomla template overrides into current Joomla template
+	public static function install_template_overrides($display_mssg = false)
+	{
+		jimport('joomla.filesystem.path' );
+		jimport('joomla.filesystem.folder');
+		jimport('joomla.filesystem.file');
+		$app = JFactory::getApplication();
+
+		$pathDestFolder_arr = array(
+			JPath::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/images/'),
+			JPath::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/imageslist/')
+		);
+		$pathSourceFolder_arr = array(
+			JPath::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/images'),
+			JPath::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/imageslist')
+		);
+
+		$install_count = $update_count = 0;
+
+		foreach($pathDestFolder_arr as $i => $pathDestFolder)
+		{
+			$pathSourceFolder = $pathSourceFolder_arr[$i];
+	
+			// 1. Check DESTINATION folder
+			if ( !JFolder::exists($pathDestFolder) && !JFolder::create($pathDestFolder) )
+			{
+				echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
+			}
+	
+			// 2. Copy override files
+			$files = glob($pathSourceFolder . '/*.*');
+
+			foreach($files as $sourcepath)
+			{
+				$dest_path = $pathDestFolder . basename($sourcepath);
+				
+				$not_exists = !JFile::exists($dest_path);
+				if ($not_exists || filemtime($sourcepath) > filemtime($dest_path))
+				{
+					$not_exists ? $install_count++ : $update_count++;
+					copy($sourcepath, $dest_path);
+				}
+			}
+		}
+
+		if ($display_mssg)
+		{
+			if ($install_count)
+			{
+				JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_('FLEXI_INSTALLED') . '</span> ' . $install_count . ' template overrides', 'message');
+			}
+
+			if ($display_mssg && $update_count)
+			{
+				JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_('FLEXI_UPDATED') . '</span> ' . $update_count . ' template overrides', 'message');
+			}
+		}
+	}
+
 }
