@@ -302,7 +302,16 @@
 			<field name="column_width3" type="number" cssprep="less" default="31.6" label="FLEXI_TMPL_WIDTH_THREE" description="FLEXI_TMPL_WIDTH_THREE_DESC" min="0" max="100" />
 			<field name="column_width4" type="number" cssprep="less" default="23.4" label="FLEXI_TMPL_WIDTH_FOUR" description="FLEXI_TMPL_WIDTH_FOUR_DESC" min="0" max="100" />
 
-
+			<field name="item_tab_customclass" type="separator" default="FLEXI_TMPL_ITEM_CUSTOMCLASS_TAB" description="" icon_class="icon-brush" level="tab_open" box_type="1" />
+			<field name="custom_class_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_CUSTOMCLASS_DESC" description="" level="level3" />
+			<field name="above_description_line1class" type="text" size="3" default="lineinfo line1 " label="FLEXI_ABOVEDESC1_CLASS" description="FLEXI_ABOVEDESC1_CLASS_DESC" />
+			<field name="above_description_line1_nolabelclass" type="text" size="3" default="lineinfo line1 " label="FLEXI_ABOVEDESC1NOLAB_CLASS" description="FLEXI_ABOVEDESC1NOLAB_CLASS_DESC" />
+			<field name="above_description_line2class" type="text" size="3" default="lineinfo line2 " label="FLEXI_ABOVEDESC2_CLASS" description="FLEXI_ABOVEDESC2_CLASS_DESC" />
+			<field name="above_description_line2_nolabelclass" type="text" size="3" default="lineinfo line2 " label="FLEXI_ABOVEDESC2NOLAB_CLASS" description="FLEXI_ABOVEDESC2NOLAB_CLASS_DESC" />
+			<field name="under_description_line1class" type="text" size="3" default="lineinfo line3 " label="FLEXI_UNDERDESC1_CLASS" description="FLEXI_UNDERDESC1_CLASS_DESC" />
+			<field name="under_description_line1_nolabelclass" type="text" size="3" default="lineinfo line3 " label="FLEXI_UNDERDESC1NOLAB_CLASS" description="FLEXI_UNDERDESC1NOLAB_CLASS_DESC" />
+			<field name="under_description_line2class" type="text" size="3" default="lineinfo line4 " label="FLEXI_UNDERDESC2_CLASS" description="FLEXI_UNDERDESC2_CLASS_DESC" />
+			<field name="under_description_line2_nolabelclass" type="text" size="3" default="lineinfo line4 " label="FLEXI_UNDERDESC2NOLAB_CLASS" description="FLEXI_UNDERDESC2NOLAB_CLASS_DESC" />
 
 
 		<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />

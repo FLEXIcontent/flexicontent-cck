@@ -236,7 +236,15 @@
 			<option value="outset">FLEXI_OUTSET</option>
 			</field>
 
-						<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
+      <field name="item_tab_customclass" type="separator" default="FLEXI_TMPL_ITEM_CUSTOMCLASS_TAB" description="" icon_class="icon-brush" level="tab_open" box_type="1" />
+			<field name="custom_class_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_CUSTOMCLASS_DESC" description="" level="level3" />
+      <field name="topfieldclass" type="text" size="3" default="iteminfo group " label="FLEXI_TOPFIELD_CLASS" description="FLEXI_TOPFIELD_CLASS_DESC" />
+      <field name="beforeclass" type="text" size="3" default="customblock beforedescription group " label="FLEXI_BEFOREPOSITION_CLASS" description="FLEXI_BEFOREPOSITION_CLASS_DESC" />
+      <field name="descclass" type="text" size="3" default="description group " label="FLEXI_DESCRIPTION_CLASS" description="FLEXI_DESCRIPTION_CLASS_DESC" />
+      <field name="afterclass" type="text" size="3" default="customblock afterdescription group " label="FLEXI_AFTERPOSITION_CLASS" description="FLEXI_AFTERPOSITION_CLASS_DESC" />
+			<field name="bottomfieldclass" type="text" size="3" default="itemadditionnal group " label="FLEXI_BOTTOMFIELD_CLASS" description="FLEXI_BOTTOMFIELD_CLASS_DESC" />
+
+	<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 
 		</fieldset>
 	</fields>

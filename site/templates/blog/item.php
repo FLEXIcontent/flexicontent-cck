@@ -46,7 +46,16 @@ switch ($this->params->get( 'columnmode', 2 )) {
 	default: $columnmode = 'variablecol'; break;
 }
 // ***********
-// DECIDE TAGS 
+// CUSTOM CLASS
+// ***********
+$topfieldclass = $this->params->get( 'topfieldclass','iteminfo group ');
+$beforeclass = $this->params->get( 'beforeclass','customblock beforedescription group ');
+$descclass = $this->params->get( 'descclass','description group ');
+$afterclass = $this->params->get( 'afterclass','customblock afterdescription group ');
+$bottomfieldclass = $this->params->get( 'bottomfieldclass','itemadditionnal group '); 
+
+// ***********
+// DECIDE TAGS
 // ***********
 $page_heading_shown =
 	$this->params->get( 'show_page_heading', 1 ) &&
@@ -64,7 +73,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
-if ($menu) $page_classes .= ' menuitem'.$menu->id; 
+if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 // SEO
 $microdata_itemtype = $this->params->get( 'microdata_itemtype', 'Article');
@@ -72,8 +81,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
-	
-	
+
+
   <?php if ($item->event->beforeDisplayContent) : ?>
 		<!-- BOF beforeDisplayContent -->
 		<div class="fc_beforeDisplayContent group">
@@ -81,7 +90,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
-	
+
 	<?php if (JRequest::getCmd('print')) : ?>
 		<!-- BOF Print handling -->
 		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
@@ -90,9 +99,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 		<?php endif; ?>
 		<!-- EOF Print handling -->
-		
+
 	<?php else : ?>
-	
+
 		<?php
 		$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
 		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
@@ -102,12 +111,12 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 		$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 		?>
-		
+
 		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $deletebutton || $statebutton || $approvalbutton) : ?>
-		
+
 			<!-- BOF buttons -->
 			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
-			
+
 			<div class="buttons btn-group">
 			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
 			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
@@ -135,10 +144,10 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			</div>
 			<?php endif; ?>
 			<!-- EOF buttons -->
-			
+
 		<?php endif; ?>
 	<?php endif; ?>
-	
+
 	<?php if ( $page_heading_shown ) : ?>
 		<!-- BOF page heading -->
 		<h1 class="componentheading">
@@ -146,8 +155,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</h1>
 		<!-- EOF page heading -->
 	<?php endif; ?>
-	
-	
+
+
 	<?php if ($this->params->get('show_title', 1)) : ?>
 		<!-- BOF item title -->
 		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
@@ -160,7 +169,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<?php echo '</h'.$itemTitleHeaderLevel; ?>>
 		<!-- EOF item title -->
 	<?php endif; ?>
-	
+
   <?php if ($item->event->afterDisplayTitle) : ?>
 		<!-- BOF afterDisplayTitle -->
 		<div class="fc_afterDisplayTitle group">
@@ -171,52 +180,52 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ((intval($item->modified) !=0 && $this->params->get('show_modify_date')) || ($this->params->get('show_author') && ($item->creator != "")) || ($this->params->get('show_create_date')) || (($this->params->get('show_modifier')) && (intval($item->modified) !=0))) : ?>
 	<!-- BOF item basic/core info -->
-	<div class="iteminfo group">
-		
+	<div class="<?php echo $topfieldclass; ?>">
+
 		<div class="createdline">
-			
+
 			<?php if (($this->params->get('show_author')) && ($item->creator != "")) : ?>
 			<div class="createdby">
 				<?php FlexicontentFields::getFieldDisplay($item, 'created_by', $values=null, $method='display'); ?>
 				<?php echo JText::sprintf('FLEXI_WRITTEN_BY', $this->fields['created_by']->display); ?>
 			</div>
 			<?php endif; ?>
-			
+
 			<?php if (($this->params->get('show_author')) && ($item->creator != "") && ($this->params->get('show_create_date'))) : ?>
 			::
 			<?php endif; ?>
-	
+
 			<?php if ($this->params->get('show_create_date')) : ?>
 			<div class="created">
 				<?php FlexicontentFields::getFieldDisplay($item, 'created', $values=null, $method='display'); ?>
-				<?php echo '['.JHtml::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>		
+				<?php echo '['.JHtml::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>
 			</div>
 			<?php endif; ?>
-			
+
 		</div>
-		
+
 		<div class="modifiedline">
-			
+
 			<?php if (($this->params->get('show_modifier')) && ($item->modifier != "")) : ?>
 			<div class="modifiedby">
 				<?php FlexicontentFields::getFieldDisplay($item, 'modified_by', $values=null, $method='display'); ?>
 				<?php echo JText::_('FLEXI_LAST_UPDATED').' '.JText::sprintf('FLEXI_BY', $this->fields['modified_by']->display); ?>
 			</div>
 			<?php endif; ?>
-	
+
 			<?php if (($this->params->get('show_modifier')) && ($item->modifier != "") && ($this->params->get('show_modify_date'))) : ?>
 			::
 			<?php endif; ?>
-			
+
 			<?php if (intval($item->modified) !=0 && $this->params->get('show_modify_date')) : ?>
 				<div class="modified">
 				<?php FlexicontentFields::getFieldDisplay($item, 'modified', $values=null, $method='display'); ?>
 				<?php echo '['.JHtml::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>
 				</div>
 			<?php endif; ?>
-			
+
 		</div>
-		
+
 	</div>
 	<!-- EOF item basic/core info -->
 	<?php endif; ?>
@@ -240,11 +249,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	</div>
 	<!-- EOF item rating, favourites -->
 	<?php endif; ?>
-	
-	
+
+
 	<?php if (isset($item->positions['beforedescription'])) : ?>
 	<!-- BOF beforedescription block -->
-	<div class="customblock beforedescription group">
+	<div class="<?php echo $beforeclass; ?>">
 		<?php foreach ($item->positions['beforedescription'] as $field) : ?>
 		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
@@ -258,10 +267,10 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	</div>
 	<!-- EOF beforedescription block -->
 	<?php endif; ?>
-	
+
 	<?php if (!$_text_via_pos): ?>
 	<!-- BOF description block -->
-	<div class="description group">
+	<div class="<?php echo $descclass; ?>">
 	<?php echo $this->fields['text']->display; ?>
 	</div>
 	<!-- EOF description block -->
@@ -269,7 +278,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['afterdescription'])) : ?>
 	<!-- BOF afterdescription block -->
-	<div class="customblock afterdescription group">
+	<div class="<?php echo $afterclass; ?>">
 		<?php foreach ($item->positions['afterdescription'] as $field) : ?>
 		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
@@ -283,10 +292,10 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	</div>
 	<!-- EOF afterdescription block -->
 	<?php endif; ?>
-	
+
 	<?php if (($this->params->get('show_tags', 1)) || ($this->params->get('show_category', 1)))  : ?>
 	<!-- BOF item categories, tags -->
-	<div class="itemadditionnal group">
+	<div class="<?php echo $bottomfieldclass; ?> ">
 		<?php if ($this->params->get('show_category', 1)) : ?>
 		<div class="categories">
 			<?php FlexicontentFields::getFieldDisplay($item, 'categories', $values=null, $method='display'); ?>
@@ -316,7 +325,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				echo JComments::showComments($item->id, 'com_flexicontent', $this->escape($item->title));
 			endif;
 		endif;
-	
+
 		if ($this->params->get('comments') == 2) :
 			if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
     			require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
@@ -330,12 +339,12 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ($item->event->afterDisplayContent) : ?>
 	<!-- BOF afterDisplayContent -->
-	<div class="fc_afterDisplayContent group">
+	<div class="fc_afterDisplayContent group ">
 		<?php echo $item->event->afterDisplayContent; ?>
 	</div>
 	<!-- EOF afterDisplayContent -->
 	<?php endif; ?>
-	
+
 <?php echo '</'.$mainAreaTag.'>'; ?>
 
 <?php } /* EOF if html5  */ ?>
