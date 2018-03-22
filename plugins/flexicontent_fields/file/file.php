@@ -72,6 +72,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
+		$file_source = (int) $field->parameters->get('file_source', 0);
+
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
 		$top_notice = '';//$use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
@@ -517,6 +519,30 @@ class plgFlexicontent_fieldsFile extends FCField
 		{
 			$js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
+		}
+
+
+		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
+		static $mm_mode_common_js_added = false;
+		if ( $file_source == -2 && !$mm_mode_common_js_added )
+		{
+			// We will use the mootools based media manager
+			JHtml::_('behavior.framework', true);
+			
+			// Load the modal behavior script.
+			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
+			
+			// Include media field JS, detecting different version of Joomla
+			if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js') ) $media_js = 'media/mediafield-mootools.min.js';
+			else if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js') ) $media_js = 'media/mediafield.min.js';
+			else $media_js = 'media/mediafield.js';
+			
+			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
+			
+			// Tooltips for image path and image popup preview
+			JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
+			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
+			$mm_mode_common_js_added = true;
 		}
 
 
@@ -1218,14 +1244,21 @@ class plgFlexicontent_fieldsFile extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
-	function getFileData($fid, $published=1, $extra_select='')
+
+
+
+
+	/**
+	 * Get DB data for the given file IDs
+	 */
+
+	function getFileData($fid, $published = 1, $extra_select = '')
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
 		$return_data = array();
 		$new_ids = array();
-		$file_ids = (array)$fid;
+		$file_ids = (array) $fid;
 		foreach ($file_ids as $file_id)
 		{
 			$f = (int)$file_id;
@@ -1257,7 +1290,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
+			{
 				$return_data[$file_id] = $cached_data[$f];
+			}
 		}
 
 		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;

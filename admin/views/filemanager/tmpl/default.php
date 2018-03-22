@@ -38,6 +38,7 @@ $jinput = $app->input;
 $user     = JFactory::getUser();
 $session  = JFactory::getSession();
 $document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
 
 $perms = FlexicontentHelperPerm::getPerm();  // Get compoent permissions
 
@@ -647,13 +648,19 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					</th>
 					
 				<?php if (!empty($this->cols['state'])) : ?>
-					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
+					<th class="center hideOnDemandClass">
+						<?php echo JHtml::_('grid.sort', 'FLEXI_PUBLISHED', 'f.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					</th>
 				<?php endif; ?>
 				<?php if (!empty($this->cols['access'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone">
+						<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'f.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					</th>
 				<?php endif; ?>
 				<?php if (!empty($this->cols['lang'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_LANGUAGE' ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone">
+						<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'f.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					</th>
 				<?php endif; ?>
 				
 				<?php if ($this->folder_mode) : ?>
@@ -1130,13 +1137,21 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 		<form action="<?php echo $action_url . 'ftpValidate'; ?>" name="ftpForm" id="ftpForm" method="post">
 			<fieldset title="<?php echo JText::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?>">
 				<legend><?php echo JText::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?></legend>
-				<table class="fc-form-tbl">
+				<table class="fc-form-tbl fcinner">
 					<tbody>
 						<tr>
-							<td class="key"><label class="label" for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?></label></td>
-							<td><input type="text" id="username" name="username" class="input-xlarge" size="70" value="" /></td>
-							<td class="key"><label class="label" for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?></label></td>
-							<td><input type="password" id="password" name="password" class="input-xlarge" size="70" value="" /></td>
+							<td class="key">
+									<label class="fc-prop-lbl" for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?></label>
+							</td>
+							<td>
+								<input type="text" id="username" name="username" class="input-xlarge" size="70" value="" />
+							</td>
+							<td class="key">
+									<label class="fc-prop-lbl" for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?></label>
+							</td>
+							<td>
+									<input type="password" id="password" name="password" class="input-xlarge" size="70" value="" />
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -1190,7 +1205,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					</td>
 					<td rowspan="3" style="text-align: center;" class="fc_hidden_960">
 					'.($enable_multi_uploader ? '
-						<div class="fc-mssg fc-info" style="margin: 0px 0 8px 0; padding-top: 4px; padding-bottom: 4px; width: 100%; box-sizing: border-box;">'.JText::_('Please edit file properties<br/>after you upload the files').'</div>
+						<div class="fc-mssg fc-info" style="margin: 0px 0 8px 0; padding-top: 4px; padding-bottom: 4px; width: 100%; box-sizing: border-box;">'.JText::_('You may edit file properties <br/>by clicking on the pencil icon').'</div>
 						<button class="btn-small '.$btn_class.' '.$tip_class.'" onclick="jQuery(\'#filemanager-1\').toggle(); jQuery(\'#filemanager-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
 							id="single_multi_uploader" title="'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC' ).'" style=""
 						>
@@ -1248,11 +1263,11 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<form action="<?php echo $action_url . 'saveprops'; ?>&amp;format=raw" name="filePropsForm" id="filePropsForm" method="get" enctype="multipart/form-data">
 					
 					<!--span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_FILE_PROPERTIES'); ?></span-->
-					<table class="fc-form-tbl" id="file-props-form-container">
+					<table class="fc-form-tbl fcinner fcfullwidth" id="file-props-form-container">
 
 						<tr>
 							<td id="file-props-name-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
-								<label class="label" id="file-props-name-lbl" for="file-props-name">
+								<label class="fc-prop-lbl" id="file-props-name-lbl" for="file-props-name">
 								<?php echo JText::_( 'FLEXI_FILE_FILENAME' ); ?>
 								</label>
 							</td>
@@ -1265,7 +1280,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					<?php if (!$this->folder_mode) : ?>
 						<tr>
 							<td id="file-props-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
-								<label class="label" id="file-props-title-lbl" for="file-props-title">
+								<label class="fc-prop-lbl" id="file-props-title-lbl" for="file-props-title">
 								<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 								</label>
 							</td>
@@ -1276,7 +1291,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-props-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
-								<label class="label" id="file-props-desc-lbl" for="file-props-desc_uploadFileForm">
+								<label class="fc-prop-lbl" id="file-props-desc-lbl" for="file-props-desc_uploadFileForm">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 								</label>
 							</td>
@@ -1287,7 +1302,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-props-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-								<label class="label" id="file-props-lang-lbl" for="file-props-lang">
+								<label class="fc-prop-lbl" id="file-props-lang-lbl" for="file-props-lang">
 								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 								</label>
 							</td>
@@ -1298,7 +1313,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-props-access-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
-								<label class="label" id="file-props-access-lbl" for="file-props-access">
+								<label class="fc-prop-lbl" id="file-props-access-lbl" for="file-props-access">
 								<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 								</label>
 							</td>
@@ -1310,7 +1325,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						<?php if ($this->target_dir==2) : ?>
 						<tr>
 							<td id="file-props-secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
-								<label class="label" id="file-props-secure-lbl">
+								<label class="fc-prop-lbl" id="file-props-secure-lbl">
 								<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
 								</label>
 							</td>
@@ -1352,11 +1367,11 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<form action="<?php echo $action_url . 'upload'; ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 					
 					<span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_BASIC_UPLOADER'); ?></span>
-					<table class="fc-form-tbl" id="file-upload-form-container">
+					<table class="fc-form-tbl fcinner" id="file-upload-form-container">
 						
 						<tr>
 							<td id="file-upload-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1); ?>">
-								<label class="label" id="file-upload-lbl" for="file-upload">
+								<label class="fc-prop-lbl" id="file-upload-lbl" for="file-upload">
 								<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 								</label>
 							</td>
@@ -1370,7 +1385,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					<?php if (!$this->folder_mode) : ?>
 						<tr>
 							<td id="file-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
-								<label class="label" id="file-title-lbl" for="file-title">
+								<label class="fc-prop-lbl" id="file-title-lbl" for="file-title">
 								<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 								</label>
 							</td>
@@ -1381,7 +1396,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
-								<label class="label" id="file-desc-lbl" for="file-desc_uploadFileForm">
+								<label class="fc-prop-lbl" id="file-desc-lbl" for="file-desc_uploadFileForm">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 								</label>
 							</td>
@@ -1392,7 +1407,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-								<label class="label" id="file-lang-lbl" for="file-lang">
+								<label class="fc-prop-lbl" id="file-lang-lbl" for="file-lang">
 								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 								</label>
 							</td>
@@ -1403,7 +1418,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-access-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
-								<label class="label" id="file-access-lbl" for="file-access">
+								<label class="fc-prop-lbl" id="file-access-lbl" for="file-access">
 								<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 								</label>
 							</td>
@@ -1415,7 +1430,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						<?php if ($this->target_dir==2) : ?>
 						<tr>
 							<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
-								<label class="label" id="secure-lbl">
+								<label class="fc-prop-lbl" id="secure-lbl">
 								<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
 								</label>
 							</td>
@@ -1460,6 +1475,9 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 	<!-- File URL by Form -->
 	<?php if ($this->layout !='image' ) : /* not applicable for LAYOUT 'image' */ ?>
 
+
+
+
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_URL' ), 'filebyurl' );*/ ?>
 	<div class="tabbertab" id="fileurl_tab" data-icon-class="icon-link">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_URL' ); ?> </h3>
@@ -1468,12 +1486,12 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 			<fieldset class="filemanager-tab" >
 				<fieldset class="actions" id="filemanager-3">
 					
-					<table class="fc-form-tbl" id="file-url-form-container">
+					<table class="fc-form-tbl fcinner" id="file-url-form-container">
 						
 						<tr>
-							<td id="file-url-data-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_URL', 'FLEXI_FILE_URL_DESC', 1, 1); ?>">
-								<label class="label" for="file-url-data">
-								<?php echo JText::_( 'FLEXI_FILE_URL' ); ?>
+							<td id="file-url-data-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
+								<label class="fc-prop-lbl" for="file-url-data">
+								<?php echo JText::_( 'FLEXI_URL_LINK' ); ?>
 								</label>
 							</td>
 							<td id="file-url-data-container">
@@ -1481,9 +1499,10 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 							</td>
 						</tr>
 
+
 						<tr>
 							<td id="file-url-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
-								<label class="label" for="file-url-title">
+								<label class="fc-prop-lbl" for="file-url-title">
 								<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 								</label>
 							</td>
@@ -1494,7 +1513,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-url-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
-								<label class="label" for="file-url-desc">
+								<label class="fc-prop-lbl" for="file-url-desc">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 								</label>
 							</td>
@@ -1505,7 +1524,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-url-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-								<label class="label" id="file-url-lang-lbl" for="file-url-lang">
+								<label class="fc-prop-lbl" id="file-url-lang-lbl" for="file-url-lang">
 								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 								</label>
 							</td>
@@ -1516,7 +1535,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-url-access-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
-								<label class="label" id="file-url-access-lbl" for="file-url-access">
+								<label class="fc-prop-lbl" id="file-url-access-lbl" for="file-url-access">
 								<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 								</label>
 							</td>
@@ -1527,7 +1546,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-url-ext-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC', 1, 1); ?>">
-								<label class="label" for="file-url-ext">
+								<label class="fc-prop-lbl" for="file-url-ext">
 								<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 								</label>
 							</td>
@@ -1538,7 +1557,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 						<tr>
 							<td id="file-url-size-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', '', 1, 1); ?>">
-								<label class="label" for="file-url-size">
+								<label class="fc-prop-lbl" for="file-url-size">
 								<?php echo JText::_( 'FLEXI_SIZE' ); ?>
 								</label>
 							</td>
@@ -1574,18 +1593,18 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 	
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'filefromserver' );*/ ?>
 	<div class="tabbertab" id="server_tab" data-icon-class="icon-stack">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?> </h3>
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BATCH_ADD_FILES' ); ?> </h3>
 		
 		<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo JSession::getFormToken() . '=1'; ?>" class="form-validate form-horizontal" name="addFileForm" id="addFileForm" method="post">
 			<fieldset class="filemanager-tab" >
 				<fieldset class="actions" id="filemanager-4">
 	
-					<table class="fc-form-tbl" id="add-files-form-container">
+					<table class="fc-form-tbl fcinner" id="add-files-form-container">
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_SRC_DIR', 'FLEXI_CHOOSE_SRC_DIR_DESC', 1, 1); ?>">
-								<label class="label" for="file-dir-path">
-								<?php echo JText::_( 'FLEXI_CHOOSE_SRC_DIR' ); ?>
+								<label class="fc-prop-lbl" for="file-dir-path">
+								<?php echo JText::_( 'FLEXI_SRC_DIR' ); ?>
 								</label>
 							</td>
 							<td>
@@ -1595,7 +1614,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-								<label class="label" id="_file-lang-lbl" for="_file-lang">
+								<label class="fc-prop-lbl" id="_file-lang-lbl" for="_file-lang">
 								<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 								</label>
 							</td>
@@ -1609,7 +1628,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILTER_EXT', 'FLEXI_FILE_FILTER_EXT_DESC', 1, 1); ?>">
-								<label class="label" for="file-filter-ext">
+								<label class="fc-prop-lbl" for="file-filter-ext">
 								<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT' ); ?>
 								</label>
 							</td>
@@ -1620,7 +1639,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
-								<label class="label" for="file-desc_addFileForm">
+								<label class="fc-prop-lbl" for="file-desc_addFileForm">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 								</label>
 							</td>
@@ -1631,7 +1650,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILTER_REGEX', 'FLEXI_FILE_FILTER_REGEX_DESC', 1, 1); ?>">
-								<label class="label" for="file-filter-re">
+								<label class="fc-prop-lbl" for="file-filter-re">
 								<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>
 								</label>
 							</td>
@@ -1642,7 +1661,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_KEEP_ORIGINAL_FILE', 'FLEXI_KEEP_ORIGINAL_FILE_DESC', 1, 1); ?>">
-								<label class="label">
+								<label class="fc-prop-lbl">
 								<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE' ); ?>
 								</label>
 							</td>
@@ -1659,7 +1678,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 						
 						<tr>
 							<td class="key <?php echo $tip_class; ?>" data-placement="top" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
-								<label class="label">
+								<label class="fc-prop-lbl">
 								<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 								</label>
 							</td>

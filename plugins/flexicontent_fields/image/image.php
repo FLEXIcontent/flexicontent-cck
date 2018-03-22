@@ -160,22 +160,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		static $mm_mode_common_js_added = false;
 		if ( $image_source == -2 && !$mm_mode_common_js_added )
 		{
-			$pathDestFolder   = JPath::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/images/');
-			$pathSourceFolder = JPath::clean(JPATH_ROOT.'/plugins/flexicontent_fields/image/media/tmpl/');
-			
-			// 1. Check DESTINATION folder
-			if ( !JFolder::exists($pathDestFolder) && !JFolder::create($pathDestFolder) )
-			{
-			 echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
-			}
-			
-			// 2. Copy override files
-			$files = glob($pathSourceFolder."/*.*");
-			foreach($files as $sourcepath)
-			{
-			 $dest_path = $pathDestFolder.'/'.basename($sourcepath);
-			 if (!JFile::exists($dest_path) || filemtime($sourcepath) > filemtime($dest_path)) copy($sourcepath, $dest_path);
-			}
+			// Check and if needed install Joomla template overrides into current Joomla template
+			flexicontent_html::install_template_overrides();
 
 			// We will use the mootools based media manager
 			JHtml::_('behavior.framework', true);

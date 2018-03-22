@@ -2695,7 +2695,8 @@ table.fc-form-tbl td {
 	padding: 2px 24px 6px 0px;
 }
 table.fc-form-tbl td.fc-nopad-h-cell {
-	padding: 2px 0px 6px 0px;
+	padding-left: 0px;
+	padding-right: 0px;
 }
 table.fc-form-tbl.fccompact td {
 	padding: 0px 8px 4px 0px;
@@ -2709,6 +2710,11 @@ table.fc-form-tbl td.key {
 }
 table.fc-form-tbl.fccompact td.key {
 	min-width: auto;
+}
+table.fc-form-tbl.fc-padded-v td,
+table.fc-form-tbl.fc-padded-v td.key {
+	vertical-align: top;
+	padding-bottom: 20px;
 }
 table.fc-form-tbl.fcfullwidth {
 	width: 100% !important;

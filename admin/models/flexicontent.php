@@ -571,6 +571,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	}
 
 
+	// Check and if needed install Joomla template overrides into current Joomla template
+	function install_template_overrides()
+	{
+		flexicontent_html::install_template_overrides(true);
+	}
+
+
+	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
 	{
 		jimport('joomla.filesystem.path' );
@@ -1171,7 +1179,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getDeprecatedFiles(&$deprecated=null)
+	function getDeprecatedFiles(&$deprecated = null, $done = false)
 	{
 		// Store JPATH_BASE variable (needed in case of hard linking to flexicontent files outside of Joomla folder)
 		if (JPATH_BASE != realpath(__DIR__.'/../..') || !file_exists(__DIR__.'/tasks/defines.php') || filemtime(__FILE__) >= filemtime(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tasks'.DS.'defines.php'))
@@ -1189,13 +1197,26 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
+
+		$done_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_done');
 		
-		$files = array(
-			JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/users.php',
-			JPATH_ADMINISTRATOR . '/components/com_flexicontent/installation/install.mysql.nonutf8.sql',
-			JPATH_ADMINISTRATOR . '/components/com_flexicontent/installation/uninstall.mysql.nonutf8.sql',
-			JPATH_SITE . '/plugins/flexicontent_fields/minigallery/css/minigallery.php'
-		);
+		// If file / folder removal already done then stop further steps
+		if (JFile::exists($done_file))
+		{
+			return true;
+		}
+
+		// Mark file / folder removal as finished and stop further steps
+		if ($done)
+		{
+			touch ($done_file);
+			return true;
+		}
+
+		// Load list of depreacted files and folders
+		$depr_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_list.php');
+		include($depr_file);
+
 		foreach ($files as $file)
 		{
 			if (JFile::exists($file))
@@ -1204,8 +1225,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 
-		$folders = array(
-		);
 		foreach ($folders as $folder)
 		{
 			if (JFolder::exists($folder))
@@ -1214,9 +1233,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 
-		$return = count($deprecated['files']) + count($deprecated['folders']) ? false : true;
-		return $return;
+		// Calculate if finished
+		$deprecated_count = count($deprecated['files']) + count($deprecated['folders']);
+		$finished = $deprecated_count ? false : true;
+
+		// Mark file / folder removal as finished if zero files and folders need to be removed
+		if ($finished)
+		{
+			touch ($done_file);
+		}
+		
+		return $finished;
 	}
+
 
 	/**
 	 * Method to check if the field positions were converted

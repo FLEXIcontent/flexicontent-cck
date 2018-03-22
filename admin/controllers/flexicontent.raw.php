@@ -883,6 +883,9 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 			}
 		}
 
+		// Always set this to prevent task from blocking UI
+		$model->getDeprecatedFiles($deprecated, $_done = true);
+
 		if ($model->getDeprecatedFiles())
 		{
 			echo '<span class="install-ok"></span>';
