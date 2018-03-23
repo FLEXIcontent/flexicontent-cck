@@ -177,35 +177,35 @@
       <field name="subtitle1class" type="text" size="3" default="flexi lineinfo subtitle1 group " label="FLEXI_SUBTITLE1_CLASS" description="FLEXI_SUBTITLE1_CLASS_DESC" />
       <field name="subtitle2class" type="text" size="3" default="flexi lineinfo subtitle2 group " label="FLEXI_SUBTITLE2_CLASS" description="FLEXI_SUBTITLE2_CLASS_DESC" />
       <field name="subtitle3class" type="text" size="3" default="flexi lineinfo subtitle3 group " label="FLEXI_SUBTITLE3_CLASS" description="FLEXI_SUBTITLE2_CLASS_DESC" />
-			<field name="subtitle_tab1class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB1_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab2class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB2_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab3class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB3_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab4class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB4_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab5class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB5_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab6class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB6_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab7class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB7_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab8class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB8_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab9class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB9_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab10class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB10_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="subtitle_tab11class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB11_CLASS" description="FLEXI__TAB_CLASS_DESC" />
-			<field name="subtitle_tab12class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB12_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="imageclass" type="text" size="3" default="flexi image  " label="FLEXI_IMAGE_CLASS" description="FLEXI_IMAGE_CLASS_DESC" />
-			<field name="topclass" type="text" size="3" default="flexi infoblock group " label="FLEXI_TOP_CLASS" description="FLEXI_TOP_CLASS_DESC" />
+			<field name="subtitle_tab1_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB1_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab2_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB2_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab3_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB3_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab4_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB4_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab5_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB5_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab6_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB6_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab7_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB7_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab8_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB8_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab9_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB9_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab10_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB10_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="subtitle_tab11_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB11_CLASS" description="FLEXI__TAB_CLASS_DESC" />
+			<field name="subtitle_tab12_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_SUBTITLE_TAB12_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="imageclass" type="text" size="3" default="flexi image span4  " label="FLEXI_IMAGE_CLASS" description="FLEXI_IMAGE_CLASS_DESC" />
+			<field name="topclass" type="text" size="3" default="flexi infoblock span8" label="FLEXI_TOP_CLASS" description="FLEXI_TOP_CLASS_DESC" />
 			<field name="descriptionclass" type="text" size="3" default="description group " label="FLEXI_DESCRIPTION_CLASS" description="FLEXI_DESCRIPTION_CLASS_DESC" />
-			<field name="bottom_tab1class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB1_CLASS" description="FLEXI_TAB1_CLASS_DESC" />
-			<field name="bottom_tab2class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB2_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab3class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB3_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab4class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB4_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab5class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB5_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab6class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB6_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab7class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB7_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab8class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB8_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab9class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB9_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab10class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB10_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab11class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB11_CLASS" description="FLEXI_TAB_CLASS_DESC" />
-			<field name="bottom_tab12class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB12_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab1_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB1_CLASS" description="FLEXI_TAB1_CLASS_DESC" />
+			<field name="bottom_tab2_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB2_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab3_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB3_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab4_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB4_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab5_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB5_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab6_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB6_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab7_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB7_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab8_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB8_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab9_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB9_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab10_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB10_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab11_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB11_CLASS" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="bottom_tab12_class" type="text" size="3" default="flexi lineinfo " label="FLEXI_BOTTOM_TAB12_CLASS" description="FLEXI_TAB_CLASS_DESC" />
 			<field name="bottom" type="text" size="3" default="flexi infoblock group " label="FLEXI_BOTTOM_CLASS" description="FLEXI_BOTTOMFIELD_CLASS_DESC" />
-			
+
 			<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 		</fieldset>
 	</fields>

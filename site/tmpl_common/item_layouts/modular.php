@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -40,9 +40,19 @@ JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="te
 if (isset($item->toc)) {
 	$item->fields['text']->display = $item->toc . $item->fields['text']->display;
 }
+// ***********
+// CUSTOM CLASS
+// ***********
+$subtitle1class = $this->params->get( 'subtitle1class','flexi lineinfo subtitle1 group ');
+$subtitle2class = $this->params->get( 'subtitle2class','flexi lineinfo subtitle2 group ');
+$subtitle3class = $this->params->get( 'subtitle3class','flexi lineinfo subtitle3 group ');
+$topclass = $this->params->get( 'topclass','flexi infoblock span8 ');
+$imageclass = $this->params->get( 'imageclass','flexi image span4 ');
+$descriptionclass = $this->params->get( 'descriptionclass','description group ');
+$bottomclass = $this->params->get( 'bottomclass','flexi infoblock group ');
 
 // ***********
-// DECIDE TAGS 
+// DECIDE TAGS
 // ***********
 $page_heading_shown =
 	$this->params->get( 'show_page_heading', 1 ) &&
@@ -54,16 +64,16 @@ $mainAreaTag = 'div';
 
 // SEO, header level of title tag
 $itemTitleHeaderLevel = '2';
-	
+
 // SEO, header level of tab title tag
-$tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';  	
+$tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';
 
 $page_classes  = 'flexicontent';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
-if ($menu) $page_classes .= ' menuitem'.$menu->id; 
+if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 // SEO
 $microdata_itemtype = $this->params->get( 'microdata_itemtype', 'Article');
@@ -71,9 +81,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 ?>
 
 <?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
-	
+
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
-	
+
   <?php if ($item->event->beforeDisplayContent) : ?>
 		<!-- BOF beforeDisplayContent -->
 		<div class="fc_beforeDisplayContent group">
@@ -81,7 +91,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
-	
+
 	<?php if (JRequest::getCmd('print')) : ?>
 		<!-- BOF Print handling -->
 		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
@@ -90,9 +100,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 		<?php endif; ?>
 		<!-- EOF Print handling -->
-		
+
 	<?php else : ?>
-	
+
 		<?php
 		$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
 		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
@@ -102,12 +112,12 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 		$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 		?>
-		
+
 		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $deletebutton || $statebutton || $approvalbutton) : ?>
-		
+
 			<!-- BOF buttons -->
 			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
-			
+
 			<div class="buttons btn-group">
 			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
 			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
@@ -135,10 +145,10 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			</div>
 			<?php endif; ?>
 			<!-- EOF buttons -->
-			
+
 		<?php endif; ?>
 	<?php endif; ?>
-	
+
 	<?php if ( $page_heading_shown ) : ?>
 		<!-- BOF page heading -->
 		<h1 class="componentheading">
@@ -146,18 +156,18 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</h1>
 		<!-- EOF page heading -->
 	<?php endif; ?>
-	
+
 	<?php echo ( ($mainAreaTag == 'section') ? '</header>' : ''); ?>
-	
+
 	<?php echo ( ($mainAreaTag == 'section') ? '<article>' : ''); ?>
-	
+
 	<?php
 		$header_shown =
 			$this->params->get('show_title', 1) || $item->event->afterDisplayTitle ||
 			isset($item->positions['subtitle1']) || isset($item->positions['subtitle2']) || isset($item->positions['subtitle3']);
 	?>
-	
-	
+
+
 	<?php if ($this->params->get('show_title', 1)) : ?>
 		<!-- BOF item title -->
 		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
@@ -170,8 +180,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<?php echo '</h'.$itemTitleHeaderLevel; ?>>
 		<!-- EOF item title -->
 	<?php endif; ?>
-	
-	
+
+
   <?php if ($item->event->afterDisplayTitle) : ?>
 		<!-- BOF afterDisplayTitle -->
 		<div class="fc_afterDisplayTitle group">
@@ -179,11 +189,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF afterDisplayTitle -->
 	<?php endif; ?>
-	
-	
+
+
 	<?php if (isset($item->positions['subtitle1'])) : ?>
 		<!-- BOF subtitle1 block -->
-		<div class="flexi lineinfo subtitle1 group">
+		<div class="<?php echo $subtitle1class; ?>">
 			<?php foreach ($item->positions['subtitle1'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -195,11 +205,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF subtitle1 block -->
 	<?php endif; ?>
-	
-	
+
+
 	<?php if (isset($item->positions['subtitle2'])) : ?>
 		<!-- BOF subtitle2 block -->
-		<div class="flexi lineinfo subtitle2 group">
+		<div class="<?php echo $subtitle2class; ?>">
 			<?php foreach ($item->positions['subtitle2'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -211,11 +221,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF subtitle2 block -->
 	<?php endif; ?>
-	
-	
+
+
 	<?php if (isset($item->positions['subtitle3'])) : ?>
 		<!-- BOF subtitle3 block -->
-		<div class="flexi lineinfo subtitle3 group">
+		<div class="<?php echo $subtitle3class; ?>">
 			<?php foreach ($item->positions['subtitle3'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -227,11 +237,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF subtitle3 block -->
 	<?php endif; ?>
-	
-	
-	
+
+
+
 	<div class="fcclear"></div>
-	
+
 	<?php
 		// Find if at least one tabbed position is used
 		$tabcount = 12; $createtabs = false;
@@ -239,23 +249,25 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			$createtabs = @$createtabs ||  isset($item->positions['subtitle_tab'.$tc]);
 		}
 	?>
-	
+
 	<?php if ($createtabs) :?>
 		<!-- tabber start -->
 		<div id="fc_subtitle_tabset" class="fctabber group">
-		
+
 		<?php for ($tc=1; $tc<=$tabcount; $tc++) : ?>
 			<?php
 			$tabpos_name  = 'subtitle_tab'.$tc;
 			$tabpos_label = JText::_($this->params->get('subtitle_tab'.$tc.'_label', $tabpos_name));
+			$tabpos_header_class = JText::_($this->params->get('subtitle_tab'.$tc.'_class', 'tabberheading'));
+			$tabpos_content_class = JText::_($this->params->get('subtitle_tab'.$tc.'_class', 'flexi lineinfo '));
 			$tab_id = 'fc_'.$tabpos_name;
 			?>
-			
+
 			<?php if (isset($item->positions[$tabpos_name])): ?>
 			<!-- tab start -->
 			<div id="<?php echo $tab_id; ?>" class="tabbertab">
-				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
-				<div class="flexi lineinfo">
+				<h3 class="<?php echo $tabpos_header_class; ?>"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+				<div class="flexi lineinfo <?php echo $tabpos_content_class; ?>">
 					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
 					<div class="flexi element field_<?php echo $field->name; ?>">
 						<?php if ($field->label) : ?>
@@ -267,41 +279,41 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				</div>
 			</div>
 			<!-- tab end -->
-		 	
+
 			<?php endif; ?>
-			
+
 		<?php endfor; ?>
-		
+
 		</div>
 		<!-- tabber end -->
 	<?php endif; ?>
-	
-	
+
+
 	<div class="fcclear"></div>
-	
-	
+
+
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
 		<!-- BOF image/top row -->
 		<div class="flexi topblock group">  <!-- NOTE: image block is inside top block ... -->
-			
+
 			<?php if (isset($item->positions['image'])) : ?>
 				<!-- BOF image block -->
 				<?php foreach ($item->positions['image'] as $field) : ?>
-				<div class="flexi image field_<?php echo $field->name; ?>">
+				<div class="<?php echo $imageclass; ?> field_<?php echo $field->name; ?>">
 					<?php echo $field->display; ?>
 					<div class="fcclear"></div>
 				</div>
 				<?php endforeach; ?>
 				<!-- EOF image block -->
 			<?php endif; ?>
-			
+
 			<?php if (isset($item->positions['top'])) : ?>
 				<!-- BOF top block -->
 				<?php
 					$top_cols = $this->params->get('top_cols', 'two');
 					$span_class = ''; //$top_cols == 'one' ? 'span8' : 'span4'; // commented out: bootstrap spanNN is not responsive to width !
 				?>
-				<div class="flexi infoblock <?php echo $top_cols; ?>cols">
+				<div class="<?php echo $topclass; ?> <?php echo $top_cols; ?>cols">
 					<ul class="flexi">
 						<?php foreach ($item->positions['top'] as $field) : ?>
 						<li class="flexi lvbox <?php echo 'field_' . $field->name; ?>">
@@ -317,18 +329,18 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				</div>
 				<!-- EOF top block -->
 			<?php endif; ?>
-			
+
 		</div>
 		<!-- EOF image/top row -->
 	<?php endif; ?>
-	
-	
+
+
 	<div class="fcclear"></div>
-	
-	
+
+
 	<?php if (isset($item->positions['description'])) : ?>
 		<!-- BOF description -->
-		<div class="description group">
+		<div class="<?php echo $descriptionclass; ?>">
 			<?php foreach ($item->positions['description'] as $field) : ?>
 				<?php if ($field->label) : ?>
 			<div class="desc-title label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
@@ -338,11 +350,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF description -->
 	<?php endif; ?>
-	
-	
+
+
 	<div class="fcclear"></div>
-	
-	
+
+
 	<?php
 		// Find if at least one tabbed position is used
 		$tabcount = 12; $createtabs = false;
@@ -350,23 +362,25 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			$createtabs = @$createtabs ||  isset($item->positions['bottom_tab'.$tc]);
 		}
 	?>
-	
+
 	<?php if ($createtabs) :?>
 		<!-- tabber start -->
 		<div id="fc_bottom_tabset" class="fctabber group">
-	
+
 		<?php for ($tc=1; $tc<=$tabcount; $tc++) : ?>
 			<?php
 			$tabpos_name  = 'bottom_tab'.$tc;
 			$tabpos_label = JText::_($this->params->get('bottom_tab'.$tc.'_label', $tabpos_name));
+			$tabpos_header_class = JText::_($this->params->get('bottom_tab'.$tc.'_class', 'tabberheading'));
+			$tabpos_content_class = JText::_($this->params->get('bottom_tab'.$tc.'_class', 'flexi lineinfo '));
 			$tab_id = 'fc_'.$tabpos_name;
 			?>
-		
+
 			<?php if (isset($item->positions[$tabpos_name])): ?>
 			<!-- tab start -->
 			<div id="<?php echo $tab_id; ?>" class="tabbertab">
-				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
-				<div class="flexi lineinfo">
+				<h3 class="<?php echo $tabpos_header_class ; ?>"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+				<div class="flexi lineinfo <?php echo $tabpos_content_class ; ?>">
 					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
 					<div class="flexi element field_<?php echo $field->name; ?>">
 						<?php if ($field->label) : ?>
@@ -379,23 +393,23 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			</div>
 			<!-- tab end -->
 			<?php endif; ?>
-			
+
 		<?php endfor; ?>
-		
+
 		</div>
 		<!-- tabber end -->
 	<?php endif; ?>
-	
-	
+
+
 	<div class="fcclear"></div>
-	
-	
+
+
 	<?php
 		$footer_shown =
 			isset($item->positions['bottom']) || $item->event->afterDisplayContent;
 	?>
-	
-	
+
+
 	<?php if (isset($item->positions['bottom'])) : ?>
 		<!-- BOF bottom block -->
 		<?php
@@ -418,10 +432,10 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF bottom block -->
 	<?php endif; ?>
-	
-	
-	
-	
+
+
+
+
 	<?php if ($item->event->afterDisplayContent) : ?>
 		<!-- BOF afterDisplayContent -->
 		<div class="fc_afterDisplayContent group">
@@ -429,11 +443,11 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		</div>
 		<!-- EOF afterDisplayContent -->
 	<?php endif; ?>
-	
-	
-	
+
+
+
 	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
-	
+
 	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
 		<!-- BOF comments -->
 		<div class="comments group">
@@ -444,7 +458,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					echo JComments::showComments($item->id, 'com_flexicontent', $this->escape($item->title));
 				endif;
 			endif;
-	
+
 			if ($this->params->get('comments') == 2) :
 				if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
 		  			require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
