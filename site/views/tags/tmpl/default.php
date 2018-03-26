@@ -36,11 +36,11 @@ $image_method = (int)$params->get('image_method', 1);
 $image_size		= $params->get('image_size', '');
 
 // Retrieve default image for the image field
-if ($use_image && $image_source) {
-	$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $image_source;
-	$db->setQuery($query);
-	$image_dbdata = $db->loadObject();
-	//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
+if ($use_image && $image_source)
+{
+	$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = ' . (int) $image_source;
+	$image_dbdata = $db->setQuery($query)->loadObject();
+	//$image_dbdata->params = new JRegistry($image_dbdata->params);
 	
 	$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
 	$img_field_size = $img_size_map[ $image_size ];
@@ -179,10 +179,11 @@ $items	= & $this->items;
 			$thumb = '';
 			if ($image_source)
 			{
-				FlexicontentFields::getFieldDisplay($item, $img_field_name, null, 'display', 'module');
-				$img_field = $item->fields[$img_field_name];
-				if ( !empty($img_field->thumbs_src['large'][0]) )
+				$imageurl = FlexicontentFields::getFieldDisplay($item, $img_field_name, null, 'display_' . ($img_field_size ?: 'large') . '_src', 'module');
+
+				if ($imageurl)
 				{
+					$img_field = $item->fields[$img_field_name];
 					!$img_field_size
 						? $src = str_replace(JUri::root(), '',  $img_field->thumbs_src['large'][0])
 						: $thumb = $img_field->thumbs_src[ $img_field_size ][0];

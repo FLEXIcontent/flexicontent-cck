@@ -3823,9 +3823,15 @@ class flexicontent_html
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 
 		// Set input-set attributes and input's label class if not given
-		$fset_attribs = !$fset_attribs && $add_fset ? ' class="radio btn-group btn-group-yesno"' : $fset_attribs;
-		$label_class  = !$label_class && $add_fset ? ' btn': $label_class;
-		$label_on_class = !$label_on_class && $add_fset ? ' active': $label_on_class;
+		$fset_attribs = !$fset_attribs && $add_fset
+			? ' class="radio btn-group group-fcinfo"'
+			: $fset_attribs;
+		$label_class = !$label_class && $add_fset
+			? ''
+			: $label_class;
+		$label_on_class = !$label_on_class && $add_fset
+			? ''
+			: $label_on_class;
 
 		$html = $add_fset ? '<fieldset ' . $fset_attribs . '>' : '';
 		$n = 0;
