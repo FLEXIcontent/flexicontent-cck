@@ -105,8 +105,8 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 					$all_langs= FLEXIUtilities::getLanguages($hash='code');
 				}
 				$lang_data = $all_langs->{$item->language};
-				
-				$field->{$prop} = $lang_data && $lang_data->title_native ? $lang_data->title_native : $lang_data->name;
+
+				$field->{$prop} = $lang_data && $lang_data->code !== '*' && $lang_data->title_native ? $lang_data->title_native : $lang_data->name;
 				break;
 
 			case 'id':
