@@ -2741,7 +2741,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// ***
 		foreach($item_arr as $item)
 		{
-			if ($item->associations && $item->language && $item->language !== '*')
+			if (!empty($item->associations) && $item->language && $item->language !== '*')
 			{
 				unset($item->associations[$item->language]);
 				flexicontent_db::saveAssociations($item, $_data, $context = 'com_content.item');
