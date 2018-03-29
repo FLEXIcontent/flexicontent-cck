@@ -9,20 +9,28 @@
 	{
 		var maxWidth  = typeof winwidth === 'undefined'  ? 0 : winwidth;
 		var maxHeight = typeof winheight === 'undefined' ? 0 : winheight;
-		var w = maxWidth  ? maxWidth  : jQuery( window ).width() - 70;
-		var h = maxHeight ? maxHeight : jQuery( window ).height() - 120;
+		var w = maxWidth  ? maxWidth  : jQuery(window).width() - 70;
+		var h = maxHeight ? maxHeight : jQuery(window).height() - 120;
 
 		// Add fixed scrolling class and ... also add auto-width / auto-height classes so dimensions are treated as MAX values
 		params.dialogClass = typeof params.dialogClass !== 'undefined'  ?  params.dialogClass  :  'fc-fixed-dialog';
 		params.dialogClass += ' fc-autow-dialog';
 		params.dialogClass += ' fc-autoh-dialog';
 
-		params.winwidth  = w  > (jQuery( window ).width() - 70)   ? (jQuery( window ).width() - 70)  :  w;
-		params.winheight = h  > (jQuery( window ).height() - 120) ? (jQuery( window ).height() - 120) : h;
+		if (jQuery(window).width() < 600 || jQuery(window).height() < 600)
+		{
+			params.winwidth  = w  > (jQuery(window).width() - 10)  ? (jQuery(window).width() - 10)  : w;
+			params.winheight = h  > (jQuery(window).height() - 10) ? (jQuery(window).height() - 10) : h;
+		}
+		else
+		{
+			params.winwidth  = w  > (jQuery(window).width() - 70)   ? (jQuery(window).width() - 70)   : w;
+			params.winheight = h  > (jQuery(window).height() - 120) ? (jQuery(window).height() - 120) : h;
+		}
 		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
 
-		params.winleft = (jQuery( window ).width()  - params.winwidth)  / 2 + 5;
-		params.wintop  = (jQuery( window ).height() - params.winheight) / 2 - 5;
+		params.winleft = (jQuery(window).width()  - params.winwidth)  / 2 + 5;
+		params.wintop  = (jQuery(window).height() - params.winheight) / 2 - 5;
 		//window.console.log ('winleft : ' + params.winleft + ', wintop : ' + params.wintop);
 
 		return params;
@@ -1339,10 +1347,31 @@
 				maxheight = maxheight || 0;
 				params = fc_getAutoSizePos(maxwidth, maxheight, params);
 
-				dialog_box.css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' });
-				dialog_box.css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
+				dialog_box
+					.css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' })
+					.css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
 			}
 		});
+
+		// Handle sbox
+		params = fc_getAutoSizePos(0, 0, {});
+
+		var dialog_box = jQuery('#sbox-window');
+		if (dialog_box)
+		{
+			dialog_box
+				.css({ 'position': 'fixed' })
+				.css({ 'left': params.winleft+'px', 'width': (params.winwidth-40)+'px' })
+				.css({ 'top': params.wintop+'px', 'height': (params.winheight-20)+'px' })
+				.find('#sbox-content').children('iframe')
+					.removeAttr('width').removeAttr('height').css({ 'width': '100%', 'height': '100%' });
+		}
+
+		var dialog_box = jQuery('div.field-media-wrapper > div.modal');
+		if (dialog_box)
+		{
+			dialog_box.css({ 'top': (params.wintop-30)+'px', 'height': (params.winheight-60)+'px' });
+		}
 
 		// Fix modal's inner container adding unneeded scrollbar
 		var dialogs = jQuery(boxHsel);
