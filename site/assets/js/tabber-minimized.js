@@ -201,8 +201,8 @@ tabberObj.prototype.init = function(e)
 	var decode_entities = document.createElement("textarea");  // used to decode html entities
 	
   /* Loop through each tab we found */
-  for (i=0; i < this.tabs.length; i++) {
-
+  for (i=0; i < this.tabs.length; i++)
+  {
     t = this.tabs[i];
 
     /* Get the label to use for this tab:
@@ -212,8 +212,9 @@ tabberObj.prototype.init = function(e)
      */
     t.headingText = t.div.title;
     t.headingTitle = '';
-    t.headingIconClass = t.div.getAttribute('data-icon-class');
-    t.headingPrefixTxt = t.div.getAttribute('data-prefix-text');
+    t.headingIconClass  = t.div.getAttribute('data-icon-class');
+    t.headingIcon2Class = t.div.getAttribute('data-icon2-class');
+    t.headingPrefixTxt  = t.div.getAttribute('data-prefix-text');
     
     /* Remove the title attribute to prevent a tooltip from appearing */
     if (this.removeTitle)
@@ -237,6 +238,8 @@ tabberObj.prototype.init = function(e)
           decode_entities.innerHTML = headingElement.innerHTML;
 					t.headingText = decode_entities.value;
           t.headingTitle = headingElement.title;
+          t.headingContent = headingElement.dataset.content;
+          t.headingPlacement = headingElement.dataset.placement;
           if (typeof jQuery != 'undefined')
           {
             tab_classes=jQuery(headingElement).attr('class');
@@ -271,16 +274,25 @@ tabberObj.prototype.init = function(e)
 
     /* Create a link to activate the tab */
     DOM_a = document.createElement("a");
-    if (t.headingIconClass)
+    if (t.headingIconClass || t.headingIcon2Class)
     {
-    	var icon = document.createElement("i");
-    	icon.setAttribute('class', t.headingIconClass);
-    	DOM_a.appendChild(icon);
-    	DOM_a.appendChild(document.createTextNode(' '));
+    	var icon_classes = [];
+    	icon_classes[0] = t.headingIconClass;
+    	icon_classes[1] = t.headingIcon2Class;
+    	for (var j = 0; j < icon_classes.length; j++)
+    	{
+    		if (!icon_classes[j]) continue;
+	    	var icon = document.createElement("i");
+	    	icon.setAttribute('class', icon_classes[j]);
+	    	DOM_a.appendChild(icon);
+	    	DOM_a.appendChild(document.createTextNode(' '));
+	    }
     }
     DOM_a.appendChild(document.createTextNode(t.headingText));
     DOM_a.href = "javascript:void(null);";
     DOM_a.title = t.headingTitle;
+    DOM_a.dataset.content = t.headingContent;
+    DOM_a.dataset.placement = t.headingPlacement;
     DOM_a.onclick = this.navClick;
     if (typeof jQuery != 'undefined')
     {

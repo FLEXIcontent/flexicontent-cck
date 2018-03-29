@@ -1179,6 +1179,13 @@ body.contentpane.component #flexicontent,
 body.contentpane.modal #flexicontent {
 	padding: 8px 8px 4px 8px;
 }
+div.field-media-wrapper > div.modal .modal-body {
+	height: 100% !important;
+	max-height: 100% !important;
+}
+div.field-media-wrapper > div.modal .modal-body > iframe {
+	height: 100% !important;
+}
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess,
 fieldset.adminform,
@@ -1557,15 +1564,6 @@ table.fc-form-tbl td.key > .fc-prop-lbl {
 	line-height: 22px;
 	width: 0;
 	background-color: #0099ff;
-}
-body .popover-title {
-	font-weight: bold;
-}
-body .popover.left .arrow::after {
-	border-left-color: #333;
-}
-body .popover .arrow::after {
-	border-width: 0;
 }
 div.pane-sliders ul.adminformlist li select {
 	margin-bottom: 0px;
