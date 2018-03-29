@@ -397,7 +397,6 @@ class osmap_com_flexicontent
 		}
 		
 		$items = self::getItems($where_basic, $params, $extra_join, $extra_endwhere);
-		echo count($items) . '<br>';
 		
 		// Terminate if no items were found
 		if ( empty($items) ) return;

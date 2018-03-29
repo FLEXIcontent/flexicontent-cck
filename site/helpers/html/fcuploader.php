@@ -80,10 +80,12 @@ abstract class JHtmlFcuploader
 	public static function init($field, $u_item_id, $up_tag_id, $options)
 	{
 		static $initialized = array();
+
 		if (isset($initialized[$up_tag_id]))
 		{
 			return;
 		}
+
 		$initialized[$up_tag_id] = true;
 
 		$defaults = array(
@@ -101,7 +103,10 @@ abstract class JHtmlFcuploader
 			'handle_FileFiltered' => 'null',
 			'handle_FileUploaded' => 'null'
 		);
-		foreach($defaults as $i => $v)  isset($options[$i]) || $options[$i] = $v;
+		foreach($defaults as $i => $v)
+		{
+			isset($options[$i]) || $options[$i] = $v;
+		}
 
 		$uops = self::getUploadConf($field);
 
@@ -178,18 +183,26 @@ abstract class JHtmlFcuploader
 	public static function getUploadConf($field)
 	{
 		static $uops = array();
-		$conf_index = $field ? $field->id : 'component';
 
-		if (isset($uops[$conf_index])) return $uops[$conf_index];
+		$conf_index = $field
+			? $field->id
+			: 'component';
+
+		if (isset($uops[$conf_index]))
+		{
+			return $uops[$conf_index];
+		}
 		
 		$uconf = new JRegistry();
-		$uconf->merge( JComponentHelper::getParams('com_flexicontent') );
+		$uconf->merge(JComponentHelper::getParams('com_flexicontent'));
+
 		if (!empty($field))
 		{
 			$uconf->merge($field->parameters);
 		}
 
 		// Try field with upload_maxsize and resize_on_upload parameters
+		$u = array();
 		$u['upload_maxsize']   = (int) $uconf->get('upload_maxsize', 10000000);
 		$u['resize_on_upload'] = (int) $uconf->get('resize_on_upload', 1);
 

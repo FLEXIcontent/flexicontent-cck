@@ -51,7 +51,6 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_DATE_YEAR_LIMITATION_OFFSETS" description="" level="level3" />
-			<field name="" type="separator" default="(Joomla 3.9+)" description="" level="level4" />
 			<field name="minyear" type="text" default="" filter="int" label="FLEXI_FIELD_DATE_MINIMUM_YEAR" description="Relative to current year, negative is before current year, zero is current, positive is after current year" />
 			<field name="maxyear" type="text" default="" filter="int" label="FLEXI_FIELD_DATE_MAXIMUM_YEAR" description="Relative to current year, negative is before current year, zero is current, positive is after current year" />
 			
