@@ -72,8 +72,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
-		$file_source = (int) $field->parameters->get('file_source', 0);
-
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
 		$top_notice = '';//$use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
@@ -522,30 +520,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 
 
-		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
-		static $mm_mode_common_js_added = false;
-		if ( $file_source == -2 && !$mm_mode_common_js_added )
-		{
-			// We will use the mootools based media manager
-			JHtml::_('behavior.framework', true);
-			
-			// Load the modal behavior script.
-			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
-			
-			// Include media field JS, detecting different version of Joomla
-			if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js') ) $media_js = 'media/mediafield-mootools.min.js';
-			else if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js') ) $media_js = 'media/mediafield.min.js';
-			else $media_js = 'media/mediafield.js';
-			
-			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
-			
-			// Tooltips for image path and image popup preview
-			JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
-			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
-			$mm_mode_common_js_added = true;
-		}
-
-
 		// Added field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
@@ -757,12 +731,15 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
-		if ($allowaddtocart && $mod_is_enabled === null) {
+
+		if ($mod_is_enabled === null && $allowaddtocart && !JFactory::getApplication()->isAdmin())
+		{
 			$db = JFactory::getDbo();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
-			$db->setQuery($query);
-			$mod_is_enabled = $db->loadResult();
-			if (!$mod_is_enabled) {
+			$mod_is_enabled = $db->setQuery($query)->loadResult();
+
+			if (!$mod_is_enabled)
+			{
 				JFactory::getApplication()->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
 			}
 		}
