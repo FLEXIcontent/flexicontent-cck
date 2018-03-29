@@ -731,12 +731,15 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
-		if ($allowaddtocart && $mod_is_enabled === null) {
+
+		if ($mod_is_enabled === null && $allowaddtocart && !JFactory::getApplication()->isAdmin())
+		{
 			$db = JFactory::getDbo();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
-			$db->setQuery($query);
-			$mod_is_enabled = $db->loadResult();
-			if (!$mod_is_enabled) {
+			$mod_is_enabled = $db->setQuery($query)->loadResult();
+
+			if (!$mod_is_enabled)
+			{
 				JFactory::getApplication()->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
 			}
 		}
@@ -1218,14 +1221,21 @@ class plgFlexicontent_fieldsFile extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
-	function getFileData($fid, $published=1, $extra_select='')
+
+
+
+
+	/**
+	 * Get DB data for the given file IDs
+	 */
+
+	function getFileData($fid, $published = 1, $extra_select = '')
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
 		static $cached_data = array();
 		$return_data = array();
 		$new_ids = array();
-		$file_ids = (array)$fid;
+		$file_ids = (array) $fid;
 		foreach ($file_ids as $file_id)
 		{
 			$f = (int)$file_id;
@@ -1257,7 +1267,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		{
 			$f = (int)$file_id;
 			if ( isset($cached_data[$f]) && $f)
+			{
 				$return_data[$file_id] = $cached_data[$f];
+			}
 		}
 
 		return !is_array($fid) ? @$return_data[(int)$fid] : $return_data;
