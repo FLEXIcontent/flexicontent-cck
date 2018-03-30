@@ -220,28 +220,36 @@ class FlexicontentViewFile extends JViewLegacy
 
 		$rowdata = new stdclass();
 
-		if (!$row->url)
+		switch ((int) $row->url)
 		{
-			$path = $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-			$rowdata->path = $path . DS . $row->filename;
+			case 0:
+				$path = $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+				$rowdata->path = JPath::clean($path . DS . $row->filename);
 
-			$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
-		}
+				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
+				break;
 
-		else
-		{
-			$url = $row->filename_original ?: $row->filename;
-			$rowdata->calculated_size = $model->get_file_size_from_url($url);
+			case 1:
+				$url = $row->filename_original ?: $row->filename;
+				$rowdata->calculated_size = $model->get_file_size_from_url($url);
 
-			if ($rowdata->calculated_size === -999)
-			{
-				$app->enqueueMessage($model->getError(), 'warning');
-			}
+				if ($rowdata->calculated_size === -999)
+				{
+					$app->enqueueMessage($model->getError(), 'warning');
+				}
 
-			// Maintain current size if size could not be calulcated
-			$rowdata->calculated_size = $rowdata->calculated_size < 0
-				? $row->size
-				: $rowdata->calculated_size;
+				// Maintain current size if size could not be calulcated
+				$rowdata->calculated_size = $rowdata->calculated_size < 0
+					? $row->size
+					: $rowdata->calculated_size;
+				break;
+
+			case 2:
+				$path = $row->filename_original ?: $row->filename;
+				$rowdata->path = JPath::clean(JPATH_ROOT . DS . $path);
+
+				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
+				break;
 		}
 
 		$rowdata->calculated_size_display = number_format(ceil($rowdata->calculated_size / (1024)), 0) .' KBs';

@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 
 $lang = JFactory::getLanguage();
+$this->viewLayout = basename(__FILE__, '.php');
 
 JHtml::_('stylesheet', 'media/popup-imagelist.css', array('version' => 'auto', 'relative' => true));
 
@@ -47,9 +48,25 @@ else
 	);
 }
 
-// Also get Documents and Videos
-$this->docs    = !empty($add_docs) ? $this->get('documents') : array();
-$this->videos  = !empty($add_vids) ? $this->get('videos') : array();
+// Force container to body of container to full height
+JFactory::getDocument()->addStyleDeclaration(
+	'
+		body.contentpane.component {
+			height: 100%;
+			box-sizing: border-box;
+		}
+	'
+);
+
+// Only get required documents
+$filetypes = JFactory::getApplication()->input->getString('filetypes', false);
+$filetypes = $filetypes ?: 'folders,images';
+$filetypes = explode(',', $filetypes);
+
+$this->docs    = in_array('docs', $filetypes) ? $this->get('documents') : array();
+$this->videos  = in_array('videos', $filetypes) ? $this->get('videos') : array();
+$this->images  = in_array('images', $filetypes) ? $this->images : array();
+$this->folders = in_array('folders', $filetypes) ? $this->folders : array();
 
 // Add image preview on click to preview icon
 if (count($this->images))
@@ -124,7 +141,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 			$folder =  &$this->folders[$i];
 			?>
 			<li class="imgOutline thumbnail height-80 width-80 center">
-				<a href="index.php?option=com_media&amp;view=imagesList&amp;tmpl=component&amp;folder=<?php echo $folder->path_relative; ?>&amp;asset=<?php echo $asset;?>&amp;author=<?php echo $author;?>" target="imageframe">
+				<a href="index.php?option=com_media&amp;view=imagesList&amp;layout=<?php echo $this->viewLayout;?>&amp;tmpl=component&amp;folder=<?php echo $folder->path_relative; ?>&amp;asset=<?php echo $asset;?>&amp;author=<?php echo $author;?>" target="imageframe">
 					<div class="imgFolder">
 						<span class="icon-folder-2"></span>
 					</div>

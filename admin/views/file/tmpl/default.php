@@ -52,11 +52,50 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_FILENAME_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="filename_original">
-					<?php echo JText::_( !$this->row->url ? 'FLEXI_FILENAME' : 'FLEXI_FILE_URL' ); ?>
+					<?php
+					switch ((int) $this->row->url)
+					{
+						case 0:
+							echo JText::_('FLEXI_FILENAME');
+							break;
+						case 1:
+							echo JText::_('FLEXI_URL_LINK');
+							break;
+						case 2:
+							echo JText::_('FLEXI_JMEDIA_LINK');
+							break;
+					}
+					?>
 				</label>
 			</td>
 			<td>
-				<input type="text" id="filename_original" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" class="input-xxlarge required" maxlength="4000" />
+				<?php if ((int) $this->row->url !== 2) :
+
+					echo '
+					<input type="text" id="filename_original" name="filename_original" value="' . (strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename) . '" class="input-xxlarge required" maxlength="4000" />
+					';
+
+				else :
+
+					$jMedia_file_displayData = array(
+						'disabled' => false,
+						'preview' => 'tooltip',
+						'readonly' => false,
+						'class' => 'required',
+						'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=folders,images,docs,videos&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+						'asset' => 'com_flexicontent',
+						'authorId' => '',
+						'previewWidth' => 480,
+						'previewHeight' => 360,
+						'name' => 'file-jmedia-data',
+						'id' => 'file-jmedia-data',
+						'value' => strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename,
+						'folder' => '',
+					);
+					echo JLayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+
+				endif; ?>
+
 			</td>
 		</tr>
 

@@ -2455,6 +2455,9 @@ body.contentpane.component #flexicontent,
 body.contentpane.modal #flexicontent {
 	padding: 8px 8px 4px 8px;
 }
+div.field-media-wrapper > div.modal {
+	height: 70%;
+}
 div.field-media-wrapper > div.modal .modal-body {
 	height: 100% !important;
 	max-height: 100% !important;

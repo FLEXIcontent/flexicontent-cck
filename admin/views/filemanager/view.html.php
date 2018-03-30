@@ -101,8 +101,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			}
 		}
 
-		if (!$fieldid && $view=='fileselement') die('no valid field ID');
-		$_view = $view.$fieldid;
+		if (!$fieldid && $view === 'fileselement') die('no valid field ID');
+		$_view = $view . $fieldid;
 		//$folder_mode = !$fieldid ? 0 : $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode', 'folder_mode', 0, 'int' );
 
 
@@ -122,7 +122,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
 		$filter_stamp     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_stamp',     'filter_stamp',     '',          'word' );
 		
-		$target_dir = $layout=='image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
+		$target_dir = $layout === 'image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
 		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
 		$cols = array();
 
@@ -149,7 +149,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		else
 		{
 			// Filemanager view, add all columns
-			if ($view=='filemanager')
+			if ($view === 'filemanager')
 			{
 				foreach($optional_cols as $col) $cols[$col] = 1;
 			}
@@ -162,7 +162,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
 		$filter_item      = $app->getUserStateFromRequest( $option.'.'.$_view.'.item_id',          'item_id',          '',           'int' );
 		
-		if ($layout!='image')
+		if ($layout !== 'image')
 		{
 			if ($filter_lang) $count_filters++;
 			if ($filter_url) $count_filters++;
@@ -184,7 +184,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($filter_uploader && !empty($cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
-		$u_item_id = $view=='fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
+		$u_item_id = $view === 'fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
 
 
 		// Text search
@@ -212,41 +212,46 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// ***
 		// *** Add css and js to document
 		// ***
-		
-		if ($app->isSite())
+
+		if ($layout !== 'indexer')
 		{
-			$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+			if ($app->isSite())
+			{
+				$document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+			}
+
+			else
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+
+			// Fields common CSS
+			$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+
+			// Add JS frameworks
+			flexicontent_html::loadFramework('select2');
+			$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+			flexicontent_html::loadFramework('flexi-lib');
+
+			flexicontent_html::loadFramework('flexi-lib-form');
+
+			// Add js function to overload the joomla submitform validation
+			JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+			$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		}
-		else
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 
-		// Fields common CSS
-		$document->addStyleSheetVersion(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
-
-		
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-		flexicontent_html::loadFramework('flexi-lib');
-		
-		// Add js function to overload the joomla submitform validation
-		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		
 		// ************************
 		// Create Submenu & Toolbar
 		// ************************
 		
 		// Create Submenu (and also check access to current view)
-		if ($view!='fileselement')
+		if ($view !== 'fileselement')
 		{
 			FLEXIUtilities::ManagerSideMenu('CanFiles');
 		}
@@ -254,7 +259,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FILEMANAGER' );
 		$site_title = $document->getTitle();
-		if ($view!='fileselement')
+		if ($view !== 'fileselement')
 		{
 			JToolbarHelper::title( $doc_title, 'files' );
 		}
@@ -272,7 +277,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// DB mode
 		if ( !$folder_mode )
 		{
-			$rows_pending = $view=='fileselement'
+			$rows_pending = $view === 'fileselement'
 				? $model->getDataPending()
 				: false;
 			if (empty($rows_pending))
@@ -285,7 +290,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// FOLDER mode
 		else
 		{
-			$rows_pending = $view=='fileselement'
+			$rows_pending = $view === 'fileselement'
 				? $model->getFilesFromPath($u_item_id, $fieldid, null, true)
 				: false;
 			if (empty($rows_pending))
@@ -463,7 +468,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->option = $option;
 		$this->view   = $view;
 
-		if ($view=='fileselement')
+		if ($view === 'fileselement')
 		{
 			$this->img_folder = $img_folder;
 			$this->thumb_w    = $thumb_w;
