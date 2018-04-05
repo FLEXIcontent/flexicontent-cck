@@ -1,20 +1,9 @@
 <?php
 /**
- * HTML5 Template
- * @version 1.5 stable $Id: item_html5.php 0001 2012-09-23 14:00:28Z Rehne $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @package FLEXIcontent
+ * @copyright (C) 2009-2018 Emmanuel Danan, Georgios Papadakis, Yannick Berges
+ * @author Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @license GNU/GPL v2
- *
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
@@ -32,24 +21,30 @@ JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="te
 
 // Prepend toc (Table of contents) before item's description (toc will usually float right)
 // By prepend toc to description we make sure that it get's displayed at an appropriate place
-if (isset($item->toc)) {
+if (isset($item->toc))
+{
 	$item->fields['text']->display = $item->toc . $item->fields['text']->display;
 }
 
-// ***********
-// CUSTOM CLASS
-// ***********
-$subtitle1class = $this->params->get( 'subtitle1class','flexi lineinfo subtitle1 group ');
-$subtitle2class = $this->params->get( 'subtitle2class','flexi lineinfo subtitle2 group ');
-$subtitle3class = $this->params->get( 'subtitle3class','flexi lineinfo subtitle3 group ');
-$topclass = $this->params->get( 'topclass','flexi infoblock span8 ');
-$imageclass = $this->params->get( 'imageclass','flexi image span4 ');
-$descriptionclass = $this->params->get( 'descriptionclass','description group ');
-$bottomclass = $this->params->get( 'bottomclass','flexi infoblock group ');
 
-// ***********
-// DECIDE TAGS
-// ***********
+/**
+ * Custom Classes for containers
+ */
+
+$box_class_subtitle1 = $this->params->get('box_class_subtitle1', 'flexi group lineinfo subtitle1');
+$box_class_subtitle2 = $this->params->get('box_class_subtitle2', 'flexi group lineinfo subtitle2');
+$box_class_subtitle3 = $this->params->get('box_class_subtitle3', 'flexi group lineinfo subtitle3');
+
+$box_class_image  = $this->params->get('box_class_image', 'flexi group image span4');
+$box_class_top    = $this->params->get('box_class_top', 'flexi group infoblock span8');
+$box_class_descr  = $this->params->get('box_class_descr', 'flexi group description');
+$box_class_bottom = $this->params->get('box_class_bottom', 'flexi group infoblock');
+
+
+/**
+ * Decide Tags for containers
+ */
+
 $page_heading_shown =
 	$this->params->get( 'show_page_heading', 1 ) &&
 	$this->params->get('page_heading') != $item->title &&
@@ -192,7 +187,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['subtitle1'])) : ?>
 		<!-- BOF subtitle1 block -->
-		<div class="<?php echo $subtitle1class; ?>">
+		<div class="<?php echo $box_class_subtitle1; ?>">
 			<?php foreach ($item->positions['subtitle1'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -208,7 +203,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['subtitle2'])) : ?>
 		<!-- BOF subtitle2 block -->
-		<div class="<?php echo $subtitle2class; ?>">
+		<div class="<?php echo $box_class_subtitle2; ?>">
 			<?php foreach ($item->positions['subtitle2'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -224,7 +219,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['subtitle3'])) : ?>
 		<!-- BOF subtitle3 block -->
-		<div class="<?php echo $subtitle3class; ?>">
+		<div class="<?php echo $box_class_subtitle3; ?>">
 			<?php foreach ($item->positions['subtitle3'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -261,16 +256,15 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<?php
 			$tabpos_name  = 'subtitle_tab'.$tc;
 			$tabpos_label = JText::_($this->params->get('subtitle_tab'.$tc.'_label', $tabpos_name));
-			$tabpos_header_class = JText::_($this->params->get('subtitle_tab'.$tc.'_class', 'tabberheading'));
-			$tabpos_content_class = JText::_($this->params->get('subtitle_tab'.$tc.'_class', 'flexi lineinfo '));
+			$box_class    = $this->params->get('box_class_subtitle_tab'.$tc, 'flexi lineinfo');
 			$tab_id = 'fc_'.$tabpos_name;
 			?>
 
 			<?php if (isset($item->positions[$tabpos_name])): ?>
 			<!-- tab start -->
 			<div id="<?php echo $tab_id; ?>" class="tabbertab">
-				<h3 class="<?php echo $tabpos_header_class; ?>"><?php echo $tabpos_label; ?></h3><!-- tab title -->
-				<div class="flexi lineinfo <?php echo $tabpos_content_class; ?>">
+				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+				<div class="<?php echo $box_class; ?>">
 					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
 					<div class="flexi element field_<?php echo $field->name; ?>">
 						<?php if ($field->label) : ?>
@@ -303,7 +297,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<?php if (isset($item->positions['image'])) : ?>
 				<!-- BOF image block -->
 				<?php foreach ($item->positions['image'] as $field) : ?>
-				<figure class="<?php echo $imageclass; ?> field_<?php echo $field->name; ?>">
+				<figure class="<?php echo $box_class_image; ?> field_<?php echo $field->name; ?>">
 					<?php echo $field->display; ?>
 					<div class="fcclear"></div>
 				</figure>
@@ -317,7 +311,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					$top_cols = $this->params->get('top_cols', 'two');
 					$span_class = ''; //$top_cols == 'one' ? 'span8' : 'span4'; // commented out: bootstrap spanNN is not responsive to width !
 				?>
-				<div class="<?php echo $topclass; ?> <?php echo $top_cols; ?>cols ">
+				<div class="<?php echo $box_class_top; ?> <?php echo $top_cols; ?>cols">
 					<ul class="flexi row">
 						<?php foreach ($item->positions['top'] as $field) : ?>
 						<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
@@ -344,7 +338,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['description'])) : ?>
 		<!-- BOF description -->
-		<div class="<?php echo $descriptionclass; ?>">
+		<div class="<?php echo $box_class_descr; ?>">
 			<?php foreach ($item->positions['description'] as $field) : ?>
 				<?php if ($field->label) : ?>
 			<div class="desc-title label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
@@ -376,16 +370,15 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			<?php
 			$tabpos_name  = 'bottom_tab'.$tc;
 			$tabpos_label = JText::_($this->params->get('bottom_tab'.$tc.'_label', $tabpos_name));
-			$tabpos_header_class = JText::_($this->params->get('bottom_tab'.$tc.'_class', 'tabberheading'));
-			$tabpos_content_class = JText::_($this->params->get('bottom_tab'.$tc.'_class', 'flexi lineinfo '));
+			$box_class    = $this->params->get('box_class_bottom_tab'.$tc, 'flexi lineinfo');
 			$tab_id = 'fc_'.$tabpos_name;
 			?>
 
 			<?php if (isset($item->positions[$tabpos_name])): ?>
 			<!-- tab start -->
 			<div id="<?php echo $tab_id; ?>" class="tabbertab">
-				<h3 class="<?php echo $tabpos_header_class ; ?>"><?php echo $tabpos_label; ?></h3><!-- tab title -->
-				<div class="flexi lineinfo <?php echo $tabpos_content_class ; ?>">
+				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+				<div class="<?php echo $box_class; ?>">
 					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
 					<div class="flexi element field_<?php echo $field->name; ?>">
 						<?php if ($field->label) : ?>
@@ -425,7 +418,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			$bottom_cols = $this->params->get('bottom_cols', 'two');
 			$span_class = $bottom_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
 		?>
-		<div class="<?php echo $bottomclass; ?> <?php echo $bottom_cols; ?>cols">
+		<div class="<?php echo $box_class_bottom; ?> <?php echo $bottom_cols; ?>cols group">
 			<ul class="flexi row">
 				<?php foreach ($item->positions['bottom'] as $field) : ?>
 				<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
