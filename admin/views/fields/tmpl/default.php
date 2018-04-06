@@ -235,7 +235,7 @@ function delAllFilters() {
 	</div>
 	<?php endif; ?>
 
-	<table id="adminListTableFCfields" class="table fcmanlist">
+	<table id="adminListTableFCfields" class="adminlist table fcmanlist">
 	<thead>
 		<tr>
 			<?php /*

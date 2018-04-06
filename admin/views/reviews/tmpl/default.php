@@ -153,7 +153,7 @@ function delAllFilters() {
 	<div class="fcclear"></div>
 	
   
-	<table id="adminListTableFCreviews" class="table fcmanlist">
+	<table id="adminListTableFCreviews" class="adminlist table fcmanlist">
 	<thead>
 		<tr class="header">
 			<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>

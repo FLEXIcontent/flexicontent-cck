@@ -226,7 +226,7 @@ function delAllFilters() {
 	
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCcats" class="table fcmanlist">
+	<table id="adminListTableFCcats" class="adminlist table fcmanlist">
 	<thead>
 		<tr>
 			<th width="1%" class="nowrap center hidden-phone">

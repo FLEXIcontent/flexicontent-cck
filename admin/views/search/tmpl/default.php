@@ -173,7 +173,7 @@ function delAllFilters() {
 	<?php echo '<span class="label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?>
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCsearch<?php echo $this->isADV ? '_advanced' : '_basic'; ?>" class="table fcmanlist">
+	<table id="adminListTableFCsearch<?php echo $this->isADV ? '_advanced' : '_basic'; ?>" class="adminlist table fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
