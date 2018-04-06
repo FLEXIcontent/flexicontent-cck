@@ -123,7 +123,7 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 	
 	<div class="fcclear"></div>
 
-	<table id="adminListTableFCgroups" class="adminlist fcmanlist" style="min-width: 400px;">
+	<table id="adminListTableFCgroups" class="table fcmanlist" style="min-width: 400px;">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
