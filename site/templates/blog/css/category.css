@@ -1,54 +1,54 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
-	color: #ff0000;
-	background-color: #3d2020;
-	padding-top: 10px;
-	padding-right: 2px;
-	padding-left: 50px;
-	padding-bottom: 8px;
-	border-radius: 15px;
+	color: inherit;
+	background-color: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #0d18ab;
+	background-color: #999999;
 	color: #ffffff;
-	border-radius: 80px;
-	padding-top: 7px;
-	padding-right: 10px;
+	border-radius: 3px;
+	padding-top: 2px;
+	padding-right: 4px;
 	padding-left: 4px;
-	padding-bottom: 6px;
+	padding-bottom: 2px;
 }
 body #flexicontent ul.leadingblock > li {
-	background-color: #8f1414;
-	color: #ffffff;
-	padding-top: 20px;
-	padding-right: 20px;
-	padding-left: 20px;
-	padding-bottom: 20px;
-	border-radius: 5px;
-	margin-top: 5px;
-	margin-right: 5px;
-	margin-left: 5px;
-	margin-bottom: 20px;
-	border: 10px groove #26cc50;
-}
-body #flexicontent ul.introblock > li {
-	background-color: #2d24e0;
-	color: #cfff0f;
-	padding-top: 10px;
-	padding-right: 10px;
-	padding-left: 10px;
-	padding-bottom: 10px;
-	border-radius: 6px;
-	margin-top: 4px;
+	background-color: inherit;
+	color: inherit;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+	border-radius: 0px;
+	margin-top: 32px;
 	margin-right: 0px;
 	margin-left: 0px;
-	margin-bottom: 4px;
-	border: 7px double #d331e8;
+	margin-bottom: 32px;
+	border: 0px solid inherit;
+}
+body #flexicontent ul.introblock > li {
+	background-color: inherit;
+	color: inherit;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+	border-radius: 0px;
+	margin-top: 32px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 32px;
+	border: 0px solid inherit;
 }
 body #flexicontent ul.leadingblock.one > li,
 body #flexicontent ul.introblock.one > li {
-	width: 96%;
+	width: 100%;
 }
 body #flexicontent ul.leadingblock.two > li,
 body #flexicontent ul.introblock.two > li {
@@ -60,7 +60,7 @@ body #flexicontent ul.introblock.three > li {
 }
 body #flexicontent ul.leadingblock.four > li,
 body #flexicontent ul.introblock.four > li {
-	width: 22.1%;
+	width: 23.4%;
 }
 #flexicontent .clear {
 	border: 0;

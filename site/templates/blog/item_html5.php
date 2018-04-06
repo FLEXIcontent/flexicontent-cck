@@ -29,42 +29,49 @@ if (isset($item->positions) && is_array($item->positions)) {
 
 // Prepend toc (Table of contents) before item's description (toc will usually float right)
 // By prepend toc to description we make sure that it get's displayed at an appropriate place
-if (isset($item->toc)) {
+if (isset($item->toc))
+{
 	$item->fields['text']->display = $item->toc . $item->fields['text']->display;
 }
 
 // Set the class for controlling number of columns in custom field blocks
-switch ($this->params->get( 'columnmode', 2 )) {
+switch ($this->params->get( 'columnmode', 2 ))
+{
 	case 0: $columnmode = 'singlecol'; break;
 	case 1: $columnmode = 'doublecol'; break;
 	default: $columnmode = 'variablecol'; break;
 }
 
-// ***********
-// CUSTOM CLASS
-// ***********
-$topfieldclass = $this->params->get( 'topfieldclass','iteminfo group ');
-$beforeclass = $this->params->get( 'beforeclass','customblock beforedescription group ');
-$descclass = $this->params->get( 'descclass','description group ');
-$afterclass = $this->params->get( 'afterclass','customblock afterdescription group  ');
-$bottomfieldclass = $this->params->get( 'bottomfieldclass','itemadditionnal group ');
+
+/**
+ * Custom Classes for containers
+ */
+
+$box_class_fields_top        = $this->params->get('box_class_fields_top', 'group iteminfo');
+$box_class_beforedescription = $this->params->get('box_class_beforedescription', 'group customblock beforedescription');
+$box_class_description       = $this->params->get('box_class_description', 'group description');
+$box_class_afterdescription  = $this->params->get('box_class_afterdescription', 'group customblock afterdescription');
+$box_class_fields_bottom     = $this->params->get('box_class_fields_bottom', 'group itemadditional');
 
 
-// ***********
-// DECIDE TAGS
-// ***********
+/**
+ * Decide Tags for containers
+ */
+
 $page_heading_shown =
 	$this->params->get( 'show_page_heading', 1 ) &&
 	$this->params->get('page_heading') != $item->title &&
 	$this->params->get('show_title', 1);
 
 // Main container
-$mainAreaTag = $page_heading_shown ? 'section' : 'article';
+$mainAreaTag = $page_heading_shown
+	? 'section'
+	: 'article';
 
 // SEO, header level of title tag
 $itemTitleHeaderLevel = $page_heading_shown ? '2' : '1';
 
-$page_classes  = 'flexicontent';
+$page_classes  = 'flexicontent group';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
@@ -76,15 +83,15 @@ $microdata_itemtype = $this->params->get( 'microdata_itemtype', 'Article');
 $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"';
 ?>
 
-<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
+<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?>>
 
-	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
+	<?php echo $mainAreaTag === 'section' ? '<header>' : ''; ?>
 
   <?php if ($item->event->beforeDisplayContent) : ?>
 		<!-- BOF beforeDisplayContent -->
-		<?php echo ( ($mainAreaTag == 'section') ? '<aside' : '<div'); ?> class="fc_beforeDisplayContent group">
+		<?php echo $mainAreaTag === 'section' ? '<aside' : '<div'; ?> class="fc_beforeDisplayContent group">
 			<?php echo $item->event->beforeDisplayContent; ?>
-		<?php echo ( ($mainAreaTag == 'section') ? '</aside>' : '</div>'); ?>
+		<?php echo $mainAreaTag === 'section' ? '</aside>' : '</div>'; ?>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 
@@ -176,6 +183,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<!-- EOF item title -->
 	<?php endif; ?>
 
+
   <?php if ($item->event->afterDisplayTitle) : ?>
 		<!-- BOF afterDisplayTitle -->
 		<div class="fc_afterDisplayTitle group">
@@ -186,7 +194,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ((intval($item->modified) !=0 && $this->params->get('show_modify_date')) || ($this->params->get('show_author') && ($item->creator != "")) || ($this->params->get('show_create_date')) || (($this->params->get('show_modifier')) && (intval($item->modified) !=0))) : ?>
 	<!-- BOF item basic/core info -->
-	<div class="<?php $topfieldclass; ?>">
+	<div class="<?php echo $box_class_fields_top; ?>">
 
 		<div class="createdline">
 
@@ -263,7 +271,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['beforedescription'])) : ?>
 	<!-- BOF beforedescription block -->
-	<div class="<?php echo $beforeclass; ?>">
+	<div class="<?php echo $box_class_beforedescription; ?>">
 		<?php foreach ($item->positions['beforedescription'] as $field) : ?>
 		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
@@ -280,7 +288,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (!$_text_via_pos): ?>
 	<!-- BOF description block -->
-	<div class="<?php echo $descclass; ?> ">
+	<div class="<?php echo $box_class_description; ?>">
 	<?php echo $this->fields['text']->display; ?>
 	</div>
 	<!-- EOF description block -->
@@ -288,7 +296,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (isset($item->positions['afterdescription'])) : ?>
 	<!-- BOF afterdescription block -->
-	<div class="<?php echo $afterclass; ?>">
+	<div class="<?php echo $box_class_afterdescription; ?>">
 		<?php foreach ($item->positions['afterdescription'] as $field) : ?>
 		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
@@ -305,7 +313,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if (($this->params->get('show_tags', 1)) || ($this->params->get('show_category', 1)))  : ?>
 	<!-- BOF item categories, tags -->
-	<div class="<?php echo $bottomfieldclass; ?>">
+	<div class="<?php echo $box_class_fields_bottom; ?>">
 		<?php if ($this->params->get('show_category', 1)) : ?>
 		<div class="categories">
 			<?php FlexicontentFields::getFieldDisplay($item, 'categories', $values=null, $method='display'); ?>
@@ -326,25 +334,25 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	<?php endif; ?>
 
 	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
-	<!-- BOF comments -->
-	<section class="comments group">
-	<?php
-		if ($this->params->get('comments') == 1) :
-			if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :
-				require_once(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php');
-				echo JComments::showComments($item->id, 'com_flexicontent', $this->escape($item->title));
+		<!-- BOF comments -->
+		<section class="comments group">
+		<?php
+			if ($this->params->get('comments') == 1) :
+				if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :
+					require_once(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php');
+					echo JComments::showComments($item->id, 'com_flexicontent', $this->escape($item->title));
+				endif;
 			endif;
-		endif;
 
-		if ($this->params->get('comments') == 2) :
-			if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
-    			require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
-    			echo jomcomment($item->id, 'com_flexicontent');
-  			endif;
-  		endif;
-	?>
-	</section>
-	<!-- EOF comments -->
+			if ($this->params->get('comments') == 2) :
+				if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
+					require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
+					echo jomcomment($item->id, 'com_flexicontent');
+				endif;
+			endif;
+		?>
+		</section>
+		<!-- EOF comments -->
 	<?php endif; ?>
 
     <?php echo ( ($mainAreaTag == 'section') ? '</article>' : ''); ?>

@@ -2,18 +2,18 @@ body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: inherit;
 	background-color: inherit;
-	padding-top: inheritpx;
-	padding-right: inheritpx;
-	padding-left: inheritpx;
-	padding-bottom: inheritpx;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
 	border-radius: 0px;
 }
 .fcitems {
 	background-color: inherit;
-	padding-top: inheritpx;
-	padding-right: inheritpx;
-	padding-left: inheritpx;
-	padding-bottom: inheritpx;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
 	border-radius: 0px;
 	border: 0px solid inherit;
 	color: inherit;
@@ -89,7 +89,7 @@ body #flexicontent .customblock.afterdescription.group {
 }
 .itemactions,
 .iteminfo,
-.itemadditionnal,
+.itemadditional,
 .description {
 	margin: 1em 0 1em 0;
 }
@@ -107,13 +107,13 @@ body #flexicontent .customblock.afterdescription.group {
 	margin-right: 32px;
 	float: left;
 }
-.itemadditionnal span {
+.itemadditional span {
 	margin: 0 0 0.3em;
 }
-.itemadditionnal .categories {
+.itemadditional .categories {
 	display: block;
 }
-.itemadditionnal .tags {
+.itemadditional .tags {
 	display: block;
 }
 .customblock {

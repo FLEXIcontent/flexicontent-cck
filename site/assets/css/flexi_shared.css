@@ -1775,3 +1775,15 @@ body .form-horizontal .control-group {
 	padding-left: 2% !important;
 	padding-right: 2% !important;
 }
+.fcspacer-8 {
+	margin-top: 8px !important;
+}
+.fcspacer-16 {
+	margin-top: 16px !important;
+}
+.fcspacer-24 {
+	margin-top: 24px !important;
+}
+.fcspacer-32 {
+	margin-top: 32px !important;
+}

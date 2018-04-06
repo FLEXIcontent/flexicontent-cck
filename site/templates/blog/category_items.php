@@ -32,18 +32,19 @@ if ($lead_link_to_popup || $intro_link_to_popup)
 {
 	flexicontent_html::loadFramework('flexi-lib');
 }
-// ***********
-// CUSTOM CLASS
-// ***********
 
-$above_description_line1class = $this->params->get( 'above_description_line1class','lineinfo line1 ');
-$above_description_line1_nolabelclass = $this->params->get( 'above_description_line1_nolabelclass','lineinfo line1 ');
-$above_description_line2class = $this->params->get( 'above_description_line2class','lineinfo line2 ');
-$above_description_line2_nolabelclass = $this->params->get( 'above_description_line2_nolabelclass','lineinfo line2 ');
-$under_description_line1class = $this->params->get( 'under_description_line1class','lineinfo line3 ');
-$under_description_line1_nolabelclass = $this->params->get( 'under_description_line1_nolabelclass',' lineinfo line3 ');
-$under_description_line2class = $this->params->get( 'under_description_line2class','lineinfo line4 ');
-$under_description_line2_nolabelclass = $this->params->get( 'under_description_line2_nolabelclass','lineinfo line4 ');
+/**
+ * Custom CSS classes for field positions
+ */
+
+$box_class_above_desc_1 = $this->params->get( 'box_class_above-description-line1','lineinfo line1 ');
+$box_class_above_desc_1_no_lbl = $this->params->get( 'box_class_above-description-line1-nolabel','lineinfo line1 ');
+$box_class_above_desc_2 = $this->params->get( 'box_class_above-description-line2','lineinfo line2 ');
+$box_class_above_desc_2_no_lbl = $this->params->get( 'box_class_above-description-line2-nolabel','lineinfo line2 ');
+$box_class_under_desc_1 = $this->params->get( 'box_class_under-description-line1','lineinfo line3 ');
+$box_class_under_desc_1_no_lbl = $this->params->get( 'box_class_under-description-line1-nolabel',' lineinfo line3 ');
+$box_class_under_desc_2 = $this->params->get( 'box_class_under-description-line2','lineinfo line4 ');
+$box_class_under_desc_2_no_lbl = $this->params->get( 'box_class_under-description-line2-nolabel','lineinfo line4 ');
 
 
 // MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
@@ -339,7 +340,7 @@ if ($leadnum) :
 
 			<!-- BOF above-description-line1 block -->
 			<?php if (isset($item->positions['above-description-line1'])) : ?>
-			<div class="<?php echo $above_description_line1class; ?>">
+			<div class="<?php echo $box_class_above_desc_1; ?>">
 				<?php foreach ($item->positions['above-description-line1'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -354,7 +355,7 @@ if ($leadnum) :
 
 			<!-- BOF above-description-nolabel-line1 block -->
 			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
-			<div class="<?php echo $above_description_line1_nolabelclass; ?>">
+			<div class="<?php echo $box_class_above_desc_1_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -366,7 +367,7 @@ if ($leadnum) :
 
 			<!-- BOF above-description-line2 block -->
 			<?php if (isset($item->positions['above-description-line2'])) : ?>
-			<div class="<?php echo $above_description_line2class; ?>">
+			<div class="<?php echo $box_class_above_desc_2; ?>">
 				<?php foreach ($item->positions['above-description-line2'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -381,7 +382,7 @@ if ($leadnum) :
 
 			<!-- BOF above-description-nolabel-line2 block -->
 			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
-			<div class="<?php echo $above_description_line2_nolabelclass; ?>">
+			<div class="<?php echo $box_class_above_desc_2_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -415,7 +416,7 @@ if ($leadnum) :
 
 			<!-- BOF under-description-line1 block -->
 			<?php if (isset($item->positions['under-description-line1'])) : ?>
-			<div class="<?php echo $under_description_line1class; ?>">
+			<div class="<?php echo $box_class_under_desc_1; ?>">
 				<?php foreach ($item->positions['under-description-line1'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -430,7 +431,7 @@ if ($leadnum) :
 
 			<!-- BOF under-description-line1-nolabel block -->
 			<?php if (isset($item->positions['under-description-line1-nolabel'])) : ?>
-			<div class="<?php echo $under_description_line1_nolabelclass;?>">
+			<div class="<?php echo $box_class_under_desc_1_nolbl; ?>">
 				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -442,7 +443,7 @@ if ($leadnum) :
 
 			<!-- BOF under-description-line2 block -->
 			<?php if (isset($item->positions['under-description-line2'])) : ?>
-			<div class="<?php echo $under_description_line2class; ?>">
+			<div class="<?php echo $box_class_under_desc_2; ?>">
 				<?php foreach ($item->positions['under-description-line2'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -457,7 +458,7 @@ if ($leadnum) :
 
 			<!-- BOF under-description-line2-nolabel block -->
 			<?php if (isset($item->positions['under-description-line2-nolabel'])) : ?>
-			<div class="<?php echo $under_description_line2_nolabelclass; ?>">
+			<div class="<?php echo $box_class_under_desc_2_nolbl; ?>">
 				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -682,7 +683,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF above-description-line1 block -->
 			<?php if (isset($item->positions['above-description-line1'])) : ?>
-			<div class="<?php echo $above_description_line1class; ?>">
+			<div class="<?php echo $box_class_above_desc_1; ?>">
 				<?php foreach ($item->positions['above-description-line1'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -697,7 +698,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF above-description-nolabel-line1 block -->
 			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
-			<div class="<?php echo $above_description_line1_nolabelclass; ?>">
+			<div class="<?php echo $box_class_above_desc_1_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -709,7 +710,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF above-description-line2 block -->
 			<?php if (isset($item->positions['above-description-line2'])) : ?>
-			<div class="<?php echo $above_description_line2class; ?>">
+			<div class="<?php echo $box_class_above_desc_2; ?>">
 				<?php foreach ($item->positions['above-description-line2'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -724,7 +725,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF above-description-nolabel-line2 block -->
 			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
-			<div class="<?php echo $above_description_line2_nolabelclass; ?>">
+			<div class="<?php echo $box_class_above_desc_2_nolbl; ?>">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -758,7 +759,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF under-description-line1 block -->
 			<?php if (isset($item->positions['under-description-line1'])) : ?>
-			<div class="<?php echo $under_description_line1class; ?>">
+			<div class="<?php echo $box_class_under_desc_1; ?>">
 				<?php foreach ($item->positions['under-description-line1'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -773,7 +774,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF under-description-line1-nolabel block -->
 			<?php if (isset($item->positions['under-description-line1-nolabel'])) : ?>
-			<div class="<?php echo $under_description_line1_nolabelclass; ?>">
+			<div class="<?php echo $box_class_under_desc_1_nolbl; ?>">
 				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
@@ -785,7 +786,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF under-description-line2 block -->
 			<?php if (isset($item->positions['under-description-line2'])) : ?>
-			<div class="<?php echo $under_description_line2class;?>">
+			<div class="<?php echo $box_class_under_desc_2; ?>">
 				<?php foreach ($item->positions['under-description-line2'] as $field) : ?>
 				<div class="element">
 					<?php if ($field->label) : ?>
@@ -800,7 +801,7 @@ if ($count > $leadnum) :
 
 			<!-- BOF under-description-line2-nolabel block -->
 			<?php if (isset($item->positions['under-description-line2-nolabel'])) : ?>
-			<div class="<?php echo $under_description_line2_nolabelclass; ?>">
+			<div class="<?php echo $box_class_under_desc_2_nolbl; ?>">
 				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
 				<div class="element">
 					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>

@@ -72,7 +72,7 @@ $itemTitleHeaderLevel = '2';
 // SEO, header level of tab title tag
 $tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';
 
-$page_classes  = 'flexicontent';
+$page_classes  = 'flexicontent group';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
@@ -84,7 +84,7 @@ $microdata_itemtype = $this->params->get( 'microdata_itemtype', 'Article');
 $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"';
 ?>
 
-<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
+<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?>>
 
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 
@@ -463,13 +463,13 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 			if ($this->params->get('comments') == 2) :
 				if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
-		  			require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
-		  			echo jomcomment($item->id, 'com_flexicontent');
-					endif;
+					require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
+					echo jomcomment($item->id, 'com_flexicontent');
 				endif;
+			endif;
 		?>
 		</div>
-		<!-- BOF comments -->
+		<!-- EOF comments -->
 	<?php endif; ?>
 
 <?php echo '</'.$mainAreaTag.'>'; ?>

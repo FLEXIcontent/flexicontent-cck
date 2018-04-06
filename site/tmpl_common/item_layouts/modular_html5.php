@@ -51,7 +51,9 @@ $page_heading_shown =
 	$this->params->get('show_title', 1);
 
 // Main container
-$mainAreaTag = $page_heading_shown  ?  'section' : 'article';
+$mainAreaTag = $page_heading_shown
+	? 'section'
+	: 'article';
 
 // SEO, header level of title tag
 $itemTitleHeaderLevel = $page_heading_shown ? '2' : '1';
@@ -465,13 +467,13 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 			if ($this->params->get('comments') == 2) :
 				if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
-		  			require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
-		  			echo jomcomment($item->id, 'com_flexicontent');
-					endif;
+					require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
+					echo jomcomment($item->id, 'com_flexicontent');
 				endif;
+			endif;
 		?>
 		</section>
-		<!-- BOF comments -->
+		<!-- EOF comments -->
 	<?php endif; ?>
 
 <?php echo '</'.$mainAreaTag.'>'; ?>
