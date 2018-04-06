@@ -76,7 +76,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		
 		$row = $rows[0];
 		echo '<h1>'.$table_name.'</h1>';
-		echo '<table class="adminlist fcmanlist">'."\n";
+		echo '<table class="table fcmanlist">'."\n";
 		echo '<thead>'."\n";
 		echo "<tr>\n";
 		foreach($row as $prop => $value) {

@@ -157,11 +157,14 @@ div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-resu
 input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
 input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 
-[name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
 
-.flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label:not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + script + label:not(.btn),
+
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
 	display: inline-block !important;
 	margin: 1px 12px 1px 0px;
 	padding: 0px 0px 0px 24px !important;
@@ -186,6 +189,7 @@ div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select
 
 input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + script + label:not(.btn),
 .flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
 	background-position: 0 0 !important;
 	font-style: italic !important;
@@ -195,6 +199,7 @@ input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(
 
 input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr):disabled + script + label:not(.btn),
 .flexicontent input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -72px !important;
 	font-style: italic !important;
@@ -207,30 +212,36 @@ input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.bt
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 
 input[type="checkbox"].fc_checkradio + label,
-[name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn) {
+[name="adminForm"] input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label:not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks2.png) no-repeat 0 0 !important;
 }
 input[type="radio"].fc_checkradio + label,
-[name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
+[name="adminForm"] input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + script + label:not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks2.png) no-repeat 0 -72px !important;
 }
 
 
 input[type="checkbox"].fc_checkradio + label.green,
-[name="adminForm"] input[type="checkbox"] + label.green:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"] + label.green:not(.plupload_button):not(.btn) {
+[name="adminForm"] input[type="checkbox"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label.green:not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn) {
 	background: url(../images/checks3.png) no-repeat 0 0 !important;
 }
 input[type="radio"].fc_checkradio + label.green,
-[name="adminForm"] input[type="radio"] + label.green:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"] + label.green:not(.plupload_button):not(.btn) {
+[name="adminForm"] input[type="radio"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + script + label.green:not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn) {
 	background: url(../images/checks3.png) no-repeat 0 -72px !important;
 }
 
-.flexicontent input[type="radio"] + label.green.single,
-.flexicontent input[type="checkbox"] + label.green.single,
+.flexicontent input[type="radio"]:not(.skip_fccr) + script + label.green:not(.btn),
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label.green:not(.btn),
+.flexicontent input[type="radio"]:not(.skip_fccr) + label.green.single,
+.flexicontent input[type="checkbox"]:not(.skip_fccr) + label.green.single,
 .fc_checkradio + label.green.single {
 	padding-left: 18px !important;
 	margin: 0px !important;
@@ -240,16 +251,18 @@ input[type="radio"].fc_checkradio + label.green,
 
 div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 
-input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn) {
+input[type="checkbox"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="checkbox"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="checkbox"]:checked:not(.skip_fccr) + script + label:not(.btn),
+.flexicontent input[type="checkbox"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -24px !important;
 	/*background-position: 0 -19px !important;*/
 }
 
-input[type="radio"]:checked + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="radio"]:checked + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"]:checked + label:not(.plupload_button):not(.btn) {
+input[type="radio"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+[name="adminForm"] input[type="radio"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type="radio"]:checked:not(.skip_fccr) + script + label:not(.btn),
+.flexicontent input[type="radio"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -48px !important;
 	/*background-position: 0 -57px !important;*/
 }

@@ -53,7 +53,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 		</span>
 	</div>		
 
-	<table id="adminListTableFCarchive" class="adminlist fcmanlist">
+	<table id="adminListTableFCarchive" class="table fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
