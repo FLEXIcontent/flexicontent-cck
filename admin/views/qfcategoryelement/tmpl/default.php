@@ -115,7 +115,7 @@ function delAllFilters() {
 
 
 
-	<table class="table fcmanlist">
+	<table class="adminlist table fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>

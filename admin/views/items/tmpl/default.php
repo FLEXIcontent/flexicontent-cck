@@ -657,7 +657,7 @@ jQuery(document).ready(function(){
 
 	<div class="fcclear"></div>
 
-	<table id="adminListTableFCitems" class="table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFCitems" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
 

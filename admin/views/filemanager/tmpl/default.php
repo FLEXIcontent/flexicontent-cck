@@ -630,7 +630,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 				<input id="fc-fileman-grid-thumb-size-val" name="fc-fileman-grid-thumb-size-val" type="text" size="12" value="140" />
 			</div>
 
-			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="table fcmanlist fman_list_element">
+			<table id="adminListTableFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminlist table fcmanlist fman_list_element">
 			<thead>
     		<tr class="header">
 					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>

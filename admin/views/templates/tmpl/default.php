@@ -117,7 +117,7 @@ $list_total_cols = 8;
 	</div>
 	-->
 	
-	<table id="adminListTableFCtemplates" class="table fcmanlist" style="width: 100% !important;">
+	<table id="adminListTableFCtemplates" class="adminlist table fcmanlist" style="width: 100% !important;">
 	
 	<thead>
 		<tr class="header">
