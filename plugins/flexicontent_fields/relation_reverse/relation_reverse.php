@@ -196,9 +196,22 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	}
 
 
+
+	// ***
+	// *** CATEGORY/SEARCH FILTERING METHODS
+	// ***
+
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
+		// Supports filtering, but currently does not display any filter
+	}
+
+
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
+		// Supports filtering, but currently does not display any filter
 	}
 
 
@@ -209,37 +222,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$reverse_field_id = (int) $filter->parameters->get('reverse_field', 0);
-
-		if ( !$reverse_field_id )
-		{
-			echo '<div class="alert alert-warning">' . $filter->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
-			return null;
-		}
-
-		$ri_value = reset($value);
-		$ri_field_id = key($value);
-
-		$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
-			? - $ri_field_id
-			: 0;
-
-		if (!$ri_field_id)
-		{
-			return null;
-		}
-
-		else
-		{
-			$value = $ri_value;
-
-			$filter->filter_colname     = ' rival.value';
-			$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $reverse_field_id
-				. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id;
-			$filter->filter_valueformat = null;   // use default
-			$filter->filter_valuewhere = null;   // use default
-		}
-
-		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
+		// field_type is not changed text field can handle this field type
+		return FLEXIUtilities::call_FC_Field_Func('relation', 'getFiltered', array(&$filter, $value, $return_sql));
 	}
 }
