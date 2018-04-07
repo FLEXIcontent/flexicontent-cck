@@ -467,14 +467,14 @@ jQuery(document).ready(function()
 
 		// Total information
 		$show_total_only     = (int) $field->parameters->get('show_total_only', 0);
-		$total_show_auto_btn = $field->field_type != 'relation' ? 0 : (int) $field->parameters->get('total_show_auto_btn', 0);
-		$total_show_list     = $field->field_type != 'relation' ? 0 : (int) $field->parameters->get('total_show_list', 0);
+		$total_show_auto_btn = $field->field_type !== 'relation' ? 0 : (int) $field->parameters->get('total_show_auto_btn', 0);
+		$total_show_list     = $field->field_type !== 'relation' ? 0 : (int) $field->parameters->get('total_show_list', 0);
 		
 		if ($prop=='display_total')  // Explicitly requested
 		{
 			$disp->total_info = true;
 		}
-		elseif ( $show_total_only==1 || ($show_total_only == 2 && (count($values) || $field->field_type == 'relation_reverse')) )  // For relation reverse we will count items inside the layout
+		elseif ( $show_total_only==1 || ($show_total_only == 2 && (count($values) || $field->field_type === 'relation_reverse')) )  // For relation reverse we will count items inside the layout
 		{
 			$app = JFactory::getApplication();
 			$option = $app->input->get('option', '', 'cmd');
@@ -508,12 +508,12 @@ jQuery(document).ready(function()
 		// *** Prepare item list data for rendering the related items list
 		// ***
 
-		$reverse_field_id = $field->parameters->get('reverse_field', 0);
+		$relation_field_id = $field->parameters->get('reverse_field', 0);
 
-		if ($field->field_type == 'relation_reverse')
+		if ($field->field_type === 'relation_reverse')
 		{
 			// Check that relation field to be reversed was configured
-			if ( !$reverse_field_id )
+			if (!$relation_field_id)
 			{
 				$field->{$prop} = '<div class="alert alert-warning">' . $field->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 				return;
@@ -635,8 +635,9 @@ jQuery(document).ready(function()
 		$indexed_elements = true;
 		FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 	}
-	
-	
+
+
+	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
@@ -672,27 +673,72 @@ jQuery(document).ready(function()
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$ri_value = reset($value);
-		$ri_field_id = key($value);
+		// If we are filtering via a relation-reverse field, then get the ID of relation field
+		if ($filter->field_type === 'relation_reverse')
+		{
+			$relation_field_id = (int) $filter->parameters->get('reverse_field', 0);
 
-		$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
-			? - $ri_field_id
+			if (!$relation_field_id)
+			{
+				echo '<div class="alert alert-warning">' . $filter->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+				return null;
+			}
+		}
+		elseif ($filter->field_type === 'relation')
+		{
+			$relation_field_id = $filter->id;
+		}
+		else
+		{
+			echo '<div class="alert alert-warning">Field type : ' . $filter->field_type . ' is not filterable </div>';
+			return null;
+		}
+
+		$is_relation = $filter->field_type === 'relation';
+		$ritem_field_id = key($value);
+		$ritem_field_id = is_int($ritem_field_id) && $ritem_field_id < 0
+			? - $ritem_field_id
 			: 0;
 
-		if (!$ri_field_id)
+		if (!$ritem_field_id)
 		{
-			$filter->filter_colname     = ' rel.value_integer';
-			$filter->filter_valuesjoin  = null;   // use default
-			$filter->filter_valueformat = null;   // use default
+			if ($is_relation)
+			{
+				$filter->filter_colname     = ' rel.value_integer';
+				$filter->filter_valuesjoin  = null;   // use default
+				$filter->filter_valueformat = null;   // use default
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		else
 		{
-			$value = $ri_value;
+			$rel = 'relv';
+			$c = 'c';
+			$join_field_filters = '';
 
-			$filter->filter_colname     = ' rival.value';
-			$filter->filter_valuesjoin  = ' JOIN #__flexicontent_fields_item_relations AS relv ON relv.value_integer=c.id AND relv.field_id = ' . $filter->id
-				. ' JOIN #__flexicontent_fields_item_relations AS rival ON rival.item_id=relv.item_id AND rival.field_id = ' . $ri_field_id;
+			// Find items that are directly / indirectly related via a RELATION / REVERSE RELATION field
+			$match_rel_items = $is_relation
+				? $c . '.id = ' . $rel . '.item_id'
+				: $c . '.id = ' . $rel . '.value_integer';
+			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS ' . $rel . ' ON ' . $match_rel_items . ' AND ' . $rel . '.field_id = ' . $relation_field_id;
+
+			$val_tbl = $rel . '_ritems';
+			$val_field_id = $ritem_field_id;
+
+			// RELATED / REVERSE RELATED Items must have given values
+			$val_on_items = $is_relation
+				? $val_tbl . '.item_id = ' . $rel . '.value_integer'
+				: $val_tbl . '.item_id = ' . $rel . '.item_id';
+
+			// Join with values table 'ON' the current filter field id and 'ON' the items at interest ... below we will add an extra 'ON' clause to limit to the given field values
+			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS ' . $val_tbl . ' ON ' . $val_on_items . ' AND ' . $val_tbl . '.field_id = ' . $val_field_id;
+
+			$filter->filter_colname     = ' ' . $val_tbl . '.value';
+			$filter->filter_valuesjoin  = $join_field_filters; 
 			$filter->filter_valueformat = null;   // use default
 			$filter->filter_valuewhere = null;   // use default
 		}

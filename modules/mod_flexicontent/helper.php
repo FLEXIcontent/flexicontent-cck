@@ -1872,21 +1872,22 @@ class modFlexicontentHelper
 			
 			foreach ($static_filters_data as $filter_id => $filter_values)
 			{
-				$rel_field_id = 0;  // Set if current Field is a relation / relation reverse field
-				$ri_field_id = 0;   // The field of the related items via 'rel_field_id' to apply limitation
+				$relation_field_id = 0;  // Set if current Field is a relation / relation reverse field
+				$ritem_field_id = 0;     // The field of items related via 'relation_field_id' to apply limitation
 
 				// Check if we will apply limitation via relation field
 				if (is_array($filter_values) && count($filter_values) === 1)
 				{
-					$ri_field_id = key($filter_values);
-					$ri_field_id = is_int($ri_field_id) && $ri_field_id < 0
-						? - $ri_field_id
+					$ritem_field_id = key($filter_values);
+					$ritem_field_id = is_int($ritem_field_id) && $ritem_field_id < 0
+						? - $ritem_field_id
 						: 0;
 				}
 
-				// Check existance of the field of the related items that will be used to apply limitations, and set into '$rel_field_id'
-				if ($ri_field_id)
+				// Check existance of the relation field
+				if ($ritem_field_id)
 				{
+					$is_relation = true;
 					$filter_values = reset($filter_values);
 
 					$_fields = FlexicontentFields::getFieldsByIds(array($filter_id));
@@ -1895,24 +1896,45 @@ class modFlexicontentHelper
 						$ri_field = reset($_fields);
 						$ri_item = null;
 						FlexicontentFields::loadFieldConfig($ri_field, $ri_item);
-						$rel_field_id = (int) $ri_field->parameters->get('reverse_field', 0) ?: $filter_id;
+						$is_relation = $ri_field->parameters->get('reverse_field', 0, 'INT') === 0;
+						$relation_field_id = $ri_field->parameters->get('reverse_field', 0, 'INT') ?: $filter_id;
 					}
 				}
 
-				// Table column alias (field value column used for limitations)
-				$val_alias = $ri_field_id
-					? 'ri_rel'.$filter_id
-					: 'rel'.$filter_id;
+				// Table alias of 1st join with items-values-relation table
+				$rel = 'rel' . $filter_id;
+				$c = 'i';
 
-				if ($rel_field_id)
+				// Case 1: Require that filter values are in --Related / Reverse Related-- items of the returned items
+				if ($relation_field_id)
 				{
-					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.value_integer=i.id AND rel'.$filter_id.'.field_id = ' . $rel_field_id
-						. ' JOIN #__flexicontent_fields_item_relations AS ' . $val_alias . ' ON ' . $val_alias . '.item_id=rel'.$filter_id.'.item_id AND ' . $val_alias . '.field_id = ' . $ri_field_id;
+					// Find items that are directly / indirectly related via a RELATION / REVERSE RELATION field
+					$match_rel_items = $is_relation
+						? $c . '.id = ' . $rel . '.item_id'
+						: $c . '.id = ' . $rel . '.value_integer';
+					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS ' . $rel . ' ON ' . $match_rel_items . ' AND ' . $rel . '.field_id = ' . $relation_field_id;
+
+					$val_tbl = $rel . '_ritems';
+					$val_field_id = $ritem_field_id;
+
+					// RELATED / REVERSE RELATED Items must have given values
+					$val_on_items = $is_relation
+						? $val_tbl . '.item_id = ' . $rel . '.value_integer'
+						: $val_tbl . '.item_id = ' . $rel . '.item_id';
 				}
+
+				// Case 2: Require that filter values are in --returned-- items themselves
 				else
 				{
-					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+					$val_tbl = $rel;
+					$val_field_id = $filter_id;
+
+					// RETURNED Items must have given values
+					$val_on_items = $val_tbl . '.item_id = ' . $c . '.id';
 				}
+
+				// Join with values table 'ON' the current filter field id and 'ON' the items at interest ... below we will add an extra 'ON' clause to limit to the given field values
+				$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS ' . $val_tbl . ' ON ' . $val_on_items . ' AND ' . $val_tbl . '.field_id = ' . $val_field_id;
 
 				// Handle single-valued filter as multi-valued
 				if ( !is_array($filter_values) )
@@ -1925,20 +1947,20 @@ class modFlexicontentHelper
 				{
 					$in_values = array();
 					foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
-					$join_field_filters .= ' AND '.$negate_op.' (' . $val_alias . '.value IN ('.implode(',', $in_values).') ) ';
+					$join_field_filters .= ' AND '.$negate_op.' (' . $val_tbl . '.value IN ('.implode(',', $in_values).') ) ';
 				}
 
 				// Range value filter
 				else
 				{
 					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
-					$value_empty = !strlen(@ $filter_values[1]) && strlen(@ $filter_values[2]) ? ' OR ' . $val_alias . '.value="" OR ' . $val_alias . '.value IS NULL ' : '';
+					$value_empty = !strlen(@ $filter_values[1]) && strlen(@ $filter_values[2]) ? ' OR ' . $val_tbl . '.value="" OR ' . $val_tbl . '.value IS NULL ' : '';
 					
 					if ( strlen(@ $filter_values[1]) || strlen(@ $filter_values[2]) )
 					{
 						$join_field_filters .= ' AND '.$negate_op.' ( 1 ';
-						if ( strlen(@ $filter_values[1]) ) $join_field_filters .= ' AND (' . $val_alias . '.value >=' . $filter_values[1] . ') ';
-						if ( strlen(@ $filter_values[2]) ) $join_field_filters .= ' AND (' . $val_alias . '.value <=' . $filter_values[2] . $value_empty . ') ';
+						if ( strlen(@ $filter_values[1]) ) $join_field_filters .= ' AND (' . $val_tbl . '.value >=' . $filter_values[1] . ') ';
+						if ( strlen(@ $filter_values[2]) ) $join_field_filters .= ' AND (' . $val_tbl . '.value <=' . $filter_values[2] . $value_empty . ') ';
 						$join_field_filters .= ' )';
 					}
 				}
