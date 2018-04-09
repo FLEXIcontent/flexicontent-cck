@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -10,7 +10,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
 use Joomla\String\StringHelper;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
@@ -27,9 +26,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		parent::__construct( $subject, $params );
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** DISPLAY methods, item form & frontend views
 	// ***
@@ -38,14 +37,31 @@ class plgFlexicontent_fieldsRelation extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
 		$field->label = JText::_($field->label);
-		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
+
+
+		// ***
+		// *** Case of autorelated item
+		// ***
+
+		if (JFactory::getApplication()->input->get('autorelation_'.$field->id, 0, 'int'))
+		{
+			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . 'You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field</div>';
+			return;
+		}
+
 		// Initialize framework objects and other variables
-		$db   = JFactory::getDbo();
-		$user = JFactory::getUser();
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDbo();
+		$user = JFactory::getUser();
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -53,24 +69,27 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 
 
-		$field->html = '';
+		// ***
+		// *** Number of values
+		// ***
 
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+
+		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		$elementid_ns = str_replace('-', '_', $elementid);  // Name Safe Element ID
 
+		// Name Safe Element ID
+		$elementid_ns = str_replace('-', '_', $elementid);
 
-		// ***
-		// *** Case of autorelated item
-		// ***
-
-		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$field->id, 0, 'int');
-
-		if ( $autorelation_itemid )
-		{
-			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . 'You can not auto-relate items using a relation field, please add a relation reverse field, and select to reverse this field</div>';
-			return;
-		}
+		$js = "";
+		$css = "";
 
 
 		// ***
@@ -111,14 +130,12 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// ***
 		// *** EDITING PARAMETERS
 		// ***
-		
+
 		// some parameters shortcuts
 		$size				= $field->parameters->get( 'size', 12 ) ;
 		$size	 	= $size ? ' size="'.$size.'"' : '';
 		$prepend_item_state = $field->parameters->get( 'prepend_item_state', 1 ) ;
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
-		$required 	= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
 		$selected_items_label = $field->parameters->get( 'selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL' ) ;
 		$selected_items_sortable = $field->parameters->get( 'selected_items_sortable', 0 ) ;
 
@@ -138,8 +155,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$items_arr = $db->loadObjectList();
 		}
 		else $items_arr = array();
-		
-		
+
+
 		// ***
 		// *** Create category tree to use for selecting related items
 		// ***
@@ -164,11 +181,12 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		$cat_selected = count($allowedtree)==1 ? reset($allowedtree) : '';
 		$cat_selecor_box_style = count($allowedtree)==1 ? 'style="display:none;" ' :'';
-		
+
 		$_cat_selector = flexicontent_cats::buildcatselect(
 			$allowedtree, $elementid.'_cat_selector', $catvals=($cat_selected ? $cat_selected->id : ''),
 			$top=JText::_( 'FLEXI_SELECT' ), // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
-			' class="use_select2_lib '.$elementid.'_cat_selector" ',
+			' class="use_select2_lib '.$elementid.'_cat_selector" '
+				. ' onchange="return fcfield_relation.cat_selector_change(\'' . $elementid . '\', ' . $item->id . ', ' . $field->id . ', ' . $item->type_id . ', \'' . $item->language . '\');" ',
 			$check_published = true, $check_perms = true,
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
 			$skip_subtrees=array(), $disable_subtrees=array()
@@ -203,217 +221,84 @@ class plgFlexicontent_fieldsRelation extends FCField
 	  {
 			$common_css_js_added = true;
 			flexicontent_html::loadFramework('select2');
-			
-			$css = '';
-			if ($css) $document->addStyleDeclaration($css);
+
+			JText::script('FLEXI_RIFLD_ERROR', false);
+			JText::script('FLEXI_RIFLD_NO_ITEMS', false);
+			JText::script('FLEXI_RIFLD_ADD_ITEM', false);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js');	
 		}
+
+		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . ($required ? ' required' : '') . ($selected_items_sortable ? ' fc_select2_sortable' : '');
 
 
 		// ***
 		// *** Create field's HTML display for item form
 		// ***
 
-		$_classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect' . $required . ($selected_items_sortable ? ' fc_select2_sortable' : '');
-		$field->html .= '
-		<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
-		
+		$field->html = array();
+		$n = 0;
+		//if ($use_ingroup) {print_r($field->value);}
+		$field->html[] = '
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-category-selector" '.$cat_selecor_box_style.'>
 				<label class="' . $add_on_class . ' fc-lbl cats-selector-lbl" for="'.$elementid.'_cat_selector">'.JText::_( 'FLEXI_CATEGORY' ).'</label>
 				'.$_cat_selector.'
 			</div>
-			
+
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-item-selector">
 				<label class="' . $add_on_class . ' fc-lbl item-selector-lbl" for="'.$elementid.'_item_selector">'.JText::_( 'FLEXI_RIFLD_ITEMS' ).'</label>
-				<select id="'.$elementid.'_item_selector" name="'.$elementid.'_item_selector" class="use_select2_lib" onchange="return fcrelation_field_'.$elementid_ns.'_add_related(this);">
+				<select id="'.$elementid.'_item_selector" name="'.$elementid.'_item_selector" class="use_select2_lib" onchange="return fcfield_relation.add_related(this, \'' . $elementid . '\');">
 					<option value="">-</option>
 				</select>
 			</div>
-			
+
 			<div class="'.$input_grp_class.' fc-xpended-row fcrelation-field-selected-items">
 				<label class="' . $add_on_class . ' fc-lbl selected-items-lbl" for="'.$elementid.'">'.JText::_($selected_items_label).'</label>
-				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' onchange="return fcrelation_field_'.$elementid_ns.'_mark_selected();" >
+				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="'.$_classes.'" '.$size.' onchange="return fcfield_relation.selected_items_modified(\'' . $elementid . '\');" >
 					'.$items_options_select.'
 				</select>
 				'.($selected_items_sortable ? '
 				<span class="add-on"><span class="icon-info hasTooltip" title="'.JText::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO').'"></span>' . JText::_('FLEXI_ORDER') . '</span>' : '').'
 			</div>
-			
-		</div>
 		';
-		
-		$js = "
 
-function fcrelation_field_".$elementid_ns."_add_related(el)
-{
-	if (!parseInt(jQuery(el).val())) return false;
-
-	var
-		item_selector = jQuery(el),
-		item_id = parseInt(item_selector.val()),
-		cat_selector = jQuery('#".$elementid."_cat_selector'),
-		cat_id = cat_selector.val(),
-		selected_item = item_selector.find('option:selected'),
-		item_title = selected_item.text(),
-		itemid_catid = item_id + ':' + cat_id;
-
-	window.console.log(itemid_catid);
-
-	var selitems_selector = jQuery('#".$elementid."');
-	selitems_selector.append(jQuery('<option>', {
-		value: itemid_catid,
-		text: item_title,
-		selected: 'selected'
-	})).trigger('change');
-
-	return true;
-}
-
-
-function fcrelation_field_".$elementid_ns."_mark_selected()
-{
-	var item_selector = jQuery('#".$elementid."_item_selector');
-	var selitems_selector = jQuery('#".$elementid."');
-
-	var selitems_arr = selitems_selector.val();
-	selitems_arr = !!selitems_arr ? selitems_arr : [];
-
-	for (var i = 0; i < selitems_arr.length; i++)
-	{
-		selitems_arr[i] = parseInt(selitems_arr[i]).toString();
-	}
-	window.console.log(selitems_arr);
-
-	[].forEach.call(
-		document.querySelectorAll('#' + item_selector.attr('id') + ' option'),
-		function(el)
+		// If using single category then trigger loading the items selector
+		if (count($allowedtree) === 1)
 		{
-			if (selitems_arr.indexOf(el.value) >= 0)
+			$js .= "
+			jQuery(document).ready(function()
 			{
-				el.disabled = true;
-				el.setAttribute('disabled', 'disabled');
-			}
-			else
-			{
-				el.disabled = false;
-				el.removeAttribute('disabled');
-			}
+				jQuery('#" . $elementid . "_cat_selector').trigger('change');
+			});
+			";
 		}
-	);
 
-	// Clear item selection
-	setTimeout(function() {
-		item_selector.val('').trigger('change');
-	}, 50);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 
-	return true;
-}
+		// Do not convert the array to string if field is in a group
+		if ($use_ingroup);
 
-
-jQuery(document).ready(function()
-{
-	jQuery('#".$elementid."').change(function()
-	{
-		var selitems_selector = jQuery('#".$elementid."');
-		setTimeout(function() {
-			var non_selected = selitems_selector.find('option:not(:selected)');
-			if (non_selected.length)
-			{
-				non_selected.remove();
-				selitems_selector.trigger('change');
-			}
-		}, 50);
-		return true;
-	});
-
-
-	jQuery('#".$elementid."_cat_selector').change(function()
-	{
-		var cat_selector = jQuery(this);
-		var ".$elementid_ns."_cat_selector_val = cat_selector.val();
-		var catid = parseInt(cat_selector.val());
-		
-		var item_selector = jQuery('#".$elementid."_item_selector');
-
-		// Remove any previous error message
-		item_selector.parent().find('.fc-relation-field-error').remove();
-
-		// Check for empty category
-		if (!catid)
+		// Handle multiple records
+		elseif ($multiple)
 		{
-			item_selector.empty();
-			item_selector.append('<option value=\"\">-</option>');
-			item_selector.val('').trigger('change');  // trigger change event to update select2 display
-			item_selector.show();
-			return;
+			$field->html = !count($field->html) ? '' :
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			if (!$add_position) $field->html .= '
+				<div class="input-append input-prepend fc-xpended-btns">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
+					</span>
+				</div>';
 		}
-		
-		var sel2_item_selector = jQuery('#s2id_".$elementid."_item_selector');
-		sel2_item_selector.hide();
-		
-		var loading = jQuery('<div class=\"fc_loading_msg\" style=\"position:absolute; background-color:transparent;\"></div>');
-		loading.insertAfter(sel2_item_selector);
-		
-		jQuery.ajax({
-			type: 'POST',
-			url: 'index.php?option=com_flexicontent&tmpl=component&format=raw',
-			dataType: 'json',
-			data: {
-				task: 'call_extfunc',
-				omethod: 'html', /* unused */
-				exttype: 'plugins',
-				extfolder: 'flexicontent_fields',
-				extname: 'relation',
-				extfunc: 'getCategoryItems',
-				field_id: ".$field->id.","
-			.($item->id ? "
-				item_id: ".$item->id.",
-			" : "
-				type_id: ".$item->type_id.",
-				lang_code: '".$item->language."',"
-			)."
-				catid: catid
-			}
-		}).done( function(data) {
-			//window.console.log ('Got data for:' + cat_selector.attr('id'));
-			item_selector.empty();
-			
-			if (data=='')                   item_selector.append('<option value=\"\">".JText::_('FLEXI_RIFLD_ERROR')."</option>');
-			else if (data.error!='')        item_selector.append('<option value=\"\">-</option>');
-			else if (!data.options.length)  item_selector.append('<option value=\"\">".JText::_('FLEXI_RIFLD_NO_ITEMS')."</option>');
-			else {
-				item_selector.append('<option value=\"\">'+'- ".JText::_('FLEXI_RIFLD_ADD_ITEM', true)."'+' -</option>');
-				var item;
-				for(var i=0; i<data.options.length; i++)
-				{
-					item = data.options[i];
-					item_selector.append(
-						jQuery('<option>', {
-							value: item.item_id,
-							text: item.item_title
-						})
-					);
-				}
-			}
-			
-			// Disable selected values (this will also trigger change event to update select2 display)
-			fcrelation_field_".$elementid_ns."_mark_selected();
 
-			// Remove loading animation
-			sel2_item_selector.next().remove();
-
-			// Show the item selector or display the error message
-			if (data && data.error!='')
-				jQuery('<span class=\"add-on fc-relation-field-error\"> <span class=\"icon-warning\"></span> '+data.error+'</span>').insertAfter(item_selector);
-			else
-				sel2_item_selector.show();
-		});
-		
-	});
-	". ( count($allowedtree)==1 ? "jQuery('#".$elementid."_cat_selector').trigger('change');" : "" ) . "
-	
-});";
-		
-		$document->addScriptDeclaration( $js );
+		// Handle single values
+		else
+		{
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
 	}
 
 
@@ -469,7 +354,7 @@ jQuery(document).ready(function()
 		$show_total_only     = (int) $field->parameters->get('show_total_only', 0);
 		$total_show_auto_btn = $field->field_type !== 'relation' ? 0 : (int) $field->parameters->get('total_show_auto_btn', 0);
 		$total_show_list     = $field->field_type !== 'relation' ? 0 : (int) $field->parameters->get('total_show_list', 0);
-		
+
 		if ($prop=='display_total')  // Explicitly requested
 		{
 			$disp->total_info = true;
@@ -533,8 +418,8 @@ jQuery(document).ready(function()
 			$itemcount = count($values);
 
 			// change upper limit if itemcount is set and error checked
-			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&  
-				$field->parameters->get( 'itemcount', 0) > 0 && 
+			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&
+				$field->parameters->get( 'itemcount', 0) > 0 &&
 				$field->parameters->get( 'itemcount', 0) < $itemcount
 			) {
 				$itemcount = $field->parameters->get( 'itemcount', 0);
@@ -614,8 +499,8 @@ jQuery(document).ready(function()
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
@@ -630,7 +515,7 @@ jQuery(document).ready(function()
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		// No special SQL query, default query is enough since index data were formed as desired, during indexing
 		$indexed_elements = true;
 		FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
@@ -650,7 +535,7 @@ jQuery(document).ready(function()
 			$item_tbl_alias = 'ct', $relcat_tbl_alias = 'rel',
 			$default_order='', $default_order_dir='', $sfx='_form', $support_2nd_lvl=false
 		);
-		
+
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' ct.id AS value, ct.title AS text';
@@ -661,7 +546,7 @@ jQuery(document).ready(function()
 		$filter->filter_groupby = ' GROUP BY fi.value_integer '; // * will be be appended with , fi.item_id
 		$filter->filter_having  = null;  // use default
 		$filter->filter_orderby = $orderby; // use field ordering setting
-		
+
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 
@@ -738,7 +623,7 @@ jQuery(document).ready(function()
 			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS ' . $val_tbl . ' ON ' . $val_on_items . ' AND ' . $val_tbl . '.field_id = ' . $val_field_id;
 
 			$filter->filter_colname     = ' ' . $val_tbl . '.value';
-			$filter->filter_valuesjoin  = $join_field_filters; 
+			$filter->filter_valuesjoin  = $join_field_filters;
 			$filter->filter_valueformat = null;   // use default
 			$filter->filter_valuewhere = null;   // use default
 		}
@@ -752,13 +637,13 @@ jQuery(document).ready(function()
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$filter->isindexed = true;
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** SEARCH / INDEXING METHODS
 	// ***
@@ -768,7 +653,7 @@ jQuery(document).ready(function()
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-		
+
 		if ($post===null) {
 			$values = null;
 			$field->field_valuesselect = ' fi.value_integer AS value_id, ct.title AS value';
@@ -784,18 +669,18 @@ jQuery(document).ready(function()
 			$values = array();
 			foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
 		}
-		
+
 		//JFactory::getApplication()->enqueueMessage('ADV: '.print_r($values, true), 'notice');
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
+
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
-		
+
 		if ($post===null) {
 			$values = null;
 			$field->field_valuesselect = ' fi.value_integer AS value_id, ct.title AS value';
@@ -803,7 +688,7 @@ jQuery(document).ready(function()
 			$field->field_groupby      = ' GROUP BY fi.value_integer ';
 		} else if (!empty($post)) {
 			$_ids = array();
-			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID 
+			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID
 			$db = JFactory::getDbo();
 			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode(',', $_ids).')';
 			$db->setQuery($query);
@@ -811,7 +696,7 @@ jQuery(document).ready(function()
 			$values = array();
 			foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
 		}
-		
+
 		//JFactory::getApplication()->enqueueMessage('BAS: '.print_r($values, true), 'notice');
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
@@ -828,7 +713,7 @@ jQuery(document).ready(function()
 		$use_cat_acl = $field->parameters->get('use_cat_acl', 1);
 		$method_cat = $field->parameters->get('method_cat', 1);
 		$usesubcats = $field->parameters->get('usesubcats', 0 );
-		
+
 		$catids = $field->parameters->get('catids');
 		if ( empty($catids) )							$catids = array();
 		else if ( ! is_array($catids) )		$catids = !FLEXI_J16GE ? array($catids) : explode("|", $catids);
@@ -837,22 +722,22 @@ jQuery(document).ready(function()
 		// ***
 		// *** Get & check Global category related permissions
 		// ***
-		
+
 		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
 		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-		
-		
+
+
 		// ***
 		// *** Calculate categories to use for retrieving the items
 		// ***
-		
+
 		$allowed_cats = $disallowed_cats = false;
-		
+
 		// Get user allowed categories
 		$usercats = $use_cat_acl && !$viewallcats ?
 			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false, $check_published = true) :
 			FlexicontentHelperPerm::returnAllCats($check_published=true, $specific_catids=null) ;
-		
+
 		// Find (if configured) , descendants of the categories
 		if ($usesubcats)
 		{
@@ -870,7 +755,7 @@ jQuery(document).ready(function()
 		// ***
 		// *** Decided allowed categories according to method of CATEGORY SCOPE
 		// ***
-		
+
 		// Include method
 		if ( $method_cat == 3 )
 		{
@@ -906,16 +791,16 @@ jQuery(document).ready(function()
 
 		// Get Access Levels of user
 		$uacc = array_flip(JAccess::getAuthorisedViewLevels($user->id));
-		
-		
+
+
 		// Get request variables
 		$field_id = $app->input->get('field_id', 0, 'int');
 		$item_id  = $app->input->get('item_id',  0, 'int');
 		$type_id  = $app->input->get('type_id',  0, 'int');
 		$lang_code= $app->input->get('lang_code',  0, 'cmd');
 		$catid    = $app->input->get('catid',    0, 'int');
-		
-		
+
+
 		// Basic checks
 		$response = array();
 		$response['error'] = '';
@@ -936,9 +821,9 @@ jQuery(document).ready(function()
 		{
 			jexit(json_encode($response));
 		}
-		
-		
-		
+
+
+
 		/**
 		 * Load and check field
 		 */
@@ -964,13 +849,13 @@ jQuery(document).ready(function()
 				$response['error'] = 'you do not have permission to edit lthis field';
 			}
 		}
-		
+
 		if ($response['error'])
 		{
 			jexit(json_encode($response));
 		}
-		
-		
+
+
 		/**
 		 * Load and check item
 		 */
@@ -1005,15 +890,15 @@ jQuery(document).ready(function()
 		{
 			jexit(json_encode($response));
 		}
-		
-		
+
+
 		// ***
 		// *** Load field configuration
 		// ***
-		
+
 		FlexicontentFields::loadFieldConfig($field, $item);
 		$field->item_id = $item_id;
-		
+
 		// Some needed parameters
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
 
@@ -1042,8 +927,8 @@ jQuery(document).ready(function()
 		$samelangonly  = (int) $field->parameters->get('samelangonly', 1);
 		$onlypublished = (int) $field->parameters->get('onlypublished', 1);
 		$ownedbyuser   = (int) $field->parameters->get('ownedbyuser', 0);
-		
-		
+
+
 		/**
 		 * Item retrieving query ... CREATE WHERE CLAUSE according to configured limitations SCOPEs
 		 */
@@ -1195,10 +1080,10 @@ jQuery(document).ready(function()
 			. $orderby
 			;
 		$items_arr = $db->setQuery($query)->loadObjectList();
-		
+
 		// Some configuration
 		$prepend_item_state = (int) $field->parameters->get('prepend_item_state', 1);
-		
+
 		foreach($items_arr as $itemdata)
 		{
 			$itemtitle = StringHelper::strlen($itemdata->title) > $maxtitlechars
@@ -1213,7 +1098,7 @@ jQuery(document).ready(function()
 
 			$itemcat_arr = explode(',', $itemdata->catlist);
 			$itemid = $itemdata->id;
-			
+
 			$response['options'][] = array('item_id' => $itemid, 'item_title' => $itemtitle);
 		}
 
