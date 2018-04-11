@@ -1,10 +1,13 @@
 	var fcfield_relation = {};
 
-	fcfield_relation.add_related = function(el, elementid)
+	fcfield_relation.add_related = function(el)
 	{
 		if (!parseInt(jQuery(el).val())) return false;
 
-		var
+		var val_box = el;
+		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
+
+		var elementid = val_box.getAttribute('data-elementid'),
 			item_selector = jQuery(el),
 			item_id = parseInt(item_selector.val()),
 			cat_selector = jQuery('#' + elementid + '_cat_selector'),
@@ -66,8 +69,13 @@
 	}
 
 
-	fcfield_relation.selected_items_modified = function(elementid)
+	fcfield_relation.selected_items_modified = function(el)
 	{
+		var val_box = el;
+		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
+
+		var elementid = val_box.getAttribute('data-elementid');
+
 		fcfield_relation.mark_selected(elementid);
 
 		var selitems_selector = jQuery('#' + elementid);
@@ -84,10 +92,19 @@
 	}
 
 
-	fcfield_relation.cat_selector_change = function(elementid, item_id, field_id, item_type, item_lang)
+	fcfield_relation.cat_selector_change = function(el)
 	{
-		var cat_selector = jQuery('#' + elementid + '_cat_selector');
-		var catid = parseInt(cat_selector.val());
+		var val_box = el;
+		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
+		
+		var elementid = val_box.getAttribute('data-elementid'),
+			item_id = val_box.getAttribute('data-item_id'),
+			field_id = val_box.getAttribute('data-field_id'),
+			item_type = val_box.getAttribute('data-item_type'),
+			item_lang = val_box.getAttribute('data-item_lang');
+
+		var cat_selector = document.getElementById(elementid + '_cat_selector');
+		var catid = parseInt(cat_selector.value);
 
 		var item_selector = jQuery('#' + elementid + '_item_selector');
 
