@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -38,20 +38,20 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
 		$use_ingroup = 0; //$field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		$is_ingroup  = 0; //!empty($field->ingroup);
-		
+
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -71,23 +71,23 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
-		
+
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
 		$top_notice = $use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
-		
+
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
 		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 1);
 		$form_file_preview  = (int) $field->parameters->get('form_file_preview', 2);
-		
+
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
-		
+
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		$imageexts   = array('jpg','gif','png','bmp','jpeg');
@@ -105,7 +105,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		{
 			$file_ids  = array();
 			$form_data = array();
-			
+
 			// Check if reloading user data after form reload (e.g. due to form validation error)
 			$v = reset($field->value);
 			if (is_array($v) && isset($v['file-id']))
@@ -122,10 +122,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			{
 				$file_ids = $field->value;
 			}
-			
+
 			// Get file data for given file ids
 			$files_data = $this->getFileData( $file_ids, $published=false );
-			
+
 			// Do not skip values if in fieldgroup
 			if ($use_ingroup)
 			{
@@ -140,10 +140,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$field->value = array_keys($files_data);
 			}
 		}
-		
-		// Inline mode needs an default value, TODO add for popup too ? 
+
+		// Inline mode needs an default value, TODO add for popup too ?
 		$has_values = count($field->value);
-		
+
 		if (empty($field->value) || $use_ingroup)
 		{
 			// Create an empty file properties value, used by code that creates empty inline file editing form fields
@@ -160,7 +160,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				'uploaded' => '', 'uploaded_by' => 0, 'checked_out' => false, 'checked_out_time' => ''
 			);
 		}
-		
+
 		// Button for popup file selection
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
 		$addExistingURL = JUri::base(true)
@@ -171,17 +171,17 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			.'&amp;targetid=%s'
 			.'&amp;existing_class=fc_filedata_storage_name'
 			.'&amp;' . JSession::getFormToken() . '=1';
-		
+
 		$_prompt_txt = JText::_( 'FLEXI_FIELD_MGALLERY_SELECTED_FILE' );  //JText::_( 'FLEXI_ADD_FILE' );
-		
+
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		$value_classes .= $fields_box_placing ? ' floated' : '';
-		
+
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
 
@@ -266,7 +266,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			});
 		";
 		$css = "";
-		
+
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
@@ -288,7 +288,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				});
 			});
 			";
-			
+
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
@@ -297,12 +297,12 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				
+
 				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-				
+
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
@@ -313,34 +313,34 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-del]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-del');
 				newField.find('.inlinefile-del-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-del').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-del-lbl');
-				
+
 				var theInput = newField.find('input.fc_filedata').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data');
 				theInput.attr('data-rowno',uniqueRowNum".$field->id.");
-				
+
 				newField.find('.inlinefile-data-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-lbl');
-				
+
 				var theInput = newField.find('input.fc_fileid').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-id]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-id');
-				
+
 				newField.find('.fc_filedata_txt_nowrap').html('-');
 				newField.find('.fc_filedata_title').html('-');
-				
+
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt');
-				
+
 				var imgPreview = newField.find('.fc_preview_thumb').first();
 				imgPreview.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_img_preview');
 				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 				".($form_file_preview != 1 ? '
 				imgPreview.hide();' : '')."
-				
+
 				".($iform_title ? "
 				var theInput = newField.find('input.fc_filetitle').first();
 				theInput.val('');
@@ -348,7 +348,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-title');
 				newField.find('.inlinefile-title-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-title').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-title-lbl');
 				" : "")."
-				
+
 				".($iform_lang ? "
 				var theInput = newField.find('select.fc_filelang').first();
 				theInput.get(0).selectedIndex = 0;
@@ -356,7 +356,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang');
 				newField.find('.inlinefile-lang-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-lang-lbl');
 				" : "")."
-				
+
 				".($iform_access ? "
 				var theInput = newField.find('select.fc_fileaccess').first();
 				//theInput.get(0).selectedIndex = 0;
@@ -381,7 +381,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					nr++;
 				});
 				" : "")."
-			
+
 				".($iform_stamp ? "
 				var nr = 0;
 				newField.find('.inlinefile-stamp-info').remove();
@@ -397,7 +397,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					nr++;
 				});
 				" : "")."
-			
+
 				".($iform_desc ? "
 				var theInput = newField.find('textarea.fc_filedesc').first();
 				theInput.val('');
@@ -405,12 +405,13 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-desc');
 				newField.find('.inlinefile-desc-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-desc').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-desc-lbl');
 				" : "")."
-				
-				// Re-init any select2 elements
-				var has_select2 = newField.find('div.select2-container').length != 0;
-				if (has_select2) {
-					newField.find('div.select2-container').remove();
-					newField.find('select.use_select2_lib').select2('destroy').show().select2();
+
+				// Destroy any select2 elements
+				var sel2_elements = newField.find('div.select2-container');
+				if (sel2_elements.length)
+				{
+					sel2_elements.remove();
+					newField.find('select.use_select2_lib').select2('destroy').show();
 				}
 
 				// Update button for modal file selection
@@ -421,36 +422,39 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
 				});
 				";
-			
+
 			// Add new field to DOM
 			$js .= "
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
+
+				// Re-init any select2 elements
+				fc_attachSelect2(newField);
 				";
-			
+
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
-			
+
 			// Show new field, increment counters
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-				
+
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				
 				// Attach bootstrap event on new element
 				fc_bootstrapAttach(newField);
-				
+
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 
@@ -467,7 +471,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-				
+
 				if ( 1 ) // A deleted container always has a value, thus decrement (or empty) the counter value in the 'required' form element
 				{
 					var valcounter = document.getElementById('".$elementid."');
@@ -476,11 +480,11 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					}
 					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
-				
+
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-				
+
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if (rowCount".$field->id." > 1)
 				{
@@ -495,9 +499,9 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				}
 			}
 			";
-			
+
 			$css .= '';
-			
+
 			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
@@ -562,7 +566,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				';
 		}
 		unset($_html);
-		
+
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html = !count($field->html) ? '' :
@@ -596,22 +600,22 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			<input id="'.$elementid.'" class="'.$required_class.' fc_hidden_value" type="text" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || 1; //(int) $field->parameters->get( 'allow_multiple', 1 ) ;
-		
+
 		$field->label = JText::_($field->label);
-		
+
 		$values = $values ? $values : $field->value;
-		
+
 		// Check for no values and no default value, and return empty display
 		if ( empty($values) )
 		{
@@ -690,7 +694,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$slideshowClass = 'Slideshow';
 
 		if (empty($values)) return;
-		
+
 		if (!$js_and_css_added)
 		{
 			$document->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
@@ -767,7 +771,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			";
 			$document->addScriptDeclaration($js);
 		}
-		
+
 		$pimages = array();
 		$display = array();
 		$thumbs  = array();
@@ -776,7 +780,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$captions = '';
 		if($usecaptions===2)
 			$captions = htmlspecialchars($field->parameters->get( 'customcaptions', 'This is a caption' ), ENT_COMPAT, 'UTF-8');
-		
+
 		$group_str = 'data-fancybox-group="fcitem_'.$item->id.'_fcfield_'.$field->id.'"';
 		$n = 0;
 		foreach($files_data as $file_id => $file_data)
@@ -809,7 +813,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$n++;
 			}
 		}
-		
+
 		$field->{$prop} = '
 		<div id="'.$htmltag_id.'" class="slideshow">
 			<div class="slideshow-images">
@@ -827,9 +831,9 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			'.implode("\n", $pimages).'
 		</div>';
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -838,7 +842,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
@@ -856,7 +860,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
-		
+
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
@@ -873,7 +877,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		// *** Reformat the posted data
 		// ***
 
-		// Make sure posted data is an array 
+		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
 
 		$newpost = array();
@@ -885,7 +889,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
 			}
-			
+
 			// support for basic CSV import / export
 			if ( $is_importcsv )
 			{
@@ -916,7 +920,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
 				}
 			}
-			
+
 			// we were given a file ID
 			elseif (!is_array($v))
 			{
@@ -949,7 +953,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					if ($use_ingroup) $newpost[$new++] = null;
 					continue;
 				}
-				
+
 				// validate data or empty/set default values
 				$v['file-del']   = !$iform_allowdel ? 0 : (int) (!empty($v['file-del']) ? 1 : 0);
 				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
@@ -961,12 +965,12 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				{
 					$v['secure']   = !$iform_dir    ? 0 : ((int) $v['secure'] ? 1 : 0);
 				}
-				
+
 				// UPDATE existing file
 				if ( !$new_file && $file_id )
 				{
 					$dbdata = array();
-					
+
 					$dbdata['id'] = $file_id;
 					if ($iform_title)  $dbdata['altname'] = $v['file-title'];
 					if ($iform_desc)   $dbdata['description'] = $v['file-desc'];
@@ -974,13 +978,13 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					if ($iform_access) $dbdata['access'] = $v['file-access'];
 					if ($iform_stamp)  $dbdata['stamp']  = $v['stamp'];
 					//if ($iform_dir)  $dbdata['secure'] = $v['secure'];  // !! Do not change folder for existing files
-					
+
 					// Load file data from DB
 					$row = JTable::getInstance('flexicontent_files', '');
 					$row->load( $file_id );
 					$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
-					
+
 					// Security concern, check file is assigned to current item
 					$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
 					if ( $v['file-del'] )
@@ -989,7 +993,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 							? JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );
 							: JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 					}
-					
+
 					// Delete existing file if so requested
 					if ( $v['file-del'] )
 					{
@@ -1002,22 +1006,22 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;  // Skip file since unloading / removal was requested
 					}
-					
+
 					// Set the changed data into the object
 					foreach ($dbdata as $index => $data) $row->{$index} = $data;
-					
-					// Update DB data of the file 
+
+					// Update DB data of the file
 					if ( !$row->check() || !$row->store() )
 					{
 						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDbo()->getErrorMsg(), 'warning' );
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
-					
+
 					// Set file id as value of the field
 					$v = $file_id;
 				}
-				
+
 				//INSERT new file
 				elseif( $new_file )
 				{
@@ -1033,7 +1037,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 							$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 						}
-						
+
 						// Delete previous file if no longer used
 						else if ( $this->canDeleteFile($field, $file_id, $item) )
 						{
@@ -1041,7 +1045,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 							$fm->delete( array($file_id) );
 						}
 					}
-					
+
 					// Skip file if unloading / removal was requested
 					if ( $v['file-del'] )
 					{
@@ -1060,7 +1064,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$app->input->set('file-desc', $v['file-desc']);
 					$app->input->set('file-lang', $v['file-lang']);
 					$app->input->set('file-access', $v['file-access']);
-					
+
 					// The dform field name of the <input type="file" ...
 					$app->input->set('file-ffname', 'custom');
 					$app->input->set('fname_level1', $field->name);
@@ -1076,13 +1080,13 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 						JFactory::getApplication()->enqueueMessage($upload_err, $err_type);
 					}
 				}
-				
+
 				else {
 					// no existing file and no new file uploaded
 					$v = $use_ingroup ? null : false;
 				}
 	    }
-			
+
 	    if (!$use_ingroup)
 			{
 	    	// NOT inside field group, add it only if not empty reverse the file array, indexing it by file IDs, to add each file only once
@@ -1094,17 +1098,17 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$newpost[$new++] = $v===null ? null : (int)$v;  // null means skip value but increment value position
 			}
     }
-    
+
     // IF NOT inside field group, the file array was reversed (indexed by file IDs), so that the same file can be added once
-   	$post = !$use_ingroup ? array_flip($newpost) : $newpost;  
+   	$post = !$use_ingroup ? array_flip($newpost) : $newpost;
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
@@ -1114,7 +1118,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	function getFileData($fid, $published=1, $extra_select='')
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
@@ -1128,7 +1132,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			if ( !isset($cached_data[$f]) && $f)
 				$new_ids[] = $f;
 		}
-		
+
 		// Get file data not retrieved already
 		if ( count($new_ids) )
 		{
@@ -1147,7 +1151,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$cached_data[$file_id] = $file_data;
 			}
 		}
-		
+
 		// Finally get file data in correct order
 		foreach($file_ids as $file_id)
 		{
@@ -1175,14 +1179,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$db->setQuery($query);
 		$file_id = $db->loadResult();
 		if (!$file_id)  return true;
-		
+
 		$ignored['item_id'] = $item->id;
-		
+
 		$fm = new FlexicontentModelFilemanager();
 		return $fm->candelete( array($file_id), $ignored );
 	}
-	
-	
+
+
 	// *****************************************
 	// Check if file is assigned to current item
 	// *****************************************
@@ -1202,15 +1206,15 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$db_id = $db->loadResult();
 		return (boolean)$db_id;
 	}
-	
-	
+
+
 	// *************************************
 	// Return an icon according to file type
 	// *************************************
 	function addIcon( &$file )
 	{
 		static $icon_exists = array();
-		
+
 		switch ($file->ext)
 		{
 			// Image

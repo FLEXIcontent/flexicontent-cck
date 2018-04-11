@@ -436,12 +436,12 @@ class FCIndexedField extends FCField
 				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
 				
-				// Re-init any select2 elements
-				var has_select2 = newField.find('div.select2-container').length != 0;
-				if (has_select2) {
-					newField.find('div.select2-container').remove();
+				// Destroy any select2 elements
+				var sel2_elements = newField.find('div.select2-container');
+				if (sel2_elements.length)
+				{
+					sel2_elements.remove();
 					newField.find('select.use_select2_lib').select2('destroy').show();
-					fc_attachSelect2(newField);
 				}
 			")."
 
@@ -457,6 +457,12 @@ class FCIndexedField extends FCField
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
+
+				// Re-init any select2 elements
+				fc_attachSelect2(newField);
 				";
 			
 			// Listen to the changes of depends-on-master field
@@ -500,9 +506,6 @@ class FCIndexedField extends FCField
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -1290,11 +1293,19 @@ class FCIndexedField extends FCField
 		{
 			$empty_value = static::$valueIsArr ? array() : null;
 			$custom = JFactory::getApplication()->input->get('custom', array(), 'array');
-			if ( isset($custom['_fcfield_valueholder_'][$field->name]) ) 
+
+			if (isset($custom['_fcfield_valueholder_'][$field->name])) 
 			{
 				$holders = $custom['_fcfield_valueholder_'][$field->name];
 				$vals = array();
-				foreach($holders as $i => $v)  $vals[]  =  isset($post[(int)$i]) ? $post[(int)$i] : $empty_value;
+
+				foreach($holders as $i => $v)
+				{
+					$vals[] = isset($post[(int)$i])
+						? $post[(int)$i]
+						: $empty_value;
+				}
+
 				$post = $vals;
 			}
 		}

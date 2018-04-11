@@ -10,7 +10,7 @@ foreach($field->value as $file_id)
 	$fieldname_n = $fieldname.'['.$n.']';
 	$elementid_n = $elementid.'_'.$n;
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
-	
+
 	$preview_css = 'width:100px; height:100px;';
 	if ( !in_array(strtolower($file_data->ext), $imageexts)) {
 		$preview_src = $image_placeholder;
@@ -21,7 +21,7 @@ foreach($field->value as $file_id)
 			$file_data->filename ;
 		$preview_src = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
 	}
-	
+
 	$info_txt_classes = $file_data->published ? '' : 'file_unpublished '.$tooltip_class;
 	$info_txt_tooltip = $file_data->published ? '' : 'title="'.flexicontent_html::getToolTip('FLEXI_FILE_FIELD_FILE_UNPUBLISHED', 'FLEXI_FILE_FIELD_FILE_UNPUBLISHED_DESC', 1, 1).'"';
 	$_select_file_lbl = '
@@ -29,9 +29,9 @@ foreach($field->value as $file_id)
 				' . JText::_('FLEXI_FIELD_'.$FT.'_SELECT_FILE') . '
 			</label>
 	';
-	
+
 	$cols2_exist = $iform_title || $iform_lang || $iform_access || $iform_desc || $iform_dir;
-	
+
 	$field->html[] = '
 	<div class="fcclear"></div>
 	<div style="display:inline-block;">
@@ -65,7 +65,7 @@ foreach($field->value as $file_id)
 					').'
 				</span>
 			</span>
-			
+
 			'.( (!$multiple || $is_ingroup) && !$required_class ? '
 			<br/>
 			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
@@ -75,7 +75,7 @@ foreach($field->value as $file_id)
 			' : ( (!$multiple || $is_ingroup) && $required_class ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 		</td>
 	</tr>'.
-	
+
 	( $iform_title ? '
 	<tr class="inlinefile-title-row">
 		<td class="key inlinefile-title-lbl-cell">
@@ -89,7 +89,7 @@ foreach($field->value as $file_id)
 			</span>
 		</td>
 	</tr>' : '').
-	
+
 	( $iform_lang ? '
 	<tr class="inlinefile-lang-row">
 		<td class="key inlinefile-lang-lbl-cell">
@@ -103,7 +103,7 @@ foreach($field->value as $file_id)
 			</span>
 		</td>
 	</tr>' : '').
-	
+
 	( $iform_access ? '
 	<tr class="inlinefile-access-row">
 		<td class="key inlinefile-access-lbl-cell">
@@ -117,7 +117,7 @@ foreach($field->value as $file_id)
 			</span>
 		</td>
 	</tr>' : '').
-	
+
 	( $iform_desc ? '
 	<tr class="inlinefile-desc-row">
 		<td class="key inlinefile-desc-lbl-cell">
@@ -131,7 +131,7 @@ foreach($field->value as $file_id)
 			</span>
 		</td>
 	</tr>' : '').
-	
+
 	( $iform_dir ? '
 	<tr class="inlinefile-secure-row">
 		<td class="key inlinefile-secure-lbl-cell">
@@ -149,7 +149,7 @@ foreach($field->value as $file_id)
 			</span>
 		</td>
 	</tr>' : '').
-	
+
 	( $iform_stamp ? '
 	<tr class="inlinefile-stamp-row">
 		<td class="key inlinefile-stamp-lbl-cell">

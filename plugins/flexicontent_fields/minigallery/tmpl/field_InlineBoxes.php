@@ -10,7 +10,7 @@ foreach($field->value as $file_id)
 	$fieldname_n = $fieldname.'['.$n.']';
 	$elementid_n = $elementid.'_'.$n;
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
-	
+
 	$preview_css = 'width:100px; height:100px;';
 	if ( !in_array(strtolower($file_data->ext), $imageexts)) {
 		$preview_src = $image_placeholder;
@@ -21,7 +21,7 @@ foreach($field->value as $file_id)
 			$file_data->filename ;
 		$preview_src = JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
 	}
-	
+
 	$info_txt_classes = $file_data->published ? '' : 'file_unpublished '.$tooltip_class;
 	$info_txt_tooltip = $file_data->published ? '' : 'title="'.flexicontent_html::getToolTip('FLEXI_FILE_FIELD_FILE_UNPUBLISHED', 'FLEXI_FILE_FIELD_FILE_UNPUBLISHED_DESC', 1, 1).'"';
 
@@ -46,7 +46,7 @@ foreach($field->value as $file_id)
 				<br/>
 				'.($form_file_preview ? '<img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" style="'.$preview_css.'" alt="Preview image placeholder"/>' : '').'
 			</div>
-			
+
 			'.( (!$multiple || $is_ingroup) && !$required_class ? '
 			<br/>
 			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
@@ -75,7 +75,7 @@ foreach($field->value as $file_id)
 			</div>
 
 		</div>'.
-	
+
 	( $iform_title ? '
 		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-title-box">
 			<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1).'" id="'.$elementid_n.'_file-title-lbl" for="'.$elementid_n.'_file-title">
@@ -83,7 +83,7 @@ foreach($field->value as $file_id)
 			</label>
 			<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.htmlspecialchars(!isset($form_data[$file_id]) ? $file_data->altname : $form_data[$file_id]['file-title'], ENT_COMPAT, 'UTF-8').'" class="fc_filetitle '.$required_class.' fcfield_textval" />
 		</div>' : '').
-	
+
 	( $iform_lang ? '
 		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-lang-box">
 			<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
@@ -91,7 +91,7 @@ foreach($field->value as $file_id)
 			</label>
 			'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="fc_filelang use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
 		</div>' : '').
-	
+
 	( $iform_access ? '
 		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-access-box">
 			<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
@@ -99,7 +99,7 @@ foreach($field->value as $file_id)
 			</label>
 				'.JHtml::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
 		</div>' : '').
-	
+
 	( $iform_desc ? '
 		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-desc-box">
 			<label class="' . $add_on_class . ' fc-lbl inlinefile-desc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
@@ -107,7 +107,7 @@ foreach($field->value as $file_id)
 			</label>
 			<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc fcfield_textareaval">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
 		</div>' : '').
-	
+
 	( $iform_dir ? '
 		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-secure-box">
 			<label class="' . $add_on_class . ' fc-lbl inlinefile-secure-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
@@ -124,7 +124,7 @@ foreach($field->value as $file_id)
 				</fieldset>
 			').'
 		</div>' : '').
-	
+
 	( $iform_stamp ? '
 		<div class="'.$input_grp_class.' fc-xpended-row inlinefile-stamp-box">
 			<label class="' . $add_on_class . ' fc-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">

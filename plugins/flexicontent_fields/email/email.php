@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,13 +36,13 @@ class plgFlexicontent_fieldsEmail extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
-		
+
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -72,17 +72,17 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// ***
 		// *** Email address
 		// ***
-		
+
 		// Default value
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_addr = $default_addr ? JText::_($default_addr) : '';
-		
+
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 4000 ) ;   // client/server side enforced
 		$inputmask	= $field->parameters->get( 'inputmask', '' ) ;
-		
+
 		// create extra HTML TAG parameters for the form field
 		$addr_attribs = $field->parameters->get( 'extra_attributes', '' )
 			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
@@ -123,18 +123,18 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$field->value[0]['text'] = $default_title;
 			$field->value[0] = serialize($field->value[0]);
 		}
-		
+
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		$value_classes .= $fields_box_placing ? ' floated' : '';
-		
+
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
 		$js = "";
 		$css = "";
-		
+
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
@@ -156,7 +156,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 				});
 			});
 			";
-			
+
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
@@ -165,18 +165,18 @@ class plgFlexicontent_fieldsEmail extends FCField
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				
+
 				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-				
+
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 				";
-			
+
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update the new email address
 			$js .= "
@@ -185,12 +185,12 @@ class plgFlexicontent_fieldsEmail extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
 				newField.find('.emailaddr-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
-				
+
 				// Update inputmask
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
-			
+
 			// Update the new email linking text
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.emailtext').first();
@@ -198,37 +198,48 @@ class plgFlexicontent_fieldsEmail extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				newField.find('.emailtext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+
+				// Destroy any select2 elements
+				var sel2_elements = newField.find('div.select2-container');
+				if (sel2_elements.length)
+				{
+					sel2_elements.remove();
+					newField.find('select.use_select2_lib').select2('destroy').show();
+				}
 				";
-			
+
 			// Add new field to DOM
 			$js .= "
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
+
+				// Re-init any select2 elements
+				fc_attachSelect2(newField);
 				";
-			
+
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
-			
+
 			// Show new field, increment counters
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-				
+
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				
 				// Attach bootstrap event on new element
 				fc_bootstrapAttach(newField);
-				
+
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -242,11 +253,11 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-				
+
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-				
+
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if (rowCount".$field->id." > 1)
 				{
@@ -261,9 +272,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 				}
 			}
 			";
-			
+
 			$css .= '';
-			
+
 			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
@@ -305,7 +316,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
-		
+
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html = !count($field->html) ? '' :
@@ -334,42 +345,42 @@ class plgFlexicontent_fieldsEmail extends FCField
 			' . $field->html;
 		}
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
-		
+
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		
+
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
-		
+
 		// Email address
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_addr = ($addr_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_addr = $default_addr ? JText::_($default_addr) : '';
-		
+
 		// Email title & linking text (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		$default_title = $default_title ? JText::_($default_title) : '';
-		
+
 		// Rendering options
 		$email_cloaking = $field->parameters->get( 'email_cloaking', 1 ) ;
 		$mailto_link    = $field->parameters->get( 'mailto_link', 1 ) ;
 		$format = JFactory::getApplication()->input->get('format', 'html', 'cmd');
-				
+
 		// Get field values
 		$values = $values ? $values : $field->value;
-		
+
 		// Check for no values and no default value, and return empty display
 		if ( empty($values) )
 		{
@@ -383,7 +394,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$values[0]['text'] = JText::_($default_title);
 			$values[0] = serialize($values[0]);
 		}
-		
+
 		$unserialize_vals = true;
 		if ($unserialize_vals)
 		{
@@ -401,8 +412,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		}
-		
-		
+
+
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -410,10 +421,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-		
+
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
+
 		switch($separatorf)
 		{
 			case 0:
@@ -444,15 +455,15 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$separatorf = '&nbsp;';
 			break;
 		}
-		
+
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-		
+
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
-		
+
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
@@ -465,9 +476,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -476,7 +487,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
@@ -492,7 +503,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// *** Reformat the posted data
 		// ***
 
-		// Make sure posted data is an array 
+		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
 
 		$newpost = array();
@@ -511,24 +522,24 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// ***
 			// *** Validate data, skipping values that are empty after validation
 			// ***
-			
+
 			$addr = flexicontent_html::dataFilter($v['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
-			
+
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($addr))
 			{
 				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
 			}
-			
+
 			$newpost[$new] = array();
 			$newpost[$new]['addr'] = $addr;
 			$newpost[$new]['text'] = flexicontent_html::dataFilter(@$v['text'], 0, 'STRING', 0);
-			
+
 			$new++;
 		}
 		$post = $newpost;
-		
+
 		// Serialize multi-property data before storing them into the DB,
 		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v)
@@ -540,19 +551,19 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$app->enqueueMessage( print_r($post, true), 'warning');
 		}*/
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
@@ -561,24 +572,24 @@ class plgFlexicontent_fieldsEmail extends FCField
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** SEARCH / INDEXING METHODS
 	// ***
@@ -588,11 +599,11 @@ class plgFlexicontent_fieldsEmail extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-		
+
 		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
 		// b. Each of the indexes of $values will be added to the column 'value_id',
 		//    and it is meant for fields that we want to be filterable via a drop-down select
-		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving
 		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
 		// 'search_properties'   contains property fields that should be added as text
@@ -601,14 +612,14 @@ class plgFlexicontent_fieldsEmail extends FCField
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
-	
+
+
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
-		
+
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
@@ -618,5 +629,5 @@ class plgFlexicontent_fieldsEmail extends FCField
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
+
 }

@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -21,8 +21,8 @@ class plgFlexicontent_fieldsRadioimage extends FCIndexedField
 	static $isDropDown = 0;
 	static $promptEnabled = 0;
 	static $usesImages = 1;
-	
-	
+
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***

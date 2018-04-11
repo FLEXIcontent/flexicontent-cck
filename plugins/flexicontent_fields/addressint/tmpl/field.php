@@ -10,7 +10,7 @@ foreach ($values as $value)
 {
 	$fieldname_n = $fieldname.'['.$n.']';
 	$elementid_n = $elementid.'_'.$n;
-	
+
 	// make sure that optional data exist
 	$value['addr_display']   = @ $value['addr_display'];
 	$value['addr_formatted'] = @ $value['addr_formatted'];
@@ -28,7 +28,7 @@ foreach ($values as $value)
 	$value['zip']  = @ $value['zip'];
 	$value['lat'] = @ $value['lat'];
 	$value['lon'] = @ $value['lon'];
-	
+
 	$coords_are_empty = !$value['lat'] && !$value['lon'];
 	$value_is_empty   =
 		empty($value['addr_display']) && empty($value['addr_formatted']) && empty($value['addr1']) &&
@@ -45,9 +45,9 @@ foreach ($values as $value)
 
 	$field_html = '
 	<div class="fcfield_field_data_box fcfield_addressint_data">
-	
+
 	<div><div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock addrint_messages" style="display:none;"></div></div>
-	
+
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
 			<td colspan="2" class="fc-nopad-h-cell">
@@ -147,8 +147,8 @@ foreach ($values as $value)
 	'
 	</tbody></table>
 	</div>
-	
-	
+
+
 	<div id="'.$elementid_n.'_addressint_map" class="fcfield_field_preview_box fcfield_addressint_map" style="display: none;">
 		<div>
 			<div class="'.$input_grp_class.' fc-xpended">
@@ -166,13 +166,13 @@ foreach ($values as $value)
 			<div id="map_canvas_'.$elementid_n.'" class="addrint_map_canvas" '.($map_width || $map_height  ?  'style="width:'.$map_width.'px; height:'.$map_height.'px;"' : '').'></div>
 		</div>
 	</div>
-	
-	
+
+
 	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.htmlspecialchars($value['addr_formatted'], ENT_COMPAT, 'UTF-8').'" />
 	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" />
 	<input type="hidden" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.htmlspecialchars($value['zoom'], ENT_COMPAT, 'UTF-8').'" />
 	';
-	
+
 	if($addr_edit_mode == 'plaintext')
 	{
 		$field_html .= '
@@ -195,7 +195,7 @@ foreach ($values as $value)
 		<input type="hidden" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" value="'.htmlspecialchars($value['addr_display'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
-	
+
 	if(!$edit_latlon)
 	{
 		$field_html .= '
@@ -207,7 +207,7 @@ foreach ($values as $value)
 	$js .= '
 	fcfield_addrint.LatLon["'.$elementid_n.'"] =  {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
 	';
-	
+
 	$dom_ready_js .= '
 		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field->name.'");' . /* autocomplete search */'
 		'.($coords_are_empty ? '' : 'fcfield_addrint.initMap("'.$elementid_n.'", "'.$field->name.'");') . /* initialize map */'

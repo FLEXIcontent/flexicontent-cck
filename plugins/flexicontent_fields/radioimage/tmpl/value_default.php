@@ -32,19 +32,19 @@ foreach ($values as $value)
 			$value = $this->unserialize_array($value, $force_array=true, $force_value=true);
 		}
 	}
-	
+
 	// Make sure value is an array
 	if (!is_array($value))
 	{
 		$value = strlen($value) ? array($value) : array();
 	}
-	
+
 	// Skip empty if not in field group
 	if ( !count($value) && !$is_ingroup && !$display_all )  continue;
-	
+
 	$html  = array();
 	$index = array();
-	
+
 	// CASE a. Display ALL elements (selected and NON-selected)   ***  NOT supported inside fieldgroup YET
 	if ( $display_all )
 	{
@@ -60,7 +60,7 @@ foreach ($values as $value)
 
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
-			
+
 			/* only for (*IMAGE) fields */
 			else if ($text_or_value == 2)
 				$disp = !$image_type ?
@@ -76,7 +76,7 @@ foreach ($values as $value)
 					<span class="alert alert-info fc_ifield_val_txt">'.($text_or_value == 3 ? $element->text : $element->value).'</span>
 				</div>
 				';
-			
+
 			if ( isset($indexes[$val]) ) {
 				$html[]  = $pretext.$disp.$posttext;
 				$index[] = $element->value;
@@ -84,7 +84,7 @@ foreach ($values as $value)
 				$html[]  = $ns_pretext.$disp.$ns_posttext;
 		}
 	}
-	
+
 	// CASE b. Display only selected elements
 	else
 	{
@@ -97,10 +97,10 @@ foreach ($values as $value)
 				if ( $is_ingroup ) $html[]	= '';
 				continue;
 			}
-			
+
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp = $element->text;
-			
+
 			/* only for (*IMAGE) fields */
 			else if ($text_or_value == 2)
 				$disp = !$image_type ?
@@ -116,7 +116,7 @@ foreach ($values as $value)
 					<span class="alert alert-info fc_ifield_val_txt">'.($text_or_value == 3 ? $element->text : $element->value).'</span>
 				</div>
 				';
-			
+
 			$html[]  = $pretext . $disp . $posttext;
 			$index[] = $pretext . $element->value . $posttext;
 		}

@@ -29,6 +29,6 @@ foreach ($tags as $tag)
 		$field->{$prop}[] = $pretext . $display . $posttext;
 
 		// Some extra data
-		$field->value[] = $tag->name; 
+		$field->value[] = $tag->name;
 	}
 }

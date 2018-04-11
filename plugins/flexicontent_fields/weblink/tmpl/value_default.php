@@ -27,7 +27,7 @@ foreach ($values as $value)
 		}
 		continue;
 	}
-	
+
 	// Check if link is 'internal' aka 'safer', but make it absolute before checking it !
 	$link = $this->make_absolute_url($value['link']);
 	$isInternal = JUri::isInternal($link);
@@ -82,7 +82,7 @@ foreach ($values as $value)
 	{
 		$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$item->id.'&ord='.($n+1).'&task=weblink' );
 	}
-	
+
 	// If linking text is  URL convert from Punycode to UTF8
 	if ( empty($linktext) )
 	{
@@ -91,7 +91,7 @@ foreach ($values as $value)
 
 	// Create indirect link to web-link address with custom displayed text
 	$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">' .$linktext. '</a>';
-	
+
 	// HITS: either as icon or as inline text or both
 	$hits_html = '';
 	if ($display_hits && $hits)
@@ -111,10 +111,10 @@ foreach ($values as $value)
 			$html .= ' ' . $hits_html;
 		}
 	}
-	
+
 	// Add prefix / suffix
 	$field->{$prop}[$n]	= $pretext . $html . $posttext;
-	
+
 	$n++;
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }

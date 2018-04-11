@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -17,7 +17,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	//static $prior_to_version = "3.2";  // Display message for non free plugin
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
-	
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -26,9 +26,9 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	{
 		parent::__construct( $subject, $params );
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** DISPLAY methods, item form & frontend views
 	// ***
@@ -37,13 +37,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
-		
+
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -56,23 +56,23 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		// ****************
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
-		
-		
+
+
 		// *************
 		// Email address
 		// *************
-		
+
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
 		$inputmask	= $field->parameters->get( 'inputmask', 'email' ) ;
-		
+
 		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		$attribs .= ' size="'.$size.'" ';
 		$classes = $required;
-		
+
 		static $inputmask_added = false;
 	  if ($inputmask && !$inputmask_added) {
 			$inputmask_added = true;
@@ -83,19 +83,19 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$classes .= ' has_inputmask';
 		}
 		$classes .= ' validate-email';
-		
-		
+
+
 		// **********************************
 		// Full, first, last names (optional)
 		// **********************************
-		
+
 		// Optional properties
 		$usefull   = $field->parameters->get( 'use_full', 0 ) ;
 		$usefirst  = $field->parameters->get( 'use_first', 0 ) ;
 		$uselast   = $field->parameters->get( 'use_last', 0 ) ;
-		
+
 		if ( !$field->parameters->get('initialized',0) ) $this->initialize($field);
-		
+
 		// Initialise property with default value
 		if ( !$item->id ) {
 			$value = array();
@@ -104,14 +104,14 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$value['first'] = '';
 			$value['last'] = '';
 		}
-		
+
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		
+
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
 		$js = "";
 		$css = '
 		div[class^="fcfield_avs_box-"] {
@@ -121,14 +121,14 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		';
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		
-		
+
+
 		// *****************************************
 		// Create field's HTML display for item form
 		// *****************************************
-		
+
 		$field->html = array();
-		
+
 		$user = JFactory::getUser();
 		if ($item->id) {
 			if ($field->parameters->get( 'display_item_owner', 0 ) ) {
@@ -161,7 +161,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$n = 0;
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
-			
+
 			$value['addr'] = !empty($value['addr']) ? $value['addr'] : '';
 			$value['addr'] = htmlspecialchars(
 				(FLEXI_J30GE ? JStringPunycode::emailToUTF8($value['addr']) : $value['addr']),
@@ -172,7 +172,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 					<label class="label">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_ADDR' ).'</label>
 					<input class="avs_addr fcfield_textval'.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
-			
+
 			$full = '';
 			if ($usefull) {
 				$value['full'] = !empty($value['full']) ? $value['full'] : '';
@@ -183,7 +183,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 					<input class="avs_full fcfield_textval" name="'.$fieldname_n.'[full]" type="text" size="'.$size.'" value="'.$value['full'].'" />
 				</div>';
 			}
-			
+
 			$first = '';
 			if ($usefirst) {
 				$value['first'] = !empty($value['first']) ? $value['first'] : '';
@@ -194,7 +194,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 					<input class="avs_first fcfield_textval" name="'.$fieldname_n.'[first]" type="text" size="'.$size.'" value="'.$value['first'].'" />
 				</div>';
 			}
-			
+
 			$last = '';
 			if ($uselast) {
 				$value['last'] = !empty($value['last']) ? $value['last'] : '';
@@ -205,7 +205,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 					<input class="avs_last fcfield_textval" name="'.$fieldname_n.'[last]" type="text" size="'.$size.'" value="'.$value['last'].'" />
 				</div>';
 			}
-			
+
 			$field->html[] = '
 				'.$addr.'
 				'.$full.'
@@ -213,23 +213,23 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				'.$last.'
 				';
 		}
-		
+
 		if ( !count($field->html) && $field->formhidden!=4 ) $field->html[] = '';
 		$field->html = !count($field->html) ? null : '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
 		//$field->{$prop} = $field->label . " : this field is not meant to be used for display, only meant for item form";
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -238,11 +238,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		// Check if item is an existing item, being modified, if so then nothing to do
 		$isnew = $item->_isnew;
 		if (!$isnew) return;
-		
+
 		// Check if user is logged, if so then nothing to do
 		$user = JFactory::getUser();
 		if ($user->id)
@@ -250,32 +250,32 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$post = array();
 			return;
 		}
-		
+
 		// Check if not inside form
 		$app = JFactory::getApplication();
 		$layout = $app->input->get('layout', '', 'cmd');
 		$task   = $app->input->get('task', '', 'cmd');
 		if ( $layout != "form" && $task != 'add' && $task != 'edit' ) return;
-		
-		
+
+
 		// Server side validation
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
-		
-		// Make sure posted data is an array 
+
+		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
 		if ( !isset($post[0]) )
 		{
 			JError::raiseWarning(0, 'empty FORM data for field: Account via submit');
 			return false;
 		}
-		
-		
+
+
 		// **************************************************************
 		// Validate data, skipping values that are empty after validation
 		// **************************************************************
-		
+
 		$email = flexicontent_html::dataFilter($post[0]['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
-		
+
 		// Cancel item creation, if email is invalid
 		if ( !$email || !JMailHelper::isEmailAddress($email) )
 		{
@@ -285,7 +285,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			JError::raiseWarning(0, $error);
 			return false;
 		}
-				
+
 		$full  = flexicontent_html::dataFilter(@$post[0]['full'], 0, 'STRING', 0);
 		$first = flexicontent_html::dataFilter(@$post[0]['first'], 0, 'STRING', 0);
 		$last  = flexicontent_html::dataFilter(@$post[0]['last'], 0, 'STRING', 0);
@@ -296,15 +296,15 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		}
 		$name = trim($full ? $full : $first.' '.$last);
 		$name = $name ? $name : $email;
-		
+
 		// Make sure field is initialized
 		$this->initialize($field);
-		
+
 		// Check email already used
 		$db = JFactory::getDbo();
 		$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
 		$existingUserID = $db->loadResult();
-		
+
 		// HANDLE existing user
 		if ( $existingUserID )
 		{
@@ -318,13 +318,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			// Account with given email exists, set as item's author
 			$item->created_by = $existingUserID;
 		}
-		
+
 		// CREATE new user
 		else if ( $field->parameters->get('create_accounts', 0) )
 		{
 			$username = $email; // EMAIL used as username
 			$newUserID = $this->registerUser($name, $username, $email, $password, $gender, $field);
-			
+
 			if ($newUserID === false) {
 				// Cancel item creation, if email creation returns false
 				$notice = JText::_('FLEXI_ACCOUNT_V_SUBMIT_ACCOUNT_CREATION_FAILED');
@@ -336,8 +336,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		} else {
 			// item will have the 'default' owner ...
 		}
-		
-		
+
+
 		// CREATE EDIT COUPON
 		$create_coupons = $field->parameters->get( 'create_coupons', 0 ) ;
 		if ($create_coupons)
@@ -361,13 +361,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			}
 		}
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
@@ -377,27 +377,27 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	function initialize(&$field)
 	{
 		if ( $field->parameters->get('initialized',0) ) return;  // initialization already done
-		
+
 		// Execute SQL installation file
 		$sql_file = dirname(__FILE__) .DS. 'installation' .DS. 'install.mysql.utf8.sql';
 		flexicontent_db::execute_sql_file($sql_file);
-		
+
 		$attribs = json_decode($field->attribs);
 		$attribs->initialized = 1;
 		$attribs = json_encode($attribs);
-		
+
 		$db = JFactory::getDbo();
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
 		$db->setQuery($query);
 		$result = $db->execute();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 	}
-	
-	
+
+
 	public static function registerUser($name, $username, $email, $password, $gender, &$field)
 	{
 		// Initialize new usertype setting
@@ -406,22 +406,22 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		jimport('cms.component.helper');
 		JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
 		JFactory::getLanguage()->load('com_users', JPATH_SITE, null, true);
-		
+
 		$app = JFactory::getApplication();
 		$db = JFactory::getDbo();
 		$usersConf = JComponentHelper::getParams( 'com_users' );
-		
+
 		$useractivation = $field->parameters->get('useractivation', $usersConf->get('useractivation', 2)); // Default: use Joomla com_users setting (2=user self-activation)
 		$new_usertype   = $field->parameters->get('new_usertype',  $usersConf->get('useractivation', 2));  // Default: use Joomla com_users setting (2=registered)
 		$mail_to_admin  = $field->parameters->get('mail_to_admin', $usersConf->get('mail_to_admin', 1));  // Default: use Joomla com_users setting (1=enabled)
 		$adm_email_bcc  = $field->parameters->get('adm_email_bcc', 1);  // Default: send single email to admins as BCC
-		
+
 		// Add 'salt' to password
 		$password_clear = $password;
 		$salt     = JUserHelper::genRandomPassword(32);
 		$crypted  = JUserHelper::getCryptedPassword($password_clear, $salt);
 		$password = $crypted.':'.$salt;
-		
+
 		$instance = JUser::getInstance();
 		$instance->set('id',       0);
 		$instance->set('name',     $name);
@@ -431,10 +431,10 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$instance->set('email',    $email);
 		$instance->set('usertype', 'deprecated');
 		$instance->set('groups',   array($new_usertype));
-		
+
 		// Here is possible set user profile details
 		$instance->set('profile',  array('gender' =>  $gender));
-		
+
 		// Email with activation link
 		if ($useractivation == 2 || $useractivation == 1)
 		{
@@ -452,23 +452,23 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			if ($existingUserID) return -$existingUserID;
 			else return false;
 		}
-		
+
 		// Make sure user was created
 		$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
 		$newUserID = $db->loadResult();
 		$user = JFactory::getUser($newUserID);
-		
+
 		// User creation failed ?? !!
 		if ( !$user->id )  return false;
-		
+
 		$data = $user->getProperties();
 		$data['fromname'] = $app->getCfg('fromname');
 		$data['mailfrom'] = $app->getCfg('mailfrom');
 		$data['sitename'] = $app->getCfg('sitename');
 		$data['siteurl'] = JUri::root();
 		$data['password_clear'] = $password_clear;
-		
-		
+
+
 		switch ($useractivation) {
 		case 2:  // self-activate via link in email
 		case 1:  // verify via link in email, then admin is notified and activates the account
@@ -476,7 +476,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			$uri = JUri::getInstance();
 			$base = $uri->toString(array('scheme', 'user', 'pass', 'host', 'port'));
 			$data['activate'] = $base . JRoute::_('index.php?option=com_users&task=registration.activate&token=' . $data['activation'], false);
-			
+
 			$emailSubject = JText::sprintf( 'COM_USERS_EMAIL_ACCOUNT_DETAILS', $data['name'], $data['sitename'] );
 			$emailBody = JText::sprintf(
 				($useractivation == 2 ? 'COM_USERS_EMAIL_REGISTERED_WITH_ADMIN_ACTIVATION_BODY' : 'COM_USERS_EMAIL_REGISTERED_WITH_ACTIVATION_BODY'),
@@ -485,7 +485,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				$data['username'], $data['password_clear']
 			);
 			break;
-		
+
 		case 0:   // Instant account activation without verification, just notify the user of his/her account
 		default:
 			$emailSubject = JText::sprintf( 'COM_USERS_EMAIL_ACCOUNT_DETAILS', $data['name'], $data['sitename'] );
@@ -497,16 +497,16 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			);
 			break;
 		}
-		
+
 		// Clean the email data
 		//$emailSubject = JMailHelper::cleanSubject($emailSubject);
 		//$emailBody    = JMailHelper::cleanBody($emailBody);
 		//$fromname     = JMailHelper::cleanAddress($data['fromname']);
 		$recipient = array($email);
-		
+
 		$html_mode=true; $cc=null; $bcc=null;
 		$attachment=null; $replyto=null; $replytoname=null;
-		
+
 		// Send the email
 		$send_result = JFactory::getMailer()->sendMail(
 			$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
@@ -526,7 +526,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				'COM_USERS_EMAIL_REGISTERED_NOTIFICATION_TO_ADMIN_BODY',
 				$data['name'], $data['username'],	$data['siteurl']
 			);
-			
+
 			// Get all admin users
 			$query->clear()
 				->select($db->quoteName(array('name', 'email', 'sendEmail')))
@@ -542,7 +542,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				JError::raiseError(500, JText::sprintf('COM_USERS_DATABASE_ERROR', $e->getMessage()));
 				return false;
 			}
-			
+
 			// Send single mail to all superadministrators id
 			$adm_emails = array();
 			foreach ($rows as $row) {
@@ -551,7 +551,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			}
 			$recipient = $adm_email_bcc ? array($data['mailfrom']) : $adm_emails;
 			$bcc = $adm_email_bcc ? $adm_emails : null;
-			
+
 			// Remove main recepient from BCC, to avoid email failing
 			if ($bcc)
 			{
@@ -568,55 +568,55 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				return false;
 			}
 		}
-		
+
 		return $newUserID;
 	}
-	
-	
+
+
 	function sendEditCoupon(&$item, &$field, $email, $token)
 	{
 		$db  = JFactory::getDbo();
 		$app = JFactory::getApplication();
-		
+
 		$SiteName	= $app->getCfg('sitename');
 		$mailfrom = $app->getCfg('mailfrom');
 		$fromname = $app->getCfg('fromname');
-		
+
 		// Check for a valid from address
 		if (! $mailfrom || ! JMailHelper::isEmailAddress($mailfrom))
 		{
 			$notice = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_INVALID_EMAIL', $mailfrom);
 			JError::raiseWarning(0, $notice);
 		}
-		
+
 		$subject = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_YOUR_NEW_ITEM_AT', $SiteName);
 		$desc    = JText::_( $field->parameters->get('coupon_desc'), '...' );
-		$link = JRoute::_( 
+		$link = JRoute::_(
 			JUri::root(false).
 			//'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$item->catid.'&id='.$item->id.
 			FlexicontentHelperRoute::getItemRoute($item->id, $item->catid).
 			'&task=edit&edittok='.$token
 		);
-		
+
 		// Build the message to send
 		$body  = JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_EDIT_LINK_SEND_INFO', $SiteName, $fromname, $mailfrom, $link);
 		$body	.= "\n\n".$desc; // Extra text
-		
+
 		// Clean the email data
 		$emailSubject = JMailHelper::cleanSubject($subject);
 		$emailBody    = JMailHelper::cleanBody($body);
 		$fromname     = JMailHelper::cleanAddress($fromname);
 		$recipient = array($email);
-		
+
 		$html_mode=true; $cc=null; $bcc=null;
 		$attachment=null; $replyto=null; $replytoname=null;
-		
+
 		// Send the email
 		$send_result = JFactory::getMailer()->sendMail(
 			$mailfrom, $fromname, $recipient, $emailSubject, $emailBody,
 			$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 		);
-		
+
 		if ( $send_result !== true )
 		{
 			JError::raiseWarning(500, JText:: _ ('FLEXI_ACCOUNT_V_SUBMIT_EDIT_LINK_NOT_SENT'));
@@ -624,5 +624,5 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		}
 		return true;
 	}
-	
+
 }

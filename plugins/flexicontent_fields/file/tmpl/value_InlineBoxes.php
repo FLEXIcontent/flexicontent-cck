@@ -128,8 +128,8 @@ foreach($values as $file_id)
 			</span>
 		</span>';
 	}
-	
-	
+
+
 	// c. SIZE: in KBs / MBs
 	$sizeinfo = '';
 	if ($display_size)
@@ -146,8 +146,8 @@ foreach($values as $file_id)
 			$sizeinfo .= '<span class="fcfile_size_value value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_GBS').'</span>';
 		$sizeinfo .= '</span>';
 	}
-	
-	
+
+
 	// d. HITS: either as icon or as inline text or both
 	$hits = '';
 	if ($display_hits)
@@ -165,8 +165,8 @@ foreach($values as $file_id)
 		$hits .= '</span>';
 	}
 	$field->hits_total += $file_data->hits;
-	
-	
+
+
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
 	$filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
 	$filetitle_escaped = htmlspecialchars($filetitle, ENT_COMPAT, 'UTF-8');
@@ -218,7 +218,7 @@ foreach($values as $file_id)
 	// ***
 	// *** Create field's displayed html
 	// ***
-	
+
 	$html = '';
 
 
@@ -266,12 +266,12 @@ foreach($values as $file_id)
 
 
 	// [4]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
-	
+
 	$actions_arr = array();
 
 
 	// ***
-	// *** CASE 1: no download ... 
+	// *** CASE 1: no download ...
 	// ***
 
 	// EITHER (a) Current user NOT authorized to download file AND no access URL is not configured
@@ -286,11 +286,11 @@ foreach($values as $file_id)
 	// *** CASE 2: Display download button passing file variables via a mini form
 	// *** (NOTE: the form action can be a no access url if user is not authorized to download file)
 	// ***
-	
+
 	else if ($usebutton)
 	{
 		$file_classes .= ' btn';  // ' fc_button fcsimple';   // Add an extra css class (button display)
-		
+
 		// DOWNLOAD: single file instant download
 		if ($allowdownloads)
 		{
@@ -303,7 +303,7 @@ foreach($values as $file_id)
 					'<input type="hidden" name="fc_item_id" value="'.$item->id.'"/>'."\n".
 					'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
 			}
-			
+
 			// The download button in a mini form ...
 			$actions_arr[] = ''
 				.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
@@ -311,7 +311,7 @@ foreach($values as $file_id)
 				.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' btn-success fcfile_downloadFile" title="'.$downloadsinfo.'" value="'.$downloadstext.'"/>'
 				.'</form>'."\n";
 		}
-		
+
 		if ($authorized && $allowview && !$file_data->url)
 		{
 			$actions_arr[] = '
@@ -322,13 +322,13 @@ foreach($values as $file_id)
 				</a>';
 			$fancybox_needed = 1;
 		}
-		
+
 		// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
 		if ($authorized && $allowaddtocart && !$file_data->url)
 		{
 			// CSS class to anchor downloads list adding function
 			$addtocart_classes = $file_classes . ' fcfile_addFile';
-			
+
 			$attribs = ' class="'. $addtocart_classes .'"'
 				. ' title="'. $addtocartinfo .'"'
 				. ' data-filename="'. $filetitle_escaped .'"'
@@ -338,8 +338,8 @@ foreach($values as $file_id)
 			$actions_arr[] =
 				'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
 		}
-		
-		
+
+
 		// SHARE FILE VIA EMAIL: open a popup or inline email form ...
 		if ($is_public && $allowshare && !$com_mailto_found)
 		{
@@ -361,7 +361,7 @@ foreach($values as $file_id)
 
 
 	// ***
-	// *** CASE 3: display a download link (with file title or filename) passing variables via the URL 
+	// *** CASE 3: display a download link (with file title or filename) passing variables via the URL
 	// *** (NOTE: the target link can be a no access url if user is not authorized to download file)
 	// ***
 
@@ -378,7 +378,7 @@ foreach($values as $file_id)
 					'&fc_item_id="'.$item->id.
 					'&fc_file_id="'.$file_id;
 			}
-			
+
 			// The download link, if filename/title not shown, then display a 'download' prompt text
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
@@ -395,13 +395,13 @@ foreach($values as $file_id)
 				</a>';
 			$fancybox_needed = 1;
 		}
-		
+
 		// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
 		if ($authorized && $allowaddtocart && !$file_data->url)
 		{
 			// CSS class to anchor downloads list adding function
 			$addtocart_classes = $file_classes . ' fcfile_addFile';
-			
+
 			$attribs  = ' class="'. $addtocart_classes .'"'
 				. ' title="'. $addtocartinfo .'"'
 				. ' filename="'. $filetitle_escaped .'"'
@@ -413,7 +413,7 @@ foreach($values as $file_id)
 					' . $addtocarttext . '
 				</a>';
 		}
-		
+
 		// SHARE FILE VIA EMAIL: open a popup or inline email form ...
 		if ($is_public && $allowshare && !$com_mailto_found)
 		{
@@ -432,7 +432,7 @@ foreach($values as $file_id)
 				.'</a>';
 		}
 	}
-	
+
 	//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
 	$html =
 		($buttonsposition ? $html : '') .
