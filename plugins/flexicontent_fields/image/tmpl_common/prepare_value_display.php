@@ -18,13 +18,13 @@
 		return _FC_CONTINUE_;
 	}
 	$i++;
-	
+
 	// Some types contain sub-path together with the image name (relative to joomla folder)
 	if ( is_array($orig_urlpath) )
 	{
 		$orig_urlpath[$i] = str_replace('\\', '/', dirname($image_subpath));
 	}
-	
+
 	// In other cases check for sub-path relative to the calculated 'original path'
 	else
 	{
@@ -45,28 +45,28 @@
 	$title	= ($usetitle && isset($value['title'])) ? $value['title'] : '';
 	$alt	= ($usealt && isset($value['alt'])) ? $value['alt'] : $alt_image_prefix . ($n + 1);
 	$desc	= ($usedesc && isset($value['desc'])) ? $value['desc'] : '';
-	
+
 	// Optional custom properties
 	$cust1	= ($usecust1 && isset($value['cust1'])) ? $value['cust1'] : '';
 	$desc .= $cust1 ? $cust1_label.': '.$cust1 : '';  // ... Append custom properties to description
 	$cust2	= ($usecust2 && isset($value['cust2'])) ? $value['cust2'] : '';
 	$desc .= $cust2 ? $cust2_label.': '.$cust2 : '';  // ... Append custom properties to description
-	
+
 	// HTML encode output
 	$title= htmlspecialchars($title, ENT_COMPAT, 'UTF-8');
 	$alt	= htmlspecialchars($alt, ENT_COMPAT, 'UTF-8');
 	$desc	= htmlspecialchars($desc, ENT_COMPAT, 'UTF-8');
-	
+
 	$srcb = $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
 	$srcs = $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
 	$srcm = $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
 	$srcl = $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
 	$srco = (is_array($orig_urlpath) ? $orig_urlpath[$i] : $orig_urlpath)  . '/'   .$image_name;  // original image
-	
+
 	// Create a popup url link
 	$urllink = isset($value['urllink']) ? $value['urllink'] : '';
 	//if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
-	
+
 	// Create a popup tooltip (legend)
 	$class = 'fc_field_image';
 	if ($uselegend && (!empty($title) || !empty($desc)))
@@ -78,13 +78,13 @@
 	{
 		$legend = '';
 	}
-	
+
 	// Handle single image display, with/without total, TODO: verify all JS handle & ignore display none on the img TAG
 	$style = ($i!=0 && $isSingle) ? 'display:none;' : '';
-	
+
 	// Create a unique id for the link tags, and a class name for image tags
 	$uniqueid = $item->id . '_' . $field->id . '_' . $i;
-	
+
 	switch ($thumb_size)
 	{
 		case -1: $src = $srcb; break;
@@ -94,25 +94,25 @@
 		case 4: $src = $srco; break;
 		default: $src = $srcs; break;
 	}
-	
-	
+
+
 	// Create a grouping name
 	switch ($grouptype)
 	{
 		// This field only
 		case 0: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id.'_fcfield_'.$field->id; break;
-		
+
 		// All fields of the item
 		case 1: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id; break;
-		
+
 		// Per view:  all items of category page, or search page
 		case 2: $group_name = 'fcview_'.$view; break;
-		
+
 		// No group
 		default: $group_name = ''; break;
 	}
-	
-	
+
+
 	// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only (for consistency use 'use_ingroup' of 'ingroup')
 	if ($use_ingroup)
 	{
@@ -139,13 +139,13 @@
 	$field->thumbs_src['medium'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcm;
 	$field->thumbs_src['large'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcl;
 	$field->thumbs_src['original'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srco;
-	
+
 	$field->thumbs_path['backend'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcb;
 	$field->thumbs_path['small'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcs;
 	$field->thumbs_path['medium'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcm;
 	$field->thumbs_path['large'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
 	$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
-	
+
 	// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
 	if ( $isHtmlViewFE && $useogp )
 	{
@@ -166,7 +166,7 @@
 
 	// ***
 	// *** CHECK if we were asked for value only display (e.g. image source)
-	// *** if so we will not be creating the HTML code for Image / Gallery 
+	// *** if so we will not be creating the HTML code for Image / Gallery
 	// ***
 
 	if ( isset(self::$value_only_displays[$prop]) )
@@ -240,5 +240,5 @@
 			</div>';
 		}
 	}
-	
+
 	return 0;

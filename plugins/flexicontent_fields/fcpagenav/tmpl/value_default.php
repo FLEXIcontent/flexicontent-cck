@@ -55,7 +55,7 @@ else
 		</span>
 	';
 }
-		
+
 // Item location and total count
 $html .= $show_prevnext_count ? '<span class="fcpagenav-items-cnt btn disabled">'.($location+1).' / '.$item_count.'</span>' : '';
 
@@ -86,5 +86,5 @@ else
 		</span>
 	';
 }
-		
+
 $html .= '</span>';

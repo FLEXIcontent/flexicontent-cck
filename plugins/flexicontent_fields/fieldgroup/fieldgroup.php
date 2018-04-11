@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,7 +36,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
 		$use_ingroup = 0; // Field grouped should not be recursively grouped
 
@@ -54,7 +54,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$user = JFactory::getUser();
 		$app  = JFactory::getApplication();
 		$isAdmin = $app->isAdmin();
-		
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = 'btn'; //$cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = 'btn-group'; //$cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -70,19 +70,19 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
-		
-		
+
+
 		// **************
 		// Value handling
 		// **************
-		
+
 		// Get fields belonging to this field group
 		$grouped_fields = $this->getGroupFields($field);
-		
+
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 1;
 		$this->getGroupFieldsValues($field, $item, $grouped_fields, $max_count);
-		
+
 		// Render Form HTML of the field
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 		$js = "";
 		$css = "";
-		
+
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
@@ -125,14 +125,14 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.fc-toggle-group-up').data('fc_noeffect', 1).trigger('click');" : "")
 			."});
 			";
-			
+
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".$max_count.";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".$max_count.";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 			";
-		
+
 			// Create function call for add/deleting Field values
 			$addField_pattern = "
 				var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
@@ -180,7 +180,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				$addField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($addField_pattern, $grouped_field->name)  );
 				$delField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($delField_pattern, $grouped_field->name)  );
 			}
-		
+
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -188,17 +188,17 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				
+
 				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-				
+
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().find('ul.fcfield-sortables').children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
-				
+
 				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
 				var theSet = newField.find('input, select');
 				var nr = 0;
@@ -209,39 +209,39 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					nr++;
 				});
 				";
-			
+
 			// Add new field to DOM
 			$js .= "
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				";
-			
+
 			// Add new element to sortable objects (if field not in group) -- NOTE: remove_previous: 2 means remove element without do any cleanup actions
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				
+
 				// Add new values for each field
 				var groupval_box = newField;
 				var add_params = {remove_previous: 2, scroll_visible: 0, animate_visible: 0};
 				".$addField_funcs."
 				";
-			
+
 			// Readd prettyCheckable and remove previous if so requested
 			$js .="
 				if (remove_previous) lastField.remove();
 				";
-				
+
 			// Show new field, increment counters
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-				
+
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-				
+
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -254,7 +254,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 				// Find field value container
 				var row = btn.closest('li');
-				
+
 				// Do cleanup by calling the deleteField of each individual field, these functions will re-add last element as empty if needed
 				var groupval_box = jQuery(el).closest('li');
 				".$delField_funcs."
@@ -262,7 +262,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				{
 					uniqueRowNum".$field->id."++;   // increment unique row id, since last group was re-added
 				}
-				
+
 				// Also remove the group field values container if not last one
 				if (rowCount".$field->id." > 1)
 				{
@@ -277,9 +277,9 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				}
 			}
 			";
-			
+
 			$css .= '';
-			
+
 			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
@@ -304,14 +304,14 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$js .= '';
 			$css .= '';
 		}
-		
+
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		
+
 		$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 		$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
-		
-		
+
+
 		if ($compact_edit)
 		{
 			$compact_edit_excluded = $field->parameters->get('compact_edit_excluded', array());
@@ -319,8 +319,8 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			if ( !is_array($compact_edit_excluded) )  $compact_edit_excluded = preg_split("/[\|,]/", $compact_edit_excluded);
 			$compact_edit_excluded = array_flip($compact_edit_excluded);
 		}
-		
-		
+
+
 		$field->html = array();
 		for ($n = 0; $n < $max_count; $n++)
 		{
@@ -333,7 +333,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					'.(!$add_position ? '' : $add_here).'
 				</div>
 				');
-			
+
 			// Append item-form display HTML of the every field in the group
 			$i = 0;
 			foreach($grouped_fields as $field_id => $grouped_field)
@@ -345,7 +345,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
 				}
 
-				// Check for not-assigned to type fields, 
+				// Check for not-assigned to type fields,
 				if (!isset($grouped_field->html[$n]))
 				{
 					if ($form_empty_fields)
@@ -365,7 +365,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon ' : ' ') .$tooltip_class;
 					 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $grouped_field->description, 0, 1);
 				}
-				
+
 				$field->html[$n] .= '<div class="fcclear"></div>
 				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'">
 					<label id="custom_'.$grouped_field->name.'_'.$n.'-lbl" class="'.$lbl_class.'" title="'.$lbl_title.'" data-for="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
@@ -377,10 +377,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				';
 				$i++;
 			}
-			
+
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-		
+
 		// Non value HTML
 		$non_value_html = '';
 		foreach($grouped_fields as $field_id => $grouped_field)
@@ -394,7 +394,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 			$non_value_html .= @$grouped_field->html[-1];
 		}
-		
+
 		// Implode form HTML as a list
 		$list_classes  = "fcfield-sortables";
 		$list_classes .= " fcfield-group";
@@ -414,11 +414,11 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.fc-show-vals-btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>
 			</div>
 		';
-		
+
 		// Check max allowed version
 		//$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
 		//$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
-		
+
 		// Append non value html of fields
 		$field->html =
 			($non_value_html ? $non_value_html . '<div class="fcclear"></div>' : '') .
@@ -438,8 +438,8 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				' : '').'
 			'.$field->html;
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
@@ -629,9 +629,9 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$field->{$prop} = '';
 		}
 	}
-	
-	
-	
+
+
+
 	// Helper method to create HTML display of an item list according to replacements
 	private function _createDisplayHTML(&$field, &$item, &$grouped_fields, $custom_html, $max_count, $pretext, $posttext)
 	{
@@ -639,13 +639,13 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		// Parse and identify custom fields
 		// ********************************
 		//return array('"<b>Custom HTML</b>" display for fieldgroup field, is not implemented yet, please use default HTML');
-		
+
 		if (!$custom_html) return "Empty custom HTML variable for group field: ". $field->label;
 		$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)(##)?([a-zA-Z_0-9-]+)?\}\}/", $custom_html, $field_matches);
 		$gf_reps    = $result ? $field_matches[0] : array();
 		$gf_names   = $result ? $field_matches[1] : array();
 		$gf_methods = $result ? $field_matches[3] : array();
-		
+
 		//foreach ($gf_names as $i => $gf_name)
 		//	$parsed_fields[] = $gf_names[$i] . ($gf_methods[$i] ? "->". $gf_methods[$i] : "");
 		//echo "$custom_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";
@@ -655,24 +655,24 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$_name_to_field[$grouped_field->name] = $grouped_fields[$i];
 		}
 		//print_r(array_keys($_name_to_field)); echo "<br/>";
-		
-		
+
+
 		// ***********************************************************************
 		// Parse and identify language strings and then make language replacements
 		// ***********************************************************************
-		
+
 		$result = preg_match_all("/\%\%([^%]+)\%\%/", $custom_html, $translate_matches);
 		$translate_strings = $result ? $translate_matches[1] : array('FLEXI_READ_MORE_ABOUT');
 		foreach ($translate_strings as $translate_string)
 		{
 			$custom_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $custom_html);
 		}
-		
-		
+
+
 		// **************************************************************
 		// Render HTML of grouped fields mentioned inside the custom HTML
 		// **************************************************************
-		
+
 		$_rendered_fields = array();
 		if ( count($gf_names) )
 		{
@@ -736,16 +736,16 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				}
 			}
 		}
-		
-		
+
+
 		// *******************************************************************
 		// Render the value list of the fieldgroup, using custom HTML for each
 		// value-set of the fieldgroup, and performing the field replacements
 		// *******************************************************************
-		
+
 		// Get labels to hide on empty values
 		$hide_lbl_ifnoval = $this->getHideLabelsOnEmpty($field);
-		
+
 		$custom_display = array();
 		//echo "<br/>max_count: ".$max_count."<br/>";
 		for($n=0; $n < $max_count; $n++)
@@ -776,10 +776,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 		return $custom_display;
 	}
-	
-	
-	
-	
+
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -788,25 +788,25 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		// field_type is not changed text field can handle this field type
 		//FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		// field_type is not changed text field can handle this field type
 		//FLEXIUtilities::call_FC_Field_Func('text', 'onAfterSaveField', array(&$field, &$post, &$file, &$item));
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		// field_type is not changed text field can handle this field type
 		//FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeDeleteField', array(&$field, &$item));
 	}
@@ -816,13 +816,13 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	// Retrieves the fields that are part of the given 'fieldgroup' field
 	function getGroupFields(&$field)
 	{
 		static $grouped_fields = array();
 		if (isset($grouped_fields[$field->id])) return $grouped_fields[$field->id];
-		
+
 		$fieldids = $field->parameters->get('fields', array());
 		if ( empty($fieldids) ) {
 			$fieldids = array();
@@ -830,11 +830,11 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		if ( !is_array($fieldids) ) {
 			$fieldids = preg_split("/[\|,]/", $fieldids);
 		}
-		
+
 		if ( empty($fieldids) ) {  // No assigned fields
-			return $grouped_fields[$field->id] = array();  
+			return $grouped_fields[$field->id] = array();
 		}
-		
+
 		$db = JFactory::getDbo();
 		$query = 'SELECT f.* '
 			. ' FROM #__flexicontent_fields AS f '
@@ -844,7 +844,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			;
 		$db->setQuery($query);
 		$grouped_fields[$field->id] = $db->loadObjectList('id');
-		
+
 		$_grouped_fields = array();
 		foreach($grouped_fields[$field->id] as $field_id => $grouped_field)
 		{
@@ -852,22 +852,22 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			if (empty($grouped_field->parameters)) {
 				$grouped_field->parameters = new JRegistry($grouped_field->attribs);
 			}
-			
+
 			// Check if field is not set to participate in a field group and skip it
 			if ( !$grouped_field->parameters->get('use_ingroup') ) continue;
 			$_grouped_fields[$field_id] = $grouped_field;
 		}
 		$grouped_fields[$field->id] = $_grouped_fields;
-		
+
 		return $grouped_fields[$field->id];
 	}
-	
-	
+
+
 	// Retrieves and add values to the given field objects
 	function getGroupFieldsValues(&$field, &$item, &$grouped_fields, &$max_count)
 	{
 		$do_compact = true;
-		
+
 		// ****************
 		// Get field values
 		// ****************
@@ -886,14 +886,14 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			else {
 				$grouped_field->value = null;
 			}
-			
+
 			// Update max value index
 			$last_index = !is_array($grouped_field->value) || !count($grouped_field->value) ? 0 : max(array_keys($grouped_field->value));
 			$max_index = $last_index > $max_index ? $last_index : $max_index;
 		}
 		//echo "<br/><br/><br/>DB DATA<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
-		
-		
+
+
 		// ***********************************************************************************
 		// (Compatibility) For groups that have fields with non-set values, add NULL values
 		// This way the field will not skip the value and instead will create an empty display
@@ -916,8 +916,8 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		}
 		//echo "<br/><br/><br/>NULLED<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
 		//echo "<pre>"; print_r($null_count); echo "</pre>";
-		
-		
+
+
 		// *********************************
 		// Find groups that had empty values
 		// *********************************
@@ -926,16 +926,16 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			if ( isset($null_count[$n]) && $null_count[$n]==count($grouped_fields) )  $grp_isempty[$n] = 1;
 		}
 		//print_r($grp_isempty); exit;
-		
-		
+
+
 		// *************************************************************************
 		// Compact FIELD GROUP values by removing groups that are (ALL values) empty
 		// *************************************************************************
-		
+
 		// Make sure we have some empty fieldgroups, if this was requested (= that is the max_count that was passed to the function)
 		$start_at = $max_count + count($grp_isempty) - ($max_index+1);
 		if ($start_at < 0) $start_at = 0;
-		
+
 		if ($do_compact) foreach($grouped_fields as $field_id => $grouped_field)
 		{
 			$i = $start_at;
@@ -952,7 +952,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 						if ( isset($item->fields[$grouped_field->name]->value) )  $item->fields[$grouped_field->name]->value[$i] = $grouped_field->value[$n];
 					}
 				}
-				
+
 				// Unset moved groups or group with ALL-empty values
 				if ( $n > $i || isset($grp_isempty[$n]) )
 				{
@@ -960,31 +960,31 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					if ( isset($item->fieldvalues[$field_id]) ) unset($item->fieldvalues[$field_id][$n]);
 					if ( isset($item->fields[$grouped_field->name]->value) ) unset($item->fields[$grouped_field->name]->value[$n]);
 				}
-				
+
 				// Increment adding position if group was not empty
 				if ( !isset($grp_isempty[$n]) ) $i++;
 			}
 		}
 		//echo "<br/><br/><br/>COMPACTED<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
-		
+
 		$max_count = $max_index + 1;
 		if ($do_compact) $max_count -= (count($grp_isempty) - $start_at);
 		//echo $field->label.": max_count = $max_count <br/>";
 	}
-	
-	
+
+
 	// Return the fields (ids) that will hide their labels if they have no value
 	function getHideLabelsOnEmpty(&$field)
 	{
 		static $hide_lbl_ifnoval_arr = array();
 		if (isset($hide_lbl_ifnoval_arr[$field->id])) return $hide_lbl_ifnoval_arr[$field->id];
-		
+
 		$hide_lbl_ifnoval = $field->parameters->get('hide_lbl_ifnoval', array());
 		if ( empty($hide_lbl_ifnoval) )  $hide_lbl_ifnoval = array();
 		if ( !is_array($hide_lbl_ifnoval) )  $hide_lbl_ifnoval = preg_split("/[\|,]/", $hide_lbl_ifnoval);
 		$hide_lbl_ifnoval_arr[$field->id] = array_flip($hide_lbl_ifnoval);
-		
+
 		return $hide_lbl_ifnoval_arr[$field->id];
 	}
-	
+
 }

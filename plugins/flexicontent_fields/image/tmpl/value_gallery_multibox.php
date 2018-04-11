@@ -59,8 +59,8 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 			opac:0.7,            //(decimal) overlay opacity Default: 0.7
 			useOverlay:false,    //(boolean) use a semi-transparent background. Default: false
 			overlaybg:'01.png',  //(string) overlay image in 'overlays' folder. Default: '01.png'
-			onOpen:function(){},   //(object) a function to call when the box opens. Default: function(){} 
-			onClose:function(){},  //(object) a function to call when the box closes. Default: function(){} 
+			onOpen:function(){},   //(object) a function to call when the box opens. Default: function(){}
+			onClose:function(){},  //(object) a function to call when the box closes. Default: function(){}
 			easing:'swing',        //(string) effect of jQuery Default: 'swing'
 			useratio:false,        //(boolean) windows size follows ratio. (iframe or Youtube) Default: false
 			ratio:'90'             //(number) window ratio Default: '90'

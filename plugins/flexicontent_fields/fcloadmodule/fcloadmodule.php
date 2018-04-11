@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,25 +36,25 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
-		
+
 		// initialise property
 		if ( empty($field->value[0]) )
 		{
 			$field->value[0] = '';
 		}
-		
+
 		$document	= JFactory::getDocument();
-		
+
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
 		$mod_params	= $field->parameters->get( 'mod_params', '') ;
 		$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
-		
+
 		if ( empty($mod_params[0]) ) return;
-		
+
 		$field->html = array();
 		$n = 0;
 
@@ -99,7 +99,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		{
 			$values = array(array());
 		}
-		
+
 		$unserialize_vals = true;
 		if ($unserialize_vals)
 		{
@@ -159,7 +159,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 
 			// *****************************
-			// Set module parameter per item 
+			// Set module parameter per item
 			// *****************************
 			$mod_params	= $field->parameters->get( 'mod_params', '') ;
 			$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
@@ -208,9 +208,9 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		$display = trim( implode('', $display) );
 		$field->{$prop} = strlen( $display ) ? $display : null;
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -220,17 +220,17 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
-		
-		// Make sure posted data is an array 
+
+		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
@@ -240,16 +240,16 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	function _getModuleObject($id)
 	{
 		$db = JFactory::getDbo();
-		
+
 		$query 	= 'SELECT * FROM #__modules'
 				. ' WHERE id = ' . (int)$id
 				;
 		$db->setQuery($query);
-				
+
 		return $db->loadObject();
 	}
 

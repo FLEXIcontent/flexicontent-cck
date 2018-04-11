@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -39,13 +39,13 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		return false;
 	}
 
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		static $users = null;
 		if ($users === null)
 		{
@@ -54,7 +54,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
 			JFactory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}
-		
+
 		$displayed_user = $field->parameters->get('displayed_user', 1);
 		switch($displayed_user)
 		{
@@ -68,7 +68,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				$user_id = $users[-1]->id;
 				$user = $users[-1];
 				break;
-				
+
 			// User selected in item form
 			case 2:
 				$user_id = (int) reset($field->value);
@@ -78,7 +78,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 					$user = $users[$user_id];
 				}
 				break;
-				
+
 			// Item's author
 			default:
 			case 1:
@@ -90,13 +90,13 @@ class plgFlexicontent_fieldsJProfile extends FCField
 				}
 				break;
 		}
-		
+
 		$user->params = new JRegistry($user->params);
 		$user->params = $user->params->toArray();
-		
+
 		$user->profile = JUserHelper::getProfile( $user_id );
 		//echo "<pre>"; echo print_r($user); echo "</pre>";
-		
+
 		$field->{$prop} = '
 		<span class="alert alert-info fc-iblock" style="min-width:50%; margin-bottom:0px;">'.JText::_('COM_USERS_PROFILE_CORE_LEGEND').'</span><br/>
 		<dl class="dl-horizontal">
@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			').'
 		</dl>
 		';
-		
+
 		$profile_info = array();
 		if (!empty($user->profile->profile)) foreach($user->profile->profile as $pname => $pval) {
 			$profile_info[] = '
@@ -147,13 +147,13 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			<dl class="dl-horizontal">
 				'. implode('', $profile_info).'
 			</dl>';
-		
+
 		//$userProfile = JUserHelper::getProfile( $user_id );
 		//echo "Main Address :" . $userProfile->profile['address1'];
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -163,21 +163,21 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}*/
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	/*function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}*/
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	/*function onBeforeDeleteField(&$field, &$item) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}*/
-	
-	
-	
+
+
+
 	// ***
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
@@ -187,17 +187,17 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 	}*/
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	/*function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 	}*/
-	
-	
-	
+
+
+
 	// ***
 	// *** SEARCH / INDEXING METHODS
 	// ***
@@ -209,8 +209,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		return true;
 	}*/
-	
-	
+
+
 	// Method to create basic search index (added as the property field->search)
 	/*function onIndexSearch(&$field, &$post, &$item)
 	{
@@ -224,14 +224,14 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	function getUserProfile_FC()
 	{
 		$authordescr_item_html = false;
-		
+
 		// Retrieve author configuration
 		$authorparams = flexicontent_db::getUserConfig($item->created_by);
-		
+
 		// Render author profile
 		if ( $authordescr_itemid = $authorparams->get('authordescr_itemid') )
 		{
@@ -243,17 +243,17 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
 			$app->input->set('view', $saved_view);
 		}
-		
+
 		return $authordescr_item_html;
 	}
-	
-	
+
+
 	function getUserProfile_Joomla()
 	{
 		return 'getUserProfile_Joomla() is empty';
 	}
-	
-	
+
+
 	function getUserProfile_CB()
 	{
 		return 'getUserProfile_CB() is empty';

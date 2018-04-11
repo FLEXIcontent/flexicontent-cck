@@ -129,47 +129,47 @@ foreach ($this->values as $n => $value)
 {
 	// Skip value if both address and formated address are empty
 	if (
-		!isset($value['addr_display']) && !isset($value['addr_formatted']) && !isset($value['addr1']) && 
+		!isset($value['addr_display']) && !isset($value['addr_formatted']) && !isset($value['addr1']) &&
 		!isset($value['city']) && !isset($value['state']) && !isset($value['province'])  &&
 		(!isset($value['lat']) || !isset($value['lon'])) && !isset($value['url'])
 	) continue;
-	
+
 	// generate address html
 	$addr = '';
-	
+
 	if ($addr_display_mode == 'plaintext' && !empty($value['addr_display']))
 	{
 		$addr = '<div class="address">' . str_replace("\n", '<br />', $value['addr_display']) . '</div>';
 	}
-	
+
 	// prefer addr_display if available
 	else if ($addr_display_mode == 'formatted')
 	{
 		$matches = array();
 		$addr = $addr_format_tmpl;
-		
+
 		// match all conditional groups first
 		preg_match_all('/(\[\[.[^\]\]]*\]\])/', $addr, $matches);
-		
+
 		foreach($matches[1] as $match)
-		{			
+		{
 			// $match is something like '[[addr2|{{addr2}}<br />]]'
 			preg_match('/\[\[(.[^\|]*)\|(.[^\]\]]*)\]\]/', $match, $cond_field);
-			
+
 			// $cond_field[1] is something like 'addr2'
 			if(empty($value[$cond_field[1]])) {
 					$addr = str_replace($match, '', $addr);
 			}
-			
+
 			// $cond_content[2] is something like '{{addr2}}<br />'
 			else {
 					$addr = str_replace($match, $cond_field[2], $addr);
-			}		
+			}
 		}
-		
+
 		// match all field value groups
 		preg_match_all('/\{\{(.[^\}\}]*)\}\}/m', $addr, $matches);
-		
+
 		$is_us = @ $value['country'] == 'US';
 		$state_added = false;
 		foreach($matches[1] as $match)
@@ -186,13 +186,13 @@ foreach ($this->values as $n => $value)
 				$prop_val = @ $value[$match];
 			$addr = str_replace('{{'.$match.'}}', ($match == 'country' ? (!empty($value['country']) ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '') : $prop_val), $addr);
 		}
-		
+
 		$addr = '<div class="address">' . $addr . '</div>';
 	}
-	
+
 	// generate link to google maps directions
 	$map_link = empty($value['url'])  ?  false  :  $value['url'];
-	
+
 	// if no url, compatibility with old values
 	if (empty($map_link))
 	{
@@ -206,13 +206,13 @@ foreach ($this->values as $n => $value)
 				.($value['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : ''));
 		}
 		else {
-			$map_link .= urlencode($value['lat'] . "," . $value['lon']); 
+			$map_link .= urlencode($value['lat'] . "," . $value['lon']);
 		}
 	}
 
 	// generate map directions link html
 	$map_directions = '<div class="directions"><a href="'.$map_link.'" target="_blank">'.$directions_link_label.'</a></div>';
-	
+
 	// generate map (only if lat and lon available)
 	$map = '';
 	if ($show_map && (!empty($value['lon']) || !empty($value['lat'])))
@@ -226,7 +226,7 @@ foreach ($this->values as $n => $value)
 				."&amp;markers=size:".$marker_size."%7Ccolor:".$marker_color."%7C|".$value['lat'].",".$value['lon']
 				."&amp;sensor=false"
 				.($google_maps_static_api_key ? '&amp;key=' . $google_maps_static_api_key : '');
-				
+
 			$map .= '
 				<div class="map">
 					<div class="image">
@@ -267,7 +267,7 @@ foreach ($this->values as $n => $value)
 		}
 		continue;
 	}
-	
+
 	$field->{$prop}[$n] =
 		$field_prefix
 		.($map_position == 0 && $show_map ? $map : '')
@@ -276,7 +276,7 @@ foreach ($this->values as $n => $value)
 		.($directions_position == 'after' && $show_address ? $map_directions : '')
 		.($map_position == 1 && $show_map ? $map : '')
 		.$field_suffix;
-	
+
 	$n++;
 }
 

@@ -106,10 +106,7 @@ body .alert.fc-small {
 	padding: 2px 8px;
 	margin: 2px 8px;
 }
-body .alert.fc-iblock {
-	display: inline-block;
-}
-body .alert.fc-small.fc-iblock {
+body .alert.fc-small {
 	display: inline-block;
 	margin: 1px 4px 1px 2px;
 	vertical-align: middle;
@@ -399,7 +396,10 @@ div.statetoggler {
 /********************
  * Various Containers
  ********************/
- 
+
+body .fc-iblock {
+	display: inline-block !important;  /* FORCED (this is the purpose of the class) */
+}
 body .fc-nowrap-box,
 #flexicontent .nowrap_box,
 .flexicontent .nowrap_box {

@@ -32,7 +32,7 @@ foreach ($values as $n => $value)
 	$title_attr = $desc ? $desc : $title;
 	$img_legend_custom ='
 		<img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
-			data-medium="' . JUri::root(true).'/'.$srcm . '" 
+			data-medium="' . JUri::root(true).'/'.$srcm . '"
 			data-large="' . JUri::root(true).'/'.$srcl . '"
 			data-description="'.$title_attr.'" itemprop="image"/>
 	';
@@ -101,7 +101,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	}
 
 	JFactory::getDocument()->addCustomTag('
-	<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">	
+	<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">
 		<div class="rg-image-wrapper">
 			{{if itemsCount > 1}}
 				<div class="rg-image-nav">

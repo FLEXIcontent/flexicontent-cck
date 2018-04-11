@@ -16,13 +16,13 @@ foreach ($values as $value)
 		}
 		continue;
 	}
-	
+
 	// If not using property or property is empty, then use default property value
 	// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 	$addr = $value['addr'];
 	$text = @$value['text'];
 	$text = ($usetitle && strlen($text))  ?  $text  :  $default_title;
-	
+
 	if ( !strlen($text) || !$usetitle )
 	{
 		$text = JStringPunycode::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
@@ -32,7 +32,7 @@ foreach ($values as $value)
 	{
 		$text_is_email = strpos($text,'@') !== false;
 	}
-	
+
 	// Create field's display
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 	if ($format != 'feed' && $email_cloaking)
@@ -41,14 +41,14 @@ foreach ($values as $value)
 	}
 	else
 	{
-		$html = $mailto_link ? 
+		$html = $mailto_link ?
 			'<a href="mailto:' . $addr . '" target="_blank" itemprop="email">' . $text . '</a>' :
 			$text;
 	}
-	
+
 	// Add prefix / suffix
 	$field->{$prop}[$n]	= $pretext . $html . $posttext;
-	
+
 	$n++;
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }

@@ -21,7 +21,7 @@ defined('_JEXEC') or die;
 	<?php echo $subject; ?>
 	<div class="fcclear"></div>
 	<br/>
-	
+
 	<label class="label" for="subject_field">
 		<?php echo JText::_('FLEXI_FIELD_FILE_EMAIL_DESCRIPTION'); ?>
 	</label>

@@ -10,7 +10,7 @@
 	{
 		return _FC_RETURN_;
 	}
-	
+
 	// Check for no values found
 	if ( !count($field->{$prop}) )
 	{

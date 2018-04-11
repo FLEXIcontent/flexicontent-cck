@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -28,9 +28,9 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_relation', JPATH_ADMINISTRATOR);
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** DISPLAY methods, item form & frontend views
 	// ***
@@ -40,7 +40,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
-		
+
 		// Initialize framework objects and other variables
 		$user = JFactory::getUser();
 
@@ -69,7 +69,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		// ***
 		// *** Get relation field being reversed and load its configuration
 		// ***
-		
+
 		$reversed_field = reset($_fields);
 		FlexicontentFields::loadFieldConfig($reversed_field, $item);
 
@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		if(!is_array($post) && !strlen($post)) return;
 
 		$reverse_field_id = (int) $field->parameters->get('reverse_field', 0);
-		
+
 		if ($reverse_field_id)
 		{
 			$_fields = FlexicontentFields::getFieldsByIds(array($reverse_field_id));
@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 			{
 				$reversed_field = reset($_fields);
 				FlexicontentFields::loadFieldConfig($reversed_field, $item);
-				
+
 				$auto_relate_curritem = $reversed_field->parameters->get( 'auto_relate_curritem', 0);
 				$auto_relate_menu_itemid = $reversed_field->parameters->get( 'auto_relate_menu_itemid', 0);
 
@@ -189,8 +189,8 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}

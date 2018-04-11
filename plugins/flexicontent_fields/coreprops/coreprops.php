@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,35 +36,35 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$props_type = $field->parameters->get( 'props_type' ) ;
-		
+
 		$field->html = '';
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		static $all_langs = null;
 		static $cat_links = array();
 		static $acclvl_names = null;
-		
+
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
 		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-		
+
 		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
-		
+
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
+
 		switch($separatorf)
 		{
 			case 0:
@@ -95,7 +95,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			$separatorf = '&nbsp;';
 			break;
 		}
-		
+
 		$props_type = $field->parameters->get('props_type');
 		switch($props_type)
 		{
@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$field->{$prop} = $props_type;
 				break;
 		}
-			
+
 		if (strlen($field->{$prop})) {
 			$field->{$prop} = $opentag.$pretext. $field->{$prop} .$posttext.$closetag;
 		}
@@ -156,19 +156,19 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	// ***
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
-	
+
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$props_type = $filter->parameters->get('props_type');
 		//if ($props_type == 'language') {
 		//	$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		//}
-		
+
 		//$indexed_elements = in_array($props_type, array('language'));
-		
+
 		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		//if ($props_type =='...') {
 		//	$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
@@ -176,30 +176,30 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 		//	FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		//}
 	}
-	
-	
-	
+
+
+
 
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$db = JFactory::getDbo();
 		$formfieldname = 'filter_'.$filter->id;
-		
+
 		$_s = $isSearchView ? '_s' : '';
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,8)) ;
-		
+
 		// Create first prompt option of drop-down select
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
 		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
-		
+
 		// Prepend Field's Label to filter HTML
 		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
 		$filter->html = '';
-		
+
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
@@ -235,7 +235,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$filter->filter_groupby = ' GROUP BY i.language ';
 				$filter->filter_having  = null;   // use default, null indicates to use default, space is use empty
 				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
-				
+
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
 
@@ -243,13 +243,13 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$filter->html	.= 'CORE property field of type: '.$props_type.' can not be used as search filter';
 			break;
 		}
-		
+
 		// a. If field filter has defined a custom SQL query to create filter (drop-down select) options, execute it and then create the options
 		if ( !empty($query) )
 		{
 			$db->setQuery($query);
 			$lists = $db->loadObjectList();
-			
+
 			// Add the options
 			$options = array();
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
@@ -265,7 +265,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
 			foreach ($lists as $list) $options[] = JHtml::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
-		
+
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
 		if ( !empty($options) )
 		{
@@ -273,19 +273,19 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			flexicontent_html::loadFramework('select2');
 			$classes  = " use_select2_lib". @ $extra_classes;
 			$extra_param = '';
-			
+
 			// MULTI-select: special label and prompts
 			if ($display_filter_as == 6)
 			{
 				$classes .= ' fc_prompt_internal fc_is_selmultiple';
-				
+
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$extra_param = ' data-placeholder="'.$_inner_lb.'"';
 
 				// Add type to filter PROMPT (via js)
 				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
 			}
-			
+
 			// Create HTML tag attributes
 			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
 			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="5" ' : '';
@@ -314,14 +314,14 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 		// Special CASE for some filters, do some replacements
 		//if ( $props_type == 'alias') $filter->html = str_replace('_', ' ', $filter->html);
 	}
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$db = JFactory::getDbo();
 		$value_quoted = array();
 		foreach ($value as $i => $v)
@@ -362,8 +362,8 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 		$filtered = $db->loadColumn();
 		return $filtered;
 	}
-	
-	
+
+
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)

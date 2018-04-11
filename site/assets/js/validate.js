@@ -489,6 +489,11 @@ var JFormValidator = function()
 		var id = $elem.attr('data-element-grpid');
 		id = id ? id : $elem.attr('id');
 		
+		if (id && !!!$elem.get(0).form)
+		{
+			window.console.log('No form for object: ' + $elem);
+			window.console.log('No form for DOM element: ' +$elem.get(0));
+		}
 		!id ?
 			$elem.data('label', false) :
 			refreshFormLabels($elem.get(0).form) ;
@@ -551,6 +556,10 @@ var JFormValidator = function()
 					$el.data('use_fcfield_box', 1);
 				}
 				else $el.data('use_fcfield_box', 0);
+			}
+			else if (hasClass(el, 'use_fcfield_box'))
+			{
+				$el.data('use_fcfield_box', 1);
 			}
 
 			// Radio / Checkbox can not be checked with val() instead we will use special validation handlers

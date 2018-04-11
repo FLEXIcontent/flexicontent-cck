@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -69,8 +69,8 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		// field_type is not changed text field can handle this field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item )
 	{
@@ -89,9 +89,9 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		// field_type is not changed text field can handle this field type
 		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeDeleteField', array(&$field, &$item));
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
@@ -103,8 +103,8 @@ class plgFlexicontent_fieldsTextselect extends FCField
 
 		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
-	
-	
+
+
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
@@ -120,9 +120,9 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		$_fld_obj = $asSelect ? new plgFlexicontent_fieldsSelect($dispatcher, array()) : new plgFlexicontent_fieldsText($dispatcher, array());
 		$_fld_obj->onDisplayFilter($filter, $value, $formName);
 		$filter->field_type = 'textselect';
-	}	
-	
-	
+	}
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
@@ -131,8 +131,8 @@ class plgFlexicontent_fieldsTextselect extends FCField
 
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
@@ -141,9 +141,9 @@ class plgFlexicontent_fieldsTextselect extends FCField
 
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** SEARCH / INDEXING METHODS
 	// ***
@@ -157,8 +157,8 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		FLEXIUtilities::call_FC_Field_Func('text', 'onIndexAdvSearch', array(&$field, &$post, &$item));
 		return true;
 	}
-	
-	
+
+
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
@@ -174,7 +174,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	function _prepareField_as_SelectField(&$field)
 	{
 		// Field parameters meant to be used by select field are prefixed with 'select_'

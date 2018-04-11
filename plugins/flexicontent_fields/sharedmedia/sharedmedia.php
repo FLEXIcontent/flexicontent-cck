@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 
 		// API key and other form configuration
-		$debug_to_console = (int) $field->parameters->get('debug_to_console', 1);
+		$debug_to_console = (int) $field->parameters->get('debug_to_console', 0);
 		$use_native_apis  = (int) $field->parameters->get('use_native_apis', 0);
 		$embedly_key = $field->parameters->get('embedly_key','') ;
 		$youtube_key = $field->parameters->get('youtube_key', '');
@@ -189,6 +189,9 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				";
 
 				// Extra actions after adding element to the DOM
@@ -219,9 +222,6 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
 
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -1026,7 +1026,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		// *** Reformat the posted data
 		// ***
 
-		// Make sure posted data is an array 
+		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
 
 		$newpost = array();

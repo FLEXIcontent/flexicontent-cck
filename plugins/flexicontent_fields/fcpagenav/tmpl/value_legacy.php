@@ -56,7 +56,7 @@ if ($field->prev)
 	</span>
 	';
 }
-		
+
 // Previous item linking
 if ($field->next)
 {
@@ -86,5 +86,5 @@ if ($field->next)
 	</span>
 	';
 }
-		
+
 $html .= '</span>';

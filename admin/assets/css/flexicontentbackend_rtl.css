@@ -770,10 +770,7 @@ body .alert.fc-small {
 	padding: 2px 8px;
 	margin: 2px 8px;
 }
-body .alert.fc-iblock {
-	display: inline-block;
-}
-body .alert.fc-small.fc-iblock {
+body .alert.fc-small {
 	display: inline-block;
 	margin: 1px 4px 1px 2px;
 	vertical-align: middle;
@@ -1002,6 +999,9 @@ div.statetoggler > div.statetoggler_inner > .options > span > img {
 .noUi-base .noUi-handle .fc-sliderTooltip strong {
 	display: block;
 	padding: 2px;
+}
+body .fc-iblock {
+	display: inline-block !important;
 }
 body .fc-nowrap-box,
 #flexicontent .nowrap_box,

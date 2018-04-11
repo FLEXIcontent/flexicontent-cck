@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -38,14 +38,14 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->html = '';
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->{$prop} = '';
-		
+
 		global $globalcats;
 		$app  = JFactory::getApplication();
 		$db   = JFactory::getDbo();
@@ -54,7 +54,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$view   = $app->input->get('view', 'item', 'cmd');
 		$print  = $app->input->get('print', '', 'cmd');
 		$add_tooltips = JComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
-		
+
 		// No output if it is not FLEXIcontent item view or view is "print"
 		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print)
 		{
@@ -78,7 +78,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$next_label			= JText::_($field->parameters->get('next_label', 'FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		$loop_prevnext = (int) $field->parameters->get('loop_prevnext', 1);
-		
+
 		$field->{$prop} = null;
 		$cid = $app->input->get('cid', 0 , 'int');
 		$cid = !$cid || !isset($globalcats[$cid])
@@ -119,11 +119,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		{
 			$ids = null;
 			$loc_to_ids = $this->getItemList($ids, $cid, $user->id);
-			
+
 			$ids_to_loc = array_flip($loc_to_ids);  // Item ID to location MAP
 			$item_count = count($loc_to_ids);    // Total items in category
 			$location   = isset($ids_to_loc[$item->id]) ? $ids_to_loc[$item->id] : false;  // Location of current content item in array list
-			
+
 			if ($location!==false)
 			{
 				$offset = $location-50 > 0 ? $location-50 : 0;
@@ -227,10 +227,10 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$items_arr = array();
 		if ($field->prev) $items_arr[$field->prev->id] = $field->prev;
 		if ($field->next) $items_arr[$field->next->id] = $field->next;
-		
+
 		$img_err_msg = '';
 		$thumbs = $this->getItemThumbs($field->parameters, $items_arr, $img_err_msg, $uprefix='item', $rprefix='nav');
-		
+
 		$field->prevThumb = $field->prev && isset($thumbs[$field->prev->id]) ? $thumbs[$field->prev->id] : '';
 		$field->nextThumb = $field->next && isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
 
@@ -255,7 +255,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		if ($load_css)
 		{
-			JFactory::getDocument()->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
+			JFactory::getDocument()->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
 		}
 
 		$field->{$prop} = $html;
@@ -266,18 +266,18 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	{
 		if ( !$params->get($uprefix.'_use_image', 0) ) return array();
 		if ( empty($items) ) return array();
-		
+
 		if ( $params->get($uprefix.'_image') ) {
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $params->get($uprefix.'_image_size' , 'l') ];
 			$img_field_name = $params->get($uprefix.'_image');
 		}
-		
+
 		if (!empty($img_field_name))
 		{
 			FlexicontentFields::getFieldDisplay($items, $img_field_name, $values=null, 'display_'.$img_field_size.'_src', FLEXI_ITEMVIEW);
 		}
-		
+
 		$thumbs = array();
 		foreach($items as $item_id => $item)
 		{
@@ -293,7 +293,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			else {
 				$src = flexicontent_html::extractimagesrc($item);
 			}
-				
+
 			$RESIZE_FLAG = !$params->get($uprefix.'_image') || !$params->get($uprefix.'_image_size');
 			if ( $src && $RESIZE_FLAG ) {
 				// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
@@ -306,7 +306,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 				$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-				
+
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
 				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
@@ -317,29 +317,29 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		return $thumbs;
 	}
-	
-	
+
+
 	function getCatThumb(&$cat, &$params, $uprefix='cat', $rprefix='nav')
 	{
 		if ( empty($cat->id) || !$params->get($uprefix.'_use_image', 0) ) return '';
-		
+
 		// Joomla media folder
 		$app = JFactory::getApplication();
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
-		
+
 		$cat_image_source = $params->get($uprefix.'_image_source');
-		
+
 		$cat->image = $cat->parameters->get('image');
 		$image_src = "";
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = "";
-		
+
 		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
 			$src = JUri::base(true) ."/". $joomla_image_url . $cat->image;
-			
+
 			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
 			$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
 			$aoe	= '&amp;aoe=1';
@@ -349,7 +349,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-			
+
 			$image_src = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 			// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
@@ -362,20 +362,20 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif', 'jpg', 'jpeg') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-			
+
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
 			$image_src = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		$cat->image_src = $image_src;
 		return $image_src;
 	}
-	
-	
+
+
 	function getItemList(&$ids=null, $cid=null, &$userid=0)
 	{
 		$app  = JFactory::getApplication();
 		$db = JFactory::getDbo();
-		
+
 		if ($ids===null)
 		{
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$app->input->set('layout', $saved_layout); // restore layout
 			$app->input->set('option', $saved_option); // restore option
 			$app->input->set('view', $saved_view); // restore view
-			
+
 			return $list;
 		}
 
@@ -436,9 +436,9 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			return $list;
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Retrieve subcategory ids of a given category
 	 *
@@ -454,7 +454,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items
 		$display_subcats = $cparams->get('display_subcategories_items', 2);   // include subcategory items
-		
+
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
@@ -464,7 +464,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
-		
+
 		// Calculate categories to use for retrieving items
 		$query_catids = array();
 		foreach ($id_arr as $id)
@@ -476,7 +476,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			}
 		}
 		$query_catids = array_keys($query_catids);
-		
+
 		// Items in featured categories
 		/*
 		$cats_featured = $cparams->get('display_cats_featured', 0);
@@ -491,7 +491,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 		// ***
 		// *** Filter by depth level
-		// *** 
+		// ***
 
 		// Include categories
 		if ($display_subcats==0)
@@ -510,7 +510,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		{
 			$anddepth = ' AND c.id IN (' .implode(',', $query_catids). ')';
 		}
-		
+
 		// Finally create the query to get the category ids.
 		// NOTE: this query is not just needed to get 1st level subcats, but it always needed TO ALSO CHECK the ACCESS LEVEL
 		$query = 'SELECT c.id'
@@ -521,11 +521,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			. $anddepth
 			. ' ORDER BY '.$ordering
 			;
-		
+
 		$db->setQuery($query);
 		$this->_data_cats = $db->loadColumn();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-		
+
 		return $this->_data_cats;
 	}
 }

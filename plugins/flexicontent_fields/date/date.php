@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,13 +36,13 @@ class plgFlexicontent_fieldsDate extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
-		
+
 		$date_source = $field->parameters->get('date_source', 0);
 		if ( $date_source==1 || $date_source==2 )
 		{
@@ -63,7 +63,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$config   = JFactory::getConfig();
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
-		
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -80,23 +80,23 @@ class plgFlexicontent_fieldsDate extends FCField
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
-		
+
 		$minyear = $field->parameters->get('minyear', '');
 		$maxyear = $field->parameters->get('maxyear', '');
 
 		$minyear = strlen($minyear) ? (int) $minyear : '';
 		$maxyear = strlen($maxyear) ? (int) $maxyear : '';
-		
+
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$disable_keyboardinput = (int) $field->parameters->get('disable_keyboardinput', 0);
-		
-		
+
+
 		// *******************************************
 		// Find timezone and create user instructions,
 		// both according to given configuration
 		// *******************************************
-		
+
 		$date_format_form = ''; //$field->parameters->get( 'date_format_form', '' ) ;
 		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
 
@@ -112,17 +112,17 @@ class plgFlexicontent_fieldsDate extends FCField
 		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
 		$dateformat = $dateformat && $dateformat != '_custom_' ? JText::_($dateformat) :
 			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
-		
+
 		$timezone = 'UTC'; // Default is not to use TIMEZONE
 		$tz_info  = '';    // Default is not to show TIMEZONE info
 		$field_notes = '';
-		
-		
+
+
 		// Time is allowed
 		if ($date_allowtime) {
 			if ($date_source!=3) $field_notes .= JText::_('FLEXI_DATE_CAN_ENTER_TIME') .($date_allowtime==2 ? '<br/>'.JText::_('FLEXI_DATE_USE_ZERO_TIME_ON_EMPTY') : '');
 		}
-		
+
 		if (!$use_editor_tz)  // ** timezone is disabled above, if time usage is disabled
 		{
 			// Raw date storing, ignoring timezone. NOTE: this is OLD BEHAVIOUR
@@ -136,7 +136,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$tz = new DateTimeZone($timezone);
 			$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			$tz_info =  $tz_offset > 0 ? ' &nbsp; UTC +'.$tz_offset : ' UTC '.$tz_offset;
-			
+
 			$field_notes .= '
 				<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED').'
 				<br/>'.JText::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
@@ -150,7 +150,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$date_now->setTimezone($tz);
 			$date_now_str = $date_now->format($dateformat, $local = true);
 		}
-		
+
 		$field_notes = $field_notes ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$field_notes : '';
 
 		// Initialise property with default value
@@ -159,17 +159,17 @@ class plgFlexicontent_fieldsDate extends FCField
 			$field->value = array();
 			$field->value[0] = '';
 		}
-		
+
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		
+
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
-		
+
 		$js = "";
 		$css = "";
-		
+
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
@@ -191,7 +191,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				});
 			});
 			";
-			
+
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
@@ -200,18 +200,18 @@ class plgFlexicontent_fieldsDate extends FCField
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				
+
 				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-				
+
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 				";
-			
+
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update the new (date) input field
 			$js .= "
@@ -219,32 +219,35 @@ class plgFlexicontent_fieldsDate extends FCField
 				theInput.val('');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-				
+
 				// Update date picker
 				var newCalendar = typeof JoomlaCalendar === 'function';
 				var thePicker = theInput.next();
 				thePicker.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." + (newCalendar ? '_btn' : '_img'));
 				";
-				
+
 			if ($date_source==3) $js .= "
 				newField.find('.fcfield_timestamp_value_new').css('display', '');
 				newField.find('.fcfield_timestamp_value_existing').html('').css('display', 'none');
 				";
-			
+
 			// Disable keyboard input if so configured
 			if($disable_keyboardinput)
 				$js .= "
 				theInput.on('keydown keypress keyup', false);
 				";
-			
+
 			// Add new field to DOM
 			$js .= "
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				";
-			
+
 			if ($date_source!=3) $js .= "
 				// Add a tag id to the date field outer container to be able to select it
 				var df_tag_id = 'field-calendar-fc_".$field->id."_' + (uniqueRowNum".$field->id." + 1);
@@ -267,25 +270,22 @@ class plgFlexicontent_fieldsDate extends FCField
 					});
 				}
 				";
-			
+
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
-			
+
 			// Show new field, increment counters
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-				
+
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -298,11 +298,11 @@ class plgFlexicontent_fieldsDate extends FCField
 
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-				
+
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-				
+
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if (rowCount".$field->id." > 1)
 				{
@@ -317,9 +317,9 @@ class plgFlexicontent_fieldsDate extends FCField
 				}
 			}
 			";
-			
+
 			$css .= '';
-			
+
 			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
@@ -334,16 +334,6 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 
-		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
-		
-		
 		/**
 		 * Create field's HTML display for item form
 		 */
@@ -351,14 +341,15 @@ class plgFlexicontent_fieldsDate extends FCField
 		$field->html = array();
 		$n = 0;
 		$skipped_vals = array();
+		$per_val_js = '';
 
 		foreach ($field->value as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
-			
+
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
-			
+
 			if ($date_source==3)
 			{
 				// Use indexes of existing values to keep track of field values being re-ordered, this (partly) avoids form tampering
@@ -374,18 +365,18 @@ class plgFlexicontent_fieldsDate extends FCField
 				{
 					$timestamp = '';
 				}
-				
-				$timestamp .= 
+
+				$timestamp .=
 						'<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_new" style="'.($timestamp ? 'display:none;' : '').'">'.JText::_('FLEXI_FIELD_DATE_NOW').', '. // ' - '$date_now_str.' - '
-						'<span class="fcfield_timestamp_note">'.JText::_( 'FLEXI_AUTO' ).'</span></span>'; 
-				
+						'<span class="fcfield_timestamp_note">'.JText::_( 'FLEXI_AUTO' ).'</span></span>';
+
 				$html = $timestamp .'
 					<input type="hidden" class="fcfield_date" value="'.($value ? $n : '').'" id="'.$elementid_n.'" name="'.$fieldname_n.'" />
 				';
 			}
 			else
 			{
-				$attribs_arr = array('class'=>'fcfield_date input-medium' . $required_class);
+				$attribs_arr = array('class'=>'fcfield_date use_fcfield_box input-medium' . $required_class);
 
 				if (strlen($minyear))
 				{
@@ -396,7 +387,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				{
 					$attribs_arr['maxYear'] = $maxyear;
 				}
-				
+
 				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone);
 
 				if (!$html)
@@ -409,9 +400,11 @@ class plgFlexicontent_fieldsDate extends FCField
 					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr, $skip_on_invalid=true, $timezone);
 				}
 			}
-			
+
 			$field->html[] = '
-				'.$html.'
+				<div class="fcfield_box' .($required ? ' required_box' : ''). ' fc-iblock" data-label_text="'.$field->label.'">
+					' . $html . '
+				</div>
 				'.($use_ingroup || !$multiple ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
 					'.$move2.'
@@ -419,21 +412,43 @@ class plgFlexicontent_fieldsDate extends FCField
 					'.(!$add_position ? '' : $add_here).'
 				</div>
 				');
-			
-			if($disable_keyboardinput) {
-				$document->addScriptDeclaration("
-					jQuery(document).ready(function(){
-						jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
-					});
-				");
+
+			if ($disable_keyboardinput)
+			{
+				$per_val_js = "
+					jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
+				";
 			}
-			
+
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-		
-		if ($use_ingroup) { // do not convert the array to string if field is in a group
-		} else if ($multiple) { // handle multiple records
+
+		if ($per_val_js)
+		{
+			$js .= "
+			jQuery(document).ready(function()
+			{
+				" . $per_val_js . "
+			});
+			";
+		}
+
+		// Added field's custom CSS / JS
+		if ($multiple) $js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+		";
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+
+		// Do not convert the array to string if field is in a group
+		if ($use_ingroup);
+
+		// Handle multiple records
+		elseif ($multiple)
+		{
 			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
@@ -445,18 +460,22 @@ class plgFlexicontent_fieldsDate extends FCField
 						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
-		} else {  // handle single values
+		}
+
+		// Handle single values
+		else
+		{
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
-		
+
 		if (!$use_ingroup)
 			$field->html = (($show_usage && $field_notes) ? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="fcclear"></div>' : '')  .  $field->html;
-		
+
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
@@ -466,24 +485,24 @@ class plgFlexicontent_fieldsDate extends FCField
 		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
-		
+
 		// Some variables
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
-		
+
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
 		$date_source = $field->parameters->get('date_source', 0);
 		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
 		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
 		$no_value_msg   = $show_no_value ? JText::_($no_value_msg) : '';
-		
+
 		// Get field values
 		$values = $values ? $values : $field->value;
-		
+
 		// Load publish_up/publish_down values if so configured
 		if ( $date_source==1 || $date_source==2 )
 		{
@@ -492,23 +511,23 @@ class plgFlexicontent_fieldsDate extends FCField
 				$nullDate = JFactory::getDbo()->getNullDate();
 				$never_date = ''; //JText::_('FLEXI_NEVER');
 			}
-			
+
 			$_value = $date_source == 1 ? $item->publish_up : $item->publish_down;
 			if ($_value == $nullDate) {
 				$field->{$prop} = $date_source==2 ? $never_date : '';
 				return;
 			}
-			
+
 			$values = array($_value);
 		}
-		
+
 		// Check for no values and no default value, and return empty display
 		if ( empty($values) )
 		{
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
 		}
-		
+
 		// Timezone configuration
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
@@ -517,18 +536,18 @@ class plgFlexicontent_fieldsDate extends FCField
 		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
 		$dateformat = $dateformat && $dateformat != '_custom_' ? JText::_($dateformat) :
 			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
-		
+
 		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
 		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
 		$display_tz_suffix   = $field->parameters->get( 'display_tz_suffix', 1) ;
-		
+
 		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
 
 		// Prefix - Suffix - Separator parameters - Other common parameters
 		$common_params_array = $this->getCommonParams();
 		extract($common_params_array);
-		
+
 		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
 		if ( !$use_editor_tz ) {
 			// Raw date output, ignore timezone (no timezone info is printed), NOTE: this is OLD BEHAVIOUR of this field
@@ -538,7 +557,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		} else {
 			$tz_suffix_type = $display_tz_guests;
 		}
-		
+
 		// Decide the timezone to use
 		$tz_info = '';
 		switch ($tz_suffix_type)
@@ -553,7 +572,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			case 2:
 				$timezone = $config->get('offset');  // Site's timezone
 				break;
-			case 3: 
+			case 3:
 				$timezone = $user->getParam('timezone' );  // User's local time
 				break;
 		}
@@ -565,15 +584,15 @@ class plgFlexicontent_fieldsDate extends FCField
 			$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 		}
-		
+
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
-		
+
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
-		
+
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
 		{
@@ -583,7 +602,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			{
 				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-				
+
 				// Add microdata once for all values, if field -- is NOT -- in a field group
 				if ( $itemprop )
 				{
@@ -594,9 +613,9 @@ class plgFlexicontent_fieldsDate extends FCField
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -605,30 +624,30 @@ class plgFlexicontent_fieldsDate extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$date_source = $field->parameters->get('date_source', 0);
-		
+
 		// Timestamp mode (Current time), which will be displayed as user time but saved as 'UTC 0'
 		if ( $date_source==3 ) {
 			// Dates are always stored using 'UTC 0' timezone
 			$tz = new DateTimeZone('UTC');
-			
+
 			$date_now = JFactory::getDate('now');
 			$date_now->setTimezone($tz);
-			
+
 			$date_now_value = $date_now->toSql();
 		}
-		
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
-		
+
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
-		
+
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
-		
+
 		if ($use_editor_tz == 0) {
 			// Raw date input, ignore timezone, NOTE: this is OLD BEHAVIOUR of this field
 			$timezone = 'UTC';
@@ -642,7 +661,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		// *** Reformat the posted data
 		// ***
 
-		// Make sure posted data is an array 
+		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
 
 		$newpost = array();
@@ -666,18 +685,18 @@ class plgFlexicontent_fieldsDate extends FCField
 			// ***
 
 			$post[$n] = flexicontent_html::dataFilter($post[$n], 200, 'STRING', 0);
-			
+
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($post[$n]))
 			{
 				if ($use_ingroup) $newpost[$new++] = null;
 				continue;
 			}
-			
+
 			// Check if dates are allowed to have time part
 			@list($date, $time) = preg_split('#\s+#', $post[$n], $limit=2);
 			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
-				
+
 			if (!$date_allowtime)
 			{
 				// Time part not allowed
@@ -688,7 +707,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				// Time part exists
 				$post[$n] = $date.' '.$time;
 			}
-				
+
 			if (!$use_editor_tz || !$time)
 			{
 				// Dates have no timezone information, because either :
@@ -709,21 +728,21 @@ class plgFlexicontent_fieldsDate extends FCField
 			$app->enqueueMessage( print_r($post, true), 'warning');
 		}*/
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** CATEGORY/SEARCH FILTERING METHODS
 	// ***
@@ -732,16 +751,16 @@ class plgFlexicontent_fieldsDate extends FCField
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
-	
-	
+
+
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$_s = $isSearchView ? '_s' : '';
 		$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
 		if ($date_filter_group=='year') { $date_valformat='%Y'; }
@@ -793,33 +812,33 @@ class plgFlexicontent_fieldsDate extends FCField
 		} else {
 			return "date_source: ".$date_source." not implemented";
 		}
-		
+
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default
-		
+
 		if ($isSearchView)
 			$filter->filter_orderby_adv = ' ORDER BY value_id';  // we can use a date type cast here, but it is not needed due to the format of value_id
 		else
 			$filter->filter_orderby = ' ORDER BY '.$valuecol;
-		
+
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
 		if ($date_filter_group=='year') { $date_valformat='%Y'; }
 		else if ($date_filter_group=='month') { $date_valformat='%Y-%m';}
 		else { $date_valformat='%Y-%m-%d'; }
 
 		$date_source = $filter->parameters->get('date_source', 0);
-		
+
 		if ( !$date_source || $date_source==3 ) {
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
 			$filter->filter_valuesjoin = null;   // use default query
@@ -830,30 +849,30 @@ class plgFlexicontent_fieldsDate extends FCField
 		} else {
 			JFactory::getApplication()->enqueueMessage( __FUNCTION__." for field: '".$filter->label.", date_source: ".$date_source." not implemented" , 'notice' );
 		}
-		
+
 		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
-		
+
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
-	
-	
+
+
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
-		
+
 		$date_source = $filter->parameters->get('date_source', 0);
 		/*if ( $date_source==1 || $date_source==2 ) {
 			JFactory::getApplication()->enqueueMessage( "Field: '".$filter->label."' is using start/end publication dates and cannot be used as filter in search view" , 'notice' );
 			return;
 		}*/
-		
+
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** SEARCH / INDEXING METHODS
 	// ***
@@ -863,13 +882,13 @@ class plgFlexicontent_fieldsDate extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-		
+
 		$values = $this->_prepareForSearchIndexing($field, $item, $post, $for_advsearch=1);
-		
+
 		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
 		// b. Each of the indexes of $values will be added to the column 'value_id',
 		//    and it is meant for fields that we want to be filterable via a drop-down select
-		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving
 		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
 		// 'search_properties'   contains property fields that should be added as text
@@ -878,16 +897,16 @@ class plgFlexicontent_fieldsDate extends FCField
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
-	
-	
+
+
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
-		
+
 		$values = $this->_prepareForSearchIndexing($field, $item, $post, $for_advsearch=0);
-		
+
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
@@ -903,27 +922,27 @@ class plgFlexicontent_fieldsDate extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
 	function _prepareForSearchIndexing(&$field, &$item, &$post, $for_advsearch=0)
 	{
 		$date_source = $field->parameters->get('date_source', 0);
-		
+
 		$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
 		if ($date_filter_group=='year') { $date_valformat='%Y'; }
 		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 		else { $date_valformat='%Y-%m-%d'; }
-		
+
 		// Display date 'label' can be different than the (aggregated) date value
 		$date_filter_label_format = $field->parameters->get('date_filter_label_format_s', '');
 		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
-		
+
 		if ($post===null) {
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 			$_value_col = !$date_source || $date_source==3 ? 'fi.value' : ($date_source == 1 ? 'i.publish_up' : 'i.publish_down');
 			$valuecol = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_txtformat);
-			
+
 			$field->field_valuesselect = ' '.$valuecol.' AS value_id, '.$textcol.' AS value';
 			if ( $date_source==1 || $date_source==2 ) {
 				$field->field_valuesfrom = ' FROM #__content AS i ';
@@ -949,5 +968,5 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 		return $values;
 	}
-	
+
 }

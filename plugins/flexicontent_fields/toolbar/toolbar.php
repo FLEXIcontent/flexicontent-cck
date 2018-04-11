@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -38,13 +38,13 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$app = JFactory::getApplication();
 		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 
@@ -52,13 +52,13 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 		//$scheme = JUri::getInstance()->getScheme();  // we replaced http(s):// with //
 		$document	= JFactory::getDocument();
-		
+
 		$lang = $document->getLanguage();
 		$lang = $item->params->get('language', $lang);
 		$lang = $lang ? $lang : 'en-GB';
 		$lang = substr($lang, 0, 2);
 		$lang = in_array($lang, array('en','es','it','th')) ? $lang : 'en';
-		
+
 		// parameters shortcuts
 		$display_comments	= $field->parameters->get('display_comments', 1) && $item->parameters->get('comments',0);
 		$display_resizer	= $field->parameters->get('display_resizer', 1);
@@ -67,13 +67,13 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		$display_voice 		= $field->parameters->get('display_voice', 1);
 		$display_pdf 		= 0; //$field->parameters->get('display_pdf', 1);
 		$load_css 			= $field->parameters->get('load_css', 1);
-		
+
 		$_sfx = ($view != FLEXI_ITEMVIEW) ? '_cat' : '';
 		$display_social 	= $field->parameters->get('display_social'.$_sfx, ($view != FLEXI_ITEMVIEW ? 0 : 1));
-		
+
 		$addthis_user		= $field->parameters->get('addthis_user', '');
 		$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
-		
+
 		$spacer_size		= $field->parameters->get('spacer_size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
 		$default_size 		= $field->parameters->get('default_size', 12);
@@ -82,28 +82,28 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 
 		$spacer				= ' style="width:'.$spacer_size.'px;"';
-		
+
 		static $css_loaded = false;
 		if ($load_css && !$css_loaded)
 		{
 			$css_loaded = true;
 			$document->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
-		
-		
+
+
 		// Create an absolute ITEM URL add and escaped ITEM TITLE
 		if ($display_social || $display_comments || $display_email || $display_print)
 		{
 			$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug);
-			
-			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https 
+
+			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https
 			//$item_url_abs = JRoute::_($item_url, true, -1);
-			
+
 			$item_url_abs = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . JRoute::_($item_url);
 			$item_title_escaped = htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' );
 		}
-		
-		
+
+
 		// Created an array of Toolbar's actions (buttons) according to configuration
 		$ops = array();
 
@@ -111,7 +111,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($display_comments)
 		{
 			$comment_link = $item_url_abs . '#addcomments';
-			
+
 			$ops[] = '
 			<div class="flexi-react toolbar-element">
 				<span class="comments-bubble">'.($module_position ? '<!-- jot '.$module_position.' s -->' : '').$this->_getCommentsCount($item->id).($module_position ? '<!-- jot '.$module_position.' e -->' : '').'</span>
@@ -149,12 +149,12 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			</div>
 			';
 		}
-		
+
 		// email button
 		if ($display_email)
 		{
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
-			
+
 			$url = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $item_url_abs );
 			$estatus = 'width=400,height=400,menubar=yes,resizable=yes';
 			$ops[] = '
@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			</div>
 			';
 		}
-		
+
 		// print button
 		if ($display_print)
 		{
@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			} else {
 				$document->addScript('//vozme.com/get_text.js');
 			}
-			
+
 			$ops[] = '
 			<div class="flexi-voice toolbar-element">
 			'.( $lang=='th' ? '
@@ -220,13 +220,13 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			{
 				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".JFactory::getApplication()->getCfg('sitename')."\" />");
 			}
-			
+
 			// OPEN GRAPH: title
 			if ($field->parameters->get('add_og_title') && $view == 'item') {
 				$title = flexicontent_html::striptagsandcut($item->title);
 				$document->addCustomTag("<meta property=\"og:title\" content=\"{$title}\" />");
 			}
-			
+
 			// OPEN GRAPH: description
 			if ($field->parameters->get('add_og_descr') && $view == 'item')
 			{
@@ -237,7 +237,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					$document->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");
 				}
 			}
-			
+
 			// OPEN GRAPH: type
 			$og_type = (int) $field->parameters->get('add_og_type');
 			if ($og_type && $view == 'item') {
@@ -245,7 +245,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				$og_type_names = array(1=>'article', 2=>'website');
 				$document->addCustomTag("<meta property=\"og:type\" content=\"".$og_type_names[$og_type]."\">");
 			}
-			
+
 			// OPEN GRAPH: image (extracted from item's description text)
 			$imageurl = '';
 			if ($field->parameters->get('add_og_image') && $view == 'item')
@@ -277,39 +277,39 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
 				}
 			}
-			
+
 			// Add og-URL explicitely as this is required by facebook ?
 			if ($item_url_abs && JFactory::getApplication()->input->get('format', 'html') === 'html')
 			{
 				$document->addCustomTag("<meta property=\"og:url\" content=\"".$item_url_abs."\" />");
 			}
 
-			
-			
+
+
 			// ****************************
 			// AddThis social SHARE buttons
 			// ****************************
-			
+
 			$addthis_custom_code     = $field->parameters->get('addthis_custom_code'   .$_sfx, '');
 			$addthis_code_predefined = $field->parameters->get('addthis_code_predefined'.$_sfx, 3);
-			
+
 			$addthis_size    = $field->parameters->get('addthis_size' .$_sfx, 20);
 			$addthis_style   = $field->parameters->get('addthis_style'.$_sfx,  1);
-			
+
 			$addthis_fb_like = $field->parameters->get('addthis_fb_like'.$_sfx, 1);
 			$fb_like_resize  = $addthis_style==2 ? 0 : $field->parameters->get('addthis_fb_like_resize'.$_sfx, 1) ? 'fc_resize' : '';
-			
+
 			$addthis_box_style = $field->parameters->get('addthis_box_style'.$_sfx, 0);
 			$addthis_box_pos   = $field->parameters->get('addthis_box_pos'.$_sfx, 0);
-			
+
 			// Allow floating in ITEM view only (because in category we have multiple !)
 			$addthis_style_class  = $addthis_style==2 && $view=='item' ? 'addthis_floating_style' : 'addthis_default_style';
-			
+
 			// Size class (note this is ignored by boxed style)
 			$addthis_size_class   = 'addthis_'.$addthis_size.'x'.$addthis_size.'_style';
-			
+
 			$outer_box_class  = 'fc_size_'.$addthis_size . ($addthis_box_style==1 ? ' fccleared' : '');
-			
+
 			$fb_like_layouts = array(   // data-fb-like-layout will be replaced with fb:like:layout on document ready
 				1 => 'data-fb-like-layout="button_count"',
 				2 => 'data-fb-like-layout="box_count"',
@@ -321,7 +321,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				$fb_like = '<a class="addthis_button_facebook"></a>';
 			else
 				$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like '.$fb_like_resize.'" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
-			
+
 			if (!$addthis_custom_code)
 			{
 				switch ($addthis_code_predefined)
@@ -345,7 +345,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 						<!-- AddThis Button END -->
 						';
 						break;
-					
+
 					case 2:
 						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
@@ -360,7 +360,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 						<!-- AddThis Button END -->
 						';
 						break;
-											
+
 					case 3:
 						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
@@ -375,7 +375,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 						<!-- AddThis Button END -->
 						';
 						break;
-						
+
 					default:
 					case 4:
 						$addthis_custom_code = '
@@ -392,12 +392,12 @@ class plgFlexicontent_fieldsToolbar extends FCField
 						break;
 				}
 			}
-			
+
 			// Replacements (pass HTML validation)
 			$addthis_custom_code = str_replace('addthis:url', 'data-url', $addthis_custom_code);
 			$addthis_custom_code = str_replace('addthis:title', 'data-title', $addthis_custom_code);
 			$addthis_custom_code = str_replace('fb:like:layout', 'data-fb-like-layout', $addthis_custom_code);
-			
+
 			// Replacements
 			$addthis_custom_code = str_replace('_item_url_', $item_url_abs, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_item_title_', $item_title_escaped, $addthis_custom_code);
@@ -405,24 +405,24 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			$addthis_custom_code = str_replace('_fb_like_', $fb_like, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_addthis_pubid_', $addthis_pubid, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_jtext_SHARE_', JText::_('FLEXI_FIELD_TOOLBAR_SHARE'), $addthis_custom_code);
-			
+
 			$addthis_custom_code = str_replace('_addthis_STYLE_' , $addthis_style_class , $addthis_custom_code);
 			$addthis_custom_code = str_replace('_addthis_SIZE_'  , $addthis_size_class, $addthis_custom_code);
-			
+
 			$addthis_html = $addthis_box_pos ?
 				'<div class="flexi-socials fc-outside '.$outer_box_class.'">'.$addthis_custom_code.'</div>' :
 				'<div class="toolbar-spacer"'.$spacer.'></div> <div class="flexi-socials '.$outer_box_class.'">' .$addthis_custom_code. '</div>' ;
-			
+
 			// Add AddThis JS if not already added
 			static $addthis_added = null;
 			if (!$addthis_added && JFactory::getApplication()->input->get('format', 'html') === 'html')
 			{
-				$document->addCustomTag('	
+				$document->addCustomTag('
 					<script type="text/javascript">
 					var addthis_config = {
 						services_exclude: "print,email"
 					}
-					var fc_shape_fb_addthis = function() { 
+					var fc_shape_fb_addthis = function() {
 						jQuery(".addthis_button_facebook_like.fc_resize").each(function(i, el) {
 							var scale = -1 + jQuery(el).get(0).getBoundingClientRect().width / jQuery(el).get(0).offsetWidth;
 							jQuery(el).css({"margin-bottom": scale*jQuery(this).height()});
@@ -433,7 +433,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					};
 					jQuery(document).ready(function() {
 						setTimeout(fc_shape_fb_addthis, 2500); setTimeout(fc_shape_fb_addthis, 3500); setTimeout(fc_shape_fb_addthis, 4500);
-						
+
 						jQuery(".addthis_toolbox").each(function(i, el) {
 							if (jQuery(el).get(0).hasAttribute("data-url")) jQuery(el).attr("addthis:url", jQuery(el).attr("data-url"));
 							if (jQuery(el).get(0).hasAttribute("data-title")) jQuery(el).attr("addthis:title", jQuery(el).attr("data-title"));
@@ -443,11 +443,11 @@ class plgFlexicontent_fieldsToolbar extends FCField
 						scriptTag.src = "//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'";
 						document.getElementsByTagName("head")[0].appendChild(scriptTag);
 					});
-					
+
 					</script>
 				');
 				$addthis_added = 1;
-				
+
 				if ($fb_like) {
 					$css = '
 						.flexi-socials .addthis_toolbox.addthis_floating_style,
@@ -457,12 +457,12 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				}
 			}
 		}
-		
+
 		$display = $addthis_html && $addthis_box_pos ? '
 			<div class="flexitoolbar">
 				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
 			</div>'
-			.$addthis_html :			
+			.$addthis_html :
 			'<div class="flexitoolbar">
 				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
 				'.$addthis_html.'
@@ -471,9 +471,9 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 		$field->{$prop} = $display;
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
@@ -483,13 +483,13 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
@@ -499,12 +499,12 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-	
+
 	function _getCommentsCount($id)
 	{
 		$db = JFactory::getDbo();
 		static $jcomment_installed = null;
-		
+
 		if ($jcomment_installed===null) {
 			$app = JFactory::getApplication();
 			$dbprefix = $app->getCfg('dbprefix');
@@ -512,7 +512,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			$jcomment_installed = (boolean) count($db->loadObjectList());
 		}
 		if (!$jcomment_installed) return 0;
-		
+
 		$query 	= 'SELECT COUNT(com.object_id)'
 				. ' FROM #__jcomments AS com'
 				. ' WHERE com.object_id = ' . (int)$id
@@ -520,11 +520,11 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				. ' AND com.published = 1'
 				;
 		$db->setQuery($query);
-				
+
 		return $db->loadResult() ? (int)$db->loadResult() : 0;
 	}
-	
-	
+
+
 	function _extractimageurl(& $item)
 	{
 		$matches = NULL;

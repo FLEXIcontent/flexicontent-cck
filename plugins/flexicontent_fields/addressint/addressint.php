@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,17 +36,17 @@ class plgFlexicontent_fieldsAddressint extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		$field->label = JText::_($field->label);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
-		
+
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
-		
+
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
@@ -175,7 +175,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		
+
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -185,12 +185,12 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$js = '
 			fcfield_addrint.allowed_countries["'.$field->name.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
 			fcfield_addrint.single_country["'.$field->name.'"] = "'.$single_country.'";
-		
+
 			fcfield_addrint.map_zoom["'.$field->name.'"] = '.$map_zoom.';
 			fcfield_addrint.map_type["'.$field->name.'"] = "'.strtoupper($map_type).'";
 		';
 		$css = "";
-		
+
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
@@ -212,7 +212,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				});
 			});
 			";
-			
+
 			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
@@ -221,18 +221,18 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				
+
 				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-				
+
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 				";
-			
+
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update non-optional properties
 			$js .= "
@@ -241,14 +241,14 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][lat]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_lat');
 				newField.find('.addrint_lat-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_lat');
-				
+
 				theInput = newField.find('input.addrint_lon').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][lon]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_lon');
 				newField.find('.addrint_lon-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_lon');
 			";
-			
+
 			// Address format: 'plaintext'
 			if ($addr_edit_mode == 'plaintext') $js .= "
 				theInput = newField.find('.addrint_addr_display').first();
@@ -300,7 +300,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theSelect.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][state]');
 				theSelect.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_state');
 				newField.find('.fc_gm_usstate-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_state');
-				
+
 				// Re-init any select2 element
 				var has_select2 = theSelect.hasClass('use_select2_lib');
 				if (has_select2) {
@@ -364,7 +364,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theDiv.html('');
 				theDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_messages');
 				";
-			
+
 			// Clear canvas container and hide outer container of map
 			$js .= "
 				theDiv = newField.find('div.addrint_map_canvas');
@@ -375,7 +375,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addressint_map');
 				theDiv.hide();
 				";
-				
+
 			// Attach search auto-complete
 			$js .= "
 				theInput = newField.find('.addrint_autocomplete').first();
@@ -383,42 +383,42 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autocomplete]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_autocomplete');
 				newField.find('.addrint_autocomplete-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_autocomplete');
-				
+
 				theSelect = newField.find('select.addrint_ac_type').first();
 				theSelect.val('');
 				theSelect.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][ac_type]');
 				theSelect.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_ac_type');
 				";
-			
+
 			// Add new field to DOM
 			$js .= "
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+
+				// Attach form validation on new element
+				fc_validationAttach(newField);
 				";
-							
+
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
-			
+
 			// Show new field, increment counters
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-				
+
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				
 				// Initialize gmaps search autocomplete
 				fcfield_addrint.initAutoComplete('".$elementid."_'+uniqueRowNum".$field->id.", '".$field->name."');
-				
+
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -431,11 +431,11 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-				
+
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-				
+
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if (rowCount".$field->id." > 1)
 				{
@@ -452,9 +452,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				}
 			}
 			";
-			
+
 			$css .= '';
-			
+
 			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
@@ -515,7 +515,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
 			JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
-			$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');	
+			$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/addressint/js/form.js');
 
 			// Load google maps library
 			flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
@@ -563,7 +563,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				'.$_html_;
 		}
 		unset($_html_);
-		
+
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html = !count($field->html) ? '' :
@@ -581,9 +581,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 	}
-	
-	
-	
+
+
+
 	// ***
 	// *** SEARCH / INDEXING METHODS
 	// ***
@@ -593,34 +593,34 @@ class plgFlexicontent_fieldsAddressint extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-		
+
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array('addr1','addr2','addr3','city','state','province','zip','country'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}*/
-	
-	
+
+
 	// Method to create basic search index (added as the property field->search)
 	/*function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
-		
+
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array('addr1','addr2','addr3','city','state','province','zip','country'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}*/
 
-	
+
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		// Check if field has posted data
 		if ( empty($post) || !is_array($post)) return;
-		
+
 		// Make sure posted data is an array
 		$v = reset($post);
 		$post = !is_array($v) ? array($post) : $post;
-		
+
 		// Enforce configuration so that user does not manipulate form to add disabled data
 		$use_name     = $field->parameters->get('use_name', 1);
 		$use_addr2    = $field->parameters->get('use_addr2', 1);
@@ -630,19 +630,19 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_country  = $field->parameters->get('use_country', 1);
 		$use_zip_suffix = $field->parameters->get('use_zip_suffix', 1);
 		$map_zoom = $field->parameters->get('map_zoom', 16);
-		
+
 		// Get allowed countries
 		$ac_country_default = $field->parameters->get('ac_country_default', '');
 		$ac_country_allowed_list = $field->parameters->get('ac_country_allowed_list', '');
 		$ac_country_allowed_list = array_unique(FLEXIUtilities::paramToArray($ac_country_allowed_list, "/[\s]*,[\s]*/", false, true));
 		$ac_country_allowed_list = array_flip($ac_country_allowed_list);
-		
+
 		$new=0;
 		$newpost = array();
 		foreach ($post as $n => $v)
 		{
 			if (empty($v)) continue;
-			
+
 			// Skip value if both address and formated address are empty
 			if (
 				empty($v['addr_display']) && empty($v['addr_formatted']) &&
@@ -650,13 +650,13 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				empty($v['province']) && empty($v['zip']) &&
 				(empty($v['lat']) || empty($v['lon'])) && empty($v['url'])
 			) continue;
-			
+
 			// validate data or empty/set default values
 			$newpost[$new] = array();
-			
+
 			// Skip value if non-allowed country was passed
 			if ( $use_country && @ $v['country'] && count($ac_country_allowed_list) && !isset($ac_country_allowed_list[$v['country']]) ) $continue;
-			
+
 			$newpost[$new]['addr_display']  = !isset($v['addr_display']) ? '' : flexicontent_html::dataFilter($v['addr_display'],   4000, 'STRING', '');
 			$newpost[$new]['addr_formatted']= !isset($v['addr_formatted']) ? '' : flexicontent_html::dataFilter($v['addr_formatted'], 4000, 'STRING', '');
 			$newpost[$new]['addr1'] = !isset($v['addr1']) ? '' : flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', '');
@@ -666,10 +666,10 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['lon']   = !isset($v['lon']) ? '' : flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
 			$newpost[$new]['url']   = !isset($v['url']) ? '' : flexicontent_html::dataFilter($v['url'],    4000,   'URL', '');
 			$newpost[$new]['zoom']  = !isset($v['zoom']) ? '' : flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', $map_zoom);
-			
+
 			$newpost[$new]['lat']   = $newpost[$new]['lat'] ? $newpost[$new]['lat'] : '';  // clear if zero
 			$newpost[$new]['lon']   = $newpost[$new]['lon'] ? $newpost[$new]['lon'] : '';  // clear if zero
-			
+
 			// Allow saving these into the DB, so that they can be enabled later
 			$newpost[$new]['name']       = /*!$use_name       ||*/ !isset($v['name'])       ? '' : flexicontent_html::dataFilter($v['name'],     4000,  'STRING', 0);
 			$newpost[$new]['addr2']      = /*!$use_addr2      ||*/ !isset($v['addr2'])      ? '' : flexicontent_html::dataFilter($v['addr2'],    4000, 'STRING', 0);
@@ -678,7 +678,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['country']    = /*!$use_country    ||*/ !isset($v['country'])    ? '' : flexicontent_html::dataFilter($v['country'],     2,  'STRING', 0);
 			$newpost[$new]['province']   = /*!$use_province   ||*/ !isset($v['province'])   ? '' : flexicontent_html::dataFilter($v['province'],  200,  'STRING', 0);
 			$newpost[$new]['zip_suffix'] = /*!$use_zip_suffix ||*/ !isset($v['zip_suffix']) ? '' : flexicontent_html::dataFilter($v['zip_suffix'], 10,  'STRING', 0);
-			
+
 			$new++;
 		}
 		$post = $newpost;
@@ -698,28 +698,28 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					$item->calculated_fieldvalues[$to_fieldname][$i] = $v[$propname];
 				}
 			}
-			
+
 			$post[$i] = serialize($v);
 		}
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		$field->label = JText::_($field->label);
-		
+
 		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
-		
+
 		// Use the custom field values, if these were provided
 		$values = $values !== null ? $values : $this->field->value;
-		
+
 		// Parse field values
 		$this->values = $this->parseValues($values);
-		
+
 		// Get choosen display layout
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout && $viewlayout != 'value' ? 'value_'.$viewlayout : 'value';

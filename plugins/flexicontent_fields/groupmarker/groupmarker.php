@@ -2,7 +2,7 @@
 /**
  * @package         FLEXIcontent
  * @version         3.2
- * 
+ *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            http://www.flexicontent.com
  * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
@@ -36,18 +36,18 @@ class plgFlexicontent_fieldsGroupmarker extends FCField
 	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-		
+
 		static $tabsetStack = array();
-		
+
 		static $tabSetCur = -1;
 		static $tabSetCnt = -1;
 		static $tabCnt = array();
-		
+
 		$marker_type     = $field->parameters->get( 'marker_type' ) ;
 		$cont_label      = $field->parameters->get( 'cont_label' ) ;
 		$cont_cssclass   = $field->parameters->get( 'cont_cssclass' ) ;
 		$custom_html_sep = $field->parameters->get( 'custom_html_sep' ) ;
-		
+
 		$field->html = '';
 		switch ($marker_type) {
 			case 'tabset_start':
@@ -87,6 +87,6 @@ class plgFlexicontent_fieldsGroupmarker extends FCField
 				break;
 		}
 	}
-	
+
 }
 ?>

@@ -355,10 +355,13 @@ jQuery(document).ready(function() {
 		{
 			var oldFuncResult = oldFunc.apply(this, arguments);
 			var el = JoomlaCalendar.prototype.__currentCalendarInput; //jQuery(document.activeElement);
-			var previous_value = el.attr('data-previous_value');
-			if ( typeof previous_value !== "undefined" && previous_value != el.val())
+			if (!!el)
 			{
-				el.trigger('change');
+				var previous_value = el.attr('data-previous_value');
+				if ( typeof previous_value !== "undefined" && previous_value != el.val())
+				{
+					el.trigger('change');
+				}
 			}
 			return oldFuncResult;
 		}

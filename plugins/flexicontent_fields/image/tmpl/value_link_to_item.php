@@ -33,7 +33,7 @@ foreach ($values as $n => $value)
 			'.count($values).' '.JText::_('FLEXI_IMAGES').'
 		</span>' : '').'
 	</span>';
-	
+
 	// If single display and not in field group then do not add more images
 	if (!$is_ingroup && $isSingle)
 	{
