@@ -72,7 +72,7 @@ $this->document->addScriptDeclaration($js);
 					<?php echo $form->getInput('label'); ?>
 				</td>
 			</tr>
-			<?php if ($form->getValue('iscore') == 0) : ?>
+
 			<tr>
 				<td class="key">
 					<?php echo $form->getLabel('name'); ?>
@@ -80,44 +80,36 @@ $this->document->addScriptDeclaration($js);
 				<td>
 					<?php echo $form->getInput('name'); ?>
 					<input type="hidden" id="jform_title" name="jform[title]" value="<?php echo $this->form->getValue('name'); ?>" />
-					
-					<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('FLEXI_FIELDNAME_CHANGE_WARNING'); ?>">
-						<?php echo $warn_image; ?>
-						<?php echo $conf_image; ?>
-						<?php echo JText::_('FLEXI_NOTES'); ?>
-					</span>
-					
-					<?php if ($form->getValue('field_type')=='textarea') :
-						$msg_txt = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1);
+
+					<?php if (! $form->getValue('iscore')) : ?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('FLEXI_FIELDNAME_CHANGE_WARNING'); ?>">
+							<?php echo $warn_image; ?>
+							<?php echo $conf_image; ?>
+							<?php echo JText::_('FLEXI_NOTES'); ?>
+						</span>
+					<?php endif; ?>
+
+					<?php
+					if ($form->getValue('field_type') === 'textarea')
+					{
+						$customize_mssg = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1);
+					}
+					elseif ($form->getValue('field_type')=='maintext') 
+					{
+						$customize_mssg = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1);
+					}
 					?>
-						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo $msg_txt; ?>">
+
+					<?php if (! empty($customize_mssg)) : ?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo $customize_mssg; ?>">
 							<?php echo $hint_image; ?>
 							<?php echo $conf_image; ?>
 							<?php echo JText::_('FLEXI_NOTES'); ?>
 						</span>
 					<?php endif; ?>
+
 				</td>
 			</tr>
-			<?php else : ?>
-			<tr>
-				<td class="key">
-					<?php echo $form->getLabel('name'); ?>
-				</td>
-				<td>
-					<?php echo $form->getInput("name"); ?>
-					
-					<?php if ($form->getValue('field_type')=='maintext') :
-						$msg_txt = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1);
-					?>
-						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo $msg_txt; ?>">
-							<?php echo $hint_image; ?>
-							<?php echo $conf_image; ?>
-							<?php echo JText::_('FLEXI_NOTES'); ?>
-						</span>
-					<?php endif; ?>
-				</td>
-			</tr>
-			<?php endif; ?>
 
 			
 			<?php if ($form->getValue("iscore") == 0) : ?>
