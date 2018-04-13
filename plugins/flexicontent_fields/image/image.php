@@ -1496,6 +1496,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Display types that need special container are not allowed when field in a group
 		$no_container_needed = array(1,2,3,4,6);
+
 		if (
 			($isItemsManager && !in_array($popuptype, $iManager_containers)) ||
 			($is_ingroup && is_numeric($popuptype) && !in_array($popuptype, $no_container_needed))
