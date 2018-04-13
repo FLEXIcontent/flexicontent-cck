@@ -1716,6 +1716,9 @@ class flexicontent_html
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
+				// Load polyfills for older IE
+				JHtml::_('behavior.polyfill', array('event', 'classlist', 'map'), 'lte IE 11');
+
 				$js .= "";
 
 				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
