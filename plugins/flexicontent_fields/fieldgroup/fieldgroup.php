@@ -200,12 +200,16 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
-				var theSet = newField.find('input, select');
+				var theSet = newField.find('input, select, textarea, button');
 				var nr = 0;
-				theSet.each(function() {
-					var elem = jQuery(this);
-					elem.attr('name', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
-					elem.attr('id', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
+				theSet.each(function()
+				{
+					if (!!this.id)
+					{
+						this.setAttribute('data-original-id', this.id);
+					}
+					this.setAttribute('name', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
+					this.setAttribute('id', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
 					nr++;
 				});
 				";

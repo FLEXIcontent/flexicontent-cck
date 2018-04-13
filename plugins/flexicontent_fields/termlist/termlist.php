@@ -213,20 +213,23 @@ class plgFlexicontent_fieldsTermlist extends FCField
 				var boxClass = 'termtext';
 				var container = newField.find('.fc_'+boxClass);
 				var container_inner = newField.find('.fcfield_box');
-				var txtarea = container.find('textarea').first();
 
-				var hasTinyMCE = container.find('textarea').hasClass('mce_editable');  //typeof tinyMCE === 'undefined' ? false : !!tinyMCE.get( txtarea.attr('id') );
-				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : txtarea.next().hasClass('CodeMirror');
-
-				var oldAreaID = container.find('textarea').attr('id');
+				var txtArea   = container.find('textarea').first();
+				var oldAreaID = txtArea.attr('id');
 				var newAreaID = '".$elementid."_'+uniqueRowNum".$field->id.";
 				var regex_oldAreaID = new RegExp(oldAreaID, 'g');
+
+				// ID of originally cloned textarea 
+				var srcAreaID = txtArea.attr('data-original-id') ? txtArea.attr('data-original-id') : txtArea.attr('id');
+
+				var hasTinyMCE = txtArea.hasClass('mce_editable');  //typeof tinyMCE === 'undefined' ? false : !!tinyMCE.get( srcAreaID );
+				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : txtArea.next().hasClass('CodeMirror');
 
 				".( !$use_html ? "" : "
 				if (hasCodeMirror)  // CodeMirror case
 				{
 					// Get options not from copy but from the original DOM element
-					var CMoptions = jQuery('#'+txtarea.attr('id')).next().get(0).CodeMirror.options;
+					var CMoptions = document.getElementById(srcAreaID).nextSibling.CodeMirror.options;
 
 					// Cleanup the cloned HTML elements of the editor
 					container.find('.CodeMirror').remove();
@@ -238,8 +241,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 					if (hasTinyMCE)
 					{
 						MCEoptions = tinyMCE.majorVersion >= 4 ?
-							tinymce.get(oldAreaID).settings :
-							tinymce.EditorManager.get(oldAreaID).settings;
+							tinymce.get(srcAreaID).settings :
+							tinymce.EditorManager.get(srcAreaID).settings;
 
 						// Clear some options
 						MCEoptions.id = null;
@@ -532,7 +535,6 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-
 		$field->label = JText::_($field->label);
 
 		// Some variables

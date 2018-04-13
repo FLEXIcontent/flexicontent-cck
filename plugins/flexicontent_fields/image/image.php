@@ -1462,9 +1462,17 @@ class plgFlexicontent_fieldsImage extends FCField
 			$usepopup = 0;
 		}
 
-		// If using a non allowed gallery JS, then force fancybox
-		$iManager_containers = array(1,4);  // Only allow multibox and fancybox in items manager
-		$no_container_needed = array(1,2,3,4,6);  // Display types that need special container are not allowed when field in a group
+
+		/**
+		 * If using a non allowed gallery JS, then force fancybox
+		 */
+
+		// Only allow multibox and fancybox in items manager
+		$iManager_containers = array(1,4);
+
+		// Display types that need special container are not allowed when field in a group
+		$no_container_needed = array(1,2,3,4,6);
+
 		if (
 			($isItemsManager && !in_array($popuptype, $iManager_containers)) ||
 			($is_ingroup && is_numeric($popuptype) && !in_array($popuptype, $no_container_needed))
@@ -1550,8 +1558,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($isLinkToPopup)
 			{
 				$usepopup = 1;
-				if ($url_target == 'multibox') $popuptype = 1;
-				if ($url_target == 'fancybox') $popuptype = 4;
+				if ($url_target === 'multibox') $popuptype = 1;
+				if ($url_target === 'fancybox') $popuptype = 4;
 			}
 
 			// Not linking in popup, disable adding gallery JS
@@ -1659,11 +1667,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$thumb_size = -1;
 		}
-		else if ($view == 'category')
+		elseif ($view === 'category')
 		{
 			$thumb_size = $field->parameters->get('thumbincatview',1);
 		}
-		else if ($view == 'item')
+		elseif ($view === 'item')
 		{
 			$thumb_size = $field->parameters->get('thumbinitemview',2);
 		}
