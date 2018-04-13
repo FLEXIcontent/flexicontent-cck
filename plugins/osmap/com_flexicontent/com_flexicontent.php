@@ -381,7 +381,7 @@ class osmap_com_flexicontent
 
 		// First thing we need to do is to select only the requested items
 		// (ONLY include items that have current category as their main category)
-		$where_basic = ' WHERE 1 ';
+		$where_basic = ' WHERE i.state IN (1, -5) ';
 		$extra_join  = '';
 		$extra_endwhere = '';
 		
