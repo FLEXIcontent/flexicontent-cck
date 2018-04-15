@@ -89,4 +89,6 @@ foreach ($related_items_sets as $n => $related_items)
 		. $HTML->items_list
 		. ($submit_related_position == 1 || $submit_related_position == 2 ? $HTML->submit_related_btn : '')
 		;
+
+	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }

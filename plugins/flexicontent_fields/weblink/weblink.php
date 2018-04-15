@@ -398,7 +398,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$css .= '';
 		}
 
-
 		// Added field's custom CSS / JS
 		if ($multiple) $js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
@@ -414,7 +413,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// *** Create field's HTML display for item form
 		// ***
 
-		$field->html = array();  // Make sure this is an array
+		$field->html = array();
 
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field_InlineBoxes';
@@ -426,9 +425,12 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
+		// Do not convert the array to string if field is in a group
+		if ($use_ingroup);
 
-		if ($use_ingroup) { // do not convert the array to string if field is in a group
-		} else if ($multiple) { // handle multiple records
+		// Handle multiple records
+		elseif ($multiple)
+		{
 			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
@@ -440,7 +442,11 @@ class plgFlexicontent_fieldsWeblink extends FCField
 						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
-		} else {  // handle single values
+		}
+
+		// Handle single values
+		else
+		{
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 
@@ -707,10 +713,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
-
-		// Set field and item objects
-		$this->setField($field);
-		$this->setItem($item);
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
