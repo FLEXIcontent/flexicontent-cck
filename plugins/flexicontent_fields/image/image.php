@@ -1676,7 +1676,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			// MultiBox maybe added in extra cases besides popup
 			// (a) in Item manager, (b) When linking to URL in popup target
 			$view_allows_mb  = $isItemsManager || $isHtmlViewFE;
-			$config_needs_mb = $isLinkToPopup  || ($usepopup && $popuptype == 1);
+			$config_needs_mb = !empty($isLinkToPopup)  || ($usepopup && $popuptype == 1);
 			if ( $view_allows_mb && $config_needs_mb )
 			{
 				if (!$multiboxadded)
