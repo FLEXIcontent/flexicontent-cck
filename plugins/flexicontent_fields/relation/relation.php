@@ -235,6 +235,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
+
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
 				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
@@ -554,7 +555,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+
 		$field->label = JText::_($field->label);
+
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
 		// Set field and item objects
 		$this->setField($field);
@@ -769,6 +776,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
+
+		// Normally field is a single set of multiple items (aka non-multi-value),
+		// thus we added no special separator when being used as multiple-value (multiple sets)
+		if (!$is_ingroup)
+		{
+			$field->{$prop} = implode('<br>', $field->{$prop});
+		}
 	}
 
 
@@ -789,6 +803,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$is_importcsv = JFactory::getApplication()->get('task', '', 'cmd') == 'importcsv';
 		$field->use_suborder = $multiple;
+
+
+		// ***
+		// *** Reformat the posted data
+		// ***
 
 		// Make sure posted data is an array
 		$post = !is_array($post) ? array($post) : $post;
