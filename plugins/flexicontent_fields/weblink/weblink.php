@@ -714,6 +714,9 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
+		$this->setField($field);
+		$this->setItem($item);
+
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 

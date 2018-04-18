@@ -104,6 +104,31 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Name Safe Element ID
 		$elementid_ns = str_replace('-', '_', $elementid);
 
+
+		// ***
+		// *** Create category tree to use for creating the category selector
+		// ***
+
+		// Get categories without filtering
+		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
+		$tree = flexicontent_cats::getCategoriesTree();
+
+		// Get allowed categories
+		$allowed_cats = self::getAllowedCategories($field);
+		if (empty($allowed_cats))
+		{
+			$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
+			return;
+		}
+
+		// Add categories that will be used by the category selector
+		$allowedtree = array();
+		foreach ($allowed_cats as $catid)
+		{
+			$allowedtree[$catid] = $tree[$catid];
+		}
+
+
 		$js = "";
 		$css = "";
 
@@ -214,6 +239,12 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 				// Re-init any select2 elements
 				fc_attachSelect2(newField);
+
+				" . (count($allowedtree) === 1 ? "
+				var cat_selector = jQuery('#" . $elementid."_'+uniqueRowNum".$field->id . "+'_cat_selector');
+				cat_selector[0].selectedIndex = 1;
+				cat_selector.trigger('change');
+				" : "") . "
 				";
 
 			// Add new element to sortable objects (if field not in group)
@@ -362,26 +393,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 
 		// ***
-		// *** Create category tree to use for selecting related items
+		// *** Create category selector to use for selecting related items
 		// ***
-
-		// Get categories without filtering
-		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
-		$tree = flexicontent_cats::getCategoriesTree();
-
-		// Get allowed categories
-		$allowed_cats = self::getAllowedCategories($field);
-		if (empty($allowed_cats))
-		{
-			$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
-			return;
-		}
-
-		// Add categories that will be used by the category selector
-		foreach ($allowed_cats as $catid)
-		{
-			$allowedtree[$catid] = $tree[$catid];
-		}
 
 		$cat_selected = count($allowedtree)==1 ? reset($allowedtree) : '';
 		$cat_selecor_box_style = count($allowedtree) === 1 ? 'style="display:none;" ' : '';
@@ -686,16 +699,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 				}
 			}
 
-			// set upper limit as $values array length
-			$itemcount = count($values);
+			/**
+			 * Set upper limit as $values array length
+			 */
 
-			// change upper limit if itemcount is set and error checked
-			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&
-				$field->parameters->get( 'itemcount', 0) > 0 &&
-				$field->parameters->get( 'itemcount', 0) < $itemcount
-			) {
-				$itemcount = $field->parameters->get( 'itemcount', 0);
-			}
+			$itemcount = (int) $field->parameters->get( 'itemcount', 0);
 
 			$related_items_sets = array();
 
@@ -709,7 +717,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 				}
 
 				// Limit list to desired max # items
-				for ($i = 0; $i < $itemcount; $i++)
+				$max_vals = $itemcount > 0 && $itemcount <= count($vals)
+					? $itemcount
+					: count($vals);
+
+				for ($i = 0; $i < $max_vals; $i++)
 				{
 					$v = $vals[$i];
 
