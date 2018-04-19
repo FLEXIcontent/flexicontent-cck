@@ -1413,24 +1413,23 @@ if ($this->item->type_id) {
 // JOOMLA IMAGE/URLS TAB
 // *********************
 if ( count($FC_jfields_html) ) : ?>
-	
+	<?php
+		if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
+			$fsetname = 'COM_CONTENT_IMAGES_AND_URLS';
+			$fseticon = 'icon-pencil-2';
+		} else if (isset($FC_jfields_html['images'])) {
+			$fsetname = 'FLEXI_IMAGES';
+			$fseticon = 'icon-images';
+		} else if (isset($FC_jfields_html['urls'])) {
+			$fsetname = 'FLEXI_LINKS';
+			$fseticon = 'icon-link';
+		} else {
+			$fsetname = 'FLEXI_COMPATIBILITY';
+			$fseticon = 'icon-pencil-2';
+		}
+	?>
 	<!-- Joomla images/urls tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $fseticon; ?>">
-		<?php
-			if (isset($FC_jfields_html['images']) && isset($FC_jfields_html['urls'])) {
-				$fsetname = 'COM_CONTENT_IMAGES_AND_URLS';
-				$fseticon = 'icon-pencil-2';
-			} else if (isset($FC_jfields_html['images'])) {
-				$fsetname = 'FLEXI_IMAGES';
-				$fseticon = 'icon-images';
-			} else if (isset($FC_jfields_html['urls'])) {
-				$fsetname = 'FLEXI_LINKS';
-				$fseticon = 'icon-link';
-			} else {
-				$fsetname = 'FLEXI_COMPATIBILITY';
-				$fseticon = 'icon-pencil-2';
-			}
-		?>
 		<h3 class="tabberheading"> <?php echo JText::_($fsetname); ?> </h3>
 		
 		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
