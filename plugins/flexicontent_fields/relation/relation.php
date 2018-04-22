@@ -242,8 +242,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 				" . (count($allowedtree) === 1 ? "
 				var cat_selector = jQuery('#" . $elementid."_'+uniqueRowNum".$field->id . "+'_cat_selector');
-				cat_selector[0].selectedIndex = 1;
-				cat_selector.trigger('change');
+				if (cat_selector.length)
+				{
+					cat_selector[0].selectedIndex = 1;
+					cat_selector.trigger('change');
+				}
 				" : "") . "
 				";
 
@@ -315,27 +318,17 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// *** Initialise values and split them into: (a) item ids and (b) category ids
 		// ***
 
-		if (!$field->value)
-		{
-			$field->value = array(array());
-		}
-		else
-		{
-			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-			$field->value = is_array($field->value)
-				? $field->value
-				: array($field->value);
+		$field->value = is_array($field->value) ? $field->value : array($field->value);
 
-			if (!is_array(reset($field->value)))
+		foreach ($field->value as $i => $value)
+		{
+			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			if ( !is_array($value) )
 			{
-				$array = $this->unserialize_array(reset($field->value), $force_array=false, $force_value=false);
-				$field->value = $array ?: $field->value;
-
-				// Also Force it to be a "multiple" value field, aka an array of an array of values
-				$field->value = array($field->value);
+				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+				$field->value[$i] = $array ?: array($value);
 			}
 		}
-
 
 		$related_items = array();
 		$_itemids = array();
