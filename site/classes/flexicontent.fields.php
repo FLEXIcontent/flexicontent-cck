@@ -2090,7 +2090,7 @@ class FlexicontentFields
 		// *** Replace item properties
 		// ***
 
-		preg_match_all("/{item->[^}]+}/", $query, $matches);
+		preg_match_all("/{item->[0-9a-zA-Z_]+}/", $query, $matches);
 
 		$canCache = count($matches[0]) == 0;
 		if ( !$item_pros && count($matches[0]) )
@@ -2122,7 +2122,7 @@ class FlexicontentFields
 
 		if ($field)
 		{
-			preg_match_all("/{field->[^}]+}/", $query, $matches);
+			preg_match_all("/{field->[0-9a-zA-Z_]+}/", $query, $matches);
 			foreach ($matches[0] as $replacement_tag)
 			{
 				$replacement_value = '$'.substr($replacement_tag, 1, -1);
