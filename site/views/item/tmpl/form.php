@@ -70,7 +70,7 @@ $referer_encoded = htmlspecialchars($referer, ENT_COMPAT, 'UTF-8');
 
 $lang = JFactory::getApplication()->input->getCmd('lang', '');
 $site_languages = FLEXIUtilities::getLanguages();
-$sef_lang = $row->language != '*' && isset($site_languages->{$lang}) ? $site_languages->{$lang}->sef : '';
+$sef_lang = $this->row->language != '*' && isset($site_languages->{$lang}) ? $site_languages->{$lang}->sef : '';
 
 // Print message about zero allowed categories
 if ( !$this->lists['catid'] && !$this->menuCats )
@@ -161,10 +161,15 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 					var term = request.term;
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						url: '".JUri::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&". JSession::getFormToken() ."=1" . ($sef_lang ? '&lang=' . $sef_lang : '') . "',
+						/*
+						url: '".JUri::base(true)."/index.php?option=com_flexicontent&". JSession::getFormToken() ."=1" . ($sef_lang ? '&lang=' . $sef_lang : '') . "',
+						*/
+						url: '".JUri::base(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
-							q: request.term
+							q: request.term,
+							task: 'viewtags',
+							format: 'json'
 						},
 						success: function( data ) {
 							//window.console.log( '... received tags for \"' + term + '\"');

@@ -221,7 +221,7 @@ if($format == 'raw') return;
 
 // Do not convert urls for TASKs: ajaxvote, ajaxfav, txtautocomplete
 // but ... these should be raw format, and the JRoute::_() should not have been called on them anyway ...
-if ($task == 'ajaxvote' || $task == 'ajaxfav' || $task == 'txtautocomplete') return;
+if ($task == 'ajaxvote' || $task == 'ajaxfav' || $task == 'txtautocomplete' || $task == 'viewtags') return;
 
 
 
