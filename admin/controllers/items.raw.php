@@ -214,45 +214,51 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$app    = JFactory::getApplication();
-		$jinput = $app->input;
 		$perms  = FlexicontentHelperPerm::getPerm();
 
 		@ob_end_clean();
 
-		// header("Content-type:text/json");
-		// header('Content-type: application/json');
-		// header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
+		//header('Content-type: application/json; charset=utf-8');
+		header('Content-type: application/json');
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
 
+		$array = array();
+
 		if (!$perms->CanUseTags)
 		{
-			$array = array("{\"id\":\"0\",\"name\":\"You have no access\"}");
+			$array[] = (object) array(
+				'id' => '0',
+				'name' => JText::_('FLEXI_FIELD_NO_ACCESS')
+			);
 		}
 		else
 		{
 			$model = $this->getModel('item');
-			$tagobjs = $model->gettags($jinput->get('q', '', 'string'));
-
-			$array = array();
+			$tagobjs = $model->gettags($this->input->get('q', '', 'string'));
 
 			if ($tagobjs)
 			{
 				foreach ($tagobjs as $tag)
 				{
-					$array[] = "{\"id\":\"" . $tag->id . "\",\"name\":\"" . $tag->name . "\"}";
+					$array[] = (object) array(
+						'id' => $tag->id,
+						'name' => $tag->name
+					);
 				}
 			}
 
 			if (empty($array))
 			{
-				$array[] = "{\"id\":\"0\",\"name\":\"" . ($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found') . "\"}";
+				$array[] = (object) array(
+					'id' => '0',
+					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
+				);
 			}
 		}
 
-		echo "[\n" . implode(",\n", $array) . "\n]";
-		exit;
+		jexit(json_encode($array/*, JSON_UNESCAPED_UNICODE*/));
 	}
 
 

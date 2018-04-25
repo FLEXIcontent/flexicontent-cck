@@ -52,7 +52,7 @@ class FlexicontentTasksCore
 
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
-		$cparams = JComponentHelper::getParams( $this->option );
+		$cparams = JComponentHelper::getParams($this->option);
 		$use_tmp = true;
 
 		// Get request variables
@@ -139,6 +139,7 @@ class FlexicontentTasksCore
 		$limit      = $pageSize;
 
 		$lang_where = '';
+
 		if ($filtercat)
 		{
 			$lang_where .= '   AND ( i.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR i.language="*" ) ';
@@ -146,7 +147,9 @@ class FlexicontentTasksCore
 
 		$access_where = '';
 		$joinaccess = '';
-		/*if (!$show_noauth) {
+
+		/*if (!$show_noauth)
+		{
 			$user = JFactory::getUser();
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
@@ -179,8 +182,7 @@ class FlexicontentTasksCore
 			//.' ORDER BY score DESC'  // THIS MAYBE SLOW
 			.' LIMIT '.$limitstart.', '.$limit
 			;
-		$db->setQuery( $query  );
-		$data = $db->loadAssocList();
+		$data = $db->setQuery($query)->loadAssocList();
 		//print_r($data); exit;
 
 		// Get last word (this is a word prefix) and remove it from words array
@@ -202,7 +204,9 @@ class FlexicontentTasksCore
 				foreach ($matches[2] as $_m)
 				{
 					if ($search_prefix)
+					{
 						$_m = preg_replace('/\b'.$search_prefix.'/u', '', $_m);
+					}
 					$_m_low = StringHelper::strtolower($_m, 'UTF-8');
 					$words_found[$_m_low] = 1;
 				}
@@ -213,7 +217,7 @@ class FlexicontentTasksCore
 		// Pagination not appropriate when using autocomplete ...
 		$options = array();
 		$options['Total'] = count($words_found);
-		
+
 		// Create responce and JSON encode it
 		$options['Matches'] = array();
 		$n = 0;
@@ -221,29 +225,102 @@ class FlexicontentTasksCore
 		{
 			if (!$search_prefix)
 			{
-				if ( StringHelper::strlen($_w) < $min_word_len ) continue;  // word too short
-				if ( $this->_isStopWord($_w, $tbl) ) continue;  // stopword or too common
+				// Word too short
+				if (StringHelper::strlen($_w) < $min_word_len )
+				{
+					continue;
+				}
+
+				// Stopword or too common
+				if ($this->_isStopWord($_w, $tbl))
+				{
+					continue;
+				}
 			}
 
 			$options['Matches'][] = array(
 				'text' => $complete_words.($complete_words ? ' ' : '').$_w,
 				'id' => $complete_words.($complete_words ? ' ' : '').$_w
 			);
-			$n++;
-			if ($n >= $pageSize) break;
+			++$n;
+
+			if ($n >= $pageSize)
+			{
+				break;
+			}
 		}
 
-		echo json_encode($options);
-		jexit();
+		jexit(json_encode($options));
 	}
 
+
+	/**
+	 * Method to fetch the tags for selecting in item form
+	 *
+	 * @since 1.5
+	 */
+	public function viewtags()
+	{
+		// Check for request forgeries
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+
+		require_once JPath::clean(JPATH_BASE . '/../components/com_flexicontent/helpers/permission.php');
+
+		$app    = JFactory::getApplication();
+		$perms  = FlexicontentHelperPerm::getPerm();
+
+		@ob_end_clean();
+
+		//header('Content-type: application/json; charset=utf-8');
+		header('Content-type: application/json');
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
+
+		$array = array();
+
+		if (!$perms->CanUseTags)
+		{
+			$this->_loadLanguage();
+			$array[] = (object) array(
+				'id' => '0',
+				'name' => JText::_('FLEXI_FIELD_NO_ACCESS')
+			);
+		}
+		else
+		{
+			$tagobjs = $this->_gettags($app->input->get('q', '', 'string'));
+
+			if ($tagobjs)
+			{
+				foreach ($tagobjs as $tag)
+				{
+					$array[] = (object) array(
+						'id' => $tag->id,
+						'name' => $tag->name
+					);
+				}
+			}
+
+			if (empty($array))
+			{
+				$this->_loadLanguage();
+				$array[] = (object) array(
+					'id' => '0',
+					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
+				);
+			}
+		}
+
+		jexit(json_encode($array/*, JSON_UNESCAPED_UNICODE*/));
+	}
 
 
 	// ***
 	// *** Helper methods
 	// ***
 
-	protected function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
+	private function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
 	{
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
@@ -255,13 +332,13 @@ class FlexicontentTasksCore
 			.' FROM #__'.$tbl
 			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
 			.' LIMIT 1';
-		$db->setQuery($query);
-		$result = $db->loadAssocList();
+		$result = $db->setQuery($query)->loadAssocList();
+
 		return !empty($return) ? true : false;
 	}
 
 
-	protected function _callPlugins()
+	private function _callPlugins()
 	{
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
@@ -295,5 +372,45 @@ class FlexicontentTasksCore
 		{
 			$globalcats = $plg->getCategoriesTree();
 		}
+	}
+
+
+	/**
+	 * Method to fetch tags according to a given mask
+	 * 
+	 * @return object
+	 * @since 1.0
+	 */
+	private function _getTags($mask="", $limit=100)
+	{
+		$db = JFactory::getDbo();
+
+		$escaped_mask = $db->escape($mask, true);
+		$quoted_mask  = $db->Quote('%' . $escaped_mask . '%', false);
+
+		$mask_where = $mask ? ' name LIKE ' . $quoted_mask . ' AND ' : '';
+
+		$query = 'SELECT * '
+			. ' FROM #__flexicontent_tags'
+			. ' WHERE ' . $mask_where . ' published = 1'
+			. ' ORDER BY name LIMIT 0, ' . (int) $limit
+			;
+		$tags = $db->setQuery($query)->loadObjectlist();
+
+		return $tags;
+	}
+
+
+	/**
+	 * Method to load language files
+	 * 
+	 * @return object
+	 * @since 3.2.1.4
+	 */
+	private function _loadLanguage()
+	{
+		// Load english language file for 'com_flexicontent' component then override with current language file
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 	}
 }
