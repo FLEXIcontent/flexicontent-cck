@@ -114,7 +114,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$tree = flexicontent_cats::getCategoriesTree();
 
 		// Get allowed categories
-		$allowed_cats = self::getAllowedCategories($field);
+		$allowed_cats = $this->getAllowedCategories($field);
 		if (empty($allowed_cats))
 		{
 			$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
@@ -318,55 +318,23 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// *** Initialise values and split them into: (a) item ids and (b) category ids
 		// ***
 
-		$field->value = is_array($field->value) ? $field->value : array($field->value);
+		// Parse values
+		$field->value = $this->parseValues($field->value);
+		//echo '<pre>'; echo $field->label . ' ID: ' . $field->id . "\n"; print_r($field->value); echo '</pre>';
+		
+		// No limit for used items
+		$item_limit = 0;
 
-		foreach ($field->value as $i => $value)
-		{
-			// Compatibility for non-serialized values (e.g. reload user input after form validation error) or for NULL values in a field group
-			if ( !is_array($value) )
-			{
-				$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
-				$field->value[$i] = $array ?: array($value);
-			}
-		}
-
-		$related_items = array();
-		$_itemids = array();
-
-		foreach($field->value as $n => $values)
-		{
-			$related_items[$n] = array();
-			$_itemids[$n] = array();
-
-			if (!$values)
-			{
-				continue;
-			}
-
-			foreach ($values as $v)
-			{
-				if (!$v)
-				{
-					continue;
-				}
-
-				list ($itemid, $catid) = explode(':', $v);
-				$itemid = (int) $itemid;
-				$catid  = (int) $catid;
-				$related_items[$n][$itemid] = new stdClass;
-				$related_items[$n][$itemid]->itemid = $itemid;
-				$related_items[$n][$itemid]->catid  = $catid;
-				$related_items[$n][$itemid]->value  = $v;
-				$_itemids[$n][] = $itemid;
-			}
-		}
+		// Get related items IDs and their category ID
+		$itemids_sets = null;
+		$related_items_sets = $this->parseRelatedItems($field->value, $item_limit, $itemids_sets);
 
 
 		// ***
 		// *** Item retrieving query ... put together and execute it
 		// ***
 
-		foreach($_itemids as $n => $_itemids_v)
+		foreach($itemids_sets as $n => $_itemids_v)
 		{
 			if (count($_itemids_v))
 			{
@@ -428,7 +396,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 					$itemtitle = $statestr.$itemtitle." ";
 				}
 				$itemid = $itemdata->id;
-				$items_options_select[$n] .= '<option selected="selected" value="'.$related_items[$n][$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
+				$items_options_select[$n] .= '<option selected="selected" value="'.$related_items_sets[$n][$itemid]->value.'" >'.$itemtitle.'</option>'."\n";
 			}
 		}
 
@@ -460,13 +428,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$n = 0;
 		//if ($use_ingroup) {print_r($field->value);}
 
-		foreach ($related_items as $n => $related_items_v)
+		foreach ($related_items_sets as $n => $related_items)
 		{
 			$fieldname_n = $fieldname . ($multiple ? '['.$n.']' : '') . '[]';
 			$elementid_n = $elementid . ($multiple ? '_' . $n : '');
 
 			// Skip empty if not in field group, and at least one value was added
-			if (!count($related_items_v) && !$use_ingroup && $n)  continue;
+			if (!count($related_items) && !$use_ingroup && $n)  continue;
 
 			$field->html[] = '
 				'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
@@ -574,10 +542,6 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$this->setItem($item);
 
 		$values = $values ? $values : $field->value;
-		if ( !is_array($values) )
-		{
-			$values = array($values);
-		}
 
 
 		// ***
@@ -620,7 +584,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		{
 			$disp->total_info = true;
 		}
-		elseif ( $show_total_only==1 || ($show_total_only == 2 && (count($values) || $field->field_type === 'relation_reverse')) )  // For relation reverse we will count items inside the layout
+		elseif ( $show_total_only==1 || ($show_total_only == 2 && (empty($values) || $field->field_type === 'relation_reverse')) )  // For relation reverse we will count items inside the layout
 		{
 			$app = JFactory::getApplication();
 			$option = $app->input->get('option', '', 'cmd');
@@ -671,65 +635,15 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		else  // $field->field_type === 'autorelationfilters' || $field->field_type === 'relation'
 		{
-			if (!$values)
-			{
-				$values = array(array());
-			}
-			else
-			{
-				// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-				$values = is_array($values)
-					? $values
-					: array($values);
+			// Parse values
+			$values = $this->parseValues($values);
 
-				if (!is_array(reset($values)))
-				{
-					$array = $this->unserialize_array(reset($values), $force_array=false, $force_value=false);
-					$values = $array ?: $values;
+			// Get limit of displayed items
+			$item_limit = (int) $field->parameters->get('itemcount', 0);
 
-					// Also Force it to be a "multiple" value field, aka an array of an array of values
-					$values = array($values);
-				}
-			}
-
-			/**
-			 * Set upper limit as $values array length
-			 */
-
-			$itemcount = (int) $field->parameters->get( 'itemcount', 0);
-
-			$related_items_sets = array();
-
-			foreach($values as $n => $vals)
-			{
-				$related_items_sets[$n] = array();
-
-				if (!$vals)
-				{
-					continue;
-				}
-
-				// Limit list to desired max # items
-				$max_vals = $itemcount > 0 && $itemcount <= count($vals)
-					? $itemcount
-					: count($vals);
-
-				for ($i = 0; $i < $max_vals; $i++)
-				{
-					$v = $vals[$i];
-
-					if (!$v)
-					{
-						continue;
-					}
-
-					list ($itemid, $catid) = explode(":", $v);
-					$related_items_sets[$n][$itemid] = new stdClass();
-					$related_items_sets[$n][$itemid]->itemid = $itemid;
-					$related_items_sets[$n][$itemid]->catid  = $catid;
-					$related_items_sets[$n][$itemid]->value  = $v;
-				}
-			}
+			// Get related items IDs and their category ID
+			$itemids_sets = null;
+			$related_items_sets = $this->parseRelatedItems($values, $item_limit, $itemids_sets);
 		}
 
 
@@ -1021,7 +935,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	}
 
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	public function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 		if ( !$field->issearch ) return;
@@ -1048,7 +962,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	}
 
 
-	static function getAllowedCategories(& $field)
+	protected function getAllowedCategories($field)
 	{
 		// Get API objects / data
 		$app    = JFactory::getApplication();
@@ -1127,7 +1041,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	 * Method called via AJAX to get dependent values
 	 */
 
-	function getCategoryItems()
+	public function getCategoryItems()
 	{
 		// Get API objects / data
 		$app   = JFactory::getApplication();
@@ -1290,7 +1204,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * CATEGORY SCOPE
 		 */
 
-		$allowed_cats = self::getAllowedCategories($field);
+		$allowed_cats = $this->getAllowedCategories($field);
 
 		if (empty($allowed_cats))
 		{
@@ -1452,4 +1366,81 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Output the field
 		jexit(json_encode($response));
 	}
+
+
+	// Parses and returns fields values, unserializing them if serialized
+	protected function parseValues($_values)
+	{
+		// Make sure we have an array of values
+		if (!$_values)
+		{
+			$vals = array(array());
+		}
+		else
+		{
+			$vals = !is_array($_values)
+				? array($_values)
+				: $_values;
+		}
+
+		// Compatibility with legacy storage, we no longer serialize all values to one, this way the field can be reversed and filtered
+		if (count($vals) === 1 && is_string(reset($vals)))
+		{
+			$array = $this->unserialize_array(reset($vals), $force_array=false, $force_value=false);
+			$vals = $array ?: $vals;
+		}
+		
+		// Force multiple value format (array of arrays)
+		if (is_string(reset($vals)))
+		{
+			$vals = array($vals);
+		}
+
+		return $vals;
+	}
+	
+	// Parses and returns fields values, unserializing them if serialized
+	protected function parseRelatedItems($values, $item_limit, & $itemids_sets = null)
+	{
+		$related_items_sets = array();
+		$itemids_sets = array();
+
+		foreach($values as $n => $vals)
+		{
+			$related_items_sets[$n] = array();
+			$itemids_sets[$n] = array();
+
+			if (!$vals)
+			{
+				continue;
+			}
+
+			// Limit list to desired max # items
+			$max_vals = $item_limit > 0 && $item_limit <= count($vals)
+				? $item_limit
+				: count($vals);
+
+			for ($i = 0; $i < $max_vals; $i++)
+			{
+				$v = $vals[$i];
+
+				if (!$v)
+				{
+					continue;
+				}
+
+				list ($itemid, $catid) = explode(':', $v);
+				$itemid = (int) $itemid;
+				$catid  = (int) $catid;
+				$related_items_sets[$n][$itemid] = new stdClass;
+				$related_items_sets[$n][$itemid]->itemid = $itemid;
+				$related_items_sets[$n][$itemid]->catid  = $catid;
+				$related_items_sets[$n][$itemid]->value  = $v;
+				$itemids_sets[$n][] = $itemid;
+			}
+		}
+
+		return $related_items_sets;
+	}
+
 }
