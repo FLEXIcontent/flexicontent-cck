@@ -179,7 +179,7 @@ class FCIndexedField extends FCField
 
 
 		// Initialise property with default value
-		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) )
+		if (!$field->value || (count($field->value) === 1 && $field->value[0] === null))
 		{
 			$field->value = static::$valueIsArr && !empty($field->ingroup)
 				? array($default_values)
