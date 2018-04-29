@@ -43,7 +43,11 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
-		// initialize framework objects and other variables
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
+		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
