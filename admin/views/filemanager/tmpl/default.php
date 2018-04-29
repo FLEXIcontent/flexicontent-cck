@@ -402,12 +402,13 @@ if ($enable_multi_uploader)
 	$uploader_html = JHtml::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
 	$js = '
-		jQuery(document).ready(function()
-		{
+	jQuery(document).ready(function()
+	{
+		setTimeout(function(){
 			var IEversion = fc_isIE();
 			var is_IE8_IE9 = IEversion && IEversion < 10;
 			if (is_IE8_IE9) fctabber["fileman_tabset"].tabShow(1);
-	
+
 			// Show outer container of uploader
 			jQuery("#filemanager-2").show();
 			jQuery("#'.$uploader_tag_id . $up_sfx_n.'").css("min-height", 180);
@@ -423,8 +424,9 @@ if ($enable_multi_uploader)
 
 			// Hide basic uploader form if using multi-uploader script
 			jQuery("#filemanager-1").hide();
-		});
-		';
+		}, 20);
+	});
+	';
 
 	$document->addScriptDeclaration($js);
 }

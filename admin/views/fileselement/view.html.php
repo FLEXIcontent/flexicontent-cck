@@ -343,7 +343,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		if ($folder_mode)
 		{
 			$js = "
-			jQuery(document).ready(function()
+			document.addEventListener('DOMContentLoaded', function()
 			{
 				var delfilename = '".$delfilename."';
 				var remove_existing_files_from_list = 0;
@@ -401,7 +401,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		else
 		{
 			$js = "
-			jQuery(document).ready(function()
+			document.addEventListener('DOMContentLoaded', function()
 			{
 				// Find and mark file usage by filename search
 				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
