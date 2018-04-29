@@ -44,6 +44,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 
+		// Set field and item objects
+		$this->setField($field);
+		$this->setItem($item);
+
 
 		// ***
 		// *** Case of autorelated item
@@ -314,13 +318,12 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 
 
-		// ***
-		// *** Initialise values and split them into: (a) item ids and (b) category ids
-		// ***
+		/*
+		 * Initialise values and split them into: (a) item ids and (b) category ids
+		 */
 
 		// Parse values
 		$field->value = $this->parseValues($field->value);
-		//echo '<pre>'; echo $field->label . ' ID: ' . $field->id . "\n"; print_r($field->value); echo '</pre>';
 		
 		// No limit for used items
 		$item_limit = 0;
@@ -614,9 +617,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$disp->item_list = $has_itemslist_access[$field->id] && (!$disp->total_info || $total_show_list);
 
 
-		// ***
-		// *** Prepare item list data for rendering the related items list
-		// ***
+		/*
+		 * Prepare item list data for rendering the related items list
+		 */
 
 		$relation_field_id = $field->parameters->get('reverse_field', 0);
 
@@ -1396,6 +1399,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$vals = array($vals);
 		}
 
+		//echo '<div class="alert alert-info"><h2>parseValues()</h2><pre>'; print_r($vals); echo '</pre></div>';
 		return $vals;
 	}
 	
@@ -1440,6 +1444,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			}
 		}
 
+		//echo '<div class="alert alert-info"><h2>parseRelatedItems()</h2><pre>'; print_r($related_items_sets); echo '</pre></div>';
 		return $related_items_sets;
 	}
 

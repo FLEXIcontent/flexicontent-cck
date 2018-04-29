@@ -7,11 +7,16 @@ foreach ($related_items_sets as $n => $related_items)
 		continue;
 	}
 
+	$HTML = new stdClass();
+
+
+
 	// ***
 	// *** --01-- Create the items list
 	// ***
 
 	$HTML->items_list = '';
+
 	if ($disp->item_list && !empty($related_items))
 	{
 		// Implode using the configured separator
@@ -37,6 +42,7 @@ foreach ($related_items_sets as $n => $related_items)
 	// ***
 
 	$HTML->submit_related_btn = '';
+
 	if ($disp->submit_related_btn)
 	{
 		// Force single button display, if no items list HTML
@@ -65,6 +71,7 @@ foreach ($related_items_sets as $n => $related_items)
 	// ***
 
 	$HTML->total_info = '';
+
 	if ($disp->total_info)
 	{
 		$total_count = isset($options->total) ? $options->total : count($related_items);
