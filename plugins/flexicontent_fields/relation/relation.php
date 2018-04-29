@@ -323,6 +323,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 */
 
 		// Parse values
+		//echo '<div class="alert alert-info"><h2>DB: ' . $field->label . '</h2><pre>'; print_r($field->value); echo '</pre></div>';
 		$field->value = $this->parseValues($field->value);
 		
 		// No limit for used items
@@ -676,6 +677,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			foreach ($related_items_sets as $n => $related_items)
 			{
 				$related_items_sets[$n] = FlexicontentFields::getItemsList($field->parameters, $related_items, $field, $item, $options);
+				//echo '<div class="alert alert-warning"><h2>related_items html: ' . $field->label . '</h2><pre>'; print_r(array_keys($related_items_sets[$n])); echo '</pre></div>';
 			}
 		}
 
@@ -698,6 +700,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
 		include(self::getViewPath($field->field_type, $viewlayout));
+
+		//echo '<div class="well"><h2>HTML display: ' . $this->field->label . '</h2>'; print_r($field->{$prop}); echo '</div>';
 
 		// Normally field is a single set of multiple items (aka non-multi-value),
 		// thus we added no special separator when being used as multiple-value (multiple sets)
@@ -726,6 +730,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$is_importcsv = JFactory::getApplication()->get('task', '', 'cmd') == 'importcsv';
 		$field->use_suborder = $multiple;
 
+		//JFactory::getApplication()->enqueueMessage($field->label . ' (before): <pre>' . print_r($post, true) . '</pre>', 'notice');
+
 
 		// ***
 		// *** Reformat the posted data
@@ -735,7 +741,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$post = !is_array($post) ? array($post) : $post;
 
 		// Account for fact that ARRAY form elements are not submitted if they do not have a value
-		if ( $use_ingroup )
+		if ( $multiple )
 		{
 			$empty_value = array();
 			$custom = JFactory::getApplication()->input->get('custom', array(), 'array');
@@ -755,6 +761,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 				$post = $vals;
 			}
 		}
+
+		//JFactory::getApplication()->enqueueMessage($field->label . ' (after): <pre>' . print_r($post, true) . '</pre>', 'notice');
 	}
 
 
@@ -1374,6 +1382,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 	// Parses and returns fields values, unserializing them if serialized
 	protected function parseValues($_values)
 	{
+		$use_ingroup = $this->field->parameters->get('use_ingroup', 0);
+		$multiple   = $use_ingroup || (int) $this->field->parameters->get( 'allow_multiple', 0 ) ;
+
 		// Make sure we have an array of values
 		if (!$_values)
 		{
@@ -1394,12 +1405,26 @@ class plgFlexicontent_fieldsRelation extends FCField
 		}
 		
 		// Force multiple value format (array of arrays)
-		if (is_string(reset($vals)))
+		if (!$multiple)
 		{
-			$vals = array($vals);
+			if (is_string(reset($vals)))
+			{
+				$vals = array($vals);
+			}
+		}
+		else
+		{
+			foreach ($vals as & $v)
+			{
+				if (!is_array($v))
+				{
+					$v = strlen($v) ? array($v) : array();
+				}
+			}
+			unset($v);
 		}
 
-		//echo '<div class="alert alert-info"><h2>parseValues()</h2><pre>'; print_r($vals); echo '</pre></div>';
+		//echo '<div class="alert alert-info"><h2>parseValues(): ' . $this->field->label . '</h2><pre>'; print_r($vals); echo '</pre></div>';
 		return $vals;
 	}
 	
@@ -1444,7 +1469,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			}
 		}
 
-		//echo '<div class="alert alert-info"><h2>parseRelatedItems()</h2><pre>'; print_r($related_items_sets); echo '</pre></div>';
+		//echo '<div class="alert alert-info"><h2>parseRelatedItems(): ' . $this->field->label . '</h2><pre>'; print_r($related_items_sets); echo '</pre></div>';
 		return $related_items_sets;
 	}
 

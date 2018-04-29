@@ -266,7 +266,11 @@ class FlexicontentFields
 			{
 				foreach ($fv as & $ov)
 				{
-					if (count($ov) == 1) $ov = reset($ov);
+					// Maybe examine parameters and avoid this if either of 'allow_multiple' , 'use_ingroup' is set
+					if (count($ov) === 1)
+					{
+						$ov = reset($ov);
+					}
 				}
 				unset($ov);
 			}
