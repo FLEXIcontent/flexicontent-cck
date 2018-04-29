@@ -442,25 +442,27 @@ if ($enable_multi_uploader)
 	$uploader_html = JHtml::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
 	$js .= '
-		var IEversion = fc_isIE();
-		var is_IE8_IE9 = IEversion && IEversion < 10;
-		if (is_IE8_IE9) fctabber["fileman_tabset"].tabShow(1);
+		setTimeout(function(){
+			var IEversion = fc_isIE();
+			var is_IE8_IE9 = IEversion && IEversion < 10;
+			if (is_IE8_IE9) fctabber["fileman_tabset"].tabShow(1);
 
-		// Show outer container of uploader
-		jQuery("#filemanager-2").show();
-		jQuery("#'.$uploader_tag_id . $up_sfx_n.'").css("min-height", 180);
+			// Show outer container of uploader
+			jQuery("#filemanager-2").show();
+			jQuery("#'.$uploader_tag_id . $up_sfx_n.'").css("min-height", 180);
 
-		// Show uploader
-		'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
+			// Show uploader
+			'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
 
-		// Also set filelist height
-		'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
+			// Also set filelist height
+			'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
 
-		// Uploader does not initialize properly when hidden in IE8 / IE9 with "runtime": "html4" (it does if using "runtime": "flash")
-		if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fileman_tabset"].tabShow(0);
+			// Uploader does not initialize properly when hidden in IE8 / IE9 with "runtime": "html4" (it does if using "runtime": "flash")
+			if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fileman_tabset"].tabShow(0);
 
-		// Hide basic uploader form if using multi-uploader script
-		jQuery("#filemanager-1").hide();
+			// Hide basic uploader form if using multi-uploader script
+			jQuery("#filemanager-1").hide();
+		}, 20);
 	';
 }
 
