@@ -2514,6 +2514,12 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		$output_filename = $dest_path . $prefix . $filename ;
+		
+		// Catch case of bad permission for thumbnail files but good permission for containing folder ...
+		if (file_exists($output_filename))
+		{
+			JFile::delete($output_filename);
+		}
 
 		if ($phpThumb->GenerateThumbnail())
 		{
