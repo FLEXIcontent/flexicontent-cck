@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -36,14 +36,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @var int
 	 */
 	var $_id = null;
-	
+
 	/**
 	 * Category ids (multiple category view)
 	 *
 	 * @var int
 	 */
 	var $_ids = array();
-	
+
 	/**
 	 * Category properties
 	 *
@@ -57,34 +57,34 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @var mixed
 	 */
 	var $_childs = null;
-	
+
 	/**
 	 * Template configuration name (layout)
 	 *
 	 * @var int
 	 */
 	var $_clayout = null;
-	
+
 	/**
 	 * Array of peer-categories data
 	 *
 	 * @var mixed
 	 */
 	var $_peers = null;
-	
+
 	/**
 	 * Category/Subcategory (current page) ITEMS  (belonging to $_data_cats Categories)
 	 *
 	 * @var mixed
 	 */
 	var $_data = null;
-	
+
 	/**
 	 * Array of subcategory ids, including category id (or ids for multi-category view) too, used to create the ITEMS list
 	 * @var array
 	 */
 	var $_data_cats = null;
-	
+
 	/**
 	 * Count of the total (not just current page) Category/Subcategory ITEMS
 	 *
@@ -105,43 +105,43 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @var integer
 	 */
 	var $_authorid = 0;
-	
+
 	/**
 	 * User id for favoured items (used by FAVS layout)
 	 *
 	 * @var integer
 	 */
 	var $_uid = 0;
-	
+
 	/**
 	 * Tag id for tagged items (used by TAGS layout)
 	 *
 	 * @var integer
 	 */
 	var $_tagid = 0;
-	
+
 	/**
 	 * Category layout
 	 *
 	 * @var string
 	 */
 	var $_layout = '';  // !! This should be empty for empty for 'category' layout
-	
+
 	/**
 	 * Comments information for cat's items
 	 *
 	 * @var string
 	 */
 	var $_comments = null;
-	
+
 	/**
 	 * Tag data for tagged items (used by TAGS layout)
 	 *
 	 * @var object
 	 */
 	var $_tag = null;
-	
-	
+
+
 	/**
 	 * Current / active search elements
 	 *
@@ -150,7 +150,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_active_filts  = null;
 	var $_active_search = null;
 	var $_active_ai     = null;
-	
+
 	/**
 	 * Constructor
 	 *
@@ -249,17 +249,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('uid', $this->_uid);
 		$this->setState('cids', $this->_ids);
 		$this->setState('clayout', $this->_clayout);
-		
+
 		// Other
 		//if ($this->_id) $app->setUserState( $option.'.nav_catid',  $this->_id );
 		$this->setState('option', $option);
-		
+
 		// We set category parameters to component parameters, these will be full calculated when getCategory() is called
 		$this->_params = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$this->_params->merge($cparams);
-		
-		
+
+
 		// ***
 		// *** Set state EXCEPT: limit and limitstart that will be calculated at getData()
 		// *** and after getCategory() has been called thus parameters have been loaded fully
@@ -268,7 +268,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Set filter order variables into state
 		$this->setState('filter_order', $jinput->get('filter_order', 'i.title', 'cmd'));
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
-		
+
 		// Get minimum word search length
 		$db = JFactory::getDbo();
 		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
@@ -303,8 +303,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		$this->_id = $cid;
 	}
-	
-	
+
+
 	/**
 	 * Method to set & override item's layout
 	 *
@@ -316,8 +316,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_clayout = $name;
 		$this->setState('clayout', $this->_clayout);
 	}
-	
-	
+
+
 	/**
 	 * Method to get Data
 	 *
@@ -359,7 +359,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// 1, create full query: filter, ordered, limited
 		$query = $this->_buildQuery();
-			
+
 		// Check if Text Search / Filters / AI are NOT active and special before FORM SUBMIT (per page) -limit- was configured
 		// NOTE: this must run AFTER _buildQuery() !
 		$use_limit_before = $app->getUserState('use_limit_before_search_filt', 0);
@@ -370,7 +370,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$app->input->set('limit', $limit);
 			$this->setState('limit', $limit);
 		}
-			
+
 		// Get limitstart, and in case limit has been changed, adjust it accordingly
 		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
@@ -390,21 +390,25 @@ class FlexicontentModelCategory extends JModelLegacy {
 			foreach ($rows as $row) $query_ids[] = $row->id;
 			//$this->_db->setQuery($query, $limitstart, $limit);
 			//$query_ids = $this->_db->loadColumn();
-				
+
 			// 3, get current items total for pagination
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $this->_db->loadResult();
 		}
-			
+
 		catch (Exception $e) {
 			// 2, get items via normal joomla SQL layer
 			$this->_db->setQuery($query, $limitstart, $limit);
 			$query_ids = $this->_db->loadColumn();
-				
+
 			// 3, get current items total for pagination
-			if ( count($query_ids) ) {
-				if ( !$this->_total ) $this->getTotal();
-			} else {
+			if (count($query_ids))
+			{
+				$this->_total = null;
+				$this->getTotal();
+			}
+			else
+			{
 				$this->_total = 0;
 			}
 		}
@@ -413,7 +417,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Assign total number of items found this will be used to decide whether to do item counting per filter value
 		global $fc_catview;
 		$fc_catview['view_total']  = $this->_total;
-			
+
 		// 4, get item data
 		if (count($query_ids)) $query = $this->_buildQuery($query_ids);
 		$_data = array();
@@ -421,16 +425,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_db->setQuery($query);
 			$_data = $this->_db->loadObjectList('id');
 		}
-			
+
 		// 5, reorder items
 		$this->_data = array();
 		if ($_data) foreach($query_ids as $item_id) {
 			$this->_data[] = $_data[$item_id];
 		}
-			
+
 		// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
 		flexicontent_db::getOriginalContentItemids($this->_data);
-			
+
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -450,11 +454,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function getTotal()
 	{
 		// Lets load the total nr if it doesn't already exist
-		if ( $this->_total===null )
+		if ($this->_total === null)
 		{
 			//$query = $this->_buildQuery();
 			//$this->_total = (int) $this->_getListCount($query);
-			
+
 			$query_count = $this->_buildQuery(-1);
 			$this->_db->setQuery($query_count);
 			$this->_total = $this->_db->loadResult();
@@ -462,8 +466,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		return $this->_total;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the pagination object
 	 *
@@ -477,15 +481,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$limit = (int) $this->getState('limit');
 			$limitstart = (int) $this->getState('limitstart');
-			
+
 			//jimport('cms.pagination.pagination');
 			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $limitstart, $limit);
 		}
 		return $this->_pagination;
 	}
-	
-	
+
+
 	/**
 	 * Returns category parameters (merged in order: component, menu item, category and author overidden params)
 	 *
@@ -504,36 +508,41 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return string
 	 */
-	function _buildQuery( $query_ids=false, $count_total = true )
+	function _buildQuery( $query_ids = false, $count_total = true )
 	{
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $this->getState('option');
 		$params  = $this->_params;
-		$counting=true;
+
+		$counting = true;
 		$extra_where = '';
-		
-		if ( $query_ids==-1 ) {
+
+		if ($query_ids == -1)
+		{
 			// Get FROM and JOIN SQL CLAUSES
 			$fromjoin = $this->_buildItemFromJoin($counting);
-			
+
 			// ... count rows
 			// Create sql WHERE clause
 			$where = $this->_buildItemWhere('where', $counting, $extra_where);
-		} else if ( !$query_ids ) {
+		}
+
+		elseif (!$query_ids)
+		{
 			// Get FROM and JOIN SQL CLAUSES
 			$fromjoin = $this->_buildItemFromJoin($counting);
-			
+
 			// Create sql WHERE clause
 			$where = $this->_buildItemWhere('where', $counting, $extra_where);
-			
+
 			// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
 			$order = '';
 			$orderby = $this->_buildItemOrderBy($order);
 			$orderby_join = '';
-			
+
 			if ($this->_id) $app->setUserState( $option.'.'.$this->_id.'.nav_orderby',  $order );
-			
+
 			// Set order array (2-level) in case it is later needed
 			$this->_category->_order_arr = $order;
 
@@ -542,7 +551,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
 				$orderbycustomfieldint = (int)$params->get('orderbycustomfieldint', 0);
-				if ($orderbycustomfieldint == 4)
+				if ($orderbycustomfieldint === 4)
 				{
 					$orderby_join .= '
 						LEFT JOIN (
@@ -562,7 +571,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$_field_id = (int) @ $order_parts[1];
 				$_o_method = @ $order_parts[2];
 
-				if ($_field_id && count($order_parts)==4)
+				if ($_field_id && count($order_parts) === 4)
 				{
 					if ($_o_method=='file_hits')
 					{
@@ -584,7 +593,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
 				$orderbycustomfieldint_2nd = (int)$params->get('orderbycustomfieldint'.'_2nd', 0);
-				if ($orderbycustomfieldint_2nd==4)
+				if ($orderbycustomfieldint_2nd === 4)
 				{
 					$orderby_join .= '
 						LEFT JOIN (
@@ -604,7 +613,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$_field_id = (int) @ $order_parts[1];
 				$_o_method = @ $order_parts[2];
 
-				if ($_field_id && count($order_parts)==4)
+				if ($_field_id && count($order_parts) === 4)
 				{
 					if ($_o_method=='file_hits')
 					{
@@ -622,24 +631,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 
 			// Create JOIN for ordering items by author's name
-			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+			if ( in_array('author', $order) || in_array('rauthor', $order) )
+			{
 				$orderby_col = '';
 				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 			}
-			
+
 			// Create JOIN for ordering items by a most commented
-			if ( in_array('commented', $order) ) {
+			if ( in_array('commented', $order) )
+			{
 				$orderby_col   = ', COUNT(DISTINCT com.id) AS comments_total';
 				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
 			}
-			
+
 			// Create JOIN for ordering items by a most rated
 			if ( in_array('rated', $order) )
 			{
 				$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
 				$voting_field->parameters = new JRegistry($voting_field->attribs);
 				$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
-				$_weights = array();			
+				$_weights = array();
 				for ($i = 1; $i <= 9; $i++)
 				{
 					$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
@@ -647,13 +658,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$orderby_col   = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
 				$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 			}
-		} else {
+		}
+
+		else
+		{
 			// Get FROM and JOIN SQL CLAUSES
 			$fromjoin = $this->_buildItemFromJoin();
-			
+
 			// SELECT sub-clause to calculate details of the access level items in regards to current user
 			$select_access = $this->_buildAccessSelect();
-			
+
 			// Create JOIN (and select column) of image field used as item image in RSS feed
 			$feed_image_source = $jinput->get('format', '', 'cmd') == "feed"  ?  (int) $params->get('feed_image_source', 0)  :  0;
 			if ($feed_image_source) {
@@ -661,13 +675,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$feed_img_col = ', img.value as image';
 			}
 		}
-		
-		if ( $query_ids==-1 ) {
-			$query = ' SELECT count(i.id) ';
-		} else if ( !$query_ids ) {
-			$query = 'SELECT '.($count_total ? 'SQL_CALC_FOUND_ROWS' : '').' DISTINCT i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
-			$query .= @ $orderby_col;
-		} else {
+
+		if ($query_ids == -1)
+		{
+			$query = ' SELECT COUNT(DISTINCT i.id) '
+				;
+		}
+
+		elseif (!$query_ids)
+		{
+			// SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
+			$query = 'SELECT '
+				. ($count_total ? 'SQL_CALC_FOUND_ROWS' : '') . ' DISTINCT i.id '
+				. @ $orderby_col
+				;
+		}
+
+		else
+		{
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
 				. ' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
@@ -676,22 +701,30 @@ class FlexicontentModelCategory extends JModelLegacy {
 				. $select_access
 				;
 		}
-		
+
+
 		$query .= $fromjoin;
-		
-		if ( $query_ids==-1 ) {
+
+		if ($query_ids == -1)
+		{
 			$query .= ""
 				. $where . $extra_where
-				. ' GROUP BY i.id '
+				//. ' GROUP BY i.id '
 				;
-		} else if ( !$query_ids ) {
+		}
+
+		elseif (!$query_ids)
+		{
 			$query .= ""
 				. @ $orderby_join  // optional
 				. $where . $extra_where
 				//. ' GROUP BY i.id '
 				. $orderby
 				;
-		} else {
+		}
+
+		else
+		{
 			$query .= ""
 				. @ $feed_img_join    // optional
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
@@ -699,13 +732,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 				//. ' ORDER BY FIELD(i.id, '. implode(',', $query_ids) .')'
 				;
 		}
-		
+
 		//echo $query."<br/><br/> \n";
 		return $query;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Retrieve subcategory ids of a given category
 	 *
@@ -722,7 +755,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		$show_noauth = $this->_params->get('show_noauth', 0);   // show unauthorized items
 		$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
-		
+
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
@@ -732,7 +765,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
-		
+
 		// Calculate categories to use for retrieving items
 		$query_catids = array();
 		foreach ($id_arr as $id)
@@ -743,7 +776,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		$query_catids = array_keys($query_catids);
-		
+
 		// Items in featured categories
 		/*$cats_featured = $this->_params->get('display_cats_featured', 0);
 		$featured_cats_parent = $this->_params->get('featured_cats_parent', 0);
@@ -751,7 +784,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($cats_featured && $featured_cats_parent) {
 			foreach ($globalcats[$featured_cats_parent]->descendantsarray as $subcatid) $query_catids_exclude[$subcatid] = 1;
 		}*/
-		
+
 		// filter by depth level
 		if ($display_subcats==0) {
 			// Include categories
@@ -763,7 +796,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Include categories and their descendants
 			$anddepth = ' AND c.id IN (' .implode(',', $query_catids). ')';
 		}
-		
+
 		// Finally create the query to get the category ids.
 		// NOTE: this query is not just needed to get 1st level subcats, but it always needed TO ALSO CHECK the ACCESS LEVEL
 		$query = 'SELECT c.id'
@@ -774,15 +807,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. $anddepth
 			. ' ORDER BY '.$ordering
 			;
-		
+
 		$this->_db->setQuery($query);
 		$this->_data_cats = $this->_db->loadColumn();
-		
+
 		return $this->_data_cats;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Method to build the part of SELECT clause that calculates item access
 	 *
@@ -793,12 +826,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$user    = JFactory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);
-		
+
 		$select_access = '';
-		
+
 		// Extra access columns for main category and content type (item access will be added as 'access')
 		$select_access .= ', c.access as category_access, ty.access as type_access';
-		
+
 		if ($show_noauth)
 		{
 			// Access Flags for: content type, main category, item
@@ -815,11 +848,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$select_access .= ', 1 AS has_access';
 		}
-		
+
 		return $select_access;
 	}
-	
-	
+
+
 	/**
 	 * Build the order clause for item listing
 	 *
@@ -831,7 +864,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$request_var = $this->_params->get('orderby_override', 0) || $this->_params->get('orderby_override_2nd', 0) ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
 		$default_order_dir = $this->getState('filter_order_Dir');
-		
+
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildItemOrderBy(
 			$this->_params,
@@ -840,8 +873,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=true
 		);
 	}
-	
-	
+
+
 	/**
 	 * Build the order clause for subcategory listing
 	 *
@@ -854,7 +887,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$config_param = 'subcat_orderby';
 		$default_order = 'c.lft';
 		$default_order_dir = 'ASC';
-		
+
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildCatOrderBy(
 			$this->_params,
@@ -863,21 +896,25 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$default_order, $default_order_dir
 		);
 	}
-	
-	
+
+
 	/**
 	 * Method to build the WHERE clause
 	 *
 	 * @access private
 	 * @return array
 	 */
-	function _buildItemFromJoin($counting=false)
+	function _buildItemFromJoin($counting = false)
 	{
 		static $fromjoin = null;
-		if (!empty($fromjoin[$counting])) return $fromjoin[$counting];
-		
+
+		if (!empty($fromjoin[$counting]))
+		{
+			return $fromjoin[$counting];
+		}
+
 		$text_search = $this->_buildTextSearch();
-		
+
 		$tmp_only = $counting && !$text_search;
 		$from_clause = $counting ? ' FROM #__flexicontent_items_tmp AS i ' : ' FROM #__content AS i ';
 
@@ -895,18 +932,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$join_clauses_with_text =
 			($counting && !$text_search ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '.$text_search)
 			.$_join_clauses;
-		
+
 		global $fc_catview;
-		if ($counting) {
+
+		if ($counting)
+		{
 			$fc_catview['join_clauses'] = $join_clauses;
 			$fc_catview['join_clauses_with_text'] = $join_clauses_with_text;
 		}
-		
+
 		$fromjoin[$counting] = $from_clause.$join_clauses_with_text;
 		return $fromjoin[$counting];
 	}
-	
-	
+
+
 	/**
 	 * Method to build the WHERE clause
 	 *
@@ -917,13 +956,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		global $globalcats, $fc_catview;
 		if ( isset($fc_catview[$wherepart]) ) return $fc_catview[$wherepart];
-		
+
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $this->getState('option');
 		$user		= JFactory::getUser();
 		$db     = JFactory::getDbo();
-		
+
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$app  = JFactory::getApplication();
@@ -932,7 +971,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
-		
+
 		$use_tmp = $counting == true;
 
 		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
@@ -943,16 +982,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
-		
+
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
-		
+
 		// Prevent author's profile item from appearing in the author listings
 		if ($this->_authorid && (int)$this->_params->get('authordescr_itemid'))
 			$where .= ' AND i.id != ' . (int)$this->_params->get('authordescr_itemid');
-		
+
 		// Limit to favourites
 		if ($this->_layout=='favs')
 		{
@@ -966,11 +1005,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 			$where .= ' AND (' . implode(' OR ', $where_favs) . ')';
 		}
-		
+
 		// Limit to give tag id
 		if ($this->_layout=='tags')
 			$where .= ' AND tag.tid = ' . $db->Quote($this->_tagid);
-		
+
 		if ($this->_id || count($this->_ids))
 		{
 			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
@@ -979,11 +1018,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$_data_cats = "'".implode("', '", $this->_data_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_data_cats.')';
 		}
-		
+
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		
+
 		if (!$ignoreState)
 		{
 			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = ' . $user->id : '';
@@ -1009,7 +1048,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$lta = 'i';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
-		
+
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
@@ -1022,20 +1061,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND  c.access IN (0,'.$aid_list.')';
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
-		
-		
+
+
 		// Calculate filters and alphaindex WHERE clauses
 		$filters_where = $this->_buildFiltersWhere();
 		$alpha_where   = $this->_buildAlphaIndexWhere();
-		
-		
+
+
 		// All items / Normal only / Featured only
 		$flag_featured = (int) $this->_params->get('display_flag_featured', 0);
-		
-		
+
+
 		// Check if doing a before FORM SUBMIT, "FEATURED ONLY" item list  --  then check if Text Search / Filters / AI are NOT active and LIST-ALL Flag not present
 		$use_limit_before = (int) $this->_params->get('use_limit_before_search_filt', 0);
-		
+
 		$app->setUserState('use_limit_before_search_filt', 0);
 		if ( $use_limit_before )
 		{
@@ -1045,8 +1084,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if ($use_limit_before==2) $flag_featured = 2;
 			}
 		}
-		
-		
+
+
 		// Now include featured items according to state calculated above
 		if ( !$app->getUserState('use_limit_before_search_filt', 0) )
 			switch ($flag_featured)
@@ -1062,23 +1101,23 @@ class FlexicontentModelCategory extends JModelLegacy {
 				case 2: $extra_where .= ' AND i.featured=1'; break;   // 2: featured only
 				default: break;  // 0: both normal and featured
 			}
-		
-		
+
+
 		$fc_catview['filters_where'] = $filters_where;
 		$fc_catview['alpha_where'] = $alpha_where;
-		
+
 		$filters_where = implode(' ', $filters_where);
-		
+
 		$fc_catview['where_no_alpha']   = $where . $filters_where;
 		$fc_catview['where_no_filters'] = $where . $alpha_where;
 		$fc_catview['where_conf_only']  = $where;
-		
+
 		$fc_catview['where'] = $where . $filters_where . $alpha_where;
-		
+
 		return $fc_catview[$wherepart];
 	}
-	
-	
+
+
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
@@ -1091,49 +1130,49 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$app      = JFactory::getApplication();
 		$option   = $this->getState('option');
 		$db = $this->_db;
-		
+
 		static $text_search = null;
 		if ($text_search !== null) return $text_search;
 		$text_search = '';
-		
-		
+
+
 		// ****************************************
-		// Create WHERE clause part for Text Search 
+		// Create WHERE clause part for Text Search
 		// ****************************************
-		
+
 		$text = $app->input->get('filter', $app->input->get('q', '', 'string'), 'string');
-		
+
 		// Check for LIKE %word% search, for languages without spaces
 		$filter_word_like_any = $this->_params->get('filter_word_like_any', 0);
-		
+
 		$phrase = $filter_word_like_any ?
 			$app->input->get('searchphrase', $app->input->get('p', 'any', 'word'), 'word') :
 			$app->input->get('searchphrase', $app->input->get('p', 'exact', 'word'), 'word') ;
-		
+
 		$si_tbl = 'flexicontent_items_ext';
-		
+
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		$words = preg_split('/\s\s*/u', $text);
-		
+
 		$this->_active_search = $text;  // Set _relevant _active_* FLAG
-		
+
 		if( strlen($text) )
 		{
 			$ts = 'ie';
 			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
-			
+
 			switch ($phrase)
 			{
 				case 'natural':
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
 					break;
-				
+
 				case 'natural_expanded':
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
 					break;
-				
+
 				case 'exact':
 					$stopwords = array();
 					$shortwords = array();
@@ -1152,20 +1191,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
 					}
 					break;
-				
+
 				case 'all':
 					$stopwords = array();
 					$shortwords = array();
 					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					$app->input->set('ignoredwords', implode(' ', $stopwords));
 					$app->input->set('shortwords', implode(' ', $shortwords));
-					
+
 					$newtext = '+' . implode( '* +', $words ) . '*';
 					$quoted_text = $db->escape($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
-				
+
 				case 'any':
 				default:
 					// Check for LIKE %word% search, for languages without spaces
@@ -1177,7 +1216,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 						$app->input->set('ignoredwords', implode(' ', $stopwords));
 						$app->input->set('shortwords', implode(' ', $shortwords));
-						
+
 						$newtext = implode( '* ', $words ) . '*';
 						$quoted_text = $db->escape($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
@@ -1185,15 +1224,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 					}
 					break;
 			}
-			
+
 			$text_search = ' AND '. $_text_match;
 		}
 		$fc_catview['search'] = $text_search;
-		
+
 		return $text_search;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
@@ -1203,12 +1242,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildFiltersWhere()
 	{
 		global $fc_catview;
-		$app      = JFactory::getApplication();
-		$option   = $this->getState('option');
-		$db = $this->_db;
-		
+		$app    = JFactory::getApplication();
+		$option = $this->getState('option');
+		$db     = $this->_db;
+
 		$filters_where = array();
-		
+
 		// Get filters these are EITHER (a) all filters (to do active only) OR (b) Locked filters
 		// USING all filters here to allow filtering via module, thus category view can be filtered even if 'use_filters' is OFF
 		$shown_filters  = FlexicontentFields::getFilters( 'filters', /*'use_filters'*/ '__ALL_FILTERS__', $this->_params, $check_access=true );
@@ -1216,7 +1255,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$filters = array();
 		if ($shown_filters)  foreach($shown_filters  as $_filter) $filters[$_filter->id] = $_filter;
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
-		
+
 		// Override text search auto-complete category ids with those of filter 13
 		$f13_val = $app->input->get('filter_13', null, 'array');
 		if ( isset($filters[13]) && !empty($f13_val) )
@@ -1232,30 +1271,30 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_params->set('txt_ac_cid', 'NA');
 			$this->_params->set('txt_ac_cids', $_cids);
 		}
-		
+
 		// Get SQL clause for filtering via each field
 		$return_sql = 2;
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
 			$filt_vals = $app->input->get('filter_'.$filter->id, '', 'array');
-			
+
 			// Skip filters without value
 			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
 			$empty_filt_vals_string = !is_array($filt_vals) && !strlen(trim($filt_vals));
 			$allow_filtering_empty = $filter->parameters->get('allow_filtering_empty', 0);
-			
+
 			if ( !$allow_filtering_empty && ($empty_filt_vals_array || $empty_filt_vals_string) ) continue;
 			if ( !$empty_filt_vals_array && !$empty_filt_vals_string) $this->_active_filts[ $filter->id ] = $filt_vals;  // Set _relevant _active_* FLAG
-			
+
 			//echo "Category model active filters: [".$filter->id."] <pre>"; print_r($filt_vals); echo "</pre>";
 			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals, $return_sql);
 		}
-		
+
 		return $filters_where;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the visible category filters according to category parameters
 	 *
@@ -1265,8 +1304,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function &getFilters() {
 		return FlexicontentFields::getFilters('filters', 'use_filters', $this->_params, $check_access=true);
 	}
-	
-	
+
+
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
@@ -1278,22 +1317,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get alpha index request variable and do some security checks, by removing any quotes and other non-valid characters
 		$alpha = JFactory::getApplication()->input->get('letter', NULL, 'string');
 		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
-		
+
 		if (StringHelper::strlen($alpha)==0) {
 			// nothing to do
 			return '';
 		}
-		
+
 		// Detect and handle character groups and character ranges,  WARNING: The following is needed because
 		// utf8 is multibyte and MySQL regexp doesnot support multibyte, thus we can not use [] with utf8
-		
+
 		$range = explode("-", $alpha);
 		if (count($range) > 2)
 		{
 			echo "Error in Alpha Index please correct letter range: ".$alpha."<br>";
 			return '';
 		}
-		
+
 		else if (count($range) == 1)
 		{
 			$regexp = '"^('.StringHelper::substr($alpha,0,1);
@@ -1302,31 +1341,31 @@ class FlexicontentModelCategory extends JModelLegacy {
 			endfor;
 			$regexp .= ')"';
 		}
-		
+
 		else if (count($range) == 2)
 		{
-			
+
 			// Get range characters
 			$startletter = $range[0];  $endletter = $range[1];
-			
+
 			// ERROR CHECK: Range START and END are single character strings
 			if (StringHelper::strlen($startletter) != 1 || StringHelper::strlen($endletter) != 1) {
 				echo "Error in Alpha Index<br>letter range: ".$alpha." start and end must be one character<br>";
 				return '';
 			}
-			
+
 			// Get ord of characters and their rangle length
 			$startord=FLEXIUtilities::uniord($startletter);
 			$endord=FLEXIUtilities::uniord($endletter);
 			$range_length = $endord - $startord;
-			
+
 			// ERROR CHECK: Character range has at least one character
 			if ($range_length > 50 || $range_length < 1) {
-				// A sanity check that the range is something logical and that 
+				// A sanity check that the range is something logical and that
 				echo "Error in Alpha Index<br>letter range: ".$alpha.", is incorrect or contains more that 50 characters<br>";
 				return '';
 			}
-			
+
 			// Check if any character out of the range characters exists
 			// Meaning (There is at least on item title starting with one of the range characters)
 			$regexp = '"^('.$startletter;
@@ -1334,12 +1373,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$regexp .= '|'.FLEXIUtilities::unichr($uord);
 			endfor;
 			$regexp .= ')"';
-			
+
 		} else {
 			echo "Error in Alpha Index<br>incorrect letter range: ".$alpha."<br>";
 			return '';
 		}
-		
+
 		$where = '';
 		if ( !empty($regexp) )
 		{
@@ -1352,12 +1391,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			//$alpha_term = $this->_db->escape( '^['.$alpha.']', true );
 			//$where = ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $alpha_term, false );
 		}
-		
+
 		$this->_active_ai = $alpha;  // Set _relevant _active_* FLAG
 		return $where;
 	}
-	
-	
+
+
 	/**
 	 * Method to build the childs categories query
 	 *
@@ -1368,7 +1407,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$user    = JFactory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
-		
+
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
@@ -1378,19 +1417,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
-		
+
 		// AND-WHERE clause : filter by parent category (-ies)
 		if ($id) $id_arr = array($id);
 		else $id_arr  = $this->_id ? array($this->_id) : $this->_ids;
 		$id_list = implode(',', $id_arr);
 		$andparent = ' AND c.parent_id IN ('. $id_list .')';
-		
+
 		// ORDER BY clause
 		$orderby = $this->_buildCatOrderBy();
-		
+
 		// JOIN clause : category creator (needed for J2.5 category ordering)
 		$creator_join = ' LEFT JOIN #__users AS u ON u.id = c.created_user_id';
-		
+
 		$query = 'SELECT c.*,'
 			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
 			. ' FROM #__categories AS c'
@@ -1404,8 +1443,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			;
 		return $query;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the assigned items for a category
 	 *
@@ -1417,10 +1456,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats;
 		$user = JFactory::getUser();
 		$db   = JFactory::getDbo();
-		
+
 		// Get the view's parameters
 		$use_tmp = true;
-		
+
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$app  = JFactory::getApplication();
@@ -1429,7 +1468,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
-	
+
 		// Get some parameters and other info
 		$catlang = $this->_params->get('language', '');          // Category language (currently UNUSED)
 		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
@@ -1439,23 +1478,23 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
-	
+
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1 ';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
-		
+
 		// Filter the category view with the current user language
 		if ($filtercat)
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
 		}
-		
+
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		
+
 		if (!$ignoreState)
 		{
 			$OR_isOwner = $user->id && $show_owned ? ' OR i.created_by = ' . $user->id : '';
@@ -1477,7 +1516,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Count items according to full depth level !!!
 		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
 		$where .= ' AND rel.catid IN ('.$catlist.')';
-		
+
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
 		if (!$show_noauth)
@@ -1488,7 +1527,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND mc.access IN (0,'.$aid_list.')';
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
-		
+
 		$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
 			. ' FROM #__flexicontent_cats_item_relations AS rel'
 			. (!$use_tmp ?
@@ -1499,10 +1538,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
 			. $where
 			;
-		
+
 		$db->setQuery($query);
 		$assigneditems = $db->loadResult();
-		
+
 		return $assigneditems;
 	}
 
@@ -1518,11 +1557,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$user			= JFactory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
-		
+
 		// Where
 		$where = ' WHERE c.published = 1';
 		$where .= ' AND c.parent_id = '. (int)$id;
-		
+
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
 		$andaccess = '';
@@ -1532,24 +1571,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
-		
+
 		// *** Removed : (a) Retrieving all category columns and (b) ordering categories,
 		// since this is currently only used for counting subcategories ... so only category ids are retrieved
 		$creator_join = FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '';
 		$orderby = $this->_buildCatOrderBy();
-		
+
 		$query = 'SELECT DISTINCT c.id '
 			. ' FROM #__categories as c'
 			. $joinaccess
-			. $creator_join 
+			. $creator_join
 			. $where
 			. $andaccess
 			. $orderby
 			;
-		
+
 		$this->_db->setQuery($query);
 		$subcats = $this->_db->loadObjectList();
-		
+
 		return $subcats;
 	}
 
@@ -1569,12 +1608,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			return array();
 		}
-		
+
 		$show_itemcount   = $this->_params->get('show_itemcount', 1);
-		
+
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
+
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
 
@@ -1597,10 +1636,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 			$k = 1 - $k;
 		}
-		
+
 		return $this->_childs;
 	}
-	
+
 
 
 	/**
@@ -1619,12 +1658,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			return array();
 		}
-		
+
 		$show_itemcount   = $this->_params->get('show_itemcount_peercat', 1);
-		
+
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
+
 		$query = $this->_buildChildsQuery($this->_category->parent_id);
 		$this->_peers = $this->_getList($query);
 
@@ -1646,11 +1685,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 			$k = 1 - $k;
 		}
-		
+
 		return $this->_peers;
 	}
 
-	
+
 	/**
 	 * Method to load the Category
 	 *
@@ -1734,7 +1773,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		 * Check category was found / is published, and throw an error. Note that an empty
 		 * layout means single category view, so raise an error if category id is missing
 		 */
-		
+
 		if (($this->_id || $cat_required) && !$_category)
 		{
 			$err_mssg = $err_type = false;
@@ -1742,7 +1781,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
 				$err_type = 404;
 			}
-			
+
 			// Throw error -OR- return if errors suppresed
 			if ($err_mssg)
 			{
@@ -1767,7 +1806,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				$this->_category = new stdClass;
 				$this->_category->published = 1;
-				$this->_category->id = $this->_id;   // can be zero for layouts: author/myitems/favs/tags, etc 
+				$this->_category->id = $this->_id;   // can be zero for layouts: author/myitems/favs/tags, etc
 				$this->_category->title = '';
 				$this->_category->description = '';
 				$this->_category->slug = '';
@@ -1788,7 +1827,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_layout)
 		{
 			$err_mssg = $err_type = false;
-			
+
 			if (!in_array($this->_layout, array('favs','tags','mcats','myitems','author')))
 			{
 				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
@@ -1823,7 +1862,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$login_redirect = true;
 				}
 			}
-			
+
 			// Raise a notice and redirect
 			if ($err_mssg)
 			{
@@ -1883,7 +1922,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$allowed_levels = array_flip($aid_arr);
 			$canread = isset($allowed_levels[$this->_category->access]);
-			
+
 			if ($canread)
 			{
 				foreach($parents as $parent)
@@ -1896,7 +1935,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 			}
 		}
-		
+
 		// Handle unreadable category (issue 403 unauthorized error, redirecting unlogged users to login)
 		if ($this->_id && !$canread)
 		{
@@ -1917,7 +1956,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 			elseif ($this->_params->get('unauthorized_page', ''))
 			{
-				$app->redirect($this->_params->get('unauthorized_page'));				
+				$app->redirect($this->_params->get('unauthorized_page'));
 			}
 
 			else
@@ -1930,8 +1969,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		return $this->_category;
 	}
-	
-	
+
+
 	/**
 	 * Method to load the Tags Data, when layout is 'tags'
 	 *
@@ -1965,7 +2004,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Get the linked joomla tag
-		
+
 		if (!empty($this->_tag->jtag_id))
 		{
 			$query = 'SELECT *'
@@ -1993,8 +2032,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		return $this->_tag;
 	}
-	
-	
+
+
 	/**
 	 * Method to decide which item layout to use
 	 *
@@ -2006,9 +2045,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// *********************************************************************************
 		// Get category layout from configuration if not already set (e.g. via HTTP Request)
 		// *********************************************************************************
-		
+
 		$app = JFactory::getApplication();
-		
+
 		// Decide to use mobile or normal category template layout
 		$useMobile = $params->get('use_mobile_layouts', 0 );
 		if ($useMobile)
@@ -2019,20 +2058,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 		}
-		
+
 		// Get category layout (... if not already set), from the configuration parameter (that was decided above)
 		$desktop_clayout = $params->get('clayout', 'blog');
 		$clayout_default = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
 		$params->set('clayout_default', $clayout_default);
-		
+
 		$clayout = $this->_clayout=='__request__' ?
 			$app->input->get('clayout', $clayout_default, 'cmd') :
 			$clayout_default ;
 		if ( empty($clayout) )  $clayout = $clayout_default;
-		
+
 		// Get all templates from cache, (without loading any language file this will be done at the view)
 		$themes = flexicontent_tmpl::getTemplates();
-		
+
 		// Verify the category layout exists
 		if ( !isset($themes->category->{$clayout}) )
 		{
@@ -2042,20 +2081,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$clayout = $fixed_clayout;
 			FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
 		}
-		
-		
+
+
 		// *****************************************************************************************
 		// Finally set the clayout (template name) into model / category's parameters / HTTP Request
 		// *****************************************************************************************
-		
+
 		$this->setCatLayout($clayout);
-		
+
 		// Maybe these should not be changed ... and instead the view will get correct value from state !!
 		$params->set('clayout', $clayout);
 		$app->input->set('clayout', $clayout);
 	}
-	
-	
+
+
 	/**
 	 * Method to load content article parameters
 	 *
@@ -2067,22 +2106,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		if ( $this->_params !== NULL && !$force ) return;
 		$id = (int)$this->_id;
-		
+
 		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu item
 		if ($menu)
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
-		
+
 		// a. Clone component parameters ... we will use these as parameters base for merging
 		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
-		
+
 		$debug_inheritcid = $app->input->get('print', null, 'cmd') ? 0 : $compParams->get('debug_inheritcid');
 		if ($debug_inheritcid) {
 			$merge_stack = array();
 			array_push($merge_stack, "CLONED COMPONENT PARAMETERS");
 			array_push($merge_stack, "MERGED LAYOUT PARAMETERS");
 		}
-		
+
 		// b. Retrieve category parameters and create parameter object
 		if ($id) {
 			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
@@ -2092,7 +2131,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		} else {
 			$catParams = new JRegistry();
 		}
-		
+
 		// c. Retrieve author parameters if using displaying AUTHOR/MYITEMS layouts, and merge them into category parameters
 		if ($this->_authorid!=0) {
 			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
@@ -2104,7 +2143,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$_author_basicreg = new JRegistry($author_extdata->author_basicparams);
 				if ($_author_basicreg->get('orderbycustomfieldid')==="0") $_author_basicreg->set('orderbycustomfieldid', '');
 				$catParams->merge( $_author_basicreg );
-				
+
 				// Merge author OVERRIDDEN category parameters
 				$_author_catreg = new JRegistry($author_extdata->author_catparams);
 				if ( $_author_basicreg->get('override_currcat_config',0) ) {
@@ -2113,15 +2152,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 			}
 		}
-		
-		
+
+
 		// d. Retrieve inherited parameter and create parameter objects
 		global $globalcats;
 		$heritage_stack = array();
 		$inheritcid = $catParams->get('inheritcid', '');
 		$inheritcid_comp = $compParams->get('inheritcid', -1);
 		$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
-		
+
 		// CASE A: inheriting from parent category tree
 		if ( $id && $inherit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
 			$order_clause = 'level';  // 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
@@ -2140,7 +2179,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 			}
 		}
-		
+
 		// CASE B: inheriting from specific category
 		else if ( $id && $inheritcid > 0 && !empty($globalcats[$inheritcid]) ){
 			$query = 'SELECT title, params FROM #__categories WHERE id = '. $inheritcid;
@@ -2151,18 +2190,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 				array_push($heritage_stack, $catdata);
 			}
 		}
-		
-		
+
+
 		// *******************************************************************************************************************
 		// Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/ancestors-cats/category/author/menu
 		// *******************************************************************************************************************
-		
+
 		// -1. layout parameters will be placed on top at end of this code ...
-		
+
 		// 0. Start from component parameters
 		$params = new JRegistry();
 		$params->merge($compParams);
-		
+
 		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
 		while (!empty($heritage_stack)) {
 			$catdata = array_pop($heritage_stack);
@@ -2170,7 +2209,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$params->merge($catdata->params);
 			if ($debug_inheritcid) array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title);
 		}
-		
+
 		// 2. Merge category parameters (potentially overriden via  author's category parameters)
 		if ($catParams->get('orderbycustomfieldid')==="0") $catParams->set('orderbycustomfieldid', '');
 		$params->merge($catParams);
@@ -2178,12 +2217,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			array_push($merge_stack, "MERGED CATEGORY PARAMETERS of current category");
 		if ($debug_inheritcid && $this->_authorid && !empty($_author_catreg) && $_author_catreg->get('override_currcat_config',0))
 			array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid}");
-		
+
 		// g. Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
-		if ( $menu && !empty($this->mergeMenuParams) ) 
+		if ( $menu && !empty($this->mergeMenuParams) )
 		{
 			$this->_menu_itemid = $menu->id;
-			
+
 			$view_ok      = @$menu->query['view']     == 'category';
 			$cid_ok       = @$menu->query['cid']      == $this->_id;
 			$layout_ok    = @$menu->query['layout']   == $this->_layout;
@@ -2191,12 +2230,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$authorid_ok  = ($this->_layout!='author') || (@$menu->query['authorid'] == $this->_authorid);
 			// Examine tagid only for tags layout
 			$tagid_ok     = ($this->_layout!='tags')   || (@$menu->query['tagid'] == $this->_tagid);
-			
+
 			// We will merge menu parameters last, thus overriding the default categories parameters if either
 			// (a) override is enabled in the menu or (b) category Layout is 'myitems' or 'favs' or 'tags' or 'mcats' which has no default parameters
 			$overrideconf = $menu_params->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='favs' || $this->_layout=='mcats' || $this->_layout=='tags';
 			$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
-			
+
 			if ( $menu_matches && $overrideconf ) {
 				// Add - all - menu parameters related or not related to category parameters override
 				if ($menu_params->get('orderbycustomfieldid')==="0") $menu_params->set('orderbycustomfieldid', '');
@@ -2212,19 +2251,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$params->set( 'item_depth', $menu_params->get('item_depth') );
 			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 		}
-		
-		
+
+
 		// Parameters meant for lists
 		$params->set('show_editbutton', $params->get('show_editbutton_lists', 1));
 		$params->set('show_deletebutton', $params->get('show_deletebutton_lists', 0));
 		$params->set('show_state_icon', $params->get('show_state_icon_lists', 0));
 		$params->set('show_title', $params->get('show_title_lists', 1));
 		$params->set('link_titles', $params->get('link_titles_lists', 1));
-		
+
 		// Set filter values (initial or locked) via configuration parameters
 		if ($params->get('use_persistent_filters')) FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
 		FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
-		
+
 		// Bugs of v2.0 RC2
 		if (is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)))
 		{
@@ -2237,13 +2276,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$app->enqueueMessage("The login url seems to be wrongly set in the FLEXIcontent component configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>", 'notice');
 			$params->set('login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')));
 		}
-		
-		
+
+
 		// Retrieve Layout's parameters, also deciding the layout
 		$this->decideLayout($params);
 		$layoutParams = $this->getLayoutparams();
 		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
-		
+
 		// Allow global layout parameters to be inherited properly, placing on TOP of all others
 		$this->_params = clone($layoutParams);
 		$this->_params->merge($params);
@@ -2258,20 +2297,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_params->set('txt_ac_cid',  (!empty($this->_id) ? $this->_id : 'NA') );
 		// Set category ids for TEXT autocomplete (maybe overriden by category filter 13 in getFilters)
   	$this->_params->set('txt_ac_cids', (!empty($this->_ids) ? $this->_ids : array()) );
-  	
+
 		// Include subcat items
 		$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
 		$this->_params->set('txt_ac_usesubs', (int) $display_subcats );
-		
+
 		// Also set into a global variable
 		global $fc_catview;
 		$fc_catview['params'] = $this->_params;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the active filter result
-	 * 
+	 *
 	 * @access private
 	 * @return string
 	 * @since 1.5
@@ -2279,13 +2318,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _getFiltered( &$filter, $value, $return_sql=true )
 	{
 		$field_type = $filter->field_type;
-		
+
 		if ( in_array($field_type, array('createdby','modifiedby','type','categories','tags')) )
 		{
 			$values = is_array($value) ? $value : array($value);
 		}
-		
-		switch($field_type) 
+
+		switch($field_type)
 		{
 			case 'language':
 				$values_quoted = array();
@@ -2295,7 +2334,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' WHERE language IN ('. implode(",", $values_quoted) .')';
 				//$filter_query = ' AND i.created_by IN ('. implode(",", $values_quoted) .')';
 				break;
-				
+
 			case 'createdby':
 				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
@@ -2311,7 +2350,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' WHERE modified_by IN ('. implode(",", $values) .')';
 				//$filter_query = ' AND i.modified_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
 				break;
-			
+
 			case 'type':
 				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
@@ -2319,7 +2358,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' WHERE type_id IN ('. implode(",", $values) .')';
 				//$filter_query = ' AND ie.type_id IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
 				break;
-			
+
 			case 'state':
 				$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => 2, 'T' => -2 );
 				$values = is_array($value) ? $value : array($value);
@@ -2330,7 +2369,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' WHERE state IN ('. implode(",", $filt_states) .')';
 				//$filter_query = !count($values) ? ' AND 1 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
 				break;
-			
+
 			case 'categories':
 				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				global $globalcats;
@@ -2351,7 +2390,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						;
 				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
 				break;
-			
+
 			case 'tags':
 				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT itemid'
@@ -2360,7 +2399,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						;
 				//$filter_query = ' AND tag.tid IN ('. implode(",", $values) .')';
 				break;
-			
+
 			default:
 				// Make sure plugin file of current file is loaded and then check if custom filtering function exists
 				$field_type_file = $filter->iscore ? 'core' : $field_type;
@@ -2369,15 +2408,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 					require_once($path);
 					$method_exists = method_exists("plgFlexicontent_fields{$field_type_file}", "getFiltered");
 				}
-				
+
 				// Use custom field filtering if 'getFiltered' plugin method exists, otherwise try to use our default filtering function
 				$filtered = ! @ $method_exists ?
 					FlexicontentFields::getFiltered($filter, $value, $return_sql) :
 					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value, &$return_sql ));
 				//print_r($filtered); echo '<br/><br/>';
-				break; 
+				break;
 		}
-		
+
 		if ( !isset($filter_query) )
 		{
 			if ( isset($filtered) )
@@ -2404,7 +2443,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
 				}
 				$tmp_tbl = $iids_tblname[$filter->id];
-				
+
 				try {
 					// Use sub-query on temporary table
 					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
@@ -2431,25 +2470,25 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 			}
-			
+
 			// Create subquery if temporary table creation failed
 			if ( !isset($filtered) && isset($query) )  $filtered = ' AND i.id IN (' . $query . ')';
-			
+
 			// An empty return value means no matching values were found
 			$filtered = empty($filtered) ? ' AND 0 ' : $filtered;
-			
+
 			// A string mean a subquery was returned, while an array means that item ids we returned
 			$filter_query = is_array($filtered) ?  ' AND i.id IN ('. implode(',', $filtered) .')' : $filtered;
 		}
 		//echo "<br/>" .$filter->name. ': '. $filter_query."<br/>";
-		
+
 		return $filter_query;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the layout parameters of an item
-	 * 
+	 *
 	 * @return string
 	 * @since 1.5
 	 */
@@ -2457,11 +2496,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		return $this->_clayout ? flexicontent_tmpl::getLayoutparams('category', $this->_clayout, '', $force) : '';
 	}
-	
-	
+
+
 	/**
 	 * Method to build the alphabetical index
-	 * 
+	 *
 	 * @access public
 	 * @return array
 	 * @since 1.5
@@ -2470,16 +2509,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		// Make sure category has been loaded
 		$this->getCategory();
-		
+
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		
-		$fromjoin = $this->_buildItemFromJoin($counting=true);
+
+		$fromjoin = $this->_buildItemFromJoin($counting = true);
 		$where    = $this->_buildItemWhere('where_no_alpha');
-		
+
 		$query	= //'SELECT DISTINCT i.title_ai AS alpha'
-		'SELECT DISTINCT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
+		'SELECT DISTINCT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha';
+
+		$query .= ''
 			. $fromjoin
 			. $where
 			//. ' GROUP BY alpha'
@@ -2487,34 +2528,34 @@ class FlexicontentModelCategory extends JModelLegacy {
 			;
 		$this->_db->setQuery($query);
 		$alpha = $this->_db->loadColumn();
-		
+
 		if ( $print_logging_info ) @$fc_run_times['execute_alphaindex_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		return $alpha;
 	}
-	
-	
+
+
 	function &getCommentsInfo ( $item_ids = false)
 	{
 		// Return existing data and initialize array
 		if ($this->_comments!==null) return $this->_comments;
 		$this->_comments = array();
-		
+
 		// Check jcomments plugin is installed and enabled
 		if ( !JPluginHelper::isEnabled('system', 'jcomments') )  return $this->_comments;
-		
+
 		// Normal case, item ids not given, we will retrieve comments information of cat/sub items
 		if ( empty($item_ids) )
 		{
 			// First make sure item data have been retrieved
 			$this->getData();
 			if ( empty($this->_data) )  return $this->_comments;
-			
+
 			// Then get item ids
 			$item_ids = array();
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
 		}
-		
+
 		$db = JFactory::getDbo();
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
@@ -2525,13 +2566,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		      ;
 		$db->setQuery($query);
 		$comments = $db->loadObjectList('item_id');
-		
+
 		if ( $comments ) $this->_comments = $comments;
-		
+
 		return $comments;
 	}
-	
-	
+
+
 	/**
 	 * Increment the hit counter for the category.
 	 * @param   int  $pk  Optional primary key of the category to increment.
@@ -2553,8 +2594,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *
@@ -2566,8 +2607,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		return flexicontent_db::getFavourites($type=1, $this->_id);
 	}
-	
-	
+
+
 	/**
 	 * Method to get the nr of favourites of an user
 	 *
@@ -2579,8 +2620,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		return flexicontent_db::getFavoured($type=1, $this->_id, JFactory::getUser()->id);
 	}
-	
-	
+
+
 	/**
 	 * Method to remove a favourite
 	 *
@@ -2592,8 +2633,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		return flexicontent_db::removefav($type=1, $this->_id, JFactory::getUser()->id);
 	}
-	
-	
+
+
 	/**
 	 * Method to add a favourite
 	 *

@@ -307,40 +307,76 @@ class flexicontent_db
 		$query = $db->replacePrefix($query);  //echo "<pre>"; print_r($query); echo "\n\n";
 		$db_connection = $db->getConnection();
 		
-		$data = array();
-		if ($dbtype == 'mysqli' )
+		if ($dbtype === 'pdomysql' && is_a($db_connection, 'mysqli'))
 		{
-			$result = $unbuffered ?
-				mysqli_query( $db_connection , $query, MYSQLI_USE_RESULT ) :
-				mysqli_query( $db_connection , $query ) ;
-			if ($result===false)
+			$dbtype = 'mysqli';
+		}
+
+		$data = array();
+
+		if ($dbtype === 'mysqli')
+		{
+			$result = $unbuffered
+				? mysqli_query($db_connection , $query, MYSQLI_USE_RESULT)
+				: mysqli_query($db_connection , $query);
+
+			if ($result === false)
+			{
 				throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
-			
-			if ($assoc) {
-				while($row = mysqli_fetch_assoc($result)) $data[] = $row;
-			} else {
-				while($row = mysqli_fetch_object($result)) $data[] = $row;
 			}
+
+			while ($row = $assoc ? mysqli_fetch_assoc($result) : mysqli_fetch_object($result))
+			{
+				$data[] = $row;
+			}
+
 			mysqli_free_result($result);
 		}
-		
-		else if ( $dbtype == 'mysql' )
+
+		elseif ($dbtype === 'mysql')
 		{
-			$result = $unbuffered ?
-				mysql_unbuffered_query( $query, $db_connection ) :
-				mysql_query( $query, $db_connection  ) ;
-			
+			$result = $unbuffered
+				? mysql_unbuffered_query($query, $db_connection)
+				: mysql_query($query, $db_connection);
+
 			if ($result===false)
+			{
 				throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
-				
-			if ($assoc) {
-				while($row = mysql_fetch_assoc($result)) $data[] = $row;
-			} else {
-				while($row = mysql_fetch_object($result)) $data[] = $row;
 			}
+
+			while ($row = $assoc ? mysql_fetch_assoc($result) : mysql_fetch_object($result))
+			{
+				$data[] = $row;
+			}
+
 			mysql_free_result($result);
 		}
-		
+
+		elseif ($dbtype === 'pdomysql')
+		{
+			// Exceptions maybe thrown by the below statements
+			if (!$unbuffered)
+			{
+				$result = $db_connection->query($query);
+				$data = $assoc
+					? $result->fetchAll(PDO::FETCH_ASSOC)
+					: $result->fetchAll(PDO::FETCH_OBJ);
+			}
+			else
+			{
+				$result = $db_connection->prepare(
+					$query,
+					array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false)
+				);
+				$result->execute();
+
+				while ($row = $assoc ? $result->fetch(PDO::FETCH_ASSOC) : $result->fetch(PDO::FETCH_OBJ))
+				{
+					$data[] = $row;
+				}
+			}
+		}
+
 		else
 		{
 			throw new Exception( __FUNCTION__.'(): direct db query, unsupported DB TYPE' );

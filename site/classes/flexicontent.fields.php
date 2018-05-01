@@ -3325,7 +3325,7 @@ class FlexicontentFields
 		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
 
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+		$require_all = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 		
