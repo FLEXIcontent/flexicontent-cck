@@ -491,6 +491,10 @@
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
+			<field name="ogplimit" type="radio" default="1" label="FLEXI_SOCIAL_SUGGEST_IMG_LIMIT" depend_class="social-mode" description="FLEXI_SOCIAL_SUGGEST_IMG_LIMIT_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_ALL</option>
+				<option value="1">FLEXI_SOCIAL_IMG_FIRST_ONLY</option>
+			</field>
 			
 		</fieldset>
 		<fieldset name="group-image-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">

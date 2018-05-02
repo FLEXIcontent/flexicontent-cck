@@ -1601,6 +1601,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$useogp     = $field->parameters->get('useogp', 0);
 		$ogpinview  = FLEXIUtilities::paramToArray($field->parameters->get('ogpinview', array()));
 		$ogpthumbsize = $field->parameters->get('ogpthumbsize', 2);
+		$ogplimit     = $field->parameters->get('ogplimit', 1);
 
 
 		// ***
@@ -2051,9 +2052,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
 
 			// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
-			if ( $isHtmlViewFE && $useogp )
+			if ($isHtmlViewFE && $useogp && $i <= $ogplimit)
 			{
-				if ( in_array($view, $ogpinview) ) {
+				if (in_array($view, $ogpinview))
+				{
 					switch ($ogpthumbsize)
 					{
 						case 1: $ogp_src = JUri::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
