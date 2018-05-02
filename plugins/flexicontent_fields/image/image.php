@@ -1577,6 +1577,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$useogp     = $field->parameters->get('useogp', 0);
 		$ogpinview  = FLEXIUtilities::paramToArray($field->parameters->get('ogpinview', array()));
 		$ogpthumbsize = $field->parameters->get('ogpthumbsize', 2);
+		$ogplimit     = $field->parameters->get('ogplimit', 1);
 
 
 		// ***
