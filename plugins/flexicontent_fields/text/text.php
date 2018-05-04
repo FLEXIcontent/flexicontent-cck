@@ -424,8 +424,36 @@ class plgFlexicontent_fieldsText extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		$app = JFactory::getApplication();
-		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
+
+		// ***
+		// *** One time initialization
+		// ***
+
+		static $initialized = null;
+		static $app, $document, $option, $format, $realview;
+		static $itemViewId, $isItemsManager, $isHtmlViewFE;
+
+		if ($initialized === null)
+		{
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->get('option', '', 'cmd');
+			$format    = $app->input->get('format', 'html', 'cmd');
+			$realview  = $app->input->get('view', '', 'cmd');
+
+			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
+			$isItemsManager = $app->isAdmin() && $realview === 'items' && $option === 'com_flexicontent';
+			$isHtmlViewFE   = $format === 'html' && $app->isSite();
+
+		}
+
+		// Current view variable
+		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = $itemViewId === (int) $item->id;
 
 		// Value handling parameters
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
@@ -583,25 +611,26 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 
 
-		// ************
-		// Add OGP tags
-		// ************
+		/*
+		 * Add OGP tags
+		 */
 		if ($field->parameters->get('useogp', 0) && !empty($field->{$prop}))
 		{
-			// Get ogp configuration
-			$ogpinview  = $field->parameters->get('ogpinview', array());
-			$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-			$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
-			$ogpusage   = $field->parameters->get('ogpusage', 0);
+			// The current view is frontend view with HTML format and is a full item view of current item
+			if ($isHtmlViewFE && $isMatchedItemView)
+			{
+				$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
+				$ogpusage  = $field->parameters->get('ogpusage', 0);
 
-			if ( in_array($view, $ogpinview) ) {
 				switch ($ogpusage)
 				{
 					case 1: $usagetype = 'title'; break;
 					case 2: $usagetype = 'description'; break;
 					default: $usagetype = ''; break;
 				}
-				if ($usagetype) {
+
+				if ($usagetype)
+				{
 					$content_val = !$is_ingroup ? flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) :
 						flexicontent_html::striptagsandcut($opentag.implode($separatorf, $field->{$prop}).$closetag, $ogpmaxlen) ;
 					JFactory::getDocument()->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');

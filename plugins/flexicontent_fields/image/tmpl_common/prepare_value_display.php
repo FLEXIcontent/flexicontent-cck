@@ -146,10 +146,15 @@
 	$field->thumbs_path['large'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
 	$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
 
-	// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
-	if ($isHtmlViewFE && $useogp && $i <= $ogplimit)
+	/*
+	 * Suggest 1 or more (all?) images to social website listing, e.g. Facebook, twitter etc, (making sure that URL is ABSOLUTE URL)
+	 * Also check that 
+	 * - we are in HTML format at Frontend
+	 * - we are viewing the item in full item view 
+	 */
+	if ($useogp && ($ogplimit === 0 || $i < $ogplimit))
 	{
-		if (in_array($view, $ogpinview))
+		if ($isHtmlViewFE && $isMatchedItemView)
 		{
 			switch ($ogpthumbsize)
 			{

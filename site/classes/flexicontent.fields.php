@@ -5106,6 +5106,9 @@ class FlexicontentFields
 			$fc_run_times['render_subfields'][$i_slave] = 0;
 		}
 
+		// Treat list creation as the 'sublist' VIEW case
+		$_view = 'sublist';
+
 		foreach($custom_field_names as $i => $custom_field_name)
 		{
 			if ( isset($disallowed_fieldnames[$custom_field_name]) ) continue;
@@ -5114,7 +5117,7 @@ class FlexicontentFields
 			if ($i_slave) $start_microtime = microtime(true);
 
 			$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
-			FlexicontentFields::getFieldDisplay($item_list, $custom_field_name, $custom_field_values=null, $display_var);
+			FlexicontentFields::getFieldDisplay($item_list, $custom_field_name, $custom_field_values=null, $display_var, $_view);
 
 			if ($i_slave) $fc_run_times['render_subfields'][$i_slave] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
