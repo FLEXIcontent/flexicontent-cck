@@ -59,15 +59,31 @@ class plgFlexicontent_fieldsCore extends FCField
 			return;
 		}
 
+
+		// ***
+		// *** One time initialization
+		// ***
+
 		static $initialized = null;
-		static $app, $document, $option;
+		static $app, $document, $option, $format, $realview;
+		static $itemViewId, $isItemsManager, $isHtmlViewFE;
 		static $isMobile, $isTablet, $useMobile;
 		static $cut_options;
-		if ($initialized===null)
+
+		if ($initialized === null)
 		{
-			$app = JFactory::getApplication();
-			$option = $app->input->get('option', '', 'cmd');
-			$document = JFactory::getDocument();
+			$initialized = 1;
+
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
+			$option    = $app->input->get('option', '', 'cmd');
+			$format    = $app->input->get('format', 'html', 'cmd');
+			$realview  = $app->input->get('view', '', 'cmd');
+
+			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
+			$isItemsManager = $app->isAdmin() && $realview === 'items' && $option === 'com_flexicontent';
+			$isHtmlViewFE   = $format === 'html' && $app->isSite();
+
 			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 
 			// Get isMobile / isTablet Flags
@@ -87,9 +103,12 @@ class plgFlexicontent_fieldsCore extends FCField
 			);
 		}
 
-		$realview = $app->input->get('view', 'item', 'cmd');
-		$view = $app->input->get('flexi_callview', $realview, 'cmd');
-		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
+		// Current view variable
+		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = $itemViewId === (int) $item->id;
+
 
 		$field = is_object($_field)
 			? $_field
@@ -376,21 +395,19 @@ class plgFlexicontent_fieldsCore extends FCField
 						$field->{$prop} = flexicontent_html::striptagsandcut($field->{$prop}, 200, $uncut_length, $cut_options);
 					}
 
-					// Add ogp description
+					/*
+					 * Add OGP Tags (description)
+					 */
 					if ($field->parameters->get('useogp', 1) && $field->{$prop})
 					{
-						if ($app->input->get('format', 'html', 'cmd') == 'html' && $app->isSite())
+						// The current view is frontend view with HTML format and is a full item view of current item
+						if ($isHtmlViewFE && $isMatchedItemView)
 						{
-							$ogpinview  = $field->parameters->get('ogpinview', array());
-							$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-							$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+							$ogpmaxlen = $field->parameters->get('ogpmaxlen', 300);
 
-							if ( in_array($view, $ogpinview) )
-							{
-								$item->metadesc
-									? $document->addCustomTag('<meta property="og:description" content="' . $item->metadesc . '" />')
-									: $document->addCustomTag('<meta property="og:description" content="' . flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) . '" />');
-							}
+							$item->metadesc
+								? $document->addCustomTag('<meta property="og:description" content="' . $item->metadesc . '" />')
+								: $document->addCustomTag('<meta property="og:description" content="' . flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) . '" />');
 						}
 					}
 					break;

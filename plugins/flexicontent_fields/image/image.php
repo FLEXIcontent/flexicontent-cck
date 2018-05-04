@@ -1133,8 +1133,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		$app  = JFactory::getApplication();
-
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$target_dir   = (int) $field->parameters->get('target_dir', 1);
 		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
@@ -1145,26 +1143,42 @@ class plgFlexicontent_fieldsImage extends FCField
 		// ***
 
 		static $initialized = null;
-		static $app, $document, $option;
+		static $app, $document, $option, $format, $realview;
+		static $itemViewId, $isItemsManager, $isHtmlViewFE;
 		static $isMobile, $isTablet, $useMobile;
 		static $configured_file_path;
-		if ($initialized===null)
+
+		if ($initialized === null)
 		{
 			$initialized = 1;
+
 			$app       = JFactory::getApplication();
-			$document	 = JFactory::getDocument();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->get('option', '', 'cmd');
+			$format    = $app->input->get('format', 'html', 'cmd');
+			$realview  = $app->input->get('view', '', 'cmd');
+
+			$itemViewId     = $realview === 'item' && $option === 'com_flexicontent' ? $app->input->get('id', 0, 'int') : 0;
+			$isItemsManager = $app->isAdmin() && $realview === 'items' && $option === 'com_flexicontent';
+			$isHtmlViewFE   = $format === 'html' && $app->isSite();
+
 			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 
 			// Get isMobile / isTablet Flags
-
 			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+
+			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 		}
+
+		// Current view variable
+		$view = $app->input->get('flexi_callview', ($realview ?: 'item'), 'cmd');
+
+		// The current view is a full item view of the item
+		$isMatchedItemView = $itemViewId === (int) $item->id;
 
 
 		// ***
@@ -1176,18 +1190,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		static $gallerifficadded = false;
 		static $elastislideadded = false;
 		static $photoswipeadded  = false;
-
-
-		// ***
-		// *** Current view variable / FLAGs
-		// ***
-
-		$realview = $app->input->get('view', 'item', 'cmd');
-		$view = $app->input->get('flexi_callview', $realview, 'cmd');
-		$format = $app->input->get('format', 'html', 'cmd');
-
-		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
-		$isHtmlViewFE   = $format === 'html' && $app->isSite();
 
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -1599,7 +1601,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		// ***
 
 		$useogp     = $field->parameters->get('useogp', 0);
-		$ogpinview  = FLEXIUtilities::paramToArray($field->parameters->get('ogpinview', array()));
 		$ogpthumbsize = $field->parameters->get('ogpthumbsize', 2);
 		$ogplimit     = $field->parameters->get('ogplimit', 1);
 
@@ -2051,10 +2052,15 @@ class plgFlexicontent_fieldsImage extends FCField
 			$field->thumbs_path['large'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
 			$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
 
-			// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
-			if ($isHtmlViewFE && $useogp && $i <= $ogplimit)
+			/*
+			 * Suggest 1 or more (all?) images to social website listing, e.g. Facebook, twitter etc, (making sure that URL is ABSOLUTE URL)
+			 * Also check that 
+			 * - we are in HTML format at Frontend
+			 * - we are viewing the item in full item view 
+			 */
+			if ($useogp && ($ogplimit === 0 || $i < $ogplimit))
 			{
-				if (in_array($view, $ogpinview))
+			if ($isHtmlViewFE && $isMatchedItemView)
 				{
 					switch ($ogpthumbsize)
 					{
@@ -2435,6 +2441,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Apply open/close tags
 		$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 	}
+
 
 
 	// ***
