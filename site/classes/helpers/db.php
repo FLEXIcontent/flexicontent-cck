@@ -250,20 +250,31 @@ class flexicontent_db
 			.' FROM #__'.$tbl
 			.' WHERE MATCH ('.$col.') AGAINST ("'.$_word_clause.'" IN BOOLEAN MODE)'
 			.' LIMIT 1';
+
 		$_words = array();
-		foreach ($words as $word) {
+		foreach ($words as $word)
+		{
 			$quoted_word = $db->escape($word, true);
 			$q = sprintf($query, $quoted_word);
-			$db->setQuery($q);
-			$result = $db->loadAssocList();
-			if ( !empty($result) ) {
-				$_words[] = $word;      // word found
-			} else if ( StringHelper::strlen($word) < $min_word_len ) {
-				$shortwords[] = $word;  // word not found and word too short
-			} else {
-				$stopwords[] = $word;   // word not found
+			$result = $db->setQuery($q)->loadAssocList();
+
+			// Word found
+			if (!empty($result))
+			{
+				$_words[] = $word;
+			}
+			// Word not found and word too short
+			elseif (StringHelper::strlen($word) < $min_word_len)
+			{
+				$shortwords[] = $word;
+			}
+			// Word not found
+			else
+			{
+				$stopwords[] = $word;
 			}
 		}
+
 		return $_words;
 	}
 	

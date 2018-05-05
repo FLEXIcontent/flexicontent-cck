@@ -513,7 +513,7 @@
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
 				<option value="natural">FLEXI_NATURAL_PHRASE</option>
-				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_MORE_RESULTS</option>
 			</field>
 			<field name="search_autocomplete" type="fcradio" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" class="btn-group">
 				<option value="">FLEXI_USE_GLOBAL</option>

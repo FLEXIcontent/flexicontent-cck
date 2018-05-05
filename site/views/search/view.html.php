@@ -484,8 +484,11 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ($show_searchphrase)
 		{
 			$searchphrase_names = array(
-				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'natural'=>'FLEXI_NATURAL_PHRASE',
-				'exact'=>'FLEXI_EXACT_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT'
+				'all'=>'FLEXI_ALL_WORDS',
+				'any'=>'FLEXI_ANY_WORDS',
+				'natural'=>'FLEXI_NATURAL_PHRASE',
+				'natural_expanded'=>'FLEXI_NATURAL_PHRASE_MORE_RESULTS',
+				'exact'=>'FLEXI_EXACT_PHRASE',
 			);
 
 			$phrases = array();

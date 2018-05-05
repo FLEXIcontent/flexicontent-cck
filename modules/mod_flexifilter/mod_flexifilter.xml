@@ -144,7 +144,7 @@
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
 				<option value="natural">FLEXI_NATURAL_PHRASE</option>
-				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_MORE_RESULTS</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" />

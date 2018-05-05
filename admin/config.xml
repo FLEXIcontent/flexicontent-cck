@@ -15,9 +15,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filter_word_like_any" type="multilist" subtype="radio" default="0" label="FLEXI_FILTER_WORD_LIKE_ANY" description="FLEXI_FILTER_WORD_LIKE_ANY_DESC" class="txtsearch_display btn-group group-fcmethod" inline_tip="This will have big performance impact on large websites 5000+ items" tip_class="" tip_img="warning.png" >
+			<field name="filter_word_like_any" type="multilist" subtype="radio" default="0" label="FLEXI_FILTER_WORD_NO_SPACE_SEARCH" description="FLEXI_FILTER_WORD_NO_SPACE_SEARCH_DESC" class="txtsearch_display btn-group group-fcmethod fcoffactive" inline_tip="FLEXI_FILTER_WORD_NO_SPACE_SEARCH_INFO" tip_class="" tip_img="information.png" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="filter_word_relevance_order" type="multilist" subtype="radio" default="1" label="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST" description="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST_DESC" class="txtsearch_display btn-group group-fcmethod fcoffactive" inline_tip="FLEXI_FILTER_WORD_MOST_RELEVANT_FIRST_INFO" tip_class="" tip_img="information.png" >
+				<option value="1">FLEXI_FILTER_WORD_RELEVANT_TITLE</option>
+				<option value="2">FLEXI_YES</option>
 			</field>
 			
 		<field name="" type="separator" default="FLEXI_MULTI_LANGUAGE" label="" level="level0" />
@@ -642,7 +646,7 @@
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
 				<option value="natural">FLEXI_NATURAL_PHRASE</option>
-				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_MORE_RESULTS</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" icon_class="icon-filter" level="tab_open" box_type="1" remove_boxes="2" />
