@@ -136,6 +136,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `type_id` int(11) NOT NULL DEFAULT '0',
  `lang_parent_id` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`id`),
+ FULLTEXT KEY `title` (`title`),
  KEY `alias` (`alias`(64)),
  KEY `state` (`state`),
  KEY `catid` (`catid`),

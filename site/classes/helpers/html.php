@@ -1014,8 +1014,8 @@ class flexicontent_html
 			'all'=>'FLEXI_ALL_WORDS',
 			'any'=>'FLEXI_ANY_WORDS',
 			'natural'=>'FLEXI_NATURAL_PHRASE',
+			'natural_expanded'=>'FLEXI_NATURAL_PHRASE_MORE_RESULTS',
 			'exact'=>'FLEXI_EXACT_PHRASE',
-			'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT'
 		);
 
 		$searchphrases = array();

@@ -384,7 +384,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
 			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
 			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
-			$query_limited = $query . ' LIMIT '.$limit.' OFFSET '.$limitstart;
+			$query_limited = $query
+				. ' LIMIT ' . $limit
+				. ' OFFSET ' . $limitstart;
 			$rows = flexicontent_db::directQuery($query_limited);
 			$query_ids = array();
 			foreach ($rows as $row) $query_ids[] = $row->id;
@@ -531,7 +533,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		elseif (!$query_ids)
 		{
 			// Get FROM and JOIN SQL CLAUSES
-			$fromjoin = $this->_buildItemFromJoin($counting);
+			$select_relevance = array();
+			$fromjoin = $this->_buildItemFromJoin($counting, $select_relevance);
 
 			// Create sql WHERE clause
 			$where = $this->_buildItemWhere('where', $counting, $extra_where);
@@ -702,6 +705,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 				;
 		}
 
+		if (!$query_ids && $select_relevance)
+		{
+			$priorities = array();
+			$n = count($select_relevance);
+			foreach ($select_relevance as $s)
+			{
+				$priorities['priority' . $n] = ' (' . $s . ') AS priority' . $n;
+				$n--;
+			}
+			$query .= ', ' . implode(', ', $priorities) ;
+			$ord_priorities = implode(' DESC, ', array_keys($priorities)) . ' DESC, ';
+			$orderby = str_replace( 'ORDER BY ', 'ORDER BY ' . $ord_priorities, $orderby);
+		}
 
 		$query .= $fromjoin;
 
@@ -904,7 +920,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return array
 	 */
-	function _buildItemFromJoin($counting = false)
+	function _buildItemFromJoin($counting = false, & $select_relevance = array())
 	{
 		static $fromjoin = null;
 
@@ -913,7 +929,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			return $fromjoin[$counting];
 		}
 
-		$text_search = $this->_buildTextSearch();
+		// 0: Basic Search Index, 1: Advanced Search Index
+		$txtmode = 0;
+		$text_search = $this->_buildTextSearch(null, null, $txtmode, $select_relevance);
+
+		global $fc_catview;
+		$fc_catview['search'] = $text_search;
 
 		$tmp_only = $counting && !$text_search;
 		$from_clause = $counting ? ' FROM #__flexicontent_items_tmp AS i ' : ' FROM #__content AS i ';
@@ -926,11 +947,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. ($counting ? '' : ' LEFT JOIN #__users AS u ON u.id = i.created_by')
 			;
-		$join_clauses =
-			($counting ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id ')
-			.$_join_clauses;
 		$join_clauses_with_text =
-			($counting && !$text_search ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '.$text_search)
+			(!$counting || $text_search
+				? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id ' . $text_search
+				: ''
+			)
+			.$_join_clauses;
+		$join_clauses =
+			(!$counting
+				? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '
+				: ''
+			)
 			.$_join_clauses;
 
 		global $fc_catview;
@@ -941,7 +968,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$fc_catview['join_clauses_with_text'] = $join_clauses_with_text;
 		}
 
-		$fromjoin[$counting] = $from_clause.$join_clauses_with_text;
+		$fromjoin[$counting] = $counting
+			? $from_clause . $join_clauses_with_text
+			: $from_clause . $join_clauses;
+
 		return $fromjoin[$counting];
 	}
 
@@ -1124,110 +1154,179 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return array
 	 */
-	function _buildTextSearch()
+	function _buildTextSearch($text = null, $phrase = null, $txtmode = 0, & $select_relevance = array())
 	{
-		global $fc_catview;
-		$app      = JFactory::getApplication();
-		$option   = $this->getState('option');
-		$db = $this->_db;
+		$app    = JFactory::getApplication();
+		$option = $app->input->getCmd('option', '');
+		$db     = JFactory::getDbo();
 
 		static $text_search = null;
-		if ($text_search !== null) return $text_search;
+
+		if ($text_search !== null)
+		{
+			return $text_search;
+		}
+
 		$text_search = '';
 
 
-		// ****************************************
-		// Create WHERE clause part for Text Search
-		// ****************************************
+		/**
+		 * Create query CLAUSE for Text Search
+		 */
 
-		$text = $app->input->get('filter', $app->input->get('q', '', 'string'), 'string');
+		if ($text === null)
+		{
+			$text = $app->input->get('filter', $app->input->get('q', '', 'string'), 'string');
+		}
 
-		// Check for LIKE %word% search, for languages without spaces
-		$filter_word_like_any = $this->_params->get('filter_word_like_any', 0);
+		// Set _relevant _active_* FLAG
+		$this->_active_search = $text;
 
-		$phrase = $filter_word_like_any ?
-			$app->input->get('searchphrase', $app->input->get('p', 'any', 'word'), 'word') :
-			$app->input->get('searchphrase', $app->input->get('p', 'exact', 'word'), 'word') ;
+		// Text search using LIKE %word% (compatibility for language without spaces)
+		$filter_word_like_any = (int) $this->_params->get('filter_word_like_any', 0);
 
-		$si_tbl = 'flexicontent_items_ext';
+		// Text search relevance [title] or [title, search index]
+		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 1);
+		
+		if ($phrase === null)
+		{
+			$default_searchphrase = $this->_params->get('default_searchphrase', 'all');
+			$phrase = $app->input->get('searchphrase', $app->input->get('p', $default_searchphrase, 'word'), 'word');
+		}
 
-		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
+		$si_tbl = !$txtmode
+			? 'flexicontent_items_ext'
+			: 'flexicontent_advsearch_index';
+
+		// Prefix the words for short word / stop words matching
+		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';
+		$text_np = trim($text);
+		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
+
+		// Split to words
+		$words_np = preg_split('/\s\s*/u', $text_np);
 		$words = preg_split('/\s\s*/u', $text);
 
-		$this->_active_search = $text;  // Set _relevant _active_* FLAG
-
-		if( strlen($text) )
+		if (strlen($text))
 		{
-			$ts = 'ie';
-			$escaped_text = $db->escape($text, true);
-			$quoted_text = $db->Quote( $escaped_text, false );
+			$ts = !$txtmode ? 'ie' : 'ts';
+			$escaped_text_np = $db->escape($text_np, true);
+			$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
-			switch ($phrase)
+			$escaped_text = $db->escape($text, true);
+			$quoted_text  = $db->Quote($escaped_text, false);
+			$exact_text   = $db->Quote('%' . $escaped_text . '%', false);
+
+			$isprefix = $phrase !== 'exact';
+			$stopwords = array();
+			$shortwords = array();
+
+			/*
+			 * LIKE %word% search (needed by languages without spaces), auto skip this for other languages
+			 */
+			if ($filter_word_like_any && in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th')))
 			{
+				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text_np.'%', false );
+				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text_np.'%', false );
+			}
+
+			/*
+			 * FullText search
+			 */
+			else
+			{
+				if (!$search_prefix)
+				{
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix);
+				}
+
+				// Abort if all words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
+				if (empty($words))
+				{
+					return ' AND 0 = 1 ';
+				}
+
+				switch ($phrase)
+				{
 				case 'natural':
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
+					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN NATURAL LANGUAGE MODE) ';
+					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN NATURAL LANGUAGE MODE) ';
+					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN NATURAL LANGUAGE MODE) ';
 					break;
 
 				case 'natural_expanded':
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' WITH QUERY EXPANSION) ';
+					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
 					break;
 
 				case 'exact':
-					$stopwords = array();
-					$shortwords = array();
-					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
-					if (empty($words)) {
-						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
-						$app->input->set('ignoredwords', implode(' ', $stopwords));
-						$app->input->set('shortwords', implode(' ', $shortwords));
-						$_text_match = ' 0=1 ';
-					} else {
-						// speed optimization ... 2-level searching: first require ALL words, then require exact text
-						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = $db->escape($newtext, true);
-						$quoted_text = $db->Quote( $quoted_text, false );
-						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
-						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
-					}
+					// Speed optimization ... 2-level searching: first require ALL words via FULLTEXT index, then require exact text via LIKE %phrase%
+					$newtext = '+' . implode(' +', $words);
+					$escaped_text = $db->escape($newtext, true);
+					$quoted_text  = $db->Quote($escaped_text, false);
+
+					// Relevance by title, try to match (EXACT) words, via OR ignoring stop words and short words ...
+					$newtext_np = implode(' ', $words_np);
+					$escaped_text_np = $db->escape($newtext_np, true);
+					$quoted_text_np  = $db->Quote($escaped_text_np, false);
+
+					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
+					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
 				case 'all':
-					$stopwords = array();
-					$shortwords = array();
-					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
-					$app->input->set('ignoredwords', implode(' ', $stopwords));
-					$app->input->set('shortwords', implode(' ', $shortwords));
-
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
-					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$escaped_text = $db->escape($newtext, true);
+					$quoted_text  = $db->Quote($escaped_text, false);
+
+					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
+					$newtext_np = implode( '* ', $words_np ) . '*';
+					$escaped_text_np = $db->escape($newtext_np, true);
+					$quoted_text_np  = $db->Quote($escaped_text_np, false);
+
+					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
 				case 'any':
 				default:
-					// Check for LIKE %word% search, for languages without spaces
-					if ($filter_word_like_any) {
-						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-					} else {
-						$stopwords = array();
-						$shortwords = array();
-						if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
-						$app->input->set('ignoredwords', implode(' ', $stopwords));
-						$app->input->set('shortwords', implode(' ', $shortwords));
+					$newtext = implode( '* ', $words ) . '*';
+					$escaped_text = $db->escape($newtext, true);
+					$quoted_text  = $db->Quote($escaped_text, false);
 
-						$newtext = implode( '* ', $words ) . '*';
-						$quoted_text = $db->escape($newtext, true);
-						$quoted_text = $db->Quote( $quoted_text, false );
-						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
-					}
+					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
+					$newtext_np = implode( '* ', $words_np ) . '*';
+					$escaped_text_np = $db->escape($newtext_np, true);
+					$quoted_text_np  = $db->Quote($escaped_text_np, false);
+
+					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_title_relev = ' MATCH (i.title) AGAINST ('.$quoted_text_np.' IN BOOLEAN MODE) ';
+					$_index_relev = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
+				}
 			}
 
-			$text_search = ' AND '. $_text_match;
+			// Title relevance clause, Search index relevance clause ... (currently search index relevance not DONE)
+			if ($filter_word_relevance_order > 0)
+			{
+				$select_relevance['rel_title'] = $_title_relev;
+			}
+
+			if ($filter_word_relevance_order > 1)
+			{
+				$select_relevance['rel_index'] = $_index_relev;
+			}
+
+			// Indicate ignored words
+			$app->input->set('ignoredwords', implode(' ', $stopwords));
+			$app->input->set('shortwords', implode(' ', $shortwords));
+
+			// Construct TEXT SEARCH limitation clause
+			$text_search = ' AND '. $_index_match;
 		}
-		$fc_catview['search'] = $text_search;
 
 		return $text_search;
 	}
@@ -2514,6 +2613,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
+		$select_relevance = array();
 		$fromjoin = $this->_buildItemFromJoin($counting = true);
 		$where    = $this->_buildItemWhere('where_no_alpha');
 
