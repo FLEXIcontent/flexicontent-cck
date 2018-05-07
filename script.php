@@ -828,6 +828,9 @@ class com_flexicontentInstallerScript
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
+					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NULL AFTER `alias`";
+					}
 					
 					// Types TABLE
 					$tbl_name = 'flexicontent_tags';

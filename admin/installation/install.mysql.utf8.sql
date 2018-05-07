@@ -201,6 +201,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `asset_id` int(11) unsigned NOT NULL default '0',
   `name` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
+  `description` text NOT NULL,
   `published` tinyint(1) NOT NULL,
   `itemscreatable` SMALLINT(8) NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
