@@ -23,9 +23,10 @@ jimport('legacy.view.legacy');
 
 class FlexicontentViewTypes extends JViewLegacy
 {
-	function display( $tpl = null ) {
-
+	function display( $tpl = null )
+	{
 		$fc_css = JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css';
+
 		echo '
 		<link rel="stylesheet" href="'.JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />
 		<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VHASH.'" />
@@ -38,55 +39,77 @@ class FlexicontentViewTypes extends JViewLegacy
 		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		$types = is_array($types) ? $types : array();
 
-		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
+		$ctrl_task = 'items.add';
 		$icon = "components/com_flexicontent/assets/images/layout_add.png";
-		$btn_class = FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+		$btn_class = 'choose_type';
 
 		echo '
-<div id="flexicontent">
-	<table class="fc-table-list">
-		<tr>
-			<th>'.JText::_( 'FLEXI_SELECT_TYPE' ).'</th>
-		</tr>
-		<tr>
-			<td>
+<div id="flexicontent" style="margin:32px;" >
+	<ul class="nav nav-tabs nav-stacked">
 		';
 		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;". JSession::getFormToken() ."=1";
-		$_name = '- '.JText::_("FLEXI_ANY") .' -';//.' ... '. JText::_("FLEXI_TYPE");
+		$_name = '- ' . JText::_("FLEXI_NO_TYPE") . ' -';
 		?>
-			<a class="<?php echo $btn_class; ?> btn-info" href="<?php echo $link; ?>" style="min-width:60px;" target="_parent">
-				<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $_name; ?>" />&nbsp;-->
-				<?php echo $_name; ?>
-			</a>
-		<?php
+			<li>
+				<a class="<?php echo $btn_class; ?>" href="<?php echo $link; ?>" target="_parent">
+					<?php echo $_name; ?>
+					<small class="muted">
+						<?php echo JText::_('FLEXI_NEW_ITEM_FORM_NO_TYPE_DESC'); ?>
+					</small>
+				</a>
+			</li>
 
+		<?php
 		foreach($types as $type)
 		{
 			$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 
-			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1";
+			/*
+			 * Creation not allowed, and item type is not visible
+			 */
+			if (!$allowed && $type->itemscreatable == 1)
+			{
+				continue;
+			}
 
-			if ( !$allowed && $type->itemscreatable == 2 ) {
+			/*
+			 * Creation not allowed, but item type is visible
+			 */
+			elseif (!$allowed && $type->itemscreatable == 2)
+			{
+				$link = "javascript:;";
 				?>
-				<span class="badge badge-warning">
-					<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $type->name; ?>" />&nbsp;-->
+			<li>
+				<a class="<?php echo $btn_class; ?>" href="<?php echo $link; ?>" target="_parent" style="color: gray; cursor: not-allowed;">
 					<?php echo $type->name; ?>
-				</span>
-				<?php
-			} else {
-				?>
-				<a class="<?php echo $btn_class; ?> btn-success" href="<?php echo $link; ?>" target="_parent">
-					<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $type->name; ?>" />&nbsp;-->
-					<?php echo JText::_($type->name); ?>
+					<small class="muted">
+						<?php echo $type->description ?: JText::_('FLEXI_NO_DESCRIPTION'); ?>
+					</small>
 				</a>
+			</li>
+			<?php
+			}
+
+			/*
+			 * Creation (of this item type) is allowed
+			 */
+			else
+			{
+				$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;". JSession::getFormToken() ."=1";
+				?>
+			<li>
+				<a class="<?php echo $btn_class; ?>" href="<?php echo $link; ?>" target="_parent">
+					<?php echo JText::_($type->name); ?>
+					<small class="muted">
+						<?php echo $type->description ?: JText::_('FLEXI_NO_DESCRIPTION'); ?>
+					</small>
+				</a>
+			</li>
 			<?php
 			}
 		}
 		echo '
-			</td>
-		</tr>
-	</table>
+	</ul>
 </div>
 		';
 	}

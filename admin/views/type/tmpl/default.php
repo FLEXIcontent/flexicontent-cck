@@ -98,7 +98,14 @@ $this->document->addScriptDeclaration($js);
 	
 	
 	<div class="fctabber fields_tabset" id="field_specific_props_tabset">
-		
+
+		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-paragraph-justify" >
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DESCRIPTION'); ?> </h3>
+
+			<?php echo $this->form->getInput('description'); ?>
+
+			</div>
+
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-cogs" >
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CORE_FIELDS'); ?> </h3>
 			
