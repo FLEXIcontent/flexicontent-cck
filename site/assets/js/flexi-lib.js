@@ -75,6 +75,9 @@
 	{
 		params = typeof params !== 'undefined' ? params : {};
 		params = fc_getAutoSizePos(winwidth, winheight, params);
+
+		// Make it jQuery object if it is not already
+		obj = jQuery(obj);
 		
 		// Get close function
 		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;

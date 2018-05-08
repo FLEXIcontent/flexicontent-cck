@@ -1954,6 +1954,7 @@ class flexicontent_html
 	{
 		$options = $options ?: array(
 			'cut_at_word' => false,
+			'more_box_id' => '',
 			'more_toggler' => 0,
 			'more_icon' => 'icon-paragraph-center',
 			'more_txt' => '...',
@@ -2018,23 +2019,26 @@ class flexicontent_html
 			switch ($options['more_toggler'])
 			{
 			case 2:
-				$text2 =  '
+				$box_js = $options['more_box_id']
+					? ' var box = document.getElementById(\'' . $options['more_box_id'] . '\'); '
+					: ' var box = this.parentElement.previousElementSibling; ';
+				$text2 = (!$options['more_box_id'] ? '
 					<div style="display:none;">
 						'. $text . '
-					</div>
+					</div>' : '') . '
 					<span class="readmore">
-						<a href="javascript:;" class="btn btn-mini" onclick="var box = jQuery(this).parent().prev(); fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . JText::_($options['modal_title']) . '\'}); return false;">
+						<span style="cursor: pointer;" class="btn btn-mini" onclick="' . $box_js . ' fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . JText::_($options['modal_title']) . '\'}); return false;">
 							<span class="'.$options['more_icon'].'"></span>
 							'.JText::_($options['more_txt']).'
-						</a>
+						</span>
 					</span>';
 				break;
 			case 1:
 				$text2 = '
-					<a href="javascript:;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\';">
+					<span style="cursor: pointer;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\'; return false;">
 						<span class="'.$options['more_icon'].'"></span>
 						'.JText::_($options['more_txt']).'
-					</a>
+					</span>
 					<span class="fc_cutted_text" style="display: none;">
 						' . htmlspecialchars(StringHelper::substr($cleantext, $chars), ENT_COMPAT, 'UTF-8') . '
 					</span>';
