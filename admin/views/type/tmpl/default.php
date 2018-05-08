@@ -101,7 +101,9 @@ $this->document->addScriptDeclaration($js);
 
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-paragraph-justify" >
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DESCRIPTION'); ?> </h3>
-
+			<div class="alert alert-success" style="display: inline-block;">
+				<?php echo JText::_('FLEXI_REGARDING_ITEM_TYPE_DESCRIPTION_TEXT_USAGE'); ?>
+			</div>
 			<?php echo $this->form->getInput('description'); ?>
 
 			</div>

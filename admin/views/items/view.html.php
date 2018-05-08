@@ -337,7 +337,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($CanAddAny)
 		{
 			$btn_task = '';
-			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&format=raw';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new';
 			//$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 780, 240);   //JToolbarHelper::addNew( $btn_task );
 			$js .= "
 				jQuery('#toolbar-new a.toolbar, #toolbar-new button').attr('href', '".$popup_load_url."')
