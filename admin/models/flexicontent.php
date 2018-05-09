@@ -1196,9 +1196,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 
 		$deprecated = array();
+		static $finished;
 		
-		static $return;
-		if ($return===true) return $return;
+		if ($finished===true)
+		{
+			return $finished;
+		}
+
+		$finished = false;
 
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
@@ -1207,22 +1212,24 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$deprecated['folders'] = array();
 
 		$done_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_done');
+		$depr_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_list.php');
 		
 		// If file / folder removal already done then stop further steps
-		if (JFile::exists($done_file))
+		if (JFile::exists($done_file) && (filemtime($done_file) > filemtime($depr_file)))
 		{
-			return true;
+			$finished = true;
+			return $finished;
 		}
 
 		// Mark file / folder removal as finished and stop further steps
 		if ($done)
 		{
 			touch ($done_file);
-			return true;
+			$finished = true;
+			return $finished;
 		}
 
 		// Load list of depreacted files and folders
-		$depr_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_list.php');
 		include($depr_file);
 
 		foreach ($files as $file)
