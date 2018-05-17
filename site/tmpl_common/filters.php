@@ -1,4 +1,5 @@
 <?php
+$app    = JFactory::getApplication();
 $document = JFactory::getDocument();
 
 // Form (text search / filters) configuration
@@ -56,7 +57,9 @@ $filter_instructions = ($use_search || $use_filters) ? $filter_instructions : 0;
 // Create instructions (tooltip or inline message)
 $legend_class = 'fc_legend_text';
 $legend_tip = '';
-if ($filter_instructions == 1) {
+
+if ($filter_instructions == 1)
+{
 	$legend_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 	$legend_tip =
 		 ($use_search ? '<b>'.JText::_('FLEXI_TEXT_SEARCH').'</b><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '')
@@ -64,7 +67,10 @@ if ($filter_instructions == 1) {
 		.($use_filters ? '<b>'.JText::_('FLEXI_FIELD_FILTERS').'</b><br/>'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '')
 		;
 	$legend_tip = flexicontent_html::getToolTip(null, $legend_tip, 0, 1);
-} else if ($filter_instructions == 2) {
+}
+
+elseif ($filter_instructions == 2)
+{
 	$legend_inline =
 		 ($use_search ? '<strong>'.JText::_('FLEXI_TEXT_SEARCH').'</strong><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '')
 		.(($use_search || $use_filters) ? '<br/><br/>' : '')
@@ -81,9 +87,9 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 ?>
 
 <div id="<?php echo $form_id; ?>_filter_box" class="fc_filter_box floattext">
-	
+
 	<fieldset class="fc_filter_set">
-		
+
 		<?php if ($filter_instructions == 1) : ?>
 		<legend>
 			<span class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
@@ -91,22 +97,29 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			</span>
 		</legend>
 		<?php endif; ?>
-		
+
 		<?php if ($filter_instructions == 2) :?>
 			<div class="fc-mssg fc-info"><?php echo $legend_inline; ?></div>
 		<?php endif; ?>
-		
+
 		<?php if ( $use_search ) : /* BOF search */ ?>
 			<?php
-			$ignoredwords = JRequest::getVar('ignoredwords');
-			$shortwords = JRequest::getVar('shortwords');
-			$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
+			$ignoredwords = $app->input->getString('ignoredwords');
+			$shortwords = $app->input->getString('shortwords');
+			$min_word_len = $app->getUserState($app->input->getCmd('option') . '.min_word_len', 0);
+
 			$msg = '';
-			$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
-			$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
-			$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
+			$msg .= $ignoredwords
+				? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON') . ': <b>' . $ignoredwords . '</b>'
+				: '';
+			$msg .= $ignoredwords && $shortwords
+				? ' <br/> '
+				: '';
+			$msg .= $shortwords
+				? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) . ': <b>' . $shortwords . '</b>'
+				: '';
 			?>
-			
+
 			<div class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
 				<?php
 				$text_search_class = 'fc_text_filter';
@@ -114,11 +127,11 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete '.$_label_internal) : ' '.$_label_internal;
 				$text_search_prompt = htmlspecialchars(JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST'), ENT_QUOTES, 'UTF-8');
 				?>
-				
+
 				<?php if ($show_search_label==1) : ?>
 					<div class="fc_filter_label"><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></div>
 				<?php endif; ?>
-				
+
 				<div class="fc_filter_html fc_text_search">
 					<input type="text" class="<?php echo $text_search_class; ?>"
 						<?php echo 'data-txt_ac_lang="'.JFactory::getLanguage()->getTag().'"'; ?>
@@ -128,116 +141,161 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						placeholder="<?php echo $text_search_prompt; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
-					
+
 					<?php if ( $msg ) : ?><div class="fc-mssg fc-note"><?php echo $msg; ?></div><?php endif; ?>
 				</div>
-				
+
 			</div>
-			
+
 		<?php endif; /* EOF search */ ?>
-		
+
 		<?php
-			$filter_messages = JRequest::getVar('filter_messages', array());
+			$filter_messages = $app->getUserState('filter_messages', array(), 'array');
+			$filter_messages = $filter_messages ?: array();
+			$app->setUserState('filter_messages', null);
 			$msg = '';
 			$msg = implode(' <br/> ', $filter_messages);
 			if ( $msg ) :
 				?><div class="fcclear"></div><div class="fc-mssg fc-note"><?php echo $msg; ?></div><?php
 			endif;
 		?>
-		
+
 		<?php if ($use_filters): /* BOF filter */ ?>
 			<?php
 			// Prefix/Suffix texts
-			$pretext  = $params->get( 'filter_pretext', '' );
-			$posttext = $params->get( 'filter_posttext', '' );
-			
+			$pretext  = $params->get('filter_pretext', '');
+			$posttext = $params->get('filter_posttext', '');
+
 			// Open/Close tags
-			$opentag  = !$filters_in_tabs ? $params->get( 'filter_opentag', '' )  : '<div class="fctabber fields_tabset" id="fcform_tabset_'.(++$_filter_TABsetCnt).'" >';
-			$closetag = !$filters_in_tabs ? $params->get( 'filter_closetag', '' ) : '</div>';
-			?>
-			
-			<?php
-			$n=0;
+			$opentag  = !$filters_in_tabs
+				? $params->get('filter_opentag', '')
+				: '<div class="fctabber fields_tabset" id="fcform_tabset_'.(++$_filter_TABsetCnt).'" >';
+			$closetag = !$filters_in_tabs
+				? $params->get('filter_closetag', '')
+				: '</div>';
+
+			$n = 0;
 			$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
+
 			$filters_html = array();
-			foreach ($filters as $filt) :
-				if (empty($filt->html)) continue;
+
+			foreach ($filters as $filt)
+			{
+				if (empty($filt->html))
+				{
+					continue;
+				}
+
 				$filt_lbl = $filt->label;
-				if ( isset($fgInfo->field_to_grp[$filt->id]) ) {
+
+				if (isset($fgInfo->field_to_grp[$filt->id]))
+				{
 					$fieldgrp_id = $fgInfo->field_to_grp[$filt->id];
 					$filt_lbl = '<div class="label label-info">'.$fgInfo->grps[$fieldgrp_id]->label .'</div><br/>'. $filt_lbl;
 				}
-				
-				// Support for old 3rd party filters, that include an auto-submit statement or include a fixed form name
-				// These CUSTOM fields should be updated to have this auto-submit code removed fixed form name changed too
-				
-				// Compatibility HACK 1
-				// These fields need to be have their onChange Event prepended with the FORM PREPARATION function call,
-				// ... but if these filters change value after we 'prepare' form then we have an issue ...
-				if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) && preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
+
+				/*
+				 * Support for old 3rd party filters, that include an auto-submit statement or include a fixed form name
+				 * These CUSTOM fields should be updated to have this auto-submit code removed fixed form name changed too
+				 */
+
+				/*
+				 * Compatibility workaround 1
+				 * These fields need to be have their onChange Event prepended with the FORM PREPARATION function call,
+				 * ... but if these filters change value after we 'prepare' form then we have an issue ...
+				 */
+				if (preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) && preg_match('/\.submit\(\)/', $filt->html, $matches))
+				{
 					$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}'.$prepend_onchange, $filt->html);
 				}
-				
-				// Compatibility HACK 2
-				// These fields also need to have any 'adminForm' string present in their filter's HTML replaced with the name of our form
+
+				/*
+				 * Compatibility workaround 2
+				 * These fields also need to have any 'adminForm' string present in their filter's HTML replaced with the name of our form
+				 */
 				$filt->html = preg_replace('/([\'"])adminForm([\'"])/', '${1}'.$form_name.'${2}', $filt->html);
-				
+
 				$label_outside  = !$filters_in_tabs && ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1));
 				$even_odd_class = !$filters_in_tabs ? (($n++)%2 ? ' fc_even': ' fc_odd') : '';
-				
+
 				// Highlight active filter
-				$filt_vals  = JRequest::getVar('filter_'.$filt->id, '', '');
-				$has_filt_vals_array  = is_array($filt_vals)  && strlen(trim(implode('',$filt_vals)));
-				$has_filt_vals_string = !is_array($filt_vals) && strlen(trim($filt_vals));
-				$filter_label_class = ($has_filt_vals_array || $has_filt_vals_string) ? 'fc_filter_active' : 'fc_filter_inactive';
-				
-				$_filter_html = 
-				
+				$filt_vals = $app->input->get('filter_' . $filt->id, '', 'array');
+
+				// Skip filters without value
+				if (is_array($filt_vals))
+				{
+					if (!count($filt_vals))
+					{
+						$is_empty = true;
+					}
+					else
+					{
+						$v = reset($filt_vals);
+
+						$is_empty = is_array($v)
+							? false
+							: !strlen(trim(implode('', $filt_vals)));
+					}
+				}
+				else
+				{
+					$is_empty = !is_array($filt_vals) && !strlen(trim($filt_vals));
+				}
+
+				$filter_label_class = !$is_empty
+					? 'fc_filter_active'
+					: 'fc_filter_inactive';
+
+				$_filter_html =
+
 					/* Optional TAB start and filter label as TAB title */
 					($filters_in_tabs ? '
 					<div class="tabbertab" id="fcform_tabset_'.$_filter_TABsetCnt.'_tab_'.($tabSetCnt++).'" >
-						<h3 class="tabberheading '.$filter_label_class.'">'.$filt_lbl.($has_filt_vals_array || $has_filt_vals_string ? ' *' : '' ).'</h3>' : '')
-						
+						<h3 class="tabberheading ' . $filter_label_class . '">' . $filt_lbl . (!$is_empty ? ' *' : '') . '</h3>' : '')
+
 						/* External filter container */.'
 						<div class="'.$filter_container_class.$even_odd_class.' fc_filter_id_'.$filt->id.'" >'.
-						
+
 							/* Optional filter label before filter's HTML */
 							($label_outside ? '
 							<div class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt_lbl. '</div>' : '')
-							
+
 							/* Internal filter container and filter 's HTML */.'
 							<div class="fc_filter_html fc_html_field_'.$filt->id.'">'
 								.$filt->html.'
 							</div>
-							
+
 						</div>
 					'.
-					
+
 					/* Optional TAB end */
 					($filters_in_tabs ? '
 					</div>' : '').'
 				';
-				
-				$_filter_html = $filter_placement!=3 ? $pretext .$_filter_html. $posttext : $_filter_html;
-				
-				$filters_html[] = $_filter_html;
-			endforeach;
 
-			
+				$_filter_html = $filter_placement != 3
+					? $pretext . $_filter_html . $posttext
+					: $_filter_html;
+
+				$filters_html[] = $_filter_html;
+			}
+
+
 			// (if) Using separator
 			$separatorf = '';
-			if ( $filter_placement==0 ) {  
+			if ($filter_placement == 0)
+			{
 				$separatorf = $params->get( 'filter_separatorf', 1 );
 				$separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag, 5 => '' );
 				$separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
 			}
-			
+
 			// Create HTML of filters
 			echo $opentag . implode($separatorf, $filters_html) . $closetag;
 			unset ($filters_html);
 			?>
-			
-			
+
+
 		<?php endif; /* EOF filter */ ?>
 
 
@@ -246,7 +304,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				<input type="submit" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" />
 			</div>
 		<?php endif; ?>
-		
+
 		<?php if ($show_search_go || $show_search_reset) : ?>
 		<div class="<?php echo $filter_container_class; ?> fc_filter_buttons_box">
 			<div class="fc_buttons btn-group">
@@ -255,20 +313,20 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					<i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?>
 				</button>
 				<?php endif; ?>
-					
+
 				<?php if ($show_search_reset) : ?>
 				<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
 					<i class="icon-remove"></i><?php echo JText::_( 'FLEXI_RESET' ); ?>
 				</button>
 				<?php endif; ?>
-					
+
 			</div>
 			<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
 		</div>
 		<?php endif; ?>
 
 	</fieldset>
-		
+
 </div>
 
 <?php endif; /* EOF search and filter block */

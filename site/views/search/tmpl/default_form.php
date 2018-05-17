@@ -242,7 +242,9 @@ $r = 0;
 				</legend>
 				
 			<?php	
-			$filter_messages = $app->input->get('filter_messages', array(), 'array');
+			$filter_messages = $app->getUserState('filter_messages', array(), 'array');
+			$filter_messages = $filter_messages ?: array();
+			$app->setUserState('filter_messages', null);
 			$msg = '';
 			$msg = implode(' <br/> ', $filter_messages);
 			if ( $msg ) :

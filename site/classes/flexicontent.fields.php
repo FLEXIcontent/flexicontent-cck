@@ -3007,14 +3007,32 @@ class FlexicontentFields
 		$_value = array();
 		foreach ($value as $i => $v)
 		{
-			$v = trim($v);
-			if (strlen($v)) $_value[$i] = $v;
+			if (is_array($v))
+			{
+				// Indirect fitering ... for filtering on values of fields of related items
+				if ($i < 0)
+				{
+					$_value = $v;
+				}
+				break;
+			}
+			else
+			{
+				$v = trim($v);
+
+				if (strlen($v))
+				{
+					$_value[$i] = $v;
+				}
+			}
 		}
 		$value = $_value;
 
 		// No values were given
-		if ( !count($value) ) return '';
-
+		if (!count($value))
+		{
+			return '';
+		}
 
 		$db = JFactory::getDbo();
 		$display_filter_as = (int) $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
@@ -3602,9 +3620,9 @@ class FlexicontentFields
 				{
 					// Set a notice message about not counting item per filter values and instead showing item TOTAL of current category / view
 					$faceted_overlimit_msg = 1;
-					$filter_messages = $app->input->set('filter_message', array(), 'array');
+					$filter_messages = array();
 					$filter_messages[] = JText::sprintf('FLEXI_FACETED_ITEM_LIST_OVER_LIMIT', $faceted_max_item_limit, $view_total);
-					$app->input->set('filter_messages', $filter_messages);
+					$app->setUserState('filter_messages', $filter_messages);
 				}
 			}
 			
@@ -4833,6 +4851,7 @@ class FlexicontentFields
 				{
 					$filter_value = $rel_field_value;
 				}
+				//print_r($filter_value);
 			}
 
 			// CASE: range values:  value01---value02
