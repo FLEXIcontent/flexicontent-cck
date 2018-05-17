@@ -1600,9 +1600,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		// *** Social website sharing configuration
 		// ***
 
-		$useogp     = $field->parameters->get('useogp', 0);
-		$ogpthumbsize = $field->parameters->get('ogpthumbsize', 2);
-		$ogplimit     = $field->parameters->get('ogplimit', 1);
+		$useogp = (int) $field->parameters->get('useogp', 0);
+		$ogpthumbsize = (int) $field->parameters->get('ogpthumbsize', 2);
+		$ogplimit     = (int) $field->parameters->get('ogplimit', 1);
 
 
 		// ***
