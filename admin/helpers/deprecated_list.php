@@ -8,5 +8,4 @@ $files = array(
 );
 
 $folders = array(
-	JPATH_SITE . '/plugins/flexicontent_fields/image/media'
 );
