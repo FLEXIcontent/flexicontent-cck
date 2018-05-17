@@ -1376,15 +1376,39 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			$filt_vals = $app->input->get('filter_'.$filter->id, '', 'array');
+			$filt_vals = $app->input->get('filter_' . $filter->id, '', 'array');
 
 			// Skip filters without value
-			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
-			$empty_filt_vals_string = !is_array($filt_vals) && !strlen(trim($filt_vals));
-			$allow_filtering_empty = $filter->parameters->get('allow_filtering_empty', 0);
+			if (is_array($filt_vals))
+			{
+				if (!count($filt_vals))
+				{
+					$is_empty = true;
+				}
+				else
+				{
+					$v = reset($filt_vals);
 
-			if ( !$allow_filtering_empty && ($empty_filt_vals_array || $empty_filt_vals_string) ) continue;
-			if ( !$empty_filt_vals_array && !$empty_filt_vals_string) $this->_active_filts[ $filter->id ] = $filt_vals;  // Set _relevant _active_* FLAG
+					$is_empty = is_array($v)
+						? false
+						: !strlen(trim(implode('', $filt_vals)));
+				}
+			}
+			else
+			{
+				$is_empty = !is_array($filt_vals) && !strlen(trim($filt_vals));
+			}
+
+			if (!$filter->parameters->get('allow_filtering_empty', 0) && $is_empty)
+			{
+				continue;
+			}
+
+			// Set _relevant _active_* FLAG
+			if (!$is_empty)
+			{
+				$this->_active_filts[ $filter->id ] = $filt_vals;
+			}
 
 			//echo "Category model active filters: [".$filter->id."] <pre>"; print_r($filt_vals); echo "</pre>";
 			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals, $return_sql);
