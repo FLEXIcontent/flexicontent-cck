@@ -319,7 +319,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 			if ('.$use_native_apis.') {
 				// try youtube
-				var myregexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+				var myregexp = /(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
 				if(url.match(myregexp) != null) {
 					mediaID = url.match(myregexp)[1];
 					apiType = "youtube";
@@ -821,6 +821,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$display_author   = $field->parameters->get('display_author', 0);
 		$display_duration = $field->parameters->get('display_duration',0) ;
 		$display_description = $field->parameters->get('display_description', 0);
+		$privacy_embeed = $field->parameters->get('privacy_embeed', 0);
 
 		$headinglevel = $field->parameters->get('headinglevel', 3);
 		$width        = (int)$field->parameters->get('width', 960);
@@ -948,7 +949,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				switch($value['api_type'])
 				{
 					case 'youtube':
-						$embed_url = '//www.youtube.com/embed/' . $content_id;
+						$embed_url = '//www.youtube' . ($privacy_embeed ? '-nocookie' : '') . '.com/embed/' . $content_id;
 						$_show_related = '&rel=0';
 						$_show_srvlogo = '&modestbranding=1&maxwidth=0';
 						break;

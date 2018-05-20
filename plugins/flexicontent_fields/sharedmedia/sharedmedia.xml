@@ -191,18 +191,22 @@
 				<option value="0" show_list="" hide_list="disp-native-apis">noembed API only</option>
 				<option value="1" show_list="disp-native-apis" hide_list="">noembed API and native APIs</option>
 			</field>
+			<field name="privacy_embeed" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PRIVACY_EMBEED" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PRIVACY_EMBEED_DESC" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_AUTOSTART_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_CONFIG" level="level3" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBEDLY_CONFIG" level="level2" />
 			<field name="force_ssl" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FORCESSL" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FORCESSL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_CONFIG" level="level3" depend_class="disp-native-apis" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_CONFIG" level="level2" depend_class="disp-native-apis" />
 			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY_DESC" depend_class="disp-native-apis" labelclass="label label-info" />
 
 			<field name="" type="separator" default="Debug" level="level1" />
