@@ -476,10 +476,12 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 
 			// After filtering form submit may have different display
-			$canonical_filters .= !empty($jinput->get('listall', null, 'INT')) ? '&listall=1' : '';
+			$listall = $jinput->get('listall', null, 'INT');
+			$canonical_filters .= !empty($listall) ? '&listall=1' : '';
 
 			// Add word-combination variable (submit only if not having the default value)
-			$canonical_filters .= !empty($jinput->get('p', null, 'CMD')) ? '&p=' . $jinput->get('p', null, 'CMD') : '';
+			$word_combination = $jinput->get('p', null, 'CMD');
+			$canonical_filters .= !empty($word_combination) ? '&p=' . $word_combination : '';
 
 			$ucanonical = JRoute::_(
 				FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars)
