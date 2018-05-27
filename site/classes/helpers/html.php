@@ -3283,12 +3283,12 @@ class flexicontent_html
 	 */
 	static function ratingbar($item)
 	{
-		//sql calculation doesn't work with negative values and thus only minus votes will not be taken into account
-		if ($item->votes == 0) {
+		if ((int) $item->votes <= 0)
+		{
 			return '<span class="badge">'.JText::_( 'FLEXI_NOT_YET_RATED' ).'</span>';
 		}
 
-		//we do the rounding here and not in the query to get better ordering results
+		// Round to integer percentage in case it was not done already in the SQL query
 		$rating = round($item->votes);
 
 		$tooltip_class = ' hasTooltip';

@@ -650,16 +650,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Create JOIN for ordering items by a most rated
 			if ( in_array('rated', $order) )
 			{
-				$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
-				$voting_field->parameters = new JRegistry($voting_field->attribs);
-				$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
-				$_weights = array();
-				for ($i = 1; $i <= 9; $i++)
-				{
-					$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
-				}
-				$orderby_col   = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
-				$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+				$rating_join = null;
+				$orderby_col   = ', ' . flexicontent_db::buildRatingOrderingColumn($rating_join);
+				$orderby_join .= ' LEFT JOIN ' . $rating_join;
 			}
 		}
 

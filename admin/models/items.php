@@ -1029,20 +1029,8 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( $query_ids || in_array($filter_order, array('rating_count','rating')) )
 		{
-			$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
-			$voting_field->parameters = new JRegistry($voting_field->attribs);
-			$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
-
-			$rating_resolution = (int)$voting_field->parameters->get('rating_resolution', 5);
-			$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
-			$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
-
-			$_weights = array();			
-			for ($i = 1; $i <= 9; $i++)
-			{
-				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * ' . (100 / $rating_resolution) . ')';
-			}
-			$ratings_col = ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * ' . (100 / $rating_resolution) . ' END AS rating';
+			$rating_join = null;
+			$ratings_col = ', ' . flexicontent_db::buildRatingOrderingColumn($rating_join, $colname = 'rating');
 		}
 
 		if ( !$query_ids )
@@ -1119,7 +1107,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
 
 				. ($query_ids || in_array($filter_order, array('rating_count', 'rating'))
-					? ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
+					? ' LEFT JOIN ' . $rating_join
 					: '')
 
 				. (!$query_ids && in_array('RV', $filter_state)
@@ -1207,6 +1195,9 @@ class FlexicontentModelItems extends JModelLegacy
 				break;
 			case 'i.modified':
 				$orderby 	= ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir . ', i.created ' . ' ' . $filter_order_Dir;
+				break;
+			case 'rating':
+				$orderby 	= ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir . ', cr.rating_count ' . ' ' . $filter_order_Dir;
 				break;
 			default:
 				$orderby 	= empty($filter_order) ? '' : ' ORDER BY ' . $filter_order . ' ' . $filter_order_Dir;
