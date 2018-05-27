@@ -1175,15 +1175,15 @@ jQuery(document).ready(function(){
 			</td>
 
 			<td>
-				<?php echo $row->hits; ?>
+				<?php echo '<span class="badge badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
 			</td>
 
 			<td>
-				<?php echo $row->rating_count; ?>
+				<?php echo '<span class="badge badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
 			</td>
 
 			<td>
-				<?php echo sprintf('%.1f', (float) $row->rating); ?>%
+				<?php echo '<span class="badge badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
 			</td>
 
 			<td class="col_id">

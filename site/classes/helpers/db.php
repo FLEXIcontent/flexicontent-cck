@@ -398,6 +398,44 @@ class flexicontent_db
 
 
 	/**
+	 * Build the calculation of the rating column used for ordering an item listing
+	 * @access public
+	 * @return string
+	 */
+	static function buildRatingOrderingColumn(& $rating_join = null, $colname = 'votes')
+	{
+		$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
+		$voting_field->parameters = new JRegistry($voting_field->attribs);
+
+		$rating_resolution = (int) $voting_field->parameters->get('rating_resolution', 5);
+		$rating_resolution = $rating_resolution >= 5 ? $rating_resolution : 5;
+		$rating_resolution = $rating_resolution <= 100 ? $rating_resolution : 100;
+		$default_rating    = (int) $voting_field->parameters->get('default_rating', 70);
+
+		$_weights = array();
+
+		for ($i = 1; $i <= 9; $i++)
+		{
+			$weight_factor = round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2);
+			//$_weights[] = 'WHEN ' . $i . ' THEN ROUND(' . $weight_factor . ' * cr.rating_sum / cr.rating_count * ' . (100 / $rating_resolution / $rating_resolution) . ') * ' . $rating_resolution;
+			$_weights[] = 'WHEN ' . $i . ' THEN ROUND(' . $weight_factor . ' * cr.rating_sum / cr.rating_count * ' . (100 / $rating_resolution) . ')';
+		}
+
+		$rating_join = '#__content_rating AS cr ON cr.content_id = i.id';
+		$_rating_percentage = 'CASE cr.rating_count'
+			. ' ' . implode(' ', $_weights)
+			. ' ELSE IF (ISNULL (cr.rating_count)'
+			. '   , ' . round($default_rating / $rating_resolution) * $rating_resolution
+			//. '   , ROUND(cr.rating_sum / cr.rating_count * ' . (100 / $rating_resolution / $rating_resolution) . ') * ' . $rating_resolution
+			. '   , ROUND(cr.rating_sum / cr.rating_count * ' . (100 / $rating_resolution) . ')'
+			. ' )'
+			. ' END AS ' . $colname;
+
+		return $_rating_percentage;
+	}
+
+
+	/**
 	 * Build the order clause of item listings
 	 * precedence: $request_var ==> $order ==> $config_param ==> $default_order_col (& $default_order_dir)
 	 * @access private
@@ -613,7 +651,7 @@ class flexicontent_db
 				$order_dir	= 'DESC';
 				break;
 			case 'rated':
-				$order_col	= 'votes';
+				$order_col	= 'votes DESC, rating_count';
 				$order_dir	= 'DESC';
 				break;
 			case 'id':

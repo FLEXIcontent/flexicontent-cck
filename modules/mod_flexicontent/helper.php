@@ -1825,21 +1825,28 @@ class modFlexicontentHelper
 		$add_rated = $display_voting_feat || $display_voting || in_array('rated', $ordering);
 		
 		// Additional select and joins for ratings
-		$select_rated = $add_rated ? ', cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
-		if ( in_array('rated', $ordering) )
+		if ($add_rated)
 		{
-			$voting_field = reset(FlexicontentFields::getFieldsByIds(array(11)));
-			$voting_field->parameters = new JRegistry($voting_field->attribs);
-			$default_rating = (int) $voting_field->parameters->get('default_rating', 70);
-			$_weights = array();			
-			for ($i = 1; $i <= 9; $i++)
+			$select_rated = ', cr.rating_sum as rating_sum, cr.rating_count as rating_count';
+
+			$rating_join = null;
+			$rating_col = flexicontent_db::buildRatingOrderingColumn($rating_join);
+
+			if (in_array('rated', $ordering))
 			{
-				$_weights[] = 'WHEN '.$i.' THEN '.round(((int) $voting_field->parameters->get('vote_'.$i.'_weight', 100)) / 100, 2).'*((cr.rating_sum / cr.rating_count) * 20)';
+				$select_rated .= ', ' . $rating_col;
+				$orderby_join .= ' LEFT JOIN ' . $rating_join;
 			}
-			$select_rated   .= ', CASE cr.rating_count WHEN NULL THEN ' . $default_rating . ' ' . implode(' ', $_weights).' ELSE (cr.rating_sum / cr.rating_count) * 20 END AS votes';
+
+			// We will not exclude non-rated items by using INNER JOIN, since we now have configuration for not-yet rated items ... (e.g. 70%)
+			$join_rated_type  = ' LEFT JOIN';  // in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
+			$join_rated       = $join_rated_type . $rating_join;
 		}
-		$join_rated_type  = in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
-		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
+		else
+		{
+			$select_rated = '';
+			$join_rated = '';
+		}
 		
 		
 		// ***********************************************************
