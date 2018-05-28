@@ -1835,11 +1835,10 @@ class modFlexicontentHelper
 			if (in_array('rated', $ordering))
 			{
 				$select_rated .= ', ' . $rating_col;
-				$orderby_join .= ' LEFT JOIN ' . $rating_join;
 			}
 
 			// We will not exclude non-rated items by using INNER JOIN, since we now have configuration for not-yet rated items ... (e.g. 70%)
-			$join_rated_type  = ' LEFT JOIN';  // in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
+			$join_rated_type  = ' LEFT JOIN ';  // in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
 			$join_rated       = $join_rated_type . $rating_join;
 		}
 		else
