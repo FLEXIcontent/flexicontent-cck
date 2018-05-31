@@ -67,7 +67,7 @@ class FlexicontentViewItemelement extends JViewLegacy
 		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',   'filter_cats',    0,     'int' );
 		$filter_type   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',    0,     'int' );
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access',  '',    'string' );
-		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'cmd' );
+		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'string' );
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author',  '',    'cmd' );
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
@@ -180,4 +180,3 @@ class FlexicontentViewItemelement extends JViewLegacy
 		parent::display($tpl);
 	}
 }
-?>
