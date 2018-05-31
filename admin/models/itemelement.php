@@ -62,38 +62,41 @@ class FlexicontentModelItemelement extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function __construct()
 	{
 		parent::__construct();
-		$app = JFactory::getApplication();
-
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-
+		
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option.'.'.$view.'.';
+		
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		$limit      = $app->getUserStateFromRequest( $option.'.'.$view.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.'.$view.'.limitstart', 'limitstart', 0, 'int' );
-
+		// *****************************
+		// Pagination: limit, limitstart
+		// *****************************
+		
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-
+		$jinput->set( 'limitstart',	$limitstart );
+		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
+		
+		$app->setUserState($p.'limit', $limit);
+		$app->setUserState($p.'limitstart', $limitstart);
 	}
-
-	/**
-	 * Method to get categories item data
-	 *
-	 * @access public
-	 * @return array
-	 */
-
-
+	
+	
 	/**
 	 * Method to get item data
 	 *
@@ -103,7 +106,6 @@ class FlexicontentModelItemelement extends JModelLegacy
 	function getData()
 	{
 		$app     = JFactory::getApplication();
-
 		$jinput  = $app->input;
 		$cid     = $jinput->get('cid', array(), 'array');
 
@@ -121,23 +123,26 @@ class FlexicontentModelItemelement extends JModelLegacy
 		// Lets load the Items if it doesn't already exist
 		if ( $this->_data === null )
 		{
-			// 1, get filtered, limited, ordered items
-			$query = $this->_buildQuery();
-			
-			if ( $print_logging_info )  $start_microtime = microtime(true);
-			$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
-			$rows = $this->_db->loadObjectList();
-			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			
-			// 2, get current items total for pagination
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
-			
-			// 3, get item ids
-			$query_ids = array();
-			foreach ($rows as $row)
+			if (1)
 			{
-				$query_ids[] = $row->id;
+				// 1, get filtered, limited, ordered items
+				$query = $this->_buildQuery();
+
+				if ( $print_logging_info )  $start_microtime = microtime(true);
+				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
+				$rows = $this->_db->loadObjectList();
+				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+				// 2, get current items total for pagination
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total = $this->_db->loadResult();
+
+				// 3, get item ids
+				$query_ids = array();
+				foreach ($rows as $row)
+				{
+					$query_ids[] = $row->id;
+				}
 			}
 			
 			// 4, get item data
@@ -146,7 +151,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 			$_data = array();
 			if (count($query_ids))
 			{
-				$_data = $this->_db->setQuery($query)->loadObjectList('id');
+				$_data = $this->_db->setQuery($query)->loadObjectList('item_id');
 			}
 			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			
@@ -176,11 +181,14 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 */
 	function getTotal()
 	{
-		$user = JFactory::getUser();
-		if ( !$user->id ) return array();  // catch case of guest user submitting in frontend
-		
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_total))
+		// Catch case of guest user submitting in frontend
+		if (!JFactory::getUser()->id)
+		{
+			return array();
+		}
+
+		// Lets load the Items if it doesn't already exist
+		if ( $this->_total === null )
 		{
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
@@ -191,14 +199,14 @@ class FlexicontentModelItemelement extends JModelLegacy
 	
 	
 	/**
-	 * Method to get a pagination object for the events
+	 * Method to get a pagination object for the Items
 	 *
 	 * @access public
-	 * @return integer
+	 * @return object
 	 */
 	function getPagination()
 	{
-		// Lets load the content if it doesn't already exist
+		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
 			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
@@ -210,16 +218,17 @@ class FlexicontentModelItemelement extends JModelLegacy
 	
 	
 	/**
-	 * Build the query
+	 * Method to build the query for the Items
 	 *
 	 * @access private
 	 * @return string
+	 * @since 1.0
 	 */
 	function _buildQuery($query_ids = false)
 	{
 		if (!$query_ids)
 		{
-			$query = 'SELECT DISTINCT i.id'
+			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id'
 				. ' FROM #__flexicontent_items_tmp AS i'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -228,11 +237,13 @@ class FlexicontentModelItemelement extends JModelLegacy
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
 				. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
 				. $this->_buildContentWhere()
-				. $this->_buildContentOrderBy();
+				. ' GROUP BY i.id'
+				. $this->_buildContentOrderBy()
+				;
 		}
 		else
 		{
-			$query = 'SELECT i.*, i.language AS lang'
+			$query = 'SELECT i.*, ie.item_id as item_id, i.language AS lang'
 				. ', u.name AS author, t.name AS type_name, CASE WHEN level.title IS NULL THEN CONCAT_WS(\'\', \'deleted:\', i.access) ELSE level.title END AS access_level'
 				. ' FROM #__flexicontent_items_tmp AS i'
 				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
@@ -242,18 +253,21 @@ class FlexicontentModelItemelement extends JModelLegacy
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
 				. ' LEFT JOIN #__categories AS c ON i.catid = c.id'
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
-				. ' GROUP BY i.id';
+				. ' GROUP BY i.id'
+				;
 		}
 
+		//echo $query ."<br/><br/>";
 		return $query;
 	}
 	
 	
 	/**
-	 * Build the order clause
+	 * Method to build the orderby clause of the query for the Items
 	 *
 	 * @access private
 	 * @return string
+	 * @since 1.0
 	 */
 	function _buildContentOrderBy($query = null)
 	{
@@ -271,13 +285,14 @@ class FlexicontentModelItemelement extends JModelLegacy
 		else
 			return ' ORDER BY '. $orderby;
 	}
-	
-	
+
+
 	/**
-	 * Build the where clause
+	 * Method to build the where clause of the query for the Items
 	 *
 	 * @access private
 	 * @return string
+	 * @since 1.0
 	 */
 	function _buildContentWhere($query = null)
 	{
@@ -310,7 +325,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',  'filter_cats',  0,  'int' );
 		
 		$filter_type   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',  'filter_type',  0,  'int' );
-		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',  'filter_lang',  '', 'cmd' );
+		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',  'filter_lang',  '', 'string' );
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author','filter_author','', 'cmd' );
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'int' );
 		
@@ -434,7 +449,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$this->_db->setQuery($query);
 
 		return $this->_db->loadObjectList();
-	}	
+	}
 	
 	
 	/**

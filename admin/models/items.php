@@ -307,19 +307,19 @@ class FlexicontentModelItems extends JModelLegacy
 	function getData()
 	{
 		static $tconfig = array();
-		
+
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$task    = $jinput->get('task', '', 'cmd');
 		$cid     = $jinput->get('cid', array(), 'array');
-		
+
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		// Lets load the Items if it doesn't already exist
 		if ( $this->_data === null )
 		{
-			if ($task=='copy')
+			if ($task === 'copy')
 			{
 				$query_ids = $cid;
 			}
@@ -327,16 +327,16 @@ class FlexicontentModelItems extends JModelLegacy
 			{
 				// 1, get filtered, limited, ordered items
 				$query = $this->_buildQuery();
-				
+
 				if ( $print_logging_info )  $start_microtime = microtime(true);
 				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 				$rows = $this->_db->loadObjectList();
 				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-				
+
 				// 2, get current items total for pagination
 				$this->_db->setQuery("SELECT FOUND_ROWS()");
 				$this->_total = $this->_db->loadResult();
-				
+
 				// 3, get item ids
 				$query_ids = array();
 				foreach ($rows as $row)
@@ -963,6 +963,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
 		}
+
 		return $this->_total;
 	}
 	
@@ -975,7 +976,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function getPagination()
 	{
-		// Lets load the Items if it doesn't already exist
+		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
 			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
@@ -993,7 +994,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildQuery( $query_ids=false )
+	function _buildQuery($query_ids = false)
 	{
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
@@ -1158,22 +1159,34 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( !$query_ids )
 		{
 			$having = array();
-			if ( in_array('RV', $filter_state) ) $having[] = ' i.version<>MAX(fv.version_id) ';
-			if ( count($customFiltsActive) ) $having[] = ' matched_custom = '.count($customFiltsActive);
-			$query .= ""
+
+			if (in_array('RV', $filter_state))
+			{
+				$having[] = ' i.version<>MAX(fv.version_id) ';
+			}
+
+			if (count($customFiltsActive))
+			{
+				$having[] = ' matched_custom = '.count($customFiltsActive);
+			}
+
+			// We will use GROUP BY to be able to calculate the aggregated column 'matched_custom' (aggregate function COUNT) 
+			$query .= ''
 				. $where
 				. ' GROUP BY i.id'
-				. ( count($having) ? ' HAVING '.implode(' AND ', $having) : '' )
+				. (count($having) ? ' HAVING ' . implode(' AND ', $having) : '')
 				. $orderby
 				;
 		}
 		else
 		{
+			// We will use GROUP BY to be able to calculate the aggregated columns 'relcats' and 'taglist' (aggregate function GROUP_CONCAT) 
 			$query .= ''
-				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
+				. ' WHERE i.id IN (' . implode(',', $query_ids) . ')'
 				. ' GROUP BY i.id'
 				;
 		}
+
 		//echo $query ."<br/><br/>";
 		return $query;
 	}
@@ -1215,6 +1228,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		return $orderby;
 	}
+
 
 	/**
 	 * Method to build the where clause of the query for the Items
