@@ -104,31 +104,43 @@ class FCIndexedField extends FCField
 		if ($display_as_select)
 		{
 			// DISPLAY using select2 JS
-			$use_jslib = $field->parameters->get( 'use_jslib', 1 ) ;
-			$use_select2 = $use_jslib==1 || $use_jslib==2;
+			$use_jslib = (int) $field->parameters->get('use_jslib', 1);
+			$use_select2 = $use_jslib === 1 || $use_jslib === 2;
+
 			if ($sortable && !$use_select2)
 			{
 				$use_select2 = true;
 				$error_msg = '<div class="alert alert-warning fc-small fc-iblock">Sortable property enabled, please also enable using select2 JS (usage of it forced to ON)</div><div class="fcclear"></div>';
 			}
+
 			static $select2_added = null;
-		  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
+
+		  if ($use_select2 && $select2_added === null)
+			{
+				$select2_added = flexicontent_html::loadFramework('select2');
+			}
 
 			// Fields: select / selectmultiple and fields: radioimage / checkboximage displayed as drop-down select in item edit form
 			$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
 
 			// Useful when displaying as multi-select without select2 JS
-			$size = $field->parameters->get( 'size', 6 ) ;
+			$size = (int) $field->parameters->get('size', 6);
 		}
 		else
 		{
 			// DISPLAY using prettyCheckable JS
-			$use_jslib = $field->parameters->get( 'use_jslib', 2 ) ;
-			$use_prettycheckable = $use_jslib==2;
+			$use_jslib = (int) $field->parameters->get('use_jslib', 2);
+			$use_prettycheckable = $use_jslib === 2;
+
 			static $prettycheckable_added = null;
-		  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-			$placeInsideLabel = static::$usesImages && !($use_prettycheckable && $prettycheckable_added);
+
+		  if ($use_prettycheckable && $prettycheckable_added === null)
+			{
+				$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+			}
+
+			$placeInsideLabel = static::$usesImages && !($use_jslib === 3) && !($use_prettycheckable && $prettycheckable_added);
 		}
 
 
@@ -219,18 +231,31 @@ class FCIndexedField extends FCField
 				$input_classes[] = 'use_prettycheckable';
 				$attribs .= static::$usesImages ? ' data-customClass="fcradiocheckimage"' : ' data-customClass="fcradiocheck"';
 			}
+
 			if (static::$valueIsArr)
 			{
 				if ($max_values || $min_values || $exact_values)
+				{
 					$input_classes[] = 'validate-cboxlimitations';
+				}
 				else if ($required)
+				{
 					$input_classes[] = 'required validate-checkbox';  // do basic checkbox-required validation
+				}
 			}
 			else if ($required)
+			{
 				$input_classes[] = 'required validate-radio';  // do basic radio-required validation
+			}
+
+			if ($use_jslib === 3)
+			{
+				$input_classes[] = 'fc_checkradio';  // do default CSS styling for checkbox / radio
+			}
 
 			// Attributes for input-labels
-			$label_class = 'fccheckradio_lbl ' . ($form_vals_display==1 ? $tooltip_class : '');
+			$label_class = ($use_jslib === 3 ? '' : 'fccheckradio_lbl ')
+				. ($form_vals_display==1 ? $tooltip_class : '');
 			$label_style = static::$usesImages ? 'vertical-align: unset!important;' : '';  // fix for image placement inside label
 		}
 
@@ -627,7 +652,7 @@ class FCIndexedField extends FCField
 				{
 					if ( !empty($element->isprompt) )
 					{
-						$options[] = '<span style="float: left;" class="'.$element->isprompt.'">'.$element->text.'</span>';
+						$options[] = '<span class="'.$element->isprompt.'">'.$element->text.'</span>';
 						continue;
 					}
 					$checked  = (in_array($element->value, $value)  ?  ' checked="checked"'  :  '') . (in_array($element->value, $default_values)  ?  ' data-is-defval="1"'  :  '');
@@ -644,7 +669,7 @@ class FCIndexedField extends FCField
 						.$pretext
 						.(!$placeInsideLabel ? $input_fld : '')
 						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" '.($form_vals_display==1 ? 'title="'.@ $element->label_tip.'"' : '').'>'
-							. ($placeInsideLabel ? $input_fld : '')
+							. ($placeInsideLabel ? $input_fld : '') . ' '
 							.($form_vals_display!=1 ? $element->text : '')
 							.($form_vals_display==2 ? ' <br/>' : '')
 							.($form_vals_display >0 ? $element->image_html : '')
@@ -838,7 +863,7 @@ class FCIndexedField extends FCField
 						'value' => (static::$valueIsArr ? '_field_selection_prompt_' : ''),
 						'text' => $cascade_prompt,
 						'disable' => (static::$valueIsArr ? true : null),
-						'isprompt' => 'fcpadded alert alert-info'
+						'isprompt' => 'fcpadded alert alert-info fc_input_set_prompt'
 					);
 					$elements = array('_field_selection_prompt_' => $prompt);
 				}
