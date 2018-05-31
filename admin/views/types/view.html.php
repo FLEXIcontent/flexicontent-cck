@@ -40,6 +40,7 @@ class FlexicontentViewTypes extends JViewLegacy
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
+		$layout  = $jinput->get('layout', 'default', 'cmd');
 
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
@@ -114,8 +115,10 @@ class FlexicontentViewTypes extends JViewLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		// Create Submenu (and also check access to current view)
-		FLEXIUtilities::ManagerSideMenu('CanTypes');
-		
+		$layout === 'typeslist'
+			? FLEXIUtilities::ManagerSideMenu(null)
+			: FLEXIUtilities::ManagerSideMenu('CanTypes');
+
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TYPES' );
 		$site_title = $document->getTitle();
