@@ -119,6 +119,7 @@
 			<field name="use_jslib" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="not_using_jslib" hide_list="">FLEXI_NO</option>
 				<option value="2" show_list="" hide_list="not_using_jslib">prettyCheckable / Select2</option>
+				<option value="3" show_list="not_using_jslib" hide_list="">FLEXI_CSS_STYLING</option>
 			</field>
 			<field name="form_vals_display" type="radio" default="1" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_LABEL</option>

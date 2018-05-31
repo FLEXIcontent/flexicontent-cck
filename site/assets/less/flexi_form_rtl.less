@@ -81,6 +81,7 @@ body #flexicontent span.fc-prop-lbl {
 #flexicontent .fcradiocheckimage label.fccheckradio_lbl {
 	vertical-align: unset !important;
 }
+
 label.fccheckradio_lbl,
 span.fcselect_lbl {
 	display: inline-block;
@@ -112,15 +113,9 @@ span.fcselect_lbl {
 
 
 /* Hide input field, but exclude input inside labels (graceful fallback for older browsers) */
-
+.group-fcset > input,
 input[type="checkbox"].fc_checkradio,
-input[type="radio"].fc_checkradio,
-
-[name="adminForm"] input[type="checkbox"]:not(.skip_fccr),
-[name="adminForm"] input[type="radio"]:not(.skip_fccr),
-
-.flexicontent input[type="checkbox"]:not(.skip_fccr),
-.flexicontent input[type="radio"]:not(.skip_fccr) {
+input[type="radio"].fc_checkradio {
 	width: 24px !important;
 	/*width: 19px !important;*/
 	margin: 0 !important;
@@ -129,17 +124,9 @@ input[type="radio"].fc_checkradio,
 	display: none !important;
 }
 
-
+.group-fcset > label input,
 label input[type="checkbox"].fc_checkradio,
-label input[type="radio"].fc_checkradio,
-
-//[name="adminForm"] input[type="checkbox"][name^="cid"],
-[name="adminForm"] input[type="checkbox"]:only-child,
-[name="adminForm"] label input[type="checkbox"]:not(.skip_fccr),
-[name="adminForm"] label input[type="radio"]:not(.skip_fccr),
-
-.flexicontent label input[type="checkbox"]:not(.skip_fccr),
-.flexicontent label input[type="radio"]:not(.skip_fccr) {
+label input[type="radio"].fc_checkradio {
 	width: auto !important;
 	margin: 3px 3px 0px 0px !important;
 	padding: unset !important;
@@ -149,25 +136,14 @@ label input[type="radio"].fc_checkradio,
 }
 
 
-
 /* Style the label to also include the checkbox, radio */
 
-div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
-
-input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
-input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
-
-[name="adminForm"] input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label:not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + script + label:not(.btn),
-
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
+.group-fcset > input + label,
+input[type="checkbox"].fc_checkradio + label,
+input[type="radio"].fc_checkradio + label {
 	display: inline-block !important;
 	margin: 1px 12px 1px 0px;
-	padding: 0px 0px 0px 24px !important;
+	padding: 0px 24px 0px 0px !important;
 	line-height: 22px !important;
 	height: 22px !important;
 	text-align: right !important;
@@ -180,68 +156,42 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 	height: 19px !important;*/
 }
 
-div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label {
-	width: 100% !important;
-	box-sizing: border-box !important;
-}
-
-div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
-
-input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + script + label:not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
-	background-position: 0 0 !important;
+.group-fcset > input[type="checkbox"]:disabled + label,
+input[type="checkbox"].fc_checkradio:disabled + label {
+	background-position: 100% 0 !important;
 	font-style: italic !important;
 	cursor: default !important;
 	opacity: 0.6 !important;
 }
 
-input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr):disabled + script + label:not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
-	background-position: 0 -72px !important;
+.group-fcset > input[type="radio"]:disabled + label,
+input[type="radio"].fc_checkradio:disabled + label {
+	background-position: 100% -72px !important;
 	font-style: italic !important;
 	color: gray !important;
 	cursor: default !important;
 	opacity: 0.6 !important;
 }
 
-
-div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
-
-input[type="checkbox"].fc_checkradio + label,
-[name="adminForm"] input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label:not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
-	background: url(../images/checks2.png) no-repeat 0 0 !important;
+.group-fcset > input[type="checkbox"] + label,
+input[type="checkbox"].fc_checkradio + label {
+	background: url(../images/checks2.png) no-repeat 100% 0 !important;
 }
-input[type="radio"].fc_checkradio + label,
-[name="adminForm"] input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + script + label:not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
-	background: url(../images/checks2.png) no-repeat 0 -72px !important;
+.group-fcset > input[type="radio"] + label,
+input[type="radio"].fc_checkradio + label {
+	background: url(../images/checks2.png) no-repeat 100% -72px !important;
 }
 
 
-input[type="checkbox"].fc_checkradio + label.green,
-[name="adminForm"] input[type="checkbox"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label.green:not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn) {
-	background: url(../images/checks3.png) no-repeat 0 0 !important;
+.group-fcset > input[type="checkbox"] + label.green,
+input[type="checkbox"].fc_checkradio + label.green {
+	background: url(../images/checks3.png) no-repeat 100% 0 !important;
 }
-input[type="radio"].fc_checkradio + label.green,
-[name="adminForm"] input[type="radio"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + script + label.green:not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + label.green:not(.plupload_button):not(.btn) {
-	background: url(../images/checks3.png) no-repeat 0 -72px !important;
+.group-fcset > input[type="radio"] + label.green,
+input[type="radio"].fc_checkradio + label.green {
+	background: url(../images/checks3.png) no-repeat 100% -72px !important;
 }
-
-.flexicontent input[type="radio"]:not(.skip_fccr) + script + label.green:not(.btn),
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + script + label.green:not(.btn),
-.flexicontent input[type="radio"]:not(.skip_fccr) + label.green.single,
-.flexicontent input[type="checkbox"]:not(.skip_fccr) + label.green.single,
+.group-fcset > label.green.single,
 .fc_checkradio + label.green.single {
 	padding-right: 18px !important;
 	margin: 0px !important;
@@ -249,43 +199,30 @@ input[type="radio"].fc_checkradio + label.green,
 
 /* Style the checked versions of checkbox,radio */
 
-div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
-
-input[type="checkbox"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="checkbox"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="checkbox"]:checked:not(.skip_fccr) + script + label:not(.btn),
-.flexicontent input[type="checkbox"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
-	background-position: 0 -24px !important;
-	/*background-position: 0 -19px !important;*/
+.group-fcset > input[type="checkbox"]:checked + label,
+input[type="checkbox"].fc_checkradio:checked + label {
+	background-position: 100% -24px !important;
+	/*background-position: 100% -19px !important;*/
 }
 
-input[type="radio"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-[name="adminForm"] input[type="radio"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn),
-.flexicontent input[type="radio"]:checked:not(.skip_fccr) + script + label:not(.btn),
-.flexicontent input[type="radio"]:checked:not(.skip_fccr) + label:not(.plupload_button):not(.btn) {
-	background-position: 0 -48px !important;
-	/*background-position: 0 -57px !important;*/
+.group-fcset > input[type="radio"]:checked + label,
+input[type="radio"].fc_checkradio:checked + label {
+	background-position: 100% -48px !important;
+	/*background-position: 100% -57px !important;*/
 }
 
+.group-fcset > input,
 input[type="checkbox"].fc_checkradio,
 input[type="checkbox"].fc_checkradio:focus,
 input[type="radio"].fc_checkradio,
-input[type="radio"].fc_checkradio:focus,
-[name="adminForm"] input[type="checkbox"],
-[name="adminForm"] input[type="checkbox"]:focus,
-[name="adminForm"] input[type="radio"],
-[name="adminForm"] input[type="radio"]:focus,
-.flexicontent input[type="checkbox"],
-.flexicontent input[type="checkbox"]:focus,
-.flexicontent input[type="radio"],
-.flexicontent input[type="radio"]:focus {
+input[type="radio"].fc_checkradio:focus {
 	border: 0px !important;
 }
 
 
-
 /* Styling for radio/checkboxes , for browser not supporting above, e.g. ie8,ie9) */
 
+.group-fcset input,
 input.fc_checkradio {
 	margin: 0px 4px 3px 4px;
 	padding: 0px;
@@ -294,13 +231,32 @@ input.fc_checkradio {
 	top: -1px;
 }
 
+/* Fix CSS rule that assumes input is always inside the label */
+
+.flexicontent input[type="radio"] + label:not(.btn),
+.flexicontent input[type="checkbox"] + label:not(.btn) {
+	display: unset;
+	margin-left: 0.5em;
+}
 
 /* Styling for radio/checkboxes lists */
 
 .fc_input_set {
 	display: inline-block;
 	vertical-align: top;
+	padding: 2px;
+	border: 1px solid rgba(255, 255, 255, .01);
+	-webkit-background-clip: padding-box; /* for Safari */
+	background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */	
 }
+.fc_input_set.invalid {
+}
+.fc_input_set.fc_prompt
+{
+	float: right;
+	font-weight: normal;
+}
+
 div.fc_checkradio_group_wrapper {
 	display: inline-block;
 	float: right;
