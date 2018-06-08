@@ -50,11 +50,12 @@
 
 	fcfield_addrint.initMap = function(elementid_n, config_name)
 	{
-		jQuery('#map_canvas_' + elementid_n).addClass('has_fc_google_maps_map');
-
+		var el = document.getElementById('map_canvas_' + elementid_n);
+		
+		jQuery(el).addClass('has_fc_google_maps_map');
 		jQuery('#' + elementid_n + '_addressint_map').show();  // Show map container
 		
-		fcfield_addrint.google_maps[elementid_n] = new google.maps.Map(document.getElementById('map_canvas_' + elementid_n), {
+		fcfield_addrint.google_maps[elementid_n] = new google.maps.Map(el, {
 			center: fcfield_addrint.LatLon[elementid_n],
 			scrollwheel: false,
 			zoom: fcfield_addrint.map_zoom[config_name],
@@ -65,8 +66,9 @@
 			streetViewControl: false,
 			rotateControl: false,
 		});
-
-		jQuery('#map_canvas_' + elementid_n).data('google_maps_ref', fcfield_addrint.google_maps[elementid_n]);
+		
+		el.dataset = !!el.dataset ? el.dataset : {};
+		el.dataset.google_maps_ref = fcfield_addrint.google_maps[elementid_n];
 		
 		myMarker = new google.maps.Marker({
 			map: fcfield_addrint.google_maps[elementid_n],

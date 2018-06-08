@@ -505,11 +505,11 @@ function fc_getLayout_".$_name."(el, initial)
 ")."
 
 window.addEvent('domready', function(){
-	var el = jQuery('#jform_".($view=='field' ? "attribs_" : "params_").$_name."');
+	var el = document.getElementById('jform_".($view=='field' ? "attribs_" : "params_").$_name."');
 	fc_getLayout_".$_name."(el, 1);
 
 	// In case on DOM ready the element is intialized, retry on this custom event
-	el.on('initialize-fc-element', function(){
+	el.addEventListener('initialize-fc-element', function() {
 		fc_getLayout_".$_name."(el, 1);
 	});
 });
