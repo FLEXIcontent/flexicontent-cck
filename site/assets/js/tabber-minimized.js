@@ -29,6 +29,39 @@
 	SOFTWARE.
 	==================================================*/
 
+
+Element.prototype.tabber_hasClass = function(className)
+{
+  if (!!this.classList)
+	{
+    return this.classList.contains(className);
+	}
+  else
+	{
+    return !!this.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+	}
+}
+
+
+Element.prototype.tabber_addClass = function(className)
+{
+  if (!this.tabber_hasClass(className))
+	{
+		this.className += ' ' + className;
+	}
+}
+
+
+Element.prototype.tabber_removeClass = function(className)
+{
+  if (this.tabber_hasClass(className))
+	{
+    var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    this.className = this.className.replace(reg, ' ');
+  }
+}
+
+
 function tabberObj(argsObj)
 {
 	var arg; /* name of an argument to override */
@@ -239,9 +272,9 @@ tabberObj.prototype.init = function(e)
 					t.headingTitle = headingElement.title;
 					t.headingContent = headingElement.dataset.content;
 					t.headingPlacement = headingElement.dataset.placement;
-					if (typeof jQuery != 'undefined')
+					if (headingElement.hasAttribute('class'))
 					{
-						tab_classes=jQuery(headingElement).attr('class');
+						tab_classes=headingElement.getAttribute('class');
 					}
 					if (this.titleElementsStripHTML)
 					{
@@ -293,9 +326,9 @@ tabberObj.prototype.init = function(e)
 		DOM_a.dataset.content = t.headingContent;
 		DOM_a.dataset.placement = t.headingPlacement;
 		DOM_a.onclick = this.navClick;
-		if (typeof jQuery != 'undefined')
+		if (tab_classes)
 		{
-			jQuery(DOM_a).addClass(tab_classes);
+			DOM_a.tabber_addClass(tab_classes);
 		}
 
 		/* Add some properties to the link so we can identify which tab
@@ -471,9 +504,11 @@ tabberObj.prototype.tabShow = function(tabberIndex)
 	}
 	
 	// Force redraw of any google maps inside TAB
-	jQuery('.has_fc_google_maps_map').each(function() {
-		google.maps.event.trigger(jQuery(this).data('google_maps_ref'), 'resize');
-	});
+	var elArr = document.querySelectorAll('#' + div.id + ' .has_fc_google_maps_map');
+	for (var n = 0, len = elArr.length; n < len; n++)
+	{
+		google.maps.event.trigger(elArr[n].dataset.google_maps_ref, 'resize');
+	}
 
 	return this;
 };
@@ -529,15 +564,15 @@ function tabberAutomatic(tabberArgs, container_id)
 	/* Find all DIV elements in the document that have the configured classname */
 	var container_selector = typeof container_id != 'undefined' ? '#' + container_id + ' ' : 'body ';
 	var divs = new Array();
-	var i = 0;
 
-	jQuery(container_selector + 'div.' + tempObj.classMain).each(function() {
-		divs[i] = jQuery(this).get(0);
-		i++;
-	});
+	var divArr = document.querySelectorAll(container_selector + 'div.' + tempObj.classMain);
+	for (var n = 0, len = divArr.length; n < len; n++)
+	{
+		divs[n] = divArr[n];
+	}
 
 	/* Loop through all found DIV elements, and initialize TABBER in them */
-	for (i=0; i < divs.length; i++)
+	for (var i = 0; i < divs.length; i++)
 	{
 		/* Recheck if each DIV has the correct classname */
 		if (divs[i].className && divs[i].className.match(tempObj.REclassMain))
@@ -548,7 +583,32 @@ function tabberAutomatic(tabberArgs, container_id)
 		}
 	}
 
-	jQuery(container_selector).find('.fc-element-auto-init').trigger('initialize-fc-element');
+	var elArr = document.querySelectorAll(container_selector + ' .fc-element-auto-init');//.trigger('initialize-fc-element');
+	var event;
+
+	if (elArr.length)
+	{
+		if (window.CustomEvent && typeof(window.CustomEvent) === 'function')
+		{
+			event = new CustomEvent('initialize-fc-element', {
+				bubbles:    true,
+				cancelable: true,
+				customdata: {}
+			});
+		}
+		// IE trap
+		else
+		{
+			event = document.createEvent('Event');
+			event.initEvent('initialize-fc-element', true, true); //can bubble, and is cancellable
+			event.customdata = {};
+		}
+
+		for (var n = 0, len = elArr.length; n < len; n++)
+		{
+			elArr[n].dispatchEvent(event);
+		}
+	}
 
 	return this;
 }
