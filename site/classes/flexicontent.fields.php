@@ -3050,7 +3050,7 @@ class FlexicontentFields
 		}
 
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
@@ -3158,7 +3158,7 @@ class FlexicontentFields
 		{
 			$value_clauses = array();
 
-			if ( ! $require_all )
+			if (!$require_all_values)
 			{
 				foreach ($value as $val)
 				{
@@ -3242,11 +3242,11 @@ class FlexicontentFields
 
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = count($value)>1 && !$isRange   // prevent require_all for known ranges
+		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 
-		$query = 'SELECT '.($require_all ? $idname : 'DISTINCT ' . $idname);
+		$query = 'SELECT '.($require_all_values ? $idname : 'DISTINCT ' . $idname);
 
 		// We have a special values join, by default, select from the content table
 		if ($valuesjoin)
@@ -3265,7 +3265,7 @@ class FlexicontentFields
 				. $valueswhere ;
 		}
 
-		if ($require_all && count($value) > 1)
+		if ($require_all_values && count($value) > 1)
 		{
 			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
 			// e.g. HAVING COUNT(DISTINCT colname) = ...
@@ -3343,7 +3343,7 @@ class FlexicontentFields
 		$isTextInput = $display_filter_as==1 || $display_filter_as==3;
 
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
+		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 		
@@ -3363,11 +3363,11 @@ class FlexicontentFields
 		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
 		
 		// Get ALL items that have such values for the given field
-		$query = 'SELECT '.($require_all ? 'fs.item_id' : 'DISTINCT fs.item_id')
+		$query = 'SELECT '.($require_all_values ? 'fs.item_id' : 'DISTINCT fs.item_id')
 			.' FROM #__'.$field_tbl.' AS fs'
 			.' WHERE fs.field_id=' . $filter->id
 			. $valueswhere ;
-		if ($require_all && count($value) > 1)
+		if ($require_all_values && count($value) > 1)
 		{
 			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
 			// e.g. HAVING COUNT(DISTINCT colname) = ...
@@ -3495,7 +3495,7 @@ class FlexicontentFields
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
-		$require_all = is_array($value) && count($value)>1 && !$isRange   // prevent require_all for known ranges
+		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
 		
@@ -4023,7 +4023,9 @@ class FlexicontentFields
 			$value_style = $clear_values ? 'float:left; clear:both;' : '';
 			
 			$i = 0;
-			$checked = ($display_filter_as==5) ? !count($value) || !strlen(reset($value)) : !strlen($value);
+			$checked = is_array($value)
+				? !count($value) || (!is_array(reset($value))  && !strlen(reset($value)))
+				: !strlen($value);			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
 			$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
