@@ -706,6 +706,45 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 
 	// ***
+	// *** METHODS HANDLING events on field values
+	// ***
+
+	// Method to execute a task when an action on a value is performed
+	function onFieldValueAction_FC(&$field, $item, $value_order, $config)
+	{
+		/**
+		 * IMPORTANT:
+		 * If you add EVENT 'onFieldValueAction_FC' to a SYSTEM plugin use $handled_types = array('weblink')
+		 */
+		$handled_types = static::$field_types;
+
+		if (!in_array($field->field_type, $handled_types))
+		{
+			return;
+		}
+
+		/**
+		 * Use $field->id, $item, $value_order, $config to decide on making an action
+		 * Typical config array data is:
+
+			$config = array(
+				'task' => 'default'
+			);
+		*/
+
+		//echo '<pre>' . get_class($this) . '::' . __FUNCTION__ . "()\n\n"; print_r($config); echo '</pre>'; die('TEST code reached exiting');
+
+		/**
+		 * false is failure, indicates abort further actions
+		 * true is success
+		 * null is no work done
+		 */
+		return null;
+	}
+
+
+
+	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events
 	// ***
 
