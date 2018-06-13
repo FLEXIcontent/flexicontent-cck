@@ -1384,9 +1384,9 @@ class FlexicontentController extends JControllerLegacy
 		$id   = $this->input->get('id', 0, 'int');
 		$type = $this->input->get('type', 'item', 'cmd');
 
-		if ($type!='item' && $type!='category')
+		if ($type !== 'item' && $type !== 'category')
 		{
-			jexit('Type: '. $type .' not supported');
+			jexit('Type: ' . $type . ' not supported');
 		}
 
 		// Get Favourites field configuration
@@ -1403,7 +1403,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 		// Guest user does not have DB data, instead use Cookie data
-		else if (!$user->id)
+		elseif (!$user->id)
 		{
 			// Output simple response without counter
 			echo flexicontent_favs::toggleCookieFav($type, $id) < 1
@@ -2239,14 +2239,18 @@ class FlexicontentController extends JControllerLegacy
 		$task   = $this->input->get('task', 'download', 'cmd');
 		$method = $this->input->get('method', 'download', 'cmd');
 
-		if ($method!='view' && $method!='download') die('unknown download method:' . $method);
+		// Sanity check
+		if ($method !== 'view' && $method !== 'download')
+		{
+			die('unknown download method:' . $method);
+		}
 
 
-		// *******************************************************************************************************************
-		// Single file download (via HTTP request) or multi-file downloaded (via a folder structure in session or in DB table)
-		// *******************************************************************************************************************
+		/**
+		 * Single file download (via HTTP request) or multi-file downloaded (via a folder structure in session or in DB table)
+		 */
 
-		if ($task == 'download_tree')
+		if ($task === 'download_tree')
 		{
 			// TODO: maybe move this part in module
 			$cart_id = $this->input->get('cart_id', 0, 'int');
@@ -2266,11 +2270,12 @@ class FlexicontentController extends JControllerLegacy
 				$cart_token = $this->input->get('cart_token', '', 'cmd');
 				
 				$query = ' SELECT * FROM #__flexicontent_downloads_cart WHERE id='. $cart_id;
-				$db->setQuery( $query );
-				$cart = $db->loadObject();
+				$cart = $db->setQuery($query)->loadObject();
 				
-				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-				if (!$cart) { echo JText::_('cart id no '.$cart_id.', was not found'); jexit(); }
+				if (!$cart)
+				{
+					jexit('Cart with ID: ' . $cart_id . ', was not found');
+				}
 				
 				$cart_token_matches = $cart_token==$cart->token;  // no access will be checked
 				$nodes = json_decode($cart->json);
@@ -2278,7 +2283,7 @@ class FlexicontentController extends JControllerLegacy
 			
 			
 			// Some validation check
-			if ( !is_array($nodes) )
+			if (!is_array($nodes))
 			{
 				$app->enqueueMessage("Tree structure is empty or invalid", 'notice');
 				$this->setRedirect('index.php', '');
@@ -2309,11 +2314,11 @@ class FlexicontentController extends JControllerLegacy
 
 			$coupon_id    = $this->input->get('conid', 0, 'int');
 			$coupon_token = $this->input->get('contok', '', 'string');
-			
-			if ( $coupon_id )
+
+			if ($coupon_id)
 			{
 				$_nowDate = 'UTC_TIMESTAMP()';
-				$_nullDate = $db->Quote( $db->getNullDate() );
+				$_nullDate = $db->Quote($db->getNullDate());
 				$query = ' SELECT *'
 					.', CASE WHEN '
 					.'   expire_on = '.$_nullDate.'   OR   expire_on > '.$_nowDate
@@ -2322,16 +2327,9 @@ class FlexicontentController extends JControllerLegacy
 					.'   hits_limit = -1   OR   hits < hits_limit'
 					.'  THEN 0 ELSE 1 END AS has_reached_limit'
 					.' FROM #__flexicontent_download_coupons'
-					.' WHERE id='. $coupon_id .' AND token='. $db->Quote( $coupon_token )
+					.' WHERE id = ' . $coupon_id . ' AND token = ' . $db->Quote($coupon_token)
 					;
-				$db->setQuery( $query );
-				$coupon = $db->loadObject();
-				
-				if ($db->getErrorNum())
-				{
-					echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
-					jexit();
-				}
+				$coupon = $db->setQuery($query)->loadObject();
 				
 				if ($coupon)
 				{
@@ -2339,20 +2337,21 @@ class FlexicontentController extends JControllerLegacy
 					if ( !$slink_valid_coupon )
 					{
 						$query = ' DELETE FROM #__flexicontent_download_coupons WHERE id='. $coupon->id;
-						$db->setQuery( $query );
-						$db->execute();
+						$db->setQuery($query)->execute();
 					}
 				}
-				
-				$file_node->coupon = !empty($coupon) ? $coupon : false;  // NULL will not be catched by isset()
+
+				// Set to false to indicate not found, since null (not set) will mean not given
+				$file_node->coupon = !empty($coupon) ? $coupon : false;
 			}
+
 			$tree_files = array($file_node);
 		}
 
 
-		// **************************************************
-		// Create and Execute SQL query to retrieve file info
-		// **************************************************
+		/**
+		 * Create and Execute SQL query to retrieve file info
+		 */
 
 		// Create SELECT OR JOIN / AND clauses for checking Access
 		$access_clauses['select'] = '';
@@ -2366,9 +2365,9 @@ class FlexicontentController extends JControllerLegacy
 		}
 
 
-		// ***************************
-		// Get file data for all files
-		// ***************************
+		/**
+		 * Get file data for all files
+		 */
 
 		$fields_props = array();
 		$fields_conf  = array();
@@ -2382,7 +2381,7 @@ class FlexicontentController extends JControllerLegacy
 			$content_id = (int) $file_node->contentid;
 			$file_id    = (int) $file_node->fileid;
 
-			if ( !isset($fields_conf[$field_id]) )
+			if (!isset($fields_conf[$field_id]))
 			{
 				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
@@ -2419,20 +2418,14 @@ class FlexicontentController extends JControllerLegacy
 					.' AND f.published= 1'
 					. $access_clauses['and']
 					;
-			$db->setQuery($query);
-			$file = $db->loadObject();
-			if ($db->getErrorNum())
-			{
-				echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
-				jexit();
-			}
+			$file = $db->setQuery($query)->loadObject();
 			//echo "<pre>". print_r($file, true) ."</pre>"; exit;
-			
-			
-			// **************************************************************
-			// Check if file was found AND IF user has required Access Levels
-			// **************************************************************
-			
+
+
+			/**
+			 * Check if file was found AND IF user has required Access Levels
+			 */
+
 			if ( empty($file) || ($using_access && (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access)) )
 			{
 				if (empty($file))
@@ -2443,8 +2436,8 @@ class FlexicontentController extends JControllerLegacy
 				else
 				{
 					$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
-					
-					if ( !empty($file_node->coupon) )
+
+					if (!empty($file_node->coupon))
 					{
 						if ( $file_node->coupon->has_expired )              $msg .= JText::_('FLEXI_FDC_COUPON_HAS_EXPIRED');         // No access and given coupon has expired
 						else if ( $file_node->coupon->has_reached_limit )   $msg .= JText::_('FLEXI_FDC_COUPON_REACHED_USAGE_LIMIT'); // No access and given coupon has reached download limit
@@ -2453,7 +2446,7 @@ class FlexicontentController extends JControllerLegacy
 
 					else
 					{
-						if ( isset($file_node->coupon) )
+						if (isset($file_node->coupon))
 						{
 							$msg .= "<br/> <small>".JText::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
 						}
@@ -2474,37 +2467,89 @@ class FlexicontentController extends JControllerLegacy
 				}
 				
 				// Only abort for single file download
-				if ($task != 'download_tree')
+				if ($task !== 'download_tree')
 				{
 					$this->setRedirect('index.php', '');
 					return;
 				}
 			}
-			
-			
-			// ****************************************************
-			// (for non-URL) Create file path and check file exists
-			// ****************************************************
 
-			if ( !$file->url )
+
+			/**
+			 * (for non-URL) Create file path and check file exists
+			 */
+
+			if (!$file->url)
 			{
 				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 				$file->abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
 
-				if ( !JFile::exists($file->abspath) )
+				if (!JFile::exists($file->abspath))
 				{
 					$msg = JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
 
 					// Only abort for single file download
-					if ($task != 'download_tree') { $this->setRedirect('index.php', ''); return; }
+					if ($task !== 'download_tree')
+					{
+						$this->setRedirect('index.php', '');
+						return;
+					}
 				}
 			}
 
 
-			// *********************************************************************
-			// Increment hits counter of file, and hits counter of file-user history
-			// *********************************************************************
+			/**
+			 * Get item and field JTable records, and then load field's configuration
+			 */
+
+			$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$field = JTable::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
+			$item->load($file_node->contentid);
+			$field->load($file_node->fieldid);
+			FlexicontentFields::loadFieldConfig($field, $item);
+
+
+			/**
+			 * Trigger pluging event 'onFieldValueAction_FC'
+			 * Import all system plugins, and all FC field plugins
+			 */
+
+			ob_start();
+			JPluginHelper::importPlugin('system');
+			JPluginHelper::importPlugin('flexicontent_fields');
+			$text = ob_get_contents();
+			ob_end_clean();
+
+			// Die on plugin output but ... ignore bogus plugin code adding white characters to output
+			if (trim($text))
+			{
+				die('Aborting, plugin output detected: ' . $text);
+			}
+
+
+			$value_order = null;
+			$config = array(
+				'fileid' => $file_id,
+				'task' => $task,  // (string) 'download', 'download_tree'
+				'method' => $method,  // (string) 'view', 'download'
+				'coupon_id' => $coupon_id,  // int or null
+				'coupon_token' => $coupon_token // string or null
+			);
+			$result = JEventDispatcher::getInstance()->trigger('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config));
+
+			// Abort on pluging event code returning value -- false --
+			if ($result === false)
+			{
+				// Event should have set the warning / error message ... set none here
+				$this->setRedirect($_SERVER['HTTP_REFERER']);
+				return;
+			}
+
+
+			/**
+			 * Increment hits counter of file, and hits counter of file-user history
+			 */
 
 			$filetable = JTable::getInstance('flexicontent_files', '');
 			$filetable->hit($file_id);
@@ -2525,30 +2570,29 @@ class FlexicontentController extends JControllerLegacy
 					. ' WHERE id = '. (int)$file->history_id
 					;
 			}
-			$db->setQuery( $query );
-			$db->execute();
+			$db->setQuery($query)->execute();
 			
 			
-			// **************************************************************************************************
-			// Increment hits on download coupon or delete the coupon if it has expired due to date or hits limit 
-			// **************************************************************************************************
-			if ( !empty($file_node->coupon) )
+			/**
+			 * Increment hits on download coupon or delete the coupon if it has expired due to date or hits limit 
+			 */
+
+			if (!empty($file_node->coupon))
 			{
-				if ( !$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired )
+				if (!$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired)
 				{
 					$query = ' UPDATE #__flexicontent_download_coupons'
 						.' SET hits = hits + 1'
 						.' WHERE id='. $file_node->coupon->id
 						;
-					$db->setQuery( $query );
-					$db->execute();
+					$db->setQuery($query)->execute();
 				}
 			}
 			
 			
-			// **************************
-			// Special case file is a URL
-			// **************************
+			/**
+			 * Special case file is a URL
+			 */
 			
 			if ($file->url)
 			{
@@ -2573,9 +2617,9 @@ class FlexicontentController extends JControllerLegacy
 			}
 
 
-			// *********************************************************************
-			// Set file (tree) node and assign file into valid files for downloading
-			// *********************************************************************
+			/**
+			 * Set file (tree) node and assign file into valid files for downloading
+			 */
 
 			$file->node = $file_node;
 			$valid_files[$file_id] = $file;
@@ -2678,7 +2722,7 @@ class FlexicontentController extends JControllerLegacy
 		//sjexit();
 		
 		
-		if ( !empty($email_recipients) )
+		if (!empty($email_recipients))
 		{
 			ob_start();
 			$sendermail	= $app->getCfg('mailfrom');
@@ -2686,11 +2730,11 @@ class FlexicontentController extends JControllerLegacy
 			$sendername	= $app->getCfg('sitename');
 			$subject    = JText::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT');
 			$message_header = JText::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT_BY') .': '. $user->name .' ['.$user->username .']';
-			
-			
-			// ****************************************************
-			// Send email notifications about file being downloaded
-			// ****************************************************
+
+
+			/**
+			 * Send email notifications about file being downloaded
+			 */
 			
 			// Personalized email per subscribers
 			foreach ($email_recipients as $email_addr => $files_arr)
@@ -2777,11 +2821,11 @@ class FlexicontentController extends JControllerLegacy
 			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
 			$archivename = $tmp_ffname . '.zip';
 			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
-			
-			
-			// ******************
-			// Create the archive
-			// ******************
+
+
+			/**
+			 * Create the archive
+			 */
 
 			$za = new flexicontent_zip();
 			$zip_result = $za->open($archivepath, ZipArchive::CREATE);
@@ -2794,12 +2838,12 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$za->addDir($targetpath, "");
 			$za->close();
-			
-			
-			// *********************************
-			// Remove temporary folder structure
-			// *********************************
-			
+
+
+			/**
+			 * Remove temporary folder structure
+			 */
+
 			if (!JFolder::delete(($targetpath)) )
 			{
 				$msg = "Temporary folder ". $targetpath ." could not be deleted";
@@ -2842,11 +2886,9 @@ class FlexicontentController extends JControllerLegacy
 		$dlfile->download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
 
 
-
-
-		// ************************
-		// Handle PDF time-stamping
-		// ************************
+		/**
+		 * Handle PDF time-stamping
+		 */
 
 		$pdf = false;
 		$dlfile->abspath_tmp = false;
@@ -2998,14 +3040,14 @@ class FlexicontentController extends JControllerLegacy
 		$user  = JFactory::getUser();
 
 		// Get HTTP REQUEST variables
-		$field_id   = $this->input->get('fid', 0, 'int');
-		$content_id = $this->input->get('cid', 0, 'int');
-		$order      = $this->input->get('ord', 0, 'int');
+		$field_id    = $this->input->get('fid', 0, 'int');
+		$content_id  = $this->input->get('cid', 0, 'int');
+		$value_order = $this->input->get('ord', 0, 'int');
 
 
-		// **************************************************
-		// Create and Execute SQL query to retrieve file info
-		// **************************************************
+		/**
+		 * Create and Execute SQL query to retrieve file info
+		 */
 
 		// Create SELECT OR JOIN / AND clauses for checking Access
 		$access_clauses['select'] = '';
@@ -3024,21 +3066,15 @@ class FlexicontentController extends JControllerLegacy
 				. $access_clauses['join']
 				.' WHERE rel.item_id = ' . $content_id
 				.' AND rel.field_id = ' . $field_id
-				.' AND rel.valueorder = ' . $order
+				.' AND rel.valueorder = ' . $value_order
 				. $access_clauses['and']
 				;
-		$db->setQuery($query);
-		$link_data = $db->loadObject();
-		if ($db->getErrorNum())
-		{
-			echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
-			jexit();
-		}
+		$link_data = $db->setQuery($query)->loadObject();
 
 
-		// **************************************************************
-		// Check if file was found AND IF user has required Access Levels
-		// **************************************************************
+		/**
+		 * Check if web link value was found AND IF user has required Access Levels
+		 */
 
 		if ( empty($link_data) || (!$link_data->has_content_access || !$link_data->has_field_access) )
 		{
@@ -3059,50 +3095,86 @@ class FlexicontentController extends JControllerLegacy
 							." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
 						: '')
 				;
-				$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_WEBLINK_DATA', $order, $content_id, $field_id);
+				$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_WEBLINK_DATA', $value_order, $content_id, $field_id);
 				$app->enqueueMessage($msg,'notice');
 			}
+
 			// Abort redirecting to home
 			$this->setRedirect('index.php', '');
 			return;
 		}
 
 
-		// **********************
-		// Increment hits counter
-		// **********************
+		/**
+		 * Get item and field JTable records, and then load field's configuration
+		 */
 
-		// recover the link array (url|title|hits)
-		$link = unserialize($link_data->value);
+		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$field = JTable::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
+		$item->load($content_id);
+		$field->load($field_id);
+		FlexicontentFields::loadFieldConfig($field, $item);
 
-		// force an absolute URL, if relative URL prepend Joomla root uri
-		$url = flexicontent_html::make_absolute_url($link['link']);
 
-		// update the hit count
-		$link['hits'] = (int)$link['hits'] + 1;
-		$value = serialize($link);
+		/**
+		 * Trigger pluging event 'onFieldValueAction_FC'
+		 * Import all system plugins, and all FC field plugins
+		 */
 
-		// update the array in the DB
-		$query 	= 'UPDATE #__flexicontent_fields_item_relations'
-				.' SET value = ' . $db->Quote($value)
-				.' WHERE item_id = ' . $content_id
-				.' AND field_id = ' . $field_id
-				.' AND valueorder = ' . $order
-				;
-		$db->setQuery($query);
-		try {
-			$db->execute();
+		ob_start();
+		JPluginHelper::importPlugin('system');
+		JPluginHelper::importPlugin('flexicontent_fields');
+		$text = ob_get_contents();
+		ob_end_clean();
+
+		// Die on plugin output but ... ignore bogus plugin code adding white characters to output
+		if (trim($text))
+		{
+			die('Aborting, plugin output detected: ' . $text);
 		}
-		catch (Exception $e) {
-			JError::raiseWarning( 500, $e->getMessage() );
+
+		$config = array(
+			'task' => 'default'
+		);
+		$result = JEventDispatcher::getInstance()->trigger('onFieldValueAction_FC', array(&$field, &$item, $value_order, &$config));
+
+		// Abort on pluging event code returning value -- false --
+		if ($result === false)
+		{
+			// Event should have set the warning / error message ... set none here
+			$this->setRedirect($_SERVER['HTTP_REFERER']);
 			return;
 		}
 
 
-		// ***************************
-		// Finally redirect to the URL
-		// ***************************
-		
+		/*
+		 * Increment hits counter
+		 */
+
+		// Recover the link array (url|title|hits)
+		$link = unserialize($link_data->value);
+
+		// Force an absolute URL, if relative URL prepend Joomla root uri
+		$url = flexicontent_html::make_absolute_url($link['link']);
+
+		// Update the hit count
+		$link['hits'] = (int) $link['hits'] + 1;
+		$value = serialize($link);
+
+		// Update the array in the DB
+		$query 	= 'UPDATE #__flexicontent_fields_item_relations'
+				.' SET value = ' . $db->Quote($value)
+				.' WHERE item_id = ' . $content_id
+				.' AND field_id = ' . $field_id
+				.' AND valueorder = ' . $value_order
+				;
+		$db->setQuery($query)->execute();
+
+
+		/**
+		 * Finally redirect to the URL
+		 */
+
 		@header("Location: ".$url."","target=blank");
 		$app->close();
 	}
@@ -3221,11 +3293,12 @@ class FlexicontentController extends JControllerLegacy
 	{
 		if ($this->input->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$user  = JFactory::getUser();
+		$user = JFactory::getUser();
 		$select_access = $joinacc = $andacc = '';
 		
 		// Access Flags for: content item and field
-		if ( $get_select_access ) {
+		if ($get_select_access)
+		{
 			$select_access = '';
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
@@ -3240,11 +3313,14 @@ class FlexicontentController extends JControllerLegacy
 				' THEN 1 ELSE 0 END AS has_content_access';
 		}
 		
-		else {
+		else
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			if ($include_file)
+			{
 				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+			}
 			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
 			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
 		}
@@ -3272,19 +3348,22 @@ class FlexicontentController extends JControllerLegacy
 		foreach ($nodes as $node)
 		{
 			// Folder (Parent node)
-			if ( $node->isParent ) {
+			if ($node->isParent)
+			{
 				$targetpath_node = JPath::clean($targetpath.DS.$node->name);
 				JFolder::create($targetpath_node, 0755);
 				
 				// Folder has sub-contents
-				if ( !empty($node->children) ) {
+				if (!empty($node->children))
+				{
 					$node_files = $this->_traverseFileTree($node->children, $targetpath_node);
 					foreach ($node_files as $nodeID => $file)  $all_files[$nodeID] = $file;
 				}
 			}
 			
 			// File (Leaf node)
-			else {
+			else
+			{
 				$file = new stdClass();
 				$nodeID = $node->id;
 				$file->fieldid    = (int) $node->fieldid;  // sql security ...
@@ -3297,6 +3376,7 @@ class FlexicontentController extends JControllerLegacy
 				$all_files[$nodeID] = $file;
 			}
 		}
+
 		return $all_files;
 	}
 
