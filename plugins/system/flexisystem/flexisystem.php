@@ -2618,4 +2618,25 @@ class plgSystemFlexisystem extends JPlugin
 			}
 		}
 	}
+
+
+	// Method to execute a task when an action on a value is performed
+	public function onFieldValueAction_FC(&$field, $item, $value_order, $config)
+	{
+		$handled_types = array('file', 'weblink');
+
+		if (!in_array($field->field_type, $handled_types))
+		{
+			return;
+		}
+
+		//echo '<pre>' . get_class($this) . '::' . __FUNCTION__ . "()\n\n"; print_r($config); echo '</pre>'; die('TEST code reached exiting');
+
+		/**
+		 * false is failure, indicates abort further actions
+		 * true is success
+		 * null is no work done
+		 */
+		return null;
+	}	
 }
