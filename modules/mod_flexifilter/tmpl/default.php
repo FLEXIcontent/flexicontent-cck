@@ -27,7 +27,7 @@ $text_search_val = JFactory::getApplication()->input->get('filter', '', 'string'
 $ff_placement = $params->get('ff_placement', 0);
 
 if ($ff_placement){
-	$ff_slider_id = 
+	$ff_slider_id =
 		($module->id     ? '_'.$module->id : '')
 		;
 	$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
@@ -36,7 +36,7 @@ if ($ff_placement){
 }
 ?>
 
-<form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' >
+<form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' role='search' >
 
 <?php if ( !empty($cats_select_field) ) : ?>
 <fieldset class="fc_filter_set" style="padding-bottom:0px;">
