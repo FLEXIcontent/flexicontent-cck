@@ -138,6 +138,7 @@ label input[type="radio"].fc_checkradio {
 
 /* Style the label to also include the checkbox, radio */
 
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 .group-fcset > input + label,
 input[type="checkbox"].fc_checkradio + label,
 input[type="radio"].fc_checkradio + label {
@@ -156,6 +157,12 @@ input[type="radio"].fc_checkradio + label {
 	height: 19px !important;*/
 }
 
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label {
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 .group-fcset > input[type="checkbox"]:disabled + label,
 input[type="checkbox"].fc_checkradio:disabled + label {
 	background-position: 0 0 !important;
@@ -173,6 +180,7 @@ input[type="radio"].fc_checkradio:disabled + label {
 	opacity: 0.6 !important;
 }
 
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 .group-fcset > input[type="checkbox"] + label,
 input[type="checkbox"].fc_checkradio + label {
 	background: url(../images/checks2.png) no-repeat 0 0 !important;
@@ -199,6 +207,7 @@ input[type="radio"].fc_checkradio + label.green {
 
 /* Style the checked versions of checkbox,radio */
 
+div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 .group-fcset > input[type="checkbox"]:checked + label,
 input[type="checkbox"].fc_checkradio:checked + label {
 	background-position: 0 -24px !important;
