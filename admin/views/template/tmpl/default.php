@@ -302,7 +302,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-horizontal">
 	
-	<div class="fctabber tabset_layout" id="tabset_layout" style="margin:16px 0 !important;">
+	<div class="fctabber tabset_layout fcparams_tabset" id="tabset_layout" style="margin:16px 0 !important;">
 
 		<div class="tabbertab" id="tabset_layout_information_tab" data-icon-class="icon-info" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_INFORMATION' ); ?></h3>

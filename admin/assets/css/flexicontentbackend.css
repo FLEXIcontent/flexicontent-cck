@@ -2449,6 +2449,9 @@ body.contentpane.component #flexicontent,
 body.contentpane.modal #flexicontent {
 	padding: 8px 8px 4px 8px;
 }
+div.field-media-wrapper > div.modal {
+	height: 70%;
+}
 div.field-media-wrapper > div.modal .modal-body {
 	height: 100% !important;
 	max-height: 100% !important;
@@ -2702,7 +2705,8 @@ table.fc-form-tbl td {
 	padding: 2px 24px 6px 0px;
 }
 table.fc-form-tbl td.fc-nopad-h-cell {
-	padding: 2px 0px 6px 0px;
+	padding-left: 0px;
+	padding-right: 0px;
 }
 table.fc-form-tbl.fccompact td {
 	padding: 0px 8px 4px 0px;
@@ -2716,6 +2720,11 @@ table.fc-form-tbl td.key {
 }
 table.fc-form-tbl.fccompact td.key {
 	min-width: auto;
+}
+table.fc-form-tbl.fc-padded-v td,
+table.fc-form-tbl.fc-padded-v td.key {
+	vertical-align: top;
+	padding-bottom: 20px;
 }
 table.fc-form-tbl.fcfullwidth {
 	width: 100% !important;
@@ -3035,6 +3044,18 @@ body .form-horizontal .control-group {
 	width: 96% !important;
 	padding-left: 2% !important;
 	padding-right: 2% !important;
+}
+.fcspacer-8 {
+	margin-top: 8px !important;
+}
+.fcspacer-16 {
+	margin-top: 16px !important;
+}
+.fcspacer-24 {
+	margin-top: 24px !important;
+}
+.fcspacer-32 {
+	margin-top: 32px !important;
 }
 #flexicontent {
 	margin-bottom: 24px;

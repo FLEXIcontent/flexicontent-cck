@@ -245,9 +245,10 @@ class JFormFieldFclayout extends JFormFieldList
 				continue;
 			}
 
-			$text = $stripPrefix ? str_replace($stripPrefix, '', $file) : $file;
+			$val = $stripPrefix ? str_replace($stripPrefix, '', $file) : $file;
+			$txt = $val;
 
-			$groups['custom']['items'][] = (object) array('text' => $text, 'value' => $file);
+			$groups['custom']['items'][] = (object) array('text' => $txt, 'value' => $val);
 			$layout_files[] = $file;
 
 		}

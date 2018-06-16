@@ -349,7 +349,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="btn-group btn-group-yesno">
+			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="group-fcset fc-cleared">
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
 				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
 				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
