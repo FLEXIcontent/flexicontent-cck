@@ -166,6 +166,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
+		JHtml::_('formbehavior.chosen', 'select.use_chosen_lib'); 
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('flexi-lib-form');
 		
