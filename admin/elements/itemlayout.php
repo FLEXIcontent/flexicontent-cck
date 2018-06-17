@@ -87,7 +87,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		$type_default_layout = '';
 		$type_default_layout_mobile = '';
 		
-		if ( $view=='item' )
+		if ($view === 'item')
 		{
 			// Get typeid from URL
 			$typeid = $jinput->get('typeid', 0, 'int');
@@ -96,37 +96,38 @@ class JFormFieldItemlayout extends JFormFieldList
 			$query = false;
 			if ($pk)
 			{
-				$query = 'SELECT t.id, t.attribs'
-					. ' FROM #__flexicontent_items_ext as ie'
-					. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
-					. ' WHERE ie.item_id = ' . (int)$pk;
+				$type_attribs = flexicontent_db::getTypeAttribs(false, 0, $pk);
 			}
-			else if ($typeid)
+			elseif ($typeid)
 			{
-				$query = 'SELECT t.id, t.attribs'
-					. ' FROM #__flexicontent_types as t'
-					. ' WHERE t.id = ' . (int)$typeid;
+				$type_attribs = flexicontent_db::getTypeAttribs(false, $typeid, 0);
 			}
-			
-			if ($query)
-			{
-				$db->setQuery($query);
-				$typedata = $db->loadObject();
-			}
-			
+
 			// Finally get allowed templates
-			if ( !empty($typedata) )
+			if (!empty($type_attribs))
 			{
-				$tparams = new JRegistry($typedata->attribs);
+				$tparams = new JRegistry($type_attribs);
 				$type_default_layout = $tparams->get('ilayout', 'default');
 				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_DESKTOP'));
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
-				if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
-				else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+
+				if (empty($allowed_tmpls))
+				{
+					$allowed_tmpls = array();
+				}
+				elseif (!is_array($allowed_tmpls))
+				{
+					$allowed_tmpls = explode('|', $allowed_tmpls);
+				}
+
 				$all_tmpl_allowed = count($allowed_tmpls) == 0;
-				if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
-				
+				if (!in_array($type_default_layout, $allowed_tmpls))
+				{
+					$allowed_tmpls[] = $type_default_layout;
+				}
+
 				$use_mobile_layouts = $cparams->get('use_mobile_layouts', 0 );
+
 				if ($use_mobile_layouts && $type_default_layout_mobile)
 				{
 					if ( !in_array( $type_default_layout_mobile, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout_mobile;
@@ -137,19 +138,25 @@ class JFormFieldItemlayout extends JFormFieldList
 		
 		$tmpls = array();
 		$lays = array();
-		foreach ($tmpls_all as $tmpl) {
-			if ( $all_tmpl_allowed || in_array($tmpl->name, $allowed_tmpls) ) {
+		foreach ($tmpls_all as $tmpl)
+		{
+			if ($all_tmpl_allowed || in_array($tmpl->name, $allowed_tmpls))
+			{
 				$tmpls[] = $tmpl;
 				$lays[] = $tmpl->name;
 			}
 		}
 		$lays = implode("','", $lays);
 		
-		if ( @$attributes['enableparam'] ) {
-			if ( !$cparams->get($attributes['enableparam']) ) return '';
+		if (@$attributes['enableparam'])
+		{
+			if (!$cparams->get($attributes['enableparam']))
+			{
+				return '';
+			}
 		}
 		
-if ( ! @$attributes['skipparams'] )
+if (!@$attributes['skipparams'])
 {
 		$ext_option = 'com_flexicontent';
 		$ext_view = $view;
@@ -262,15 +269,19 @@ jQuery(document).ready(function() {
 }
 		
 		$layouts = array();
-		if ($view != 'type') {
+
+		if (@$attributes['firstoption'])
+		{
+			$layouts[] = JHtmlSelect::option('', JText::_($attributes['firstoption']));
+		}
+		elseif ($view !== 'type')
+		{
 			$type_layout = ($attributes['name'] == 'ilayout_mobile') ? $type_default_layout_mobile : $type_default_layout;
 			$layouts[] = JHtmlSelect::option('', JText::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
 		}
-		else
-		if (  @$attributes['firstoption'] ) {
-			$layouts[] = JHtmlSelect::option('', JText::_( $attributes['firstoption'] ));
-		}
-		foreach ($tmpls as $tmpl) {
+
+		foreach ($tmpls as $tmpl)
+		{
 			$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name);
 		}
 		

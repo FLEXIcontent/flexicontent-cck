@@ -209,6 +209,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function setId($id, $currcatid=null, $typeid=null, $ilayout=null)
 	{
+		// A cache of categories assigned to every item
+		static $item_cids = array();
+
 		// Set record id and wipe data, if setting a different ID
 		if ($this->_id != $id)
 		{
@@ -229,13 +232,22 @@ class ParentClassItem extends FCModelAdmin
 			? (int) $currcatid
 			: (int) $this->_cid;
 
+		// Verify current category is assigned
 		if ($this->_id)
 		{
-			$query = 'SELECT catid '
-				. ' FROM #__flexicontent_cats_item_relations '
-				. ' WHERE itemid = ' . (int) $this->_id
-				. '  AND catid = '. (int) $this->_cid;
-			$this->_cid = (int) $this->_db->setQuery($query)->loadResult();
+			if (!isset($item_cids[$this->_id]))
+			{
+				$query = 'SELECT catid '
+					. ' FROM #__flexicontent_cats_item_relations '
+					. ' WHERE itemid = ' . (int) $this->_id;
+
+				$item_cids[$this->_id] = $this->_db->setQuery($query)->loadObjectList('catid');
+			}
+
+			if (!isset($item_cids[$this->_id][$this->_cid]))
+			{
+				$this->_cid = 0;
+			}
 		}
 
 		// Set item layout
@@ -3771,29 +3783,9 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getTypeparams($forced_typeid = 0)
 	{
-		static $typeparams = array();
-
 		$typeid = $forced_typeid ?: ($this->_id ? 0 : $this->_typeid);
 
-		if ($typeid && isset($typeparams[$typeid]))
-		{
-			return $typeparams[$typeid];
-		}
-
-		$query = 'SELECT t.id, t.attribs'
-			. ' FROM #__flexicontent_types AS t'
-			.( !$forced_typeid && $this->_id
-				? ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id WHERE ie.item_id = ' . (int) $this->_id
-				: ' WHERE t.id = ' . (int) ($forced_typeid ?: $this->_typeid)
-			);
-		$data = $this->_db->setQuery($query)->loadObject();
-
-		// Cache and return
-		if (!$data)
-		{
-			return '';
-		}
-		return $typeparams[$data->id] = $data->attribs;
+		return flexicontent_db::getTypeAttribs(false, $typeid, 0);
 	}
 
 

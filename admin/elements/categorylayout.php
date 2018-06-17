@@ -89,19 +89,25 @@ class JFormFieldCategorylayout extends JFormFieldList
 		
 		$tmpls = array();
 		$lays = array();
-		foreach ($tmpls_all as $tmpl) {
-			if ( $all_tmpl_allowed || in_array($tmpl->name, $allowed_tmpls) ) {
+		foreach ($tmpls_all as $tmpl)
+		{
+			if ($all_tmpl_allowed || in_array($tmpl->name, $allowed_tmpls))
+			{
 				$tmpls[] = $tmpl;
 				$lays[] = $tmpl->name;
 			}
 		}
 		$lays = implode("','", $lays);
 		
-		if ( @$attributes['enableparam'] ) {
-			if ( !$cparams->get($attributes['enableparam']) ) return '';
+		if (@$attributes['enableparam'])
+		{
+			if (!$cparams->get($attributes['enableparam']))
+			{
+				return '';
+			}
 		}
 		
-if ( ! @$attributes['skipparams'] )
+if (!@$attributes['skipparams'])
 {
 		$ext_option = 'com_flexicontent';
 		$ext_view = $view;
@@ -214,12 +220,18 @@ jQuery(document).ready(function() {
 }
 		
 		$layouts = array();
-		if (  @$attributes['firstoption'] ) {
-			$layouts[] = JHtmlSelect::option('', JText::_( $attributes['firstoption'] ));
-		} else {
-				$layouts[] = JHtmlSelect::option('', '-- '.JText::_( 'FLEXI_USE_GLOBAL' ). ' --');
+
+		if (@$attributes['firstoption'])
+		{
+			$layouts[] = JHtmlSelect::option('', JText::_($attributes['firstoption']));
 		}
-		foreach ($tmpls as $tmpl) {
+		else
+		{
+			$layouts[] = JHtmlSelect::option('', '-- '.JText::_( 'FLEXI_USE_GLOBAL' ). ' --');
+		}
+
+		foreach ($tmpls as $tmpl)
+		{
 			$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name);
 		}
 		

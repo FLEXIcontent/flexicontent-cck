@@ -89,32 +89,68 @@ class flexicontent_db
 	 * @return string
 	 * @since 1.5
 	 */
-	static function getTypeAttribs($force = false, $typeid)
+	static function getTypeAttribs($force = false, $typeid = 0, $itemid = 0)
 	{
 		static $typeparams = array();
-		
-		if ( !$force && isset($typeparams[$typeid]) ) return $typeparams[$typeid];
+		static $item_to_type = array();
+		static $_tbl_loaded = null;
+
+		$typeid = !$typeid && isset($item_to_type[$itemid])
+			? $item_to_type[$itemid]
+			: $typeid;
+
+		if (!$force && isset($typeparams[$typeid]))
+		{
+			return $typeparams[$typeid];
+		}
 		
 		$db = JFactory::getDbo();
 		$query	= 'SELECT t.id, t.attribs'
 			. ' FROM #__flexicontent_types AS t'
-			.( $typeid ? ' WHERE t.id = ' . (int)$typeid : '')
+			. ($itemid ? ' JOIN #__flexicontent_items_ext as ie ON ie.type_id = t.id' : '')
+			. ' WHERE 1'
+			. ($typeid ? ' AND t.id = ' . (int) $typeid : '')
+			. ($itemid ? ' AND ie.item_id = ' . (int) $itemid : '')
 			;
 		$db->setQuery($query);
-		if ( $typeid ) {
+
+		// Select specific type for the given typeid or the type used by the given content itemid
+		if ($typeid || $itemid)
+		{
 			$data = $db->loadObject();
-			if (!$data) return false;
+
+			if (!$data)
+			{
+				return false;
+			}
 			
 			$typeid = $data->id;
 			$typeparams[$typeid] = $data->attribs;
+
+			// If loading type of specific item then cache item to type mapping
+			if ($itemid)
+			{
+				$item_to_type[$itemid] = $typeid;
+			}
+
 			return $typeparams[$typeid];
 		}
-		else {
-			$rows = $db->loadObjectList();
-			foreach($rows as $data) {
-				$typeid = $data->id;
-				$typeparams[$typeid] = $data->attribs;
+
+		// Select all types
+		else
+		{
+			if (!$_tbl_loaded)
+			{
+				$_tbl_loaded = true;
+				$rows = $db->loadObjectList();
+
+				foreach($rows as $data)
+				{
+					$typeid = $data->id;
+					$typeparams[$typeid] = $data->attribs;
+				}
 			}
+
 			return $typeparams;
 		}
 	}
