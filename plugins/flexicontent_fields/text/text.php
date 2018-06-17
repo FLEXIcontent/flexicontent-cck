@@ -93,7 +93,13 @@ class plgFlexicontent_fieldsText extends FCField
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		if ($auto_value) $attribs .= ' readonly="readonly" ';
-		if (!empty($default_values)) $attribs .= ' data-defvals="'.htmlspecialchars( implode('|||', $default_values), ENT_COMPAT, 'UTF-8' ).'" ';
+
+		// Attribute for default value(s)
+		if (!empty($default_values))
+		{
+			$attribs .= ' data-defvals="'.htmlspecialchars( implode('|||', $default_values), ENT_COMPAT, 'UTF-8' ).'" ';
+		}
+
 		$attribs .= ' size="'.$size.'" ';
 
 		// Custom HTML placed before / after form fields
@@ -672,32 +678,30 @@ class plgFlexicontent_fieldsText extends FCField
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// Unmasking is done via JS code, but try to redo it, to avoid value loss is unmasking was not done
-			if (1)
+			$v = $post[$n];
+
+			// Unmasking is done via JS code, but try to redo it, to avoid value loss if unmasking was not done
+			if ($inputmask === 'decimal')
 			{
-				//JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
-				if ($inputmask=="decimal_comma") {
-					$post[$n] = str_replace('.', '', $post[$n]);
-					$post[$n] = str_replace(',', '.', $post[$n]);
-				}
-				elseif ($inputmask === 'decimal_comma')
-				{
-					$post[$n] = str_replace(',', '', $post[$n]);
-				}
-				elseif ($inputmask === 'currency' || $inputmask === 'currency_euro')
-				{
-					$post[$n] = str_replace('$', '', $post[$n]);
-					$post[$n] = str_replace(chr(0xE2).chr(0x82).chr(0xAC), '', $post[$n]);
-					$post[$n] = str_replace(',', '', $post[$n]);
-				}
-				//JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
+				$v = str_replace('.', '', $v);
+				$v = str_replace(',', '.', $v);
+			}
+			elseif ($inputmask === 'decimal_comma')
+			{
+				$v = str_replace(',', '', $v);
+			}
+			elseif ($inputmask === 'currency' || $inputmask === 'currency_euro')
+			{
+				$v = str_replace('$', '', $v);
+				$v = str_replace(chr(0xE2).chr(0x82).chr(0xAC), '', $v);
+				$v = str_replace(',', '', $v);
 			}
 
 			// ***
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
+			$post[$n] = flexicontent_html::dataFilter($v, $maxlength, $validation, 0);
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($post[$n]))
