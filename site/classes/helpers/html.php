@@ -3026,33 +3026,60 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $btn_text = '', $auto_relations = false, $ignore_unauthorized = false)
+	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $btn_text = '', $auto_relations = false, $ignore_unauthorized = null)
 	{
 		if ( !$params->get('show_addbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 
 		$app = JFactory::getApplication();
 		$user	= JFactory::getUser();
 
-		// Currently add button will appear to logged users only
-		// ... unless unauthorized users are allowed
-		if ( !$user->id && $ignore_unauthorized < 2 ) return '';
-
-
-		// IF not auto-relation given ... then check if current view / layout can use ADD button
-		$view   = $app->input->get('view', '', 'CMD');
-		$layout = $app->input->get('layout', '', 'CMD');
-		if ( !$auto_relations )
+		// If not given get from component parameters
+		if ($ignore_unauthorized === null && !empty($submit_cat->parameters) && is_object($submit_cat->parameters))
 		{
-			if ( $view!='category' || $layout == 'author' || $layout == 'favs' ) return '';
+			$ignore_unauthorized = $submit_cat->parameters->get('nonauth_addbutton', 0);
+		}
+
+		// Convert to true / false
+		$ignore_unauthorized = !$user->id
+			? (int) $ignore_unauthorized === 2
+			: (int) $ignore_unauthorized > 0;
+
+		/**
+		 * The 'Add' button will appear to logged users only ... unless
+		 * we have a PERFORMANCE-SAFE option for showing it
+		 *  - either unauthorized guest users are allowed (= aka no need to calculate 'CREATE' ACL)
+		 *  - or a specific category ID was given (= aka we need to calculate 'CREATE' ACL for given category only)
+		 */
+		if (!$user->id)
+		{
+			$submit_catid_given = $submit_cat && $submit_cat->id;
+
+			if (!$ignore_unauthorized && !$submit_catid_given)
+			{
+				return '';
+			}
 		}
 
 
-		// *********************************************************************
-		// Check if user can ADD to (a) given category or to (b) at any category
-		// *********************************************************************
+		// IF not auto-relation given ... then check if current view / layout can use ADD button
+		if (!$auto_relations)
+		{
+			$view   = $app->input->get('view', '', 'CMD');
+			$layout = $app->input->get('layout', '', 'CMD');
+
+			if ($view !== 'category' || $layout === 'author' || $layout === 'favs')
+			{
+				return '';
+			}
+		}
+
+
+		/**
+		 * Check if user can ADD to (a) Given category or to (b) at Any category
+		 */
 
 		// (a) Given category
-		if ( $submit_cat && $submit_cat->id )
+		if ($submit_cat && $submit_cat->id)
 		{
 			$canAdd = $user->authorise('core.create', 'com_content.category.' . $submit_cat->id);
 		}
@@ -3063,9 +3090,12 @@ class flexicontent_html
 			// Given CATEGORY VIEW OBJECT may limit to specific category ids
 			$canAdd = $user->authorise('core.create', 'com_flexicontent');
 
-			if ($canAdd === NULL && $user->id) {
-				// Performance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
-				// thus to avoid checking some/ALL categories for "create" privelege for unlogged users
+			if ($canAdd === NULL && $user->id)
+			{
+				/**
+				 * Performance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
+				 * thus to avoid checking some/ALL categories for "create" privelege for unlogged users
+				 */
 				$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
 				if ($specific_catids && count($specific_catids) > 3) $specific_catids = false;
 				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids, $find_first = true );
@@ -3073,12 +3103,15 @@ class flexicontent_html
 			}
 		}
 
-		if ( !$canAdd && !$ignore_unauthorized ) return '';
+		if (!$canAdd && !$ignore_unauthorized)
+		{
+			return '';
+		}
 
 
-		// ******************************
-		// Create submit button/icon text
-		// ******************************
+		/**
+		 * Create submit button/icon text
+		 */
 
 		if (is_object($btn_text))
 		{
@@ -3094,9 +3127,9 @@ class flexicontent_html
 		}
 
 
-		// ***********
-		// Create link
-		// ***********
+		/**
+		 * Create link
+		 */
 
 		// Add Itemid (if given) and do SEF URL routing it --before-- appending more variables, so that
 		// ... menu item URL variables from given menu item ID will be appended if SEF URLs are OFF
@@ -3106,20 +3139,24 @@ class flexicontent_html
 		$link  = JRoute::_($link);
 
 		// Add main category ID (if given)
-		if ($submit_cat && $submit_cat->id) {
+		if ($submit_cat && $submit_cat->id)
+		{
 			$link .= (strstr($link, '?') ? '&amp;' : '?') . 'maincat='.$submit_cat->id;
 		}
 
 		// Append autorelate information to the URL (if given)
-		if ($auto_relations) foreach ( $auto_relations as $auto_relation )
+		if ($auto_relations)
 		{
-			$link .= (strstr($link, '?') ? '&amp;' : '?') . 'autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
+			foreach ($auto_relations as $auto_relation)
+			{
+				$link .= (strstr($link, '?') ? '&amp;' : '?') . 'autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
+			}
 		}
 
 
-		// ***************************************
-		// Finally create the submit icon / button
-		// ***************************************
+		/**
+		 * Finally create the submit icon / button
+		 */
 
 		$show_icons = $params->get('show_icons', 2);
 		$use_font   = $params->get('use_font_icons', 1);

@@ -86,6 +86,12 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="nonauth_addbutton" type="radio" default="" label="FLEXI_SHOW_ADD_BUTTON_TO_UNAUTHORIZED" description="FLEXI_SHOW_ADD_BUTTON_TO_UNAUTHORIZED_DESC" class="disp_addbtn btn-group group-fcinfo" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
+				<option value="2">FLEXI_YES</option>
+			</field>
 			<field name="addbutton_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" label="FLEXI_ADD_NEW_ITEM_SUBMIT_MENU_ITEM" description="FLEXI_ADD_NEW_ITEM_SUBMIT_MENU_ITEM_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 			</field>
