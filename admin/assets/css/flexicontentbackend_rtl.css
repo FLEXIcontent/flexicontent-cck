@@ -98,7 +98,7 @@ span.fcselect_lbl {
 	padding: 0px 4px 0px 0px !important;
 	margin: 0px !important;
 }
-.group-fcset > input,
+.group-fcset input,
 input[type="checkbox"].fc_checkradio,
 input[type="radio"].fc_checkradio {
 	width: 24px !important;
@@ -107,7 +107,7 @@ input[type="radio"].fc_checkradio {
 	opacity: 0 !important;
 	display: none !important;
 }
-.group-fcset > label input,
+.group-fcset label input,
 label input[type="checkbox"].fc_checkradio,
 label input[type="radio"].fc_checkradio {
 	width: auto !important;
@@ -118,7 +118,7 @@ label input[type="radio"].fc_checkradio {
 	vertical-align: bottom !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
-.group-fcset > input + label,
+.group-fcset input + label,
 input[type="checkbox"].fc_checkradio + label,
 input[type="radio"].fc_checkradio + label {
 	display: inline-block !important;
@@ -136,14 +136,14 @@ div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-resu
 	box-sizing: border-box !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
-.group-fcset > input[type="checkbox"]:disabled + label,
+.group-fcset input[type="checkbox"]:disabled + label,
 input[type="checkbox"].fc_checkradio:disabled + label {
 	background-position: 100% 0 !important;
 	font-style: italic !important;
 	cursor: default !important;
 	opacity: 0.6 !important;
 }
-.group-fcset > input[type="radio"]:disabled + label,
+.group-fcset input[type="radio"]:disabled + label,
 input[type="radio"].fc_checkradio:disabled + label {
 	background-position: 100% -72px !important;
 	font-style: italic !important;
@@ -152,37 +152,37 @@ input[type="radio"].fc_checkradio:disabled + label {
 	opacity: 0.6 !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
-.group-fcset > input[type="checkbox"] + label,
+.group-fcset input[type="checkbox"] + label,
 input[type="checkbox"].fc_checkradio + label {
 	background: url(../images/checks2.png) no-repeat 100% 0 !important;
 }
-.group-fcset > input[type="radio"] + label,
+.group-fcset input[type="radio"] + label,
 input[type="radio"].fc_checkradio + label {
 	background: url(../images/checks2.png) no-repeat 100% -72px !important;
 }
-.group-fcset > input[type="checkbox"] + label.green,
+.group-fcset input[type="checkbox"] + label.green,
 input[type="checkbox"].fc_checkradio + label.green {
 	background: url(../images/checks3.png) no-repeat 100% 0 !important;
 }
-.group-fcset > input[type="radio"] + label.green,
+.group-fcset input[type="radio"] + label.green,
 input[type="radio"].fc_checkradio + label.green {
 	background: url(../images/checks3.png) no-repeat 100% -72px !important;
 }
-.group-fcset > label.green.single,
+.group-fcset label.green.single,
 .fc_checkradio + label.green.single {
 	padding-right: 18px !important;
 	margin: 0px !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
-.group-fcset > input[type="checkbox"]:checked + label,
+.group-fcset input[type="checkbox"]:checked + label,
 input[type="checkbox"].fc_checkradio:checked + label {
 	background-position: 100% -24px !important;
 }
-.group-fcset > input[type="radio"]:checked + label,
+.group-fcset input[type="radio"]:checked + label,
 input[type="radio"].fc_checkradio:checked + label {
 	background-position: 100% -48px !important;
 }
-.group-fcset > input,
+.group-fcset input,
 input[type="checkbox"].fc_checkradio,
 input[type="checkbox"].fc_checkradio:focus,
 input[type="radio"].fc_checkradio,
