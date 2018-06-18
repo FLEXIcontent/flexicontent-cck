@@ -694,8 +694,8 @@ class plgSystemFlexisystem extends JPlugin
 		// Get total active items for every category
 		$query	= 'SELECT c.id, COUNT(rel.itemid) AS numitems'
 			. ' FROM #__categories as c'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
-			. ' LEFT JOIN #__content AS i ON rel.itemid=i.id '
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
+			. ' JOIN #__content AS i ON rel.itemid=i.id '
 			. '  AND i.state IN (1,-5) '
 			. '  AND ( i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' )'
 			. '  AND ( i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' )'
