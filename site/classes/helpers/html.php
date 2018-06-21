@@ -1738,8 +1738,16 @@ class flexicontent_html
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				// Load polyfills for older IE
-				JHtml::_('behavior.polyfill', array('event', 'classlist', 'map'), 'lte IE 11');
+				flexicontent_html::loadFramework('flexi_js_common');
+
+				// For J3.7.0+ , load polyfills for older IE browsers: < IE11
+				jimport('cms.version.version');
+				$jversion = new JVersion;
+
+				if (version_compare($jversion->getShortVersion(), '3.9.0', 'ge'))
+				{
+					JHtml::_('behavior.polyfill', array('event', 'classlist', 'map'), 'lte IE 11');
+				}
 
 				$js .= "";
 
