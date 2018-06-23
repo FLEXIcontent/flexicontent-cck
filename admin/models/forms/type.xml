@@ -228,7 +228,9 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_DESC" level="level3" />
 			<field name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL_DESC" />		
-			
+			<field name="voting_rating_texts" type="textarea" filter="string"
+				default="" rows="5" cols="30" label="FLEXI_FIELD_VOTE_RATING_SCALE_TEXTS" description="FLEXI_FIELD_VOTE_RATING_SCALE_TEXTS_DESC" class="" depend_class="composite-voting-mode"/>
+
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="FLEXI_FIELD_VOTE_COMPOSITE_VOTING_DESC" level="level2" />
 			<field name="voting_enable_extra_votes" type="radio" default="" label="FLEXI_FIELD_VOTE_ENABLE_COMPOSITE" description="FLEXI_FIELD_VOTE_ENABLE_COMPOSITE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>

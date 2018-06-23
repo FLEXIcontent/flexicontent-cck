@@ -393,8 +393,8 @@ jQuery(document).ready(function() {
 				source: function( request, response ) {
 					var el = jQuery(this.element);
 					var el_lang = el.attr('data-txt_ac_lang') ? el.attr('data-txt_ac_lang') : '';
-					var el_cid  = el.attr('data-txt_ac_cid')  ? el.attr('data-txt_ac_cid')  : (parseInt(_FC_GET['cid']) || 0);
-					var el_cids = el.attr('data-txt_ac_cids') ? el.attr('data-txt_ac_cids') : _FC_GET['cids'];
+					var el_cid  = el.attr('data-txt_ac_cid')  ? el.attr('data-txt_ac_cid')  : (parseInt(FC_URL_VARS['cid']) || 0);
+					var el_cids = el.attr('data-txt_ac_cids') ? el.attr('data-txt_ac_cids') : FC_URL_VARS['cids'];
 					var el_usesubs = parseInt(el.attr('data-txt_ac_usesubs')) || 0;
 					jQuery.ajax({
 						url: (jroot_url_fc + "components/com_flexicontent/tasks/core.php"),
@@ -477,8 +477,8 @@ jQuery(document).ready(function() {
 						pageSize: fc_select_pageSize,
 						pageNum: page,
 						lang: (jQuery(this).attr('data-txt_ac_lang') ? jQuery(this).attr('data-txt_ac_lang') : ''),
-						cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(_FC_GET['cid']) || 0)),
-						cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : _FC_GET['cids']),
+						cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(FC_URL_VARS['cid']) || 0)),
+						cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : FC_URL_VARS['cids']),
 						usesubs: (parseInt(jQuery(this).attr('data-txt_ac_usesubs')) || 0)
 					};
 				},
@@ -540,7 +540,7 @@ function fc_replaceUrlParam(url, paramName, paramValue)
 
 jQuery(document).ready(function () {
 	
-	var cc = (typeof _FC_GET !="undefined" && 'cc' in _FC_GET ? _FC_GET['cc']: '');
+	var cc = (typeof FC_URL_VARS !="undefined" && 'cc' in FC_URL_VARS ? FC_URL_VARS['cc']: '');
 	var fc_uid = fc_getCookie('fc_uid');
 	
 	if (cc!='' && fc_uid!=cc)

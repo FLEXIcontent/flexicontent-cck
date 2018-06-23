@@ -68,7 +68,7 @@ var fc_statehandler = function(options)
 			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state,
 			dataType: 'json',
 			data: {
-				lang: (typeof _FC_GET !='undefined' && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+				lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
 			},
 			success: function( data )
 			{

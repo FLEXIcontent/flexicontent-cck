@@ -1303,39 +1303,44 @@ if ($this->fields && $typeid) :
 
 		foreach ($this->fields as $field_name => $field)
 		{
-			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) )
+			if ($field->iscore && isset($tab_fields['fman'][$field->field_type]))
 			{
 				// Print any CORE fields that are placed by field manager
-				if ( isset($captured[ $field->field_type ]) ) {
-					echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
-					echo "\n".'<div class="fcclear"></div>'."\n";
+				if (isset($captured[$field->field_type]))
+				{
+					echo $captured[$field->field_type];
+					unset($captured[$field->field_type]);
+					echo "\n" . '<div class="fcclear"></div>' . "\n";
 				}
 				continue;
 			}
 			
-			else if (
+			elseif (
 				// SKIP frontend hidden fields 
-				($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('frontend_hidden')   ||   in_array($field->formhidden, array(1,3))   ||
+				($field->iscore && empty($field->html))   ||   $field->parameters->get('frontend_hidden')   ||   in_array($field->formhidden, array(1,3))   ||
 				
 				// Skip hide-if-empty fields from this listing
 				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
 			
-			// check to SKIP (hide) field e.g. description field ('maintext' field type), alias field etc
-			if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
+			// Check to SKIP (hide) field e.g. description field ('maintext' field type), alias field etc
+			if ($this->tparams->get('hide_'.$field->field_type))
+			{
+				continue;
+			}
 
 
 			$not_in_tabs = "";
 
 
-			if ($field->field_type=='groupmarker')
+			if ($field->field_type === 'groupmarker')
 			{
 				echo $field->html;
 				continue;
 			}
 
 
-			else if ($field->field_type=='coreprops')
+			elseif ($field->field_type === 'coreprops')
 			{
 				$props_type = $field->parameters->get('props_type');
 				if ( isset($tab_fields['fman'][$props_type]) ) {
@@ -1347,7 +1352,7 @@ if ($this->fields && $typeid) :
 			}
 
 
-			else if ($field->field_type=='image')
+			elseif ($field->field_type === 'image')
 			{
 				if ($field->parameters->get('image_source')==-1)
 				{
@@ -1358,7 +1363,7 @@ if ($this->fields && $typeid) :
 			}
 
 
-			else if ($field->field_type=='weblink')
+			elseif ($field->field_type === 'weblink')
 			{
 				if ($field->parameters->get('link_source')==-1)
 				{
@@ -1371,7 +1376,7 @@ if ($this->fields && $typeid) :
 
 			// Check if 'Description' field will NOT be placed via fields manager placement/ordering,
 			// but instead it will be inside a custom TAB or inside the 'Description' TAB (default)
-			else if ( $field->field_type=='maintext')
+			elseif ($field->field_type === 'maintext')
 			{
 				if (isset($all_tab_fields['text']) )
 				{

@@ -52,7 +52,7 @@ function FCFav(id, type, add_counter)
 	var currentURL = window.location;
 	var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
 	
-	var favurl = live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id+'&type='+type
+	var favurl = live_site + '/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id=' + id + '&type=' + type;
 
 	var onote_msg_box_start = '<div class="fc-mssg fc-note fc-iblock fc-nobgimage fcfavs-result-mssg" style="position: relative; margin: 1px 2px;">';
 	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage fcfavs-result-mssg" style="z-index:1000; position: relative; margin: 1px 2px;">';
@@ -69,7 +69,7 @@ function FCFav(id, type, add_counter)
 		url: favurl,
 		dataType: "text",
 		data: {
-			lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+			lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
 		},
 		success: function( response ) {
 			var links = jQuery('.favlink_' + type + '_' + id + '.fcfav-toggle-btn');

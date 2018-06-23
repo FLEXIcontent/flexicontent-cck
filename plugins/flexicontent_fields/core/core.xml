@@ -1066,8 +1066,34 @@
 			<field name="guest_no_acc_url" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_URL" description="FLEXI_FIELD_VOTE_NO_ACCESS_URL_DESC" />
 
 		</fieldset>
-		<fieldset name="group-voting-unrated" repeat="1" icon_class="icon-question" label="FLEXI_VOTE_UNRATED" addfieldpath="/administrator/components/com_flexicontent/elements">
 
+
+		<fieldset name="group-voting-grading" repeat="1" icon_class="icon-checkmark-2" label="FLEXI_FIELD_VOTE_GRADE_SCORE" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_ABOUT_USING_AS_GRADE_SCORE_INFO" class="alert-info" level="level3"/>
+			<field name="vote_iform_display" type="radio" default="0" label="FLEXI_ITEM_FORM" description="" class="btn-group group-fcmethod fcoffactive">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_READONLY</option>
+			</field>
+		</fieldset>
+
+		<fieldset name="group-voting-reviews" repeat="1" icon_class="icon-paragraph-justify" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="This an unfinished BETA feature, it is meant to be enabled only by testers" level="level3" class="alert alert-warning" />
+			<field name="" type="separator" default="" level="level_br" />
+			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		
+		
+		<fieldset name="group-voting-advanced" repeat="1" icon_class="icon-cog" label="FLEXI_ADVANCED" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+		<field name="" type="separator" default="FLEXI_ADVANCED" level="tabset_start" tab_class="s-fake" box_type="1" />
+		<field name="tab-voting-unrated" type="separator" default="FLEXI_VOTE_UNRATED" icon_class="icon-question" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_VOTE_DEFAULT_RATING_AND_WEIGHTS" level="level1"/>
 			
@@ -1087,24 +1113,17 @@
 			<field name="vote_8_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num8" />
 			<field name="vote_9_weight" type="integer" default="100" first="0" last="100" step="5" label="FLEXI_VOTE_RATING_WEIGHT" description="FLEXI_VOTE_RATING_WEIGHTS_DESC" labelclass="fc-label-num9" />
 
-		</fieldset>
-		<fieldset name="group-voting-reviews" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="tab-voting-config" type="separator" default="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY" description="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY_DESC" icon_class="icon-star-2" level="tab_open" box_type="1" />
+			
+			<field name="rating_resolution" type="text" default="" hint="5" size="10" label="FLEXI_FIELD_VOTE_RATING_RESOLUTION" description="FLEXI_FIELD_VOTE_RATING_RESOLUTION_DESC" />
+			<field name="rating_stars" type="text" default="" hint="5" size="10" label="FLEXI_FIELD_VOTE_RATING_STARS" description="FLEXI_FIELD_VOTE_RATING_STARS_DESC" />
 
-			<field name="" type="separator" default="This an unfinished BETA feature, it is meant to be enabled only by testers" level="-" class="fc-mssg fc-warning" />
-			<field name="" type="separator" default="" level="level_br" />
-			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-		</fieldset>
-		<fieldset name="group-voting-config" repeat="1" icon_class="icon-star-2" label="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY" description="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
-			<field name="rating_resolution" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_RESOLUTION" description="FLEXI_FIELD_VOTE_RATING_RESOLUTION_DESC" />
-			<field name="rating_stars" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_STARS" description="FLEXI_FIELD_VOTE_RATING_STARS_DESC" />
-			
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_DESC" level="level1" />
 			<field name="main_label" type="text" default="FLEXI_VOTE_AVERAGE_RATING" size="30" label="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL_DESC" />		
+
+			<field name="rating_texts" type="textarea" filter="string"
+				default="" hint="FLEXI_VOTE_VERY_POOR,&#13;FLEXI_VOTE_POOR,&#13;FLEXI_VOTE_FAIR,&#13;FLEXI_VOTE_GOOD,&#13;FLEXI_VOTE_EXCELLENT"
+				rows="5" cols="30" label="FLEXI_FIELD_VOTE_RATING_SCALE_TEXTS" description="FLEXI_FIELD_VOTE_RATING_SCALE_TEXTS_DESC" class="" depend_class="composite-voting-mode"/>
 			<field name="main_counter" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
@@ -1127,8 +1146,7 @@
 			<field name="main_image" type="text" default="components/com_flexicontent/assets/images/star-medium.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
 			<field name="main_dimension" type="text" default="24" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
-		</fieldset>
-		<fieldset name="group-voting-composite" repeat="1" icon_class="icon-list-2" label="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="FLEXI_FIELD_VOTE_COMPOSITE_VOTING_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="tab-voting-composite" type="separator" default="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="FLEXI_FIELD_VOTE_COMPOSITE_VOTING_DESC" icon_class="icon-list-2" level="tab_open" box_type="1" />
 			
 			<field name="enable_extra_votes" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_VOTE_ENABLE_COMPOSITE" description="FLEXI_FIELD_VOTE_ENABLE_COMPOSITE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="composite-voting-mode">FLEXI_NO</option>
@@ -1163,6 +1181,7 @@
 			<field name="extra_image" type="text" default="components/com_flexicontent/assets/images/star-medium.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" depend_class="composite-voting-mode" />
 			<field name="extra_dimension" type="text" default="24" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" depend_class="composite-voting-mode" />
 			
+		<field name="" type="separator" default="FLEXI_ADVANCED" level="tabset_close" box_type="1" />
 		</fieldset>
 		
 		

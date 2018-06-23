@@ -416,6 +416,44 @@ class plgFlexicontent_fieldsCore extends FCField
 	}
 
 
+	// Method to create field's HTML display for item form
+	function onDisplayField(&$field, &$item)
+	{
+		$field->label = JText::_($field->label);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
+		$is_ingroup  = !empty($field->ingroup);
+
+		// Get viewing layout
+		$field->item_id = $item->id;
+		$field->item = $item;
+
+		switch ($field->field_type)
+		{
+			case 'voting': // voting button
+				$vote_iform_display = (int) $field->parameters->get('vote_iform_display', 0);
+
+				if (!$vote_iform_display)
+				{
+					$field->formhidden = 3;
+					return;
+				}
+
+				// TODO: if ($raw_values !== null) $vote = convert ... $raw_values;
+				$vote = !empty($item->vote) ? $item->vote : null;
+				if ($vote)
+				{
+					$vote->allow_vote = $vote_iform_display && $vote_iform_display !== 2;
+				}
+
+				// Create field's HTML
+				$field->html = flexicontent_html::ItemVote( $field, 'all', $vote );
+				break;
+		}
+	}
+
 
 	// ***
 	// *** METHODS HANDLING before & after saving / deleting field events

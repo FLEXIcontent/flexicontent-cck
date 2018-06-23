@@ -841,14 +841,17 @@ if ($this->item->type_id) {
 			{
 				if (
 					// SKIP backend hidden fields from this listing
-					($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
+					($field->iscore && empty($field->html))   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
 					
 					// Skip hide-if-empty fields from this listing
 					( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 				) continue;
 				
-				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
-				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
+				// Check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
+				if ($this->tparams->get('hide_' . $field->field_type))
+				{
+					continue;
+				}
 				
 				$not_in_tabs = "";
 				if ($field->field_type=='groupmarker')
@@ -858,21 +861,21 @@ if ($this->item->type_id) {
 				}
 
 
-				else if ($field->field_type=='coreprops')
+				// Not used in backend (yet?)
+				elseif ($field->field_type === 'coreprops')
 				{
-					// not used in backend (yet?)
 					continue;
 				}
 
 
-				else if ($field->field_type=='maintext')
+				// Description placed in separate TAB
+				elseif ($field->field_type === 'maintext')
 				{
-					// placed in separate TAB
 					continue;
 				}
 
 
-				else if ($field->field_type=='image')
+				elseif ($field->field_type === 'image')
 				{
 					if ($field->parameters->get('image_source')==-1)
 					{
@@ -883,7 +886,7 @@ if ($this->item->type_id) {
 				}
 
 
-				else if ($field->field_type=='weblink')
+				elseif ($field->field_type === 'weblink')
 				{
 					if ($field->parameters->get('link_source')==-1)
 					{
