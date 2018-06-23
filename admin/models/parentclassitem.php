@@ -679,6 +679,10 @@ class ParentClassItem extends FCModelAdmin
 				$item = & $data;
 			}
 
+			// Retrieve voting information
+			$votes = $this->getVotes();
+			$item->vote = isset($votes[$this->_id]) ? $votes[$this->_id] : null;
+
 			// Use configured type if existing item has no type
 			$this->_typeid = $item->type_id ?: $this->_typeid;
 			$item->type_id = $this->_typeid;
@@ -3572,29 +3576,66 @@ class ParentClassItem extends FCModelAdmin
 	 * @return object
 	 * @since 1.0
 	 */
-	function getvotes($id = 0)
+
+	public function getVotes($cids = null)
+	{
+		$db = $this->_db;
+		
+		if ($cids && !is_array($cids))
+		{
+			$cids = array($cids);
+		}
+		else
+		{
+			$cids = $cids ?: array($this->_id);
+		}
+		JArrayHelper::toInteger($cids);
+
+		$query = 'SELECT *'
+			. ' FROM #__content_rating'
+			. ' WHERE content_id IN (' . implode(', ', $cids) . ')';
+		$votes = $db->setQuery($query)->loadObjectList('content_id');
+		
+		$query 	= 'SELECT *, field_id as extra_id'
+			. ' FROM #__flexicontent_items_extravote'
+			. ' WHERE content_id IN (' . implode(', ', $cids) . ')';
+		$extra_votes = $db->setQuery($query)->loadObjectList();
+		
+		// Assign each item 's extra votes to the item's votes as member variable "extra"
+		foreach ($extra_votes as $extra_vote)
+		{
+			$votes[$extra_vote->content_id]->extra[$extra_vote->extra_id] = $extra_vote;
+		}
+
+		// Compatibility for legacy calling of the method
+		if (isset($votes[$this->_id]))
+		{
+			$votes[0] = $votes[$this->_id];
+		}
+
+		return $votes;
+	}	
+
+
+	public function getRatingDisplay($id = 0)
 	{
 		$id = (int) ($id ?: $this->_id);
 
-		$this->_db->setQuery('SELECT rating_sum, rating_count FROM #__content_rating WHERE content_id = ' . (int) $id);
-		return $this->_db->loadObjectlist();
-	}
-	
-	
-	function getRatingDisplay($id = 0)
-	{
-		$id = (int) ($id ?: $this->_id);
+		$votes = $this->getVotes($id);
 
-		$votes = $this->getvotes($id);
 		if ($votes)
 		{
 			$rating_resolution = $this->getVotingResolution($id);
-			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * (100 / $rating_resolution)), 2);
-			$vote	= ((int)$votes[0]->rating_count > 1) ? (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTES' ) : (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTE' );
-			return $score.'% | '.$vote;
+			$rating_sum = (int) $votes[$id]->rating_sum;
+			$rating_count = (int) $votes[$id]->rating_count;
+			
+			$score = $rating_sum / $rating_count * (100 / $rating_resolution);
+			$score = round($score, 2);
+			$vote  = $rating_count . ' ' . JText::_($rating_count > 1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE');
+			return $score . '% | ' . $vote;
 		}
 
-		return JText::_( 'FLEXI_NOT_RATED_YET' );
+		return JText::_('FLEXI_NOT_RATED_YET');
 	}
 	
 	
@@ -5998,5 +6039,4 @@ class ParentClassItem extends FCModelAdmin
 			$db->setQuery($query)->execute();
 		}
 	}
-
 }

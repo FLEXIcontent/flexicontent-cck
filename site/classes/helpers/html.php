@@ -1727,21 +1727,50 @@ class flexicontent_html
 				$document->addScript($framework_path.'/nouislider.min.js');
 				break;
 
+			case 'flexi_js_common':
+
+				$site_languages = FLEXIUtilities::getLanguages();
+				$default_lang_code = flexicontent_html::getSiteDefaultLang();
+				$sef_lang_code = isset($site_languages->{$default_lang_code}) ? $site_languages->{$default_lang_code}->sef : '';
+				
+				$needed_vars = array('cid', 'cids', 'cc');
+				$FC_URL_VARS = array();
+
+				foreach($needed_vars as $nv)
+				{
+					!isset($_GET[$nv]) ?: $FC_URL_VARS[$nv] = $_GET[$nv];
+				}
+
+				$js .= "
+					var fc_sef_lang = '" . $sef_lang_code . "';
+					var fc_root_uri = '" . JUri::root(true) . "';
+					var fc_base_uri = '" . JUri::base(true) . "';
+					var FC_URL_VARS = " . json_encode($FC_URL_VARS) . ";
+
+					// To be removed ... in v3.3.x
+					var _FC_GET = " . json_encode($_GET) . ";
+				";
+
+				break;
+
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
+
+				flexicontent_html::loadFramework('flexi_js_common');
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
 
 				// Make sure user cookie is set
 				$jcookie = $app->input->cookie;
 				$fc_uid = $jcookie->get( 'fc_uid', null);
-				$hashedUA = JFactory::getUser()->id ? JUserHelper::getShortHashedUserAgent() : 'p';
-				if ($fc_uid != $hashedUA)  $jcookie->set( 'fc_uid', $hashedUA, 0);
+				$hashedUA = JFactory::getUser()->id
+					? JUserHelper::getShortHashedUserAgent()
+					: 'p';
 
-				$js .= "
-					var fc_root_uri = '" . JUri::root(true) . "';
-					var fc_base_uri = '" . JUri::base(true) . "';
-					var _FC_GET = ".json_encode($_GET).";
-				";
+				if ($fc_uid != $hashedUA)
+				{
+					$jcookie->set( 'fc_uid', $hashedUA, 0);
+				}
+
 				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
 				$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
 				JText::script("FLEXI_APPLYING_FILTERING", true);
@@ -3400,43 +3429,50 @@ class flexicontent_html
 	 * @param int or string $xid
 	 * @since 1.0
 	 */
-	static function ItemVote( &$field, $xid, $vote )
+	static function ItemVote(&$field, $xid, $vote)
 	{
 		// Check for invalid xid
-		if ($xid!='main' && $xid!='extra' && $xid!='all' && !(int)$xid) {
-			$html .= "ItemVote(): invalid xid '".$xid."' was given";
-			return;
+		if ($xid !== 'main' && $xid !== 'extra' && $xid !== 'all' && !(int) $xid)
+		{
+			return 'ItemVote(): invalid xid \'' . $xid . '\' was given';
 		}
 
-		if (!$vote) {
+		if (!$vote)
+		{
 			$vote = new stdClass();
 			$vote->rating_sum = $vote->rating_count = 0;
-		} else if (!isset($vote->rating_sum) || !isset($vote->rating_sum)) {
+		}
+		elseif (!isset($vote->rating_sum) || !isset($vote->rating_sum))
+		{
 			$vote->rating_sum = $vote->rating_count = 0;
 		}
 
 		$html = '';
-		$int_xid = (int)$xid;
+		$int_xid = (int) $xid;
 		$item_id = $field->item_id;
 
 
 		// Get extra voting option (composite voting)
 		$xids = array();
-		if ( ($xid=='all' || $xid=='extra' || $int_xid) && ($enable_extra_votes = $field->parameters->get('enable_extra_votes', '')) )
+		$enable_extra_votes = (int) $field->parameters->get('enable_extra_votes', 0);
+
+		if ($enable_extra_votes && ($xid === 'all' || $xid === 'extra' || $int_xid))
 		{
 			// Retrieve and split-up extra vote types, (removing last one if empty)
 			$extra_votes = $field->parameters->get('extra_votes', '');
 			$extra_votes = preg_split("/[\s]*%%[\s]*/", $extra_votes);
-			if ( empty($extra_votes[count($extra_votes)-1]) )
+
+			if (empty($extra_votes[count($extra_votes)-1]))
 			{
-				unset( $extra_votes[count($extra_votes)-1] );
+				unset($extra_votes[count($extra_votes)-1]);
 			}
 
 			// Split extra voting ids (xid) and their titles
-			foreach ($extra_votes as $extra_vote) {
+			foreach ($extra_votes as $extra_vote)
+			{
 				@list($extra_id, $extra_title, $extra_desc) = explode("##", $extra_vote);
 				$xids[$extra_id] = new stdClass();
-				$xids[$extra_id]->id    = (int)$extra_id;
+				$xids[$extra_id]->id    = (int) $extra_id;
 				$xids[$extra_id]->title = JText::_($extra_title);
 				$xids[$extra_id]->desc  = JText::_($extra_desc);
 			}
@@ -3444,53 +3480,91 @@ class flexicontent_html
 
 		// Get user current history so that it is reflected on the voting
 		$vote_history = JFactory::getSession()->get('vote_history', array(),'flexicontent');
-		if ( !isset($vote_history[$item_id]) || !is_array($vote_history[$item_id]) )
+		if (!isset($vote_history[$item_id]) || !is_array($vote_history[$item_id]))
 		{
 			$vote_history[$item_id] = array();
 		}
 
-		// Add main vote option
-		if ($xid=='main' || $xid=='all')
+		// Add main voting option
+		if ($xid === 'main' || $xid === 'all')
 		{
 			$vote_label = JText::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'));
 			$counter_show_label = $field->parameters->get('main_counter_show_label', 1);
-			$add_review_form = $field->parameters->get('allow_reviews', 0);
-			$html .= flexicontent_html::ItemVoteDisplay( $field, $item_id, $vote->rating_sum, $vote->rating_count, 'main', $vote_label,
-				$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label, $add_review_form, $xids, $review_type='item' );
+			$add_review_form = (int) $field->parameters->get('allow_reviews', 0);
+			$html .= flexicontent_html::ItemVoteDisplay(
+				$field,
+				$item_id,
+				$vote->rating_sum,
+				$vote->rating_count,
+				'main',
+				$vote_label,
+				$stars_override = 0,
+				($allow_vote = isset($vote->allow_vote) ? $vote->allow_vote : true),
+				$vote_counter = 'default',
+				$counter_show_label,
+				$add_review_form,
+				$xids,
+				$review_type='item'
+			);
 		}
 
-		if ( $xid=='all' || $xid=='extra' || ($int_xid && isset($xids[$xid])) )
+		// Add extra voting option
+		if ($xid === 'all' || $xid === 'extra' || ($int_xid && isset($xids[$xid])))
 		{
-			if ( $int_xid )
-				$_xids = array($int_xid => $xids[$int_xid]);
-			else
-				$_xids = & $xids;
+			/**
+			 * If integer then add specific voting option for the given XID,
+			 * if string (either 'all' or 'extra') then add all extra voting options
+			 */
+			$_xids = $int_xid
+				? array($int_xid => $xids[$int_xid])
+				: $xids;
 
 			$counter_show_label = $field->parameters->get('extra_counter_show_label', 1);
-			foreach ( $_xids as $extra_id => $xid_obj)
+
+			foreach ($_xids as $extra_id => $xid_obj)
 			{
-				if ( !isset($vote->extra[$extra_id]) ) {
+				if (!isset($vote->extra[$extra_id]))
+				{
 					$extra_vote = new stdClass();
 					$extra_vote->rating_sum = $extra_vote->rating_count = 0;
 					$extra_vote->extra_id = $extra_id;
-				} else {
+				}
+				else
+				{
 					$extra_vote = $vote->extra[$extra_id];
 				}
 
 				// Display incomplete vote
-				if ( (int)$extra_id && !isset($vote_history[$item_id]['main']) && isset($vote_history[$item_id][$extra_id]) ) {
-					$_rating_sum = $vote_history[$item_id][$extra_id];
+				if ((int) $extra_id && !isset($vote_history[$item_id]['main']) && isset($vote_history[$item_id][$extra_id]))
+				{
+					$rating_sum = $vote_history[$item_id][$extra_id];
 					$rating_count = 1;
-				} else {
-					$_rating_sum = 0;
+				}
+				else
+				{
+					$rating_sum = 0;
 					$rating_count = 0;
 				}
-				$html .= flexicontent_html::ItemVoteDisplay( $field, $item_id, ($extra_vote->rating_sum + $_rating_sum), ($extra_vote->rating_count + $rating_count), $extra_vote->extra_id, $xid_obj,
-					$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label );
+
+				$html .= flexicontent_html::ItemVoteDisplay(
+					$field,
+					$item_id,
+					($extra_vote->rating_sum + $rating_sum),
+					($extra_vote->rating_count + $rating_count),
+					$extra_vote->extra_id,
+					$xid_obj,
+					$stars_override = 0,
+					($allow_vote = isset($vote->allow_vote) ? $vote->allow_vote : true),
+					$vote_counter = 'default',
+					$counter_show_label
+				);
 			}
 		}
 
-		return '<div class="'.$field->name.'-group">' .$html. '</div>';
+		return '
+		<div class="'.$field->name.'-group">
+			' . $html . '
+		</div>';
 	}
 
 
@@ -3515,21 +3589,26 @@ class flexicontent_html
 
 		flexicontent_html::__DEV_check_reviews_table();
 
-		if (!is_object($xiddata)) {
-			// Only label given
+		// Only label given
+		if (!is_object($xiddata))
+		{
 			$label = $xiddata;
 			$desc = '';
-		} else {
-			// label & desc
+		}
+
+		// Label & description
+		else
+		{
 			$label = $xiddata->title;
 			$desc  = $xiddata->desc;
 		}
-		$int_xid = (int)$xid;
+
+		$int_xid = (int) $xid;
 
 
-		// *****************************************************
-		// Find if user has the ACCESS level required for voting
-		// *****************************************************
+		/**
+		 * Find if user has the ACCESS level required for voting
+		 */
 
 		static $has_acclvl;
 		if ($has_acclvl===null)
@@ -3540,60 +3619,79 @@ class flexicontent_html
 		}
 
 
-		// *********************************************************
-		// Calculate NO access actions, (case that user cannot vote)
-		// *********************************************************
+		/**
+		 * Calculate NO access actions, (case that user cannot vote)
+		 */
 
-		if ( !$has_acclvl )
+		if (!$has_acclvl)
 		{
-			if ($user->id) {
+			if ($user->id)
+			{
 				$no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
 				$no_acc_url = $field->parameters->get('logged_no_acc_url', '');
-				$no_acc_doredirect  = $field->parameters->get('logged_no_acc_doredirect', 0);
-				$no_acc_askredirect = $field->parameters->get('logged_no_acc_askredirect', 1);
-			} else {
+				$no_acc_doredirect  = (int) $field->parameters->get('logged_no_acc_doredirect', 0);
+				$no_acc_askredirect = (int) $field->parameters->get('logged_no_acc_askredirect', 1);
+			}
+			else
+			{
 				$no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
 				$no_acc_url  = $field->parameters->get('guest_no_acc_url', '');
-				$no_acc_doredirect  = $field->parameters->get('guest_no_acc_doredirect', 2);
-				$no_acc_askredirect = $field->parameters->get('guest_no_acc_askredirect', 1);
+				$no_acc_doredirect  = (int) $field->parameters->get('guest_no_acc_doredirect', 2);
+				$no_acc_askredirect = (int) $field->parameters->get('guest_no_acc_askredirect', 1);
 			}
 
 			// Decide no access Redirect URLs
-			if ($no_acc_doredirect == 2) {
+			if ($no_acc_doredirect === 2)
+			{
 				$com_users = 'com_users';
 				$no_acc_url = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
-			} else if ($no_acc_doredirect == 0) {
+			}
+			elseif ($no_acc_doredirect === 0)
+			{
 				$no_acc_url = '';
-			} // else unchanged
+			}
+			// else unchanged
 
 
 			// Decide no access Redirect Message
 			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
-			if ( !$no_acc_msg )
+
+			// Find name of required Access Level
+			if (!$no_acc_msg)
 			{
-				// Find name of required Access Level
 				$acclvl_name = '';
-				if ($acclvl && empty($acclvl_names)) {  // Retrieve this ONCE (static var)
+
+				// Retrieve this ONCE (static var)
+				if ($acclvl && empty($acclvl_names))
+				{
 					$acclvl_names = flexicontent_db::getAccessNames();
 				}
+
 				$acclvl_name =  !empty($acclvl_names[$acclvl]) ? $acclvl_names[$acclvl] : "Access Level: ".$acclvl." not found/was deleted";
 				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
 			}
-			$no_acc_msg_redirect = JText::_($no_acc_doredirect==2 ? 'FLEXI_CONFIM_REDIRECT_TO_LOGIN_REGISTER' : 'FLEXI_CONFIM_REDIRECT');
+
+			$no_acc_msg_redirect = JText::_($no_acc_doredirect === 2 ? 'FLEXI_CONFIM_REDIRECT_TO_LOGIN_REGISTER' : 'FLEXI_CONFIM_REDIRECT');
 		}
 
-		if ($vote_counter !== 'default' &&  $vote_counter!=='')
+		if ($vote_counter !== 'default' &&  $vote_counter !== '')
+		{
 			$counter = $vote_counter ? 1 : 0;
+		}
 		else
-			$counter = $field->parameters->get( ($int_xid ? 'extra_counter' : 'main_counter'), 1 );
-		$show_unrated = $field->parameters->get( 'show_unrated', 0 );  // Display info e.g. counter if unrated, TODO add parameter
-		$show_percentage = $field->parameters->get( ($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage'), 0 );
-		$class   = $field->name.'-row';
+		{
+			$counter = (int) $field->parameters->get($int_xid ? 'extra_counter' : 'main_counter', 1);
+		}
+
+		// Display info e.g. counter if unrated, TODO add parameter
+		$show_unrated = (int) $field->parameters->get('show_unrated', 0);
+		$show_percentage = (int) $field->parameters->get(($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage'), 0);
+		$class = $field->name . '-row';
 
 		// Get number of displayed stars, configuration
 		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
-		$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
-		$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
+		$rating_resolution = $rating_resolution >= 5 ? $rating_resolution : 5;
+		$rating_resolution = $rating_resolution <= 100 ? $rating_resolution : 100;
 
 		// Get number of displayed stars, configuration
 		$rating_stars = (int) ($stars_override ? $stars_override : $field->parameters->get('rating_stars', 5));
@@ -3624,7 +3722,7 @@ class flexicontent_html
 			if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
 
 			$css = '
-			/* This is via voting field parameter, please edit field configuration to override them*/
+			/* This is via voting field parameter, please edit field configuration to override them */
 			.'.$class.' div.fcvote.fcvote-box-main {
 				line-height:'.$dim.'px!important;
 			}
@@ -3653,7 +3751,7 @@ class flexicontent_html
 			if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
 
 			$css .= '
-			/* This is via voting field parameter, please edit field configuration to override them*/
+			/* This is via voting field parameter, please edit field configuration to override them */
 			.'.$class.' div.fcvote > ul.fcvote_list {
 				height:'.$dim.'px!important;
 				width:'.$element_width.'px!important;
@@ -3670,19 +3768,45 @@ class flexicontent_html
 			}
 			';
 
+			$rating_texts = trim($field->parameters->get(
+				'rating_texts',
+				'FLEXI_VOTE_VERY_POOR, FLEXI_VOTE_POOR, FLEXI_VOTE_FAIR, FLEXI_VOTE_GOOD, FLEXI_VOTE_EXCELLENT'
+			));
+			$rating_texts = preg_split("/\s*,\s*/u", $rating_texts);
+
 			$star_tooltips = array();
 			$star_classes  = array();
-			for ($i=1; $i<=$rating_resolution; $i++) {
+
+			for ($i = 1; $i <= $rating_resolution; $i++)
+			{
 				$star_zindex  = $rating_resolution - $i + 2;
 				$star_percent = (int) round(100 * ($i / $rating_resolution));
-				$css .= '.'.$class.' div.fcvote ul.fcvote_list > .voting-links a.star'.$i.' { width: '.$star_percent.'%!important; z-index: '.$star_zindex.'; }' ."\n";
-				$star_classes[$i] = 'star'.$i;
-				if ($star_percent < 20)       $star_tooltips[$i] = JText::_( 'FLEXI_VERY_POOR' );
-				else if ($star_percent < 40)  $star_tooltips[$i] = JText::_( 'FLEXI_POOR' );
-				else if ($star_percent < 60)  $star_tooltips[$i] = JText::_( 'FLEXI_REGULAR' );
-				else if ($star_percent < 80)  $star_tooltips[$i] = JText::_( 'FLEXI_GOOD' );
-				else                          $star_tooltips[$i] = JText::_( 'FLEXI_VERY_GOOD' );
-				$star_tooltips[$i] .= ' '.$i.'/'.$rating_resolution;
+				$css .= '.' . $class . ' div.fcvote ul.fcvote_list > .voting-links a.star' . $i . ' { width: ' . $star_percent . '%!important; z-index: ' . $star_zindex . '; }' . "\n";
+				$star_classes[$i] = 'star' . $i;
+
+				switch (true)
+				{
+					case $star_percent <= 20:
+						$star_tooltips[$i] = JText::_(isset($rating_texts[0]) ? $rating_texts[0] : 'FLEXI_VOTE_VERY_POOR');
+						break;
+
+					case $star_percent <= 40:
+						$star_tooltips[$i] = JText::_(isset($rating_texts[1]) ? $rating_texts[1] : 'FLEXI_VOTE_POOR');
+						break;
+
+					case $star_percent <= 60:
+						$star_tooltips[$i] = JText::_(isset($rating_texts[2]) ? $rating_texts[2] : 'FLEXI_VOTE_FAIR');
+						break;
+
+					case $star_percent <= 80:
+						$star_tooltips[$i] = JText::_(isset($rating_texts[3]) ? $rating_texts[3] : 'FLEXI_VOTE_GOOD');
+						break;
+
+					default:
+						$star_tooltips[$i] = JText::_(isset($rating_texts[4]) ? $rating_texts[4] : 'FLEXI_VOTE_EXCELLENT');
+						break;
+				}
+				$star_tooltips[$i] .= ' ' . $i . '/' . $rating_resolution;
 			}
 
 			$document->addStyleDeclaration($css);
@@ -3690,40 +3814,58 @@ class flexicontent_html
 		}
 
 		$percent = 0;
-		$factor = (int) round(100/$rating_resolution);
-		if ($rating_count != 0) {
-			$percent = number_format((intval($rating_sum) / intval( $rating_count ))*$factor,2);
-		} elseif ($show_unrated == 0) {
+		$factor = (int) round(100 / $rating_resolution);
+
+		if ((int) $rating_count !== 0)
+		{
+			$percent = number_format(((int) $rating_sum / (int) $rating_count) * $factor, 2);
+		}
+		elseif ($show_unrated === 0)
+		{
 			$counter = -1;
 		}
 
-		if ( $int_xid ) {
-			// Disable showing vote counter in extra votes
-			if ( $counter == 2 ) $counter = 0;
-		} else {
-			// Disable showing vote counter in main vote
-			if ( $counter == 3 ) $counter = 0;
+		// Disable showing vote counter in extra votes
+		if ($int_xid)
+		{
+			$counter !== 2 ?: $counter = 0;
 		}
-		$nocursor = !$allow_vote ? 'cursor:unset!important;' : '';
+
+		// Disable showing vote counter in main vote
+		else
+		{
+			$counter !== 3 ?: $counter = 0;
+		}
+
+		$nocursor = !$allow_vote
+			? 'cursor: unset !important;'
+			: '';
 
 		$html_vote_links = '';
+
 		if ($allow_vote)
 		{
 			// HAS Voting ACCESS
-			if ( $has_acclvl ) {
+			if ($has_acclvl)
+			{
 				$href = 'javascript:;';
 				$onclick = '';
 			}
+
 			// NO Voting ACCESS
-			else {
+			else
+			{
 				// WITHOUT Redirection
-				if ( !$no_acc_url ) {
+				if (!$no_acc_url)
+				{
 					$href = 'javascript:;';
 					$popup_msg = addcslashes($no_acc_msg, "'");
 					$onclick = 'alert(\''.$popup_msg.'\');';
 				}
+
 				// WITH Redirection
-				else {
+				else
+				{
 					$href = $no_acc_url;
 					$popup_msg = addcslashes($no_acc_msg . ' ... ' . $no_acc_msg_redirect, "'");
 
@@ -3733,8 +3875,10 @@ class flexicontent_html
 				}
 			}
 
-			$dovote_class = $has_acclvl ? 'fc_dovote' : '';
-			for ($i=1; $i<=$rating_resolution; $i++) {
+			$dovote_class = ' hasTooltip ' . ($has_acclvl ? 'fc_dovote' : '');
+
+			for ($i = 1; $i <= $rating_resolution; $i++)
+			{
 				$html_vote_links .= '
 					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" data-rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
 			}

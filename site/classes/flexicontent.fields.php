@@ -428,28 +428,38 @@ class FlexicontentFields
 		{
 
 			// Special case: create MAINTEXT field (description field), by calling the display function of the textarea field (will also check for tabs)
-			if ($field->field_type == 'maintext')
+			switch ($field->field_type)
 			{
-				if ( isset($item->item_translations) )
-				{
-					$shortcode = substr($item->language ,0,2);
-					foreach ($item->item_translations as $lang_id => $t)
+				case 'maintext':
+					if (isset($item->item_translations))
 					{
-						if ($shortcode == $t->shortcode) continue;
-						$field->name = array('jfdata',$t->shortcode,'text');
-						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
-						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
-						$t->fields->text->tab_labels = $field->tab_labels;
-						$t->fields->text->html = $field->html;
-						unset( $field->tab_labels );
-						unset( $field->html );
+						$shortcode = substr($item->language ,0,2);
+
+						foreach ($item->item_translations as $lang_id => $t)
+						{
+							if ($shortcode == $t->shortcode) continue;
+							$field->name = array('jfdata',$t->shortcode,'text');
+							$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
+							FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+							$t->fields->text->tab_labels = $field->tab_labels;
+							$t->fields->text->html = $field->html;
+							unset( $field->tab_labels );
+							unset( $field->html );
+						}
 					}
-				}
-				$field->name = 'text';
-				// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish/Falang data
-				$field->value[0] = $item->text; // do not decode special characters this was handled during saving !
-				// Render the field's (form) HTML
-				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+
+					// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish/Falang data
+					$field->name = 'text';
+					$field->value[0] = $item->text; // do not decode special characters this was handled during saving !
+
+					// Render the field's (form) HTML
+					FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
+					break;
+
+				default:
+					// Render the field's (form) HTML (if implemented)
+					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayField', array(&$field, &$item) );
+					break;
 			}
 
 			return;
@@ -1663,7 +1673,11 @@ class FlexicontentFields
 	{
 		$db = JFactory::getDbo();
 		$cids = array();
-		foreach ($items as $item) { array_push($cids, $item->id); }		
+
+		foreach ($items as $item)
+		{
+			array_push($cids, $item->id);
+		}
 
 		$query 	= 'SELECT * FROM #__content_rating'
 				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
@@ -1678,15 +1692,14 @@ class FlexicontentFields
 		$extra_votes= $db->loadObjectList();
 		
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
-		foreach ($extra_votes as $extra_vote ) {
+		foreach ($extra_votes as $extra_vote)
+		{
 			$votes[$extra_vote->content_id]->extra[$extra_vote->extra_id] = $extra_vote;
 		}
 		
 		return $votes;
 	}
-	
-	
-	
+
 	
 	
 	// ***********************************************************
