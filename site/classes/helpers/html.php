@@ -1237,6 +1237,21 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery(1, 1, 1, 1, $params);
 				break;
 
+			case 'bootstrap-toggle':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+
+				$framework_path = JUri::root(true).$lib_path.'/bootstrap-toggle';
+				$document->addScript($framework_path.'/js/bootstrap2-toggle.min.js');
+				$document->addStyleSheet($framework_path.'/css/bootstrap2-toggle.min.css');
+
+				$js .= "
+					jQuery(document).ready(function(){
+						jQuery('input.fc_checkboxtoggle').bootstrapToggle();
+					});
+				";
+				
+				break;
+
 			case 'touch-punch':
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
