@@ -418,8 +418,9 @@ div table.adminform td {
 }
 .fav-block .fcfav-toggle-btn {
 	padding: 4px 4px 2px 4px;
-	vertical-align: top;
+	vertical-align: middle;
 	cursor: pointer;
+	display: inline-block;
 }
 .fav-block .fcfav-reponse-tip {
 	display: inline-block;
@@ -440,13 +441,14 @@ div table.adminform td {
 	height: unset;
 	padding: 0;
 	line-height: 1em;
+	vertical-align: middle;
 }
 .fav-block .fcfav_icon_delete:before {
 	color: black;
 	font-size: 14px;
 }
 .fav-block .fcfav_icon_on:before {
-	color: darkgoldenrod;
+	color: #e0e0e0;
 }
 .fav-block .fcfav_icon_off:before {
 	color: darkgray;

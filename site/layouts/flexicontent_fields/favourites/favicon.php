@@ -12,7 +12,7 @@ static $js_and_css_added = false;
 if (!$js_and_css_added)
 {
 	$document = JFactory::getDocument();
-	$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+	$cparams  = JComponentHelper::getParams('com_flexicontent');
 	$use_font = $cparams->get('use_font_icons', 1);
 
 	$icon_del_fav = !$use_font
@@ -20,10 +20,10 @@ if (!$js_and_css_added)
 		: '<span class="icon-remove fcfav_icon_delete"></span>';
 	$icon_is_fav = !$use_font
 		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_('FLEXI_REMOVE_FAVOURITE'), NULL)
-		: '<span class="icon-heart fcfav_icon_on"></span>';
+		: '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" checked="checked" />';
 	$icon_not_fav = !$use_font
 		? JHtml::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_('FLEXI_FAVOURE'), NULL)
-		: '<span class="icon-heart fcfav_icon_off"></span>';
+		: '<input data-on="&lt;i class=\'icon-heart fcfav_icon_on\'&gt;&lt;/i&gt;" data-off="&lt;i class=\'icon-heart fcfav_icon_off\'&gt;&lt;/i&gt;" data-toggle="toggle" type="checkbox" value="1" />';
 
 	$_attribs = 'class="btn '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
 	$icon_disabled_fav = !$use_font
@@ -50,6 +50,7 @@ if (!$js_and_css_added)
 	flexicontent_html::loadFramework('jQuery');
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	flexicontent_html::loadFramework('flexi-lib');
+	flexicontent_html::loadFramework('bootstrap-toggle');
 
 	$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VHASH);
 
@@ -93,9 +94,9 @@ else
 
 	echo '
 		<span class="' . $icon_class . '">
-			<span onclick="' . $onclick . '" class="favlink_' . $type . '_' . $item->id . ' btn ' . $btn_class .'" title="' . $btn_title . '">
+			<label onclick="' . $onclick . '" class="favlink_' . $type . '_' . $item->id . ' ' . $btn_class .'" title="' . $btn_title . '">
 				' . $btn_text . '
-			</span>
+			</label>
 			<span class="fav_item_id" style="display:none;">'.$item->id.'</span>
 			<span class="fav_item_title" style="display:none;">'.$item->title.'</span>
 			<span class="fav_item_url" style="display:none;">'.$item_url.'</span>
