@@ -957,6 +957,12 @@ class FlexicontentFields
 		{
 			$jinput->set('view', 'article');
 		  $context = 'com_content.article';
+
+			// Needed by legacy non-updated plugins
+			if (!FLEXI_J40GE)
+			{
+				JRequest::setVar('view', 'article');
+			}
 		}
 
 		// ALL OTHER CASES: (FLEXIcontent category, FLEXIcontent module, etc),
@@ -965,9 +971,25 @@ class FlexicontentFields
 		{
 			$jinput->set('view', 'category');
 		  $context = 'com_content.category';
+
+			// Needed by legacy non-updated plugins
+			if (!FLEXI_J40GE)
+			{
+				JRequest::setVar('view', 'category');
+			}
 		}
-		
-		
+
+		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
+		$jinput->set('option', 'com_content');
+		$jinput->set('isflexicontent', 'yes');
+
+		// Needed by legacy non-updated plugins
+		if (!FLEXI_J40GE)
+		{
+			JRequest::setVar('option', 'com_content');
+		}
+
+
 		if ($debug) echo "<br><br>Executing plugins for <b>".$field->name."</b>:<br>";
 		
 		if ( !@$_fields_plgs[$field->name] )
@@ -1064,9 +1086,6 @@ class FlexicontentFields
 		$record->fieldid = $field->id;
 		$record->type_id = $item->type_id;
 
-		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
-		$jinput->set('option', 'com_content');
-		$jinput->set('isflexicontent', 'yes');
 
 		/**
 		 * Trigger content plugins on field's HTML display, as if they were a "joomla article"
@@ -1084,6 +1103,13 @@ class FlexicontentFields
 		// Restore 'view' and 'option' request variables
 		$jinput->set('view', $_view);
 		$jinput->set('option', $_option);
+
+		// Needed by legacy non-updated plugins
+		if (!FLEXI_J40GE)
+		{
+			JRequest::setVar('view', $_view);
+			JRequest::setVar('option', $_option);
+		}
 
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins( $suppress_arr,'restore' );

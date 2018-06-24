@@ -341,6 +341,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$jinput->set('option', 'com_content');
 		$jinput->set('isflexicontent', 'yes');
 
+		// Needed by legacy non-updated plugins
+		if (!FLEXI_J40GE)
+		{
+			JRequest::setVar('view', 'article');
+			JRequest::setVar('option', 'com_content');
+		}
+
 		$limitstart = $jinput->get('limitstart', 0, 'int');
 
 		// These events return text that could be displayed at appropriate positions by our templates
@@ -356,8 +363,15 @@ class FlexicontentViewItem extends JViewLegacy
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
-		$jinput->set('view', FLEXI_ITEMVIEW);
+		$jinput->set('view', 'item');
 		$jinput->set('option', 'com_flexicontent');
+
+		// Needed by legacy non-updated plugins
+		if (!FLEXI_J40GE)
+		{
+			JRequest::setVar('view', 'item');
+			JRequest::setVar('option', 'com_flexicontent');
+		}
 
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );
