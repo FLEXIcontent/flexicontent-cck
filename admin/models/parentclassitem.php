@@ -3824,7 +3824,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getTypeparams($forced_typeid = 0)
 	{
-		$typeid = $forced_typeid ?: ($this->_id ? 0 : $this->_typeid);
+		$typeid = $forced_typeid ?: $this->_typeid;
 
 		return flexicontent_db::getTypeAttribs(false, $typeid, 0);
 	}
