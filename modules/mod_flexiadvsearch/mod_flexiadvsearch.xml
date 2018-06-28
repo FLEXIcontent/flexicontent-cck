@@ -35,7 +35,7 @@
 				description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexiadvsearch/tmpl" ext_name="mod_flexiadvsearch"
 				hide_default="1" hide_none="1" stripext="1" filter="\.php$" exclude="^_"
 				tmpl_container="mod_tmpl_layout" params_source="file"
-				/> <!-- params_source="file" -->
+				/> <!-- params_source="inline" -->
 
 			<field name="" type="separator" default="FLEXI_MOD_MENU_ITEM" level="level1" />
 			<field name="itemid_force" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
