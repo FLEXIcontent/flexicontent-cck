@@ -3049,6 +3049,11 @@ body .form-horizontal .control-group {
 .fcspacer-32 {
 	margin-top: 32px !important;
 }
+.flexicontent .btn-toolbar .btn-wrapper {
+	float: right;
+	display: block;
+	margin: 0 0 0 8px;
+}
 hr.fcclearline {
 	border: 0;
 	height: 1px;

@@ -3583,9 +3583,10 @@ class flexicontent_html
 		static $acclvl_names  = null;
 		static $star_tooltips = null;
 		static $star_classes  = null;
+
 		$user = JFactory::getUser();
 		$db   = JFactory::getDbo();
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 
 		flexicontent_html::__DEV_check_reviews_table();
 
@@ -3610,7 +3611,9 @@ class flexicontent_html
 		 * Find if user has the ACCESS level required for voting
 		 */
 
-		static $has_acclvl;
+		 // Note  will need to remove static calculation, if this gets implemented per type
+		static $has_acclvl, $acclvl;
+
 		if ($has_acclvl===null)
 		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -3654,7 +3657,7 @@ class flexicontent_html
 
 
 			// Decide no access Redirect Message
-			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
+			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg, true) : null;
 
 			// Find name of required Access Level
 			if (!$no_acc_msg)
@@ -3667,11 +3670,16 @@ class flexicontent_html
 					$acclvl_names = flexicontent_db::getAccessNames();
 				}
 
-				$acclvl_name =  !empty($acclvl_names[$acclvl]) ? $acclvl_names[$acclvl] : "Access Level: ".$acclvl." not found/was deleted";
-				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
+				$acclvl_name = !empty($acclvl_names[$acclvl])
+					? $acclvl_names[$acclvl]
+					: 'Access Level: ' . $acclvl . ' not found / was deleted';
+				$no_acc_msg = JText::sprintf('FLEXI_VOTE_NO_ACCESS_TO_VOTE', $acclvl_name);
 			}
 
-			$no_acc_msg_redirect = JText::_($no_acc_doredirect === 2 ? 'FLEXI_CONFIM_REDIRECT_TO_LOGIN_REGISTER' : 'FLEXI_CONFIM_REDIRECT');
+			$no_acc_msg_redirect = JText::_($no_acc_doredirect === 2
+				? 'FLEXI_VOTE_CONFIM_REDIRECT_TO_LOGIN_REGISTER'
+				: 'FLEXI_VOTE_CONFIM_REDIRECT'
+			);
 		}
 
 		if ($vote_counter !== 'default' &&  $vote_counter !== '')
@@ -3867,7 +3875,7 @@ class flexicontent_html
 				else
 				{
 					$href = $no_acc_url;
-					$popup_msg = addcslashes($no_acc_msg . ' ... ' . $no_acc_msg_redirect, "'");
+					$popup_msg = addcslashes($no_acc_msg . "\\n\\n" . $no_acc_msg_redirect, "'");
 
 					if ($no_acc_askredirect==2)       $onclick = 'return confirm(\''.$popup_msg.'\');';
 					else if ($no_acc_askredirect==1)  $onclick = 'alert(\''.$popup_msg.'\'); return true;';
@@ -3981,16 +3989,20 @@ class flexicontent_html
 	 */
 	static function favoured_userlist($field, $item, & $favourites, $type='item')
 	{
-		//ob_start();  include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts'.DS.'flexicontent_fields'.DS.'favourites'.DS.'userlist.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
+		$layouts_path = null;
 
-		$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+		/**
+		 * field: 'Favourites' field
+		 * item: item or category record
+		 * type: 'item' or 'category'
+		 * favourites: value (of field)
+		 */
 
 		$displayData = array(
 			'field' => $field,
 			'item' => $item,
-			//'favoured' => $favoured,
+			'type' => 'item',
 			'favourites' => $favourites,
-			'type' => 'item'
 		);
 
 		return JLayoutHelper::render('flexicontent_fields.favourites.userlist', $displayData, $layouts_path);
@@ -4005,16 +4017,20 @@ class flexicontent_html
 	 */
 	static function favicon($field, & $favoured, $item, $type='item')
 	{
-		//ob_start();  include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'layouts'.DS.'flexicontent_fields'.DS.'favourites'.DS.'favicon.php');  $html = ob_get_contents();   ob_end_clean();  return $html;
+		$layouts_path = null;
 
-		$layouts_path = null; //realpath(JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.'core');
+		/**
+		 * field: 'Favourites' field
+		 * item: item or category record
+		 * type: 'item' or 'category'
+		 * favoured: value (of field)
+		 */
 
 		$displayData = array(
 			'field' => $field,
 			'item' => $item,
+			'type' => 'item',
 			'favoured' => $favoured,
-			//'favourites' => $favourites,
-			'type' => 'item'
 		);
 
 		return JLayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path);

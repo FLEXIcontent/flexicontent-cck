@@ -136,37 +136,50 @@ jQuery(document).ready(function(){
 	{
 		var box = jQuery('#'+tagid);
 		var box_loading = jQuery('#'+tagid+'_loading');
+
 		if (box.is(":visible"))
 		{
 			box_loading.empty().removeClass('ajax-loader').css('display', 'none');
 			box.slideUp(400, function(){ box.empty(); });
 			return;
 		}
-		box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
-		
-		var currentURL = window.location;
-		var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
-		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid="+tagid +"&content_id="+content_id +"&review_type="+review_type;
 
-		jQuery.ajax({
-			url: url,
-			dataType: "json",
-			data: {
-				lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
-			},
-			success: function( data )
-			{
-				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-				if (typeof(data.html) && data.html)
+		var currentURL = window.location;
+
+		if (1)
+		{
+			var live_site = currentURL.protocol + '//' + currentURL.host + fc_base_uri;
+			var url = live_site + '/index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid + '&content_id=' + content_id + '&review_type=' + review_type;
+			url = url + '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+			fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title: 'Review this item'});
+		}
+		else
+		{
+			var live_site = currentURL.protocol + '//' + currentURL.host + fc_root_uri;
+			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
+			var url = live_site + '/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid + '&content_id=' + content_id + '&review_type=' + review_type;
+
+
+			jQuery.ajax({
+				url: url,
+				dataType: "json",
+				data: {
+					lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
+				},
+				success: function( data )
 				{
-					box.html(data.html).slideDown();
+					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+					if (typeof(data.html) && data.html)
+					{
+						box.html(data.html).slideDown();
+					}
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
+					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 				}
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
+			});
+		}
 	}
 
 
