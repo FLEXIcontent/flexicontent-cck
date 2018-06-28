@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements" icon_class="icon-info-circle">
+		<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="content_id" type="text" default="0" label="FLEXI_ITEM" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="type" type="text" default="" label="FLEXI_TYPE" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="average_rating" type="text" default="" label="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="custom_ratings" type="text" default="" label="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="user_id" type="text" default="" label="FLEXI_REVIEW_ACCOUNT" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="email" type="text" default="" label="FLEXI_REVIEW_EMAIL" description="" labelclass="fc-prop-lbl" />
+		<field name="title" type="text" label="FLEXI_REVIEW_TITLE" description="FLEXI_REVIEW_TEXT_DESC" class="input-xxlarge" filter="JComponentHelper::filterText" labelclass="fc-prop-lbl" />
+		<field name="text" type="textarea" label="FLEXI_REVIEW_TEXT" description="FLEXI_REVIEW_TEXT_DESC" class="input-xxlarge" filter="JComponentHelper::filterText" rows="4" cols="80" buttons="false" labelclass="fc-prop-lbl" />
+		<field name="state" type="list" class="use_select2_lib" default="1" label="FLEXI_REVIEW_STATE" description="FLEXI_REVIEW_STATE_DESC" labelclass="fc-prop-lbl">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+		<field name="approved" type="fcradio" default="1" label="FLEXI_REVIEW_APPROVED" description="FLEXI_REVIEW_APPROVED_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_YES</option>
+		</field>
+		<field name="submit_date" type="text" default="" label="Submit date" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+		<field name="update_date" type="text" default="" label="Submit date" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
+	</fieldset>
+
+</form>
