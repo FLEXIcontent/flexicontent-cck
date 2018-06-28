@@ -95,8 +95,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function remove()
 	{
-		$app     = JFactory::getApplication();
-
+		$app   = JFactory::getApplication();
 		$db    = JFactory::getDbo();
 		$user  = JFactory::getUser();
 
@@ -108,9 +107,13 @@ class FlexicontentController extends JControllerLegacy
 		$itemmodel = $this->getModel('item');
 		$msg = '';
 
-		if (!is_array( $cid ) || count( $cid ) < 1) {
-			JError::raiseNotice(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
-		} else {
+		if (!is_array( $cid ) || count( $cid ) < 1)
+		{
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEM_DELETE'), 'notice');
+		}
+		else
+		{
 			// Remove unauthorized (undeletable) items
 			$auth_cid = array();
 			$non_auth_cid = array();
@@ -138,21 +141,23 @@ class FlexicontentController extends JControllerLegacy
 		//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
 
 		// Set warning for undeletable items
-		if (count($non_auth_cid)) {
-			if (count($non_auth_cid) < 2) {
-				$msg_noauth = JText::_( 'FLEXI_CANNOT_DELETE_ITEM' );
-			} else {
-				$msg_noauth = JText::_( 'FLEXI_CANNOT_DELETE_ITEMS' );
-			}
-			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_DELETE_PERMISSION' ) ." - ". JText::_( 'FLEXI_IDS_SKIPPED' );
-			JError::raiseNotice(500, $msg_noauth);
+		if (count($non_auth_cid))
+		{
+			$msg_noauth = count($non_auth_cid) < 2
+				? JText::_('FLEXI_CANNOT_DELETE_ITEM')
+				: JText::_('FLEXI_CANNOT_DELETE_ITEMS');
+			$msg_noauth .= ': ' . implode(',', $non_auth_cid) . ' - ' . JText::_('FLEXI_REASON_NO_DELETE_PERMISSION') . ' - ' . JText::_('FLEXI_IDS_SKIPPED');
+
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage($msg_noauth, 'notice');
 		}
 
 		// Try to delete
 		if ( count($auth_cid) && !$model->delete($auth_cid, $itemmodel) )
 		{
 			// Item not deleted set error message, and return url to the item url
-			JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED'), 'warning');
 			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemmodel->get('id').':'.$itemmodel->get('alias'), $globalcats[$itemmodel->get('catid')]->slug));
 		}
 
@@ -1047,14 +1052,14 @@ class FlexicontentController extends JControllerLegacy
 	function approval()
 	{
 		// Initialize variables
-		$app     = JFactory::getApplication();
-
+		$app  = JFactory::getApplication();
 		$cid  = $this->input->get('cid', 0, 'int');
 
 		if ( !$cid )
 		{
 			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_APPROVAL_SELECT_ITEM_SUBMIT' ) );
+			$app->setHeader('status', '500 Internal Server Error', true);
+			$app->enqueueMessage(JText::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'warning');
 		}
 		else
 		{
@@ -1077,9 +1082,8 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function display($cachable = null, $urlparams = false)
 	{
-		// Debuging message
-		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
-		$CLIENT_CACHEABLE_PUBLIC = 1; $CLIENT_CACHEABLE_PRIVATE = 2;
+		$CLIENT_CACHEABLE_PUBLIC = 1;
+		$CLIENT_CACHEABLE_PRIVATE = 2;
 
 		$userid = JFactory::getUser()->get('id');
 		$cc     = $this->input->get('cc', null);
@@ -1230,7 +1234,6 @@ class FlexicontentController extends JControllerLegacy
 	*/
 	function edit()
 	{
-		//JError::raiseNotice(500, 'IN edit()');   // Debuging message
 		$document = JFactory::getDocument();
 
 		$this->input->set('view', 'item');
@@ -1262,7 +1265,6 @@ class FlexicontentController extends JControllerLegacy
 	*/
 	function add()
 	{
-		//JError::raiseNotice(500, 'IN ADD()');   // Debuging message
 		$document = JFactory::getDocument();
 
 		$this->input->set('view', 'item');
@@ -1504,48 +1506,84 @@ class FlexicontentController extends JControllerLegacy
 
 		if ($user->id)
 		{
-			$query = 'SELECT * '
-				. ' FROM #__flexicontent_reviews_dev AS r'
-				. ' WHERE r.content_id = ' . (int) $content_id
-				. '  AND r.type = ' . $db->Quote($review_type)
-				. '  AND r.user_id = ' . (int) $user->id
-				;
+			$query = $db->getQuery(true)
+				->select('*')
+				->from('#__flexicontent_reviews_dev AS r')
+				->where('r.content_id = ' . (int) $content_id)
+				->where('r.type = ' . $db->Quote($review_type))
+				->where('r.user_id = ' . (int) $user->id);
 			$review = $db->setQuery($query)->loadObject();
 		}
 
-		$result = (object) array('html' => '
-		<form id="fcvote_review_form_'.$content_id.'" name="fcvote_form_'.$content_id.'">
-			<input type="hidden" name="review_id"  value="'. ($review ? $review->id : '').'"/>
-			<input type="hidden" name="content_id"  value="' . $content_id . '"/>
-			<input type="hidden" name="review_type" value="' . $review_type . '"/>
-			<table class="fc-form-tbl fcinner">
-				<tr class="fcvote_review_form_title_row">
-					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_title">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
-					<td>
-						<input type="text" name="title" size="200" value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'" id="fcvote_review_form_'.$content_id.'_title" />
-					</td>
-				</tr>
-				<tr class="fcvote_review_form_email_row">
-					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_email">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
-					<td>'.( !$user->id ? '
-						<input required type="text" name="email" size="200" value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'" id="fcvote_review_form_'.$content_id.'_email"/>
-						' : '<span class=badge>'.$user->email.'</span>' ).'
-					</td>
-				</tr>
-				<tr class="fcvote_review_form_text_row">
-					<td class="key"><label class="fc-prop-lbl" for="fcvote_review_form_'.$content_id.'_text">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
-					<td class="top">
-						<textarea required name="text" rows="4" cols="200" id="fcvote_review_form_'.$content_id.'_text">'.($review ? $review->text : '').'</textarea>
-					</td>
-				</tr>
-				<tr class="fcvote_review_form_submit_btn_row">
-					<td class="key"></td>
-					<td class="top">
-						<input type="button" class="btn btn-success fcvote_review_form_submit_btn" onclick="fcvote_submit_review_form(\''.$html_tagid.'\', this.form); return false;" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/>
-					</td>
-				</tr>
-			</table>
-		</form>
+		$layouts_path = null;
+
+		/**
+		 * field: 'Voting' field
+		 * item: item or category record
+		 * type: 'item' or 'category'
+		 * review: review record
+		 * html_tagid: HTML tag id of target box
+		 * user => user object (of user submiting the review)
+		 */
+
+		$review_type = 'item';
+
+		$result = (object) array(
+			'html' => '
+				<form id="fcvote_review_form_' . $item->id . '" name="fcvote_review_form_' . $item->id . '" action="javascript:;">
+
+					<input type="hidden" name="review_id"  value="'. ($review ? $review->id : '').'" form="fcvote_review_form_' . $item->id . '" />
+					<input type="hidden" name="content_id"  value="' . $item->id . '" />
+					<input type="hidden" name="review_type" value="' . $review_type . '" />
+
+					<table class="fc-form-tbl fcinner">
+
+						<tr class="fcvote_review_form_title_row">
+							<td class="key">
+								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_title">' . JText::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
+							</td>
+							<td>
+								<input type="text" name="title" size="200"
+									value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'"
+									id="fcvote_review_form_' . $item->id . '_title"
+								/>
+							</td>
+						</tr>
+
+						<tr class="fcvote_review_form_email_row">
+							<td class="key">
+								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_email">' . JText::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
+							</td>
+							<td>' . ($user->id ? '<span class=badge>' . $user->email . '</span>' : '
+								<input required type="text" name="email" size="200"
+									value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'"
+									id="fcvote_review_form_' . $item->id . '_email"
+								/>') . '
+							</td>
+						</tr>
+
+						<tr class="fcvote_review_form_text_row">
+							<td class="key">
+								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_text">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
+							</td>
+							<td class="top">
+								<textarea required name="text" rows="4" cols="200" id="fcvote_review_form_' . $item->id . '_text" >' . ($review ? $review->text : '') . '</textarea>
+							</td>
+						</tr>
+
+						<tr class="fcvote_review_form_submit_btn_row">
+							<td class="key"></td>
+							<td class="top">
+								<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
+									onclick="fcvote_submit_review_form(\'' . $html_tagid . '\', this.form); return false;"
+									value="' . JText::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
+								/>
+							</td>
+						</tr>
+
+					</table>
+
+				</form>
 		');
 
 		jexit(json_encode($result));
@@ -1633,13 +1671,11 @@ class FlexicontentController extends JControllerLegacy
 			}
 
 			// Try to find existing review and delete
-			if ($review->load($review_props))
+			if (!$review->load($review_props))
 			{
-				$query = 'DELETE FROM #__flexicontent_reviews WHERE id = ' . $review->id;
-				$field = $db->setQuery($query)->execute();
+				$review->reset();
 			}
 
-			$review->id = $review_id;
 			$review->content_id = $content_id;
 			$review->type  = $review_type;
 			$review->title = $title;
