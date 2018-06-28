@@ -23,19 +23,37 @@ if ( empty($filter_form_body) ) return;
 <div class="fcfilter_form_outer fcfilter_form_component">
 
 <?php
+$jcookie = JFactory::getApplication()->input->cookie;
+$cookie_name = 'fc_active_TabSlidePage';
+
 // FORM in slider
 $ff_placement = $this->params->get('ff_placement', 0);
 
 if ($ff_placement)
 {
 	$model = $this->getModel();
-	$ff_slider_id = 
-		($model->_id     ? '_'.$model->_id : '').
-		($model->_layout ? '_'.$model->_layout : '')
+	$ff_slider_id =
+		($model->_id     ? '_cat_' . $model->_id : '').
+		($model->_layout ? '_cat_' . $model->_layout : '')
 		;
 	$ff_toggle_search_title = JText::_($this->params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
-	echo JHtml::_('sliders.start', 'fcfilter_form_slider'.$ff_slider_id, array('useCookie'=>1, 'show'=>-1, 'display'=>-1, 'startOffset'=>-1, 'startTransition'=>1));
-	echo JHtml::_('sliders.panel', $ff_toggle_search_title, 'fcfilter_form_togglebtn'.$ff_slider_id);
+	$ff_slider_tagid = 'fcfilter_form_slider'.$ff_slider_id;
+
+	$active_slides = $jcookie->get($cookie_name, '{}', 'string');
+
+	try
+	{
+		$active_slides = json_decode($active_slides);
+	}
+	catch (Exception $e)
+	{
+		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
+	}
+
+	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
+
+	echo JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide));
+	echo JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $ff_toggle_search_title, $ff_slider_tagid . '_filters_slide');
 }
 ?>
 
@@ -62,7 +80,50 @@ if ($ff_placement)
 
 <?php
 // FORM in slider
-if ($ff_placement) echo JHtml::_('sliders.end');
+if ($ff_placement)
+{
+	echo JHtml::_('bootstrap.endSlide');
+	echo JHtml::_('bootstrap.endAccordion');
+	
+	JFactory::getDocument()->addScriptDeclaration("
+	(function($) {
+		$(document).ready(function ()
+		{
+			$('#" . $ff_slider_tagid ."').on('shown', function ()
+			{
+				var active_slides = fclib_getCookie('" . $cookie_name ."');
+				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
+
+				active_slides['" . $ff_slider_tagid ."'] = $('#" . $ff_slider_tagid ." .in').attr('id');
+				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
+				window.console.log(JSON.stringify(active_slides));
+			});
+
+			$('#" . $ff_slider_tagid ."').on('hidden', function ()
+			{
+				var active_slides = fclib_getCookie('" . $cookie_name ."');
+				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
+
+				active_slides['" . $ff_slider_tagid ."'] = null;
+				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
+				window.console.log(JSON.stringify(active_slides));
+			});
+
+			var active_slides = fclib_getCookie('" . $cookie_name ."');
+			try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
+
+			if (!!active_slides['" . $ff_slider_tagid ."'])
+			{
+				// Hide default active slide
+				$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
+
+				// Show the last active slide
+				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
+			}
+		});
+	})(jQuery);
+	");
+}
 
 $listall_selector = flexicontent_html::listall_selector($this->params, $formname='adminForm', $autosubmit=1);
 
