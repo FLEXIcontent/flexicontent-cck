@@ -44,7 +44,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $records_dbtbl = null;
+	var $records_dbtbl = 'flexicontent_reviews_dev';
 
 	/**
 	 * Record jtable name

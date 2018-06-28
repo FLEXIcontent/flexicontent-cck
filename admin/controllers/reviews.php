@@ -20,11 +20,14 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
-// Register autoloader for parent controller, in case controller is executed by another component
-JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+/**
+ * Register autoloader for parent controller, in case controller is executed by another component
+ * We use JPATH_BASE since parent controller exists in frontend too
+ */
+JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
 // Manually import in case used by frontend, then model will not be autoloaded correctly via getModel('name')
-require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'field.php';
+require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'review.php';
 
 /**
  * FLEXIcontent Component Reviews Controller
@@ -155,7 +158,10 @@ class FlexicontentControllerReviews extends FlexicontentController
 				$app->setUserState('com_flexicontent.edit.' . $this->record_name . '.data', $data);      // Save the jform data in the session
 
 				// For errors, we redirect back to refer
-				$this->setRedirect($_SERVER['HTTP_REFERER']);
+				if ($this->input->getCmd('tmpl') !== 'component')
+				{
+					$this->setRedirect($_SERVER['HTTP_REFERER']);
+				}
 
 				if ($this->input->get('fc_doajax_submit'))
 				{
@@ -185,14 +191,20 @@ class FlexicontentControllerReviews extends FlexicontentController
 		}
 
 		// Calculate access
-		$is_authorised = $model->canEdit($record);
+		$is_authorised = $record && $record->id
+			? FlexicontentHelperPerm::getPerm()->CanCreateReviews && $model->canEdit($record)
+			: FlexicontentHelperPerm::getPerm()->CanCreateReviews;
 
 		// Check access
 		if (!$is_authorised)
 		{
 			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
-			$this->setRedirect($this->returnURL);
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
 
 			if ($this->input->get('fc_doajax_submit'))
 			{
@@ -204,6 +216,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 			}
 		}
 
+
 		// ***
 		// *** Basic Form data validation
 		// ***
@@ -214,6 +227,11 @@ class FlexicontentControllerReviews extends FlexicontentController
 
 		// Validate Form data (record properties and parameters specified in XML file)
 		$validated_data = $model->validate($form, $data);
+
+		if (!$this->canManage)
+		{
+			$validated_data = $this->reviewerValidation($validated_data, $form);
+		}
 
 		// Check for validation error
 		if (!$validated_data)
@@ -230,7 +248,10 @@ class FlexicontentControllerReviews extends FlexicontentController
 			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
 
 			// For errors, we redirect back to refer
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($_SERVER['HTTP_REFERER']);
+			}
 
 			if ($this->input->get('fc_doajax_submit'))
 			{
@@ -252,7 +273,10 @@ class FlexicontentControllerReviews extends FlexicontentController
 			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
 
 			// For errors, we redirect back to refer
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($_SERVER['HTTP_REFERER']);
+			}
 
 			if ($this->input->get('fc_doajax_submit'))
 			{
@@ -273,7 +297,10 @@ class FlexicontentControllerReviews extends FlexicontentController
 			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
 
 			// For errors, we redirect back to refer
-			$this->setRedirect($_SERVER['HTTP_REFERER']);
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($_SERVER['HTTP_REFERER']);
+			}
 
 			if ($this->input->get('fc_doajax_submit'))
 			{
@@ -314,6 +341,142 @@ class FlexicontentControllerReviews extends FlexicontentController
 		if ($this->input->get('fc_doajax_submit'))
 		{
 			jexit(flexicontent_html::get_system_messages_html());
+		}
+	}
+
+
+
+	public function reviewerValidation($data, $form)
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__)
+		{
+			die(__FUNCTION__ . ' : direct call not allowed');
+		}
+
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
+
+		$review_id   = $data['id'];
+		$content_id  = $data['content_id'];
+		$review_type = $data['type'];
+
+		$errors = array();
+
+		// Validate title, decode entities, and strip HTML
+		$title = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
+
+		// Validate email
+		$email = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
+
+		// Validate text, decode entities and strip HTML
+		$text = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);
+
+
+		/**
+		 * Check for validation failures on posted data
+		 */
+
+		if (!$content_id)
+		{
+			$form->setError('content_id is zero');
+			return false;
+		}
+
+		if (!$email)
+		{
+			$form->setError('Email is invalid or empty');
+			return false;
+		}
+
+		if (!$user->id)
+		{
+			$query = 'SELECT id FROM #__users WHERE email = ' . $db->Quote($email);
+			$reviewer = $db->setQuery($query)->loadObject();
+
+			if ($reviewer)
+			{
+				$form->setError('Please login');
+				return false;
+			}
+		}
+
+		if (!$text)
+		{
+			$form->setError('Text is invalid or empty');
+			return false;
+		}
+
+		if ($review_type !== 'item')
+		{
+			$form->setError('review_type <> item is not yet supported');
+			return false;
+		}
+
+		// Send response to client
+		return $data;
+	}
+
+
+
+	/**
+	 * Method to do prechecks for loading / saving review forms
+	 *
+	 * @param   object    $item       by reference variable to return the reviewed item
+	 * @param   object    $field      by reference variable to return the voting (reviews) field
+	 * @param   array     $errors     The array of error messages that have occured
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	private function _preReviewingChecks($content_id, & $item = null, & $field = null, $errors = null)
+	{
+		if ($this->input->get('task', '', 'cmd') == __FUNCTION__)
+		{
+			die(__FUNCTION__ . ' : direct call not allowed');
+		}
+
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
+
+
+		/**
+		 * Load content item related to the review
+		 */
+
+		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+
+		if ($content_id && !$item->load($content_id))
+		{
+			$errors[] = 'ID: ' . $pk . ': ' . $item->getError();
+			return;
+		}
+
+
+		/**
+		 * Do voting / reviewing permissions check
+		 */
+
+		// Get voting field
+		$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
+		$field = $db->setQuery($query)->loadObject();
+
+		// Load field's configuration together with type-specific field customization
+		FlexicontentFields::loadFieldConfig($field, $item);
+
+		// Load field's language files
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+
+		// Get needed parameters
+		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
+
+		// Check reviews are allowed
+		if (!$allow_reviews)
+		{
+			$errors[] = 'Reviews are disabled';
 		}
 	}
 
@@ -579,20 +742,65 @@ class FlexicontentControllerReviews extends FlexicontentController
 
 		// Get/Create the model
 		$model  = $this->getModel($this->record_name);
-		$record = $model->getItem();
+
+		$content_id  = $this->input->get('content_id', 0, 'int');
+		$review_type = $this->input->get('review_type', 'item', 'cmd');
+
+		// Sanity checks before reviewing, content item exists, and reviewing are enabled
+		$item = null;
+		$field = null;
+		$errors = null;
+
+		$this->_preReviewingChecks($content_id, $item, $field, $errors);
+			
+		if ($errors)
+		{
+			$app->setHeader('status', '400 Bad Request', true);
+			$app->enqueueMessage(reset($errors), 'warning');
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
+
+			return;
+		}
+
+		// Try to load review by attributes in HTTP Request
+		if ($content_id && $review_type)
+		{
+			$record = $model->getRecord(array(
+				'content_id' => $content_id,
+				'type' => $review_type,
+				'user_id' => $user->id,
+			));
+		}
+
+		// Try to load by unique ID or NAME
+		else
+		{	
+			$record = $model->getItem();
+		}
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
 		$view->document = $document;
 
 		// Calculate access
-		$is_authorised = $model->canEdit($record);
+		$is_authorised = $record && $record->id
+			? FlexicontentHelperPerm::getPerm()->CanCreateReviews && $model->canEdit($record)
+			: FlexicontentHelperPerm::getPerm()->CanCreateReviews;
 
 		// Check access
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
 
 			return;
 		}
@@ -601,7 +809,12 @@ class FlexicontentControllerReviews extends FlexicontentController
 		if ($model->isCheckedOut($user->get('id')))
 		{
 			$app->setHeader('status', '400 Bad Request', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
+			$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
 
 			return;
 		}
@@ -610,7 +823,12 @@ class FlexicontentControllerReviews extends FlexicontentController
 		if (!$model->checkout())
 		{
 			$app->setHeader('status', '400 Bad Request', true);
-			$this->setRedirect($this->returnURL, JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+			if ($this->input->getCmd('tmpl') !== 'component')
+			{
+				$this->setRedirect($this->returnURL);
+			}
 
 			return;
 		}
@@ -625,7 +843,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 	 *
 	 * return: string
 	 *
-	 * @since 1.5
+	 * @since 3.2.0
 	 */
 	private function _clearCache()
 	{
@@ -682,4 +900,5 @@ class FlexicontentControllerReviews extends FlexicontentController
 
 		return $item_model;
 	}
+
 }

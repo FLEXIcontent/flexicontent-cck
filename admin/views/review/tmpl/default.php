@@ -25,6 +25,12 @@ $form = $this->form;
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<?php
+	if (!JFactory::getApplication()->isAdmin() || JFactory::getApplication()->input->getCmd('tmpl') === 'component')
+	{
+		echo JToolBar::getInstance('toolbar')->render();
+		echo '<div class="fcclear"></div><br><br>';
+	}
+
 	$fieldSets = $this->form->getFieldsets();
 	foreach ($fieldSets as $name => $fieldSet) :
 

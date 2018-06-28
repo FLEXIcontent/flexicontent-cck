@@ -51,6 +51,26 @@ class FlexicontentViewReview extends JViewLegacy
 		$manager_view = $ctrl = 'reviews';
 		$js = '';
 
+		$isAdmin = $app->isAdmin();
+		$componentTmpl = $app->input->getCmd('tmpl') === 'component';
+
+
+		if (!$isAdmin)
+		{
+			// Note : we use some strings from administrator part, so we will also load administrator language file
+			// TODO: remove this need by moving common language string to different file ?
+
+			// Load english language file for 'com_content' component then override with current language file
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+
+			// Load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
+			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
+			$this->setLayout('form');
+		}
 
 
 		// ***
@@ -84,13 +104,22 @@ class FlexicontentViewReview extends JViewLegacy
 		// ***
 		
 		// Add css to document
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
-			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
-		
+		if ($isAdmin)
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', FLEXI_VHASH);
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
+		}
+		else
+		{
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH)
+				: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', FLEXI_VHASH);
+		}
+
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('flexi-lib-form');
@@ -106,6 +135,12 @@ class FlexicontentViewReview extends JViewLegacy
 		// *** Create the toolbar
 		// ***
 		$toolbar = JToolbar::getInstance('toolbar');
+		
+		// Include JToolbarHelper
+		if (!$isAdmin)
+		{
+			require_once JPATH_ADMINISTRATOR . '/includes/toolbar.php';
+		}
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
@@ -125,28 +160,28 @@ class FlexicontentViewReview extends JViewLegacy
 		$btn_arr = array();
 
 		// Add ajax apply only for existing records
-		if ( !$isnew )
-		{
-			$btn_name = 'apply_ajax';
-			$btn_task = $ctrl.'.apply_ajax';
-
-			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
-				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
-				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
-		}
-
-		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
-		$btn_name = 'apply';
-		$btn_task = $ctrl.'.apply';
-		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
-
-		//JToolbarHelper::apply($btn_task, $btn_title, false);
+		$btn_name = 'apply_ajax';
+		$btn_task = $ctrl.'.apply_ajax';
 
 		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
-			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
-			'data-placement="right" title=""', $auto_add = 0);
+			'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
+			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+			'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
+
+		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
+		if ($isAdmin && !$componentTmpl)
+		{
+			$btn_name = 'apply';
+			$btn_task = $ctrl.'.apply';
+			$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
+
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
+
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				'data-placement="right" title=""', $auto_add = 0);
+		}
 
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'apply_btns_group');
 
@@ -157,19 +192,22 @@ class FlexicontentViewReview extends JViewLegacy
 		// ***
 		$btn_arr = array();
 
-		$btn_name = 'save';
-		$btn_task = $ctrl.'.save';
+		if ($isAdmin && !$componentTmpl)
+		{
+			$btn_name = 'save';
+			$btn_task = $ctrl.'.save';
 
-		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
-		
-		$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
-			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
-			'data-placement="bottom" title=""', $auto_add = 0);
+			//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+			
+			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
+				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-save",
+				'data-placement="bottom" title=""', $auto_add = 0);
+		}
 
 
 		// Add a save and new button, if user can create new records
-		if ($cancreate)
+		if ($isAdmin && !$componentTmpl && $cancreate)
 		{
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
@@ -195,13 +233,17 @@ class FlexicontentViewReview extends JViewLegacy
 					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 			}
 		}
+
 		flexicontent_html::addToolBarDropMenu($btn_arr, 'save_btns_group');
 
 
 		// Cancel button
-		$isnew
-			? JToolbarHelper::cancel($ctrl.'.cancel')
-			: JToolbarHelper::cancel($ctrl.'.cancel', 'JTOOLBAR_CLOSE');
+		if ($isAdmin && !$componentTmpl)
+		{
+			$isnew
+				? JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CANCEL')
+				: JToolbarHelper::cancel($ctrl.'.cancel', 'FLEXI_CLOSE_FORM');
+		}
 
 
 		// Preview button
@@ -219,7 +261,6 @@ class FlexicontentViewReview extends JViewLegacy
 				</button>', 'preview'
 			);
 		}
-
 
 
 		// ***

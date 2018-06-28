@@ -282,42 +282,78 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function _loadRecord($pk = null)
 	{
-		// Maybe we were given a name, try to use it if table has such a property
-		$name = !is_integer($pk) && !empty($pk) ? $pk : null;
-		if ($name)
+		if (is_array($pk))
 		{
-			// Check 'name' columns and then check 'alias' column exists, if none then clear $name
-			$table = $this->getTable();
-			$name_property = property_exists($table, 'name')
-				? 'name'
-				: (property_exists($table, 'alias')
-					? 'alias'
-					: null);
-			$name = $name_property ? $name : null;
+			$data = $pk;
+			$name = '';
+			$pk = 0;
+		}
+		else
+		{
+			$data = array();
+
+			// Maybe we were given a name, try to use it if table has such a property
+			$name = !is_integer($pk) && !empty($pk) ? (string) $pk : null;
+
+			if ($name)
+			{
+				// Check 'name' columns and then check 'alias' column exists, if none then clear $name
+				$table = $this->getTable();
+				$name_property = property_exists($table, 'name')
+					? 'name'
+					: (property_exists($table, 'alias')
+						? 'alias'
+						: null);
+				$name = $name_property ? $name : null;
+			}
+
+			// If PK was provided and it is also not a name, then treat it as a primary key value
+			$pk = $pk && !$name
+				? (int) $pk
+				: (int) $this->_id;
 		}
 
-		// Lets load the record if it doesn't already exist
-		if ( $this->_record===null || ($name && $this->_record->$name_property != $name) || (!$name && $this->_record->id != $pk) )
-		{
-			// If PK was provided and it is also not a name, then treat it as a primary key value
-			$pk = $pk && !$name ? (int) $pk : (int) $this->_id;
+		/**
+		 * Lets load the record if not already loaded
+		 */
 
-			$name_quoted = $name ? $this->_db->Quote($name) : null;
-			if (!$name_quoted && !$pk)
+		$data_matches = (boolean) $this->_record;
+		
+		foreach ($data as $k => $v)
+		{
+			$data_matches = $data_matches && $this->_record->$k === $v;
+		}
+
+		$execute_load = $this->_record === null
+			|| ($data && $this->_record && !$data_matches)
+			|| ($name && $this->_record && $this->_record->$name_property != $name)
+			|| ($pk && $this->_record && $this->_record->id != $pk);
+
+		if ($execute_load)
+		{
+			$this->_record = false;
+
+			if ($data || $name || $pk)
 			{
-				$this->_record = false;
-			}
-			else
-			{
-				$query = 'SELECT *'
-					. ' FROM #__' . $this->records_dbtbl
-					. ' WHERE '
-					. ( $name_quoted
-						? ' name='.$name_quoted
-						: ' id=' . (int) $pk
-					);
-				$this->_db->setQuery($query);
-				$this->_record = $this->_db->loadObject();
+				$query = $this->_db->getQuery(true)
+					->select('*')
+					->from('#__' . $this->records_dbtbl);
+
+				if ($data)
+				{
+					foreach ($data as $k => $v)
+					{
+						$query->where($this->_db->quoteName($k) . ' = ' . $this->_db->quote($v));
+					}
+				}
+				else
+				{
+					$name
+						? $query->where($this->_db->quoteName('name') . ' = ' . $this->_db->Quote($name))
+						: $query->where($this->_db->quoteName('id') . ' = ' . (int) $pk);
+				}
+
+				$this->_record = $this->_db->setQuery($query)->loadObject();
 			}
 
 			if ($this->_record)
