@@ -49,8 +49,13 @@ class FlexicontentHelperPerm
 	
 	static function getUserPerms($user_id = null)
 	{
+		$cparams   = JComponentHelper::getParams('com_flexicontent');
+
 		// Handle jcomments integration
-		$JComments_Installed = JPluginHelper::isEnabled('system', 'jcomments');
+		$JComments_Installed = JPluginHelper::isEnabled('system', 'jcomments') &&  JPluginHelper::isEnabled('content', 'jcomments');
+
+		// Handle komento integration
+		$Komento_Installed = JPluginHelper::isEnabled('system', 'komento') && JPluginHelper::isEnabled('content', 'komento');
 
 		// Find permissions for given user id
 		$user = $user_id ? JFactory::getUser($user_id) : JFactory::getUser();  // no user id given, use current user)
@@ -157,9 +162,28 @@ class FlexicontentHelperPerm
 		
 		// OTHER components permissions
 		$permission->CanPlugins   = $user->authorise('core.manage', 'com_plugins');
-		$permission->CanComments  = $user->authorise('core.manage', 'com_jcomments');
-		$permission->CanComments  =  $permission->CanComments && $JComments_Installed;
+
 		$permission->JComments_Installed = $JComments_Installed;
+		$permission->Komento_Installed   = $Komento_Installed;
+
+		switch ($cparams->get('comments'))
+		{
+			case 0:
+				$permission->CanComments = false;
+				break;
+
+			case 1:
+				$permission->CanComments = $JComments_Installed && $user->authorise('core.manage', 'com_jcomments');
+				break;
+
+			case 3:
+				$permission->CanComments = $Komento_Installed && $user->authorise('core.manage', 'com_komento');
+				break;
+
+			default:
+				$permission->CanComments = true;
+				break;
+		}
 
 		return $permission;
 	}

@@ -752,87 +752,141 @@ class FLEXIUtilities
 		
 		call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
 		call_user_func($addEntry, '<span class="fcsb-icon-flexicontent icon-home"></span>'.JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
+
 		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 		{
-			call_user_func($addEntry, '<span class="fcsb-icon-items icon-stack"></span>'.JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-			//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
-			if ($perms->CanCats) 			call_user_func($addEntry, '<span class="fcsb-icon-fc_categories icon-folder"></span>'.JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
-			if ($cparams->get('comments')==1 && $perms->CanComments)
-			{
-				call_user_func($addEntry,
-					'<a href="index.php?option=com_jcomments&task=view&fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('JComments').
-					'</a>', '', false);
-			}
-			elseif ($cparams->get('comments')==1 && !$perms->JComments_Installed)
+			true
+				? call_user_func($addEntry, '<span class="fcsb-icon-items icon-stack"></span>'.JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items') : null;
+			/*$perms->CanArchives
+				? call_user_func($addEntry, '<span class="fcsb-icon-archive icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive') : null;*/
+			$perms->CanCats
+				? call_user_func($addEntry, '<span class="fcsb-icon-fc_categories icon-folder"></span>'.JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories') : null;
+
+
+			/**
+			 * Comments integration to backend management
+			 */
+
+			$comments = (int) $cparams->get('comments', 0);
+
+			if ($comments === 1 && !$perms->JComments_Installed || $comments === 3 && !$perms->Kommento_Installed)
 			{
 				call_user_func($addEntry,
 					'<span class="fcsb-icon-comments icon-comments disabled"></span>'.
-						'<span class="fc_sidebar_entry disabled">'.JText::_('FLEXI_JCOMMENTS_MISSING').
+						'<span class="fc_sidebar_entry disabled">' . JText::_('FLEXI_COMMENTS') .
 					'</span>', '', false);
 			}
-			elseif ($cparams->get('comments')==3 && JFactory::getUser()->authorise('core.manage', 'com_komento'))
+			elseif ($comments === 1 && $perms->CanComments)
+			{
+				call_user_func($addEntry,
+					'<a href="index.php?option=com_jcomments&task=view&fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+						'<span class="fcsb-icon-comments icon-comments"></span>' . JText::_('FLEXI_COMMENTS') .
+					'</a>', '', false);
+			}
+			elseif ($comments === 3 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
 					'<a href="index.php?option=com_komento" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('Komento').
+						'<span class="fcsb-icon-comments icon-comments"></span>' . JText::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
-			elseif (!$cparams->get('comments') && $cparams->get('comments_admin_link'))
+			elseif ($comments === 0 && $cparams->get('comments_admin_link'))
 			{
 				call_user_func($addEntry,
 					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('FLEXI_COMMENTS').
 					'</a>', '', false);
 			}
-			
+
+
 			$reviews_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'reviews';
-			if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.1.99', '>'))
+
+			if (file_exists($reviews_path) && version_compare(FLEXI_VERSION, '3.3.99', '>'))
 			{
-				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-				$field = $db->loadObject();
-				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
+				$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="voting"';
+				$field = $db->setQuery($query)->loadObject();
+				FlexicontentFields::loadFieldConfig($field, $item);
 				$allow_reviews = (int)$field->parameters->get('allow_reviews', 0);
 
-				if ($allow_reviews && $perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews icon-comments-2"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
+				if ($allow_reviews && $perms->CanReviews)
+				{
+					call_user_func($addEntry, '<span class="fcsb-icon-reviews icon-comments-2"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
+				}
 			}
 			
-			if ($perms->CanTypes || $perms->CanFields || $perms->CanTags || $perms->CanFiles) call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
-			if ($perms->CanTypes)			call_user_func($addEntry, '<span class="fcsb-icon-types icon-tree"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
-			if ($perms->CanFields) 		call_user_func($addEntry, '<span class="fcsb-icon-fields icon-signup"></span>'.JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
-			if ($perms->CanTags) 			call_user_func($addEntry, '<span class="fcsb-icon-tags icon-tags"></span>'.JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
-			if ($perms->CanFiles) 		call_user_func($addEntry, '<span class="fcsb-icon-filemanager icon-images"></span>'.JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+			if ($perms->CanTypes || $perms->CanFields || $perms->CanTags || $perms->CanFiles)
+			{
+				call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
+			}
+
+			$perms->CanTypes
+				? call_user_func($addEntry, '<span class="fcsb-icon-types icon-tree"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types') : null;
+			$perms->CanFields
+				? call_user_func($addEntry, '<span class="fcsb-icon-fields icon-signup"></span>'.JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields') : null;
+			$perms->CanTags
+				? call_user_func($addEntry, '<span class="fcsb-icon-tags icon-tags"></span>'.JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags') : null;
+			$perms->CanFiles
+				? call_user_func($addEntry, '<span class="fcsb-icon-filemanager icon-images"></span>'.JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager') : null;
 			
-			if ($perms->CanTemplates || $perms->CanIndex || $perms->CanStats) call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
-			if ($perms->CanTemplates)	call_user_func($addEntry, '<span class="fcsb-icon-templates icon-eye"></span>'.JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
-			if ($perms->CanIndex)			call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
-			if ($perms->CanStats)			call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+			if ($perms->CanTemplates || $perms->CanIndex || $perms->CanStats)
+			{
+				call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
+			}
+
+			$perms->CanTemplates
+				? call_user_func($addEntry, '<span class="fcsb-icon-templates icon-eye"></span>'.JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates') : null;
+			$perms->CanIndex
+				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
+			$perms->CanStats
+				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
 			
-			if ($perms->CanAuthors || $perms->CanGroups /*|| $perms->CanArchives*/) call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
-			if ($perms->CanAuthors)		call_user_func($addEntry, '<span class="fcsb-icon-users icon-user"></span>'.JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
-			if ($perms->CanGroups)		call_user_func($addEntry, '<span class="fcsb-icon-groups icon-users"></span>'.JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
+			if ($perms->CanAuthors || $perms->CanGroups /*|| $perms->CanArchives*/)
+			{
+				call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
+			}
+
+			$perms->CanAuthors
+				? call_user_func($addEntry, '<span class="fcsb-icon-users icon-user"></span>'.JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users') : null;
+			$perms->CanGroups
+				? call_user_func($addEntry, '<span class="fcsb-icon-groups icon-users"></span>'.JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups') : null;
 		
-			if ($perms->CanConfig || $perms->CanImport || $perms->CanPlugins) call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
+			if ($perms->CanConfig || $perms->CanImport || $perms->CanPlugins)
+			{
+				call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
+			}
+
 			$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
+
 			if (file_exists($appsman_path))
 			{
 				if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench icon-wrench"></span>'.JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
 			}
-			if ($perms->CanImport)		call_user_func($addEntry, '<span class="fcsb-icon-import icon-upload"></span>'.JText::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
-			if ($perms->CanPlugins) call_user_func($addEntry,
+
+			$perms->CanImport
+				? call_user_func($addEntry, '<span class="fcsb-icon-import icon-upload"></span>'.JText::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import') : null;
+
+			if ($perms->CanPlugins)
+			{
+				call_user_func($addEntry,
 				'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 					'<span class="fcsb-icon-plugins icon-power-cord"></span>'.JText::_( 'FLEXI_PLUGINS' ).
 				'</a>', '', false);
+			}
+
 			if ($perms->CanConfig && empty($_SERVER['HTTPS']))
+			{
 				call_user_func($addEntry,
 				'<a href="http://www.flexicontent.org/downloads/download-translation-flexicontent.html?tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
 					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
+			}
 			elseif ($perms->CanConfig)
+			{
 				call_user_func($addEntry,
 				'<a href="http://www.flexicontent.org/downloads/download-translation-flexicontent.html?tmpl=component" target="_blank">'.
 					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
+			}
 		}
 	}
 
