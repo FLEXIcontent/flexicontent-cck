@@ -3,11 +3,29 @@
 /* Items-Tabbed Theme : item template CSS file */
 
 
-/*LESS EXAMPLE variable name: 'FCI_' + parameter name */
+/* LESS EXAMPLE variable name: 'FCI_' + parameter name */
 /* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: @FCI_title_color;
+	background-color: @FCI_title_bg_color;
+	padding-top: @FCI_title_pad_top + px ;
+	padding-right: @FCI_title_pad_right + px;
+	padding-left: @FCI_title_pad_left + px;
+	padding-bottom: @FCI_title_pad_bottom + px;
+	border-radius: @FCI_title_border_radius + px;
+}
+
+/* background item */
+.fcitems {
+	background-color: @FCI_item_bg_color;
+	padding-top: @FCI_item_pad_top + px ;
+	padding-right: @FCI_item_pad_right + px;
+	padding-left: @FCI_item_pad_left + px;
+	padding-bottom: @FCI_item_pad_bottom + px;
+	border-radius: @FCI_item_border_radius + px;
+	border: @FCI_item_border_size + px @FCI_item_border_type @FCI_item_border_color;
+	color:@FCI_item_text_color;
 }
 
 /* Label styling */
@@ -17,6 +35,10 @@ body #flexicontent .desc-title.label {
 	background-color: @FCI_label_bg_color;
 	color: @FCI_label_txt_color;
 	border-radius: @FCI_label_radius*1px;
+	padding-top: @FCI_label_pad_top + px ;
+	padding-right: @FCI_label_pad_right + px;
+	padding-left: @FCI_label_pad_left + px;
+	padding-bottom: @FCI_label_pad_bottom + px;
 }
 
 /* TAB styling */
@@ -46,7 +68,27 @@ body #flexicontent ul.tabbernav > li:hover a {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCI_tab_bg_color_start, 20%) , endColorstr= darken(@FCI_tab_bg_color_end, 20%) );
 	color: @FCI_tab_title_color;
 }
+body .tabbertab, #flexicontent .tabbertab {
+	background-color: @FCI_tab_content_bg_color;
+	border-radius : @FCI_tab_content_border_radius + px;
+}
+body ul.tabbernav, #flexicontent ul.tabbernav {
+	border-bottom: @FCI_tab_content_top_size + px solid @FCI_tab_content_top_color !important;
+}
 
+
+/* infoblock styling */
+
+body .flexi.infoblock{
+	color: @FCI_column_color;
+	background-color: @FCI_column_bg_color;
+	padding-top: @FCI_column_pad_top + px ;
+	padding-right: @FCI_column_pad_right + px;
+	padding-left: @FCI_column_pad_left + px;
+	padding-bottom: @FCI_column_pad_bottom + px;
+	border-radius: @FCI_column_border_radius + px;
+	border : @FCI_column_border_size + px @FCI_column_border_type @FCI_column_border_color;
+}
 
 // ***
 // *** A row of content

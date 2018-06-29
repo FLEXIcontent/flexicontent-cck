@@ -1,12 +1,74 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: inherit;
+	background-color: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
+}
+.fcitems {
+	background-color: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	color: inherit;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: #999999;
 	color: #ffffff;
 	border-radius: 3px;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+}
+body #flexicontent .customblock.beforedescription.group {
+	background-color: inherit;
+	padding-top: inheritpx !important;
+	padding-right: inheritpx !important;
+	padding-left: inheritpx !important;
+	padding-bottom: inheritpx !important;
+	color: inherit;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	margin-top: 0px !important;
+	margin-right: 8px !important;
+	margin-left: 8px !important;
+	margin-bottom: 0px !important;
+}
+body #flexicontent .description.group {
+	background-color: inherit;
+	padding-top: inheritpx !important;
+	padding-right: inheritpx !important;
+	padding-left: inheritpx !important;
+	padding-bottom: inheritpx !important;
+	color: inherit;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	margin-top: 0px !important;
+	margin-right: 8px !important;
+	margin-left: 8px !important;
+	margin-bottom: 0px !important;
+}
+body #flexicontent .customblock.afterdescription.group {
+	background-color: inherit;
+	padding-top: inheritpx !important;
+	padding-right: inheritpx !important;
+	padding-left: inheritpx !important;
+	padding-bottom: inheritpx !important;
+	color: inherit;
+	border-radius: 0px;
+	border: 0px solid inherit;
+	margin-top: 0px !important;
+	margin-right: 8px !important;
+	margin-left: 8px !important;
+	margin-bottom: 0px !important;
 }
 .iteminfo .createdline,
 .iteminfo .modifiedline {
@@ -27,7 +89,7 @@ body #flexicontent .desc-title.label {
 }
 .itemactions,
 .iteminfo,
-.itemadditionnal,
+.itemadditional,
 .description {
 	margin: 1em 0 1em 0;
 }
@@ -45,13 +107,13 @@ body #flexicontent .desc-title.label {
 	margin-right: 32px;
 	float: left;
 }
-.itemadditionnal span {
+.itemadditional span {
 	margin: 0 0 0.3em;
 }
-.itemadditionnal .categories {
+.itemadditional .categories {
 	display: block;
 }
-.itemadditionnal .tags {
+.itemadditional .tags {
 	display: block;
 }
 .customblock {

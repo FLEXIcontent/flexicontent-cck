@@ -12,14 +12,84 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: @FCI_title_color;
+	background-color: @FCI_title_bg_color;
+	padding-top: @FCI_title_pad_top + px ;
+	padding-right: @FCI_title_pad_right + px;
+	padding-left: @FCI_title_pad_left + px;
+	padding-bottom: @FCI_title_pad_bottom + px;
+	border-radius: @FCI_title_border_radius + px;
+}
+
+/* background item */
+.fcitems {
+	background-color: @FCI_item_bg_color;
+	padding-top: @FCI_item_pad_top + px ;
+	padding-right: @FCI_item_pad_right + px;
+	padding-left: @FCI_item_pad_left + px;
+	padding-bottom: @FCI_item_pad_bottom + px;
+	border-radius: @FCI_item_border_radius + px;
+	border: @FCI_item_border_size + px @FCI_item_border_type @FCI_item_border_color;
+	color:@FCI_item_text_color;
 }
 
 /* Label styling */
+
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: @FCI_label_bg_color;
 	color: @FCI_label_txt_color;
 	border-radius: @FCI_label_radius*1px;
+	padding-top: @FCI_label_pad_top + px ;
+	padding-right: @FCI_label_pad_right + px;
+	padding-left: @FCI_label_pad_left + px;
+	padding-bottom: @FCI_label_pad_bottom + px;
+}
+
+/* beforedescription block */
+body #flexicontent .customblock.beforedescription.group {
+    background-color: @FCI_beforedesc_bg_color;
+		padding-top: @FCI_beforedesc_pad_top + px !important;
+		padding-right: @FCI_beforedesc_pad_right + px !important;
+		padding-left: @FCI_beforedesc_pad_left + px !important;
+		padding-bottom: @FCI_beforedesc_pad_bottom + px !important;
+    color: @FCI_beforedesc_txt_color;
+		border-radius: @FCI_beforedesc_border_radius + px;
+		border: @FCI_beforedesc_border_size + px @FCI_beforedesc_border_type @FCI_beforedesc_border_color;
+		margin-top: @FCI_beforedesc_margin_top + px !important;
+		margin-right: @FCI_beforedesc_margin_right + px !important;
+		margin-left: @FCI_beforedesc_margin_left + px !important;
+		margin-bottom: @FCI_beforedesc_margin_bottom + px !important;
+}
+/* description */
+body #flexicontent .description.group {
+	background-color: @FCI_desc_bg_color;
+	padding-top: @FCI_desc_pad_top + px !important;
+	padding-right: @FCI_desc_pad_right + px !important;
+	padding-left: @FCI_desc_pad_left + px !important;
+	padding-bottom: @FCI_desc_pad_bottom + px !important;
+	color: @FCI_desc_txt_color;
+	border-radius: @FCI_desc_border_radius + px;
+	border: @FCI_desc_border_size + px @FCI_desc_border_type @FCI_desc_border_color;
+	margin-top: @FCI_desc_margin_top + px !important;
+	margin-right: @FCI_desc_margin_right + px !important;
+	margin-left: @FCI_desc_margin_left + px !important;
+	margin-bottom: @FCI_desc_margin_bottom + px !important;
+}
+
+/* beforedescription block */
+body #flexicontent .customblock.afterdescription.group {
+    background-color: @FCI_afterdesc_bg_color;
+		padding-top: @FCI_afterdesc_pad_top + px !important;
+		padding-right: @FCI_afterdesc_pad_right + px !important;
+		padding-left: @FCI_afterdesc_pad_left + px !important;
+		padding-bottom: @FCI_afterdesc_pad_bottom + px !important;
+    color: @FCI_afterdesc_txt_color;
+		border-radius: @FCI_afterdesc_border_radius + px;
+		border: @FCI_afterdesc_border_size + px @FCI_afterdesc_border_type @FCI_afterdesc_border_color;
+		margin-top: @FCI_afterdesc_margin_top + px !important;
+		margin-right: @FCI_afterdesc_margin_right + px !important;
+		margin-left: @FCI_afterdesc_margin_left + px !important;
+		margin-bottom: @FCI_afterdesc_margin_bottom + px !important;
 }
 
 .iteminfo .createdline,
@@ -44,7 +114,7 @@ body #flexicontent .desc-title.label {
 
 .itemactions,
 .iteminfo,
-.itemadditionnal,
+.itemadditional,
 .description {
 	margin: 1em 0 1em 0;
 }
@@ -63,13 +133,13 @@ body #flexicontent .desc-title.label {
 	float: left;
 }
 
-.itemadditionnal span {
+.itemadditional span {
 	margin: 0 0 0.3em;
 }
-.itemadditionnal .categories {
+.itemadditional .categories {
 	display: block;
 }
-.itemadditionnal .tags {
+.itemadditional .tags {
 	display: block;
 }
 

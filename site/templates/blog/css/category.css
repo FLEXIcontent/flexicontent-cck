@@ -1,12 +1,66 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: inherit;
+	background-color: inherit;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	border-radius: 0px;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: #999999;
 	color: #ffffff;
 	border-radius: 3px;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+}
+body #flexicontent ul.leadingblock > li {
+	background-color: inherit;
+	color: inherit;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+	border-radius: 0px;
+	margin-top: 32px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 32px;
+	border: 0px solid inherit;
+}
+body #flexicontent ul.introblock > li {
+	background-color: inherit;
+	color: inherit;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+	border-radius: 0px;
+	margin-top: 32px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 32px;
+	border: 0px solid inherit;
+}
+body #flexicontent ul.leadingblock.one > li,
+body #flexicontent ul.introblock.one > li {
+	width: 100%;
+}
+body #flexicontent ul.leadingblock.two > li,
+body #flexicontent ul.introblock.two > li {
+	width: 48.6%;
+}
+body #flexicontent ul.leadingblock.three > li,
+body #flexicontent ul.introblock.three > li {
+	width: 31.6%;
+}
+body #flexicontent ul.leadingblock.four > li,
+body #flexicontent ul.introblock.four > li {
+	width: 23.4%;
 }
 #flexicontent .clear {
 	border: 0;
