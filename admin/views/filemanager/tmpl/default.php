@@ -67,6 +67,24 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 //$this->CanViewAllFiles = 0; // test
 $isFilesElement = $this->view == 'fileselement';
 
+$use_jmedia_man = !$isFilesElement || (int) $this->field->parameters->get('use_myfiles', 0) === 2;
+if ($use_jmedia_man)
+{
+	if ($this->layout === 'image')
+	{
+		$filetypes = 'folders,images';
+	}
+	elseif (!$isFilesElement)
+	{
+		$filetypes = 'folders,images,docs,videos';
+	}
+	else
+	{
+		$filetypes = $this->field->parameters->get('jmedia_filetypes', array('folders', 'images'));
+		$filetypes = implode(',', $filetypes);
+	}
+}
+
 // Calculate count of shown columns 
 $list_total_cols = $isFilesElement ? 17 : 17;  // fileselement view has 1 more column the direct delete button column, and 1 ... less column the number of assigned items
 
@@ -99,11 +117,38 @@ $_tmpl = $isFilesElement ? 'component' : '';
 
 
 $enable_multi_uploader = 1;
-$nonimg_message = $this->layout == 'image' ? '\'\'' : '-1';
+$nonimg_message = $this->layout === 'image' ? '\'\'' : '-1';
 $uploader_tag_id = 'fc_filesman_uploader';
 $up_sfx_n = $this->fieldid ?: '_';
 
-$js = "
+$js = '';
+
+if ($use_jmedia_man)
+{
+	$js .= "
+	function fman_toggle_link_type(v)
+	{
+		if (v=='2')
+		{
+			document.getElementById('file-url-data-row').style.display = 'none';
+			document.getElementById('file-url-data').disabled = true;
+			document.getElementById('file-jmedia-data-row').style.display = '';
+			document.getElementById('file-jmedia-data').disabled = false;
+		}
+		else
+		{
+			document.getElementById('file-jmedia-data-row').style.display = 'none';
+			document.getElementById('file-jmedia-data').disabled = true;
+			document.getElementById('file-url-data-row').style.display = '';
+			document.getElementById('file-url-data').disabled = false;
+		}
+
+		return true;
+	}
+	";
+}
+
+$js .= "
 // delete active filter
 function delFilter(name)
 {
@@ -233,7 +278,9 @@ foreach ($this->rows as $i => $row)
 	}
 	$js .= '  _file_data['.$i.'] = '.json_encode($data).";\n";
 }
+
 $document->addScriptDeclaration($js);
+$js = '';
 
 
 
@@ -269,9 +316,7 @@ $element_class_list = implode(' ', $element_classes);
 $step_values = '[' . implode(', ', $cfg->values) . ']';
 $step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
-$js = "
-jQuery(document).ready(function()
-{
+$js .= "
 	fc_attachSingleSlider({
 		'name': '".$cfg->slider_name."',
 		'step_values': ".$step_values.",
@@ -285,9 +330,7 @@ jQuery(document).ready(function()
 		'elem_container_class': '',
 		'elem_container_prefix': '',
 	});
-});
 ";
-$document->addScriptDeclaration($js);
 
 
 
@@ -321,9 +364,7 @@ $element_class_list = implode(' ', $element_classes);
 $step_values = '[' . implode(', ', $cfg->values) . ']';
 $step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
-$js = "
-jQuery(document).ready(function()
-{
+$js .= "
 	fc_attachSingleSlider({
 		'name': '".$cfg->slider_name."',
 		'step_values': ".$step_values.",
@@ -337,9 +378,7 @@ jQuery(document).ready(function()
 		'elem_container_class': '',
 		'elem_container_prefix': '',
 	});
-});
 ";
-$document->addScriptDeclaration($js);
 
 
 
@@ -402,9 +441,7 @@ if ($enable_multi_uploader)
 	$upConf = JHtml::_('fcuploader.getUploadConf', $this->field);
 	$uploader_html = JHtml::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
-	$js = '
-	jQuery(document).ready(function()
-	{
+	$js .= '
 		setTimeout(function(){
 			var IEversion = fc_isIE();
 			var is_IE8_IE9 = IEversion && IEversion < 10;
@@ -426,10 +463,24 @@ if ($enable_multi_uploader)
 			// Hide basic uploader form if using multi-uploader script
 			jQuery("#filemanager-1").hide();
 		}, 20);
-	});
 	';
+}
 
-	$document->addScriptDeclaration($js);
+if ($use_jmedia_man)
+{
+	$js .= '
+	document.getElementById("file-jmedia-data").disabled = true;
+	';
+}
+
+if ($js)
+{
+	$document->addScriptDeclaration('
+		jQuery(document).ready(function()
+		{
+			' . $js . '
+		});
+	');
 }
 
 
@@ -475,7 +526,7 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 	
 	<?php /* echo JHtml::_('tabs.panel', JText::_( 'FLEXI_FILEMAN_LIST' ), 'filelist' ); */ ?>
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_LIST' ); ?> </h3>
+		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_FILES_REGISTRY_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_FILES_REGISTRY' ); ?> </h3>
 		
 		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
 		
@@ -738,10 +789,14 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					$is_img = in_array($ext, $imageexts);
 					if (!$is_img)
 					{
-						if ( $this->layout == 'image' )
+						if ($this->layout === 'image')
+						{
 							continue;
+						}
 						else
+						{
 							$thumb_or_icon = JHtml::image($row->icon, $row->filename);
+						}
 					}
 					
 					if ($this->folder_mode) {
@@ -1048,9 +1103,9 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 					
 					// Check if file is NOT an known / allowed image, and skip it if LAYOUT is 'image' otherwise display a 'type' icon
 					$is_img = in_array($ext, $imageexts);
-					if (!$is_img)
+					if (!$is_img && $this->layout === 'image')
 					{
-						if ( $this->layout == 'image' )  continue;
+						continue;
 					}
 					$thumb_or_icon = $thumbs_icons_arr[$i];
 
@@ -1128,8 +1183,8 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 	<!-- File(s) by uploading -->
 	
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
-	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload fc-fileman-upload-icon">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
+	<div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="icon-new fc-icon-green">
+		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 		
 		<?php if (!$this->CanUpload && ($this->layout != 'image' || !$isFilesElement)) : /* image layout of fileselement view is not subject to upload check */ ?>
 			<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
@@ -1477,30 +1532,82 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 	<!-- File URL by Form -->
 	<?php if ($this->layout !='image' ) : /* not applicable for LAYOUT 'image' */ ?>
 
-
-
-
-	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_URL' ), 'filebyurl' );*/ ?>
-	<div class="tabbertab" id="fileurl_tab" data-icon-class="icon-link">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_URL' ); ?> </h3>
+	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_URL' ), 'filebyurl' );*/ ?>
+	<?php
+		$tab_title = $use_jmedia_man ? 'FLEXI_ADD_LINK' : 'FLEXI_ADD_URL';
+	?>
+	<div class="tabbertab" id="fileurl_tab" data-icon2-class="icon-link fc-icon-gray" data-icon-class="icon-new fc-icon-green">
+		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_($tab_title . '_DESC'); ?>"> <?php echo JText::_($tab_title); ?> </h3>
 
 		<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post">
 			<fieldset class="filemanager-tab" >
 				<fieldset class="actions" id="filemanager-3">
 					
 					<table class="fc-form-tbl fcinner" id="file-url-form-container">
-						
+
+						<?php if ($use_jmedia_man) : ?>
 						<tr>
+							<td id="file-link-type-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
+								<label class="fc-prop-lbl" for="file-url-data">
+								<?php echo JText::_( 'Link type' ); ?>
+								</label>
+							</td>
+							<td id="file-link-type-container">
+								<?php
+								//echo JHtml::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
+								$_options = array();
+								$_options['1'] = JText::_( 'FLEXI_URL_LINK' );
+								$_options['2'] = JText::_( 'FLEXI_JMEDIA_LINK' );
+								echo flexicontent_html::buildradiochecklist($_options, 'file-link-type', /*selected*/1, /*type*/1, /*attribs*/'onchange="return fman_toggle_link_type(this.value);"', /*tagid*/'file-link-type');
+								?>
+							</td>
+						</tr>
+						<?php endif; ?>
+
+						<tr id="file-url-data-row">
 							<td id="file-url-data-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
 								<label class="fc-prop-lbl" for="file-url-data">
-								<?php echo JText::_( 'FLEXI_URL_LINK' ); ?>
+								<b><?php echo JText::_( 'FLEXI_URL_LINK' ); ?></b>
 								</label>
 							</td>
 							<td id="file-url-data-container">
-								<input type="text" id="file-url-data" size="44" class="required input-xxlarge" name="file-url-data" />
+								<input type="text" id="file-url-data" size="44" class="required input-xxlarge" name="file-url-data" style="padding-top: 3px; padding-bottom: 3px;" />
 							</td>
 						</tr>
 
+						<?php if ($use_jmedia_man) : ?>
+						<tr id="file-jmedia-data-row" style="display: none;">
+							<td id="file-jmedia-data-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_URL', 'FLEXI_FILE_URL_DESC', 1, 1); ?>">
+								<label class="fc-prop-lbl" for="file-jmedia-data">
+								<b><?php echo JText::_( 'FLEXI_JMEDIA_LINK' ); ?></b>
+								</label>
+							</td>
+							<td id="file-jmedia-data-container">
+								<?php
+								$jMedia_file_displayData = array(
+									'disabled' => false,
+									'preview' => 'tooltip',
+									'readonly' => false,
+									'class' => 'required',
+									'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=' . $filetypes . '&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+									'asset' => 'com_flexicontent',
+									'authorId' => '',
+									'previewWidth' => 480,
+									'previewHeight' => 360,
+									'name' => 'file-jmedia-data',
+									'id' => 'file-jmedia-data',
+									'value' => '',
+									'folder' => '',
+								);
+								echo JLayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+								?>
+							</td>
+						</tr>
+						<?php endif; ?>
+
+						<tr>
+							<td colspan="2">&nbsp;</td>
+						</tr>
 
 						<tr>
 							<td id="file-url-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
@@ -1594,8 +1701,8 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 <?php if (!$isFilesElement) : ?>
 	
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'filefromserver' );*/ ?>
-	<div class="tabbertab" id="server_tab" data-icon-class="icon-stack">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BATCH_ADD_FILES' ); ?> </h3>
+	<div class="tabbertab" id="server_tab" data-icon2-class="icon-stack fc-icon-gray" data-icon-class="icon-new fc-icon-green">
+		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_BATCH_ADD_FILES_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_BATCH_ADD_FILES' ); ?> </h3>
 		
 		<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo JSession::getFormToken() . '=1'; ?>" class="form-validate form-horizontal" name="addFileForm" id="addFileForm" method="post">
 			<fieldset class="filemanager-tab" >
@@ -1709,8 +1816,8 @@ $tools_cookies['fc-filters-box-disp'] = $jinput->cookie->get('fc-filters-box-dis
 
 
 	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_FILEMAN_INFO' ), 'fileinfo' );*/ ?>
-	<div class="tabbertab" id="fileman_info_tab" data-icon-class="icon-info">
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_INFO' ); ?> </h3>
+	<div class="tabbertab" id="fileman_info_tab" data-icon-class="icon-info fc-icon-gray">
+		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_FILEMAN_INFO_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_FILEMAN_INFO' ); ?> </h3>
 		<div id="why_box" class="info-box">
 			<h3>Why a DB-based filemanager ?</h3>
 			<ul>

@@ -212,44 +212,58 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$data['hits'] = (int) $data['hits'];
 		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
 		$data['stamp']  = $data['stamp'] ? 1 : 0;   // only allow 1 or 0
-		$data['url']    = $data['url'] ? 1 : 0;   // only allow 1 or 0
+		$data['url']    = in_array((int) $data['url'], array(0, 1, 2)) ? (int) $data['url'] : 0;   // only allow 2 or 1 or 0
 
-		// CASE local file
-		if (!$data['url'])
+		switch ($data['url'])
 		{
-			$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH . DS : COM_FLEXICONTENT_MEDIAPATH . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-			$file_path = JPath::clean($path . $data['filename']);
+			// CASE local file
+			case 0:
+				$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH . DS : COM_FLEXICONTENT_MEDIAPATH . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+				$file_path = JPath::clean($path . $data['filename']);
 
-			// Get file size from filesystem (local file)
-			$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
-		}
+				// Get file size from filesystem (local file)
+				$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
+				break;
 
-		// CASE file URL
-		else
-		{
-			// Validate file URL
-			$url = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
-			$data['filename'] = $data['filename_original'] = $url;
+			// CASE file URL
+			case 1:
 
-			// Get file size from submitted field (file URL), set to zero if no size unit specified
-			if (!empty($data['size']))
-			{
-				$arr_sizes = array('KBs' => 1024, 'MBs' => (1024 * 1024), 'GBs' => (1024 * 1024 * 1024));
-				$size_unit = (int) @ $arr_sizes[$data['size_unit']];
-				$data['size'] = ((int) $data['size']) * $size_unit;
-			}
+				// Validate file URL
+				$url = flexicontent_html::dataFilter($data['filename_original'], 4000, 'URL', 0);  // Clean bad text/html
+				$data['filename'] = $data['filename_original'] = $url;
 
-			else
-			{
-				$data['size'] = $model->get_file_size_from_url($url);
-
-				if ($data['size'] === -999)
+				// Get file size from submitted field (file URL), set to zero if no size unit specified
+				if (!empty($data['size']))
 				{
-					$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
+					$arr_sizes = array('KBs' => 1024, 'MBs' => (1024 * 1024), 'GBs' => (1024 * 1024 * 1024));
+					$size_unit = (int) @ $arr_sizes[$data['size_unit']];
+					$data['size'] = ((int) $data['size']) * $size_unit;
 				}
 
-				$data['size'] = $data['size'] < 0 ? 0 : $data['size'];
-			}
+				else
+				{
+					$data['size'] = $model->get_file_size_from_url($url);
+
+					if ($data['size'] === -999)
+					{
+						$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
+					}
+
+					$data['size'] = $data['size'] < 0 ? 0 : $data['size'];
+				}
+				break;
+
+			// CASE JMedia file PATH
+			case 2:
+
+				// Validate file URL
+				$url = flexicontent_html::dataFilter($data['filename_original'], 4000, 'PATH', 0);  // Clean bad text/html
+				$data['filename'] = $data['filename_original'] = $url;
+				$file_path = JPath::clean(JPATH_ROOT . DS . $data['filename']);
+
+				// Get file size from filesystem (local file)
+				$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
+				break;
 		}
 
 		// Validate access level exists (set to public otherwise)
@@ -775,8 +789,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
 		$file_id = 0;
 
-		$url = $this->input->get('file-url-data', null, 'string');
-		$url = flexicontent_html::dataFilter($url, 4000, 'URL', 0);  // Validate file URL
+		// 2: File Link (JMedia) , 1: URL Link
+		$linktype = $this->input->get('file-link-type', 1, 'int');
+		$linktype = $linktype === 2 ? 2 : 1;
+
+		if ($linktype === 1)
+		{
+			$url = $this->input->get('file-url-data', null, 'string');
+			$url = flexicontent_html::dataFilter($url, 4000, 'URL', 0);  // Validate file URL
+		}
+		else
+		{
+			$url = $this->input->get('file-jmedia-data', null, 'string');
+			$url = flexicontent_html::dataFilter($url, 4000, 'PATH', 0);  // Validate JMedia file PATH
+		}
+
 		$altname  = $this->input->get('file-url-title', null, 'string');
 
 		$filedesc   = flexicontent_html::dataFilter($this->input->get('file-url-desc', '', 'string'), 32000, 'STRING', 0);  // Limit number of characters
@@ -803,14 +830,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if (empty($filesize))
 		{
-			$filesize = $model->get_file_size_from_url($url);
-
-			if ($filesize === -999)
+			if ($linktype === 1)
 			{
-				$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
-			}
+				$filesize = $model->get_file_size_from_url($url);
 
-			$filesize = $filesize < 0 ? 0 : $filesize;
+				if ($filesize === -999)
+				{
+					$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
+				}
+
+				$filesize = $filesize < 0 ? 0 : $filesize;
+			}
+			else  // $linktype === 2
+			{
+				$filesize = filesize($url);
+			}
 		}
 
 		else
@@ -829,7 +863,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		// We verifiy the url prefix and add http if any
-		if (!preg_match("#^http|^https|^ftp#i", $url))
+		if ($linktype === 1 && !preg_match("#^http|^https|^ftp#i", $url))
 		{
 			$url	= 'http://' . $url;
 		}
@@ -842,7 +876,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$obj->filename_original = $url;
 		$obj->altname     = $altname;
 
-		$obj->url         = 1;
+		$obj->url         = $linktype;
 		$obj->secure      = 1;
 		$obj->stamp       = 0;
 		$obj->ext         = $ext;
