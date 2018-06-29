@@ -1166,17 +1166,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		// The current view is a full item view of the item
 		$isMatchedItemView = $itemViewId === (int) $item->id;
 
-
-		// ***
-		// *** Static FLAGS indicating if JS libs were loaded
-		// ***
-
-		static $multiboxadded = false;
-		static $fancyboxadded = false;
-		static $gallerifficadded = false;
-		static $elastislideadded = false;
-		static $photoswipeadded  = false;
-
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir          = $field->parameters->get('dir');
@@ -1453,6 +1442,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$popuptype_mobile = (int) $popuptype_mobile;
 		}
 
+		$PPFX_ = $useMobile ? 'popuptype_mobile_' : 'popuptype_';
 		$popuptype = $useMobile
 			? $popuptype_mobile
 			: $popuptype;
@@ -1655,195 +1645,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// ***
-		// *** Load the configured (or the forced) JS gallery
-		// ***
-
-		// Do not load JS, for value only displays
-		if ( !isset(self::$value_only_displays[$prop]) )
-		{
-			// MultiBox maybe added in extra cases besides popup
-			// (a) in Item manager, (b) When linking to URL in popup target
-			$view_allows_mb  = $isItemsManager || $isHtmlViewFE;
-			$config_needs_mb = !empty($isLinkToPopup)  || ($usepopup && $popuptype == 1);
-			if ( $view_allows_mb && $config_needs_mb )
-			{
-				if (!$multiboxadded)
-				{
-					flexicontent_html::loadFramework('jmultibox');  //echo $field->name.": multiboxadded";
-					$js = "
-					jQuery(document).ready(function() {
-						jQuery('a.mb').jmultibox({
-							initialWidth: 250,  //(number) the width of the box when it first opens while loading the item. Default: 250
-							initialHeight: 250, //(number) the width of the box when it first opens while loading the item. Default: 250
-							container: document.body, //(element) the element that the box will take it coordinates from. Default: document.body
-							contentColor: '#000', //(string) the color of the content area inside the box. Default: #000
-							showNumbers: ".($isItemsManager ? 'false' : 'true').",    //(boolean) show the number of the item e.g. 2/10. Default: true
-							showControls: ".($isItemsManager ? 'false' : 'true').",   //(boolean) show the navigation controls. Default: true
-							descClassName: 'multiBoxDesc',  //(string) the classname of the divs that contain the description for the item. Default: false
-							descMinWidth: 400,     //(number) the min width of the description text, useful when the item is small. Default: 400
-							descMaxWidth: 600,     //(number) the max width of the description text, so it can wrap to multiple lines instead of being on a long single line. Useful when the item is large. Default: 600
-							movieWidth: 576,    //(number) the default width of the box that contains content of a movie type. Default: 576
-							movieHeight: 324,   //(number) the default height of the box that contains content of a movie type. Default: 324
-							offset: {x: 0, y: 0},  //(object) containing x & y coords that adjust the positioning of the box. Default: {x:0, y:0}
-							fixedTop: false,       //(number) gives the box a fixed top position relative to the container. Default: false
-							path: '',            //(string) location of the resources files, e.g. flv player, etc. Default: ''
-							openFromLink: true,  //(boolean) opens the box relative to the link location. Default: true
-							opac:0.7,            //(decimal) overlay opacity Default: 0.7
-							useOverlay:false,    //(boolean) use a semi-transparent background. Default: false
-							overlaybg:'01.png',  //(string) overlay image in 'overlays' folder. Default: '01.png'
-							onOpen:function(){},   //(object) a function to call when the box opens. Default: function(){}
-							onClose:function(){},  //(object) a function to call when the box closes. Default: function(){}
-							easing:'swing',        //(string) effect of jQuery Default: 'swing'
-							useratio:false,        //(boolean) windows size follows ratio. (iframe or Youtube) Default: false
-							ratio:'90'             //(number) window ratio Default: '90'
-						});
-					});";
-					$document->addScriptDeclaration($js);
-
-					$multiboxadded = true;
-				}
-			}
-
-			// Regardless if above has added multibox , we will add a different JS gallery if so configured because it maybe needed
-			if ( !$isHtmlViewFE )
-			{
-				// Is backend OR it is not an HTML view, do not add any JS library
-			}
-
-			else if ( $usepopup )
-			{
-				switch ($popuptype)
-				{
-				// Add Fancybox image popup
-				case 4:
-					if (!$fancyboxadded) {
-						$fancyboxadded = true;
-						flexicontent_html::loadFramework('fancybox');
-					}
-					break;
-
-				// Add Galleriffic inline slideshow gallery
-				case 5:
-					$inline_gallery = 1; // unused
-
-					if (!$gallerifficadded)
-					{
-						flexicontent_html::loadFramework('galleriffic');
-						$gallerifficadded = true;
-
-						$js = "
-						//document.write('<style>.noscript { display: none; }</style>');
-						jQuery(document).ready(function() {
-							// We only want these styles applied when javascript is enabled
-							jQuery('div.navigation').css({'width' : '150px', 'float' : 'left'});
-							jQuery('div.content').css({'display' : 'inline-block', 'float' : 'none'});
-
-							// Initially set opacity on thumbs and add
-							// additional styling for hover effect on thumbs
-							var onMouseOutOpacity = 0.67;
-							jQuery('#gf_thumbs ul.thumbs li').opacityrollover({
-								mouseOutOpacity:   onMouseOutOpacity,
-								mouseOverOpacity:  1.0,
-								fadeSpeed:         'fast',
-								exemptionSelector: '.selected'
-							});
-
-							// Initialize Advanced Galleriffic Gallery
-							jQuery('#gf_thumbs').galleriffic({
-								/*enableFancybox: true,*/
-								delay:                     2500,
-								numThumbs:                 4,
-								preloadAhead:              10,
-								enableTopPager:            true,
-								enableBottomPager:         true,
-								maxPagesToShow:            20,
-								imageContainerSel:         '#gf_slideshow',
-								controlsContainerSel:      '#gf_controls',
-								captionContainerSel:       '#gf_caption',
-								loadingContainerSel:       '#gf_loading',
-								renderSSControls:          true,
-								renderNavControls:         true,
-								playLinkText:              'Play Slideshow',
-								pauseLinkText:             'Pause Slideshow',
-								prevLinkText:              '&lsaquo; Previous Photo',
-								nextLinkText:              'Next Photo &rsaquo;',
-								nextPageLinkText:          'Next &rsaquo;',
-								prevPageLinkText:          '&lsaquo; Prev',
-								enableHistory:             false,
-								autoStart:                 false,
-								syncTransitions:           true,
-								defaultTransitionDuration: 900,
-								onSlideChange:             function(prevIndex, nextIndex) {
-									// 'this' refers to the gallery, which is an extension of jQuery('#gf_thumbs')
-									this.find('ul.thumbs').children()
-										.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
-										.eq(nextIndex).fadeTo('fast', 1.0);
-								},
-								onPageTransitionOut:       function(callback) {
-									this.fadeTo('fast', 0.0, callback);
-								},
-								onPageTransitionIn:        function() {
-									this.fadeTo('fast', 1.0);
-								}
-							});
-						});
-							";
-						$document->addScriptDeclaration($js);
-					}
-					break;
-
-				// Add Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
-				case 7:
-					if (!$elastislideadded)
-					{
-						flexicontent_html::loadFramework('elastislide');
-						$elastislideadded = true;
-					}
-					$uid = 'es_'.$field->name."_fcitem".$item->id;
-					$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'elastislide'.DS.'js'.DS.'gallery_tmpl.js');
-					$js = str_replace('unique_gal_id', $uid, $js);
-					$js = str_replace('__thumb_width__', $field->parameters->get( 'w_s', 120 ), $js);
-					$document->addScriptDeclaration($js);
-
-					$document->addCustomTag('
-					<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">
-						<div class="rg-image-wrapper">
-							{{if itemsCount > 1}}
-								<div class="rg-image-nav">
-									<a href="javascript:;" class="rg-image-nav-prev">'.JText::_('FLEXI_PREVIOUS').'</a>
-									<a href="javascript:;" class="rg-image-nav-next">'.JText::_('FLEXI_NEXT').'</a>
-								</div>
-							{{/if}}
-							<div class="rg-image"></div>
-							<div class="rg-loading"></div>
-							<div class="rg-caption-wrapper">
-								<div class="rg-caption" style="display:none;">
-									<p></p>
-								</div>
-							</div>
-						</div>
-					</script>
-					');
-					break;
-
-				// Add PhotoSwipe popup carousel gallery
-				case 8:
-					if (!$photoswipeadded)
-					{
-						flexicontent_html::loadFramework('photoswipe');
-						$photoswipeadded = true;
-					}
-					break;
-				}
-			}
-		}
-
-
-		// ***
 		// *** Initialize value handling arrays and loop's common variables
 		// ***
 
-		$field->{$prop} = array();
 		$field->thumbs_src['backend'] = array();
 		$field->thumbs_src['small']   = array();
 		$field->thumbs_src['medium']  = array();
@@ -1880,552 +1684,62 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// ***
-		// *** The values loop
+		// *** Get layout name
 		// ***
 
-		$value_list_has_containers = ($popuptype == 5 || $popuptype == 7);
-		$i = -1;
-		foreach ($values as $n => $value)
+		// CASE 0: Add single image display information (e.g. image count)
+		if ( $linkto_item )
 		{
-			// Include common layout code for preparing values, but you may copy here to customize
-			//$result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/prepare_value_display.php' );
-			//if ($result === _FC_CONTINUE_) continue;
-			//if ($result === _FC_BREAK_) break;
+			$viewlayout = 'value_link_to_item';
+		}
 
-			// Unserialize value's properties and check for empty original name property
-			$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
-			$value = $array ?: array(
-				'originalname' => $value
+		// CASE 1: Handle linking to a URL instead of image zooming popup
+		elseif ( $linkto_url )
+		{
+			$viewlayout = 'value_link_to_url';
+		}
+
+		// CASE 2: // No gallery JS ... just append inline info and apply pretext, posttext
+		elseif ( !$usepopup )
+		{
+			$viewlayout = 'value_thumbnail_basic';
+		}
+
+		// CASE 3: // Built-in JS gallery
+		elseif ( is_numeric($popuptype) )
+		{
+			$built_in_gallery_names = array(
+				// Inline slideshow galleries
+				5 => 'galleriffic',
+				7 => 'elastislide',
+
+				// Popup galleries
+				1 => 'multibox',
+				2 => 'rokbox',
+				3 => 'jce_mediabox',
+				4 => 'fancybox',
+				6 => 'widgetkit',
+				8 => 'photoswipe',
 			);
 
-			$image_subpath = $value['originalname'] = isset($value['originalname']) ? trim($value['originalname']) : '';
+			$viewlayout = isset($built_in_gallery_names[$popuptype])
+				? 'value_gallery_' . $built_in_gallery_names[$popuptype]
+				: 'value_thumbnail_basic';
+		}
 
-			// Skip empty value, adding an empty placeholder if field inside in field group
-			if ( !strlen($image_subpath) )
-			{
-				if ( $is_ingroup )
-				{
-					$field->{$prop}[]	= '';
-				}
-				continue;
-			}
-			$i++;
-
-			// Some types contain sub-path together with the image name (relative to joomla folder)
-			if ( is_array($orig_urlpath) )
-			{
-				$orig_urlpath[$i] = str_replace('\\', '/', dirname($image_subpath));
-			}
-
-			// In other cases check for sub-path relative to the calculated 'original path'
-			else
-			{
-				if ($dirname = dirname($image_subpath))
-				{
-					$orig_urlpath .=  '/'. str_replace('\\', '/', $dirname);
-				}
-			}
-
-			$image_name = basename($image_subpath);
-
-
-			// ***
-			// Create thumbnails urls, note thumbnails have already been verified above
-			// ***
-
-			// Optional properties
-			$title	= ($usetitle && isset($value['title'])) ? $value['title'] : '';
-			$alt	= ($usealt && isset($value['alt'])) ? $value['alt'] : $alt_image_prefix . ($n + 1);
-			$desc	= ($usedesc && isset($value['desc'])) ? $value['desc'] : '';
-
-			// Optional custom properties
-			$cust1	= ($usecust1 && isset($value['cust1'])) ? $value['cust1'] : '';
-			$desc .= $cust1 ? $cust1_label.': '.$cust1 : '';  // ... Append custom properties to description
-			$cust2	= ($usecust2 && isset($value['cust2'])) ? $value['cust2'] : '';
-			$desc .= $cust2 ? $cust2_label.': '.$cust2 : '';  // ... Append custom properties to description
-
-			// HTML encode output
-			$title= htmlspecialchars($title, ENT_COMPAT, 'UTF-8');
-			$alt	= htmlspecialchars($alt, ENT_COMPAT, 'UTF-8');
-			$desc	= htmlspecialchars($desc, ENT_COMPAT, 'UTF-8');
-
-			$srcb = $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
-			$srcs = $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
-			$srcm = $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
-			$srcl = $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
-			$srco = (is_array($orig_urlpath) ? $orig_urlpath[$i] : $orig_urlpath)  . '/'   .$image_name;  // original image
-
-			// Create a popup url link
-			$urllink = isset($value['urllink']) ? $value['urllink'] : '';
-			//if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
-
-			// Create a popup tooltip (legend)
-			$class = 'fc_field_image';
-			if ($uselegend && (!empty($title) || !empty($desc)))
-			{
-				$class .= ' '.$tooltip_class;
-				$legend = ' title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
-			}
-			else
-			{
-				$legend = '';
-			}
-
-			// Handle single image display, with/without total, TODO: verify all JS handle & ignore display none on the img TAG
-			$style = ($i!=0 && $isSingle) ? 'display:none;' : '';
-
-			// Create a unique id for the link tags, and a class name for image tags
-			$uniqueid = $item->id . '_' . $field->id . '_' . $i;
-
-			switch ($thumb_size)
-			{
-				case -1: $src = $srcb; break;
-				case 1: $src = $srcs; break;
-				case 2: $src = $srcm; break;
-				case 3: $src = $srcl; break;   // this makes little sense, since both thumbnail and popup image are size 'large'
-				case 4: $src = $srco; break;
-				default: $src = $srcs; break;
-			}
-
-
-			// Create a grouping name
-			switch ($grouptype)
-			{
-				// This field only
-				case 0: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id.'_fcfield_'.$field->id; break;
-
-				// All fields of the item
-				case 1: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id; break;
-
-				// Per view:  all items of category page, or search page
-				case 2: $group_name = 'fcview_'.$view; break;
-
-				// No group
-				default: $group_name = ''; break;
-			}
-
-
-			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only (for consistency use 'use_ingroup' of 'ingroup')
-			if ($use_ingroup)
-			{
-				// In case of field displayed via in fieldgroup, this is an array
-				$field->{"display_backend_src"}[$n] = JUri::root(true).'/'.$srcb;
-				$field->{"display_small_src"}[$n] = JUri::root(true).'/'.$srcs;
-				$field->{"display_medium_src"}[$n] = JUri::root(true).'/'.$srcm;
-				$field->{"display_large_src"}[$n] = JUri::root(true).'/'.$srcl;
-				$field->{"display_original_src"}[$n] = JUri::root(true).'/'.$srco;
-			}
-
-			// Field displayed not via fieldgroup return only the 1st value
-			else if ($i==0)
-			{
-				$field->{"display_backend_src"} = JUri::root(true).'/'.$srcb;
-				$field->{"display_small_src"} = JUri::root(true).'/'.$srcs;
-				$field->{"display_medium_src"} = JUri::root(true).'/'.$srcm;
-				$field->{"display_large_src"} = JUri::root(true).'/'.$srcl;
-				$field->{"display_original_src"} = JUri::root(true).'/'.$srco;
-			}
-
-			$field->thumbs_src['backend'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcb;
-			$field->thumbs_src['small'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcs;
-			$field->thumbs_src['medium'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcm;
-			$field->thumbs_src['large'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srcl;
-			$field->thumbs_src['original'][$use_ingroup ? $n : $i] = JUri::root(true).'/'.$srco;
-
-			$field->thumbs_path['backend'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcb;
-			$field->thumbs_path['small'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcs;
-			$field->thumbs_path['medium'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcm;
-			$field->thumbs_path['large'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srcl;
-			$field->thumbs_path['original'][$use_ingroup ? $n : $i] = JPATH_SITE.DS.$srco;
-
-			/*
-			 * Suggest 1 or more (all?) images to social website listing, e.g. Facebook, twitter etc, (making sure that URL is ABSOLUTE URL)
-			 * Also check that 
-			 * - we are in HTML format at Frontend
-			 * - we are viewing the item in full item view 
-			 */
-			if ($useogp && ($ogplimit === 0 || $i < $ogplimit))
-			{
-			if ($isHtmlViewFE && $isMatchedItemView)
-				{
-					switch ($ogpthumbsize)
-					{
-						case 1: $ogp_src = JUri::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
-						case 2: $ogp_src = JUri::root().$srcm; break;
-						case 3: $ogp_src = JUri::root().$srcl; break;
-						case 4: $ogp_src =  JUri::root().$srco; break;
-						default: $ogp_src = JUri::root().$srcm; break;
-					}
-					$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
-					$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
-				}
-			}
-
-
-			// ***
-			// *** CHECK if we were asked for value only display (e.g. image source)
-			// *** if so we will not be creating the HTML code for Image / Gallery
-			// ***
-
-			if ( isset(self::$value_only_displays[$prop]) )
-			{
-				continue;
-			}
-
-
-			// ***
-			// *** Create image tags (according to configuration parameters)
-			// *** that will be used for the requested 'display' variable
-			// ***
-
-			switch ($prop)
-			{
-				case 'display_backend':
-					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
-					break;
-
-				case 'display_small':
-					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
-					break;
-
-				case 'display_medium':
-					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
-					break;
-
-				case 'display_large':
-					$img_legend   = '<img src="'.JUri::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
-					break;
-
-				case 'display_original':
-					$img_legend   = '<img src="'.JUri::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JUri::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
-					break;
-
-				case 'display': default:
-					$img_legend   = '<img src="'.JUri::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" itemprop="image"/>';
-					$img_nolegend = '<img src="'.JUri::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class.'" itemprop="image"/>';
-					break;
-			}
-
-
-			// ***
-			// *** Create thumbnail appending text (not linked text)
-			// ***
-
-			// For galleries that are not inline/special, we can have inline text ??
-			$inline_info = '';
-			if ( $linkto_url || ($prop=='display_large' || $prop=='display_original') || !$usepopup || !$value_list_has_containers )
-			{
-				// Add inline display of title/desc
-				if ( ($showtitle && $title ) || ($showdesc && $desc) )
-					$inline_info = '<div class="fc_img_tooltip_data alert alert-info" style="'.$style.'" >';
-
-				if ( $showtitle && $title )
-					$inline_info .= '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
-				if ( $showdesc && $desc )
-					$inline_info .= '<div class="fc_img_tooltip_desc" style="line-height:1em;">'.$desc.'</div>';
-
-				if ( ($showtitle && $title ) || ($showdesc && $desc) )
-					$inline_info .= '</div>';
-			}
-
-
-			// ***
-			// *** FINALLY CREATE the field display variable ...
-			// ***
-
-			// CASE 0: Add single image display information (e.g. image count)
-			if ( $linkto_item )
-			{
-				$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
-				$field->{$prop}[] =
-				'<span style="display: inline-block; text-align:center; ">
-					<a href="'.$item_link.'" style="display: inline-block;">
-					'.$img_nolegend.'
-					</a><br/>'
-					.($_method == 'display_single_total' || $_method == 'display_single_total_link' ? '
-					<span class="fc_img_total_data badge badge-info" style="display: inline-block;" >
-						'.count($values).' '.JText::_('FLEXI_IMAGES').'
-					</span>' : '').'
-				</span>';
-
-				// If single display and not in field group then do not add more images
-				if (!$is_ingroup && $isSingle) break;
-			}
-
-			// CASE 1: Handle linking to a URL instead of image zooming popup
-			else if ($linkto_url)
-			{
-				// CASE: Just image thumbnail since url link is empty
-				if (!$urllink)
-				{
-					$field->{$prop}[] = $pretext.'<div class="fc_img_container">'.$img_legend.$inline_info.'</div>'.$posttext;
-				}
-
-				// CASE: Link to URL that opens inside a popup via multibox
-				else if ($url_target=='multibox')
-				{
-					$field->{$prop}[] = $pretext.'
-					<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
-						'.$img_legend.'
-					<script>document.write(\'</a>\')</script>
-					<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>
-					'.$inline_info.$posttext;
-				}
-
-				// CASE: Link to URL that opens inside a popup via fancybox
-				else if ($url_target=='fancybox')
-				{
-					$field->{$prop}[] = $pretext.'
-					<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;" '.
-						'onclick="jQuery.fancybox.open([{ type: \'iframe\', href: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $title.': '.$desc : $title).'\' }], { padding : 0});"
-					>
-						'.$img_legend.'
-					</span>
-					'.$inline_info.$posttext;
-				}
-
-				// CASE: Just link to URL without popup
-				else
-				{
-					$field->{$prop}[] = $pretext.'
-					<a href="'.$urllink.'" target="'.$url_target.'">
-						'.$img_legend.'
-					</a>
-					'.$inline_info.$posttext;
-				}
-
-			}
-
-			// CASE 2: // No gallery code ... just apply pretext/posttext
-			else if
-			(
-				!$usepopup || // Plain Thumbnail List without any (popup / inline) gallery code
-				($prop=='display_large' || $prop=='display_original') // No popup if image is the largest OR original thumbs
-			)
-			{
-				$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
-			}
-
-			// CASE 3: Inline/special galleries OR --> GALLERIES THAT NEED SPECIAL ENCLOSERS
-			else if ($value_list_has_containers)
-			{
-				// !!! ... pretext/posttext/inline_info/etc not meaningful or not supported or not needed
-				switch ($popuptype)
-				{
-				// Galleriffic inline slideshow gallery
-				case 5:
-					$group_str = '';   // image grouping: not needed / not applicatble
-					$field->{$prop}[] =
-						'<a href="'.$srcl.'" class="fc_image_thumb thumb" name="drop">
-							'.$img_legend.'
-						</a>
-						<div class="caption">
-							<b>'.$title.'</b>
-							<br/>'.$desc.'
-						</div>';
-					break;
-
-				// Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
-				case 7:
-					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
-					$title_attr = $desc ? $desc : $title;
-					$img_legend_custom ='
-						 <img src="'.JUri::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
-						 	data-large="' . JUri::root(true).'/'.$srcl . '" data-description="'.$title_attr.'" itemprop="image"/>
-					';
-					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
-					$field->{$prop}[] = '
-						<li><a href="javascript:;" class="fc_image_thumb">
-							'.$img_legend_custom.'
-						</a></li>';
-					break;
-
-				// ERROR unhandled INLINE GALLERY case
-				default:
-					$field->{$prop}[] = ' Unhandled INLINE GALLERY case in image with field name: {$field->name} '; break;
-				}
-			}
-
-			// CASE 4: Popup galleries
-			else
-			{
-				switch ($popuptype)
-				{
-				// Multibox image popup
-				case 1:
-					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
-					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb" '.$group_str.' >
-							'.$img_legend.'
-						</a>
-						<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? '<span class="badge">'.$title.'</span> '.$desc : $title).'</div>'
-						.$inline_info.$posttext;
-					break;
-
-				// Rokbox image popup
-				case 2:
-					$title_attr = $desc ? $desc : $title;
-					$group_str = '';   // no support for image grouping
-					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" class="fc_image_thumb" data-rokbox data-rokbox-caption="'.$title_attr.'">
-							'.$img_legend.'
-						</a>'
-						.$inline_info.$posttext;
-					break;
-
-				// JCE popup image popup
-				case 3:
-					$title_attr = $desc ? $title.'::'.$desc : $title;
-					$group_str = $group_name ? 'group['.$group_name.'];' : '';
-					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb jcepopup" data-mediabox="'.$group_str.'title['.$title_attr.']">
-							'.$img_nolegend.'
-						</a>'
-						.$inline_info.$posttext;
-					break;
-
-				// Fancybox image popup
-				case 4:
-					$title_attr = $desc ? '<span class=\'badge\'>'.$title.'</span> '.$desc : $title;
-					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
-					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb fancybox" '.$group_str.' title="'.$title_attr.'">
-							'.$img_legend.'
-						</a>'
-						.$inline_info.$posttext;
-					break;
-
-				// (Widgetkit) SPOTlight image popup
-				case 6:
-					$title_attr = $desc ? $desc : $title;
-					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
-					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
-							'.$img_legend.'
-							<div class="overlay">
-								'.'<b>'.$title.'</b>: '.$desc.'
-							</div>
-						</a>'
-						.$inline_info.$posttext;
-					break;
-
-				// PhotoSwipe popup carousel gallery
-				case 8:
-					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
-					$field->{$prop}[] = $pretext.
-						'<a style="'.$style.'" href="'.$srcl.'" '.$group_str.' class="fc_image_thumb">
-							'.$img_legend.'
-						</a>'
-						.$inline_info.$posttext;
-					break;
-
-				// Unknown / Other Gallery Type, just add thumbails ... maybe pretext/posttext/separator/opentag/closetag will add a gallery
-				default:
-					$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
-					break;
-				}
-			}
+		// CASE 4: // Custom layout
+		else
+		{
+			$viewlayout = 'value_' . $popuptype;
 		}
 
 
 		// ***
-		// *** Apply separator and open/close tags and handle SPECIAL CASEs:
-		// *** by adding (container) HTML required by some JS image libraries
+		// *** Create field's HTML, using layout file, note full display code is included into each layout (not just the values loop)
 		// ***
 
-		// Using in field group, return array
-		if ( $is_ingroup )
-		{
-			return;
-		}
-
-		// Check for value only displays and return
-		if ( isset(self::$value_only_displays[$prop]) )
-		{
-			return;
-		}
-
-		// Check for no values found
-		if ( !count($field->{$prop}) )
-		{
-			$field->{$prop} = '';
-			return;
-		}
-
-		// Galleriffic inline slideshow gallery
-		if ($usepopup && $popuptype == 5)
-		{
-			$field->{$prop} = '
-			<div id="gf_container">
-				<div id="gallery" class="content">
-					<div id="gf_controls" class="controls"></div>
-					<div class="slideshow-container">
-						<div id="gf_loading" class="loader"></div>
-						<div id="gf_slideshow" class="slideshow"></div>
-					</div>
-					<div id="gf_caption" class="caption-container"></div>
-				</div>
-				<div id="gf_thumbs" class="navigation">
-					<ul class="thumbs noscript">
-						<li>
-						'. implode("</li>\n<li>", $field->{$prop}) .'
-						</li>
-					</ul>
-				</div>
-				<div style="clear: both;"></div>
-			</div>
-			';
-		}
-
-		// Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
-		else if ($usepopup && $popuptype == 7)
-		{
-			//$max_width = $field->parameters->get( 'w_l', 800 );
-
-			// this should be size of previewer aka size of large image thumbnail
-			$uid = 'es_'.$field->name."_fcitem".$item->id;
-			$field->{$prop} = '
-			<div id="rg-gallery_'.$uid.'" class="rg-gallery" >
-				<div class="rg-thumbs">
-					<!-- Elastislide Carousel Thumbnail Viewer -->
-					<div class="es-carousel-wrapper">
-						<div class="es-nav">
-							<span class="es-nav-prev">'.JText::_('FLEXI_PREVIOUS').'</span>
-							<span class="es-nav-next">'.JText::_('FLEXI_NEXT').'</span>
-						</div>
-						<div class="es-carousel">
-							<ul>
-								' . implode('', $field->{$prop}) . '
-							</ul>
-						</div>
-					</div>
-					<!-- End Elastislide Carousel Thumbnail Viewer -->
-				</div><!-- rg-thumbs -->
-			</div><!-- rg-gallery -->
-			';
-		}
-
-		// PhotoSwipe popup carousel gallery
-		else if ($usepopup && $popuptype == 8) {
-			$field->{$prop} = '
-			<span class="photoswipe_fccontainer" >
-				'. implode($separatorf, $field->{$prop}) .'
-			</span>
-			';
-		}
-
-		// OTHER galleries need no special enclosing, only apply separator
-		else {
-			$field->{$prop} = implode($separatorf, $field->{$prop});
-		}
-
-		// Apply open/close tags
-		$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		$field->{$prop} = array();
+		include(self::getViewPath($field->field_type, $viewlayout));
 	}
 
 
