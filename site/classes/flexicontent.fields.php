@@ -3469,29 +3469,28 @@ class FlexicontentFields
 	// Method to create a category (content list) or search filter
 	static function createFilter(&$filter, $value='', $formName='adminForm', $indexed_elements=false, $search_prop='')
 	{
-		static $apply_cache = null;
 		static $faceted_overlimit_msg = null;
 
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$cparams   = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
+		$cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
-		$use_font_icons = $cparams->get('use_font_icons', 1);
 		
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
-		$is_fc_component = $option=='com_flexicontent';
-		$isCategoryView = $is_fc_component && $view=='category';
-		$isSearchView   = $is_fc_component && $view=='search';
-		
-		if ( $print_logging_info ) {
+
+		$isFC = $option === 'com_flexicontent';
+		$isCategoryView = $isFC && $view === 'category';
+		$isSearchView   = $isFC && $view === 'search';
+
+		if ( $print_logging_info )
+		{
 			global $fc_run_times;
 			$start_microtime = microtime(true);
 		}
 		
 		// Apply caching to filters regardless of cache setting ...
-		$apply_cache = FLEXI_CACHE;
-		if ($apply_cache)
+		if (FLEXI_CACHE)
 		{
 			$itemcache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
@@ -3499,31 +3498,18 @@ class FlexicontentFields
 		}
 		
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
-		$default_size = $isDate ? 15 : 30;
 		$_s = $isSearchView ? '_s' : '';
 		
 		// Some parameter shortcuts
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
-		$size         = $filter->parameters->get( 'text_filter_size', $default_size );        // Size of filter
-		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		
 		$isSlider = $display_filter_as == 7 || $display_filter_as == 8;
 		$slider_display_config = $filter->parameters->get( 'slider_display_config'.$_s, 1 );  // Slider found values: 1 or custom values/labels: 2
 		
-		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
-		if ($filter_vals_display)
-		{
-			$icon_size  = $filter->parameters->get( 'icon_size_filter'.$_s );
-			$icon_color = $filter->parameters->get( 'icon_color_filter'.$_s );
-			
-			$icon_class = ($icon_size ? ' fc-icon-'.$icon_size : '');
-			$icon_style = ($icon_color ? ' color: '.$icon_color.';' : '');
-		}
-		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6,8)) )
+		if (in_array($display_filter_as, array(2,3,5,6,8)))
 		{
 			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
 		}
@@ -3537,8 +3523,6 @@ class FlexicontentFields
 		$require_all_values = is_array($value) && count($value) > 1 && !$isRange   // prevent require_all for known ranges
 			? $require_all_param
 			: 0;
-		
-		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
@@ -3565,14 +3549,14 @@ class FlexicontentFields
 		}
 		
 		// Get filtering values, this can be cached if not filtering according to current category filters
-		if ( $get_filter_vals )
+		if ($get_filter_vals)
 		{
 			$view_join = '';
 			$view_join_n_text = '';
 			$view_where = '';
 			$filters_where = array();
 			$text_search = '';
-			$view_total=0;
+			$view_total = 0;
 			
 			// ***
 			// *** Limiting of displayed filter values according to current category filtering, but show all field values if filter is active
@@ -3582,7 +3566,9 @@ class FlexicontentFields
 			if ( $isCategoryView )
 			{
 				global $fc_catview;
-				if ( $faceted_filter ) {
+
+				if ($faceted_filter)
+				{
 					$view_join = @ $fc_catview['join_clauses'];
 					$view_join_n_text = @ $fc_catview['join_clauses_with_text'];
 					$view_where = @ $fc_catview['where_conf_only'];
@@ -3596,8 +3582,14 @@ class FlexicontentFields
 			else if ( $isSearchView )
 			{
 				global $fc_searchview;
-				if ( empty($fc_searchview) ) return array();  // search view plugin disabled ?
-				if ( $faceted_filter ) {
+
+				if (empty($fc_searchview))
+				{
+					return array();  // search view plugin disabled ?
+				}
+
+				if ($faceted_filter)
+				{
 					$view_join = $fc_searchview['join_clauses'];
 					$view_join_n_text = $fc_searchview['join_clauses_with_text'];
 					$view_where = $fc_searchview['where_conf_only'];
@@ -3613,7 +3605,7 @@ class FlexicontentFields
 			$lang_code = $isDate && !empty($filter->date_txtformat)? JFactory::getLanguage()->getTag() : null;
 
 			// This is hack for filter core properties to be filterable in search view without being added to the adv search index
-			if( $filter->field_type == 'coreprops' &&  $view=='search' )
+			if ($filter->field_type == 'coreprops' &&  $view=='search')
 			{ 
 				$createFilterValues = 'createFilterValues';
 			}
@@ -3623,16 +3615,22 @@ class FlexicontentFields
 			{
 				$results_page = $filter->filter_options;
 			}
-			elseif ( $apply_cache )
+			elseif (FLEXI_CACHE)
+			{
 				$results_page = $itemcache->get(
 					array('FlexicontentFields', $createFilterValues),
 					array($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code)
 				);
+			}
 			elseif (!$isSearchView)
+			{
 				$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
+			}
 			else
+			{
 				$results_page = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop, $lang_code);
-			
+			}
+
 			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
 			$faceted_max_item_limit = 10000;
 			if ( $faceted_filter==2 )
@@ -3712,459 +3710,58 @@ class FlexicontentFields
 				}
 			}
 		}
+
 		else
 		{
 			$add_usage_counters = false;
 			$faceted_filter = 0; // clear faceted filter flag
 		}
-		
-		// Prepend Field's Label to filter HTML
-		// Commented out because it was moved in to form template file
-		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
+
+		$displayData = array(
+			'filter' => & $filter,
+			'filter_ffid' => $filter_ffid,
+			'filter_ffname' => $filter_ffname,
+			'results' => & $results,
+			'value' => $value,
+			'require_all_values' => $require_all_values,
+			'isSearchView' => $isSearchView,
+		);
+
+		$layouts_path = null;
+
 		$filter->html = '';
-		
+
 		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
 		if ( $hide_disabled_values && empty($results) )
 		{
 			// no HTML
 		}
-		
+
 		// *** Create the form field(s) used for filtering
-		else switch ($display_filter_as)
+		else
 		{
-		case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
-			
-			// Make use of select2 lib
-			flexicontent_html::loadFramework('select2');
-			$classes  = " use_select2_lib";
-			$extra_param = '';
-			$options = array();
-			
-			// MULTI-select: special label and prompts
-			if ($display_filter_as == 6)
+			switch ($display_filter_as)
 			{
-				$classes .= ' fc_prompt_internal fc_is_selmultiple';
-				
-				// Add field's LABEL internally or click to select PROMPT (via js)
-				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-				if ($label_filter==2)
-				{
-					$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
-				}
-				$extra_param = ' data-placeholder="'.htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8').'"';
+				case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
 
-				// Add type to filter PROMPT (via js)
-				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
-			}
-			
-			// SINGLE-select does not has an internal label a drop-down list option
-			else
-			{
-				if ($label_filter==-1) {  // *** e.g. BACKEND ITEMS MANAGER custom filter
-					$filter->html = '<span class="'.$filter->parameters->get( 'label_filter_css'.$_s, 'label' ).'">'.$filter->label.'</span>';
-					$first_option_txt = '';
-				} else if ($label_filter==2) {
-					$first_option_txt = $filter->label;
-				} else {
-					$first_option_txt = $filter->parameters->get( 'filter_usefirstoption'.$_s, 0) ? $filter->parameters->get( 'filter_firstoptiontext'.$_s, 'FLEXI_ALL') : 'FLEXI_ANY';
-					$first_option_txt = JText::_($first_option_txt);
-				}
-				$options[] = JHtml::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
-			}
-			
-			foreach ($results as $result)
-			{
-				if ( !strlen($result->value) ) continue;
-				$options[] = JHtml::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
-			}
-			
-			// Create HTML tag attributes
-			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
-			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="5" ' : '';
-			if ( $extra_attribs = $filter->parameters->get( 'filter_extra_attribs'.$_s, '' ) )
-			{
-				$attribs_str .= $extra_attribs;
-			}
-			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
-			
-			if ($display_filter_as==6 && $combine_tip)
-			{
-				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
-			}
+					echo JLayoutHelper::render('items_list_filters.select_selectmul', $displayData, $layouts_path);
+					break;
 
-			// Calculate if field has value
-			$has_value = (!is_array($value) && strlen($value)) || (is_array($value) && count($value));
-			$filter->html	.= $label_filter==2 && $has_value
-				? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
-				: '';
+				case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
 
-			if ($display_filter_as==0 || $display_filter_as==6)
-			{
-				// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
-				$filter->html	.= $display_filter_as != 6
-					? JHtml::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid)
-					: JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
-			}
-			else
-			{
-				$filter->html	.=
-					JHtml::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1') . '
-						' . $opentag_filter . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . $closetag_filter .'
-					' . JHtml::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
-			}
-			break;
-		case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
-			
-			if ( !$isSlider )
-			{
-				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
-				$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
-				
-				$attribs_str = ' class="fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'" placeholder="'.$_inner_lb.'"';
-				$attribs_arr = array('class'=>'fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'', 'placeholder' => $_inner_lb );
-			}
-			else
-			{
-				$attribs_str = "";
-				
-				$value1 = $display_filter_as==8 ? @$value[1] : $value;
-				$value2 = @$value[2];
-				if ($isSlider && $slider_display_config==1)
-				{
-					$start = $min = 0;
-					$end = $max = -1;
-					$step=1;
-					$step_values = array(0=>"''");
-					$step_labels = array(0=>JText::_('FLEXI_ANY'));
-					$i = 1;
-					foreach ($results as $result) {
-						if ( !strlen($result->value) ) continue;
-						$step_values[] = "'".addcslashes($result->value, "'")."'";
-						$step_labels[] = $result->text;
-						if ($result->value==$value1) $start = $i;
-						if ($result->value==$value2) $end   = $i;
-						$i++;
-					}
-					// Set max according considering the skipped empty values
-					$max = ($i-1)+($display_filter_as==7 ? 0 : 1); //count($results)-1;
-					if ($end == -1) $end = $max;  // Set end to last element if it was not set
-					
-					if ($display_filter_as==8)
-					{
-						$step_values[] = "''";
-						$step_labels[] = JText::_('FLEXI_ANY');
-					}
-					$step_range = 
-							"step: 1,
-							range: {'min': " .$min. ", 'max': " .$max. "},";
-				}
-				else if ($isSlider) {
-					$custom_range  = $filter->parameters->get( 'slider_custom_range'.$_s, "'min': '', '25%': 500, '50%': 2000, '75%': 10000, 'max': ''" );
-					$custom_labels = preg_split("/\s*##\s*/u", $filter->parameters->get( 'slider_custom_labels'.$_s, 'label_any ## label_500 ## label_2000 ## label_10000 ## label_any' ));
-					if ($filter->parameters->get('slider_custom_labels_jtext'.$_s, 0))
-					{
-						foreach ($custom_labels as $i=> $custom_label) $custom_labels[$i] = JText::_($custom_label);  // Language filter the custom labels
-					}
-					$custom_vals = json_decode('{'.str_replace("'", '"', $custom_range).'}', true);
-					if (!$custom_vals) {
-						$filter->html = '
-							<div class="alert">
-								Bad syntax for custom range for slider filter: '.$filter->label."
-								EXAMPLE: <br/> 'min': 0, '25%': 500, '50%': 2000, '75%': 10000, 'max': 50000".'
-							</div>';
-						break;
-					}
+					echo JLayoutHelper::render('items_list_filters.txtsearch_date_slider', $displayData, $layouts_path);
+					break;
 
-					$start = 0;
-					$end   = count($custom_vals)-1;
-					foreach($custom_vals as $i => $v)
-					{
-						$step_values[$i] = "'".addcslashes($v, "'")."'";
-					}
+				case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
 
-					$step_labels = & $custom_labels;
-					$i = 0;
-					$set_start = strlen($value1)>0;
-					$set_end   = strlen($value1)>0;
-					foreach($custom_vals as $n => $custom_val)
-					{
-						if ($set_start && $custom_val==$value1) $start = $i;
-						if ($set_end   && $custom_val==$value2) $end   = $i;
-						$custom_vals[$n] = $i++;
-					}
-					$step_range = '
-							snap: true,
-							range: '.json_encode($custom_vals).',
-					';
-				}
+					echo JLayoutHelper::render('items_list_filters.radio_checkbox', $displayData, $layouts_path);
+					break;
 
-				flexicontent_html::loadFramework('nouislider');
-				$left_no = $display_filter_as==7 ? '' : '1';
-				$rght_no = '2';  // sometimes unused
-				$js = "
-					jQuery(document).ready(function(){
-						var slider = document.getElementById('".$filter_ffid."_nouislider');
-						
-						var input1 = document.getElementById('".$filter_ffid.$left_no."');
-						var input2 = document.getElementById('".$filter_ffid.$rght_no."');
-						var isSingle = ".($display_filter_as==7 ? '1' : '0').";
-						
-						var step_values = [".implode(', ', $step_values)."];
-						var step_labels = [\"".implode('", "', array_map('addslashes', $step_labels))."\"];
-						
-						noUiSlider.create(slider, {".
-							($display_filter_as==7 ? "
-								start: ".$start.",
-								connect: false,
-							" : "
-								start: [".$start.", ".$end."],
-								connect: true,
-							")."
-								".$step_range."
-						});
-						
-						var tipHandles = slider.getElementsByClassName('noUi-handle'),
-						tooltips = [];
-						
-						// Add divs to the slider handles.
-						for ( var i = 0; i < tipHandles.length; i++ ){
-							tooltips[i] = document.createElement('span');
-							tipHandles[i].appendChild(tooltips[i]);
-							
-							tooltips[i].className += 'fc-sliderTooltip'; // Add a class for styling
-							tooltips[i].innerHTML = '<span></span>'; // Add additional markup
-							tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
-						}
-						
-						// When the slider changes, display the value in the tooltips and set it into the input form elements
-						slider.noUiSlider.on('update', function( values, handle ) {
-							var value = parseInt(values[handle]);
-							var i = value;
-							
-							if ( handle ) {
-								input2.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
-							} else {
-								input1.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
-							}
-							var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
-							var max_len = 36;
-							tooltips[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
-							var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-							var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
-							
-							//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-							if (isSingle) {
-								left<(50/100)*width ?
-									jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-									jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-							}
-							else if (handle) {
-								left<=(76/100)*width ?
-									jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-									jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-								left<=(49/100)*width ?
-									jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-									jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-							}
-							else {
-								left>=(24/100)*width ?
-									jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left') :
-									jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right');
-								left>=(51/100)*width ?
-									jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-									jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-							}
-						});
-						
-						// Handle form autosubmit
-						slider.noUiSlider.on('change', function() {
-							var slider = jQuery('#".$filter_ffid."_nouislider');
-							var jform  = slider.closest('form');
-							var form   = jform.get(0);
-							adminFormPrepare(form, parseInt(jform.attr('data-fc-autosubmit')));
-						});
-						
-						input1.addEventListener('change', function(){
-							var value = 0;  // default is first value = empty
-							for(var i=1; i<step_values.length-1; i++) {
-								if (step_values[i] == this.value) { value=i; break; }
-							}
-							slider.noUiSlider.set([value, null]);
-						});
-						".($display_filter_as==8 ? "
-						input2.addEventListener('change', function(){
-							var value = step_values.length-1;  // default is last value = empty
-							for(var i=1; i<step_values.length-1; i++) {
-								if (step_values[i] == this.value) { value=i; break; }
-							}
-							slider.noUiSlider.set([null, value]);
-						});
-						" : "")."
-					});
-				";
-				JFactory::getDocument()->addScriptDeclaration($js);
-				//JFactory::getDocument()->addStyleDeclaration("");
+				default:
+					//echo JLayoutHelper::render('items_list_filters.radiocheck', $displayData, $layouts_path);
+					$filter->html = 'Case ' . $display_filter_as . ' not implemented';
+					break;
 			}
-			
-			if ($display_filter_as==1 || $display_filter_as==7)
-			{
-				if ($isDate && !$isSlider)
-				{
-					$filter->html	.= '
-						<div class="fc_filter_element">
-							'.FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr).'
-						</div>';
-				}
-				else
-				{
-					$filter->html	.=
-					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
-						<div class="fc_filter_element">
-							<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value, ENT_COMPAT, 'UTF-8').'" />
-						</div>
-					'.($isSlider ? '</div>' : '');
-				}
-			}
-			else
-			{
-				if ($isDate && !$isSlider)
-				{
-					$filter->html	.= '
-						<div class="fc_filter_element">
-							'.FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr).'
-						</div>
-						' . $opentag_filter . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . $closetag_filter .'
-						<div class="fc_filter_element">
-							'.FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr).'
-						</div>';
-				}
-				else
-				{
-					$size = (int)($size / 2);
-					$filter->html	.=
-					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
-						<div class="fc_filter_element">
-							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[1], ENT_COMPAT, 'UTF-8').'" />
-						</div>
-						' . $opentag_filter . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . $closetag_filter .'
-						<div class="fc_filter_element">
-							<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
-						</div>
-					'.($isSlider ? '</div>' : '');
-				}
-			}
-			break;
-		case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
-			$lf_min = 10;  // add parameter for this ?
-			$add_lf = count($results) >= $lf_min;
-			if ($add_lf)  flexicontent_html::loadFramework('mCSB');
-			$clear_values = 0;
-			$value_style = $clear_values ? 'float:left; clear:both;' : '';
-			
-			$i = 0;
-			$checked = is_array($value)
-				? !count($value) || (!is_array(reset($value))  && !strlen(reset($value)))
-				: !strlen($value);			$checked_attr = $checked ? 'checked="checked"' : '';
-			$checked_attr = $checked ? 'checked="checked"' : '';
-			$checked_class = $checked ? 'fc_highlight' : '';
-			$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
-			$filter->html .= '<div class="fc_checkradio_group_wrapper fc_add_scroller'.($add_lf ? ' fc_list_filter_wrapper':'').'">';
-			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.($add_lf ? ' fc_list_filter':'').'">';
-			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">';
-			$filter->html	.= ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.$filter->label.'</span> ' : '');
-			if ($display_filter_as==4) {
-				$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
-				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
-				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
-			} else {
-				$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\', 1);" ';
-				$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'[]" ';
-				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
-			}
-			
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$tooltip_title = flexicontent_html::getToolTip('FLEXI_REMOVE_ALL', '', $translate=1, $escape=1);
-			$filter->html .= '<label class="'.$checked_class.$tooltip_class.'" for="'.$filter_ffid.$i.'" '
-				.' title="'.$tooltip_title.'" '
-				.($checked ? ' style="display:none!important;" ' : ' style="background:none!important; padding-left:0px!important;" ').'>'.
-				'<span class="fc_delall_filters"></span>';
-			$filter->html .= '</label> '
-				.($combine_tip ? ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
-				.' </li>';
-			$i++;
-			
-			foreach ($results as $result)
-			{
-				if ( !strlen($result->value) )
-				{
-					continue;
-				}
-				$checked = ($display_filter_as==5)
-					? in_array($result->value, $value)
-					: $result->value == $value;
-
-				$checked_attr = $checked
-					? ' checked=checked ' : '';
-				$disable_attr = $faceted_filter==2 && !$result->found
-					? ' disabled=disabled ' : '';
-
-				$checked_class = $checked
-					? 'fc_highlight' : '';
-				$checked_class .= $faceted_filter==2 && !$result->found
-					? ' fcdisabled ' : '';
-				$checked_class_li = $checked
-					? ' fc_checkradio_checked' : '';
-
-				$result_text_encoded = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
-
-				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
-				
-				// *** PLACE image before label (and e.g. (default) above the label)
-				if ($filter_vals_display == 2)
-				{
-					$filter->html .= isset( $result->image_url ) ?
-						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$result_text_encoded.'" title="'.$result_text_encoded.'" /></span>' :
-						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$result_text_encoded.'"></span></span>' ;
-				}
-				
-				if ($display_filter_as==4)
-				{
-					$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
-					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
-					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
-				}
-				else
-				{
-					$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\');" ';
-					$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'[]" ';
-					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
-				}
-				
-				$filter->html .= '<label class="fc_filter_val fc_cleared '.$checked_class.'" for="'.$filter_ffid.$i.'">';
-				if ($filter_vals_display == 0 || $filter_vals_display == 2)
-					$filter->html .= '<span class="fc_filter_val_lbl">' . $result_text_encoded . '</span>';
-				else if ($add_usage_counters && $result->found)
-					$filter->html .= '<span class="fc_filter_val_lbl">('.$result->found.')</span>';
-				$filter->html .= '</label>';
-				
-				// *** PLACE image after label (and e.g. (default) next to the label)
-				if ($filter_vals_display == 1)
-				{
-					$filter->html .= isset( $result->image_url ) ?
-						'<span class="fc_filter_val_img">
-							<img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="' . $result_text_encoded . '" title="' . $result_text_encoded . '" />
-						</span>' :
-						'<span class="fc_filter_val_img">
-							<span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="' . $result_text_encoded . '"></span>
-						</span>' ;
-				}
-				
-				$filter->html .= '</li>';
-				$i++;
-			}
-			$filter->html .= '</ul>';
-			$filter->html .= '</div>';
-			break;
 		}
 		//$last_error = error_get_last();
 		//echo '<pre>'; print_r($last_error); exit;
@@ -4180,8 +3777,9 @@ class FlexicontentFields
 		{
 			$filter->html = $filter->html . ' ' . $closetag_filter;
 		}
-		
-		if ( $print_logging_info ) {
+
+		if ( $print_logging_info )
+		{
 			$current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
 			$faceted_str = array(0=>'non-FACETED ', 1=>'FACETED: current view &nbsp; (cacheable) ', 2=>'FACETED: current filters:'." (".$flt_active_count.' active) ');
