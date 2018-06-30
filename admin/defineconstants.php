@@ -67,7 +67,8 @@ if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', true );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', true );
-if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.9.99', 'ge' ) );
+if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion->getShortVersion(), '3.6.99', 'g' ) );
+if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.9.99', 'g' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
@@ -96,22 +97,19 @@ if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "ima
 if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 JPath::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
 if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', JUri::root().$params->get($path, 'images/stories'));
 
-// J1.5 Section or J1.7 category type
-if (!FLEXI_J16GE) {
-	if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', $params->get('flexi_section'));
-	if (!defined('FLEXI_CAT_EXTENSION'))	define('FLEXI_CAT_EXTENSION', '');
-} else {
-	if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
-	if (!defined('FLEXI_CAT_EXTENSION')) {
-		define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-		$db = JFactory::getDbo();
-		$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
-		$db->setQuery($query);
-		$obj = $db->loadObject();
-		if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
-		if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
-	}
+if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
+
+if (!defined('FLEXI_CAT_EXTENSION'))
+{
+	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
+	$db = JFactory::getDbo();
+	$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
+	$db->setQuery($query);
+	$obj = $db->loadObject();
+	if (!defined('FLEXI_LFT_CATEGORY'))	define('FLEXI_LFT_CATEGORY', $obj->lft);
+	if (!defined('FLEXI_RGT_CATEGORY'))	define('FLEXI_RGT_CATEGORY', $obj->rgt);
 }
+
 if (FLEXI_J40GE)
 {
 	class JEventDispatcher extends Joomla\Event\Dispatcher
