@@ -1785,10 +1785,7 @@ class flexicontent_html
 				flexicontent_html::loadFramework('flexi_js_common');
 
 				// For J3.7.0+ , load polyfills for older IE browsers: < IE11
-				jimport('cms.version.version');
-				$jversion = new JVersion;
-
-				if (version_compare($jversion->getShortVersion(), '3.9.0', 'ge'))
+				if (FLEXI_J37GE)
 				{
 					JHtml::_('behavior.polyfill', array('event', 'classlist', 'map'), 'lte IE 11');
 				}
