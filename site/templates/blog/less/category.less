@@ -44,6 +44,7 @@ body #flexicontent ul.leadingblock > li{
 	margin-bottom: @FCC_lead_margin_bottom + px;
 	border-radius: @FCC_lead_border_radius + px;
 	border: @FCC_lead_border_size + px @FCC_lead_border_type @FCC_lead_border_color;
+	box-sizing: border-box !important;
 }
 /*intro style */
 body #flexicontent ul.introblock > li{
@@ -60,20 +61,26 @@ body #flexicontent ul.introblock > li{
 	margin-bottom: @FCC_intro_margin_bottom + px;
 	border-radius: @FCC_intro_border_radius + px;
 	border: @FCC_intro_border_size + px @FCC_intro_border_type @FCC_intro_border_color;
+	box-sizing: border-box !important;
 }
-/*width correction */
-body #flexicontent ul.leadingblock.one > li, body #flexicontent ul.introblock.one > li {
-    width: unit(@FCC_column_width1,~"%");
+
+body #flexicontent ul.leadingblock.one > li,
+body #flexicontent ul.introblock.one > li {
+	width: 100%;
 }
-body #flexicontent ul.leadingblock.two > li, body #flexicontent ul.introblock.two > li {
-    width: unit(@FCC_column_width2,~"%");
+body #flexicontent ul.leadingblock.two > li,
+body #flexicontent ul.introblock.two > li {
+	width: 48.6%;
 }
-body #flexicontent ul.leadingblock.three > li, body #flexicontent ul.introblock.three > li {
-    width: unit(@FCC_column_width3,~"%");
+body #flexicontent ul.leadingblock.three > li,
+body #flexicontent ul.introblock.three > li {
+	width: 31.6%;
 }
-body #flexicontent ul.leadingblock.four > li, body #flexicontent ul.introblock.four > li {
-    width: unit(@FCC_column_width4,~"%");
+body #flexicontent ul.leadingblock.four > li,
+body #flexicontent ul.introblock.four > li {
+	width: 23.4%;
 }
+
 #flexicontent .clear {
 	border: 0;
 	clear: both;
