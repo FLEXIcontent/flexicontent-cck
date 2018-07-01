@@ -50,11 +50,11 @@ body #flexicontent ul.tabbernav > li:hover a {
 body .tabbertab,
 #flexicontent .tabbertab {
 	background-color: #ffffff;
-	border-radius: 0pxpx;
+	border-radius: 0px;
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1pxpx solid inherit !important;
+	border-bottom: 1px solid inherit !important;
 }
 body .flexi.infoblock {
 	color: inherit;
