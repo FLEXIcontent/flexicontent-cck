@@ -826,7 +826,12 @@ class FlexicontentModelCategory extends FCModelAdmin
 		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		// ***
 		$mergeProperties = array('params');
-		$mergeOptions = array('params_fset' => 'params', 'layout_type' => 'category', 'model_names' => array($this->option => $this->record_name, 'com_categories' => 'category'));
+		$mergeOptions = array(
+			'params_fset'  => 'params',
+			'layout_type'  => 'category',
+			'model_names'  => array($this->option => $this->record_name, 'com_categories' => 'category'),
+			'cssprep_save' => false,
+		);
 		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
 
 		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,

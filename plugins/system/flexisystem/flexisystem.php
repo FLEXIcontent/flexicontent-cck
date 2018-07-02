@@ -2433,7 +2433,12 @@ class plgSystemFlexisystem extends JPlugin
 		$record->load($item->id);
 
 		$mergeProperties = array('attribs', 'metadata');
-		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array('com_flexicontent' => 'item', 'com_content' => 'article'));
+		$mergeOptions = array(
+			'params_fset'  => 'attribs',
+			'layout_type'  => 'item',
+			'model_names'  => array('com_flexicontent' => 'item', 'com_content' => 'article'),
+			'cssprep_save' => false,
+		);
 		$model->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
 
 		$item_data = array();
@@ -2521,6 +2526,7 @@ class plgSystemFlexisystem extends JPlugin
 		$tags_tmp = isset($data['tags']) ? $data['tags'] : null;
 		unset($data['tags']);
 
+		// Save FLEXIcontent item, using the provided data
 		$model->store($data);
 
 		// Revert changes to data
