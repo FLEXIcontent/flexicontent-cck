@@ -9,6 +9,9 @@
 
 defined('JPATH_PLATFORM') or die;
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
@@ -76,7 +79,7 @@ class JFormFieldFclayout extends JFormFieldList
 		) $view = 'module';
 
 		$cid = $jinput->get('cid', array(0), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$pk = $cid[0];
 		if (!$pk) $pk = $jinput->get('id', 0, 'int');
 		

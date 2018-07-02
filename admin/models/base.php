@@ -19,8 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.admin');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.admin');
 
 /**
  * FLEXIcontent Component BASE Model
@@ -146,7 +148,7 @@ abstract class FCModelAdmin extends JModelAdmin
 				$id = $jinput->get($key, array(), 'array');
 				if (count($id))
 				{
-					JArrayHelper::toInteger($id);
+					ArrayHelper::toInteger($id);
 					$pk = (int) $id[0];
 				}
 			}
@@ -776,7 +778,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Before any other manipulations and before other any other data is added,
 		// convert our JTable record to a JObject coping only public properies
 		$_prop_arr = $table->getProperties($public_only = true);
-		$item = JArrayHelper::toObject($_prop_arr, 'JObject');
+		$item = ArrayHelper::toObject($_prop_arr, 'JObject');
 
 		// Add to cache if not a new record
 		if ($pk)

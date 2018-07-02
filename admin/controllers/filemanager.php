@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');   // we use JPATH_BASE since parent controller exists in frontend too
@@ -1216,7 +1217,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		if ($file_mode != 'folder_mode')
 		{
-			JArrayHelper::toInteger($cid, array()); // These are file ids, for DB-mode
+			ArrayHelper::toInteger($cid, array()); // These are file ids, for DB-mode
 		}
 
 		if (!is_array($cid) || count($cid) < 1)
@@ -1430,7 +1431,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid, array());
+		ArrayHelper::toInteger($cid, array());
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -1514,7 +1515,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$user  = JFactory::getUser();
 		$model = $this->getModel('filemanager');
 		$cid = $this->input->get('cid', array(0), 'array');
-		JArrayHelper::toInteger($cid, array(0));
+		ArrayHelper::toInteger($cid, array(0));
 
 		$file_id = (int) $cid[0];
 		$row = JTable::getInstance('flexicontent_files', '');
@@ -1534,7 +1535,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 
 		$accesses = $this->input->get('access', array(0), 'array');
-		JArrayHelper::toInteger($accesses);
+		ArrayHelper::toInteger($accesses);
 		$access = $accesses[$file_id];
 
 		if (!$model->saveaccess($file_id, $access))

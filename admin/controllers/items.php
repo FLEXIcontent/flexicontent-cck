@@ -18,6 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
@@ -987,10 +990,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		$prev_order = $this->input->get('prev_order', array(0), 'array');
 		$item_cb    = $this->input->get('item_cb', array(0), 'array');
 
-		JArrayHelper::toInteger($cid);
-		JArrayHelper::toInteger($ord_catid);
-		JArrayHelper::toInteger($prev_order);
-		JArrayHelper::toInteger($item_cb);
+		ArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($ord_catid);
+		ArrayHelper::toInteger($prev_order);
+		ArrayHelper::toInteger($item_cb);
 
 		// Calculate access of orderitems ACL
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1060,10 +1063,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		$ord_catid = $this->input->get('ord_catid', array(0), 'array');
 		$prev_order = $this->input->get('prev_order', array(0), 'array');
 
-		JArrayHelper::toInteger($cid);
-		JArrayHelper::toInteger($order);
-		JArrayHelper::toInteger($ord_catid);
-		JArrayHelper::toInteger($prev_order);
+		ArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($order);
+		ArrayHelper::toInteger($ord_catid);
+		ArrayHelper::toInteger($prev_order);
 
 		// Calculate access of orderitems ACL
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1102,7 +1105,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		// *** Check at least one item was selected
 		if (!count($cid))
@@ -1198,7 +1201,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		// *** Check at least one item was selected
 		if (!count($cid))
@@ -1480,7 +1483,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('featured' => 1, 'unfeatured' => 0);
-		$value  = JArrayHelper::getValue($values, $this->task, 0, 'int');
+		$value  = ArrayHelper::getValue($values, $this->task, 0, 'int');
 
 		// Access checks.
 		foreach ($cid as $i => $id)
@@ -1536,7 +1539,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$msg = '';
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		// *** Check at least one item was selected
 		if (!count($cid))
@@ -1640,7 +1643,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$app   = JFactory::getApplication();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!count($cid))
 		{
@@ -1677,7 +1680,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$msg = '';
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!count($cid))
 		{
@@ -1762,7 +1765,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		// *** Check at least one item was selected
 		if (!count($cid))
@@ -1850,13 +1853,13 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$id			= $this->input->get('id', 0, 'int');
-		$version	= $this->input->get('version', '', 'int');
+		$id			= $this->input->getInt('id', 0);
+		$version	= $this->input->getInt('version', 0);
 		$itemmodel = $this->getModel('item');
 
 		// First checkin the open item
 		$item = JTable::getInstance($this->records_jtable, '');
-		$item->bind(JRequest::get('request'));
+		$item->load($id);
 		$item->checkin();
 
 		if ($version)
@@ -1869,7 +1872,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg = JText::_('FLEXI_NOTHING_TO_RESTORE');
 		}
 
-		$ctrlTask  = !FLEXI_J16GE ? 'controller=items&task=edit' : 'task=items.edit';
+		$ctrlTask = 'task=items.edit';
 		$this->setRedirect('index.php?option=com_flexicontent&' . $ctrlTask . '&cid[]=' . $id, $msg);
 	}
 

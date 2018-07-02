@@ -19,8 +19,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.admin');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.admin');
 require_once('base.php');
 
 /**
@@ -503,7 +505,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 				if ($item->id != null)
 				{
 					$item->associations = CategoriesHelper::getAssociations($item->id, $item->extension);
-					JArrayHelper::toInteger($item->associations);
+					ArrayHelper::toInteger($item->associations);
 				}
 				else
 				{

@@ -10,6 +10,10 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsCoreprops extends FCField
@@ -336,7 +340,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			case 'language':
 				if ($props_type=='id')
 				{
-					JArrayHelper::toInteger($value);  // Sanitize filter values as integers
+					ArrayHelper::toInteger($value);  // Sanitize filter values as integers
 				}
 
 				$filter->filter_colname     = $props_type;

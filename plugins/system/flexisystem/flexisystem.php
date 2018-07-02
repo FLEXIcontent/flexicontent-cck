@@ -2529,6 +2529,7 @@ class plgSystemFlexisystem extends JPlugin
 		// Save FLEXIcontent item, using the provided data
 		$model->store($data);
 
+
 		// Revert changes to data
 		unset($data['vstate']);
 		unset($data['custom']);

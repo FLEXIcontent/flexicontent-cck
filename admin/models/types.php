@@ -19,8 +19,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.list');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.list');
 
 /**
  * FLEXIcontent Component types Model
@@ -309,7 +311,7 @@ class FlexicontentModelTypes extends JModelList
 	// Find which records have assignments
 	function filterByAssignments($cid = array())
 	{
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$query = 'SELECT DISTINCT type_id'
 			. ' FROM #__flexicontent_items_ext'
 			. ' WHERE type_id IN ('. implode(',', $cid) .')'

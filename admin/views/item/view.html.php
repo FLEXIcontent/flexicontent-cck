@@ -19,8 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Item View
@@ -770,7 +772,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$form_cid = !empty($session_data['cid'])
 			? $session_data['cid']
 			: $item->categories;
-		JArrayHelper::toInteger($form_cid);
+		ArrayHelper::toInteger($form_cid);
 
 
 		// ***

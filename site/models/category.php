@@ -19,8 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -2452,7 +2454,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'createdby':
-				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE created_by IN ('. implode(",", $values) .')';
@@ -2460,7 +2462,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'modifiedby':
-				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE modified_by IN ('. implode(",", $values) .')';
@@ -2468,7 +2470,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'type':
-				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT id'
 						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE type_id IN ('. implode(",", $values) .')';
@@ -2487,7 +2489,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'categories':
-				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				global $globalcats;
 				$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
 				$query_catids = array();
@@ -2508,7 +2510,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				break;
 
 			case 'tags':
-				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				ArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
 						. ' WHERE tid IN ('. implode(",", $values) .')';  // no db quoting needed since these were typecasted to ints

@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\Utilities\ArrayHelper;
+
 // Import parent controller
 jimport('legacy.controller.admin');
 
@@ -131,7 +133,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$CanCats = $perms->CanCats;
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$msg = '';
 
 		if (!is_array($cid) || count($cid) < 1)
@@ -251,7 +253,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$CanCats = $perms->CanCats;
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$msg = '';
 
 		if (!is_array($cid) || count($cid) < 1)
@@ -317,16 +319,16 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 * @return void
 	 * @since 1.0
 	 */
-	function access( )
+	function access()
 	{
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$user  = JFactory::getUser();
-		$task  = JRequest::getVar('task');
+		$task  = $this->input->getCmd('task');
 		$model = $this->getModel('Categories');
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$id = (int) $cid[0];
 
 		if (!is_array($cid) || count($cid) < 1)
@@ -340,7 +342,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 
 		// Get new category access
 		$accesses = $this->input->get('access', array(0), 'array');
-		JArrayHelper::toInteger($accesses);
+		ArrayHelper::toInteger($accesses);
 		$access = $accesses[$id];
 
 		// Check authorization for access setting task

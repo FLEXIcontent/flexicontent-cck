@@ -19,6 +19,9 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 jimport('cms.plugin.plugin');
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -149,7 +152,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 
 		// Get allowed types from configuration and sanitize them as array of integers
 		$contenttypes = $params->get('contenttypes', array(), 'array');
-		JArrayHelper::toInteger($contenttypes);
+		ArrayHelper::toInteger($contenttypes);
 
 		// Force hidden content type selection if only 1 content type was initially configured
 		$canseltypes = count($contenttypes)==1 ? 0 : $canseltypes;
@@ -169,7 +172,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		{
 			// Get content types from request and sanitize them as array of integers
 			$form_contenttypes = $app->input->get('contenttypes', array(), 'array');
-			JArrayHelper::toInteger($form_contenttypes);
+			ArrayHelper::toInteger($form_contenttypes);
 
 			// Also limit to types allowed by configuration
 			$_contenttypes = array_intersect($contenttypes, $form_contenttypes);

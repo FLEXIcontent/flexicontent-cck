@@ -19,8 +19,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.admin');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.admin');
 require_once('base.php');
 
 /**
@@ -331,7 +333,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		// Add all parents to the list
 		if ($state==1) $this->_addTags($id, $cid, 'parents');
 
-		JArrayHelper::toInteger($cid, null);
+		ArrayHelper::toInteger($cid, null);
 		$cids = implode( ',', $cid );
 
 		// Get the owner of all tags

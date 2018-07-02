@@ -18,8 +18,10 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.controller.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.controller.legacy');
 
 /**
  * FLEXIcontent Component Controller
@@ -100,7 +102,7 @@ class FlexicontentController extends JControllerLegacy
 		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('id', array(), 'array');
-		JArrayHelper::toInteger($cid, array());
+		ArrayHelper::toInteger($cid, array());
 
 		require_once(JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."models".DS."items.php");
 		$model = new FlexicontentModelItems;
@@ -2288,7 +2290,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('id', array(0), 'array');
-		JArrayHelper::toInteger($cid, array(0));
+		ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)

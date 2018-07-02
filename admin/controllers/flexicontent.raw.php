@@ -91,17 +91,14 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 			(13,"categories","categories","Categories","Categories this item is assigned to",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line1.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,13),
 			(14,"tags","tags","Tags","Tags assigned to this item",0,1,1,0,0,0,0,1,"top.items.default\nunder-description-line2.category.blog",1,\'{"display_label":"1","separatorf":"2"}\',0,"0000-00-00 00:00:00",1,14)
 		';
-		$db->setQuery($query);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		echo '<span class="install-ok"></span>';
@@ -145,17 +142,13 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 			. (FLEXI_J40GE ? ", ''" : "")
 		. ")";
 
-		$db->setQuery($query);
-
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		// Save the created menu item as default_menu_itemid for the component
@@ -167,17 +160,14 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 		$query = 'UPDATE ' . (FLEXI_J16GE ? '#__extensions' : '#__components')
 				. ' SET params = ' . $db->Quote($cparams_str)
 				. ' WHERE ' . (FLEXI_J16GE ? 'extension_id' : 'id') . '=' . $flexi->id;
-		$db->setQuery($query);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		echo '<span class="install-ok"></span>';
@@ -204,24 +194,21 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 
 		$query 	= '
 		INSERT INTO `#__flexicontent_types`
-			(id, asset_id, name, alias, published, checked_out, checked_out_time, access, attribs)
+			(id, asset_id, name, alias, description, published, checked_out, checked_out_time, access, attribs)
 		VALUES
 		(
-			1, 0, "Article", "article", 1, 0, "0000-00-00 00:00:00", 1,
+			1, 0, "Article", "article", "", 1, 0, "0000-00-00 00:00:00", 1,
 			\'{"ilayout":"default","hide_maintext":"0","hide_html":"0","maintext_label":"","maintext_desc":"","comments":"","top_cols":"two","bottom_cols":"two","allow_jview":"1"}\'
 		)
 		';
-		$db->setQuery($query);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		$query 	= '
@@ -230,17 +217,14 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 		VALUES
 			(1,1,1), (2,1,2), (3,1,3), (4,1,4), (5,1,5), (6,1,6), (7,1,7), (8,1,8), (9,1,9), (10,1,10), (11,1,11), (12,1,12), (13,1,13), (14,1,14)
 		';
-		$db->setQuery($query);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		echo '<span class="install-ok"></span>';
@@ -263,20 +247,19 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 		$db = JFactory::getDbo();
 
 		$query	= 'UPDATE #__extensions'
-				. ' SET enabled = 1'
-				. ' WHERE `type`= ' . $db->Quote('plugin')
-				. ' AND (`folder` = ' . $db->Quote('flexicontent_fields')
-				. ' OR `element` = ' . $db->Quote('flexisearch')
-				. ' OR `element` = ' . $db->Quote('flexisystem')
-				. ' OR `element` = ' . $db->Quote('flexiadvsearch')
-				. ' OR `element` = ' . $db->Quote('flexiadvroute')
-				. ' OR (`folder` = ' . $db->Quote('osmap') . ' AND `element` = ' . $db->Quote('com_flexicontent') . ')'
-				. ')';
-		$db->setQuery($query);
+			. ' SET enabled = 1'
+			. ' WHERE `type`= ' . $db->Quote('plugin')
+			. ' AND (`folder` = ' . $db->Quote('flexicontent_fields')
+			. ' OR `element` = ' . $db->Quote('flexisearch')
+			. ' OR `element` = ' . $db->Quote('flexisystem')
+			. ' OR `element` = ' . $db->Quote('flexiadvsearch')
+			. ' OR `element` = ' . $db->Quote('flexiadvroute')
+			. ' OR (`folder` = ' . $db->Quote('osmap') . ' AND `element` = ' . $db->Quote('com_flexicontent') . ')'
+			. ')';
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
@@ -322,17 +305,14 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 			. " FROM #__flexicontent_cats_item_relations AS rel"
 			. " LEFT JOIN #__content AS i ON i.id = rel.itemid"
 			. " WHERE i.id IS NULL";
-		$db->setQuery($query);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		// 2nd: add missing main category relations
@@ -344,17 +324,14 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 		// Set default language for items that do not have their language set
 		$query 	= 'INSERT INTO #__flexicontent_cats_item_relations'
 			. ' (catid, itemid, ordering) ' . $subquery;
-		$db->setQuery($query);
 
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		echo '<span class="install-ok"></span>';
@@ -560,17 +537,13 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 
 					if (isset($update_queries[$tblname]))
 					{
-						$db->setQuery($update_queries[$tblname]);
-
 						try
 						{
-							$db->execute();
+							$db->setQuery($update_queries[$tblname])->execute();
 						}
 						catch (Exception $e)
 						{
-							echo '<span class="install-notok"></span>';
-							echo $e->getMessage();
-							jexit();
+							jexit('<span class="install-notok"></span>' . $e->getMessage());
 						}
 					}
 
@@ -582,19 +555,16 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 					{
 						$query  = 'ALTER TABLE #__' . $tblname . ' ';  // 'ALTER IGNORE TABLE #__' . $tblname . ' ';
 						$query .= implode(', ', $index_clause);
-						$db->setQuery($query);
 
 						try
 						{
-							$db->execute();
+							$db->setQuery($query)->execute();
 						}
 						catch (Exception $e)
 						{
 							if ($index_type != 'indexdrop')
 							{
-								echo '<span class="install-notok"></span>';
-								echo $e->getMessage();
-								jexit();
+								jexit('<span class="install-notok"></span>' . $e->getMessage());
 							}
 						}
 					}
@@ -634,18 +604,14 @@ class FlexicontentControllerFlexicontent extends FlexicontentController
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
 					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
-		$db->setQuery($query);
 
-		// Suppress exception in case of SQL error, we will print it below
 		try
 		{
-			$db->execute();
+			$db->setQuery($query)->execute();
 		}
 		catch (Exception $e)
 		{
-			echo '<span class="install-notok"></span>';
-			echo $e->getMessage();
-			jexit();
+			jexit('<span class="install-notok"></span>' . $e->getMessage());
 		}
 
 		echo '<span class="install-ok"></span>';

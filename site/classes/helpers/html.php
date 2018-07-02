@@ -2,6 +2,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Application\CMSApplication;
 
 class flexicontent_html
@@ -711,7 +712,7 @@ class flexicontent_html
 		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
 		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
 
-		JArrayHelper::toInteger($limit_options, array());
+		ArrayHelper::toInteger($limit_options, array());
 
 		if (!in_array($default_limit, $limit_options))
 		{
@@ -4847,7 +4848,7 @@ class flexicontent_html
 		$type_ids_list = false;
 		if ( !empty($type_ids) && is_array($type_ids) )
 		{
-			JArrayHelper::toInteger($type_ids, null);
+			ArrayHelper::toInteger($type_ids, null);
 			$type_ids_list = implode(',', $type_ids);
 		}
 

@@ -10,6 +10,10 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsCore extends FCField
@@ -679,7 +683,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				$cid    = $app->isSite() ? $app->input->get('cid', 0, 'int') : 0;
 				$cids   = $app->input->get('cids', array(), 'array');
-				JArrayHelper::toInteger($cids, array());
+				ArrayHelper::toInteger($cids, array());
 
 				$cats = array();
 
