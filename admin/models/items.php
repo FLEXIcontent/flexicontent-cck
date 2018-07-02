@@ -871,14 +871,14 @@ class FlexicontentModelItems extends JModelLegacy
 			else
 				$_search_index = $row->title.' | '.$row->text_stripped;
 			
-			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($_search_index).', 0)';
+			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', 0, "", "", "", '.$this->_db->Quote($_search_index) .')';
 			$id_arr[$i] = (int)$row->id;
 			$query_len += strlen($itemext[$i]) + 2;  // Sum of query length so far
 			$n++; $i++;
 			if ( ($n%101 == 0) || ($n==$row_count) || ($query_len > $query_lim ))
 			{
 				$itemext_list = implode(', ', $itemext);
-				$query = "INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`, `lang_parent_id`)"
+				$query = "INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `lang_parent_id`, `sub_items`, `sub_categories`, `related_items`, `search_index`)"
 						." VALUES " . $itemext_list
 						." ON DUPLICATE KEY UPDATE type_id=VALUES(type_id), language=VALUES(language), search_index=VALUES(search_index)";
 				$this->_db->setQuery($query);

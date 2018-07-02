@@ -1020,22 +1020,20 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
+		$format  = $app->input->getCmd('format', 'html');
 		
-		// Count an item or category hit if appropriate
-		if ($app->isSite())
+		if ($app->isSite() && $format === 'html')
 		{
+			// Count an item or category hit if appropriate
 			$this->countHit();
-		}
 
-		// CSS CLASSES for body TAG
-		if ( $app->isSite() )
-		{
+			// CSS CLASSES for body TAG
 			$start_microtime = microtime(true);
 			$css = array();
 
-			$view = $app->input->get('view', '', 'cmd');
+			$view = $app->input->getCmd('view');
 
-			if ($view=='item')
+			if ($view === 'item')
 			{
 				if ($id = $app->input->get('id', 0, 'int'))            $css[] = "item-id-".$id;  // Item's id
 				if ($cid = $app->input->get('cid', 0, 'int'))          $css[] = "item-catid-".$cid;  // Item's category id
@@ -1057,7 +1055,7 @@ class plgSystemFlexisystem extends JPlugin
 				}
 			}
 			
-			else if ($view=='category')
+			elseif ($view === 'category')
 			{
 				if ($cid = $app->input->get('cid', 0, 'int'))            $css[] = "catid-".$cid;  // Category id
 				if ($authorid = $app->input->get('authorid', 0, 'int'))  $css[] = "authorid-".$authorid; // Author id
@@ -1065,9 +1063,9 @@ class plgSystemFlexisystem extends JPlugin
 				if ($layout = $app->input->get('layout', '', 'cmd'))     $css[] = "cat-layout-".$layout;   // Category 'layout': tags, favs, author, myitems, mcats
 			}
 			
-			$html = JResponse::getBody();
+			$html = $app->getBody();
 			$html = preg_replace('#<body([^>]*)class="#', '<body\1class="'.implode(' ', $css).' ', $html, 1);  // limit to ONCE !!
-			JResponse::setBody($html);
+			$app->setBody($html);
 			$body_css_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		
@@ -1080,12 +1078,16 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Add performance message at document's end
 		global $fc_performance_msg;
-		if ($fc_performance_msg)
+
+		if ($fc_performance_msg && $format === 'html')
 		{
-			$html = JResponse::getBody();
+			$html = $app->getBody();
+
 			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
 			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
+
 			$_replace_ = strpos($html, '<!-- fc_perf -->') ? '<!-- fc_perf -->' : '</body>';
+
 			$html = str_replace($_replace_,
 				'<div id="fc_perf_box" class="fc-mssg fc-info">'.
 					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
@@ -1093,7 +1095,8 @@ class plgSystemFlexisystem extends JPlugin
 					$fc_performance_msg.
 				'</div>'."\n".$_replace_, $html
 			);
-			JResponse::setBody($html);
+
+			$app->setBody($html);
 		}
 		
 		return true;

@@ -28,8 +28,8 @@ jimport('legacy.model.list');
  */
 if (FLEXI_J40GE)
 {
-	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'Groups.php');
-	class FlexicontentModelGroups extends Joomla\Component\Users\Administrator\Model\Groups {}
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'GroupsModel.php');
+	class FlexicontentModelGroups extends Joomla\Component\Users\Administrator\Model\GroupsModel {}
 }
 else
 {

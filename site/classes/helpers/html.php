@@ -4,6 +4,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Router\Router;
 
 class flexicontent_html
 {
@@ -5471,8 +5472,27 @@ class flexicontent_html
 	{
 		static $site_router, $isAdmin, $isSH404SEF;
 
+		//$url = JRoute::link('site', $url);
+		//return $url;
+
+		if (FLEXI_J40GE)
+		{
+			$isAdmin = JFactory::getApplication()->isAdmin();
+
+			$router = Router::getInstance('site');
+			$url = $router->build($url);
+			$url = $url->toString();
+
+			if ($isAdmin)
+			{
+				$url = str_replace(JUri::base(true), JUri::root(true), $url);
+			}
+
+			return $url;
+		}
+
 		// Get frontend route instance if we are in the backend and SH404SEF is not installed
-		if ( $site_router === null )
+		if ($site_router === null)
 		{
 			$isAdmin = JFactory::getApplication()->isAdmin();
 			$isSH404SEF  = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
@@ -5534,7 +5554,7 @@ class flexicontent_html
 		}
 
 		// Check if we are in the backend again and remove administrator from URL as it is added even though we've set the application to the site app
-		if ( $isAdmin )
+		if ($isAdmin)
 		{
 			$url = str_replace(JUri::base(true), JUri::root(true), $url);
 		}

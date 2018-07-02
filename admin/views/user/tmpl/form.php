@@ -24,8 +24,11 @@ use Joomla\Utilities\ArrayHelper;
 $cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
 ArrayHelper::toInteger($cid);
 
-$edit		= JRequest::getVar('edit',true);
-$text = intval($edit) ? JText::_( 'Edit' ) : JText::_( 'New' );
+$edit = JFactory::getApplication()->input->get('edit', true);
+$text = intval($edit)
+	? JText::_('Edit')
+	: JText::_('New');
+
 $cparams = JComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
