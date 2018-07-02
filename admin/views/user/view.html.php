@@ -130,25 +130,20 @@ class FlexicontentViewUser extends JViewLegacy
 
 		// Check for post data in the event that we are returning
 		// from a unsuccessful attempt to save data
-		$post = JRequest::get('post');
-		if ( $post ) {
-			$user->bind($post);
-		}
+		$user->load($cid);
 
-		if ( $user->get('id'))
+		if ($user->get('id'))
 		{
 			$query = 'SELECT *'
-			. ' FROM #__contact_details'
-			. ' WHERE user_id = ' . $cid
-			;
-			$db->setQuery( $query );
-			$contact = $db->loadObjectList();
+				. ' FROM #__contact_details'
+				. ' WHERE user_id = ' . $cid;
+			$contact = $db->setQuery($query)->loadObjectList();
 		}
 		else
 		{
 			$contact = NULL;
 			// Get the default group id for a new user
-			$config = JComponentHelper::getParams( 'com_users' );
+			$config = JComponentHelper::getParams('com_users');
 		}
 		
 		
@@ -253,15 +248,17 @@ class FlexicontentViewUser extends JViewLegacy
 			}
 		}
 		
-		if ( !$user->get('id') ) {
+		if (!$user->get('id'))
+		{
 			$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
 			$usergroups = $new_usertype ? array($new_usertype) : array();
-		} else {
+		}
+		else
+		{
 			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
-			$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
-			$db->setQuery( $query );
-			$usergroups = $db->loadColumn();
-			if ($db->getErrorMsg())	echo $db->getErrorMsg();
+			$query = sprintf($ugrps_qtmpl, intval($user->get('id')));
+
+			$usergroups = $db->setQuery($query)->loadColumn();
 		}
 
 		// build the html select list

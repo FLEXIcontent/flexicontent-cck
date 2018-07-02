@@ -11,15 +11,26 @@ defined('_JEXEC') or die;
 
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
+
 jimport('legacy.model.admin');
-require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'user.php');
+
+if (FLEXI_J40GE)
+{
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'Model'.DS.'UserModel.php');
+	class _FlexicontentModelUser extends Joomla\Component\Users\Administrator\Model\UserModel {}
+}
+else
+{
+	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'user.php');
+	class _FlexicontentModelUser extends UsersModelUser {}
+}
 
 /**
  * User model.
  *
  * @since  1.6
  */
-class FlexicontentModelUser extends UsersModelUser
+class FlexicontentModelUser extends _FlexicontentModelUser
 {
 	/**
 	 * Constructor.

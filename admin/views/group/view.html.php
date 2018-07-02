@@ -56,7 +56,7 @@ class FlexicontentViewGroup extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		JRequest::setVar('hidemainmenu', 1);
+		JFactory::getApplication()->input->set('hidemainmenu', 1);
 
 		$user		= JFactory::getUser();
 		$isNew		= ($this->item->id == 0);
