@@ -270,7 +270,12 @@ class FlexicontentModelType extends FCModelAdmin
 
 		// We will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		$mergeProperties = array('attribs');
-		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array($this->option => $this->record_name));
+		$mergeOptions = array(
+			'params_fset'  => 'attribs',
+			'layout_type'  => 'item',
+			'model_names'  => array($this->option => $this->record_name),
+			'cssprep_save' => false,
+		);
 		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
 
 		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,

@@ -1822,7 +1822,12 @@ class ParentClassItem extends FCModelAdmin
 		// *** we will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
 		// ***
 		$mergeProperties = array('attribs', 'metadata');
-		$mergeOptions = array('params_fset' => 'attribs', 'layout_type' => 'item', 'model_names' => array($this->option => $this->record_name, 'com_content' => 'article'));
+		$mergeOptions = array(
+			'params_fset'  => 'attribs',
+			'layout_type'  => 'item',
+			'model_names'  => array($this->option => $this->record_name, 'com_content' => 'article'),
+			'cssprep_save' => false,
+		);
 		$this->mergeAttributes($item, $data, $mergeProperties, $mergeOptions);
 
 
