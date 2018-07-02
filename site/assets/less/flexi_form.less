@@ -710,13 +710,13 @@ body .nowrap_hidden {
 	overflow: hidden;
 }
 
-.flexicontent .fc_less_parameter::before {
-	background-color: darkcyan;
+.flexicontent :not(.fc_less_parameter) > .fc_less_parameter::before {
+	background-color: black;
 	color: white;
 	font-size: 12px;
 	font-weight: bold;
 	border-radius: 4px;
-	content: "L";
+	content: "css";
 	padding: 2px 4px;
 	box-sizing: content-box;
 	height: 1em;

@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -172,7 +172,7 @@ $this->document->addScriptDeclaration($js);
 
 					<?php /* No inheritage needed for these */ ?>
 					<?php echo JLayoutHelper::render('joomla.edit.publishingdata', $this); ?>
-				
+
 				</div>
 
 				<!--RIGHT COLUMN-->
@@ -362,28 +362,45 @@ $this->document->addScriptDeclaration($js);
 										foreach ($form_layout->getFieldset($fsname) as $field) :
 
 											if ($field->getAttribute('not_inherited')) continue;
-											if ($field->getAttribute('cssprep')) continue;
+											//if ($field->getAttribute('cssprep')) continue;
+
+											$cssprep = $field->getAttribute('cssprep');
+											$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 
 											$fieldname = $field->fieldname;
-											//$value = $form_layout->getValue($fieldname, $groupname, @ $this->row->params[$fieldname]);
+
+											// For J3.7.0+ , we have extra form methods Form::getFieldXml()
+											if ($cssprep && FLEXI_J37GE)
+											{
+												$_value = $form_layout->getValue($fieldname, $groupname, @ $this->iparams[$fieldname]);
+												$field->setValue($_value);
+												$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+												$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
+											}
 
 											echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
 											 ? $field->input
 											 : '
 												<div class="control-group" id="'.$field->id.'-container">
 													<div class="control-label">'.
-														str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-															$form_layout->getLabel($fieldname, $groupname)).'
+														str_replace('class="', 'class="'.$_labelclass.' ',
+															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+																$form_layout->getLabel($fieldname, $groupname)
+															)
+														) . '
 													</div>
 													<div class="controls">
-														'.
-															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+														' . ($cssprep && !FLEXI_J37GE
+															? (isset($this->iparams[$fieldname]) ? '<i>' . $this->iparams[$fieldname] . '</i>' : '<i>default</i>')
+															:
+															str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 																str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
 																	$this->getInheritedFieldDisplay($field, $this->iparams)
 																	//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 																)
-															).							
-														'
+															)
+														) .
+														($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
 													</div>
 												</div>
 											';

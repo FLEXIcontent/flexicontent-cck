@@ -259,8 +259,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			// These URL variables must match or be empty:
 			$cid_ok      = (int) $cid == (int) @ $menu->query['cid'];
 			$layout_ok   = $layout    == @ $menu->query['layout'];
-			$authorid_ok = ($layout!='author') || ((int) $authorid  == (int) @ $menu->query['authorid']);
-			$tagid_ok    = ($layout!='tags')   || ((int) $tagid     == (int) @ $menu->query['tagid']);
+			$authorid_ok = ($layout !== 'author') || ((int) $authorid  === (int) @ $menu->query['authorid']);
+			$tagid_ok    = ($layout !== 'tags')   || ((int) $tagid     === (int) @ $menu->query['tagid']);
 
 			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
 		}

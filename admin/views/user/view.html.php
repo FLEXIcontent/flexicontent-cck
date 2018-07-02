@@ -50,10 +50,11 @@ class FlexicontentViewUser extends JViewLegacy
 		$view       = $jinput->get('view', '', 'cmd');
 		$controller = $jinput->get('controller', '', 'cmd');
 
-		
-		// *****************
-		// Load JS/CSS files
-		// *****************
+
+
+		// ***
+		// *** Include needed files and add needed js / css files
+		// ***
 		
 		// Add css to document
 		!JFactory::getLanguage()->isRtl()
@@ -64,11 +65,18 @@ class FlexicontentViewUser extends JViewLegacy
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
+		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
-		
-		// Add js function to overload the joomla submitform validation
+
+		// Load custom behaviours: form validation, popup tooltips
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('bootstrap.tooltip');
+
+		// Add js function to overload the joomla submitform validation
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
@@ -223,7 +231,10 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		// Load language file of currently selected template
 		$_clayout = $params_authorcat->get('clayout');
-		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
+		if ($_clayout)
+		{
+			FLEXIUtilities::loadTemplateLanguageFile($_clayout);
+		}
 		
 		$params_author = new JRegistry($user->params);
 		
