@@ -47,7 +47,7 @@ class FlexicontentViewField extends JViewLegacy
 		$view       = $jinput->get('view', '', 'cmd');
 
 		$tip_class = ' hasTooltip';
-		$manager_view = $ctrl = 'fields.';
+		$manager_view = $ctrl = 'fields';
 		$js = '';
 
 
@@ -91,11 +91,18 @@ class FlexicontentViewField extends JViewLegacy
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
+		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
-		
-		// Add js function to overload the joomla submitform validation
+
+		// Load custom behaviours: form validation, popup tooltips
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('bootstrap.tooltip');
+
+		// Add js function to overload the joomla submitform validation
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 

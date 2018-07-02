@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -87,23 +87,23 @@ $code_btn_rawcode = array(
 
 <?php if (isset($item->positions[$_position_name])) : /* IF position has fields */ ?>
 <div class="flexi lineinfo <?php echo $_position_name; ?> group">
-	
+
 		<?php foreach ($item->positions[$_position_name] as $field) : /* LOOP through fields of the position */?>
 		<div class="flexi element field_<?php echo $field->name; ?>">
-		
+
 			<?php if ($field->label) : /* Display label according to configuration */ ?>
 				<span class="flexi label field_<?php echo $field->name; ?>">
 					<?php echo $field->label; ?>
 				</span>
 			<?php endif; ?>
-			
+
 			<div class="flexi value field_<?php echo $field->name; ?>">
 				<?php echo $field->display; ?>
 			</div>
-			
+
 		</div>
 	<?php endforeach; ?>
-		
+
 </div>
 <?php endif; ?>
 
@@ -138,18 +138,18 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 	function tmpls_fcfield_init_ordering() {
 	<?php echo $this->jssort . ';' ; ?>
 	}
-	
+
 	var code_box_cnt = 0;
 	function toggle_code_inputbox(btn)
 	{
 		var _btn = jQuery(btn);
 		var el=jQuery(btn).next().next();
-		
+
 		var becomes_visible = ! el.is(':visible');
 		el.toggle();
 		becomes_visible ? code_box_cnt++ : code_box_cnt--;
 		if (code_box_cnt<0) code_box_cnt = 0;
-		
+
 		if (becomes_visible) {
 			_btn.addClass('btn-info').find('span').removeClass('icon-eye').addClass('icon-eye-close');
 			el.get(0).select();
@@ -159,7 +159,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			el.prev().hide(400);
 		}
 	}
-	
+
 	function set_editor_contents(txtarea, theData, extension)
 	{
 		var CM = txtarea.next();//.get(0).CodeMirror;
@@ -176,11 +176,11 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				lineNumbers: true,
 				matchBrackets: true,
 				lineWrapping: true,
-				onCursorActivity: function() 
+				onCursorActivity: function()
 				{
 					CM.setLineClass(hlLine, null);
 					hlLine = CM.setLineClass(CM.getCursor().line, "activeline");
-				}	
+				}
 			});
 		}
 		else
@@ -194,7 +194,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		CM.getWrapperElement().style['font-family'] = 'Courier New';
 		CM.refresh();
 	}
-	
+
 	function save_layout_file(formid)
 	{
 		var form = jQuery('#'+formid);
@@ -204,23 +204,23 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			alert(<?php echo "'".JText::_('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true)."'"; ?>);
 			return;
 		}
-		
+
 		<?php
 		if (in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation'))) {
 			echo 'if (!confirm("'.JText::_('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true).'")) return false;';
 		}
 		?>
-		
+
 		txtarea = jQuery('#editor__file_contents');
 		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_SAVING");?><br/></span>');
-		
+
 		// Set the current codemirror data into the textarea before serializing and submit the form via AJAX
 		var CM = txtarea.next();//.get(0).CodeMirror;
 		if (CM.hasClass('CodeMirror')) {
 			var file_contents = CM.get(0).CodeMirror.getValue();
 			txtarea.val(file_contents);
 		}
-		
+
 		jQuery.ajax({
 			type: "POST",
 			url: "index.php?option=com_flexicontent&task=templates.savelayoutfile&format=raw",
@@ -236,22 +236,22 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			}
 		});
 	}
-	
+
 	function load_layout_file(layout_name, file_subpath, load_mode, btn_classes)
 	{
 		var layout_name  = (typeof layout_name != "undefined"  && layout_name!='')  ? layout_name  : jQuery('#editor__layout_name').val();
 		var file_subpath = (typeof file_subpath != "undefined" && file_subpath!='') ? file_subpath : jQuery('#editor__file_subpath').val();
 		var btn_classes = (typeof btn_classes != "undefined") ? btn_classes : '';
 		if (btn_classes=='-1') btn_classes = jQuery('#editor__btn_classes').val();
-		
+
 		var load_mode = (typeof load_mode != "undefined") ? load_mode : 0;
 		var form = jQuery('#layout_file_editor_form');
-		
+
 		jQuery('#editor__layout_name').val(layout_name);
 		jQuery('#editor__file_subpath').val(file_subpath);
 		jQuery('#editor__load_mode').val(load_mode);
 		jQuery('#editor__btn_classes').val(btn_classes);
-		
+
 		jQuery('.code_box').hide();
 		btn_classes = btn_classes!='' ? btn_classes.split(" ") : Array();
 		jQuery.each( btn_classes, function( cname, val ) {
@@ -261,17 +261,17 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			jQuery('#code_box_header').css('display', '');
 		else
 			jQuery('#code_box_header').css('display', 'none');
-		
+
 		if (load_mode == '2') {
 			form.submit();
 			return;
 		}
-		
+
 		txtarea = jQuery('#editor__file_contents');
 		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_LOADING");?><br/></span>');
 		txtarea.hide();
 		jQuery('#layout_edit_name_container').html(file_subpath);
-		
+
 		jQuery.ajax({
 			type: form.attr('method'),
 			url: form.attr('action'),
@@ -300,8 +300,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 <div id="flexicontent" class="flexicontent">
 
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-horizontal">
-	
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
+
 	<div class="fctabber tabset_layout fcparams_tabset" id="tabset_layout" style="margin:16px 0 !important;">
 
 		<div class="tabbertab" id="tabset_layout_information_tab" data-icon-class="icon-info" >
@@ -310,8 +310,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 	<!--div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important">
 		<?php echo !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $this->layout->name; ?>
 	</div-->
-	
-	
+
+
 	<table>
 		<tr>
 			<td style="vertical-align:top;">
@@ -339,7 +339,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							<span class="badge badge-success"><?php echo $this->layout->view; ?></span>
 						</td>
 					</tr>
-					
+
 					<tr>
 						<td style="padding-top:12px;" colspan="2">
 						</td>
@@ -364,12 +364,12 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							<?php echo JText::_($this->layout->description); ?>
 						</td>
 					</tr>
-					
+
 					<tr>
 						<td style="padding-top:12px;" colspan="2">
 						</td>
-					</tr>					
-					
+					</tr>
+
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
@@ -380,12 +380,12 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							<?php echo $this->layout->microdata_support!=0 ? '<i class="icon-checkmark"></i>' :  '<i class="icon-cancel"></i>'; ?>
 						</td>
 					</tr>
-					
+
 					<tr>
 						<td style="padding-top:12px;" colspan="2">
 						</td>
-					</tr>					
-					
+					</tr>
+
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
@@ -450,25 +450,25 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			</td>
 		</tr>
 	</table>
-		
+
 		</div>
-		
+
 		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
-				
+
 			<div class="fcclear"></div>
 			<div class="fc-mssg fc-success fc-nobgimage" style="font-size:100%; margin: 4px 0;">
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
 				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 			</div>
-			
+
 			<div class="container-fluid" style="padding:0px!important;">
 				<div class="span6 full_width_980">
-					
+
 					<fieldset id="available_fields_container">
 						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
 						<div class="fcclear"></div>
-						
+
 						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
 							<div style="float:left; margin-right:32px;">
 								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
@@ -483,10 +483,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 								</div>
 							</div>
 						</div>
-						
-						
+
+
 						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
-					
+
 						<div class="positions_container">
 							<ul id="sortablecorefields" class="positions">
 							<?php
@@ -503,10 +503,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							?>
 							</ul>
 						</div>
-						
-						
+
+
 						<div class="positions_title label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'); ?></div>
-						
+
 						<div class="positions_container">
 							<ul id="sortableuserfields" class="positions">
 							<?php
@@ -523,17 +523,17 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							?>
 							</ul>
 						</div>
-					
+
 					</fieldset>
-					
-				</div>	
-				
+
+				</div>
+
 				<div class="span6 full_width_980 padded_wrap_box">
-					
+
 					<fieldset id="layout_positions_container">
 						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
 						<div class="fcclear"></div>
-						
+
 						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
 							<div style="float:left; margin-right:32px;">
 								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
@@ -548,14 +548,14 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 								</div>
 							</div>
 						</div>
-						
+
 						<?php
 						if (isset($this->layout->positions)) :
 							$count = -1;
 							$posrow = null;
 							foreach ($this->layout->positions as $pos) :
 								$count++;
-								
+
 								$pos_css = "";
 								$posrow_prev = $posrow;
 								$posrow = isset($this->layout->attributes[$count]['posrow'] )  ?  $this->layout->attributes[$count]['posrow'] : '';
@@ -565,17 +565,17 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 								// Detect field group row change and close previous row if open
 								echo ($posrow_prev && $posrow_prev != $posrow)  ?  "</td></tr></table>\n"  :  "";
-								
+
 								if ($posrow)
 								{
 									// we are inside field group row, start it or continue with next field group
 									echo ($posrow_prev != $posrow)  ?  "<table style='width:100%;'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
 								}
-								
+
 							?>
-							
+
 							<div class="positions_title label label-success" style="color: white; margin:10px 0 2px; <?php echo $title_color; ?>"><?php echo $postitle; ?></div>
-							
+
 							<?php
 							if ( isset($this->layout->attributes[$count]['readonly']) ) {
 								switch ($this->layout->view) {
@@ -604,12 +604,12 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							<?php
 									endif;
 								endforeach;
-							endif;	
+							endif;
 							?>
 							</ul>
 						</div>
 							<input type="hidden" name="<?php echo $pos; ?>" id="<?php echo $pos; ?>" value="" />
-						<?php 
+						<?php
 							endforeach;
 							// Close any field group line that it is still open
 							echo $posrow ? "</td></tr></table>\n" : "";
@@ -618,38 +618,59 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						endif;
 						?>
 					</fieldset>
-					
+
 				</div>
 			</div>
-			
+
 		</div>
-		
+
 		<?php
 			$pfx = $this->layout->view == 'category' ? 'FCC' : 'FCI';
 		?>
-		
-		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >	
+
+		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
-			
-			<span class="fc-mssg-inline fc-info" style="max-width: unset; font-size:100%; margin: 4px 32px 0 0!important; padding-top:4px; padding-bottom:4px;">
-				-
-				<?php echo JText::_( $this->layout->view == 'item' ?
-					'your <b>content types / items</b> ' :
-					'your <b>content lists</b> (categories, etc)'
-				);?>
-				will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
-				<br/> -	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
-			</span>
 
-			<br />
+			<div style="max-width:1024px; margin-bottom:16px;">
 
-			<span class="fc-mssg-inline fc-info" style="max-width: unset; font-size:100%; margin: 4px 32px 0 0!important; padding-top:4px; padding-bottom:4px;">
-				-	<span class="fc_less_parameter"></span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
-				<br/> - NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%; color:black;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
-			</span>
-			
+				<div id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
+					<span class="icon-help"></span> <?php echo JText::_('FLEXI_HELP2'); ?>
+				</div>
+
+				<div id="fc-mini-help_btn2" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-less', this, 'btn-primary');" style="margin: 0 0 0 0;">
+					<span class="icon-help"></span> <?php echo JText::_('CSS'); ?> ... <small><?php echo JText::_('FLEXI_ADVANCED_USERS'); ?></small>
+				</div>
+
+				<div class="fcclear"></div>
+
+				<div id="fc-mini-help-heritage" class="fc-mssg fc-info fc-nobgimage" style="max-width: unset; font-size:100%; margin: 32px 0 !important; padding-top:4px; padding-bottom:4px; display:none;">
+					<b><?php echo JText::_('FLEXI_TMPL_ABOUT_HERITAGE'); ?></b>
+
+					<br/><br/>
+					-	<?php echo JText::_( $this->layout->view == 'item' ?
+						'your <b>content types / items</b> ' :
+						'your <b>content lists</b> (categories, etc)'
+					);?>
+					will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
+
+					<br/>
+					-	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
+				</div>
+
+				<div id="fc-mini-help-less" class="fc-mssg fc-info fc-nobgimage" style="max-width: unset; font-size:100%; margin: 32px 0 !important; padding-top:4px; padding-bottom:4px; display:none;">
+					<b><?php echo JText::_('FLEXI_TMPL_ABOUT_CSS_VIA_PARAMS'); ?></b>
+
+					<br/><br/>
+					-	<span class="fc_less_parameter"></span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
+
+					<br/>
+					- NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%; color:black;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
+				</div>
+
+			</div>
+
 			<div style="max-width:1024px; margin-top:16px;">
-			
+
 				<?php
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 				$fieldSets = $this->layout->params->getFieldsets($groupname);
@@ -663,7 +684,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							$fieldname =  $field->__get('fieldname');
 							$cssprep = $field->getAttribute('cssprep');
 							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
+
 							$value = $this->layout->params->getValue($fieldname, $groupname, @$this->conf->attribs[$fieldname]);
+							$value = $value !== '' ? $value : null;
+
 							if ($field->getAttribute('type')=='separator' || $field->hidden)
 							{
 								echo $field->input;
@@ -677,7 +701,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 									)
 								) . '</div>';
 							echo '<div class="controls">' .
-								str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_', 
+								str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_',
 									str_replace('[attribs]', '[layouts]['.$this->layout->name.']',
 										$this->layout->params->getInput($fieldname, $groupname, $value)
 									)
@@ -686,21 +710,21 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						endforeach; ?>
 					</fieldset>
 				<?php endforeach; ?>
-				
+
 			</div>
 		</div>
-		
+
 		<div class="tabbertab" id="tabset_layout_edit_files_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
-			
+
 			<div id="layout-filelist-container" class="span4" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
-				
+
 				<?php
 				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
-				
+
 				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#('.$this->layout->view.'(_.*\.|\.)(php|xml|less|css|js)|include.*less)#i');
 				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
 				$it->rewind();
@@ -726,14 +750,14 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				);
 				$file_tip['item_html5.php'] = $file_tip['item.php'].' (HTML5 version)';
 				$file_tip['category_items_html5.php'] = $file_tip['category_items.php'].' (HTML5 version)';
-				
+
 				$file_tip['category_html5.php'] = $file_tip['category.php'].' (HTML5 version)';
 				$file_tip['category_category_html5.php'] = $file_tip['category_category.php'].' (HTML5 version)';
 				$file_tip['category_alpha_html5.php'] = $file_tip['category_alpha.php'].' (HTML5 version)';
 				$file_tip['category_peercategories_html5.php'] = $file_tip['category_peercategories.php'].' (HTML5 version)';
 				$file_tip['category_subcategories_html5.php'] = $file_tip['category_subcategories.php'].' (HTML5 version)';
-				
-				
+
+
 				$file_tip_extra = array(
 					'config.less'=>'NOTE:<br/>- this is automatically imported by item.less and category.less <br/> - if you need to import extra less files, then files must be in same folder (less/include/) for automatic compiling to be triggered',
 					'item.xml'=>'This file contains layout\' s structure: including <br/> - <b>display parameters, field positions, file list, etc</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>item.php</b> <br/><b>item_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
@@ -743,7 +767,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				);
 				$file_tip_extra['item_html5.php'] = $file_tip_extra['item.php'];
 				$file_tip_extra['category_items_html5.php'] = $file_tip_extra['category_items.php'];
-				
+
 				$file_code_btns = array(
 					'item.xml'=>array('fieldPosXML'=>1, 'paramTextXML'=>1, 'paramRadioXML'=>1, 'paramSelectXML'=>1),
 					'category.xml'=>array('fieldPosXML'=>1, 'paramTextXML'=>1, 'paramRadioXML'=>1, 'paramSelectXML'=>1),
@@ -752,8 +776,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				);
 				$file_code_btns['item_html5.php'] = $file_code_btns['item.php'];
 				$file_code_btns['category_items_html5.php'] = $file_code_btns['category_items.php'];
-				
-				
+
+
 				while($it->valid())
 				{
 					if (!$it->isDot()) {
@@ -762,10 +786,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						//echo ' -- <span class="label">Key</span> '. $it->key();
 						$subpath = $it->getSubPath();
 						$subpath_highlighted = $subpath ? '<span class="label">'.str_replace('\\', '/', $subpath).'/</span>' : '';
-						
+
 						$subpath_file = $it->getSubPathName();
 						$filename = basename( $subpath_file ); //preg_replace('#^'.$subpath.'\\'.DS.'#', '', $subpath_file);
-						
+
 						// Skip some files, e.g. auto generated item / category specific files
 						if (
 							($this->layout->view == 'item' && $filename == 'config_auto_category.less') ||
@@ -774,7 +798,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							$it->next();
 							continue;
 						}
-						
+
 						$pi = pathinfo($it->key());
 						$ext = $pi['extension'];
 						$file_type = isset($ext_badge[$ext]) ?
@@ -796,7 +820,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						;
 						echo "<br/>";
 					}
-					
+
 					$it->next();
 				}
 				?>
@@ -809,17 +833,17 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<div class="fcclear"></div>
 				<div id="ajax-system-message-container"></div>
 				<div class="fcclear"></div>
-				
+
 				<div class="fc-note fc-mssg" id="edit-css-files-warning" style="display: none;">
 					<?php echo JText::_( 'FLEXI_MODIFY_LESS_FILES_INSTEAD_OF_CSS' ); ?>
 				</div>
-				
+
 				<?php
 				if ($use_editor) {
 					$editor = JFactory::getEditor('codemirror');
 					$editor_plg_params = array('mode'=>'php');  // Override parameters of the editor plugin, ignored by most editors !!
 				}
-				
+
 				$elementid_n = "editor__file_contents";  $fieldname_n = "file_contents";
 				$cols="80"; $rows="16";   $width = '100%'; $height='400px';
 				$class="fcfield_textval";
@@ -829,15 +853,15 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					$editor->display( $fieldname_n, '', $width, $height, $cols, $rows, $show_buttons, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params );
 				echo $txtarea;
 				?>
-				
+
 				<br/>
-				
+
 				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHtml::_( 'form.token' )); ?>
 				<input type="hidden" name="load_mode" id="editor__load_mode" form="layout_file_editor_form"/>
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
 				<input type="hidden" name="btn_classes" id="editor__btn_classes" form="layout_file_editor_form"/>
-				
+
 				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="<?php echo $btn_class; ?> btn-success <?php echo $tip_class; ?>" onclick="save_layout_file('layout_file_editor_form'); return false;" style="display:none;" value="Save" form="layout_file_editor_form"
 				title="<?php echo flexicontent_html::getToolTip('Save file', 'You may want to download a copy in your local disk before saving changes', 0, 1); ?>"
 				/>
@@ -847,13 +871,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<input type="button" name="load_file_btn" id="editor__load_common_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 1, -1); return false;" style="display:none;" value="Load/customize system's default" form="layout_file_editor_form"
 				title="<?php echo flexicontent_html::getToolTip('System\'s default code', 'Please note that this loads the <b>system\'s default</b> for the current file, which maybe different than <b>template\'s default</b> code', 0, 1); ?>"
 				/>
-				
-				
+
+
 				<span class="fcsep_level0" id="code_box_header" style="display:none; margin:16px 0 12px 0; background-color:#333; ">
 					<span id="layout_edit_" class="label label-info"><?php echo JText::_( 'FLEXI_INSERT_TEMPLATE_CODE' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
-				
+
 				<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
 				<div class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
 					<div class="btn <?php echo $tip_class; ?>"
@@ -868,14 +892,14 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					<textarea style="float:left; clear:both; display:none; width:100%;" rows="24" form="code_insertion_form"><?php echo htmlspecialchars($code_btn_rawcode[$_posname]); ?></textarea>
 				</div>
 				<?php endforeach; ?>
-				
+
 			</div>
-			
+
 		</div>
-			
+
 	</div>
-	
-	
+
+
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="templates" />
 	<input type="hidden" name="rows" id="rows" value="" />

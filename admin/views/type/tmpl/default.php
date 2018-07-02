@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -35,9 +35,9 @@ $this->document->addScriptDeclaration($js);
 
 	<div class="container-fluid">
 		<div class="span6 full_width_980">
-			
+
 			<table class="fc-form-tbl" style="margin-bottom:12px;">
-				
+
 				<tr>
 					<td class="key">
 							<?php echo $this->form->getLabel('name'); ?>
@@ -47,7 +47,7 @@ $this->document->addScriptDeclaration($js);
 						<input type="hidden" id="jform_title" name="jform[title]" value="<?php echo $this->form->getValue('name'); ?>" />
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('published'); ?>
@@ -56,7 +56,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('published'); ?>
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('access'); ?>
@@ -65,7 +65,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('access'); ?>
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('alias'); ?>
@@ -74,7 +74,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('alias'); ?>
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('itemscreatable'); ?>
@@ -83,9 +83,9 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('itemscreatable'); ?>
 					</td>
 				</tr>
-				
+
 			</table>
-		
+
 		</div>
 		<div class="span6 full_width_980">
 
@@ -95,8 +95,8 @@ $this->document->addScriptDeclaration($js);
 
 		</div>
 	</div>
-	
-	
+
+
 	<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-paragraph-justify" >
@@ -110,20 +110,20 @@ $this->document->addScriptDeclaration($js);
 
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-cogs" >
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CORE_FIELDS'); ?> </h3>
-			
+
 			<?php
 			//echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 			$fieldSets = $this->form->getFieldsets('attribs');
 			$prefix_len = strlen('customize_field-');
 			foreach ($fieldSets as $fsname => $fieldSet) :
 				if ( substr($fsname, 0, $prefix_len)!='customize_field-' ) continue;
-				
+
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $fsname.'-options');
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
 					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
-				
+
 				foreach ($this->form->getFieldset($fsname) as $field) :
 					$_depends = $field->getAttribute('depend_class');
 					echo ($field->getAttribute('type')=='separator' || $field->hidden) ? $field->input : '
@@ -146,7 +146,7 @@ $this->document->addScriptDeclaration($js);
 		$prefix_len = strlen('customize_field-');
 		foreach ($fieldSets as $fsname => $fieldSet) :
 			if ( $fsname=='themes' || substr($fsname, 0, $prefix_len)=='customize_field-' ) continue;
-			
+
 			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
 ?>
 		<div class="tabbertab" id="<?php echo $fsname; ?>-options" data-icon-class="<?php echo isset($fieldSet->icon_class) ? $fieldSet->icon_class : 'icon-pencil';?>" >
@@ -156,7 +156,7 @@ $this->document->addScriptDeclaration($js);
 			if (isset($fieldSet->description) && trim($fieldSet->description)) :
 				echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 			endif;
-			
+
 			foreach ($this->form->getFieldset($fsname) as $field) :
 				$_depends = $field->getAttribute('depend_class');
 				if ( $field->getAttribute('box_type') )
@@ -170,22 +170,22 @@ $this->document->addScriptDeclaration($js);
 						</div>
 					</div>
 					';
-					
+
 			endforeach;
 		?>
 		</div>
-		
+
 		<?php endforeach;
 		//echo JHtml::_('sliders.end');
 		?>
-		
-		
+
+
 	<!-- Template tab -->
 	<div class="tabbertab" id="themes-options" data-icon-class="icon-palette">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
-			
+
 			<span class="btn-group input-append" style="margin: 2px 0px 6px;">
 				<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
 			</span>
@@ -198,7 +198,7 @@ $this->document->addScriptDeclaration($js);
 				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 			</div>
 			<div class="fcclear"></div>
-			
+
 			<?php
 			foreach ($this->form->getFieldset('themes') as $field):
 				if (!$field->label || $field->hidden)
@@ -219,29 +219,29 @@ $this->document->addScriptDeclaration($js);
 					';
 				}
 			endforeach; ?>
-			
+
 			<div class="fc-sliders-plain-outer">
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 				$item_layout = $this->row->attribs->get('ilayout');
-				
+
 				foreach ($this->tmpls as $tmpl) :
-					
+
 					$form_layout = $tmpl->params;
 					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
 					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
-					
+
 					if ($tmpl->name != $item_layout) continue;
 
 					// Display only current layout and only get globalb layout parameters for it
 					$layoutParams = flexicontent_tmpl::getLayoutparams('items', $tmpl->name, '');
 					$layoutParams = new JRegistry($layoutParams);
-					
+
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
 						<fieldset class="panelform params_set">
-						
+
 						<?php
 						if (isset($fieldSet->label) && trim($fieldSet->label)) :
 							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
@@ -249,58 +249,76 @@ $this->document->addScriptDeclaration($js);
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 						endif;
-						
+
 						foreach ($form_layout->getFieldset($fsname) as $field) :
-							
+
 							if ($field->getAttribute('not_inherited')) continue;
-							if ($field->getAttribute('cssprep')) continue;
-							
+							//if ($field->getAttribute('cssprep')) continue;
+
+							$cssprep = $field->getAttribute('cssprep');
+							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
+
 							$fieldname = $field->fieldname;
-							//$value = $form_layout->getValue($fieldname, $groupname, $this->row->attribs->get($fieldname));
-							
+
+							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
+							if ($cssprep && FLEXI_J37GE)
+							{
+								$_value = $form_layout->getValue($fieldname, $groupname, @ $layoutParams[$fieldname]);
+								$field->setValue($_value);
+								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
+							}
+
 							echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
 							 ? $field->input
 							 : '
 								<div class="control-group" id="'.$field->id.'-container">
 									<div class="control-label">'.
-										str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-											$form_layout->getLabel($fieldname, $groupname)).'
+										str_replace('class="', 'class="'.$_labelclass.' ',
+											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+												$form_layout->getLabel($fieldname, $groupname)
+											)
+										) . '
 									</div>
 									<div class="controls">
-										'.
-											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+										' . ($cssprep && !FLEXI_J37GE
+											? (isset($this->iparams[$fieldname]) ? '<i>' . $this->iparams[$fieldname] . '</i>' : '<i>default</i>')
+											:
+											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
 													$this->getInheritedFieldDisplay($field, $layoutParams)
 													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 												)
-											).							
-										'
+											)
+										) .
+										($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
 									</div>
 								</div>
 							';
+
 						endforeach; ?>
-						
+
 						</fieldset>
-						
+
 					<?php endforeach; //fieldSets ?>
 				<?php endforeach; //tmpls ?>
-				
+
 				<?php echo JHtml::_('sliders.end'); ?>
 			</div>
 		</div>
 	</div>
-	
-	
+
+
 	<!-- Permissions tab -->
 	<div class="tabbertab" id="permissions-options" data-icon-class="icon-power-cord">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
-		
+
 		<div class="fc_tabset_inner">
 			<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 		</div>
-		
+
 	</div> <!-- end tab -->
-	
+
 </div> <!-- end of tab set -->
 
 <?php echo JHtml::_( 'form.token' ); ?>

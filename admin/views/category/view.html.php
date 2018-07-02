@@ -46,7 +46,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		$option     = $jinput->get('option', '', 'cmd');
 		$view       = $jinput->get('view', '', 'cmd');
 		$controller = $jinput->get('controller', '', 'cmd');
+
 		$tip_class = ' hasTooltip';
+		$manager_view = 'categories';
+		$ctrl = 'category';
+		$js = '';
 
 		// Load Joomla 'com_categories' language files
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -58,20 +62,23 @@ class FlexicontentViewCategory extends JViewLegacy
 		// *** Get record data, and check if record is already checked out
 		// ***
 		
-		// Get data from the model
+		// Get model and load the record data
 		$model = $this->getModel();
 		$row   = $this->get('Item');
-		$form  = $this->get('Form');
 		$isnew = ! $row->id;
-		$manager_view = 'categories';
-		$ctrl = 'category';
-		$js = '';
 
+		// Get JForm
+		$form  = $this->get('Form');
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'warning');
+			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
+		}
 
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
-			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
 
@@ -166,12 +173,18 @@ class FlexicontentViewCategory extends JViewLegacy
 			: $document->addStyleSheetVersion(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', FLEXI_VHASH);
 		
 		// Add JS frameworks
-		JHtml::_('formbehavior.chosen', 'select.use_chosen_lib'); 
+		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('touch-punch');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
-		
-		// Add js function to overload the joomla submitform validation
+
+		// Load custom behaviours: form validation, popup tooltips
 		JHtml::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		JHtml::_('bootstrap.tooltip');
+
+		// Add js function to overload the joomla submitform validation
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 
@@ -343,7 +356,10 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// Load language file of currently selected template
 		$_clayout = $catparams->get('clayout');
-		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
+		if ($_clayout)
+		{
+			FLEXIUtilities::loadTemplateLanguageFile($_clayout);
+		}
 
 		// Get the category layouts, checking template of current layout for modifications
 		$themes		= flexicontent_tmpl::getTemplates($_clayout);
