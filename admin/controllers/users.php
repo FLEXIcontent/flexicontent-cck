@@ -15,6 +15,9 @@
 // No direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
@@ -224,7 +227,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		$cid = JRequest::getVar('cid', array(), '', 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (count($cid) < 1)
 		{
@@ -321,7 +324,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		if (!$check_uids)
 		{
 			$cid = JRequest::getVar('cid', array(), '', 'array');
-			JArrayHelper::toInteger($cid);
+			ArrayHelper::toInteger($cid);
 			$block = JRequest::getVar('task') == 'block';
 		}
 		else
@@ -417,7 +420,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$cids   = JRequest::getVar('cid', array(), '', 'array');
 		$client = JRequest::getVar('client', 0, '', 'int');
 
-		JArrayHelper::toInteger($cids);
+		ArrayHelper::toInteger($cids);
 
 		if (count($cids) < 1)
 		{

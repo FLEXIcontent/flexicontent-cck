@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 /**
  * Users component debugging helper.
@@ -56,7 +57,7 @@ class UsersHelperDebug
 			unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
 
 			// Sort by component name
-			JArrayHelper::sortObjects($items, 'text', 1, true, $lang->getLocale());
+			ArrayHelper::sortObjects($items, 'text', 1, true, $lang->getLocale());
 		}
 
 		return $items;

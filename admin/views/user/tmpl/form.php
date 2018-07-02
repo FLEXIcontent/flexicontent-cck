@@ -18,8 +18,11 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 $cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
-JArrayHelper::toInteger($cid);
+ArrayHelper::toInteger($cid);
 
 $edit		= JRequest::getVar('edit',true);
 $text = intval($edit) ? JText::_( 'Edit' ) : JText::_( 'New' );

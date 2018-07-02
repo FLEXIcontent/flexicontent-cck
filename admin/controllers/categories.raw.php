@@ -18,6 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 // Import parent controller
 jimport('legacy.controller.admin');
 
@@ -82,9 +85,11 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		// Check for request forgeries
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$copyid	= JRequest::getInt('copycid', '', 'post');
-		$destid	= JRequest::getVar('destcid', null, 'post', 'array');
-		$task = JRequest::getVar('task');
+		$copyid	= $this->input->getInt('copycid', 0);
+		$destid	= $this->input->getArray('destcid', array());
+		$task = $this->input->getCmd('task');
+
+		ArrayHelper::toInteger($destid);
 
 		$user = JFactory::getUser();
 		$model = $this->getModel('category');

@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
@@ -359,7 +360,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -435,7 +436,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -505,7 +506,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -830,7 +831,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			return;
 		}
 
-		$accesses	= JRequest::getVar('access', array(0), 'post', 'array');
+		$accesses	= $this->input->getArray('access', array(0));
 		$access = $accesses[$field_id];
 
 		if (!$model->saveaccess($field_id, $access))
@@ -983,7 +984,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$model = $this->getModel('fields');
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$propname = $this->input->get('propname', null, 'cmd');
 
 		if (!is_array($cid) || count($cid) < 1)

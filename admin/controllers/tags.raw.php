@@ -18,6 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
@@ -100,7 +103,7 @@ class FlexicontentControllerTags extends FlexicontentController
 
 		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('cid', array(0), 'array');
-		JArrayHelper::toInteger($cid, array(0));
+		ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)

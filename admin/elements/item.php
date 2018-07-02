@@ -19,6 +19,9 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
@@ -127,13 +130,13 @@ class JFormFieldItem extends JFormField
 		if ($language && $option=='com_flexicontent' && $view=='item')
 		{
 			$id = $jinput->get('id', array(0), 'array');
-			JArrayHelper::toInteger($id);
+			ArrayHelper::toInteger($id);
 			$assocs_id = (int) $id[0];
 			
 			if (!$assocs_id)
 			{
 				$cid = $jinput->get('cid', array(0), 'array');
-				JArrayHelper::toInteger($cid);
+				ArrayHelper::toInteger($cid);
 				$assocs_id = (int) $cid[0];
 			}
 		}

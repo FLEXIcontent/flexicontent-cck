@@ -19,8 +19,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.list');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.list');
 
 /**
  * FLEXIcontent Component fields Model
@@ -610,7 +612,7 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function filterByCoreTypes($cid = array())
 	{
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		$query = 'SELECT id '
 		. ' FROM #__flexicontent_fields'

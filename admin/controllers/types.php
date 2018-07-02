@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
@@ -343,7 +344,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -405,7 +406,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -475,7 +476,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -755,7 +756,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$model = $this->getModel($this->record_name);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		$toggle_count = 0;
 

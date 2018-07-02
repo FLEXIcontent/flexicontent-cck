@@ -19,8 +19,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Items Model
@@ -547,7 +549,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$im_custom_filters = trim($im_custom_filters);
 		if (!$im_custom_filters) return array();
 		$im_custom_filters = preg_split("/[\s]*,[\s]*/", $im_custom_filters);
-		JArrayHelper::toInteger($im_custom_filters, null);
+		ArrayHelper::toInteger($im_custom_filters, null);
 		
 		// Field's has_access flag
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -1011,7 +1013,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate  = $this->_db->Quote( JFactory::getDate()->toSql() );
 		
-		JArrayHelper::toInteger($filter_tag, null);
+		ArrayHelper::toInteger($filter_tag, null);
 		$filter_state = empty($filter_state) ? array() :
 			(!is_array($filter_state) ? array($filter_state) : $filter_state);
 		
@@ -1475,19 +1477,19 @@ class FlexicontentModelItems extends JModelLegacy
 
 		if ( !empty($filter_tag) )
 		{
-			JArrayHelper::toInteger($filter_tag, null);
+			ArrayHelper::toInteger($filter_tag, null);
 			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
 		}
 
 		if ( !empty($filter_type) )
 		{
-			JArrayHelper::toInteger($filter_type, null);
+			ArrayHelper::toInteger($filter_type, null);
 			$where[] = ($tmp_only ? 'i.' : 'ie.') . 'type_id IN (' . implode( ',', $filter_type) .')';
 		}
 
 		if ( !empty($filter_author) )
 		{
-			JArrayHelper::toInteger($filter_author, null);
+			ArrayHelper::toInteger($filter_author, null);
 			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
 		}
 
@@ -1508,7 +1510,7 @@ class FlexicontentModelItems extends JModelLegacy
 
 		if ( !empty($filter_access) )
 		{
-			JArrayHelper::toInteger($filter_access, null);
+			ArrayHelper::toInteger($filter_access, null);
 			$where[] = 'i.access IN (' . implode( ',', $filter_access) .')';
 		}
 
@@ -2530,7 +2532,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$user = JFactory::getUser();
 		
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$cids = implode( ',', $cid );
 		
 		$query = 'SELECT id, catid, created_by FROM #__content'
@@ -2567,7 +2569,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( !count( $cid ) ) return false;
 		
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 		$cids = implode( ',', $cid );
 		
 		if ($itemmodel)
@@ -2916,7 +2918,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($types !== null) return $types;
 		
 		$filter_type = $this->getState( 'filter_type' );
-		JArrayHelper::toInteger($filter_type, null);
+		ArrayHelper::toInteger($filter_type, null);
 		
 		if ( empty($filter_type) ) return array();
 		
@@ -3129,7 +3131,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get field data, so that we can identify the fields and take special action for each of them
 		else
 		{
-			JArrayHelper::toInteger($fields, null);
+			ArrayHelper::toInteger($fields, null);
 
 			$query = 'SELECT *'
 				. ' FROM #__flexicontent_fields'

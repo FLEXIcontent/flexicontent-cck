@@ -19,8 +19,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Category Model
@@ -51,13 +53,13 @@ class FlexicontentModelItemcompare extends JModelLegacy
 		$jinput = $app->input;
 
 		$id = $jinput->get('id', array(0), 'array');
-		JArrayHelper::toInteger($id, array(0));
+		ArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
 		
 		if (!$pk)
 		{
 			$cid = $jinput->get('cid', array(0), 'array');
-			JArrayHelper::toInteger($cid, array(0));
+			ArrayHelper::toInteger($cid, array(0));
 			$pk = (int) $cid[0];
 		}
 

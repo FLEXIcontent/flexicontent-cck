@@ -19,11 +19,12 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Table\Table;
+
 jimport('legacy.model.admin');
 require_once('base.php');
-
-use Joomla\String\StringHelper;
-use Joomla\CMS\Table\Table;
 
 /**
  * FLEXIcontent Component Item Model
@@ -713,7 +714,7 @@ class ParentClassItem extends FCModelAdmin
 					{
 						$item->associations[$tag] = $association->id;
 					}
-					JArrayHelper::toInteger($item->associations);
+					ArrayHelper::toInteger($item->associations);
 				}
 			}
 			
@@ -3608,7 +3609,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$cids = $cids ?: array($this->_id);
 		}
-		JArrayHelper::toInteger($cids);
+		ArrayHelper::toInteger($cids);
 
 		$query = 'SELECT *'
 			. ' FROM #__content_rating'
@@ -4840,7 +4841,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		// Sanitize the ids.
 		$pks = (array) $pks;
-		JArrayHelper::toInteger($pks);
+		ArrayHelper::toInteger($pks);
 
 		if (empty($pks))
 		{
@@ -4989,8 +4990,8 @@ class ParentClassItem extends FCModelAdmin
 			: array();
 
 		// Force arrays of integers
-		JArrayHelper::toInteger($cats);
-		JArrayHelper::toInteger($featured_cats);	
+		ArrayHelper::toInteger($cats);
+		ArrayHelper::toInteger($featured_cats);	
 
 		// Auto-assign a not set main category, to be the first out of secondary categories, 
 		if ( empty($data['catid']) && !empty($cats[0]) )
@@ -5085,7 +5086,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// Make tags unique
-		JArrayHelper::toInteger($tags);
+		ArrayHelper::toInteger($tags);
 		$tags = array_keys(array_flip($tags));
 		
 		// Set tags back using itsreal name of field: 'tags'       INSTEAD OF 'tag'

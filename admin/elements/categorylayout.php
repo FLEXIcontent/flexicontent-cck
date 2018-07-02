@@ -16,8 +16,10 @@
  * GNU General Public License for more details.
  */
 
-// Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -71,13 +73,13 @@ class JFormFieldCategorylayout extends JFormFieldList
 		
 		// Get RECORED id of current view
 		$id = $jinput->get('id', array(0), 'array');
-		JArrayHelper::toInteger($id, array(0));
+		ArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
 		
 		if (!$pk)
 		{
 			$cid = $jinput->get('cid', array(0), 'array');
-			JArrayHelper::toInteger($cid, array(0));
+			ArrayHelper::toInteger($cid, array(0));
 			$pk = (int) $cid[0];
 		}
 		

@@ -1,6 +1,8 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 /*
  * CLASS with common methods for handling interaction with DB
@@ -844,7 +846,7 @@ class flexicontent_db
 	static function checkin($tbl, $redirect_url, & $controller)
 	{
 		$cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		$user = JFactory::getUser();
 		$controller->setRedirect( $redirect_url, '' );
@@ -1065,7 +1067,7 @@ class flexicontent_db
 		$associations[$item->language] = $item->id;
 
 		// Make sure associations ids are integers
-		JArrayHelper::toInteger($associations);
+		ArrayHelper::toInteger($associations);
 		
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)

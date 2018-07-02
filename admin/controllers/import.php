@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
@@ -67,7 +68,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$jinput = $app->input;
 
 		// Check for request forgeries
-		if (JRequest::getCmd('task') != 'importcsv')
+		if ($this->input->getCmd('task') !== 'importcsv')
 		{
 			JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 			echo '<link rel="stylesheet" href="' . JUri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
@@ -174,7 +175,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				$conf['maincat'] 	= $jinput->get('maincat', 0, 'int');
 				$conf['maincat_col'] = $jinput->get('maincat_col', 0, 'int');
 				$conf['seccats'] = $jinput->get('seccats', array(), 'array');
-				JArrayHelper::toInteger($conf['seccats']);
+				ArrayHelper::toInteger($conf['seccats']);
 				$conf['seccats_col'] = $jinput->get('seccats_col', 0, 'int');
 
 				// Tags

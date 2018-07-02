@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 /**
  * Register autoloader for parent controller, in case controller is executed by another component
@@ -510,7 +511,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -572,7 +573,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -642,7 +643,7 @@ class FlexicontentControllerReviews extends FlexicontentController
 		$model = $this->getModel($this->record_name_pl);
 
 		$cid = $this->input->get('cid', array(), 'array');
-		JArrayHelper::toInteger($cid);
+		ArrayHelper::toInteger($cid);
 
 		if (!is_array($cid) || count($cid) < 1)
 		{

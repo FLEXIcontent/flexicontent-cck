@@ -49,8 +49,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		@ob_end_clean();
-		$id 		= JRequest::getInt('id', 0);
-		$active 	= JRequest::getInt('active', 0);
+		$id     = $this->input->getInt('id', 0);
+		$active = $this->input->getInt('active', 0);
 
 		if (!$id)
 		{
@@ -68,7 +68,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$currentversion = $item->version;
-		$page = JRequest::getInt('page', 0);
+		$page = $this->input->getInt('page', 0);
 		$versioncount = $model->getVersionCount();
 		$numpage = ceil($versioncount / $versionsperpage);
 
@@ -393,7 +393,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
 		// JFactory::getSession()->set('flexicontent.recheck_aftersave', true);
 
-		$bind_limit = JRequest::getInt('bind_limit', 25000);
+		$bind_limit = $this->input->getInt('bind_limit', 25000);
 
 		// Make sure bind limit is sane
 		if ($bind_limit < 1 || $bind_limit > 25000)
@@ -417,7 +417,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function fixmaincat()
 	{
-		$default_cat = JRequest::getInt('default_cat', 0);
+		$default_cat = $this->input->getInt('default_cat', 0);
 		$model = $this->getModel('items');
 		$model->fixMainCat($default_cat);
 		jexit();
