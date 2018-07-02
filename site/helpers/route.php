@@ -1,20 +1,14 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1966 2014-09-21 17:33:27Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * @package         FLEXIcontent
+ * @version         3.3
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
+ * @link            http://www.flexicontent.com
+ * @copyright       Copyright © 2017, FLEXIcontent team, All Rights Reserved
+ * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
+
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
@@ -936,7 +930,14 @@ class FlexicontentHelperRoute
 	static function _findCategory($needles, &$data)
 	{
 		if ( !$needles ) return false;
-		static $layout_idvars = array('tags'=>'tagid', 'author'=>'authorid');
+
+		// For 'mcats' layout, we will support specific menu match only selection for cids in same order ... for performance reasons
+		static $layout_idvars = array
+		(
+			'tags'=>'tagid',
+			'author'=>'authorid',
+			'mcats'=>'cids',
+		);
 		
 		// Get language, url variables
 		$language = $data['language'];
@@ -1110,7 +1111,12 @@ class FlexicontentHelperRoute
 		
 		// Every VIEW may have a different variable for the lookup table in which we will add the menu items
 		static $view_varnames = array(FLEXI_ITEMVIEW=>'id', 'category'=>'cid', 'tags'=>'id', 'flexicontent'=>'rootcatid');
-		static $layout_idvars = array('tags'=>'tagid', 'author'=>'authorid');
+
+		static $layout_idvars = array(
+			'tags'=>'tagid',
+			'author'=>'authorid',
+			'mcats'=>'cids',
+		);
 		
 		self::$lookup[$language] = array();
 		$user = JFactory::getUser();
