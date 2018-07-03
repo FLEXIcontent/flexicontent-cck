@@ -1151,8 +1151,8 @@ class plgSystemFlexisystem extends JPlugin
 			
 			// Try to avoid browser warning message "Page has expired or similar"
 			// This should turning off the 'must-revalidate' directive in the 'Cache-Control' header
-			JResponse::allowCache($browser_cachable ? true : false);
-			JResponse::setHeader('Pragma', $browser_cachable ? '' :'no-cache');
+			$app->allowCache($browser_cachable ? true : false);
+			$app->setHeader('Pragma', $browser_cachable ? '' :'no-cache');
 			
 			// CONTROL INTERMEDIARY CACHES (PROXY, ETC)
 			// 1:  public content (unlogged user),   2:  private content (logged user)
@@ -1161,10 +1161,10 @@ class plgSystemFlexisystem extends JPlugin
 			
 			// SET MAX-AGE, to allow modern browsers to cache the page, despite expires header in the past
 			$cacheControl .= ', max-age=300';
-			JResponse::setHeader('Cache-Control', $cacheControl );
+			$app->setHeader('Cache-Control', $cacheControl );
 			
 			// Make sure no legacy proxies any caching !
-			JResponse::setHeader('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
+			$app->setHeader('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
 		}
 	}
 	

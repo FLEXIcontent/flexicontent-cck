@@ -309,7 +309,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			var url = jQuery("#"+element_id+"_url").val();
 			if (url=="") return;
 
-			msg_box.html("<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">");
+			msg_box.html("<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">");
 
 			'.($debug_to_console ? 'window.console.log("Fetching "+url);' : '').'
 

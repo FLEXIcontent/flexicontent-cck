@@ -464,6 +464,10 @@ switch ($view)
 					: false;
 				$title[] = $menuTitle;
 			}
+
+			// Remove the vars from the url
+			shRemoveFromGETVarsList('cid');
+			shRemoveFromGETVarsList('view');
 		}
 
 		/**
@@ -475,6 +479,7 @@ switch ($view)
 			{
 				$ancestors = $globalcats[$cid]->ancestorsarray;
 				$cat_titles = array();
+
 				foreach ($ancestors as $ancestor)
 				{
 					if (in_array($ancestor, $globalnoroute)) continue;
@@ -490,12 +495,14 @@ switch ($view)
 					}
 
 					// FALANG not installed, no need for SQL query
-					else if ( isset($globalcats[$ancestor]) ) {
+					elseif (isset($globalcats[$ancestor]))
+					{
 						list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
 						$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
 					}
 					else $cat_titles[] = $ancestor . '/';
 				}
+
 				$curr_cat_title = count($cat_titles) ? array_pop($cat_titles) : null;
 
 				$first_url_cat = ($cats_in_catlnk >= 0) ? count($cat_titles) - $cats_in_catlnk : 0;
@@ -504,9 +511,18 @@ switch ($view)
 				$last_url_cat  = ($cats_in_catlnk >= 0) ? count($cat_titles)-1 : -($cats_in_catlnk + 1);
 				$last_url_cat  = ($last_url_cat > count($cat_titles)-1) ? count($cat_titles)-1 : $last_url_cat;
 
-				for($ccnt = $first_url_cat; $ccnt <= $last_url_cat; $ccnt++ ) $title[] = $cat_titles[$ccnt];
-				if ($curr_cat_title) $title[] = $curr_cat_title;
-			} else {
+				for ($ccnt = $first_url_cat; $ccnt <= $last_url_cat; $ccnt++)
+				{
+					$title[] = $cat_titles[$ccnt];
+				}
+
+				if ($curr_cat_title)
+				{
+					$title[] = $curr_cat_title;
+				}
+			}
+			else
+			{
 				$title[] = '/';
 			}
 
@@ -697,6 +713,7 @@ switch ($view)
 
 			if ($view === 'flexicontent')
 			{
+				$rootcat = empty($rootcat) ? 0 : $rootcat;
 				$menu_matches = $menu_matches && (int) $rootcat === (int) (isset($menu->query['rootcat']) ? $menu->query['rootcat'] : 0);
 			}
 		}

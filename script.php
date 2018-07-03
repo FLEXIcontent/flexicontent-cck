@@ -329,7 +329,12 @@ class com_flexicontentInstallerScript
 				}
 			}
 		}
-		
+
+		/**
+		 * Disabled bootstrap sliders, to allow automatic non-user interactive upgrade scripts to run
+		 * Instead we will use buttons with basic JS to toggle the installation logs
+		 */
+
 		//echo JHtml::_('bootstrap.startAccordion', 'additional-extensions', array());
 		//echo JHtml::_('bootstrap.addSlide', 'additional-extensions', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
 		?>
@@ -830,6 +835,12 @@ class com_flexicontentInstallerScript
 					}
 					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NULL AFTER `alias`";
+					}
+
+					// Tags TABLE
+					$tbl_name = 'flexicontent_tags';
+					if ( $tags_tbl_exists && !array_key_exists('jtag_id', $tbl_fields['#__'.$tbl_name]) ) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `jtag_id` INT(10) UNSIGNED NULL AFTER `checked_out_time`";
 					}
 					
 					// Types TABLE

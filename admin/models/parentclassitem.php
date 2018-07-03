@@ -897,7 +897,10 @@ class ParentClassItem extends FCModelAdmin
 			else
 			{
 				// Retrieve unversioned value
-				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int) $pk;
+				$query = $db->getQuery(true)
+					->select('DISTINCT tid')
+					->from('#__flexicontent_tags_item_relations')
+					->where('itemid = ' . (int) $pk);
 				$item->tags = $db->setQuery($query)->loadColumn();
 				$item->tags = array_reverse($item->tags);
 			}
@@ -925,12 +928,18 @@ class ParentClassItem extends FCModelAdmin
 			else
 			{
 				// Retrieve unversioned value
-				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$pk;
+				$query = $db->getQuery(true)
+					->select('DISTINCT catid')
+					->from('#__flexicontent_cats_item_relations')
+					->where('itemid = ' . (int) $pk);
 				$item->categories = $db->setQuery($query)->loadColumn();
 			}
 			
 			// Make sure catid is in categories array
-			if ( !in_array($item->catid, $item->categories) ) $item->categories[] = $item->catid;
+			if (!in_array($item->catid, $item->categories))
+			{
+				$item->categories[] = $item->catid;
+			}
 			
 			// 'cats' is an alias of categories
 			$item->cats = & $item->categories;
@@ -1717,15 +1726,19 @@ class ParentClassItem extends FCModelAdmin
 			$item->load( $data['id'] );
 
 			// Retrieve property: 'tags', that do not exist in the DB TABLE class, but are created by the ITEM model
-			$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . $item->id;
-			$db->setQuery($query);
-			$item->tags = $db->loadColumn();
+			$query = $db->getQuery(true)
+				->select('DISTINCT tid')
+				->from('#__flexicontent_tags_item_relations')
+				->where('itemid = ' . $item->id);
+			$item->tags = $db->setQuery($query)->loadColumn();
 			$item->tags = array_reverse($item->tags);
 			
 			// Retrieve property: 'categories', that do not exist in the DB TABLE class, but are created by the ITEM model
-			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $item->id;
-			$db->setQuery($query);
-			$item->categories = $db->loadColumn();
+			$query = $db->getQuery(true)
+				->select('DISTINCT catid')
+				->from('#__flexicontent_cats_item_relations')
+				->where('itemid = ' . $item->id);
+			$item->categories = $db->setQuery($query)->loadColumn();
 			
 			// We need to convert FC item state TO a joomla's article state ... when triggering the before save content event
 			$fc_state = $item->state;
@@ -3599,27 +3612,36 @@ class ParentClassItem extends FCModelAdmin
 
 	public function getVotes($cids = null)
 	{
-		$db = $this->_db;
-		
 		if ($cids && !is_array($cids))
 		{
 			$cids = array($cids);
 		}
-		else
+
+		elseif (!$cids && $this->_id)
 		{
-			$cids = $cids ?: array($this->_id);
+			$cids = array($this->_id);
 		}
+
 		ArrayHelper::toInteger($cids);
 
-		$query = 'SELECT *'
-			. ' FROM #__content_rating'
-			. ' WHERE content_id IN (' . implode(', ', $cids) . ')';
-		$votes = $db->setQuery($query)->loadObjectList('content_id');
+		if (!$cids)
+		{
+			return array();
+		}
+
+		$query = $this->_db->getQuery(true)
+			->select('*')
+			->from('#__content_rating')
+			->where('content_id IN (' . implode(', ', $cids) . ')');
+
+		$votes = $this->_db->setQuery($query)->loadObjectList('content_id');
 		
-		$query 	= 'SELECT *, field_id as extra_id'
-			. ' FROM #__flexicontent_items_extravote'
-			. ' WHERE content_id IN (' . implode(', ', $cids) . ')';
-		$extra_votes = $db->setQuery($query)->loadObjectList();
+		$query = $this->_db->getQuery(true)
+			->select('*, field_id as extra_id')
+			->from('#__flexicontent_items_extravote')
+			->where('content_id IN (' . implode(', ', $cids) . ')');
+
+		$extra_votes = $this->_db->setQuery($query)->loadObjectList();
 		
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
 		foreach ($extra_votes as $extra_vote)
@@ -5653,9 +5675,10 @@ class ParentClassItem extends FCModelAdmin
 
 		if ($jtag_ids)
 		{
-			$query = 'SELECT *'
-				. ' FROM #__tags '
-				. ' WHERE id IN (' . implode(', ', $jtag_ids) . ')';
+			$query = $this->_db->getQuery(true)
+				->select('*')
+				->from('#__tags')
+				->where('id IN (' . implode(', ', $jtag_ids) . ')');
 			$jtags = $this->_db->setQuery($query)->loadObject('id');
 
 			foreach ($fctags as $fctag)

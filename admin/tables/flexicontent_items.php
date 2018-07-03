@@ -18,8 +18,15 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
+use Joomla\CMS\Event\AbstractEvent;
+use Joomla\Database\DatabaseDriver;
+use Joomla\Database\DatabaseQuery;
+use Joomla\Event\DispatcherAwareInterface;
+use Joomla\Event\DispatcherAwareTrait;
+use Joomla\Event\DispatcherInterface;
+
+jimport('joomla.access.rules');
 require_once('flexicontent_basetable.php');
 
 class _flexicontent_items_common extends flexicontent_basetable
@@ -239,7 +246,8 @@ class flexicontent_items extends _flexicontent_items
 	protected function _getAssetName()
 	{
 		$k = $this->_tbl_key;
-		return 'com_content.article.'.(int) $this->$k;
+
+		return 'com_content.article.' . (int) $this->$k;
 	}
 
 
@@ -264,11 +272,13 @@ class flexicontent_items extends _flexicontent_items
 				$this->_tbl_join_ext,
 				$this->_tbl_join_tmp
 			);
+
 			foreach ($tbls as $tbl)
 			{
 				$tbl_fields[$tbl] = $this->_db->getTableColumns($tbl, false);
 			}
 		}
+
 		$this->tbl_fields = $tbl_fields;
 
 		// Now get and return fields of the main table
@@ -322,7 +332,7 @@ class flexicontent_items extends _flexicontent_items
 
 
 	/**
-	 * Method to load a row from the database by primary key and bind the fields to the JTable instance properties.
+	 * Method to load a row from the database by primary key and bind the fields to the Table instance properties.
 	 *
 	 * @param   mixed    $keys   An optional primary key value to load the row by, or an array of fields to match.
 	 *                           If not set the instance property value is used.
@@ -331,14 +341,31 @@ class flexicontent_items extends _flexicontent_items
 	 * @return  boolean  True if successful. False if row not found.
 	 *
 	 * @since   11.1
-	 * @throws  InvalidArgumentException
-	 * @throws  RuntimeException
-	 * @throws  UnexpectedValueException
+	 * @throws  \InvalidArgumentException
+	 * @throws  \RuntimeException
+	 * @throws  \UnexpectedValueException
 	 */
 	public function load($keys = null, $reset = true)
 	{
-		// Implement JObservableInterface: Pre-processing by observers
-		$this->_observers->update('onBeforeLoad', array($keys, $reset));
+		if (FLEXI_J40GE)
+		{
+			// Pre-processing by observers
+			$event = AbstractEvent::create(
+				'onTableBeforeLoad',
+				[
+					'subject'	=> $this,
+					'keys'		=> $keys,
+					'reset'		=> $reset,
+				]
+			);
+			$this->getDispatcher()->dispatch('onTableBeforeLoad', $event);
+		}
+
+		else
+		{
+			// Implement JObservableInterface: Pre-processing by observers
+			$this->_observers->update('onBeforeLoad', array($keys, $reset));
+		}
 
 		if (empty($keys))
 		{
@@ -367,14 +394,14 @@ class flexicontent_items extends _flexicontent_items
 			{
 				if ($keyCount > 1)
 				{
-					throw new InvalidArgumentException('Table has multiple primary keys specified, only one primary key value provided.');
+					throw new \InvalidArgumentException('Table has multiple primary keys specified, only one primary key value provided.');
 				}
 
 				$keys = array($this->getKeyName() => $keys);
 			}
 			else
 			{
-				throw new RuntimeException('No table keys defined.');
+				throw new \RuntimeException('No table keys defined.');
 			}
 		}
 
@@ -386,8 +413,9 @@ class flexicontent_items extends _flexicontent_items
 		// Initialise the query.
 		$query = $this->_db->getQuery(true)
 			->select('*')
-			->from($this->_tbl);
-		$query->join('LEFT', $this->_tbl_join_ext . ' ON ' . $this->_tbl_key . ' = ' . $this->_frn_key_ext);
+			->from($this->_tbl)
+			->join('LEFT', $this->_tbl_join_ext . ' ON ' . $this->_tbl_key . ' = ' . $this->_frn_key_ext);
+
 		$fields = array_keys($this->getProperties());
 
 		foreach ($keys as $field => $value)
@@ -395,8 +423,9 @@ class flexicontent_items extends _flexicontent_items
 			// Check that $field is in the table.
 			if (!in_array($field, $fields))
 			{
-				throw new UnexpectedValueException(sprintf('Missing field in database: %s &#160; %s.', get_class($this), $field));
+				throw new \UnexpectedValueException(sprintf('Missing field in database: %s &#160; %s.', get_class($this), $field));
 			}
+
 			// Add the search tuple to the query.
 			$query->where($this->_db->quoteName($field) . ' = ' . $this->_db->quote($value));
 		}
@@ -414,8 +443,25 @@ class flexicontent_items extends _flexicontent_items
 			$result = $this->bind($row);
 		}
 
-		// Implement JObservableInterface: Post-processing by observers
-		$this->_observers->update('onAfterLoad', array(&$result, $row));
+		if (FLEXI_J40GE)
+		{
+			// Post-processing by observers
+			$event = AbstractEvent::create(
+				'onTableAfterLoad',
+				[
+					'subject'		=> $this,
+					'result'		=> &$result,
+					'row'			=> $row,
+				]
+			);
+			$this->getDispatcher()->dispatch('onTableAfterLoad', $event);
+		}
+
+		else
+		{
+			// Implement JObservableInterface: Post-processing by observers
+			$this->_observers->update('onAfterLoad', array(&$result, $row));
+		}
 
 		return $result;
 	}
@@ -512,19 +558,15 @@ class flexicontent_items extends _flexicontent_items
 			{
 				$record_ext->$p = $v;
 				
-				// Catch case of new J1.6+ article language column
-				if ($p == "language")
+				// Also use main table for article's language column
+				if ($p === 'language')
 				{
-					//$jAp= JFactory::getApplication();
-					//$jAp->enqueueMessage('setting content language to' . $v,'message');
 					$record->$p = $v;
 				}
 			
-				// Catch case of master item for (translation groups) not being set
-				if ($p == "lang_parent_id" /*&& $v==0*/)
+				// Master item id for (translation groups), (Deprecated, TODO remove)
+				if ($p === 'lang_parent_id')
 				{
-					//$jAp= JFactory::getApplication();
-					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $record->id,'message');
 					$record_ext->$p = 0;//$record->id;
 					$record_tmp->$p = 0;//$record->id;
 				}
@@ -537,9 +579,10 @@ class flexicontent_items extends _flexicontent_items
 			}
 		}
 
-		if( $this->$k )
+		if ($this->$k)
 		{
-			$ret = $this->_db->updateObject( $this->_tbl, $record, $this->_tbl_key, $updateNulls );
+			$ret = $this->_db->updateObject($this->_tbl, $record, $this->_tbl_key, $updateNulls);
+
 			$record_ext->$frn_key_ext = $this->$k;
 			$record_tmp->$frn_key_tmp = $this->$k;
 		}
@@ -551,20 +594,22 @@ class flexicontent_items extends _flexicontent_items
 			$this->id = $record->id ?: $this->_db->insertid();
 		}
 
-		if(!$ret)
+		if (!$ret)
 		{
-			$this->setError(get_class( $this ).'::store failed - '.$this->_db->getErrorMsg());
+			$this->setError(get_class($this) . '::store failed - ' . $this->_db->getErrorMsg());
 			return false;
 		}
+
 		else
 		{
-			// Check for foreign key
+			// Check foreign key for DB table items_ext
 			$ext_exists = false;
 			if (!empty($record_ext->$frn_key_ext))
 			{
 				$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_join_ext . ' WHERE ' . $frn_key_ext . '=' . (int) $record_ext->$frn_key_ext)->loadResult();
 			}
 
+			// Check foreign key for DB table items_tmp
 			$tmp_exists = false;
 			if (!empty($record_tmp->$frn_key_tmp))
 			{
@@ -598,15 +643,15 @@ class flexicontent_items extends _flexicontent_items
 			}
 
 			// Check for unique Alias
-			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$this->id;
+			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid=' . (int) $this->id;
 			$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
-				.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
-				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
-				.' WHERE i.alias='.$this->_db->Quote($this->alias)
-				.'  AND (i.catid='.(int)$this->id.' OR rel.catid IN ('.$sub_q.') )'
-				.'  AND e.language = '.$this->_db->Quote($record_ext->language)
-				.'  AND i.id <> '.(int)$this->id
-				//.'  AND e.lang_parent_id <> '.(int) $record_ext->lang_parent_id
+				. ' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
+				. ' WHERE i.alias=' . $this->_db->Quote($this->alias)
+				. '  AND (i.catid=' . (int) $this->id . ' OR rel.catid IN (' . $sub_q . ') )'
+				. '  AND e.language = ' . $this->_db->Quote($record_ext->language)
+				. '  AND i.id <> ' . (int) $this->id
+				//. '  AND e.lang_parent_id <> ' . (int) $record_ext->lang_parent_id
 				;
 
 			$duplicate_aliases = (boolean) $this->_db->setQuery($query)->loadResult();
@@ -633,11 +678,11 @@ class flexicontent_items extends _flexicontent_items
 		// Asset Tracking
 		//
 
-		$parentId	= $this->_getAssetParentId();
-		$name		= $this->_getAssetName();
-		$title		= $this->_getAssetTitle();
+		$parentId = $this->_getAssetParentId();
+		$name  = $this->_getAssetName();
+		$title = $this->_getAssetTitle();
 
-		$asset	= JTable::getInstance('Asset');
+		$asset = JTable::getInstance('Asset');
 		$asset->loadByName($name);
 
 		// Check for an error.
@@ -654,9 +699,9 @@ class flexicontent_items extends _flexicontent_items
 		}
 
 		// Prepare the asset to be stored.
-		$asset->parent_id	= $parentId;
-		$asset->name		= $name;
-		$asset->title		= $title;
+		$asset->parent_id = $parentId;
+		$asset->name  = $name;
+		$asset->title = $title;
 		
 		if ($this->_rules instanceof JAccessRules)
 		{
@@ -674,10 +719,10 @@ class flexicontent_items extends _flexicontent_items
 		{
 			$this->asset_id = (int) $asset->id;
 
-			$query = $this->_db->getQuery(true);
-			$query->update( $this->_db->quoteName( $this->_tbl ) );
-			$query->set('asset_id = '.(int) $this->asset_id);
-			$query->where($this->_db->quoteName( $k ) .' = '.(int) $this->$k);
+			$query = $this->_db->getQuery(true)
+				->update($this->_db->quoteName($this->_tbl))
+				->set('asset_id = '.(int) $this->asset_id)
+				->where($this->_db->quoteName( $k ) . ' = ' . (int) $this->$k);
 
 			$this->_db->setQuery($query)->execute();
 		}
@@ -697,14 +742,14 @@ class flexicontent_items extends _flexicontent_items
 	function check()
 	{
 		// check for empty title
-		if (trim( $this->title ) == '')
+		if (trim($this->title) == '')
 		{
 			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
 			return false;
 		}
 		
 		// check for empty alias
-		if(empty($this->alias))
+		if (empty($this->alias))
 		{
 			$this->alias = $this->title;
 		}
@@ -717,9 +762,9 @@ class flexicontent_items extends _flexicontent_items
 
 
 		// Use ITEM's language or use SITE's default language in case of ITEM's language is ALL (or empty)
-		$language = $this->language && $this->language != '*' ?
-			$this->language :
-			JComponentHelper::getParams('com_languages')->get('site', '*') ;
+		$language = $this->language && $this->language != '*'
+			? $this->language
+			: JComponentHelper::getParams('com_languages')->get('site', '*') ;
 
 		if ($language !== '*' && !JLanguage::getInstance($language)->getTransliterator())
 		{
@@ -730,7 +775,7 @@ class flexicontent_items extends _flexicontent_items
 		}
 
 		// workaround for old joomla versions (Joomla <=3.5.x) that do not allowing to set transliteration language to be element's language
-		elseif ( !$unicodeslugs && !$supports_content_language_transliteration )
+		elseif (!$unicodeslugs && !$supports_content_language_transliteration)
 		{
 			// Remove any '-' from the string since they will be used as concatenaters
 			$this->alias = str_replace('-', ' ', $this->alias);
@@ -751,7 +796,7 @@ class flexicontent_items extends _flexicontent_items
 		}
 		
 		// make fulltext empty if it only contains empty spaces
-		if (trim( str_replace( '&nbsp;', '', $this->fulltext ) ) == '')
+		if (trim(str_replace('&nbsp;', '', $this->fulltext)) == '')
 		{
 			$this->fulltext = '';
 		}
@@ -759,10 +804,14 @@ class flexicontent_items extends _flexicontent_items
 		// clean up keywords -- eliminate extra spaces between phrases and cr (\r) and lf (\n) characters from string
 		if (!empty($this->metakey))
 		{
-			$bad_characters = array("\n", "\r", "\"", "<", ">"); // array of characters to remove
-			$after_clean = StringHelper::str_ireplace($bad_characters, "", $this->metakey); // remove bad characters
-			$keys = explode(',', $after_clean); // create array using commas as delimiter
+			// Remove bad characters
+			$bad_characters = array("\n", "\r", "\"", "<", ">");
+			$after_clean = StringHelper::str_ireplace($bad_characters, "", $this->metakey);
+
+			// Create array using commas as delimiter
+			$keys = explode(',', $after_clean);
 			$clean_keys = array(); 
+
 			foreach($keys as $key)
 			{
 				if (trim($key))
@@ -770,6 +819,7 @@ class flexicontent_items extends _flexicontent_items
 					$clean_keys[] = trim($key);
 				}
 			}
+
 			$this->metakey = implode(", ", $clean_keys); // put array back together delimited by ", "
 		}
 		

@@ -45,7 +45,7 @@ jQuery(document).ready(function() {
 		var el = jQuery(this);
 		var tmpl_name = el.attr('id').replace('del-','');
 		
-		el.html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">');
+		el.html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">');
 		jQuery.ajax({
 			type: \"GET\",
 			url:  \"index.php?option=com_flexicontent&".$ctrl_task."remove&format=raw&dir=\" + tmpl_name + \"&".$form_token."=1\",

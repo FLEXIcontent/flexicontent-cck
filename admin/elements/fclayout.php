@@ -444,7 +444,7 @@ function fc_getLayout_".$_name."(el, initial)
 	var filename = selected_option.data('filename');
 	var layout_name = filename ? filename : selected_option.val();
 
-	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
+	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
 	bs_tab_handle.length
 		? panel_header.html('<a href=\"javascript:void(0);\"><span> " . $layout_label . ": '+_loading_img+'</span></a>')
 		: panel_header.html('" . '<i class="'.$icon_class.'"></i> ' . $layout_label . ": " . "' + _loading_img);

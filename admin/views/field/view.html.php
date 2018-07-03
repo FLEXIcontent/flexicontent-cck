@@ -307,7 +307,7 @@ class FlexicontentViewField extends JViewLegacy
 			$_ctrl_task = 'task=fields.getfieldspecificproperties';
 			$js .= "
 				jQuery('#".$_field_id."').on('change', function() {
-					jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+					jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"></p>');
 					jQuery.ajax({
 						type: \"GET\",
 						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',

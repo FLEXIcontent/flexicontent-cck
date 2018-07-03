@@ -26,7 +26,7 @@ window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
 		e = new Event(e).stop();
 		if (MooTools.version>="1.2.4") {
-			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');
 			new Request.HTML({
 				 url: this.get('action'),
 			   evalScripts: true,
@@ -34,7 +34,7 @@ window.addEvent('domready', function(){
 			   data: $('adminForm')
 			}).send();
 		} else {
-			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" style="vertical-align: middle;"><\/p>');
 			this.send({
 				update: 	$('log-bind')
 			});

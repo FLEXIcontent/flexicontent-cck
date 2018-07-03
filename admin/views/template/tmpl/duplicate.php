@@ -25,7 +25,7 @@ jQuery(document).ready(function() {
 	var adminForm = jQuery('#adminForm');
 	adminForm.submit(function( event ) {
 		var log_bind = jQuery('#log-bind');
-		log_bind.html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+		log_bind.html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 		jQuery.ajax({
 			type: 'POST',
 			data: adminForm.serialize(),

@@ -446,7 +446,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			$this->document->addScriptDeclaration("
 			jQuery(document).ready(function () {
 				if(jQuery.trim(jQuery('#displayfversion').html())=='') {
-					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 					jQuery.ajax({
 						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". JSession::getFormToken() ."=1',
 						success: function(str) {
@@ -476,10 +476,10 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		if (!$this->dopostinstall || !$this->allplgpublish) :
 
 			// Make sure POST-INSTALLATION Task slider is open
-			echo JHtml::_('bootstrap.startAccordion', 'fc-dash-sliders', array('active' => 'postinstall'));
+			echo JHtml::_('bootstrap.startAccordion', 'fc-dash-sliders', array('active' => 'fc-dash-sliders-postinstall'));
 
 			$title = JText::_( 'FLEXI_POST_INSTALL' );
-			echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'postinstall' );
+			echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-postinstall' );
 			echo $this->loadTemplate('postinstall');
 			echo JHtml::_('bootstrap.endSlide');
 
@@ -493,7 +493,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			ob_start(); ?>
 
 			<?php
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $_title, 'requirements' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $_title, 'fc-dash-sliders-requirements' );
 				echo '<div class="fc-mssg fc-note" style="margin: 24px; display: inline-block;">';
 				echo '<b>PHP/DB requirements</b><br/>';
 				foreach($php_lims as $type => $html) {
@@ -517,7 +517,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 			<?php if (!isset($ssliders['pending'])):
 				$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge badge-warning">'.$this->totalrows['pending'].'</span>';
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'pending' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-pending' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			?>
 			<table class="table">
@@ -576,7 +576,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 			<?php if (!isset($ssliders['revised'])):
 				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge badge-warning">'.$this->totalrows['revised'].'</span>';
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'revised' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-revised' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 			?>
 			<table class="table">
@@ -636,7 +636,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			<?php if (!isset($ssliders['inprogress'])): ?>
 			<?php
 				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge badge-info-2">'.$this->totalrows['inprogress'].'</span>';
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'inprogress' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-inprogress' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
 			<table class="table">
@@ -697,7 +697,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			<?php if (!isset($ssliders['draft'])): ?>
 			<?php
 				$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge badge-info-2">'.$this->totalrows['draft'].'</span>';
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'draft' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-draft' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
 			<table class="table">
@@ -762,7 +762,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				jQuery(document).ready(function () {
 					jQuery('#updatecomponent').click(function(e){
 						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
-							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 							jQuery.ajax({
 								url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". JSession::getFormToken() ."=1',
 								success: function(str) {
@@ -774,7 +774,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					});
 				});
 				");
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', JText::_( 'FLEXI_VERSION_CHECKING' ), 'fc-dash-sliders-updatecomponent' );
 				echo "<div id=\"displayfversion\" style='min-height:20px;'></div>";
 				echo JHtml::_('bootstrap.endSlide');
 			}
@@ -840,7 +840,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			endif;
 
 			if ($hide_fc_license_credits) :
-				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', "About FLEXIcontent", 'aboutflexi' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', "About FLEXIcontent", 'fc-dash-sliders-aboutflexi' );
 				echo $fc_logo_license;
 				echo JHtml::_('bootstrap.endSlide');
 			endif;
