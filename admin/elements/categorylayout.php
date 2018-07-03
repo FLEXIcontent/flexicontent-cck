@@ -150,8 +150,8 @@ function clayout_loadPanel(element)
 	if ( !panel.parent().hasClass('pane-disabled') ) panel.addClass('fc_layout_loaded');
 	
 	// Add LOADING animation into the panel header, and show outer box that contains the panel header and the panel
-	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
-	panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>'+(panel.hasClass('fc_layout_loaded') ? '".JText::_( 'FLEXI_REFRESHING' )."' : '".JText::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'</span></span></a>');
+	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
+	panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"><\/i>'+(panel.hasClass('fc_layout_loaded') ? '".JText::_( 'FLEXI_REFRESHING' )."' : '".JText::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'<\/span><\/span><\/a>');
 	panel.parent().removeClass('pane-disabled').show();
 	
 	// Re-enabled an already loaded panel, (avoid re-downloading which will cause modified parameters to be lost)
@@ -159,7 +159,7 @@ function clayout_loadPanel(element)
 	{
 	 	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
 	 	setTimeout(function(){
-			panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
+			panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span><\/a>');
 	 	}, 300);
 		
 	}
@@ -183,7 +183,7 @@ function clayout_loadPanel(element)
 				if (typeof(fcrecord_attach_sortable) == 'function') fcrecord_attach_sortable('#'+panel_id);
 				if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable('#'+panel_id);
 
-				panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
+				panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span><\/a>');
 			}
 		});
 	}

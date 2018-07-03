@@ -22,7 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
-	var ajaxloader = '<span class="ajax-loader"></span>';
+	var ajaxloader = '<span class="ajax-loader"><\/span>';
 
 
 <?php if(!$this->existfields) : /*@TODO must write a class for all following cases */ ?>

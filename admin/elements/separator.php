@@ -143,20 +143,20 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				var tr45 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(46)");
 				var tr46 = jQuery("#permissions-sliders .tab-content .tab-pane tbody tr:nth-child(47)");
 
-				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Component access</td></tr>");
-				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items / Categories (inherited via category-tree)</td></tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Item form</td></tr>");
-				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Category / Tags usage</td></tr>");
-				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>Existing items</b>:  (Overridable in type\'s permissions)</td></tr>");
-				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Various</td></tr>");
-				tr22.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Workflow</td></tr>");
-				tr26.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items manager</td></tr>");
-				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)</td></tr>");
-				tr35.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Fields manager</td></tr>");
-				tr39.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Overridable in field\'s permissions</td></tr>");
-				tr43.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Reviews manager</td></tr>");
-				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Files manager</td></tr>");
-				tr46.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Also used in <b>item form</b> e.g. <b>file</b> field</td></tr>");
+				tr1.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Component access<\/td><\/tr>");
+				tr4.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items / Categories (inherited via category-tree)<\/td><\/tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Item form<\/td><\/tr>");
+				tr11.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Category / Tags usage<\/td><\/tr>");
+				tr15.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\" style=\"margin-left: 10% !important;\"><b>Existing items<\/b>:  (Overridable in type\'s permissions)<\/td><\/tr>");
+				tr18.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3\">Various<\/td><\/tr>");
+				tr22.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Workflow<\/td><\/tr>");
+				tr26.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Items manager<\/td><\/tr>");
+				tr28.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Backend Managers (access)<\/td><\/tr>");
+				tr35.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Fields manager<\/td><\/tr>");
+				tr39.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Overridable in field\'s permissions<\/td><\/tr>");
+				tr43.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Reviews manager<\/td><\/tr>");
+				tr45.before("<tr><td colspan=\"3\"><span class=\"fcsep_level2\">Files manager<\/td><\/tr>");
+				tr46.before("<tr><td colspan=\"3\"><span class=\"fcsep_level3 alert alert-info fcpadded\">Also used in <b>item form<\/b> e.g. <b>file<\/b> field<\/td><\/tr>");
 			});
 		');
 	}

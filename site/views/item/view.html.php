@@ -355,13 +355,19 @@ class FlexicontentViewItem extends JViewLegacy
 		// These events return text that could be displayed at appropriate positions by our templates
 		$item->event = new stdClass();
 
-		$results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, $limitstart));
+		$results = FLEXI_J40GE
+			? $app->triggerEvent('onContentAfterTitle', array('com_content.article', &$item, &$params, $limitstart))
+			: $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
-		$results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, $limitstart));
+		$results = FLEXI_J40GE
+			? $app->triggerEvent('onContentBeforeDisplay', array('com_content.article', &$item, &$params, $limitstart))
+			: $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, $limitstart));
 		$item->event->beforeDisplayContent = trim(implode("\n", $results));
 
-		$results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, $limitstart));
+		$results = FLEXI_J40GE
+			? $app->triggerEvent('onContentAfterDisplay', array('com_content.article', &$item, &$params, $limitstart))
+			: $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
