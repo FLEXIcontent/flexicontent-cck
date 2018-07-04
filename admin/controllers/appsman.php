@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\Utilities\ArrayHelper;
+
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 
@@ -119,7 +121,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 		if ($ids_are_integers)
 		{
-			JArrayHelper::toInteger($cid, array());
+			ArrayHelper::toInteger($cid, array());
 		}
 
 		$conf = $session->get('appsman_export', array(), 'flexicontent');
@@ -499,7 +501,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			if ($ids_are_integers)
 			{
-				JArrayHelper::toInteger($cid, array());
+				ArrayHelper::toInteger($cid, array());
 			}
 
 			if (!$table)

@@ -34,20 +34,25 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 ?>
 
+
 <div class="flexicontent" id="flexicontent">
 
-<?php if (!empty( $this->sidebar)) : ?>
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
+
 
 	<?php
 	array_push($tabSetStack, $tabSetCnt);
@@ -157,7 +162,9 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					echo '<br/>';
 					?>
 				<?php endforeach; ?>
-				
+
+
+				<!-- Common management form fields -->
 				<input type="hidden" name="option" value="com_flexicontent" />
 				<input type="hidden" name="controller" value="appsman" />
 				<input type="hidden" name="view" value="appsman" />
@@ -172,8 +179,9 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<!-- tabber end -->
 	<?php $tabSetCnt = array_pop($tabSetStack); ?>
 	
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
 </div><!-- #flexicontent end -->

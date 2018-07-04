@@ -358,20 +358,23 @@ jQuery(document).ready(function(){
 
 </script>
 
+
 <div id="flexicontent" class="flexicontent">
 
 
-<?php if (!empty( $this->sidebar)) : ?>
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
 
 
@@ -1244,13 +1247,14 @@ jQuery(document).ready(function(){
 
 	<div class="fcclear"></div>
 
+	<input type="hidden" name="newstate" id="newstate" value="" />
 
+	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />
 	<input type="hidden" name="view" value="items" />
 	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
@@ -1258,8 +1262,9 @@ jQuery(document).ready(function(){
 
 	</form>
 
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
 </div><!-- #flexicontent end -->
