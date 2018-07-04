@@ -14,17 +14,20 @@ foreach($_levels as $_level) {
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" enctype="multipart/form-data" >
 
-<?php if (!empty( $this->sidebar)) : ?>
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
 
 
@@ -354,15 +357,19 @@ foreach($_levels as $_level) {
 	
 </table>
 
+
+	<!-- Common management form fields -->
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="import" />
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHtml::_( 'form.token' ); ?>
+	<?php echo JHtml::_('form.token'); ?>
 
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
 </form>
 </div><!-- #flexicontent end -->

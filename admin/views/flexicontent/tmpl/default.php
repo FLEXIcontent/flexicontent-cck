@@ -90,18 +90,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-<?php if (!empty( $this->sidebar)) : ?>
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
+
 
 		<?php
 		$config_saved = $this->params->get('flexi_cat_extension');
@@ -851,16 +855,19 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 
 		<?php if (!$hide_fc_license_credits) echo $fc_logo_license; ?>
-		
-		<input type="hidden" name="option" value="com_flexicontent" />
-		<input type="hidden" name="controller" value="" />
-		<input type="hidden" name="view" value="" />
-		<input type="hidden" name="task" value="" />
-		<?php echo JHtml::_( 'form.token' ); ?>
-		
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+
+	<!-- Common management form fields -->
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="controller" value="" />
+	<input type="hidden" name="view" value="" />
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="fcform" value="1" />
+	<?php echo JHtml::_( 'form.token' ); ?>
+
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
 </form>
 </div><!-- #flexicontent end -->

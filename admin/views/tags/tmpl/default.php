@@ -87,22 +87,27 @@ function delAllFilters() {
 
 </script>
 
+
 <div id="flexicontent" class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
-<?php if (!empty( $this->sidebar)) : ?>
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
+
 
 	<div id="fc-filters-header">
 		<span class="btn-group input-append fc-filter filter-search">
@@ -305,7 +310,9 @@ function delAllFilters() {
 	</tfoot>
 
 	</table>
-	
+
+
+	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="tags" />
@@ -314,11 +321,33 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHtml::_( 'form.token' ); ?>
+	<?php echo JHtml::_('form.token'); ?>
 
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
 </form>
+<<<<<<< HEAD
 </div><!-- #flexicontent end -->
+=======
+</div><!-- #flexicontent end -->
+
+
+<?php
+JFactory::getDocument()->addScriptDeclaration('
+	function fc_edit_jtag_modal_load( container )
+	{
+		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+		{
+			container.dialog("close");
+		}
+	}
+	function fc_edit_jtag_modal_close()
+	{
+		window.location.reload(false);
+		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+	}
+');
+>>>>>>> 54099d5e9... Fixed backend managers not using all available width

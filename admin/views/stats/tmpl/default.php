@@ -25,18 +25,22 @@ $ctrl_items = "task=items.";
 $ctrl_users = "task=users.";
 ?>
 
-<?php if (!empty( $this->sidebar)) : ?>
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
+
 
 <?php
 // BOF: Load echart libraries
@@ -65,7 +69,7 @@ else :
 
 
 <div id="flexicontent" class="flexicontent">
-	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:98%;">
+	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
@@ -74,27 +78,24 @@ else :
 	</table>
 	
 	<!-- SITE TOTALS -->
-	<div class="row-fluid">
-		<div class="span12">
-			<a href="index.php?option=com_flexicontent&amp;view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo JText::_( 'FLEXI_ITEMS' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo JText::_( 'FLEXI_CATEGORIES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo JText::_( 'FLEXI_TAGS' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=filemanager" class="btn btn-small"><?php echo $this->genstats[3]; ?> <?php echo JText::_( 'FLEXI_FILES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=types"       class="btn btn-small"><?php echo $this->genstats[4]; ?> <?php echo JText::_( 'FLEXI_TYPES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo JText::_( 'FLEXI_USERS' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo JText::_( 'FLEXI_TEMPLATES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&amp;view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo JText::_( 'FLEXI_FIELDS' ) ?></a> 
-		</div>
-	</div>
+	<a href="index.php?option=com_flexicontent&amp;view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo JText::_( 'FLEXI_ITEMS' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo JText::_( 'FLEXI_CATEGORIES' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo JText::_( 'FLEXI_TAGS' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=filemanager" class="btn btn-small"><?php echo $this->genstats[3]; ?> <?php echo JText::_( 'FLEXI_FILES' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=types"       class="btn btn-small"><?php echo $this->genstats[4]; ?> <?php echo JText::_( 'FLEXI_TYPES' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo JText::_( 'FLEXI_USERS' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo JText::_( 'FLEXI_TEMPLATES' ) ?></a> 
+	<a href="index.php?option=com_flexicontent&amp;view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo JText::_( 'FLEXI_FIELDS' ) ?></a> 
 	<!-- End of SITE TOTALS -->
 	
 	
 	<!-- ITEM TOTALS -->
 	<hr />
 	<span class="label"><?php echo JText::_( 'FLEXI_ITEMS' ) ?></span>
-	<div class="span12">
-		
-		<div class="span2">
+
+	<div class="row-fluid">
+
+	<div class="span2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=P" class="btn btn-block btn-large btn-success">
 				<div>
 					<i class="icon-asterisk "></i>
@@ -172,7 +173,7 @@ else :
 	
 	<hr>
 	
-	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_ITEMS' ); ?> - <?php echo JText::_( 'FLEXI_CREATION_DATE' ); ?>
@@ -269,7 +270,7 @@ else :
 
 	
 	<hr>
-	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_ITEM_STATES_CHART' ); ?>
@@ -354,7 +355,7 @@ else :
 	
 	
 	<hr>
-	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_GENERAL_STATS' ); ?>
@@ -498,7 +499,7 @@ else :
 	
 	<div class="fcclear"></div>
 	
-	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_RATING_STATS' ); ?>
@@ -673,7 +674,7 @@ else :
 
 	<div class="fcclear"></div>
 	<hr>
-	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_USER_STATS' ); ?>
@@ -764,7 +765,9 @@ else :
 
 	<div class="fcclear"></div>
 	
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
+</div><!-- #flexicontent end -->

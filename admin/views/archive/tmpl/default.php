@@ -32,18 +32,22 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
-<?php if (!empty( $this->sidebar)) : ?>
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
+
+<?php if (!empty( $this->sidebar)) : ?>
+
 	<div id="j-sidebar-container" class="span2 col-md-2">
 		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
-	<div class="span10 col-md-10">
-		<div id="j-main-container">
+	<div id="j-main-container" class="span10 col-md-10">
+
 <?php else : ?>
-<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
-	<div class="span12 col-md-12">
-		<div id="j-main-container">
+
+	<div id="j-main-container" class="span12 col-md-12">
+
 <?php endif;?>
+
 
 	<div id="fc-filters-header">
 		<span class="btn-group input-append fc-filter filter-search">
@@ -150,6 +154,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 
 	</table>
 
+	<!-- Common management form fields -->
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="archive" />
@@ -157,11 +162,13 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHtml::_( 'form.token' ); ?>
-	
-		<!-- fc_perf -->
-		</div>  <!-- j-main-container -->
-	</div>  <!-- spanNN -->
-</div>  <!-- row -->
+
+	<!-- fc_perf -->
+
+	</div>  <!-- j-main-container -->
+</div>  <!-- row / row-fluid-->
+
 </form>
 </div><!-- #flexicontent end -->
