@@ -129,9 +129,18 @@
 			<field name="" type="separator" default="FLEXI_MY_FILES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
 
 			<field name="use_myfiles" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Enable to allow selecting an existing file that was previously uploaded" class="btn-group group-fcmethod">
-				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-on">FLEXI_NO</option>
-				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off">FLEXI_YES</option>
+				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">FLEXI_NO</option>
+				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">FLEXI_YES</option>
+				<option value="2" show_list="use-myfiles-jmedia" hide_list="use-myfiles-on,use-myfiles-off">FLEXI_JMEDIA</option>
 			</field>
+
+			<field name="jmedia_filetypes" type="fccheckbox" default="" display_useglobal="0"
+				checkoptions="Folders,Images,Documents,Videos"
+				checkvals="folders,images,docs,videos"
+				defaultvals="folders,images"
+				label="Selectable files" description="Select file types what will be allowed and selectable by the editors" depend_class="use-myfiles-jmedia" />
+
+
 			<field name="autoassign" type="radio" default="1" label="FLEXI_UPLOADED_FILES_AUTO_ASSIGN" description="FLEXI_UPLOADED_FILES_AUTO_ASSIGN_DESC" depend_class="use-myfiles-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_UPLOADED_FILE_SELECT_N_ASSIGN</option>
