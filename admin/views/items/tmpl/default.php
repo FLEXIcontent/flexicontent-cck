@@ -21,71 +21,62 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
+global $globalcats;
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
+$config  = JFactory::getConfig();
+$user    = JFactory::getUser();
+$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+$ctrl    = 'items.';
+$isAdmin = $app->isAdmin();
 
-// Create custom field columns
-foreach($this->extra_fields as $_field):
-	$values = null;
-	$field = $_field;
-	FlexicontentFields::renderField($this->rows, $field->name, $values, $field->methodname);
-endforeach;
+$items_task = 'task=items.';
+$cats_task  = 'task=category.';
 
-$app = JFactory::getApplication();
-$jinput = $app->input;
+$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
+$useAssocs = flexicontent_db::useAssociations();
+
+
+
+/**
+ * COMMON classes and COMMON repeated texts
+ */
+
 $tip_class = ' hasTooltip';
 $btn_class = 'btn';  //'fc_button fcsimple';
 
 $ico_class   = 'fc-man-icon-s';
 $btn_s_class = 'btn btn-small';
 
-$featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
-
-$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; ';
-$end_text = '<div class="icon-arrow-up-2 btn" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $start_text, $end_text);
-
-global $globalcats;
-$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-$ctrl  = 'items.';
-$items_task = 'task=items.';
-$cats_task  = 'task=category.';
-
-$db 			= JFactory::getDbo();
-$config		= JFactory::getConfig();
-$nullDate	= $db->getNullDate();
-$user 		= JFactory::getUser();
-
-//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
-$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
-$isAdmin = $app->isAdmin();
-$useAssocs = flexicontent_db::useAssociations();
-
-$list_total_cols = 18;
-if ( $useAssocs ) $list_total_cols++;
-
-$list_total_cols += count($this->extra_fields);
-
-
-// ***
-// *** COMMON repeated texts
-// ***
-
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
-$edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
-$edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
-$rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
-$rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
-$_NEVER_ = JText::_('FLEXI_NEVER');
-$_NULL_DATE_ = $this->db->getNullDate();
+$edit_cat_title  = JText::_('FLEXI_EDIT_CATEGORY', true);
+$edit_layout     = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
+$rem_filt_txt    = JText::_('FLEXI_REMOVE_FILTER', true);
+$rem_filt_tip    = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+$_NEVER_         = JText::_('FLEXI_NEVER');
+$_NULL_DATE_     = $this->db->getNullDate();
 
 
-// ***
-// *** ICONS
-// ***
+
+/**
+ * JS for Columns chooser box and Filters box
+ */
+
+flexicontent_html::jscode_to_showhide_table(
+	'mainChooseColBox',
+	'adminListTableFCitems',
+	$start_html = '<span class="label">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+	$end_html = '<div class="icon-arrow-up-2 btn" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+);
+$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+
+
+
+/**
+ * ICONS and reusable variables
+ */
 
 $image_flag_path = "../media/mod_languages/images/";
-
-$attribs_preview = ' class="'.$ico_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
-
 
 $attribs_preview    = ' class="fc-preview-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt '.$btn_s_class.' '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
@@ -98,13 +89,25 @@ $image_editlayout = 0
 	? JHtml::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"')
 	: '<span class="icon-edit"></span>';
 
+$featimg = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' style="text-align:left" class="'.$ico_class.'" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
 
-// ***
-// *** Ordering related data
-// ***
+
+/**
+ * Order stuff and table related variables
+ */
+
+$list_total_cols = 18;
+
+if ($useAssocs)
+{
+	$list_total_cols++;
+}
+
+$list_total_cols += count($this->extra_fields);
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
+
 if ($this->reOrderingActive)
 {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comments.png" class="'.$ico_class.' '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
@@ -148,14 +151,13 @@ $ord_grp = 1;
 
 
 
-// ***
-// *** Various variables
-// ***
+/**
+ * ICONS and reusable variables
+ */
 
-$fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
-$fcfilter_attrs = ' class="input-prepend fc-xpended" ';
-$stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
+$fcfilter_attrs_row = ' class="input-prepend fc-xpended-row" ';
+$fcfilter_attrs     = ' class="input-prepend fc-xpended" ';
+$stategrps          = array(1 => 'published', 0 => 'unpublished', -2 => 'trashed', -3 => 'unpublished', -4 => 'unpublished', -5 => 'published');
 
 
 
@@ -175,7 +177,19 @@ $date_note_attrs = ' class="input-append input-prepend fc-xpended '.$tip_class.'
 
 
 
+/**
+ * Create custom field columns
+ */
+foreach($this->extra_fields as $_field)
+{
+	$values = null;
+	$field = $_field;
+	FlexicontentFields::renderField($this->rows, $field->name, $values, $field->methodname);
+}
+
 ?>
+
+
 <script type="text/javascript">
 
 function fetchcounter(el_id, task_name)

@@ -21,9 +21,12 @@ $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article
 if ($this->params->get('togglable_table_cols', 1))
 {
 	flexicontent_html::loadFramework('flexi-lib');
-	$start_text = '<span class="label">'.JText::_('FLEXI_TMPL_DEFAULT_COLUMNS_FE', true).'</span>';
-	$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
-	flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCcategory', $start_text, $end_text);
+	flexicontent_html::jscode_to_showhide_table(
+		'mainChooseColBox',
+		'adminListTableFCcategory',
+		$start_html = '<span class="label">'.JText::_('FLEXI_TMPL_DEFAULT_COLUMNS_FE', true).'<\/span>',
+		$end_html = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+	);
 }
 
 // Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)

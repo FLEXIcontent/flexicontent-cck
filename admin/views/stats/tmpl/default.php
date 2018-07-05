@@ -26,6 +26,8 @@ $ctrl_users = "task=users.";
 ?>
 
 
+<div id="flexicontent" class="flexicontent">
+
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
 
 <?php if (!empty( $this->sidebar)) : ?>
@@ -43,14 +45,15 @@ $ctrl_users = "task=users.";
 
 
 <?php
-// BOF: Load echart libraries
-if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts')) :
-	echo "echarts library not installed in ".JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts';
-elseif (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender')) :
-	echo "zrender library not installed in ".JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender';
-else :
+	// BOF: Load echart libraries
+	if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts')) :
+		echo "echarts library not installed in ".JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'echarts';
+	elseif (!file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender')) :
+		echo "zrender library not installed in ".JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'zrender';
+	else :
 ?>
-<script type="text/javascript">
+
+	<script type="text/javascript">
     require.config({
         packages: [
             {
@@ -65,10 +68,9 @@ else :
             }
         ]
     });
-</script>
+	</script>
 
 
-<div id="flexicontent" class="flexicontent">
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
@@ -95,7 +97,7 @@ else :
 
 	<div class="row-fluid">
 
-	<div class="span2">
+		<div class="span2">
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=P" class="btn btn-block btn-large btn-success">
 				<div>
 					<i class="icon-asterisk "></i>
@@ -202,7 +204,7 @@ else :
  ?>
  
 	<div class="row-fluid">
-		<div class="span11">
+		<div class="span12">
 			<div class="">
 				<div id="main" style="height:400px;width:100%"></div>
 			</div>
@@ -760,8 +762,7 @@ else :
 	</div>
 	<!-- End of Most and less Popular-->
 
-</div>
-<?php endif; /* EOF: Load echart  libraries */ ?>
+<?php endif; /* EOF: Load echart libraries */ ?>
 
 	<div class="fcclear"></div>
 	

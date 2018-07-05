@@ -106,6 +106,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	?>
 
 
+	<!-- Common management fields -->
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="appsman" />
 	<input type="hidden" name="view" value="appsman" />

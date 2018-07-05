@@ -237,7 +237,7 @@ class FlexicontentViewFields extends JViewLegacy
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-		$ordering = ($filter_type == '' || $filter_type == 0)
+		$ordering = !$filter_type
 			? ($lists['order'] == 't.ordering')
 			: ($lists['order'] == 'typeordering');
 

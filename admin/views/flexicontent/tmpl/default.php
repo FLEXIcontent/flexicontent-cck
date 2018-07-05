@@ -856,6 +856,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 		<?php if (!$hide_fc_license_credits) echo $fc_logo_license; ?>
 
+
 	<!-- Common management form fields -->
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="" />
