@@ -21,9 +21,18 @@ defined('_JEXEC') or die('Restricted access');
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
-$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
-$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCgroups', $start_text, $end_text);
+
+/**
+ * JS for Columns chooser box and Filters box
+ */
+
+flexicontent_html::jscode_to_showhide_table(
+	'mainChooseColBox',
+	'adminListTableFCgroups',
+	$start_html = '<span class="label">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+	$end_html = '<div class="icon-arrow-up-2 btn" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+);
+$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
 $edit_entry = JText::_('FLEXI_EDIT', true);
 $view_entry = JText::_('FLEXI_VIEW', true);
@@ -31,17 +40,18 @@ $view_entry = JText::_('FLEXI_VIEW', true);
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
-// Load the tooltip behavior.
-//JHtml::_('behavior.tooltip');
+/**
+ * Load JS frameworks
+ */
+JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
+JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 
 $user    = JFactory::getUser();
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 $list_total_cols = 6;
 
-JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
-$tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)
@@ -84,11 +94,11 @@ $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cooki
 
 
 	<div id="fc-filters-header">
-		<span class="btn-group input-append fc-filter filter-search">
+		<div class="btn-group input-append fc-filter filter-search">
 			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-		</span>
+		</div>
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<span class="btn-group fc-filter">

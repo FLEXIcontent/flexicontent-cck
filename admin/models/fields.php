@@ -857,21 +857,25 @@ class FlexicontentModelFields extends JModelList
 	{
 		$filter_type = $this->getState( 'filter_type' );
 
-		if ($filter_type == '' || $filter_type == 0)
+		if (!$filter_type)
 		{
 			$row = JTable::getInstance('flexicontent_fields', '');
 
-			if (!$row->load( $this->_id ) ) {
+			if (!$row->load($this->_id))
+			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
 
-			if (!$row->move( $direction )) {
+			if (!$row->move($direction))
+			{
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
+
 			return true;
 		}
+
 		else
 		{
 			$query = 'SELECT field_id, ordering'
@@ -954,13 +958,12 @@ class FlexicontentModelFields extends JModelList
 	{
 		$filter_type = $this->getState( 'filter_type' );
 		
-		if ($filter_type == '' || $filter_type == 0)
+		if (!$filter_type)
 		{
-
 			$row = JTable::getInstance('flexicontent_fields', '');
 		
 			// update ordering values
-			for( $i=0; $i < count($cid); $i++ )
+			for($i = 0; $i < count($cid); $i++)
 			{
 				$row->load( (int) $cid[$i] );
 	

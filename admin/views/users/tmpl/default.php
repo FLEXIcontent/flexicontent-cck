@@ -23,8 +23,8 @@ $jinput = $app->input;
 $tip_class = ' hasTooltip';
 $btn_class = 'btn';  //'fc_button fcsimple';
 
-$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
-$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'<\/span>';
+$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCusers', $start_text, $end_text);
 
 
