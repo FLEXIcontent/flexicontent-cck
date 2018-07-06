@@ -274,9 +274,10 @@ class FlexicontentViewTags extends JViewLegacy
 				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=indexer&tmpl=component&indexer=tag_mappings';
 				//$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 				$js .= "
-					jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button').attr('href', '".$popup_load_url."')
+					jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+						.attr('href', '".$popup_load_url."')
 						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."</span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Verify mappings to Joomla Tags'), 2)."\'}); return false;');
+							.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('Verify mappings to Joomla Tags'), 2)."\'}); return false;');
 				";
 				JToolbarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', JText::_('Verify mappings to Joomla Tags'), false );
 			}

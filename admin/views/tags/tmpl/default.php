@@ -253,12 +253,16 @@ function delAllFilters() {
 					if ($canCheckin) {
 						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'tags.', $canCheckin);
 						$task_str = 'tags.checkin';
-						if ($row->checked_out == $user->id) {
+						if ($row->checked_out === $user->id)
+						{
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
-						} else {
+						}
+						else
+						{
 							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 						}
+						$_tip_title = htmlspecialchars($_tip_title, ENT_QUOTES, 'UTF-8');
 						?>
 						<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
 							<span class="icon-checkedout"></span>
@@ -300,7 +304,7 @@ function delAllFilters() {
 			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
 			<td class="center hidden-tablet hidden-phone">
 				<?php if ($row->jtag_id) : ?>
-				<a href="javascript:;" onclick="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'<?php echo JText::_('FLEXI_EDIT_JTAG'); ?>', loadFunc: fc_edit_jtag_modal_load}); return false;" data-href="index.php?option=com_tags&task=tag.edit&id=<?php echo $row->jtag_id; ?>">
+				<a href="javascript:;" onclick="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'<?php echo JText::_('FLEXI_EDIT_JTAG'); ?>', loadFunc: fc_edit_jtag_modal_load}); return false;" data-href="index.php?option=com_tags&amp;task=tag.edit&amp;id=<?php echo $row->jtag_id; ?>">
 					<?php echo $image_editlayout; ?>
 				</a>
 				<?php endif; ?>

@@ -203,7 +203,7 @@ $tabCnt[$tabSetCnt] = 0;
 					?>
 					<input type="checkbox" id="custom_ititle_col" name="custom_ititle_col" value="1" <?php echo $_desc_checked; ?> />
 					<label for="custom_ititle_col"><?php echo JText::_("FLEXI_IMPORT_USE_CUSTOM_TITLE_COL");?></label>
-					<span class="icon-info hasTooltip" style="font-size: 18px;" title="<?php echo htmlspecialchars(JText::_('FLEXI_CUSTOM_TITLE_DESC'), ENT_COMPAT, 'UTF-8'); ?>"</span>
+					<span class="icon-info hasTooltip" style="font-size: 18px;" title="<?php echo htmlspecialchars(JText::_('FLEXI_CUSTOM_TITLE_DESC'), ENT_COMPAT, 'UTF-8'); ?>"></span>
 				</td>
 			</tr>
 			

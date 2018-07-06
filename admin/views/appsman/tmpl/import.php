@@ -151,7 +151,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						echo '<h2 style="vertical-align:middle; display:inline-block;">'.str_replace('flexicontent_', '', $_title_name).'</h2>';
 						?> &nbsp;
 						<?php if ($_option_name && $_view_name): ?>
-						<a class="btn btn-small" href="index.php?option=com_<?php echo $_option_name; ?>&view=<?php echo $_view_name; ?>" style="vertical-align:middle; display:inline-block;">
+						<a class="btn btn-small" href="index.php?option=com_<?php echo $_option_name; ?>&amp;view=<?php echo $_view_name; ?>" style="vertical-align:middle; display:inline-block;">
 							<span class="icon-box-add"></span><?php echo JText::_('FLEXI_ADD_MORE'); ?>
 						</a>
 						<?php endif; ?>

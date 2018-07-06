@@ -35,7 +35,7 @@ flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	'adminListTableFCfiles' . $this->layout . $this->fieldid,
 	$start_html = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'<\/span>',
-	$end_html = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>',
+	$end_html = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 $tools_cookies['fc-filters-box-disp'] = JFactory::getApplication()->input->cookie->get('fc-filters-box-disp', 0, 'int');
 
@@ -914,12 +914,16 @@ if ($js)
 							{
 								//if ($row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
 								$task_str = 'types.checkin';
-								if ($row->checked_out == $user->id) {
+								if ($row->checked_out === $user->id)
+								{
 									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->checked_out, $row->checked_out_time);
-								} else {
+								}
+								else
+								{
 									echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
 									$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->checked_out, $row->checked_out_time);
 								}
+								$_tip_title = htmlspecialchars($_tip_title, ENT_QUOTES, 'UTF-8');
 								?>
 								<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
 									<span class="icon-checkedout"></span>
@@ -1297,7 +1301,7 @@ if ($js)
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-contract-2"></span>
 							<span class="'.$sys_limit_class.'" style="margin-right: 4px;">'.$upConf['upload_max_w'].'x'.$upConf['upload_max_h'].'</span> <span class="fc_hidden_580">Pixels</span>
-							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.JText::_('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC').'" data-placement="top"></span>
+							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.htmlspecialchars(JText::_('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC'), ENT_QUOTES, 'UTF-8').'" data-placement="top"></span>
 						</span>
 					</td>
 					<td>
@@ -1315,7 +1319,7 @@ if ($js)
 						<span class="fc-php-upload-limit-box">
 							<span class="icon-scissors" style="margin-right: 4px;'.($upConf['upload_method'] ? '' : 'opacity: 0.3;').'"></span>
 							<span style="margin-right: 4px;">'.JText::_($upConf['upload_method'] ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upConf['upload_quality'].'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
-							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.JText::_('FLEXI_UPLOAD_FIT_METHOD_DESC').'" data-placement="top"></span>
+							<span class="icon-info '.$tip_class.'" style="padding: 2px 4px 0px 2px;" title="'.htmlspecialchars(JText::_('FLEXI_UPLOAD_FIT_METHOD_DESC'), ENT_QUOTES, 'UTF-8').'" data-placement="top"></span>
 						</span>
 					</td>
 					<td>
