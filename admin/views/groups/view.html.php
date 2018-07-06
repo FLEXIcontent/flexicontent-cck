@@ -168,7 +168,7 @@ class FlexicontentViewGroups extends JViewLegacy
 				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jgroup_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jgroup_modal_load}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn btn-small btn-success".$tip_class, $btn_icon="icon-new icon-white",
-				'data-placement="bottom" data-href="index.php?option=com_users&task=group.edit&id=0" title="Add new Joomla group"'
+				'data-placement="bottom" data-href="index.php?option=com_users&amp;task=group.edit&amp;id=0" title="Add new Joomla group"'
 			);
 		}
 

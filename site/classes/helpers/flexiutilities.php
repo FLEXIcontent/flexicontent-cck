@@ -779,7 +779,7 @@ class FLEXIUtilities
 			elseif ($comments === 1 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
-					'<a href="index.php?option=com_jcomments&task=view&fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>' . JText::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}

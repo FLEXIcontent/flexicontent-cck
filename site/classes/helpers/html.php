@@ -120,8 +120,11 @@ class flexicontent_html
 	static function gridOrderBtn($rows, $image = 'filesave.png', $task = 'saveorder')
 	{
 		//return str_replace('rel="tooltip"', '', JHtml::_('grid.order', $rows, $image, $task));
-		return '<a href="javascript:saveorder('
-			. (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn btn-small btn-primary pull-right"><span class="icon-menu-2"></span> '.JText::_('JLIB_HTML_SAVE_ORDER') .'</a>';
+		return '
+		<a href="javascript:;" onclick="saveorder(' . (count($rows) - 1) . ', \'' . $task . '\')" class="saveorder btn btn-small btn-primary pull-right">
+			<span class="icon-menu-2"></span>
+			' . JText::_('JLIB_HTML_SAVE_ORDER') . '
+		</a>';
 	}
 
 

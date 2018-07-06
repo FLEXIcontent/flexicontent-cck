@@ -252,12 +252,16 @@ function delAllFilters() {
 					if ($canCheckin) {
 						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'tags.', $canCheckin);
 						$task_str = 'tags.checkin';
-						if ($row->checked_out == $user->id) {
+						if ($row->checked_out === $user->id)
+						{
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
-						} else {
+						}
+						else
+						{
 							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 						}
+						$_tip_title = htmlspecialchars($_tip_title, ENT_QUOTES, 'UTF-8');
 						?>
 						<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
 							<span class="icon-checkedout"></span>
@@ -329,25 +333,4 @@ function delAllFilters() {
 </div>  <!-- row / row-fluid-->
 
 </form>
-<<<<<<< HEAD
 </div><!-- #flexicontent end -->
-=======
-</div><!-- #flexicontent end -->
-
-
-<?php
-JFactory::getDocument()->addScriptDeclaration('
-	function fc_edit_jtag_modal_load( container )
-	{
-		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
-		{
-			container.dialog("close");
-		}
-	}
-	function fc_edit_jtag_modal_close()
-	{
-		window.location.reload(false);
-		document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
-	}
-');
->>>>>>> 54099d5e9... Fixed backend managers not using all available width

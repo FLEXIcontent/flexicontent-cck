@@ -471,7 +471,7 @@ function delAllFilters() {
 					{
 						//echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, $ctrl, $canCheckin);
 						$task_str = $ctrl.'checkin';
-						if ($row->checked_out == $user->id)
+						if ($row->checked_out === $user->id)
 						{
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
 						}
@@ -480,6 +480,7 @@ function delAllFilters() {
 							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 						}
+						$_tip_title = htmlspecialchars($_tip_title, ENT_QUOTES, 'UTF-8');
 						?>
 						<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
 							<span class="icon-checkedout"></span>
