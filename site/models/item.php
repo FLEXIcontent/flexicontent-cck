@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -67,10 +67,10 @@ class FlexicontentModelItem extends ParentClassItem
 		$cid	= $this->_cid;
 		$params = $this->_record->parameters;
 		$cparams = $this->_cparams;
-		
+
 		$referer  = @ $_SERVER['HTTP_REFERER'];                                    // The previously viewed page (refer)
 		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JUri::base(); // Ignore it if potentially non safe URL, e.g. non-internal
-		
+
 		// a basic item title string
 		$title_str = ' ' . JText::_('FLEXI_ID') .' : '.$this->_record->id;
 
@@ -84,7 +84,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// (a) Calculate if owned by current user
 		$isOwner = $this->_record->created_by== $user->get('id');
 
-		// (b) Calculate edit access ... 
+		// (b) Calculate edit access ...
 		// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
 		$canedititem = $params->get('access-edit');
 		$caneditstate = $params->get('access-edit-state');
@@ -333,7 +333,7 @@ class FlexicontentModelItem extends ParentClassItem
 				if ($cparams->get('unauthorized_page', ''))
 				{
 					$app->enqueueMessage($msg, 'notice');  // 403
-					$app->redirect($cparams->get('unauthorized_page'));				
+					$app->redirect($cparams->get('unauthorized_page'));
 				}
 
 				// (e) finally raise a 403 forbidden Server Error if user is unauthorized to access item
@@ -364,7 +364,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// we are looking for and we have access to it.
 		//
 		$where = ' WHERE i.id = '. (int) $this->_id;
-		
+
 		return $where;
 	}
 
@@ -378,226 +378,81 @@ class FlexicontentModelItem extends ParentClassItem
 	function decideLayout(&$compParams, &$typeParams, &$itemParams)
 	{
 		$app = JFactory::getApplication();
-		
+
 		// Decide to use mobile or normal item template layout
-		$useMobile = $compParams->get('use_mobile_layouts', 0 );
-		if ($useMobile) {
-			$force_desktop_layout = $compParams->get('force_desktop_layout', 0 );
+		$useMobile = (int) $compParams->get('use_mobile_layouts', 0);
+
+		if ($useMobile)
+		{
+			$force_desktop_layout = (int) $compParams->get('force_desktop_layout', 0);
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 		}
+
 		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
-		
+
 		// Get item layout (... if not already set), from the configuration parameter (that was decided above)
-		$ilayout = $this->_ilayout=='__request__' ? $app->input->get($_ilayout, false, 'STRING') : false;
-		if (!$ilayout) {
+		$ilayout = $this->_ilayout === '__request__'
+			? $app->input->get($_ilayout, false, 'STRING')
+			: false;
+
+		if (!$ilayout)
+		{
 			$desktop_ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
-			$ilayout = !$useMobile ? $desktop_ilayout : $itemParams->get('ilayout_mobile', $typeParams->get('ilayout_mobile', $desktop_ilayout));
+			$ilayout = !$useMobile
+				? $desktop_ilayout
+				: $itemParams->get('ilayout_mobile', $typeParams->get('ilayout_mobile', $desktop_ilayout));
 		}
-		
+
 		// Verify the layout is within allowed templates, that is Content Type 's default template OR Content Type allowed templates
 		$allowed_tmpls = $typeParams->get('allowed_ilayouts');
 		$type_default_layout = $typeParams->get('ilayout', 'default');
-		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
-		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
-		
+
+		$allowed_tmpls = empty($allowed_tmpls)
+			? array()
+			: $allowed_tmpls;
+		$allowed_tmpls = !is_array($allowed_tmpls)
+			? explode('|', $allowed_tmpls)
+			: $allowed_tmpls;
+
 		// Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
-		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
-			$app->enqueueMessage("<small>Current item Layout (template) is '$ilayout':<br/>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
+		if ($ilayout != $type_default_layout && count($allowed_tmpls) && !in_array($ilayout, $allowed_tmpls))
+		{
+			$app->enqueueMessage('
+				Current item Layout (template) is \'' . $ilayout . '\'<br/>
+				- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>
+				- Please correct this in the URL or in Content Type configuration.<br/>
+				- Using Content Type Default Template Layout: \'' . $type_default_layout . '\'
+			', 'notice');
 			$ilayout = $type_default_layout;
 		}
-		
+
 		// Get all templates from cache, (without loading any language file this will be done at the view)
 		$themes = flexicontent_tmpl::getTemplates();
-		
+
 		// Verify the item layout exists
-		if ( !isset($themes->items->{$ilayout}) ) {
+		if (!isset($themes->items->{$ilayout}))
+		{
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
-			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
+			$app->enqueueMessage('
+				Current Item Layout Template is \'' . $ilayout . '\' does not exist<br/>
+				- Please correct this in the URL or in Content Type configuration.<br/>
+				- Using Template Layout: \'' . $fixed_ilayout . '\'
+			', 'notice');
 			$ilayout = $fixed_ilayout;
-			FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
+
+			// Manually load Template-Specific language file of back fall ilayout
+			FLEXIUtilities::loadTemplateLanguageFile($ilayout);
 		}
-		
+
 		// Finally set the ilayout (template name) into model / item's parameters / HTTP Request
 		$this->setItemLayout($ilayout);
 		$itemParams->set('ilayout', $ilayout);
 		$app->input->set('ilayout', $ilayout);
 	}
 
-
-	/**
-	 * Method to load content article parameters
-	 *
-	 * @access	private
-	 * @return	void
-	 * @since	1.5
-	 */
-	function _loadItemParams($force=false)
-	{
-		if (!$force && !empty($this->_record->parameters)) return;
-		
-		$app = JFactory::getApplication();
-		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
-		$isnew = !$this->_id;
-		
-		
-		// **********************************************************************
-		// Retrieve RELATED parameters that will be merged into item's parameters
-		// **********************************************************************
-		
-		// Retrieve COMPONENT parameters
-		$compParams = JComponentHelper::getComponent('com_flexicontent')->params;
-		
-		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
-		$catParams = "";
-		if ( $this->_cid )
-		{
-			$query = 'SELECT c.title, c.params FROM #__categories AS c WHERE c.id = ' . (int) $this->_cid;
-			$this->_db->setQuery($query);
-			$catData = $this->_db->loadObject();
-			$catParams = $catData->params;
-			$this->_record->category_title = $catData->title;
-		}
-		$catParams = new JRegistry($catParams);
-		
-		// Retrieve/Create item's Content Type parameters
-		$typeParams = $this->getTypeparams();
-		$typeParams = new JRegistry($typeParams);
-		
-		// Create item parameters
-		if ( !is_object($this->_record->attribs) )
-		{
-			try
-			{
-				$itemParams = new JRegistry($this->_record->attribs);
-			}
-			catch (Exception $e)
-			{
-				$itemParams = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $this->_record->id, $this->_record->attribs);
-			}
-		}
-		else
-		{
-			$itemParams = $this->_record->attribs;
-		}
-		
-		// Retrieve Layout's parameters, also deciding the layout
-		$this->decideLayout($compParams, $typeParams, $itemParams);
-		$layoutParams = $this->getLayoutparams();
-		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
-		
-		
-		// **************************************************************************************************************
-		// Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/category/type/item/menu/access
-		// **************************************************************************************************************
-		
-		// a0. Merge Layout parameters into the page configuration
-		$params = new JRegistry();
-		$params->merge($layoutParams);
-		
-		// a1. Start with empty registry, then merge COMPONENT parameters
-		$params->merge($compParams);
-		
-		// b. Merge parameters from current category, but prevent some settings from propagating ... to the item, that are meant for
-		//    category view only, these are legacy settings that were removed from category.xml, but may exist in saved configurations
-		$catParams->set('show_title', '');
-		$catParams->set('show_editbutton', '');
-		$params->merge($catParams);
-		
-		// c. Merge TYPE parameters into the page configuration
-		$params->merge($typeParams);
-
-		// d. Merge ITEM parameters into the page configuration
-		$params->merge($itemParams);
-		
-		// e. Merge ACCESS permissions into the page configuration
-		$accessperms = $this->getItemAccess();
-		$params->merge($accessperms);
-		
-		// d. Merge the active menu parameters, verify menu item points to current FLEXIcontent object
-		if ( $menu && !empty($this->mergeMenuParams) )
-		{
-			if (!empty($this->isForm))
-			{
-				$this->menu_matches = false;
-				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
-				$this->menu_matches = $view_ok;
-			}
-			else
-			{
-				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
-				$cid_ok  = $app->input->get('cid', 0, 'INT') == (int) @$menu->query['cid'];
-				$id_ok   = $app->input->get('id', 0, 'INT')  == (int) @$menu->query['id'];
-				$this->menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
-			}
-		}
-
-		// Active menu did not match to current item
-		else
-		{
-			$this->menu_matches = false;
-		}
-		
-		// MENU ITEM matched, merge parameters and use its page heading (but use menu title if the former is not set)
-		if ( $this->menu_matches )
-		{
-			$params->merge($menu->params);
-			$default_heading = $menu->title;
-			
-			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
-			$params->def('page_heading', $params->get('page_title',   $default_heading));
-			$params->def('page_title',   $params->get('page_heading', $default_heading));
-		  $params->def('show_page_heading', $params->get('show_page_title',   0));
-		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
-		}
-		
-		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
-		else
-		{
-			// Clear some menu parameters
-			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-			
-			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			$default_heading = empty($this->isForm) ? $this->_record->title :
-				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
-			
-			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
-			$show_default_heading = 0;
-			
-			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
-			$params->set('page_title',   $default_heading);
-			$params->set('page_heading', $default_heading);
-		  $params->set('show_page_heading', $show_default_heading);
-			$params->set('show_page_title',   $show_default_heading);
-		}
-
-		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
-		if ( $params->get('show_title', 1) ) {
-			if ($params->get('page_heading') == $this->_record->title) $params->set('show_page_heading', 0);
-			if ($params->get('page_title')   == $this->_record->title) $params->set('show_page_title',   0);
-		}
-
-		// Also convert metadata property string to registry object
-		try
-		{
-			$this->_record->metadata = new JRegistry($this->_record->metadata);
-		}
-		catch (Exception $e)
-		{
-			$this->_record->metadata = flexicontent_db::check_fix_JSON_column('metadata', 'content', 'id', $this->_record->id);
-		}
-
-		// Manually apply metadata from type parameters ... currently only 'robots' makes sense to exist per type
-		if ( !$this->_record->metadata->get('robots') )   !$this->_record->metadata->set('robots', $typeParams->get('robots'));
-
-
-		// *********************************************
-		// Finally set 'parameters' property of the item
-		// *********************************************
-		$this->_record->parameters = $params;
-	}
 
 
 	/**
@@ -645,7 +500,7 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::getFavoured($type=0, $this->_id, JFactory::getUser()->id);
 	}
-	
+
 
 
 	/**
@@ -672,6 +527,6 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::addfav($type=0, $this->_id, JFactory::getUser()->id);
 	}
-	
+
 }
 ?>

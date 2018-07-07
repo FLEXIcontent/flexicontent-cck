@@ -76,12 +76,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$uri        = JUri::getInstance();
 		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
-		if ( $app->isSite() )
+		$useAssocs  = flexicontent_db::useAssociations();
+
+		if ($app->isSite())
 		{
 			$menu = $app->getMenu()->getActive();
 		}
-		$useAssocs  = flexicontent_db::useAssociations();
-		
+
 		// Get the COMPONENT only parameter, since we do not have item parameters yet, but we need to do some work before creating the item
 		$page_params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
@@ -107,7 +108,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Get model and indicate to model that current view IS item form
 		$model = $this->getModel();
-		$model->isForm = true;  // Currently this flag is used only by frontend model
+		$model->isForm = true;
 
 
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
@@ -122,7 +123,8 @@ class FlexicontentViewItem extends JViewLegacy
 		// ***
 		// *** Frontend form: replace component/menu 'params' with the merged component/category/type/item/menu ETC ... parameters
 		// ***
-		if ( $app->isSite() )
+
+		if ($app->isSite())
 		{
 			$page_params = $item->parameters;
 		}
@@ -1257,5 +1259,86 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		return $perms;
+	}
+
+
+
+	/**
+	 * Method to diplay field showing inherited value
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function getInheritedFieldDisplay($field, $params, $_v = null)
+	{
+		$_v = $params ? $params->get($field->fieldname) : $_v;
+		
+		if ($_v==='' || $_v===null)
+		{
+			return $field->input;
+		}
+
+		elseif ($field->getAttribute('type')==='fcordering' || $field->getAttribute('type')==='list' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='list'))
+		{
+			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			if (preg_match('/<option\s*value="' . preg_quote($_v, '/') . '"\s*>(.*?)<\/option>/', $field->input, $matches))
+			{
+				return str_replace(
+					JText::_('FLEXI_USE_GLOBAL'),
+					JText::_('FLEXI_USE_GLOBAL') . ' (' . $matches[1] . ')',
+					$field->input);
+			}
+		}
+
+		elseif ($field->getAttribute('type')==='radio' || $field->getAttribute('type')==='fcradio' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='radio'))
+		{
+			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'value="'.$_v.'"',
+				'value="'.$_v.'" class="fc-inherited-value" ',
+				$field->input);
+		}
+
+		elseif ($field->getAttribute('type')==='fccheckbox' && is_array($_v))
+		{
+			$_input = $field->input;
+			foreach ($_v as $v)
+			{
+				$v = htmlspecialchars( $v, ENT_COMPAT, 'UTF-8' );
+				$_input = str_replace(
+					'value="'.$v.'"',
+					'value="'.$v.'" class="fc-inherited-value" ',
+					$_input);
+			}
+			return $_input;
+		}
+
+		elseif ($field->getAttribute('type')==='text' || $field->getAttribute('type')==='fcmedia' || $field->getAttribute('type')==='media')
+		{
+			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'<input ',
+				'<input placeholder="'.$_v.'" ',
+				preg_replace('/^(\s*<input\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
+			);
+		}
+		elseif ($field->getAttribute('type')==='textarea')
+		{
+			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'<textarea ',
+				'<textarea placeholder="'.$_v.'" ',
+				preg_replace('/^(\s*<textarea\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
+			);
+		}
+
+		elseif ( method_exists($field, 'setInherited') )
+		{
+			$field->setInherited($_v);
+			return $field->input;
+		}
+
+		return $field->input;
 	}
 }

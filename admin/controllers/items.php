@@ -1074,13 +1074,15 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check access
 		if (!$canOrder)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
 		if (!$model->saveorder($cid, $order, $ord_catid, $prev_order))
 		{
-			JError::raiseWarning(500, JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError());
+			$app->setHeader('status', 500);
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -1120,7 +1122,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check access
 		if (!$canCopy)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -1168,7 +1171,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS');
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) . " - " . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION') . " - " . JText::_('FLEXI_IDS_SKIPPED');
-			JError::raiseNotice(500, $msg_noauth);
+
+			$app->enqueueMessage($msg_noauth, 'notice');
 
 			if (!count($auth_cid))  // Cancel task if no items can be copied
 			{
@@ -1216,7 +1220,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check access
 		if (!$canCopy)
 		{
-			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			$app->setHeader('status', 403);
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return false;
@@ -1288,7 +1293,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS');
 			$msg_noauth .= ": " . implode(',', $non_auth_cid) . " - " . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION') . " - " . JText::_('FLEXI_IDS_SKIPPED');
-			JError::raiseNotice(500, $msg_noauth);
+
+			$app->enqueueMessage($msg_noauth, 'notice');
 
 			if (!count($auth_cid))  // Cancel task if no items can be copied
 			{
@@ -1315,8 +1321,8 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 				else
 				{
-					$msg = JText::_('FLEXI_ERROR_COPY_ITEMS');
-					JError::raiseWarning(500, $msg . " " . $model->getError());
+					$app->setHeader('status', 500);
+					$app->enqueueMessage(JText::_('FLEXI_ERROR_COPY_ITEMS') . " " . $model->getError(), 'error');
 					$msg = '';
 				}
 			}
@@ -1902,6 +1908,7 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		// Get/Create the model
 		$model = $this->getModel('item');
+		$model->isForm = true;
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);

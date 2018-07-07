@@ -319,11 +319,14 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			
 			<?php
 				$field = isset($this->fields['title']) ? $this->fields['title'] : false;
-				if ($field) {
-					$field_description = $field->description ? $field->description :
-						JText::_($this->form->getField('title')->description);
+
+				if ($field)
+				{
+					$field_description = $field->description ?: JText::_($this->form->getField('title')->description);
 					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
-				} else {
+				}
+				else
+				{
 					$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 				}
 			?>
@@ -521,11 +524,14 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 			
 			<?php
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
-				if ($field) {
-					$field_description = $field->description ? $field->description :
-						JText::_($this->form->getField('type_id')->description);
+
+				if ($field)
+				{
+					$field_description = $field->description ?: JText::_($this->form->getField('type_id')->description);
 					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel'.(!$this->item->type_id ? ' label label-warning' : '').'" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
-				} else {
+				}
+				else
+				{
 					$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 				}
 			?>
@@ -567,11 +573,14 @@ if (isset($this->item->item_translations)) foreach ($this->item->item_translatio
 		
 			<?php
 				$field = isset($this->fields['state']) ? $this->fields['state'] : false;
-				if ($field) {
-					$field_description = $field->description ? $field->description :
-						JText::_($this->form->getField('state')->description);
+
+				if ($field)
+				{
+					$field_description = $field->description ?: JText::_($this->form->getField('state')->description);
 					$label_attrs = 'class="' . $tip_class . $lbl_class . ' pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
-				} else {
+				}
+				else
+				{
 					$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 				}
 			?>
@@ -702,13 +711,17 @@ $tabCnt[$tabSetCnt] = 0;
 
 <?php
 	$field = $this->fields['text'];
-	if ($field) {
-		$field_description = $field->description ? $field->description :
-			JText::_($this->form->getField('text')->description);
+
+	if ($field)
+	{
+		$field_description = $field->description ?: JText::_($this->form->getField('text')->description);
 		$_desc = flexicontent_html::getToolTip(null, $field_description, 0, 1);
-	} else {
+	}
+	else
+	{
 		$_desc = '';
 	}
+
 	if (
 		!$field->parameters->get('backend_hidden')  &&
 		!in_array($field->formhidden, array(2,3))   &&    // check to SKIP (hide) field via field DB table property 'form_hidden'
@@ -733,21 +746,26 @@ $tabCnt[$tabSetCnt] = 0;
 			}
 			
 			// Some fields may force a container width ?
-			$display_label_form = $field->parameters->get('display_label_form', 1);
-			$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
-			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
-			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
-			$container_class = "container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
+			$display_label_form = (int) $field->parameters->get('display_label_form', 1);
+			$full_width = $display_label_form === 0 || $display_label_form === 2 || $display_label_form === -1;
+
+			$width = $field->parameters->get('container_width', ($full_width ? '100% !important;' : false));
+
+			$container_width = empty($width)
+				? ''
+				: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
+			$container_class = 'container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
 			?>
 			
 			<?php /* description field label will be USED as TAB handle title, with field's description as Tooltip */
 			/*if ($display_label_form > 0): ?>
-				<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
-				<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
-					<?php echo $field->label; ?>
-				</label>
-				</span>
-				<?php if($display_label_form==2):  ?>
+				<div class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
+					<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
+						<?php echo $field->label; ?>
+					</label>
+				</div>
+
+				<?php if($display_label_form === 2):  ?>
 					<div class="fcclear"></div>
 				<?php endif; ?>
 			<?php endif; */?>
@@ -837,8 +855,8 @@ if ($this->item->type_id) {
 			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			$row_k = 0;
 
-			foreach ($this->fields as $field)
-			{
+			foreach ($this->fields as $field) :
+
 				if (
 					// SKIP backend hidden fields from this listing
 					($field->iscore && empty($field->html))   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
@@ -908,72 +926,77 @@ if ($this->item->type_id) {
 					$label_attrs = 'class="' . $lbl_class . ' pull-left label-fcinner label-toplevel"';
 				}
 				
-				// Some fields may force a container width ?
-				$display_label_form = $field->parameters->get('display_label_form', 1);
 				$row_k = 1 - $row_k;
-				$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
-				$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
-				$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
-				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
+
+				// Some fields may force a container width ?
+				$display_label_form = (int) $field->parameters->get('display_label_form', 1);
+				$full_width = $display_label_form === 0 || $display_label_form === 2 || $display_label_form === -1;
+
+				$width = $field->parameters->get('container_width', ($full_width ? '100% !important;' : false));
+
+				$container_width = empty($width)
+					? ''
+					: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
+				$container_class = 'fcfield_row' . $row_k . ' container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
 				?>
 				
-				<div class="fcclear"></div>
+				<div class="control-group">
 
-				<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
-				<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
-					<?php echo $field->label; ?>
-				</label>
-				</div>
-				<?php if($display_label_form==2):  ?>
-					<div class="fcclear"></div>
-				<?php endif; ?>
-								
-				<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
-					<?php echo ($field->description && $edithelp==3) ? '<div class="alert fc-small fc-iblock">'.$field->description.'</div>' : ''; ?>
-				
-				<?php if ( !isset($field->html) || !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
-					
-					<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-					
-				<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
-					
-					<?php
-					array_push($tabSetStack, $tabSetCnt);
-					$tabSetCnt = ++$tabSetMax;
-					$tabCnt[$tabSetCnt] = 0;
-					?>
-					<!-- tabber start -->
-					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
-					<?php foreach ($field->html as $i => $fldhtml): ?>
-						<?php
-							// Hide field when it has no label, and skip creating tab
-							$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
-							if (!isset($field->tab_labels[$i]))	continue;
-						?>
-						
-						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
-							<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
-							<?php
-								echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
-								$not_in_tabs = "";      // Clear the hidden fields variable
-								echo $field->html[$i];  // Current TAB CONTENTS
-							?>
-						</div>
-								
-					<?php endforeach; ?>
+					<div class="control-label" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
+						<label id="label_fcfield_<?php echo $field->id; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
+							<?php echo $field->label; ?>
+						</label>
 					</div>
-					<!-- tabber end -->
-					<?php $tabSetCnt = array_pop($tabSetStack); ?>
-					
-					<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
-							
-				<?php endif; /* END MULTI-TABBED FIELD */ ?>
-				
+
+					<?php if ($display_label_form === 2):  ?>
+						<div class="fcclear"></div>
+					<?php endif; ?>
+
+					<div style="<?php echo $container_width; ?>" class="controls <?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
+						<?php echo ($field->description && $edithelp==3) ? '<div class="alert fc-small fc-iblock">'.$field->description.'</div>' : ''; ?>
+
+					<?php if ( !isset($field->html) || !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
+
+						<?php echo isset($field->html) ? $field->html : $noplugin; ?>
+
+					<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
+
+						<?php
+						array_push($tabSetStack, $tabSetCnt);
+						$tabSetCnt = ++$tabSetMax;
+						$tabCnt[$tabSetCnt] = 0;
+						?>
+						<!-- tabber start -->
+						<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+						<?php foreach ($field->html as $i => $fldhtml): ?>
+							<?php
+								// Hide field when it has no label, and skip creating tab
+								$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+								if (!isset($field->tab_labels[$i]))	continue;
+							?>
+
+							<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
+								<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
+								<?php
+									echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+									$not_in_tabs = "";      // Clear the hidden fields variable
+									echo $field->html[$i];  // Current TAB CONTENTS
+								?>
+							</div>
+
+						<?php endforeach; ?>
+						</div>
+						<!-- tabber end -->
+						<?php $tabSetCnt = array_pop($tabSetStack); ?>
+
+						<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
+
+					<?php endif; /* END MULTI-TABBED FIELD */ ?>
+
+					</div>
 				</div>
 				
-			<?php
-			}
-			?>
+			<?php endforeach; ?>
 			
 		</div>
 
@@ -1468,23 +1491,25 @@ if ( count($FC_jfields_html) ) : ?>
 			
 			<?php
 			foreach ($this->form->getFieldset('themes') as $field):
+
 				if (!$field->label || $field->hidden)
 				{
 					echo $field->input;
 					continue;
 				}
+
 				elseif ($field->input)
 				{
 					$_depends = $field->getAttribute('depend_class');
 					echo '
-					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						<span class="label-fcouter">
+					<div class="control-group'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<div class="control-label">
 							'.str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ', $field->label).'
-						</span>
-						<div class="container_fcfield">
+						</div>
+						<div class="controls container_fcfield">
 							'.$field->input.'
 						</div>
-					</fieldset>
+					</div>
 					';
 				}
 			endforeach; ?>
@@ -1522,33 +1547,55 @@ if ( count($FC_jfields_html) ) : ?>
 						endif;
 						
 						foreach ($form_layout->getFieldset($fsname) as $field) :
-							
+
 							if ($field->getAttribute('not_inherited')) continue;
-							if ($field->getAttribute('cssprep')) continue;
-							
+							//if ($field->getAttribute('cssprep')) continue;
+
+							$cssprep = $field->getAttribute('cssprep');
+							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
+
 							$fieldname = $field->fieldname;
-							//$value = $form_layout->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
-							
-							$input_only = !$field->label || $field->hidden;
-							echo
-								($input_only ? '' :
-								str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ',
-									str_replace(' for="', ' data-for="',
-										str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-											$form_layout->getLabel($fieldname, $groupname)))).'
-								<div class="container_fcfield">
-								').
-								
-								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-										$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
-									)
-								).
-								
-								($input_only ? '' : '
+
+							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
+							if ($cssprep && FLEXI_J37GE)
+							{
+								$_value = $form_layout->getValue($fieldname, $groupname, $this->item->parameters->get($fieldname));
+								$field->setValue($_value);
+								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
+							}
+
+							echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
+							 ? $field->input
+							 : '
+								<div class="control-group" id="'.$field->id.'-container">
+									<div class="control-label">'.
+										str_replace('class="', 'class="'.$_labelclass.' ',
+											str_replace(' for="', ' data-for="',
+												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+													$form_layout->getLabel($fieldname, $groupname)
+												)
+											)
+										) . '
+									</div>
+									<div class="controls">
+										' . ($cssprep && !FLEXI_J37GE
+											? (isset($this->iparams[$fieldname]) ? '<i>' . $this->iparams[$fieldname] . '</i>' : '<i>default</i>')
+											:
+											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+													$this->getInheritedFieldDisplay($field, $this->item->parameters)
+													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+												)
+											)
+										) .
+										($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
+									</div>
 								</div>
-								');
+							';
+
 						endforeach; ?>
+
 						
 						</fieldset>
 						

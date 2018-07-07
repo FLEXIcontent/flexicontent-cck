@@ -499,12 +499,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$uri        = JUri::getInstance();
 		$option     = $jinput->get('option', '', 'cmd');
 		$nullDate   = $db->getNullDate();
-		if ( $app->isSite() )
+		$useAssocs  = flexicontent_db::useAssociations();
+
+		if ($app->isSite())
 		{
 			$menu = $app->getMenu()->getActive();
 		}
-		$useAssocs  = flexicontent_db::useAssociations();
-		
+
 		// Get the COMPONENT only parameter, since we do not have item parameters yet, but we need to do some work before creating the item
 		$page_params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
@@ -530,14 +531,14 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Get model and indicate to model that current view IS item form
 		$model = $this->getModel();
-		$model->isForm = true;  // Currently this flag is used only by frontend model
+		$model->isForm = true;
 
 
 		// ***
 		// *** Get data of current version (this will load version 0, since item has not been loaded yet)
 		// ***
 
-		$cid = $model->_cid ? $model->_cid : $model->get('catid');
+		$cid = $model->_cid ?: $model->get('catid');
 
 
 		// WE NEED TO get OR decide the Content Type, before we call the getItem
@@ -545,14 +546,14 @@ class FlexicontentViewItem extends JViewLegacy
 		// - ZERO means allow user to select type, but if user is only allowed a single type, then autoselect it!
 
 		// Try type from session
-		if (!empty($session_data['type_id']) )
+		if (!empty($session_data['type_id']))
 		{
 			// This also forces zero if value not set
 			$jinput->set('typeid', (int) $session_data['type_id']);
 		}
 		
 		// Try type from active menu
-		else if ( !empty($menu) && isset($menu->query['typeid']) )
+		elseif (!empty($menu) && isset($menu->query['typeid']))
 		{
 			// This also forces zero if value not set
 			$jinput->set('typeid', (int) $menu->query['typeid']);
@@ -568,10 +569,11 @@ class FlexicontentViewItem extends JViewLegacy
 		$new_typeid = $jinput->get('typeid', 0, 'int');
 		$type_data = $model->getTypeslist(array($new_typeid), $check_perms = false, $_published=true);
 
-		if ( $new_typeid && empty($type_data) ) 
+		if ($new_typeid && empty($type_data)) 
 		{
-			JError::raiseWarning( 404, 'Type ID: '.$new_typeid.' not found' );
-			$app->redirect( 'index.php' );
+			$app->setHeader('status', '400 Bad Request', true);
+			$app->enqueueMessage('Type ID: '.$new_typeid.' not found', 'error');
+			$app->redirect('index.php');
 		}
 
 
@@ -579,7 +581,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** Verify type is allowed to the user
 		// ***
 
-		if ( !$new_typeid )
+		if (!$new_typeid)
 		{
 			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true, $_published=true);
 			if ( $types && count($types)==1 ) {
@@ -601,7 +603,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
 		$version = $jinput->get('version', 0, 'int');   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
-		
+
 		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 
@@ -611,7 +613,8 @@ class FlexicontentViewItem extends JViewLegacy
 		// ***
 		// *** Frontend form: replace component/menu 'params' with the merged component/category/type/item/menu ETC ... parameters
 		// ***
-		if ( $app->isSite() )
+
+		if ($app->isSite())
 		{
 			$page_params = $item->parameters;
 		}
@@ -822,7 +825,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$canEdit = $model->getItemAccess()->get('access-edit');
 			
 			// If no edit privilege, check if edit COUPON was provided
-			if ( !$canEdit )
+			if (!$canEdit)
 			{
 				$edittok = $jinput->get('edittok', null, 'cmd');
 				if ($edittok)
@@ -846,7 +849,7 @@ class FlexicontentViewItem extends JViewLegacy
 						}
 						else
 						{
-							JError::raiseNotice( 403, JText::_( 'EDIT_TOKEN_IS_INVALID' ) .' : '. $edittok );
+							$app->enqueueMessage(JText::_('EDIT_TOKEN_IS_INVALID') . ' : ' . $edittok, 'warning');
 						}
 					}
 				}
@@ -866,11 +869,11 @@ class FlexicontentViewItem extends JViewLegacy
 
 					$app->setHeader('status', 403);
 					$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
-					$app->redirect( $url );
+					$app->redirect($url);
 				}
 
 				// Logged user, redirect to the unauthorized page (if this has been configured)
-				else if ($unauthorized_page)
+				elseif ($unauthorized_page)
 				{
 					$app->setHeader('status', 403);
 					$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'warning');
@@ -880,7 +883,7 @@ class FlexicontentViewItem extends JViewLegacy
 				// Logged user, no unauthorized page has been configured, throw no access exception
 				else
 				{
-					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
+					$msg = JText::_('FLEXI_ALERTNOTAUTH_TASK');
 					throw new Exception($msg, 403);
 				}
 			}
@@ -897,12 +900,18 @@ class FlexicontentViewItem extends JViewLegacy
 			// Check if Content Type can be created by current user
 			if ( empty($canCreateType) )
 			{
-				if ($new_typeid) {
-					// not needed, already done be model when type_id is set, check and remove
-					$canCreateType = $model->canCreateType( array($new_typeid) );  // Can create given Content Type
-				} else {
-					// needed not done be model yet
-					$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
+				// Not needed, already done be model when type_id is set, check and remove
+				if ($new_typeid)
+				{
+					// If can create given Content Type
+					$canCreateType = $model->canCreateType(array($new_typeid));
+				}
+
+				// Needed not done be model yet
+				else
+				{
+					// If can create at least one Content Type
+					$canCreateType = $model->canCreateType();
 				}
 			}
 			
@@ -915,16 +924,18 @@ class FlexicontentViewItem extends JViewLegacy
 			if ($not_authorised && !$allowunauthorize)
 			{
 				$msg = '';
-				if ( !$canCreateType ) {
+				if (!$canCreateType)
+				{
 					$type_name = isset($types[$new_typeid]) ? '"'.JText::_($types[$new_typeid]->name).'"' : JText::_('FLEXI_ANY');
 					$msg .= ($msg ? '<br/>' : ''). JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
 				}
-				if ( !$canAssignToCategory ) {
+				if (!$canAssignToCategory)
+				{
 					$msg .= ($msg ? '<br/>' : ''). JText::_( 'FLEXI_ALERTNOTAUTH_CREATE_IN_ANY_CAT' );
 				}
 			}
 
-			else if ($max_auth_limit)
+			elseif ($max_auth_limit)
 			{
 				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
 				$authored_count = $db->loadResult();
@@ -936,18 +947,21 @@ class FlexicontentViewItem extends JViewLegacy
 			if ( ($not_authorised && !$allowunauthorize) || @ $content_is_limited )
 			{
 				// a. custom unauthorized submission page via menu item
-				if ( $notauth_menu = $app->getMenu()->getItem($notauth_itemid) )
+				if ($notauth_menu = $app->getMenu()->getItem($notauth_itemid))
 				{
-					$internal_link_vars = @ $notauth_menu->component ? '&Itemid='.$notauth_itemid.'&option='.$notauth_menu->component : '';
-					$notauthurl = JRoute::_($notauth_menu->link.$internal_link_vars, false);
-					JError::raiseNotice( 403, $msg );
+					$internal_link_vars = !empty($notauth_menu->component) ? '&Itemid=' . $notauth_itemid . '&option=' . $notauth_menu->component : '';
+					$notauthurl = JRoute::_($notauth_menu->link . $internal_link_vars, false);
+
+					$app->setHeader('status', 403);
+					$app->enqueueMessage($msg, 'notice');
 					$app->redirect($notauthurl);
 				}
 
 				// b. General unauthorized page via global configuration
-				else if ($unauthorized_page)
+				elseif ($unauthorized_page)
 				{
-					JError::raiseNotice( 403, $msg );
+					$app->setHeader('status', 403);
+					$app->enqueueMessage($msg, 'notice');
 					$app->redirect($unauthorized_page);
 				}
 
@@ -2044,5 +2058,86 @@ class FlexicontentViewItem extends JViewLegacy
 		$placementConf['coreprop_missing'] = $coreprop_missing;
 		
 		return $placementConf;
+	}
+
+
+
+	/**
+	 * Method to diplay field showing inherited value
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function getInheritedFieldDisplay($field, $params, $_v = null)
+	{
+		$_v = $params ? $params->get($field->fieldname) : $_v;
+		
+		if ($_v==='' || $_v===null)
+		{
+			return $field->input;
+		}
+
+		elseif ($field->getAttribute('type')==='fcordering' || $field->getAttribute('type')==='list' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='list'))
+		{
+			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			if (preg_match('/<option\s*value="' . preg_quote($_v, '/') . '"\s*>(.*?)<\/option>/', $field->input, $matches))
+			{
+				return str_replace(
+					JText::_('FLEXI_USE_GLOBAL'),
+					JText::_('FLEXI_USE_GLOBAL') . ' (' . $matches[1] . ')',
+					$field->input);
+			}
+		}
+
+		elseif ($field->getAttribute('type')==='radio' || $field->getAttribute('type')==='fcradio' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='radio'))
+		{
+			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'value="'.$_v.'"',
+				'value="'.$_v.'" class="fc-inherited-value" ',
+				$field->input);
+		}
+
+		elseif ($field->getAttribute('type')==='fccheckbox' && is_array($_v))
+		{
+			$_input = $field->input;
+			foreach ($_v as $v)
+			{
+				$v = htmlspecialchars( $v, ENT_COMPAT, 'UTF-8' );
+				$_input = str_replace(
+					'value="'.$v.'"',
+					'value="'.$v.'" class="fc-inherited-value" ',
+					$_input);
+			}
+			return $_input;
+		}
+
+		elseif ($field->getAttribute('type')==='text' || $field->getAttribute('type')==='fcmedia' || $field->getAttribute('type')==='media')
+		{
+			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'<input ',
+				'<input placeholder="'.$_v.'" ',
+				preg_replace('/^(\s*<input\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
+			);
+		}
+		elseif ($field->getAttribute('type')==='textarea')
+		{
+			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
+			return str_replace(
+				'<textarea ',
+				'<textarea placeholder="'.$_v.'" ',
+				preg_replace('/^(\s*<textarea\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
+			);
+		}
+
+		elseif ( method_exists($field, 'setInherited') )
+		{
+			$field->setInherited($_v);
+			return $field->input;
+		}
+
+		return $field->input;
 	}
 }
