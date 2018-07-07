@@ -48,6 +48,7 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'apply_ajax',   'save' );
 		$this->registerTask( 'save2new',     'save' );
 		$this->registerTask( 'save2copy',    'save' );
+		$this->registerTask( 'add',          'edit' );
 
 		$this->registerTask( 'download_tree',  'download' );
 
@@ -1229,11 +1230,11 @@ class FlexicontentController extends JControllerLegacy
 	}
 
 	/**
-	* Edits an item
-	*
-	* @access	public
-	* @since	1.0
-	*/
+	 * Add / Edit an item
+	 *
+	 * @access	public
+	 * @since	1.0
+	 */
 	function edit()
 	{
 		$document = JFactory::getDocument();
@@ -1249,6 +1250,7 @@ class FlexicontentController extends JControllerLegacy
 
 		// Get/Create the model
 		$model = $this->getModel($viewName);
+		$model->isForm = true;
 
 		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
@@ -1258,36 +1260,6 @@ class FlexicontentController extends JControllerLegacy
 		$view->display();
 	}
 
-	/**
-	* Logic to add an item
-	* Deprecated in 1.5.3 stable
-	*
-	* @access	public
-	* @since	1.0
-	*/
-	function add()
-	{
-		$document = JFactory::getDocument();
-
-		$this->input->set('view', 'item');
-		$this->input->set('hidemainmenu', 1);
-
-		// Get/Create the view
-		$viewType   = $document->getType();
-		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
-		$viewLayout = $this->input->get('layout', 'form', 'string');
-		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
-
-		// Get/Create the model
-		$model = $this->getModel($viewName);
-
-		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
-		$view->setModel($model, true);
-		$view->document = $document;
-
-		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
-		$view->display();
-	}
 
 
 	/**

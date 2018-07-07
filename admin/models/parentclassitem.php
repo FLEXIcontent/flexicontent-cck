@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -43,7 +43,7 @@ class ParentClassItem extends FCModelAdmin
 	var $record_name = 'item';
 
 	/**
-	 * Record database table 
+	 * Record database table
 	 *
 	 * @var string
 	 */
@@ -110,7 +110,7 @@ class ParentClassItem extends FCModelAdmin
 	 * Various record specific properties
 	 *
 	 */
-	
+
 	/**
 	 * component + type parameters
 	 *
@@ -124,28 +124,28 @@ class ParentClassItem extends FCModelAdmin
 	 * @var int
 	 */
 	var $_cid = null;
-	
+
 	/**
 	 * Template configuration name (layout)
 	 *
 	 * @var int
 	 */
 	var $_ilayout = null;
-	
+
 	/**
 	 * Item 's type or type via URL variable for new items
 	 *
 	 * @var int
 	 */
 	var $_typeid = null;
-	
+
 	/**
 	 * Item version of loaded data
 	 *
 	 * @var int
 	 */
 	var $_version = null;
-	
+
 	/**
 	 * Associated item translations
 	 *
@@ -353,37 +353,42 @@ class ParentClassItem extends FCModelAdmin
 		$app     = JFactory::getApplication();
 		$cparams = $this->_cparams;
 		$jinput  = $app->input;
-		
+
 		// View access done is meant only for FRONTEND !!! ... force it to false
-		if ( $app->isAdmin() ) $check_view_access = false;
-		
+		if ($app->isAdmin())
+		{
+			$check_view_access = false;
+		}
+
 		// Initialise and set primary if it was not given already
 		$pk = !empty($pk) ? $pk : $this->_id;
 		$pk = !empty($pk) ? $pk : (int) $this->getState($this->getName().'.id');
-		
+
 		// Set new item id, clearing item data, ONLY IF DIFFERENT than existing primary key
 		if ($pk != $this->_id)
 		{
 			$this->setId($pk);
 		}
-		
-		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
-		if ( $pk && $this->_loadRecord($pk, $no_cache, $force_version) )
-		{
-			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
-			// Extra Steps for Frontend
-			if ( !$app->isAdmin() )
-			{
-				// Load item parameters with heritage
-				$this->_loadItemParams($no_cache);
 
-				// Check item viewing access
-				if ( $check_view_access ) $this->_check_viewing_access($force_version);
+		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
+		if ($pk && $this->_loadRecord($pk, $no_cache, $force_version))
+		{
+			/**
+			 * Successfully loaded existing item, do some extra manipulation of the loaded item ...
+			 */
+
+			// Load item parameters with heritage
+			$this->_loadItemParams($no_cache);
+
+			// Check item viewing access
+			if ($check_view_access)
+			{
+				$this->_check_viewing_access($force_version);
 			}
 		}
-		
+
 		// --. Failed to load existing item, or check_view_access indicates not to create a new item object
-		else if ( $pk || $check_view_access===2 )
+		elseif ($pk || $check_view_access === 2)
 		{
 			$msg = $pk ?
 				JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk) :   // ID is set, indicate that it was not found
@@ -402,21 +407,20 @@ class ParentClassItem extends FCModelAdmin
 				{
 					$this->setError($msg);
 				}
+
 				return false;
 			}
 		}
-		
+
 		// --. Initialize new item, if not already initialized, currently this succeeds always
-		else if (!$this->_record)
+		elseif (!$this->_record)
 		{
 			$this->_initRecord();
-			if ( !$app->isAdmin() )
-			{
-				// Load item parameters with heritage, (SUBMIT ITEM FORM)
-				$this->_loadItemParams($no_cache);
-			}
+
+			// Load item parameters with heritage, (SUBMIT ITEM FORM)
+			$this->_loadItemParams($no_cache);
 		}
-		
+
 		// Verify item's type. This method verify new item type exists or gets item type for existing item
 		$this->_typeid = $this->_record->type_id = $this->getItemType()->id;
 
@@ -442,12 +446,12 @@ class ParentClassItem extends FCModelAdmin
 	{
 		//echo 'force_version: '.$force_version ."<br/>";
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		
+
 		// This is ITEM cache. NOTE: only unversioned items are cached
 		static $items = array();
 		global $fc_list_items;    // Global item cache (unversioned items)
 		static $unapproved_version_notice;
-		
+
 		// If PK was provided and it is also not a name, then treat it as a primary key value
 		$pk = $pk ? (int) $pk : (int) $this->_id;
 
@@ -456,25 +460,25 @@ class ParentClassItem extends FCModelAdmin
 		{
 			return false;
 		}
-		
+
 		// -- To load a different item:
 		// a. use member function function setId($id, $currcatid=0) to change primary key and then call getItem()
 		// b. call getItem($pk, $check_view_access=true) passing the item id and maybe also disabling read access checkings, to avoid unwanted messages/errors
-		
+
 		// Clear item to make sure it is reloaded
 		if ( $no_cache )
 		{
 			//echo "********************************<br/>\n CLEARING CACHE of ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
 			$this->_record = null;
 		}
-		
+
 		// Only retrieve item if not already, ZERO $force_version means unversioned data or maintain currently loaded version
 		else if ( isset($this->_record) && (!$force_version || $force_version==$this->_version) )
 		{
 			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
 			return (boolean) $this->_record;
 		}
-		
+
 		$db   = $this->_db;
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -491,7 +495,7 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Check if loading specific VERSION and generate version related messages
 		// ***
-		
+
 		$current_version = (int) FLEXIUtilities::getCurrentVersions($pk, true, $force=true); // Get current item version
 		$last_version    = (int) FLEXIUtilities::getLastVersions($pk, true, $force=true);    // Get last version (=latest one saved, highest version id)
 
@@ -516,7 +520,7 @@ class ParentClassItem extends FCModelAdmin
 		} else {
 			$version = 0; // Load unversioned data
 		}
-		
+
 		// Check if item is alredy loaded and is of correct version
 		if ( $this->_version == $version && isset($this->_record) )
 		{
@@ -524,11 +528,11 @@ class ParentClassItem extends FCModelAdmin
 		}
 		$this->_version = $version; // Set number of loaded version
 		//echo 'version: '.$version ."<br/>";
-		
+
 		// Current version number given, the data from the versioning table should be the same as the data from normal tables
 		// we do not force $version to ZERO to allow testing the field data of current version from the versioning table
 		//if ($version == $current_version) $version = 0;   // Force zero to retrieve unversioned data
-		
+
 		// Check if not loading the current version while we are in edit form, and raise a notice to inform the user
 		if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice)
 		{
@@ -546,10 +550,10 @@ class ParentClassItem extends FCModelAdmin
 					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE_ADMIN', $version, $current_version)
 				);
 			}
-			$this->registerMessage($message);					
+			$this->registerMessage($message);
 		}
-		
-		
+
+
 		// Only unversioned items are cached, use cache if no specific version was requested
 		if ( !$version && isset($items[$pk]) )
 		{
@@ -557,11 +561,11 @@ class ParentClassItem extends FCModelAdmin
 			$this->_record = $items[$pk];
 			return (boolean) $this->_record;
 		}
-		
+
 		//echo "**************************<br/>\n LOADING item id: {$pk}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 
-		
+
 		// ***
 		// *** TRY TO LOAD ITEM DATA
 		// ***
@@ -588,29 +592,29 @@ class ParentClassItem extends FCModelAdmin
 			{
 				// Extra access columns for main category and content type (item access will be added as 'access')
 				$select_access = 'mc.access as category_access, ty.access as type_access';
-				
+
 				// Access Flags for: content type, main category, item
 				$aid_arr = JAccess::getAuthorisedViewLevels($user->get('id'));
 				$aid_list = implode(",", $aid_arr);
 				$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
 				$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
 				$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
-				
+
 				// SQL date strings, current date and null date
 				$nowDate = $db->Quote( JFactory::getDate()->toSql() );
 				$nullDate	= $db->Quote($db->getNullDate());
-				
+
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
-				
+
 				// Get voting resolution
 				$rating_resolution = (int)$this->getVotingResolution();
-				
+
 				// *******************************
 				// Initialize and create the query
 				// *******************************
 				$query = $db->getQuery(true);
-				
+
 				$query->select('i.*, ie.*');                              // Item basic and extended data
 				$query->select($select_access);                              // Access Columns and Access Flags for: content type, main category, item
 				if ($version) $query->select('ver.version_id');           // Versioned item viewing
@@ -620,18 +624,18 @@ class ParentClassItem extends FCModelAdmin
 					'mc.title AS maincat_title, mc.alias AS maincat_alias');                // Main category data
 				$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
 				$query->select('u.name AS author');                                       // Author data
-				
+
 				// Rating count, Rating & Score
 				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score');
-				
+
 				// Item and Current Category slugs (for URL)
 				$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
 				$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
-				
+
 				// Publication Scheduled / Expired Flags
 				$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
 				$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
-				
+
 				// From content table, and extended item table, content type table, user table, rating table, categories relation table
 				$query->from('#__content AS i');
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
@@ -639,11 +643,11 @@ class ParentClassItem extends FCModelAdmin
 				$query->join('LEFT', '#__users AS u on u.id = i.created_by');
 				$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
 				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
-				
+
 				// Join twice on category table, once for current category and once for item's main category
 				$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
 				$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
-				
+
 				// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
 				if ($version)
 				{
@@ -653,7 +657,7 @@ class ParentClassItem extends FCModelAdmin
 				$query->where('i.id = ' . (int) $pk);
 
 				$db->setQuery($query);  //echo $db->replacePrefix($query);
-				
+
 				// Do not translate, this is the Falang overriden method of a database extended Class
 				// Try to execute query directly and load the data as an object
 				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) )
@@ -676,7 +680,7 @@ class ParentClassItem extends FCModelAdmin
 				{
 					$app->enqueueMessage(JText::sprintf('NOTICE: Requested item version %d was not found, loaded currently active version', $version), 'notice');
 				}
-				
+
 				$item = & $data;
 			}
 
@@ -692,24 +696,24 @@ class ParentClassItem extends FCModelAdmin
 			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
 			$item->text = $item->introtext;
 			$item->text .= StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
-			
+
 			//echo "<br/>Current version (Frontend Active): " . $item->version;
 			//echo "<br/>Version to load: ".$version;
 			//echo "<br/><b> *** db title:</b> ".$item->title;
 			//echo "<br/><b> *** db text:</b> ".$item->text;
 			//echo "<pre>*** item data: "; print_r($item); echo "</pre>"; exit;
-			
+
 			// Load associated content items
 			$useAssocs = $this->useAssociations();
-	
+
 			if ($useAssocs)
 			{
 				$item->associations = array();
-	
+
 				if ($item->id != null)
 				{
 					$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);
-					
+
 					foreach ($associations as $tag => $association)
 					{
 						$item->associations[$tag] = $association->id;
@@ -717,12 +721,12 @@ class ParentClassItem extends FCModelAdmin
 					ArrayHelper::toInteger($item->associations);
 				}
 			}
-			
+
 			// ***
 			// *** Retrieve all active site languages, and create empty item translation objects for each of them
 			// ***
 			$nn_content_tbl = 'falang_content';
-			
+
 			if ( FLEXI_FISH )
 			{
 				$site_languages = FLEXIUtilities::getlanguageslist();
@@ -731,10 +735,10 @@ class ParentClassItem extends FCModelAdmin
 				{
 					if ( !$lang_id && $item->language!='*' ) continue;
 					$lang_data->fields = new stdClass();
-					$item_translations->{$lang_id} = $lang_data; 
+					$item_translations->{$lang_id} = $lang_data;
 				}
 			}
-			
+
 			// ***
 			// *** Retrieve and prepare Falang data
 			// ***
@@ -770,12 +774,12 @@ class ParentClassItem extends FCModelAdmin
 						}
 						//echo "<br/>Falang translations found for: " . implode(",", $found_languages);
 					}
-					
+
 					foreach ($item_translations as $lang_id => $translation_data)
 					{
 						// Default title can be somewhat long, trim it to first word, so that it is more suitable for tabs
 						list($translation_data->name) = explode(' ', trim($translation_data->name));
-					
+
 						// Create text field value for all languages
 						$translation_data->fields->text = new stdClass();
 						$translation_data->fields->text->value = @ $translation_data->fields->introtext->value;
@@ -783,7 +787,7 @@ class ParentClassItem extends FCModelAdmin
 							$translation_data->fields->text->value .=  '<hr id="system-readmore" />' . @ $translation_data->fields->fulltext->value;
 						}
 					}
-					
+
 					$item->item_translations = & $item_translations;
 				}
 			}
@@ -794,15 +798,15 @@ class ParentClassItem extends FCModelAdmin
 			// *** Overwrite item fields with the requested VERSION data
 			// ***
 
-			$item->current_version = $current_version; 
-			$item->last_version    = $last_version; 
-			if ($use_versioning && $version) 
+			$item->current_version = $current_version;
+			$item->last_version    = $last_version;
+			if ($use_versioning && $version)
 			{
 				// Overcome possible group concat limitation
 				$query="SET SESSION group_concat_max_len = 9999999";
 				$db->setQuery($query);
 				$db->execute();
-				
+
 				$query = "SELECT f.id, f.name, f.field_type, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
 					." FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
@@ -811,13 +815,13 @@ class ParentClassItem extends FCModelAdmin
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
 				$fields = $fields ? $fields : array();
-				
-				// Use versioned data, by overwriting the item data 
+
+				// Use versioned data, by overwriting the item data
 				//echo "<br/>Overwritting fields with version: $version";
 				foreach($fields as $f)
 				{
 					//echo "<br/><b>{$f->field_id} : ". $f->name."</b> : "; print_r($f->value);
-					
+
 					$fieldname = $f->name;
 
 					// Skip fields that should not have been versioned: hits, state, voting
@@ -884,7 +888,7 @@ class ParentClassItem extends FCModelAdmin
 				// So we search for the {readmore} tag and split up the text field accordingly.
 				$this->splitText($item);
 			}
-			
+
 			// -- Retrieve tags field value (if not using versioning)
 			if ( $use_versioning && $version )
 			{
@@ -934,16 +938,16 @@ class ParentClassItem extends FCModelAdmin
 					->where('itemid = ' . (int) $pk);
 				$item->categories = $db->setQuery($query)->loadColumn();
 			}
-			
+
 			// Make sure catid is in categories array
 			if (!in_array($item->catid, $item->categories))
 			{
 				$item->categories[] = $item->catid;
 			}
-			
+
 			// 'cats' is an alias of categories
 			$item->cats = & $item->categories;
-			
+
 			// Set original content item id, e.g. maybe used by some fields that are marked as untranslatable
 			$useAssocs = $this->useAssociations();
 			if ($useAssocs)
@@ -975,7 +979,7 @@ class ParentClassItem extends FCModelAdmin
 			// Assign found record to the _record member property
 			$this->_record = & $item;
 		}
-		
+
 		catch (JException $e)
 		{
 			$this->_record = false;
@@ -1020,13 +1024,13 @@ class ParentClassItem extends FCModelAdmin
 		// 1) allow maintaining existing value:   $no_cache=false
 		// 2) load by default the last saved version:   $force_version=-1   means latest (last saved) version)
 		$this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
-		
+
 		// Prepare item data for being loaded into the form:
 		// (a) Convert parameters 'images', 'urls,' 'attribs' & 'metadata' to an array
 		// (b) Set property 'cid' (form field categories)
-		
+
 		$this->_record->itemparams = new JRegistry();
-		
+
 		if ($this->_id)
 		{
 			$this->_prepareMergeJsonParams('images');
@@ -1056,9 +1060,9 @@ class ParentClassItem extends FCModelAdmin
 		}
 		$form->option = $this->option;
 		$form->context = $this->getName();
-		
+
 		unset($this->_record->cid);
-		
+
 		// Determine correct permissions to check.
 		$id = !empty($data['id']) ? $data['id'] : (int) $this->getState($this->getName().'.id');
 		$isNew = !$id;
@@ -1153,11 +1157,11 @@ class ParentClassItem extends FCModelAdmin
 
 		// Check if item has languages associations, and disable changing category and language in frontend
 		/*$useAssocs = $this->useAssociations();
-		
+
 		if (!$isNew && $app->isSite() && $useAssocs)
 		{
 			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $id);
-			
+
 			// Make fields read only
 			if (!empty($associations))
 			{
@@ -1385,7 +1389,7 @@ class ParentClassItem extends FCModelAdmin
 			// NOTE: these always return true, as they do not exist YET, so they are for possible future use
 			$hasTypeDelete = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.delete');
 			$hasTypeDeleteOwn = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.delete.own');
-			
+
 			// first check delete permission on the item
 			if ($hasTypeDelete && $user->authorise('core.delete', $asset))
 			{
@@ -1422,13 +1426,13 @@ class ParentClassItem extends FCModelAdmin
 	{
 		// Initialise variables.
 		$user		= JFactory::getUser();
-		
+
 		$cats = isset($data['cid']) ? $data['cid'] : array();
 		if ( !empty($data['catid']) && !in_array($data['catid'], $cats) )
 		{
 			$cats[] =  $data['catid'];
 		}
-		
+
 		$allow = null;
 		if (count($cats))
 		{
@@ -1445,13 +1449,13 @@ class ParentClassItem extends FCModelAdmin
 				$allow &= $cat_allowed;
 			}
 		}
-		
+
 		if ($allow === null)
 		{
 			// no categories specified, revert to the component permissions.
 			$allow	= $user->authorise('core.create', 'com_flexicontent');
 		}
-		
+
 		return $allow;
 	}
 
@@ -1467,19 +1471,19 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$types = $this->getTypeslist ( $type_ids );
 		if ( empty($types) ) return false;
-		
+
 		$user	= JFactory::getUser();
 		$canCreate = $any ? false : true;
-		
+
 		foreach ($types as $type)
 		{
 			$type->allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-			
+
 			// Require ANY or ALL
 			$canCreate = $any  ?  ($canCreate || $type->allowed)  :  ($canCreate && $type->allowed);
 			if ($canCreate && $any) return true;
 		}
-		
+
 		return $canCreate;
 	}
 
@@ -1569,7 +1573,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
-		
+
 		// Default -- Dates: current and null.
 		$currentdate = JFactory::getDate();
 		$nullDate    = $this->_db->getNullDate();
@@ -1680,7 +1684,7 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Initialize various variables
 		// ***
-		
+
 		$db   = $this->_db;
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
@@ -1702,7 +1706,7 @@ class ParentClassItem extends FCModelAdmin
 		$site_zone = $app->getCfg('offset');
 		$user_zone = $user->getParam('timezone', $site_zone);
 		$tz_offset = $user_zone;
-		
+
 		// Sanitize id and approval flag as integers
 		$data['vstate'] = (int)$data['vstate'];
 		$data['id']     = (int)$data['id'];
@@ -1732,14 +1736,14 @@ class ParentClassItem extends FCModelAdmin
 				->where('itemid = ' . $item->id);
 			$item->tags = $db->setQuery($query)->loadColumn();
 			$item->tags = array_reverse($item->tags);
-			
+
 			// Retrieve property: 'categories', that do not exist in the DB TABLE class, but are created by the ITEM model
 			$query = $db->getQuery(true)
 				->select('DISTINCT catid')
 				->from('#__flexicontent_cats_item_relations')
 				->where('itemid = ' . $item->id);
 			$item->categories = $db->setQuery($query)->loadColumn();
-			
+
 			// We need to convert FC item state TO a joomla's article state ... when triggering the before save content event
 			$fc_state = $item->state;
 			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
@@ -1824,7 +1828,7 @@ class ParentClassItem extends FCModelAdmin
 			$data['text'][0] .= (preg_match('#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i', $data['text'][0]) == 0) ? ("\n".'<hr id="system-readmore" />') : "" ;
 			$data['text'] = implode('', $data['text']);
 		}
-		
+
 		// The text field is stored in the db as to seperate fields: introtext & fulltext
 		// So we search for the {readmore} tag and split up the text field accordingly.
 		$this->splitText($data);
@@ -1863,7 +1867,7 @@ class ParentClassItem extends FCModelAdmin
 			$session = JFactory::getSession();
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 			$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
-			
+
 			$autopublished    = $submit_conf && !empty($submit_conf['autopublished'])    ? $submit_conf['autopublished']    : null;  // Override flag for both TYPE and CATEGORY ACL
 			$overridecatperms = $submit_conf && !empty($submit_conf['overridecatperms']) ? $submit_conf['overridecatperms'] : null;  // Override flag for CATEGORY ACL
 
@@ -1901,22 +1905,22 @@ class ParentClassItem extends FCModelAdmin
 			@ $submit_conf['cids'] :
 			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true) ;
 		if ($overridecatperms && @ $submit_conf['maincatid']) $allowed_cid[] = $submit_conf['maincatid'];  // add the "default" main category to allowed categories
-		
+
 		// Force main category if main category selector (maincatid_show:1) was disabled (and default main category was configured)
 		if ($overridecatperms && @ $submit_conf['maincatid_show'] == 1 && @ $submit_conf['maincatid']) $data['catid'] = $submit_conf['maincatid'];
-		
+
 		if ( !empty($allowed_cid) )
 		{
 			// Add existing item's categories into the user allowed categories
 			$allowed_cid = array_merge($allowed_cid, $item->categories);
-			
+
 			// Check main category tampering
 			if ( !in_array($data['catid'], $allowed_cid) && $data['catid'] != $item->catid )
 			{
 				$this->setError( 'main category is not in allowed list (form tampered ?)' );
 				return false;
 			}
-			
+
 			// Check multi category tampering
 			$postcats = isset($submit_conf['postcats']) ? $submit_conf['postcats'] : null;
 			if ( !$isNew || !$overridecatperms || $postcats==2 )
@@ -1950,21 +1954,21 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** SECURITY concern: Check can edit state using proper owner, type and new category (all of them FORCED above)
 		// ***
-		
+
 		// Save old main category & creator (owner)
 		$old_created_by = $item->created_by;
 		$old_catid      = $item->catid;
-		
+
 		// Set proper into the item record proper owner (FORCED above) and type(FORCED above) + new main category
 		$item->created_by = isset($data['created_by']) ? $data['created_by'] : $item->created_by;
 		$item->catid      = $data['catid'];
 		$item->type_id    = isset($data['type_id']) ? $data['type_id'] : $item->type_id;
 		$canEditState = $this->canEditState( $item );
-		
+
 		// Restore old main category & creator (owner) (in case following code chooses to keep them)
 		$item->created_by = $old_created_by;
 		$item->catid      = $old_catid;
-		
+
 		// If cannot edit state or is frontend, then prevent user from changing 'featured' & 'ordering'
 		if ( !$canEditState || $app->isSite() )
 		{
@@ -1989,9 +1993,9 @@ class ParentClassItem extends FCModelAdmin
 			// Override the above values with forced auto-publishing data
 			if ( !empty($publish_up_forced) )   $data['publish_up']   = $publish_up_forced;
 			if ( !empty($publish_down_forced) ) $data['publish_down'] = $publish_down_forced;
-			
+
 			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
-			
+
 			// For existing items, force pending-state approval when user cannot publish, and versioning is OFF (aka not possible to use 'currently' active version + unapproved new version)
 			if (!$isNew)
 			{
@@ -2042,7 +2046,7 @@ class ParentClassItem extends FCModelAdmin
 			unset($data['language']);
 			if ($isNew) return false;
 		}
-		
+
 		if ( $app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']) )
 		{
 			$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
@@ -2160,13 +2164,13 @@ class ParentClassItem extends FCModelAdmin
 
 		$current_version = (int) FLEXIUtilities::getCurrentVersions($item->id, true);
 		$last_version    = (int) FLEXIUtilities::getLastVersions($item->id, true);
-		
+
 		// (a) Force item approval when versioning disabled
 		$data['vstate'] = ( !$use_versioning ) ? 2 : $data['vstate'];
-		
+
 		// (b) Force item approval when item is not yet visible (is in states (a) Draft or (b) Pending Approval)
 		$data['vstate'] = ( $item->state==-3 || $item->state==-4 ) ? 2 : $data['vstate'];
-		
+
 		// Decide new current version for the item, this depends if versioning is ON and if versioned is approved
 		if ( !$use_versioning ) {
 			// not using versioning, increment current version numbering
@@ -2178,7 +2182,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** Item version should be zero when form was loaded with no type id,
 		// *** thus next item form load will load default values of custom fields
 		$item->version = ($isNew && !empty($data['type_id_not_set']) ) ? 0 : $item->version;
-		
+
 		if ( $print_logging_info ) @$fc_run_times['item_store_prepare'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -2274,7 +2278,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** Save fields values to appropriate tables (versioning table or normal tables)
 		// *** NOTE: This allow canceling of item save operation, if 'abort' is returned
 		// ***
-		
+
 		// Do not try to load fields / save field values, if applying type
 		$result = true;
 		if ($task != 'apply_type')
@@ -2287,7 +2291,7 @@ class ParentClassItem extends FCModelAdmin
 			$result = $this->saveFields($isNew, $item, $data, $files, $old_item, $core_data_via_events);
 
 			if ( $print_logging_info ) $fc_run_times['item_store_custom'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			
+
 			// Re-bind (possibly modified data) to the item
 			$this->splitText($core_data_via_events); // split text to introtext, fulltext
 			if ( !$item->bind($core_data_via_events) )
@@ -2310,7 +2314,7 @@ class ParentClassItem extends FCModelAdmin
 				$db->execute();
 				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE id='.$item->id);
 				$db->execute();
-				
+
 				$this->setId(0);
 				$this->setError( $this->getError().' '.JText::_('FLEXI_NEW_ITEM_NOT_CREATED') );
 			}
@@ -2318,7 +2322,7 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$this->setError( $this->getError().' '.JText::_('FLEXI_EXISTING_ITEM_NOT_SAVED') );
 			}
-			
+
 			// Return false this will indicate to the controller to abort saving
 			// and set POSTED data into session so that form reloads them properly
 			return false;
@@ -2397,7 +2401,7 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// ***
-		// *** Create and store version METADATA information 
+		// *** Create and store version METADATA information
 		// ***
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -2455,13 +2459,13 @@ class ParentClassItem extends FCModelAdmin
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
 		if ( $print_logging_info ) @$fc_run_times['onCompleteSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
+
 		return true;
 	}
 
 
 	/**
-	 * Method to save field values of the item in field versioning DB table or in ..._fields_item_relations DB table 
+	 * Method to save field values of the item in field versioning DB table or in ..._fields_item_relations DB table
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -2470,7 +2474,7 @@ class ParentClassItem extends FCModelAdmin
 	function saveFields($isNew, &$item, &$data, &$files, &$old_item=null, &$core_data_via_events=null)
 	{
 		if (!$old_item) $old_item = & $item;
-		
+
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 		$dispatcher = JEventDispatcher::getInstance();
@@ -2491,10 +2495,10 @@ class ParentClassItem extends FCModelAdmin
 		// CASE 1. Check if saving an item that translates an original content in site's default language
 		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
 		$useAssocs = $this->useAssociations();
-		
+
 		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
 		$is_content_default_lang = $site_default == substr($item->language, 0,2);
-		
+
 		$get_untraslatable_values = $useAssocs && !$is_content_default_lang;
 		if ($useAssocs)
 		{
@@ -2551,16 +2555,16 @@ class ParentClassItem extends FCModelAdmin
 		//$qindex = array();
 		$core_data_via_events = array();  // Extra validation for some core fields via onBeforeSaveField
 		$postdata = array();
-		
+
 		$core_via_post = array('title'=>1, 'text'=>1);
 		foreach($fields as $field)
 		{
 			// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 			$field->item_vstate = $data['vstate'];
-			
+
 			$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 			$maintain_dbval = false;
-			
+
 			// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
 			if (
 				( $app->isSite() && ($field->formhidden==1 || $field->formhidden==3 || $field->parameters->get('frontend_hidden')) ) ||
@@ -2593,12 +2597,12 @@ class ParentClassItem extends FCModelAdmin
 				}
 			}
 
-			// OTHER (non-hidden) CUSTOM FIELDS 
+			// OTHER (non-hidden) CUSTOM FIELDS
 			else
 			{
 				$postdata[$field->name] = isset($data['custom'][$field->name]) ? $data['custom'][$field->name] : null;
 			}
-			
+
 			// Force array for field values
 			if ( !is_array($postdata[$field->name]) )
 			{
@@ -2643,7 +2647,7 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Set values of other fields (e.g. this is used for "Properties as Fields" feature)
 		// ***
-		
+
 		foreach($item->calculated_fieldvalues as $fieldname => $fieldvalues)
 		{
 			if (isset($fields[$fieldname]))
@@ -2695,11 +2699,11 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Clean-up per field search-index TABLES
 		// ***
-		
+
 		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
 		$filterables = array_keys($filterables);
 		$filterables = array_flip($filterables);
-		
+
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 		$tbl_prefix = $dbprefix.'flexicontent_advsearch_index_field_';
@@ -2709,12 +2713,12 @@ class ParentClassItem extends FCModelAdmin
 			";
 		$this->_db->setQuery($query);
 		$tbl_names = $this->_db->loadColumn();
-		
+
 		foreach($tbl_names as $tbl_name)
 		{
 			$_field_id = str_replace($tbl_prefix, '', $tbl_name);
-			
-			// Drop the table of no longer filterable field 
+
+			// Drop the table of no longer filterable field
 			if (!isset($filterables[$_field_id]))
 			{
 				$this->_db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
@@ -2733,7 +2737,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// ***
 		// *** VERIFY all search tables exist
-		// *** 
+		// ***
 
 		$tbl_names_flipped = array_flip($tbl_names);
 		foreach ($filterables as $_field_id => $_ignored)
@@ -2769,13 +2773,13 @@ class ParentClassItem extends FCModelAdmin
 
 		$ai_query_vals = array();
 		$ai_query_vals_f = array();
-		
+
 		if ($fields)
 		{
 			foreach($fields as $field)
 			{
 				$field_type = $field->iscore ? 'core' : $field->field_type;
-				
+
 				if ( $data['vstate']==2 || $isNew)    // update (regardless of state!!) search indexes if document version is approved OR item is new
 				{
 					// Trigger plugin Event 'onIndexAdvSearch' to update field-item pair records in advanced search index
@@ -2787,7 +2791,7 @@ class ParentClassItem extends FCModelAdmin
 						}
 					}
 					//echo $field->name .":".implode(",", @$field->ai_query_vals ? $field->ai_query_vals : array() )."<br/>";
-					
+
 					// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexSearch', array( &$field, &$field->postdata, &$item ));
 					if ( isset($field->search[$item->id]) && strlen($field->search[$item->id]) ) $searchindex[] = $field->search[$item->id];
@@ -2795,12 +2799,12 @@ class ParentClassItem extends FCModelAdmin
 				}
 			}
 		}
-		
+
 		// Remove item's old advanced search index entries
 		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE item_id=". $item->id;
 		$this->_db->setQuery($query);
 		$this->_db->execute();
-		
+
 		// Store item's advanced search index entries
 		$queries = array();
 		if ( count($ai_query_vals) )  // check for zero search index records
@@ -2820,18 +2824,18 @@ class ParentClassItem extends FCModelAdmin
 			$this->_db->setQuery($query);
 			$this->_db->execute();
 		}
-		
+
 		// Assigned created basic search index into item object
 		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$item->search_index = implode(' | ', $searchindex);
 		if ($search_prefix && $item->search_index) $item->search_index = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($item->search_index));
-		
+
 		// Check if vstate was set to 1 (no approve new version) while versioning is disabled
 		if (!$use_versioning && $data['vstate']!=2) {
 			$data['vstate'] = 2;
 			$app->enqueueMessage('vstate cannot be set to 1 (=no approve new version) when versioning is disabled', 'notice' );
 		}
-		
+
 		if ( $print_logging_info ) @$fc_run_times['fields_value_indexing'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -2851,7 +2855,7 @@ class ParentClassItem extends FCModelAdmin
 			$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id='.$item->id.' AND version='.((int)$last_version+1);
 			$this->_db->setQuery($query);
 			$this->_db->execute();
-			
+
 			$untranslatable_fields = array();
 			if ($fields) foreach($fields as $field)
 			{
@@ -2890,17 +2894,17 @@ class ParentClassItem extends FCModelAdmin
 		{
 			// Do not save if versioning disabled or item has no type (version 0)
 			$record_versioned_data = $use_versioning && $item->version;
-			
+
 			$ver_query_vals = array();
 			$rel_query_vals = array();
 			$rel_update_objs = array();
-			
-			// Add the new values to the database 
+
+			// Add the new values to the database
 			foreach($fields as $field)
 			{
 				//$qindex_values = $qindex[$field->name];
 				$i = 1;
-				
+
 				foreach ($field->postdata as $posted_value)
 				{
 					// Create field obj for DB insertion
@@ -2911,7 +2915,7 @@ class ParentClassItem extends FCModelAdmin
 					$obj->suborder    = 1;
 					$obj->version			= (int)$last_version+1;
 					$use_ingroup = $field->parameters->get('use_ingroup', 0);
-					
+
 					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
 					if ( !empty($field->use_suborder) && is_array($posted_value) )
 						$obj->value = null;
@@ -2920,7 +2924,7 @@ class ParentClassItem extends FCModelAdmin
 					//$obj->qindex01 = isset($qindex_values['qindex01']) ? $qindex_values['qindex01'] : NULL;
 					//$obj->qindex02 = isset($qindex_values['qindex02']) ? $qindex_values['qindex02'] : NULL;
 					//$obj->qindex03 = isset($qindex_values['qindex03']) ? $qindex_values['qindex03'] : NULL;
-					
+
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
 					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting')
 					{
@@ -2952,7 +2956,7 @@ class ParentClassItem extends FCModelAdmin
 						}
 					}
 					//echo $field->field_type." - ".$field->name." - ".strlen(trim($obj->value))." ".$field->iscore."<br/>";
-					
+
 					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
 					if(	( $isNew || $data['vstate']==2 ) && !$field->iscore )
 					{
@@ -2997,7 +3001,7 @@ class ParentClassItem extends FCModelAdmin
 								.")";
 								$rel_update_objs[] = clone($obj);
 							}
-							
+
 							// Save field value in all translating items, if current field is untranslatable
 							// NOTE: item itself is not include in associated translations, no need to check for it and skip it
 							if (count($assoc_item_ids) && $field->untranslatable)
@@ -3077,15 +3081,15 @@ class ParentClassItem extends FCModelAdmin
 				$obj->valueorder	= 1;
 				$obj->suborder	  = 1;
 				$obj->version			= (int)$last_version+1;
-				
+
 				$item_data = array();
 				$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs', 'urls', 'images');
 				foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
-				
+
 				$obj->value = serialize( $item_data );
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
-			
+
 			// b. Finally save a version of the posted Falang translated data for J1.5, if such data are editted inside the item edit form
 			/*if ( FLEXI_FISH && !empty($data['jfdata']) && $record_versioned_data )
 			{
@@ -3095,7 +3099,7 @@ class ParentClassItem extends FCModelAdmin
 				$obj->valueorder	= 1;
 				$obj->suborder    = 1;
 				$obj->version			= (int)$last_version+1;
-				
+
 				$item_lang = substr($item->language ,0,2);
 				$data['jfdata'][$item_lang]['title'] = $item->title;
 				$data['jfdata'][$item_lang]['alias'] = $item->alias;
@@ -3106,7 +3110,7 @@ class ParentClassItem extends FCModelAdmin
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}*/
 		}
-		
+
 		if ( $print_logging_info ) @$fc_run_times['fields_value_saving'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -3148,20 +3152,20 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Check and store item in the db
 		// ***
-		
+
 		// Make sure the data is valid
 		if (!$item->check())
 		{
 			$this->setError($item->getError());
 			return false;
 		}
-		
+
 		if (!$item->store())
 		{
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
+
 		// Set model properties
 		$this->_id     = $item->id;
 		$this->_record = & $item;
@@ -3174,8 +3178,8 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		$this->saveAssociations($item, $data);
-		
-		
+
+
 		// ***
 		// *** Save access information
 		// ***
@@ -3188,13 +3192,13 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		if ($createonly) return true;
-		
-		
+
+
 		// ***
 		// *** Save Falang data in the db
 		// ***
 
-		if ( FLEXI_FISH && $editjf_translations==2 )   // 0:disable with warning about found translations,  1:disable without warning about found translations,  2:edit-save translations, 
+		if ( FLEXI_FISH && $editjf_translations==2 )   // 0:disable with warning about found translations,  1:disable without warning about found translations,  2:edit-save translations,
 		{
 			$this->_saveJFdata( $data['jfdata'], $item );
 		}
@@ -3203,7 +3207,7 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 		// *** Delete old tag relations and store the new ones
 		// ***
-		
+
 		if (isset($data['tags']))
 		{
 			$this->saveFcTagsAssignments($data['tags'], $item->id, $_replace = true);
@@ -3257,31 +3261,31 @@ class ParentClassItem extends FCModelAdmin
 	 * @access	public
 	 * @return	boolean	True on success
 	 * @since	1.0
-	 */	
+	 */
 	function _saveJFdata( & $jfdata_arr, & $item)
 	{
 		//$user_currlang = flexicontent_html::getUserCurrentLang();                  // user's -current- language
 		//$default_sitelang = substr(flexicontent_html::getSiteDefaultLang(),0,2);   // site (frontend) -content- language
 		//$item_lang = substr($item->language ,0,2);                                 // item language
 		$nn_content_tbl = 'falang_content';
-		
+
 		$db = $this->_db;
 		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbtype   = $app->getCfg('dbtype');
-		
+
 		if ( in_array($dbtype, array('mysqli','mysql')) )
 		{
 			$query = "UPDATE #__content SET title=".$db->Quote($item->title).",  alias=".$db->Quote($item->alias).",  introtext=".$db->Quote($item->introtext)
 				.",  `fulltext`=".$db->Quote($item->fulltext).",  images=".$db->Quote($item->images).",  metadesc=".$db->Quote($item->metadesc).",  metakey=".$db->Quote($item->metakey)
 				.", publish_up=".$db->Quote($item->publish_up).",  publish_down=".$db->Quote($item->publish_down).",  attribs=".$db->Quote($item->attribs)." WHERE id=".$db->Quote($item->id);
 			//echo $query."<br/>\n";
-			
+
 			//$query = $db->replacePrefix($query);
 			$query = str_replace("#__", $dbprefix, $query);
 			$db_connection = $db->getConnection();
 			//echo "<pre>"; print_r($query); echo "\n\n";
-			
+
 			if ($dbtype == 'mysqli')
 			{
 				$result = mysqli_query( $db_connection , $query );
@@ -3306,7 +3310,7 @@ class ParentClassItem extends FCModelAdmin
 				throw new Exception($msg, 500);
 			}
 		}
-		
+
 		$modified = $item->modified ? $item->modified : $item->created;
 		$modified_by = $item->modified_by ? $item->modified_by : $item->created_by;
 
@@ -3332,7 +3336,7 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$jfdata['text'] = '';
 			}
-			
+
 			$jfdata['title'] = trim($jfdata['title']);
 
 			$jfdata['lang_code'] = $langs->$shortcode->code;
@@ -3381,14 +3385,196 @@ class ParentClassItem extends FCModelAdmin
 				$db->setQuery($query)->execute();
 			}
 		}
-		
+
 		return true;
 	}
 
 
 	/**
+	 * Method to load content article parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadItemParams($force=false)
+	{
+		if (!$force && !empty($this->_record->parameters)) return;
+
+		$app = JFactory::getApplication();
+		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
+		$isnew = !$this->_id;
+
+
+		/**
+		 * Retrieve RELATED parameters that will be merged into item's parameters
+		 */
+
+		// Retrieve COMPONENT parameters
+		$compParams = JComponentHelper::getComponent('com_flexicontent')->params;
+
+		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
+		$catParams = "";
+		if ( $this->_cid )
+		{
+			$query = 'SELECT c.title, c.params FROM #__categories AS c WHERE c.id = ' . (int) $this->_cid;
+			$this->_db->setQuery($query);
+			$catData = $this->_db->loadObject();
+			$catParams = $catData->params;
+			$this->_record->category_title = $catData->title;
+		}
+		$catParams = new JRegistry($catParams);
+
+		// Retrieve/Create item's Content Type parameters
+		$typeParams = $this->getTypeparams();
+		$typeParams = new JRegistry($typeParams);
+
+		// Create item parameters
+		if ( !is_object($this->_record->attribs) )
+		{
+			try
+			{
+				$itemParams = new JRegistry($this->_record->attribs);
+			}
+			catch (Exception $e)
+			{
+				$itemParams = flexicontent_db::check_fix_JSON_column('attribs', 'content', 'id', $this->_record->id, $this->_record->attribs);
+			}
+		}
+		else
+		{
+			$itemParams = $this->_record->attribs;
+		}
+
+		// Retrieve Layout's parameters, also deciding the layout
+		if ($app->isAdmin() || $this->isForm)
+		{
+			$ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
+			$this->setItemLayout($ilayout);
+		}
+		else
+		{
+			$this->decideLayout($compParams, $typeParams, $itemParams);
+		}
+
+		$layoutParams = $this->getLayoutparams();
+		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
+
+
+		/**
+		 * Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/category/type/item/menu/access
+		 */
+
+		// a0. Merge Layout parameters into the page configuration
+		$params = new JRegistry();
+		$params->merge($layoutParams);
+
+		// a1. Start with empty registry, then merge COMPONENT parameters
+		$params->merge($compParams);
+
+		// b. Merge parameters from current category, but prevent some settings from propagating ... to the item, that are meant for
+		//    category view only, these are legacy settings that were removed from category.xml, but may exist in saved configurations
+		$catParams->set('show_title', '');
+		$catParams->set('show_editbutton', '');
+		$params->merge($catParams);
+
+		// c. Merge TYPE parameters into the page configuration
+		$params->merge($typeParams);
+
+		// d. Merge ITEM parameters into the page configuration
+		$params->merge($itemParams);
+
+		// e. Merge ACCESS permissions into the page configuration
+		$accessperms = $this->getItemAccess();
+		$params->merge($accessperms);
+
+		// d. Merge the active menu parameters, verify menu item points to current FLEXIcontent object
+		if ( $menu && !empty($this->mergeMenuParams) )
+		{
+			if (!empty($this->isForm))
+			{
+				$this->menu_matches = false;
+				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$this->menu_matches = $view_ok;
+			}
+			else
+			{
+				$view_ok = 'item' == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$cid_ok  = $app->input->get('cid', 0, 'INT') == (int) @$menu->query['cid'];
+				$id_ok   = $app->input->get('id', 0, 'INT')  == (int) @$menu->query['id'];
+				$this->menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
+			}
+		}
+
+		// Active menu did not match to current item
+		else
+		{
+			$this->menu_matches = false;
+		}
+
+		// MENU ITEM matched, merge parameters and use its page heading (but use menu title if the former is not set)
+		if ( $this->menu_matches )
+		{
+			$params->merge($menu->params);
+			$default_heading = $menu->title;
+
+			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->def('page_heading', $params->get('page_title',   $default_heading));
+			$params->def('page_title',   $params->get('page_heading', $default_heading));
+		  $params->def('show_page_heading', $params->get('show_page_title',   0));
+		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
+		}
+
+		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
+		else
+		{
+			// Clear some menu parameters
+			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
+
+			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
+			$default_heading = empty($this->isForm) ? $this->_record->title :
+				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
+
+			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
+			$show_default_heading = 0;
+
+			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->set('page_title',   $default_heading);
+			$params->set('page_heading', $default_heading);
+		  $params->set('show_page_heading', $show_default_heading);
+			$params->set('show_page_title',   $show_default_heading);
+		}
+
+		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
+		if ( $params->get('show_title', 1) ) {
+			if ($params->get('page_heading') == $this->_record->title) $params->set('show_page_heading', 0);
+			if ($params->get('page_title')   == $this->_record->title) $params->set('show_page_title',   0);
+		}
+
+		// Also convert metadata property string to registry object
+		try
+		{
+			$this->_record->metadata = new JRegistry($this->_record->metadata);
+		}
+		catch (Exception $e)
+		{
+			$this->_record->metadata = flexicontent_db::check_fix_JSON_column('metadata', 'content', 'id', $this->_record->id);
+		}
+
+		// Manually apply metadata from type parameters ... currently only 'robots' makes sense to exist per type
+		if ( !$this->_record->metadata->get('robots') )   !$this->_record->metadata->set('robots', $typeParams->get('robots'));
+
+
+		/**
+		 * Finally set 'parameters' property of the item
+		 */
+		$this->_record->parameters = $params;
+	}
+
+
+	/**
 	 * Method to fetch used tags IDs as an array when performing an edit action
-	 * 
+	 *
 	 * @param int id
 	 * @return array
 	 * @since 1.0
@@ -3397,7 +3583,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		// Allow retrieval of tags of any item
 		$item_id = $item_id ? $item_id : $this->_id;
-		
+
 		// *** NOTE: this->_record->tags may already contain a VERSIONED array of values !!!
 		if( $this->_id == $item_id && !empty($this->_record->tags) ) {
 			// Return existing tags of current item
@@ -3412,7 +3598,7 @@ class ParentClassItem extends FCModelAdmin
 				// Retrieved tags of current item, set them
 				$this->_record->tags = $tags;
 			}
-			$tags = array_reverse($tags); 
+			$tags = array_reverse($tags);
 			return $tags;
 		} else {
 			return array();
@@ -3422,7 +3608,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get the list of the used tags
-	 * 
+	 *
 	 * @param 	array
 	 * @return 	array
 	 * @since 	3.0.15
@@ -3433,7 +3619,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			return array();
 		}
-		
+
 		$query 	= 'SELECT *, t.id as tid FROM #__flexicontent_tags as t '
 			. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
 			. ' ORDER BY name ASC';
@@ -3456,7 +3642,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get the list of the used tags
-	 * 
+	 *
 	 * @param 	array
 	 * @return 	array
 	 * @since 	1.5.2
@@ -3469,7 +3655,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get a list of all available tags Data
-	 * 
+	 *
 	 * @param 	array
 	 * @return 	array
 	 * @since 	1.5.2
@@ -3485,7 +3671,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to restore an old version
-	 * 
+	 *
 	 * @param int id
 	 * @param int version
 	 * @return int
@@ -3498,7 +3684,7 @@ class ParentClassItem extends FCModelAdmin
 		$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.(int)$id;
 		$this->_db->setQuery($query);
 		$this->_db->execute();
-		
+
 		// load field values from the version to restore
 		$query 	= 'SELECT item_id, field_id, value, valueorder, suborder, iscore'
 				. ' FROM #__flexicontent_items_versions as iv'
@@ -3508,7 +3694,7 @@ class ParentClassItem extends FCModelAdmin
 				;
 		$this->_db->setQuery($query);
 		$versionrecords = $this->_db->loadObjectList();
-		
+
 		// restore the old values
 		foreach ($versionrecords as $versionrecord)
 		{
@@ -3536,7 +3722,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to fetch tags according to a given mask
-	 * 
+	 *
 	 * @return object
 	 * @since 1.0
 	 */
@@ -3553,7 +3739,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to reset hits
-	 * 
+	 *
 	 * @param int id
 	 * @return int
 	 * @since 1.0
@@ -3574,11 +3760,11 @@ class ParentClassItem extends FCModelAdmin
 
 		return $row->id;
 	}
-	
-		
+
+
 	/**
 	 * Method to reset votes
-	 * 
+	 *
 	 * @param int id
 	 * @return int
 	 * @since 1.0
@@ -3604,7 +3790,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get votes
-	 * 
+	 *
 	 * @param int id
 	 * @return object
 	 * @since 1.0
@@ -3635,14 +3821,14 @@ class ParentClassItem extends FCModelAdmin
 			->where('content_id IN (' . implode(', ', $cids) . ')');
 
 		$votes = $this->_db->setQuery($query)->loadObjectList('content_id');
-		
+
 		$query = $this->_db->getQuery(true)
 			->select('*, field_id as extra_id')
 			->from('#__flexicontent_items_extravote')
 			->where('content_id IN (' . implode(', ', $cids) . ')');
 
 		$extra_votes = $this->_db->setQuery($query)->loadObjectList();
-		
+
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
 		foreach ($extra_votes as $extra_vote)
 		{
@@ -3656,7 +3842,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		return $votes;
-	}	
+	}
 
 
 	public function getRatingDisplay($id = 0)
@@ -3670,7 +3856,7 @@ class ParentClassItem extends FCModelAdmin
 			$rating_resolution = $this->getVotingResolution($id);
 			$rating_sum = (int) $votes[$id]->rating_sum;
 			$rating_count = (int) $votes[$id]->rating_count;
-			
+
 			$score = $rating_sum / $rating_count * (100 / $rating_resolution);
 			$score = round($score, 2);
 			$vote  = $rating_count . ' ' . JText::_($rating_count > 1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE');
@@ -3679,8 +3865,8 @@ class ParentClassItem extends FCModelAdmin
 
 		return JText::_('FLEXI_NOT_RATED_YET');
 	}
-	
-	
+
+
 	function getVotingResolution($id = 0)
 	{
 		static $rating_resolution = array();
@@ -3704,7 +3890,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get hits
-	 * 
+	 *
 	 * @param int id
 	 * @return int
 	 * @since 1.0
@@ -3716,12 +3902,12 @@ class ParentClassItem extends FCModelAdmin
 		$this->_db->setQuery('SELECT hits FROM #__content WHERE id = ' . (int) $id);
 		return $this->_db->loadResult();
 	}
-	
+
 
 
 	/**
 	 * Method to get subscriber count
-	 * 
+	 *
 	 * @TODO add the notification as an option with a checkbox in the favourites screen
 	 * @return object
 	 * @since 1.5
@@ -3731,7 +3917,7 @@ class ParentClassItem extends FCModelAdmin
 		static $subscribers = array();
 		$id = (int) ($id ?: $this->_id);
 		if ( isset($subscribers[$id]) ) return $subscribers[$id];
-		
+
 		$query	= 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_favourites AS f'
 				.' LEFT JOIN #__users AS u'
@@ -3747,7 +3933,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Find the item type for a given or for current item ID, ... verifying that the type exists ...
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
@@ -3802,7 +3988,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get used categories when performing an edit action
-	 * 
+	 *
 	 * @return array
 	 * @since 1.0
 	 */
@@ -3810,7 +3996,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		// Allow retrieval of categories of any item
 		$item_id = (int) ($item_id ?: $this->_id);
-		
+
 		// Return existing categories of current item
 		// NOTE: 'categories' property may already contain a VERSIONED array of values
 		if( $this->_id == $item_id && !empty($this->_record->categories) )
@@ -3846,7 +4032,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get the type parameters of an item
-	 * 
+	 *
 	 * @return string
 	 * @since 1.5
 	 */
@@ -3860,7 +4046,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get the layout parameters of an item
-	 * 
+	 *
 	 * @return string
 	 * @since 3.0
 	 */
@@ -3872,7 +4058,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get types list
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
@@ -3884,7 +4070,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to retrieve the value of a core field for a specified item version
-	 * 
+	 *
 	 * @return array
 	 * @since 1.5
 	 */
@@ -3897,12 +4083,12 @@ class ParentClassItem extends FCModelAdmin
 		} else {
 			$item = $this->getItem();  // This fuction calls the load item function for existing item and init item function in the case of new item
 		}
-		
+
 		switch ($field->field_type) {
 			case 'created': // created
 			$field_value = array($item->created);
 			break;
-			
+
 			case 'createdby': // created by
 			$field_value = array($item->created_by);
 			break;
@@ -3910,7 +4096,7 @@ class ParentClassItem extends FCModelAdmin
 			case 'modified': // modified
 			$field_value = array($item->modified);
 			break;
-			
+
 			case 'modifiedby': // modified by
 			$field_value = array($item->modified_by);
 			break;
@@ -3946,7 +4132,7 @@ class ParentClassItem extends FCModelAdmin
 			case 'score': // voting score // remove dummy value in next version for legacy purposes
 			$field_value = array('button'); // dummy value to force display
 			break;
-			
+
 			case 'categories': // assigned categories
 			$field_value = isset($item->categories) ? $item->categories : array();
 			break;
@@ -3954,20 +4140,20 @@ class ParentClassItem extends FCModelAdmin
 			case 'tags': // assigned tags
 			$field_value = isset($item->tags) ? $item->tags : array();
 			break;
-			
+
 			case 'maintext': // main text
 			$value = StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
 			$field_value = array($value);
 			break;
 		}
-		
+
 		return $field_value;
 	}
 
 
 	/**
 	 * Method to get the values of an extrafield
-	 * 
+	 *
 	 * @return object
 	 * @since 1.5
 	 * @todo move in a specific class and add the parameter $itemid
@@ -3976,14 +4162,14 @@ class ParentClassItem extends FCModelAdmin
 	{
 		if (!$item_id)  $item_id = $this->_id;
 		if (!$item_id)  return array();
-		
+
 		static $field_values;
 		if ( isset($field_values[$item_id][$version] ) )
 			return $field_values[$item_id][$version];
-		
+
 		$cparams = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
-		
+
 		$query = 'SELECT field_id, value, valueorder, suborder'
 			.( ($version<=0 || !$use_versioning) ? ' FROM #__flexicontent_fields_item_relations AS fv' : ' FROM #__flexicontent_items_versions AS fv' )
 			.' WHERE fv.item_id = ' . (int)$item_id
@@ -3992,13 +4178,13 @@ class ParentClassItem extends FCModelAdmin
 			;
 		$this->_db->setQuery($query);
 		$rows = $this->_db->loadObjectList();
-		
+
 		// Add values to cached array
 		$field_values[$item_id][$version] = array();
 		foreach ($rows as $row) {
 			$field_values[$item_id][$version][$row->field_id][$row->valueorder-1][$row->suborder-1] = $row->value;
 		}
-		
+
 		foreach ($field_values[$item_id][$version] as & $fv) {
 			foreach ($fv as & $ov) {
 				if (count($ov) == 1) $ov = reset($ov);
@@ -4006,7 +4192,7 @@ class ParentClassItem extends FCModelAdmin
 			unset($ov);
 		}
 		unset($fv);
-		
+
 		return $field_values[$item_id][$version];
 	}
 
@@ -4017,7 +4203,7 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * NOTE: Fields are skipped if (a) are not pubished OR (b) no longer belong to the item type
 	 * NOTE: VERSIONED field values will be retrieved if version is set in the HTTP REQUEST !!!
-	 * 
+	 *
 	 * @return object
 	 * @since 1.5
 	 */
@@ -4036,7 +4222,7 @@ class ParentClassItem extends FCModelAdmin
 		$typeid = $typeid ?: $this->_typeid;
 
 		$type_join = ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = ' . $typeid;
-		
+
 		$query = 'SELECT  fi.*'
 			. ' FROM #__flexicontent_fields AS fi'
 			. ($typeid ? $type_join : '')            // Require field belonging to item type
@@ -4045,10 +4231,10 @@ class ParentClassItem extends FCModelAdmin
 			. ' ORDER BY '. ($typeid ? 'ftrel.ordering, ' : '') .'fi.ordering, fi.name'
 			;
 		$fields = $this->_db->setQuery($query)->loadObjectList('name');
-		
+
 		// Get values of CUSTOM fields for current item
 		$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
-		
+
 		// Get values of language parent item (if not loading a specific version) to use them for untranslatable fields
 		if ( $original_content_id && !$this->_version)
 		{
@@ -4083,11 +4269,11 @@ class ParentClassItem extends FCModelAdmin
 					}
 				}
 			}
-			
+
 			//echo "Got ver($this->_version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br/>";
 			$field->parameters = new JRegistry($field->attribs);
 		}
-		
+
 		return $fields;
 	}
 
@@ -4111,25 +4297,25 @@ class ParentClassItem extends FCModelAdmin
 		$view = $jinput->get('view', '', 'cmd');
 
 		static $event_failed_notice_added = false;
-		
+
 		if ( $id )
 		{
 			$v = FLEXIUtilities::getCurrentVersions((int)$id);
-			
+
 			$query = 'UPDATE #__content'
 				. ' SET state = ' . (int) $state
 				. ' WHERE id = ' . (int) $id
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->execute();
-			
+
 			$query = 'UPDATE #__flexicontent_items_tmp'
 				. ' SET state = ' . (int) $state
 				. ' WHERE id = ' . (int) $id
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->execute();
-			
+
 			$query = 'UPDATE #__flexicontent_items_versions'
 				. ' SET value = ' . (int) $state
 				. ' WHERE item_id = ' . (int) $id
@@ -4140,8 +4326,8 @@ class ParentClassItem extends FCModelAdmin
 			$this->_db->setQuery( $query );
 			$this->_db->execute();
 		}
-		
-		
+
+
 		// ***
 		// *** Trigger Event 'onContentChangeState' of Joomla's Content plugins
 		// ***
@@ -4198,7 +4384,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to get the versionlist which belongs to the item
-	 * 
+	 *
 	 * @return object
 	 * @since 1.5
 	 */
@@ -4217,8 +4403,8 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
-	 * Method to count the number of versions that the item has 
-	 * 
+	 * Method to count the number of versions that the item has
+	 *
 	 * @return object
 	 * @since 1.5
 	 */
@@ -4265,33 +4451,33 @@ class ParentClassItem extends FCModelAdmin
 		$nConf->usergrps_notify_existing_reviewal    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
 
 		// (c) Get category specific notifications
-		if ( $params->get('nf_allow_cat_specific') ) 
+		if ( $params->get('nf_allow_cat_specific') )
 		{
 			$cats = $this->get('categories');
 			$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
 			$db->setQuery( $query );
 			$mcats_params = $db->loadColumn();
-			
+
 			foreach ($mcats_params as $cat_params)
 			{
 				$cat_params = new JRegistry($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
-				
+
 				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new', array()) );
 				$cats_userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending', array()) );
-				
+
 				$cats_userlist_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing', array()) );
 				$cats_userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal', array()) );
-				
+
 				$nConf->userlist_notify_new            = array_unique(array_merge($nConf->userlist_notify_new,            $cats_userlist_notify_new));
 				$nConf->usergrps_notify_new            = array_unique(array_merge($nConf->usergrps_notify_new,            $cats_usergrps_notify_new));
 				$nConf->userlist_notify_new_pending    = array_unique(array_merge($nConf->userlist_notify_new_pending,    $cats_userlist_notify_new_pending));
 				$nConf->usergrps_notify_new_pending    = array_unique(array_merge($nConf->usergrps_notify_new_pending,    $cats_usergrps_notify_new_pending));
-				
+
 				$nConf->userlist_notify_existing             = array_unique(array_merge($nConf->userlist_notify_existing,             $cats_userlist_notify_existing));
 				$nConf->usergrps_notify_existing             = array_unique(array_merge($nConf->usergrps_notify_existing,             $cats_usergrps_notify_existing));
 				$nConf->userlist_notify_existing_reviewal    = array_unique(array_merge($nConf->userlist_notify_existing_reviewal,    $cats_userlist_notify_existing_reviewal));
@@ -4299,7 +4485,7 @@ class ParentClassItem extends FCModelAdmin
 			}
 		}
 		//echo "<pre>"; print_r($nConf); exit;
-		
+
 		// Construct configuation parameter names
 		$nConf_emails = new stdClass();
 		$notify_types = array('notify_new', 'notify_new_pending', 'notify_existing', 'notify_existing_reviewal');
@@ -4307,12 +4493,12 @@ class ParentClassItem extends FCModelAdmin
 			$ugrps   [$ntype] = 'usergrps_'.$ntype;
 			$ulist   [$ntype] = 'userlist_'.$ntype;
 		}
-		
+
 		// (e) Get emails, but first convert user groups to user ids
 		foreach ($notify_types as $ntype)
 		{
 			$user_emails = array();
-			
+
 			// emails for user ids
 			$user_emails_ulist = array();
 			$_user_ids = array();
@@ -4337,27 +4523,27 @@ class ParentClassItem extends FCModelAdmin
 				$db->setQuery( $query );
 				$user_emails_ulist = $db->loadColumn();
 			}
-			
+
 			$user_emails_ugrps = array();
 			if ( count( $nConf->{$ugrps[$ntype]} ) )
 			{
 				// emails for user groups
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
-				
+
 				$db->setQuery( $query );
 				$user_emails_ugrps = $db->loadColumn();
 			}
-			
+
 			// merge them
 			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps) );
-			
+
 			$nConf_emails->{$ntype} = $user_emails;
 		}
-		
+
 		$nConf->emails = $nConf_emails;
 		//echo "<pre>"; print_r($nConf); exit;
-		
+
 		return $nConf;
 	}
 
@@ -4369,21 +4555,21 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$needs_version_reviewal     = $notify_vars->needs_version_reviewal;
 		$needs_publication_approval = $notify_vars->needs_publication_approval;
-		
+
 		$isNew         = $notify_vars->isnew;
 		$notify_emails = $notify_vars->notify_emails;
 		$notify_text   = $notify_vars->notify_text;
 		$before_cats   = $notify_vars->before_cats;
 		$after_cats    = $notify_vars->after_cats;
 		$oitem         = $notify_vars->original_item;
-		
+
 		if ( !count($notify_emails) ) return true;
-		
+
 		$app     = JFactory::getApplication();
 		$db      = JFactory::getDbo();
 		$user    = JFactory::getUser();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
-		
+
 		// Get category titles of categories add / removed from the item
 		$cats_added_titles = $cats_removed_titles = array();
 		if ( !$isNew )
@@ -4393,7 +4579,7 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$cats_added_titles[] = $after_cats[$cats_added_id]->title;
 			}
-			
+
 			$cats_removed_ids = array_diff(array_keys($before_cats), array_keys($after_cats));
 			foreach($cats_removed_ids as $cats_removed_id)
 			{
@@ -4402,7 +4588,7 @@ class ParentClassItem extends FCModelAdmin
 			$cats_altered = count($cats_added_ids) + count($cats_removed_ids);
 			$after_maincat = $this->get('catid');
 		}
-		
+
 		// Get category titles in the case of new item or categories unchanged
 		$cats_titles = array();
 		if ( $isNew || !$cats_altered)
@@ -4412,8 +4598,8 @@ class ParentClassItem extends FCModelAdmin
 				$cats_titles[] = $after_cat->title;
 			}
 		}
-		
-		
+
+
 		// **************
 		// CREATE SUBJECT
 		// **************
@@ -4422,37 +4608,37 @@ class ParentClassItem extends FCModelAdmin
 		$domain  = !empty($url["host"]) ? $url["host"] : $url["path"];
 		$subject = '['.$domain.'] - ';
 		if ( !$manual_approval_request ) {
-			
+
 			// (a) ADD INFO of being new or updated
 			$subject .= JText::_( $isNew? 'FLEXI_NF_NEW_CONTENT_SUBMITTED' : 'FLEXI_NF_EXISTING_CONTENT_UPDATED') . " ";
-			
+
 			// (b) ADD INFO about editor's name and username (or being guest)
 			$subject .= !$user->get('id') ? JText::sprintf('FLEXI_NF_BY_GUEST') : JText::sprintf('FLEXI_NF_BY_USER', $user->get('name'), $user->get('username'));
-			
+
 			// (c) (new items) ADD INFO for content needing publication approval
 			if ($isNew) {
 				$subject .= ": ";
 				$subject .= JText::_( $needs_publication_approval ? 'FLEXI_NF_NEEDS_PUBLICATION_APPROVAL' : 'FLEXI_NF_NO_APPROVAL_NEEDED');
 			}
-			
+
 			// (d) (existing items with versioning) ADD INFO for content needing version reviewal
 			if ( !$isNew && $use_versioning) {
 				$subject .= ": ";
 				$subject .= JText::_( $needs_version_reviewal ? 'FLEXI_NF_NEEDS_VERSION_REVIEWAL' : 'FLEXI_NF_NO_REVIEWAL_NEEDED');
 			}
-			
+
 		} else {
 			$subject .= JText::_('FLEXI_APPROVAL_REQUEST');
 		}
-		
-		
+
+
 		// *******************
 		// CREATE MESSAGE BODY
 		// *******************
-		
+
 		$nf_extra_properties = $params->get('nf_extra_properties', array('creator','modifier','created','modified','viewlink','editlinkfe','editlinkbe','introtext','fulltext'));
 		$nf_extra_properties  = FLEXIUtilities::paramToArray($nf_extra_properties);
-		
+
 		// ADD INFO for item title
 		$body  = '<b>'.JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</b>: ";
 		if ( !$isNew ) {
@@ -4461,10 +4647,10 @@ class ParentClassItem extends FCModelAdmin
 			$body .= !$_changed ? "" : $oitem->title . " &nbsp; ==> &nbsp; ";
 		}
 		$body .= $this->get('title'). "<br/>\r\n<br/>\r\n";
-		
+
 		// ADD INFO about state
 		$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
-		
+
 		$body .= '<b>'.JText::_( 'FLEXI_NF_CONTENT_STATE' ) . "</b>: ";
 		if ( !$isNew ) {
 			$_changed = $oitem->state != $this->get('state');
@@ -4472,7 +4658,7 @@ class ParentClassItem extends FCModelAdmin
 			$body .= !$_changed ? "" : JText::_( $state_names[$oitem->state] ) . " &nbsp; ==> &nbsp; ";
 		}
 		$body .= JText::_( $state_names[$this->get('state')] ) ."<br/><br/>\r\n";
-		
+
 		// ADD INFO for author / modifier
 		if ( in_array('creator',$nf_extra_properties) )
 		{
@@ -4490,7 +4676,7 @@ class ParentClassItem extends FCModelAdmin
 			$body .= $this->get('modifier'). "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
-		
+
 		// ADD INFO about creation / modification times. Use site's timezone !! we must
 		// (a) set timezone to be site's timezone then
 		// (b) call $date_OBJECT->format()  with s local flag parameter set to true
@@ -4498,12 +4684,12 @@ class ParentClassItem extends FCModelAdmin
 		$tz = new DateTimeZone($tz_offset);
 		$tz_offset_str = $tz->getOffset(new JDate()) / 3600;
 		$tz_offset_str = ' &nbsp; (UTC+'.$tz_offset_str.') ';
-		
+
 		if ( in_array('created',$nf_extra_properties) )
 		{
 			$date_created = JFactory::getDate($this->get('created'));
 			$date_created->setTimezone($tz);
-			
+
 			$body .= '<b>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</b>: ";
 			$body .= $date_created->format($format = 'D, d M Y H:i:s', $local = true);
 			$body .= $tz_offset_str. "<br/>\r\n";
@@ -4512,13 +4698,13 @@ class ParentClassItem extends FCModelAdmin
 		{
 			$date_modified = JFactory::getDate($this->get('modified'));
 			$date_modified->setTimezone($tz);
-			
+
 			$body .= '<b>' . JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . '</b>: '
 				. $date_modified->format($format = 'D, d M Y H:i:s', $local = true)
 				. $tz_offset_str. "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
-		
+
 		// ADD INFO about category assignments
 		$body .= '<b>'.JText::_( 'FLEXI_NF_CATEGORIES_ASSIGNMENTS').'</b>';
 		$body .= !$isNew
@@ -4532,7 +4718,7 @@ class ParentClassItem extends FCModelAdmin
 				$body .= " &nbsp; ". ($i+1) .". ". $cats_title ."<br/>\r\n";
 			}
 		}
-		
+
 		// ADD INFO for category assignments added or removed
 		if ( !empty($cats_added_titles) )
 		{
@@ -4554,7 +4740,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// ADD INFO for custom notify text
 		$subject .= ' '. JText::_( $notify_text );
-		
+
 		// Create the non-SEF URL
 		$site_languages = FLEXIUtilities::getLanguages();
 		$sef_lang = $this->_record->language != '*' && isset($site_languages->{$this->_record->language}) ? $site_languages->{$this->_record->language}->sef : '';
@@ -4593,7 +4779,7 @@ class ParentClassItem extends FCModelAdmin
 			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
-		
+
 		// ADD INFO for introtext/fulltext
 		if ( $params->get('nf_add_introtext') )
 		{
@@ -4612,8 +4798,8 @@ class ParentClassItem extends FCModelAdmin
 			$body .= "*************************************************************** <br/>\r\n";
 			$body .= flexicontent_html::striptagsandcut( $this->get('fulltext'), 200 );
 		}
-		
-		
+
+
 		// **********
 		// Send email
 		// **********
@@ -4626,7 +4812,7 @@ class ParentClassItem extends FCModelAdmin
 		$attachment  = null;
 		$replyto     = null;
 		$replytoname = null;
-		
+
 		// Remove main recepient from BCC, to avoid email failing
 		if ($bcc)
 		{
@@ -4635,7 +4821,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		$send_result = JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
-		
+
 		$debug_str = ""
 			."<br/>FROM: $from"
 			."<br/>FROMNAME:  $fromname <br/>"
@@ -4644,7 +4830,7 @@ class ParentClassItem extends FCModelAdmin
 			."<br/>SUBJECT: $subject <br/>"
 			."<br/><br/>**********<br/>BODY<br/>**********<br/> $body <br/>"
 			;
-		
+
 		if ($send_result) {
 			// OK
 			if ($params->get('nf_enable_debug',0)) {
@@ -4664,7 +4850,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Method to build an object with the items submitted to approval
-	 * it also verifies if the item state are correct (draft state is -4) 
+	 * it also verifies if the item state are correct (draft state is -4)
 	 * and if it belongs to the user
 	 *
 	 * @access	public
@@ -4675,7 +4861,7 @@ class ParentClassItem extends FCModelAdmin
 	function isUserDraft($cid)
 	{
 		$user = JFactory::getUser();
-		
+
 		if ($cid)
 		{
 			$query 	= 'SELECT c.id, c.catid, c.created_by, c.title, cat.title AS cattitle, c.checked_out'
@@ -4711,7 +4897,7 @@ class ParentClassItem extends FCModelAdmin
 		$validators = new stdClass();
 		$validators->notify_emails = $nConf->emails->notify_new_pending;
 		$validators->notify_text = ''; // clear this ... default is : 'text_notify_new_pending', but it is not used the case of manual approval
-		
+
 		return $validators;
 	}
 
@@ -4728,9 +4914,9 @@ class ParentClassItem extends FCModelAdmin
 		$db = $this->_db;
 		$user = JFactory::getUser();
 		$approvables = $this->isUserDraft($cid);
-		
+
 		$requestApproval = $user->authorise('flexicontent.requestapproval',	'com_flexicontent');
-		
+
 		$submitted = 0;
 		$noprivilege = array();
 		$checked_out = array();
@@ -4742,38 +4928,38 @@ class ParentClassItem extends FCModelAdmin
 				$noprivilege[] = $item->title;
 				continue;
 			}
-			
+
 			// Check if checked out (edited) by different user
 			if ( $approvable->checked_out != 0 && $approvable->checked_out != (int) $user->get('id') ) {
 				$checked_out[] = $item->title;
 				continue;
 			}
-			
+
 			// Get item setting it into the model (ITEM DATE: _id, _type_id, _params, etc will be updated)
 			$item = $this->getItem($approvable->id, $check_view_access=false, $no_cache=true);
-			
+
 			// Get publish privilege
 			$canEditState = $this->canEditState( $item );
 			if ( $canEditState ) {
 				$publishable[] = $item->title;
 				continue;
 			}
-				
+
 			// Set to pending approval
 			$this->setitemstate($approvable->id, -3);
-				
+
 			$validators = $this->getApprovalRequestReceivers($approvable->id, $approvable->catid);
-				
+
 			if ( !count($validators->notify_emails) ) {
 				$validators->notify_emails[] = JFactory::getApplication()->getCfg('mailfrom');
 			}
-			
+
 			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. ' WHERE rel.itemid = '.(int) $approvable->id;
 			$db->setQuery( $query );
 			$after_cats = $db->loadObjectList('id');
-					
+
 			$notify_vars = new stdClass();
 			$notify_vars->needs_version_reviewal     = 0;
 			$notify_vars->needs_publication_approval = 1;
@@ -4782,11 +4968,11 @@ class ParentClassItem extends FCModelAdmin
 			$notify_vars->notify_text   = $validators->notify_text;
 			$notify_vars->before_cats   = array();
 			$notify_vars->after_cats    = $after_cats;
-					
+
 			$this->sendNotificationEmails($notify_vars, $this->_cparams, $manual_approval_request=1);
 			$submitted++;
 		}
-		
+
 		// Number of submitted items
 		if ( $submitted) {
 			$approve_str = $submitted > 1 ? 'FLEXI_APPROVAL_ITEMS_SUBMITTED' : 'FLEXI_APPROVAL_ITEM_SUBMITTED';
@@ -4794,35 +4980,35 @@ class ParentClassItem extends FCModelAdmin
 		} else {
 			$msg = JText::_( 'FLEXI_APPROVAL_NO_ITEMS_SUBMITTED' );
 		}
-			
+
 		// Number of excluded items, and message that items must be owned and in draft state
 		$excluded = count($cid) - $submitted;
 		$msg .= $excluded  ?  ' '. $excluded .' '. JText::_( 'FLEXI_APPROVAL_ITEMS_EXCLUDED' )  :  '';
-		
+
 		// Message about excluded non-owned items, that are being owned be a different user (this means current user does not have global request approval privilege)
 		if ( count($noprivilege) ) {
 			$noprivilege_str = '"'. implode('" , "', $noprivilege) .'"';
 			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_NO_REQUEST_PRIV_EXCLUDED', $noprivilege_str).'</div>';
 		}
-		
+
 		// Message about excluded checked_out items, that are being edited be a different user
 		if ( count($checked_out) ) {
 			$checked_out_str = '"'. implode('" , "', $checked_out) .'"';
 			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_CHECKED_OUT_EXCLUDED', $checked_out_str).'</div>';
 		}
-		
+
 		// Message about excluded publishable items, that can be published by the owner
 		if ( count($publishable) ) {
 			$publishable_str = '"'. implode('" , "', $publishable) .'"';
 			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_PUBLISHABLE_EXCLUDED', $publishable_str).'</div>';
 		}
-		
+
 		$this->cleanCache(null, 0);
 		$this->cleanCache(null, 1);
 		return $msg;
 	}
-	
-	
+
+
 	/**
 	 * Method to get item (language) associations
 	 *
@@ -4923,7 +5109,7 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Method to split description text into 'introtext' and 'fulltext' so that these properties are ready for storing in the DB
 	 *
-	 */	
+	 */
 	function splitText(& $data)
 	{
 		// The text field is stored in the db as to seperate fields: introtext & fulltext
@@ -4964,7 +5150,7 @@ class ParentClassItem extends FCModelAdmin
 
 	/**
 	 * Check that alias is unique within item's categories
-	 */	
+	 */
 	function getSafeUniqueAlias($item, $data)
 	{
 		// Set alias if not already set
@@ -5013,27 +5199,27 @@ class ParentClassItem extends FCModelAdmin
 
 		// Force arrays of integers
 		ArrayHelper::toInteger($cats);
-		ArrayHelper::toInteger($featured_cats);	
+		ArrayHelper::toInteger($featured_cats);
 
-		// Auto-assign a not set main category, to be the first out of secondary categories, 
+		// Auto-assign a not set main category, to be the first out of secondary categories,
 		if ( empty($data['catid']) && !empty($cats[0]) )
 		{
 			$data['catid'] = $cats[0];
 		}
-		
+
 		$cats_indexed = array_flip($cats);
 		// Add the primary cat to the array if it's not already in
 		if ( !empty($data['catid']) && !isset($cats_indexed[$data['catid']]) )
 		{
 			$cats_indexed[$data['catid']] = 1;
 		}
-		
+
 		// Add the featured cats to the array if it's not already in
 		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat )
 		{
 			if ( $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats_indexed[$featured_cat] = 1;
 		}
-		
+
 		// Reassign (unique) categories back to the cats array
 		$cats = array_keys($cats_indexed);
 
@@ -5044,7 +5230,7 @@ class ParentClassItem extends FCModelAdmin
 
 		$user = JFactory::getUser();
 		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
-		
+
 		// At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1)
 		{
@@ -5057,7 +5243,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			// Get author's maximum allowed categories per item and set js limitation
 			$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
-			
+
 			// Verify category limitation for current author
 			if ( $max_cat_assign && count($cats) > $max_cat_assign )
 			{
@@ -5110,7 +5296,7 @@ class ParentClassItem extends FCModelAdmin
 		// Make tags unique
 		ArrayHelper::toInteger($tags);
 		$tags = array_keys(array_flip($tags));
-		
+
 		// Set tags back using itsreal name of field: 'tags'       INSTEAD OF 'tag'
 		$data['tags'] = $tags;
 		unset($data['tag']);
@@ -5135,8 +5321,8 @@ class ParentClassItem extends FCModelAdmin
 		$this->_record->$colname = $registry->toArray();
 		$this->_record->itemparams->merge($registry);
 	}
-	
-	
+
+
 	public function cleanCache($group = null, $client_id = 0)
 	{
 		$cache = FLEXIUtilities::getCache($group, $client_id);
@@ -5187,7 +5373,7 @@ class ParentClassItem extends FCModelAdmin
 		$hasTypeEdit    = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit');
 		$hasTypeEditOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.own');
 		if (!$hasTypeEdit && !$hasTypeEditOwn) return false;
-		
+
 		if ( !empty($record->id) )
 		{
 			// Existing item, use item specific permissions
@@ -5201,7 +5387,7 @@ class ParentClassItem extends FCModelAdmin
 			// *** New item *** ... edit should not be used on new item always return false
 			$allowed = false;
 		}
-		
+
 		return $allowed;
 	}
 
@@ -5233,7 +5419,7 @@ class ParentClassItem extends FCModelAdmin
 		$hasTypeEditState    = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.state');
 		$hasTypeEditStateOwn = !$record->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($record->type_id, 'core.edit.state.own');
 		if (!$hasTypeEditState && !$hasTypeEditStateOwn) return false;
-		
+
 		// Existing item, use item specific permissions
 		if ( !empty($record->id) )
 		{
@@ -5259,7 +5445,7 @@ class ParentClassItem extends FCModelAdmin
 				($hasTypeEditState && $user->authorise('core.edit.state', 'com_flexicontent')) ||
 				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', 'com_flexicontent'));
 		}
-		
+
 		return $allowed;
 	}
 
@@ -5286,7 +5472,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// The access filter has not been set, we will set access flag(s) if not set already the layout takes some responsibility for display of limited information,
 		$groups = JAccess::getAuthorisedViewLevels($user->get('id'));
-		
+
 		if ( !isset($record->has_item_access) )
 		{
 			$record->has_item_access = in_array($record->access, $groups);
@@ -5533,9 +5719,9 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 
-		// *** 
-		// *** Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
-		// *** 
+		// ***
+		// *** Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning
+		// ***
 
 		if ( $this->_cparams->get('use_versioning', 1) && $record->id && $record->current_version > $record->last_version )
 		{
@@ -5974,7 +6160,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Find / Create respective fc tags
 		$fctags = $this->createFindFcTags($jtags, $_checkACL = false, $_indexCol = 'id');
-		
+
 		$old_tags = array_flip($item->tags);
 		$new_tags = array();
 

@@ -1235,33 +1235,55 @@ if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 						endif;
 						
 						foreach ($form_layout->getFieldset($fsname) as $field) :
-							
+
 							if ($field->getAttribute('not_inherited')) continue;
-							if ($field->getAttribute('cssprep')) continue;
-							
+							//if ($field->getAttribute('cssprep')) continue;
+
+							$cssprep = $field->getAttribute('cssprep');
+							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
+
 							$fieldname = $field->fieldname;
-							//$value = $form_layout->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
-							
-							$input_only = !$field->label || $field->hidden;
-							echo
-								($input_only ? '' :
-								str_replace('class="', 'class="' . $lbl_class . ' label-fcinner ',
-									str_replace(' for="', ' data-for="',
-										str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-											$form_layout->getLabel($fieldname, $groupname)))).'
-								<div class="container_fcfield">
-								').
-								
-								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-										$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
-									)
-								).
-								
-								($input_only ? '' : '
+
+							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
+							if ($cssprep && FLEXI_J37GE)
+							{
+								$_value = $form_layout->getValue($fieldname, $groupname, $this->row->parameters->get($fieldname));
+								$field->setValue($_value);
+								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
+							}
+
+							echo ($field->getAttribute('type')=='separator' || $field->hidden || !$field->label)
+							 ? $field->input
+							 : '
+								<div class="control-group" id="'.$field->id.'-container">
+									<div class="control-label">'.
+										str_replace('class="', 'class="'.$_labelclass.' ',
+											str_replace(' for="', ' data-for="',
+												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+													$form_layout->getLabel($fieldname, $groupname)
+												)
+											)
+										) . '
+									</div>
+									<div class="controls">
+										' . ($cssprep && !FLEXI_J37GE
+											? (isset($this->iparams[$fieldname]) ? '<i>' . $this->iparams[$fieldname] . '</i>' : '<i>default</i>')
+											:
+											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+													$this->getInheritedFieldDisplay($field, $this->row->parameters)
+													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+												)
+											)
+										) .
+										($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
+									</div>
 								</div>
-								');
+							';
+
 						endforeach; ?>
+
 						
 						</fieldset>
 						
@@ -1301,8 +1323,8 @@ if ($this->fields && $typeid) :
 		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 		$row_k = 0;
 
-		foreach ($this->fields as $field_name => $field)
-		{
+		foreach ($this->fields as $field_name => $field) :
+
 			if ($field->iscore && isset($tab_fields['fman'][$field->field_type]))
 			{
 				// Print any CORE fields that are placed by field manager
@@ -1395,21 +1417,28 @@ if ($this->fields && $typeid) :
 				$label_attrs = 'class="' . $lbl_class . '"';
 			}
 
-			// Some fields may force a container width ?
-			$display_label_form = $field->parameters->get('display_label_form', 1);
 			$row_k = 1 - $row_k;
-			$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
-			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
-			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
-			$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
+
+			// Some fields may force a container width ?
+			$display_label_form = (int) $field->parameters->get('display_label_form', 1);
+			$full_width = $display_label_form === 0 || $display_label_form === 2 || $display_label_form === -1;
+
+			$width = $field->parameters->get('container_width', ($full_width ? '100% !important;' : false));
+
+			$container_width = empty($width)
+				? ''
+				: 'width:' . $width . ($width != (int) $width ? 'px !important;' : '');
+			$container_class = 'fcfield_row' . $row_k . ' container_fcfield container_fcfield_id_' . $field->id . ' container_fcfield_name_' . $field->name;
 			?>
 			
 			<div class="fcclear"></div>
+
 			<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
 				<label id="label_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : ''; ?>" data-for="<?php echo 'custom_'.$field->name;?>" <?php echo $label_attrs;?> >
 					<?php echo $field->label; ?>
 				</label>
 			</span>
+
 			<?php if($display_label_form==2):  ?>
 				<div class="fcclear"></div>
 			<?php endif; ?>
@@ -1495,8 +1524,9 @@ if ($this->fields && $typeid) :
 			{
 				$captured['text'] = ob_get_clean();
 			}
-		}
 		?>
+
+		<?php endforeach; ?>
 		
 	</div>
 
