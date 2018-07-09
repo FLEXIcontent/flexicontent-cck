@@ -46,7 +46,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 *
 	 * @var string
 	 */
-	var $records_dbtbl = 'com_categories';
+	var $records_dbtbl = 'categories';
 
 	/**
 	 * Record jtable name
@@ -238,21 +238,30 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	function getInheritedParams($force=false)
 	{
-		if ( $this->_inherited_params !== NULL && !$force ) return $this->_inherited_params;
-		$id = (int)$this->_id;
+		if ($this->_inherited_params !== null && !$force)
+		{
+			return $this->_inherited_params;
+		}
+
+		$id = (int) $this->_id;
 		
 		$app = JFactory::getApplication();
 		
 		// a. Clone component parameters ... we will use these as parameters base for merging
-		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
+		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);
 		
 		// b. Retrieve category parameters and create parameter object
-		if ($id) {
-			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
-			$this->_db->setQuery($query);
-			$catParams = $this->_db->loadResult();
+		if ($id)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('params')
+				->from('#__categories')
+				->where('id = ' . (int) $id);
+			$catParams = $this->_db->setQuery($query)->loadResult();
 			$catParams = new JRegistry($catParams);
-		} else {
+		}
+		else
+		{
 			$catParams = new JRegistry();
 		}
 		
@@ -265,39 +274,54 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
 		
 		// CASE A: inheriting from parent category tree
-		if ( $id && $inherit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
-			$order_clause = 'level';  // 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
-			$query = 'SELECT title, id, params FROM #__categories'
-				.' WHERE id IN ( ' . $globalcats[$id]->ancestorsonly . ')'
-				.' ORDER BY '.$order_clause.' DESC';
-			$this->_db->setQuery($query);
-			$catdata = $this->_db->loadObjectList('id');
-			if (!empty($catdata)) {
-				foreach ($catdata as $parentcat) {
+		if ($id && $inherit_parent && !empty($globalcats[$id]->ancestorsonly))
+		{
+			$query = $this->_db->getQuery(true)
+				->select('title, id, params')
+				->from('#__categories')
+				->where('id IN ( ' . $globalcats[$id]->ancestorsonly . ')')
+				->order('level DESC');
+				//>order('FIELD(id, ' . $globalcats[$id]->ancestorsonly . ' DESC)';
+			$catdata = $this->_db->setQuery($query)->loadObjectList('id');
+
+			if (!empty($catdata))
+			{
+				foreach ($catdata as $parentcat)
+				{
 					$parentcat->params = new JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
 					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
-					if ( !$inherit_parent ) break; // Stop inheriting from further parent categories
+
+					// Stop inheriting from further parent categories
+					if (!$inherit_parent)
+					{
+						break;
+					}
 				}
 			}
 		}
 		
 		// CASE B: inheriting from specific category
-		else if ( $id && $inheritcid > 0 && !empty($globalcats[$inheritcid]) ){
-			$query = 'SELECT title, params FROM #__categories WHERE id = '. $inheritcid;
-			$this->_db->setQuery($query);
-			$catdata = $this->_db->loadObject();
-			if ($catdata) {
+		elseif ($id && $inheritcid > 0 && !empty($globalcats[$inheritcid]))
+		{
+			$query = $this->_db->getQuery(true)
+				->select('title, params')
+				->from('#__categories')
+				->where('id = ' . (int) $inheritcid);
+			$catdata = $this->_db->setQuery($query)->loadObject();
+
+			if ($catdata)
+			{
 				$catdata->params = new JRegistry($catdata->params);
 				array_push($heritage_stack, $catdata);
 			}
 		}
 		
 		
-		// *******************************************************************************************************
-		// Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/ancestors-cats/category
-		// *******************************************************************************************************
+		/**
+		 * Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/ancestors-cats/category
+		 */
 		
 		// -1. layout parameters will be placed on top at end of this code ...
 		
@@ -306,21 +330,32 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$params->merge($compParams);
 		
 		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
-		while (!empty($heritage_stack)) {
+		while (!empty($heritage_stack))
+		{
 			$catdata = array_pop($heritage_stack);
-			if ($catdata->params->get('orderbycustomfieldid')==="0") $catdata->params->set('orderbycustomfieldid', '');
+			if ($catdata->params->get('orderbycustomfieldid') === '0')
+			{
+				$catdata->params->set('orderbycustomfieldid', '');
+			}
 			$params->merge($catdata->params);
 		}
 		
-		// 2. Merge category parameters -- CURRENT CATEGORY PARAMETERS MUST BE SKIPED ! we only want the inherited parameters
-		//if ($catParams->get('orderbycustomfieldid')==="0") $catParams->set('orderbycustomfieldid', '');
-		//$params->merge($catParams);
+		// 2. Merge category parameters
+		/**
+		 * CURRENT CATEGORY PARAMETERS MUST BE SKIPED ! we only want the inherited parameters
+		 */
+		/*
+		if ($catParams->get('orderbycustomfieldid') === '0')
+		{
+			$catParams->set('orderbycustomfieldid', '');
+		}
+		$params->merge($catParams);
+		*/
 		
-		// Retrieve Layout's parameters
+		// 3. Retrieve and merge Global Layout's parameters (placing these at TOP allows proper heritage)
 		$layoutParams = flexicontent_tmpl::getLayoutparams('category', $params->get('clayout'), '', $force);
 		$layoutParams = new JRegistry($layoutParams);
 		
-		// Allow global layout parameters to be inherited properly, placing on TOP of all others
 		$this->_inherited_params = clone($layoutParams);
 		$this->_inherited_params->merge($params);
 		
@@ -338,12 +373,12 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	function getParams($id)
 	{
-		$query 	= 'SELECT params FROM #__categories'
-				. ' WHERE id = ' . (int)$id
-				;
-		$this->_db->setQuery($query);
+		$query = $this->_db->getQuery(true)
+			->select('params')
+			->from('#__categories')
+			->where('id = ' . (int) $id);
 
-		return $this->_db->loadResult();
+		return $this->_db->setQuery($query)->loadResult();
 	}
 
 
@@ -724,16 +759,23 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$jinput->set('view', 'categories');
 		$jinput->set('option', 'com_content');
 
-		$result = $dispatcher->trigger($this->event_change_state, array('com_content.category', (array) $id, $state));
+		$results = FLEXI_J40GE
+			? $app->triggerEvent($this->event_change_state, array('com_content.category', (array) $id, $state))
+			: $dispatcher->trigger($this->event_change_state, array('com_content.category', (array) $id, $state));
 		
 		// Revert compatibilty steps ... besides the plugins using the change state event, should have updated DB state value anyway
 		$jinput->set('view', $view);
 		$jinput->set('option', $option);
-		
-		if (in_array(false, $result, true) && !$event_failed_notice_added)
+
+		// Abort further actions if any plugin returns a result === false
+		if (is_array($results) && in_array(false, $results, true))
 		{
-			$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
-			$event_failed_notice_added = true;
+			if (!$event_failed_notice_added)
+			{
+				$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
+				$event_failed_notice_added = true;
+			}
+
 			return false;
 		}
 
@@ -741,6 +783,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		{
 			$this->cleanCache(null, -1);
 		}
+
 		return true;
 	}
 
@@ -848,6 +891,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 		// Optionally copy parameters from another category
 		$copycid = (int) $data['copycid'];
+
 		if ($copycid)
 		{
 			unset($data['params']);

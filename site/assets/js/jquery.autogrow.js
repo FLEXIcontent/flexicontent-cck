@@ -100,7 +100,10 @@
 			var html = this.textarea.val().replace(/(<|>)/g, '');
 			
 			// IE is different, as per usual
-			if (jQuery.browser.msie)
+			var userAgent = navigator.userAgent.toLowerCase();
+			var is_msie = userAgent.indexOf('msie') != -1;
+
+			if (is_msie)
 			{
 				html = html.replace(/\n/g, '<BR>new');
 			}

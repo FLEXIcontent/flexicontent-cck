@@ -149,79 +149,92 @@ class FlexicontentControllerTemplates extends FlexicontentController
 
 		$db = JFactory::getDbo();
 
-		if ($ext_view == 'item')
+		switch ($ext_view)
 		{
-			$query = 'SELECT attribs FROM #__content WHERE id = ' . $ext_id;
+			case 'item':
+				// Get/Create item model ... note there should not be any relevant HTTP Request variables set ...
+				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'item.php');
+				$item_model = new FlexicontentModelItem();
+				$item = $item_model->getItem($ext_id, $check_view_access=false, $no_cache=true);
+				$ext_params = $item->parameters;
+				$inh_params = $item_model->getComponentTypeParams();
+				$query = false;
+				//$query = 'SELECT attribs FROM #__content WHERE id = ' . $ext_id;
 
-			// Load language file of the template
-			FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-			$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
-			$groupname = 'attribs';  // Name="..." of <fields> container
-		}
+				// Load language file of the template
+				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
+				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$groupname = 'attribs';  // Name="..." of <fields> container
+				break;
 
-		elseif ($ext_view == 'type')
-		{
-			$query = 'SELECT attribs FROM #__flexicontent_types WHERE id = ' . $ext_id;
+			case 'type':
+				$query = 'SELECT attribs FROM #__flexicontent_types WHERE id = ' . $ext_id;
+				$inh_params = flexicontent_tmpl::getLayoutparams('items', $directory, '', true);
+				$inh_params = new JRegistry($inh_params);
 
-			// Load language file of the template
-			FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-			$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
-			$groupname = 'attribs';  // Name="..." of <fields> container
-		}
+				// Load language file of the template
+				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
+				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$groupname = 'attribs';  // Name="..." of <fields> container
+				break;
 
-		elseif ($ext_view == 'category')
-		{
-			$query = 'SELECT params FROM #__categories WHERE id = ' . $ext_id;
+			case 'category':
+				// Get/Create category model ... note there should not be any relevant HTTP Request variables set ...
+				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
+				$cat_model = new FlexicontentModelCategory();
+				$category = $cat_model->getCategory($ext_id, $raiseErrors=false, $checkAccess=false);
+				$ext_params = $category->params;
+				$inh_params = $cat_model->getInheritedParams();
+				$query = false;
+				//$query = 'SELECT params FROM #__categories WHERE id = ' . $ext_id;
 
-			// Load language file of the template
-			FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-			$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
-			$groupname = 'attribs';  // Name="..." of <fields> container
-		}
+				// Load language file of the template
+				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
+				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$groupname = 'attribs';  // Name="..." of <fields> container
+				break;
 
-		elseif ($ext_view == 'user')
-		{
-			$query = 'SELECT author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $ext_id;
+			case 'user':
+				$query = 'SELECT author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $ext_id;
+				$inh_params = flexicontent_tmpl::getLayoutparams('category', $directory, '', true);
+				$inh_params = new JRegistry($inh_params);
 
-			// Load language file of the template
-			FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-			$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
-			$groupname = 'attribs';  // Name="..." of <fields> container
-		}
+				// Load language file of the template
+				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
+				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$groupname = 'attribs';  // Name="..." of <fields> container
+				break;
 
-		elseif ($ext_view == 'module')
-		{
-			$query = 'SELECT params FROM #__modules WHERE id = ' . $ext_id;
+			case 'module':
+				$query = 'SELECT params FROM #__modules WHERE id = ' . $ext_id;
 
-			if ($ext_name)
-			{
-				JFactory::getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
-				JFactory::getLanguage()->load($ext_name, JPATH_SITE, null, true);
-			}
+				if ($ext_name)
+				{
+					JFactory::getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
+					JFactory::getLanguage()->load($ext_name, JPATH_SITE, null, true);
+				}
 
-			$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
-			$groupname = 'params';  // Name="..." of <fields> container
-		}
+				$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
+				$groupname = 'params';  // Name="..." of <fields> container
+				break;
 
-		elseif ($ext_view == 'field')
-		{
-			$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = ' . $ext_id;
+			case 'field':
+				$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = ' . $ext_id;
 
-			if ($ext_name)
-			{
-				JFactory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
-				JFactory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, null, true);
-			}
+				if ($ext_name)
+				{
+					JFactory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
+					JFactory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, null, true);
+				}
 
-			$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
-			$groupname = 'attribs';  // Name="..." of <fields> container
-		}
+				$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
+				$groupname = 'attribs';  // Name="..." of <fields> container
+				break;
 
-		else
-		{
-			echo "not supported extension/view: " . $ext_view;
+			default:
+				echo "not supported extension/view: " . $ext_view;
 
-			return;
+				return;
 		}
 
 		if ($ext_view == 'module' && $ext_option != 'com_modules' && $ext_option != 'com_advancedmodules')
@@ -241,8 +254,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
-		$db->setQuery($query);
-		$ext_params_str = $db->loadResult();
+		if ($query)
+		{
+			// Load and parse parameters
+			$ext_params_str = $db->setQuery($query)->loadResult();
+			$ext_params = new JRegistry($ext_params_str);
+		}
 
 		$layout_names = explode(':', $layout_name);
 
@@ -308,9 +325,6 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$tmpl_params = $xml->asXML();
 		$form_layout->load($tmpl_params);
 
-		// Load existing layout values into the object (that we got from DB)
-		$ext_params = new JRegistry($ext_params_str);
-
 		foreach ($form_layout->getGroup($groupname) as $field)
 		{
 			// Get prefixed fieldname (that is, if the given layout is using prefix)
@@ -351,19 +365,31 @@ class FlexicontentControllerTemplates extends FlexicontentController
 						continue;
 					}
 
-					if ($field->getAttribute('cssprep'))
-					{
-						continue;
-					}
+					$fieldname  = $field->fieldname;
+					$cssprep    = $field->getAttribute('cssprep');
+					$labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 
-					if ($ext_type == 'templates')
+					if ($ext_type === 'templates')
 					{
+						// For J3.7.0+ , we have extra form methods Form::getFieldXml()
+						if ($cssprep && FLEXI_J37GE && $inh_params)
+						{
+							$_value = $form_layout->getValue($fieldname, $groupname, $inh_params->get($fieldname));
+							$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
+							$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
+						}
+
 						$_label = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_', $field->label);
 						$_input = str_replace('jform_attribs_', 'jform_layouts_' . $ext_name . '_',
 							str_replace('[attribs]', '[layouts][' . $ext_name . ']', $field->input)
 						);
+
+						if ($inh_params)
+						{
+							$_input = flexicontent_html::getInheritedFieldDisplay($field, $inh_params);
+						}
 					}
-					elseif ($ext_view == 'field')
+					elseif ($ext_view === 'field')
 					{
 						$_label = str_replace('jform_attribs_', 'jform_layouts_', $field->label);
 						$_input = str_replace('jform_attribs_', 'jform_layouts_',
@@ -374,6 +400,11 @@ class FlexicontentControllerTemplates extends FlexicontentController
 					{
 						$_label = $field->label;
 						$_input = $field->input;
+					}
+
+					if ($labelclass)
+					{
+						$_label = str_replace('class="', 'class="'.$labelclass.' ', $_label);
 					}
 
 					// Replace prefix in the parameter names (that is, if it exists)

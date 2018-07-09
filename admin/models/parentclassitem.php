@@ -2203,8 +2203,17 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isNew));
-		if((count($result)>0) && in_array(false, $result, true)) return false;   // cancel item save
+
+		$results = FLEXI_J40GE
+			? $app->triggerEvent('onBeforeSaveItem', array(&$item, $isNew))
+			: $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isNew));
+
+		// Abort item save if any plugin returns a result === false
+		if (is_array($results) && in_array(false, $results, true))
+		{
+			return false;
+		}
+
 		if ( $print_logging_info ) $fc_run_times['onBeforeSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -2224,7 +2233,11 @@ class ParentClassItem extends FCModelAdmin
 			$jinput->set('option', 'com_content');
 
 			if ( $print_logging_info ) $start_microtime = microtime(true);
-			$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew, $data));
+
+			$results = FLEXI_J40GE
+				? $app->triggerEvent($this->event_before_save, array('com_content.article', &$item, $isNew, $data))
+				: $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isNew, $data));
+
 			if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 			// Reverse compatibility steps
@@ -2236,8 +2249,8 @@ class ParentClassItem extends FCModelAdmin
 			$jinput->set('view', $view);
 			$jinput->set('option', $option);
 
-			// Cancel item save
-			if (in_array(false, $result, true))
+			// Abort item save if any plugin returns a result === false
+			if (is_array($results) && in_array(false, $results, true))
 			{
 				$this->setError($item->getError());
 				return false;
@@ -2357,7 +2370,15 @@ class ParentClassItem extends FCModelAdmin
 				$jinput->set('view', null);
 				$jinput->set('option', 'com_content');
 
-				$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isNew, $data));
+				$results = FLEXI_J40GE
+					? $app->triggerEvent($this->event_after_save, array('com_content.article', &$item, $isNew, $data))
+					: $dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isNew, $data));
+
+				// Abort further actions if any plugin returns a result === false
+				/*if (is_array($results) && in_array(false, $results, true))
+				{
+					return false;
+				}*/
 
 				// Reverse compatibility steps
 				$jinput->set('view', $view);
@@ -2376,7 +2397,17 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$results = $dispatcher->trigger('onAfterSaveItem', array( &$item, &$data ));
+
+		$results = FLEXI_J40GE
+			? $app->triggerEvent('onAfterSaveItem', array(&$item, &$data))
+			: $dispatcher->trigger('onAfterSaveItem', array(&$item, &$data));
+
+		// Abort further actions if any plugin returns a result === false
+		/*if (is_array($results) && in_array(false, $results, true))
+		{
+			return false;
+		}*/
+
 		if ( $print_logging_info ) @$fc_run_times['onAfterSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -2457,7 +2488,17 @@ class ParentClassItem extends FCModelAdmin
 		// ***
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
+
+		$results = FLEXI_J40GE
+			? $app->triggerEvent('onCompleteSaveItem', array(&$item, &$fields))
+			: $dispatcher->trigger('onCompleteSaveItem', array(&$item, &$fields));
+
+		// Abort further actions if any plugin returns a result === false
+		/*if (is_array($results) && in_array(false, $results, true))
+		{
+			return false;
+		}*/
+
 		if ( $print_logging_info ) @$fc_run_times['onCompleteSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		return true;
@@ -4357,7 +4398,9 @@ class ParentClassItem extends FCModelAdmin
 			JModelLegacy::addIncludePath(JPATH_BASE . '/components/com_content/models');
 
 			//Trigger the event
-			$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
+			$results = FLEXI_J40GE
+				? $app->triggerEvent($this->event_change_state, array('com_content.article', (array) $id, $jm_state))
+				: $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
 
 			// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
 			// besides the plugins using the change state event, should have updated DB state value anyway
@@ -4365,10 +4408,15 @@ class ParentClassItem extends FCModelAdmin
 			$jinput->set('option', $option);
 			if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
 
-			if (in_array(false, $result, true) && !$event_failed_notice_added)
+			// Abort further actions if any plugin returns a result === false
+			if (is_array($results) && in_array(false, $results, true))
 			{
-				$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
-				$event_failed_notice_added = true;
+				if (!$event_failed_notice_added)
+				{
+					$app->enqueueMessage('At least 1 plugin event handler for onContentChangeState failed', 'warning');
+					$event_failed_notice_added = true;
+				}
+
 				return false;
 			}
 		}
@@ -4378,6 +4426,7 @@ class ParentClassItem extends FCModelAdmin
 			$this->cleanCache(null, 0);
 			$this->cleanCache(null, 1);
 		}
+
 		return true;
 	}
 
@@ -5775,13 +5824,38 @@ class ParentClassItem extends FCModelAdmin
 				$this->table->load($pk);
 
 				// Add new tags, keeping existing ones
-				$result = $this->tagsObserver->setNewTags($jtag_ids, $replaceTags);
-
-				if (!$result)
+				if (FLEXI_J40GE)
 				{
-					$this->setError($this->table->getError());
+					$setTagsEvent = \Joomla\CMS\Event\AbstractEvent::create(
+						'onTableSetNewTags',
+						array(
+							'subject'     => $this->table,
+							'newTags'     => $jtag_ids,
+							'replaceTags' => $replaceTags,
+						)
+					);
 
-					return false;
+					try
+					{
+						$this->table->getDispatcher()->dispatch('onTableSetNewTags', $setTagsEvent);
+					}
+					catch (\RuntimeException $e)
+					{
+						$this->setError($e->getMessage());
+
+						return false;
+					}
+				}
+				else
+				{
+					$result = $this->tagsObserver->setNewTags($jtag_ids, $replaceTags);
+
+					if (!$result)
+					{
+						$this->setError(FLEXI_J40GE ? $e->getMessage() : $this->table->getError());
+
+						return false;
+					}
 				}
 				//$this->table->store();
 			}
@@ -6211,7 +6285,10 @@ class ParentClassItem extends FCModelAdmin
 		$asset = $this->typeAlias . '.' . $id;
 
 		// Create the tags helper instance will update the Joomla tags of the article, using the given tags observer instance
-		$this->createTagsHelper($this->tagsObserver, $this->type, $id, $this->typeAlias, $this->table);
+		if (!FLEXI_J40GE)
+		{
+			$this->createTagsHelper($this->tagsObserver, $this->type, $id, $this->typeAlias, $this->table);
+		}
 
 		// Load data of FLEXIcontent tags
 		$fctags = $this->getTagsByIds($fctag_ids);

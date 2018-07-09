@@ -234,8 +234,8 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 			jQuery('#fc_pager').pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
 		
-		jQuery(document).ready(function(){
-			
+		jQuery(document).ready(function()
+		{
 			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
 			jQuery('a.modal-versions').each(function(index, value) {
 				jQuery(this).on('click', function() {
@@ -245,17 +245,21 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 					return false;
 				});
 			});
+
 			// Attach pagination for versions listing
-			jQuery('#fc_pager').pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
-			
-			jQuery('#versioncomment').autogrow({
-				minHeight: 26,
-				maxHeight: 250,
-				lineHeight: 12
+			jQuery('#fc_pager').pager({
+				pagenumber: " . $this->current_page . ",
+				pagecount: " . $this->pagecount . ",
+				buttonClickCallback: PageClick
 			});
 			
+			// Attach textarea autogrow height (while typing)
+			jQuery('#versioncomment').autogrow({
+				minHeight: 32,
+				maxHeight: 250,
+				lineHeight: 16
+			});
 		})
-		
 	");
 }
 
@@ -1520,19 +1524,32 @@ if ( count($FC_jfields_html) ) : ?>
 			</div>
 			<div class="fcclear"></div>
 			
-			<div class="fc-sliders-plain-outer">
+			<div class="fc-sliders-plain-outer fc_preloaded">
 				<?php
-				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
+				//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1));
+				echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
+
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 				$item_layout = $this->item->itemparams->get('ilayout');
 				
 				foreach ($this->tmpls as $tmpl) :
 					
 					$form_layout = $tmpl->params;
-					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
-					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
-					
-					if (!$item_layout || $tmpl->name != $item_layout) continue;
+					$slider_title = '
+						<span class="btn"><i class="icon-edit"></i>
+							' . JText::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
+						</span>';
+					$slider_id = $tmpl->name . '-' . $groupname . '-options';
+
+					//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
+					echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
+
+					if (!$item_layout || $tmpl->name != $item_layout)
+					{
+						echo JHtml::_('bootstrap.endSlide');
+						continue;
+					}
 					
 					$fieldSets = $form_layout->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) : ?>
@@ -1551,16 +1568,14 @@ if ( count($FC_jfields_html) ) : ?>
 							if ($field->getAttribute('not_inherited')) continue;
 							//if ($field->getAttribute('cssprep')) continue;
 
-							$cssprep = $field->getAttribute('cssprep');
-							$_labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
-
-							$fieldname = $field->fieldname;
+							$fieldname  = $field->fieldname;
+							$cssprep    = $field->getAttribute('cssprep');
+							$labelclass = $cssprep == 'less' ? 'fc_less_parameter' : '';
 
 							// For J3.7.0+ , we have extra form methods Form::getFieldXml()
 							if ($cssprep && FLEXI_J37GE)
 							{
 								$_value = $form_layout->getValue($fieldname, $groupname, $this->item->parameters->get($fieldname));
-								$field->setValue($_value);
 								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
 								$field->setup($form_layout->getFieldXml($fieldname, $field->group), $_value, $field->group);
 							}
@@ -1570,7 +1585,7 @@ if ( count($FC_jfields_html) ) : ?>
 							 : '
 								<div class="control-group" id="'.$field->id.'-container">
 									<div class="control-label">'.
-										str_replace('class="', 'class="'.$_labelclass.' ',
+										str_replace('class="', 'class="'.$labelclass.' ',
 											str_replace(' for="', ' data-for="',
 												str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 													$form_layout->getLabel($fieldname, $groupname)
@@ -1584,7 +1599,7 @@ if ( count($FC_jfields_html) ) : ?>
 											:
 											str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 												str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-													$this->getInheritedFieldDisplay($field, $this->item->parameters)
+													flexicontent_html::getInheritedFieldDisplay($field, $this->iparams)
 													//$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
 												)
 											)
@@ -1600,11 +1615,14 @@ if ( count($FC_jfields_html) ) : ?>
 						</fieldset>
 						
 					<?php endforeach; //fieldSets ?>
+					<?php echo JHtml::_('bootstrap.endSlide'); ?>
+
 				<?php endforeach; //tmpls ?>
 				
-				<?php echo JHtml::_('sliders.end'); ?>
-			</div>
-		</div>
+				<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
+
+			</div><!-- class="fc-sliders-plain-outer" -->
+		</div><!-- tabbertab FLEXI_LAYOUT_PARAMETERS -->
 		
 	</div> <!-- end tab -->
 

@@ -665,9 +665,10 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->form   = $form;  // most core field are created via calling JForm methods
 
 		if ($useAssocs)  $this->lang_assocs = $langAssocs;
-		$this->langs  = $langs;
-		$this->params = $page_params;
-		$this->lists  = $lists;
+		$this->langs   = $langs;
+		$this->params  = $page_params;
+		$this->iparams = $model->getComponentTypeParams();
+		$this->lists   = $lists;
 		$this->typesselected = $typesselected;
 
 		$this->published     = $published;
@@ -1259,86 +1260,5 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		return $perms;
-	}
-
-
-
-	/**
-	 * Method to diplay field showing inherited value
-	 *
-	 * @access	private
-	 * @return	void
-	 * @since	1.5
-	 */
-	function getInheritedFieldDisplay($field, $params, $_v = null)
-	{
-		$_v = $params ? $params->get($field->fieldname) : $_v;
-		
-		if ($_v==='' || $_v===null)
-		{
-			return $field->input;
-		}
-
-		elseif ($field->getAttribute('type')==='fcordering' || $field->getAttribute('type')==='list' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='list'))
-		{
-			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
-			if (preg_match('/<option\s*value="' . preg_quote($_v, '/') . '"\s*>(.*?)<\/option>/', $field->input, $matches))
-			{
-				return str_replace(
-					JText::_('FLEXI_USE_GLOBAL'),
-					JText::_('FLEXI_USE_GLOBAL') . ' (' . $matches[1] . ')',
-					$field->input);
-			}
-		}
-
-		elseif ($field->getAttribute('type')==='radio' || $field->getAttribute('type')==='fcradio' || ($field->getAttribute('type')==='multilist' && $field->getAttribute('subtype')==='radio'))
-		{
-			$_v = htmlspecialchars( $_v, ENT_COMPAT, 'UTF-8' );
-			return str_replace(
-				'value="'.$_v.'"',
-				'value="'.$_v.'" class="fc-inherited-value" ',
-				$field->input);
-		}
-
-		elseif ($field->getAttribute('type')==='fccheckbox' && is_array($_v))
-		{
-			$_input = $field->input;
-			foreach ($_v as $v)
-			{
-				$v = htmlspecialchars( $v, ENT_COMPAT, 'UTF-8' );
-				$_input = str_replace(
-					'value="'.$v.'"',
-					'value="'.$v.'" class="fc-inherited-value" ',
-					$_input);
-			}
-			return $_input;
-		}
-
-		elseif ($field->getAttribute('type')==='text' || $field->getAttribute('type')==='fcmedia' || $field->getAttribute('type')==='media')
-		{
-			$_v = htmlspecialchars( preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
-			return str_replace(
-				'<input ',
-				'<input placeholder="'.$_v.'" ',
-				preg_replace('/^(\s*<input\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
-			);
-		}
-		elseif ($field->getAttribute('type')==='textarea')
-		{
-			$_v = htmlspecialchars(preg_replace('/[\n\r]/', ' ', $_v), ENT_COMPAT, 'UTF-8' );
-			return str_replace(
-				'<textarea ',
-				'<textarea placeholder="'.$_v.'" ',
-				preg_replace('/^(\s*<textarea\s[^>]+)placeholder="[^"]+"/i', '\1 ', $field->input)
-			);
-		}
-
-		elseif ( method_exists($field, 'setInherited') )
-		{
-			$field->setInherited($_v);
-			return $field->input;
-		}
-
-		return $field->input;
 	}
 }

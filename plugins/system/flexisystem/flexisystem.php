@@ -463,7 +463,7 @@ class plgSystemFlexisystem extends JPlugin
 		// Apply redirection
 		if (!empty($redirectURL))
 		{
-			$app->redirect($redirectURL, '');
+			$app->redirect($redirectURL);
 		}
 	}
 	
